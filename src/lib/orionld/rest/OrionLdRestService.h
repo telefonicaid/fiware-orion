@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
+#include <stdint.h>                     // types: uint32_t, ...
 
 
 
@@ -33,7 +33,7 @@
 //
 // OrionldServiceRoutine -
 //
-typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
+typedef bool (*OrionldServiceRoutine)(void);
 
 
 
@@ -41,7 +41,7 @@ typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
 //
 // OrionldTroeRoutine -
 //
-typedef bool (*OrionldTroeRoutine)(ConnectionInfo* ciP);
+typedef bool (*OrionldTroeRoutine)(void);
 
 
 
@@ -102,8 +102,11 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD  (1 << 2)
 #define ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS               (1 << 3)
 #define ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD                         (1 << 4)
-#define ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS                      (1 << 5)
 #define ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED                     (1 << 6)
+#define ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK                 (1 << 7)
+#define ORIONLD_SERVICE_OPTION_EXPAND_TYPE                           (1 << 8)
+#define ORIONLD_SERVICE_OPTION_EXPAND_ATTR                           (1 << 9)
+#define ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL                    (1 << 10)
 
 
 
@@ -135,6 +138,14 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_URIPARAM_DETAILS              (1 << 21)
 #define ORIONLD_URIPARAM_PRETTYPRINT          (1 << 22)
 #define ORIONLD_URIPARAM_SPACES               (1 << 23)
+#define ORIONLD_URIPARAM_SUBSCRIPTION_ID      (1 << 24)
+#define ORIONLD_URIPARAM_LOCATION             (1 << 25)
+#define ORIONLD_URIPARAM_URL                  (1 << 27)
+#define ORIONLD_URIPARAM_RELOAD               (1 << 28)
+#define ORIONLD_URIPARAM_NOTEXISTS            (1 << 29)
+#define ORIONLD_URIPARAM_RELATIONSHIPS        (1 << 30)
+#define ORIONLD_URIPARAM_GEOPROPERTIES        (1 << 31)
+#define ORIONLD_URIPARAM_LANGUAGEPROPERTIES   (1UL << 32)
 
 
 
@@ -160,7 +171,7 @@ typedef struct OrionLdRestService
   char                   matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
   int                    matchForSecondWildcardLen;     // strlen of last path to match
   uint32_t               options;                       // Peculiarities of this type of requests (bitmask)
-  uint32_t               uriParams;                     // Supported URI parameters (bitmask)
+  uint64_t               uriParams;                     // Supported URI parameters (bitmask)
 } OrionLdRestService;
 
 

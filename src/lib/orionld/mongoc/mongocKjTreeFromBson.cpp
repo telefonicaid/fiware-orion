@@ -28,7 +28,11 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjClone.h"                                     // kjClone
 }
+
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mongoc/mongocKjTreeFromBson.h"               // Own interface
@@ -45,6 +49,9 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
   char*          json;
   KjNode*        treeP = NULL;
 
+#if 0
+  // FIXME: Real implementation - avoiding the extra step going via JSON
+#else
   if ((json = bson_as_json(bsonP, NULL)) == NULL)
   {
     *titleP   = (char*) "Internal Error";
@@ -58,9 +65,15 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
       *titleP   = (char*) "Internal Error";
       *detailsP = (char*) "Error parsing JSON output from bson_as_json";
     }
+
+    //
+    // Cloning the tree, so that I can free the string 'json'
+    // FIXME: Not optimal for performance - would be better to delay the free to after the request and not clone the tree
+    //
+    treeP = kjClone(orionldState.kjsonP, treeP);
+
+    bson_free(json);
   }
-
-  bson_free(json);
-
+#endif
   return treeP;
 }

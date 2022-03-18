@@ -38,7 +38,7 @@
 extern bool collectionQuery
 (
   mongo::DBClientBase*                   connection,
-  const std::string&                     col,
+  const char*                            col,
   const mongo::BSONObj&                  q,
   std::auto_ptr<mongo::DBClientCursor>*  cursor,
   std::string*                           err
@@ -53,7 +53,7 @@ extern bool collectionQuery
 extern bool collectionRangedQuery
 (
   mongo::DBClientBase*                   connection,
-  const std::string&                     col,
+  const char*                            col,
   const mongo::Query&                    q,
   int                                    limit,
   int                                    offset,
@@ -70,7 +70,7 @@ extern bool collectionRangedQuery
 */
 extern bool collectionCount
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  q,
   unsigned long long*    c,
   std::string*           err
@@ -84,7 +84,7 @@ extern bool collectionCount
 */
 extern bool collectionFindOne
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  q,
   mongo::BSONObj*        doc,
   std::string*           err
@@ -98,7 +98,7 @@ extern bool collectionFindOne
 */
 extern bool collectionInsert
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  doc,
   std::string*           err
 );
@@ -111,7 +111,7 @@ extern bool collectionInsert
 */
 extern bool collectionUpdate
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  q,
   const mongo::BSONObj&  doc,
   bool                   upsert,
@@ -126,7 +126,7 @@ extern bool collectionUpdate
 */
 extern bool collectionRemove
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  q,
   std::string*           err
 );
@@ -139,7 +139,7 @@ extern bool collectionRemove
 */
 extern bool collectionCreateIndex
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  indexes,
   const bool&            isTTL,
   std::string*           err
@@ -153,7 +153,7 @@ extern bool collectionCreateIndex
 */
 extern bool runCollectionCommand
 (
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  command,
   mongo::BSONObj*        result,
   std::string*           err
@@ -168,7 +168,7 @@ extern bool runCollectionCommand
 extern bool runCollectionCommand
 (
   mongo::DBClientBase*   connection,
-  const std::string&     col,
+  const char*            col,
   const mongo::BSONObj&  command,
   mongo::BSONObj*        result,
   std::string*           err

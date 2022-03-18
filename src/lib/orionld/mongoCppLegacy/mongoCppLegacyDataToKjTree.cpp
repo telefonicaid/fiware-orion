@@ -65,6 +65,8 @@ static void objectToKjTree(KjNode* containerP, mongo::BSONObj* bsonObjP, char** 
       nodeP = kjInteger(orionldState.kjsonP, nodeName, be.Number());
     else if (type == mongo::jstNULL)
       nodeP = kjNull(orionldState.kjsonP, nodeName);
+    else if (type == mongo::Timestamp)
+      nodeP = kjFloat(orionldState.kjsonP, nodeName, be.date().millis / 1000.0);
     else if (type == mongo::Object)
     {
       mongo::BSONObj bo = be.embeddedObject();
@@ -83,7 +85,10 @@ static void objectToKjTree(KjNode* containerP, mongo::BSONObj* bsonObjP, char** 
       continue;
     }
 
-    kjChildAdd(containerP, nodeP);
+    if (nodeP != NULL)
+      kjChildAdd(containerP, nodeP);
+    else
+      LM_E(("Internal Error - NULL node pointer"));
   }
 }
 
@@ -130,7 +135,10 @@ static void arrayToKjTree(KjNode* containerP, mongo::BSONArray* bsonArrayP, char
       continue;
     }
 
-    kjChildAdd(containerP, nodeP);
+    if (nodeP != NULL)
+      kjChildAdd(containerP, nodeP);
+    else
+      LM_E(("Internal Error - NULL node pointer"));
   }
 }
 

@@ -22,12 +22,14 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
+#include "mongo/client/dbclient.h"
 #include "unittests/testInit.h"
 
 #include "logMsg/logMsg.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongo/client/dbclient.h"
 
 
 
@@ -45,6 +47,49 @@ using mongo::DBClientBase;
 */
 extern DBClientBase* mongoInitialConnectionGetForUnitTest();
 extern void          setMongoConnectionForUnitTest(DBClientBase* _connection);
+
+
+
+/* ****************************************************************************
+*
+* C_STR_FIELD -
+*/
+const char* C_STR_FIELD(mongo::BSONObj bob, std::string f)
+{
+  return getStringField(&bob, f.c_str());
+}
+
+
+char dbPrefix[16];
+char registrationsCollection[128];
+char entitiesCollection[128];
+char subscriptionsCollection[128];
+char avSubscriptionsCollection[128];
+
+void setDbPrefix(const char* prefix)
+{
+  strncpy(dbPrefix, prefix, sizeof(dbPrefix) - 1);
+}
+
+void setRegistrationsCollectionName(const char* colName)
+{
+  snprintf(registrationsCollection, sizeof(registrationsCollection), "%s.%s", dbPrefix, colName);
+}
+
+void setEntitiesCollectionName(const char* colName)
+{
+  snprintf(entitiesCollection, sizeof(entitiesCollection), "%s.%s", dbPrefix, colName);
+}
+
+void setSubscribeContextCollectionName(const char* colName)
+{
+  snprintf(subscriptionsCollection, sizeof(subscriptionsCollection), "%s.%s", dbPrefix, colName);
+}
+
+void setSubscribeContextAvailabilityCollectionName(const char* colName)
+{
+  snprintf(avSubscriptionsCollection, sizeof(avSubscriptionsCollection), "%s.%s", dbPrefix, colName);
+}
 
 
 

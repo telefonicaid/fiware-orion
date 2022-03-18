@@ -25,7 +25,6 @@
 *
 * Author: Gabriel Quaresma
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldPostBatchCreate -
 //
-extern bool orionldPostBatchCreate(ConnectionInfo* ciP);
+extern bool orionldPostBatchCreate(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_

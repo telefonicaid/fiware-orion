@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
+#include "orionld/types/OrionldProblemDetails.h"              // OrionldProblemDetails
 
 
 
@@ -47,5 +48,13 @@ extern void orionldErrorResponseCreate
   const char*               title,
   const char*               detail
 );
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorResponseCreate -
+//
+extern void orionldErrorResponseCreate(OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDERRORRESPONSE_H_

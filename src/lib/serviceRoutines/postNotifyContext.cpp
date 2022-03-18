@@ -28,9 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                           // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "mongoBackend/mongoNotifyContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -55,13 +56,13 @@ std::string postNotifyContext
   NotifyContextResponse  ncr;
   std::string            answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
-                                                       &ncr,
-                                                       ciP->tenant,
-                                                       ciP->httpHeaders.xauthToken,
-                                                       ciP->servicePathV,
-                                                       ciP->httpHeaders.correlator,
-                                                       ciP->httpHeaders.ngsiv2AttrsFormat));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
+                                                               &ncr,
+                                                               orionldState.tenantP,
+                                                               orionldState.xAuthToken,
+                                                               ciP->servicePathV,
+                                                               orionldState.correlator,
+                                                               orionldState.attrsFormat));
   TIMED_RENDER(answer = ncr.render());
 
   return answer;

@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"        // orionldState
+
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -49,7 +51,7 @@ std::string badNgsi10Request
 )
 {
   std::string answer;
-  std::string details = std::string("service '") + ciP->url + "' not found";
+  std::string details = std::string("service '") + orionldState.urlPath + "' not found";
 
   alarmMgr.badInput(clientIp, details);
   restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);

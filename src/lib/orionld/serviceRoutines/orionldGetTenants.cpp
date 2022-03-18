@@ -31,9 +31,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
-#include "orionld/common/orionldState.h"                         // orionldState, tenantV, tenants
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/tenantList.h"                           // tenantList
 #include "orionld/serviceRoutines/orionldGetTenants.h"           // Own interface
 
 
@@ -42,25 +41,22 @@ extern "C"
 //
 // orionldGetTenants -
 //
-bool orionldGetTenants(ConnectionInfo* ciP)
+bool orionldGetTenants(void)
 {
   KjNode* tenantP;
 
   orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
 
   //
-  // First the default tenant
+  // The default "tenant" is not in this list, and it will not be included.
+  // Which is perfectly OK
   //
-  tenantP = kjString(orionldState.kjsonP, NULL, dbName);
-  kjChildAdd(orionldState.responseTree, tenantP);
-
-  //
-  // Then the other tenants
-  //
-  for (unsigned int ix = 0; ix < tenants; ix++)
+  OrionldTenant* tP = tenantList;
+  while (tP != NULL)
   {
-    tenantP = kjString(orionldState.kjsonP, NULL, tenantV[ix]);
+    tenantP = kjString(orionldState.kjsonP, NULL, tP->tenant);
     kjChildAdd(orionldState.responseTree, tenantP);
+    tP = tP->next;
   }
 
   orionldState.noLinkHeader = true;

@@ -203,22 +203,22 @@ Date: REGEX(.*)
 03. Get the list of geo-indexes
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 165
+Content-Length: 150
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g3"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g1"
   }
 ]
@@ -237,30 +237,30 @@ Date: REGEX(.*)
 05. Get the list of geo-indexes
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 281
+Content-Length: 254
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "tenant": "ftest-tn1",
+    "tenant": "tn1",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest-tn1",
+    "tenant": "tn1",
     "attribute": "g1"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g3"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g1"
   }
 ]
@@ -274,30 +274,30 @@ Date: REGEX(.*)
 07. Get the list of geo-indexes
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 281
+Content-Length: 254
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "tenant": "ftest-tn1",
+    "tenant": "tn1",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest-tn1",
+    "tenant": "tn1",
     "attribute": "g1"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g3"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g1"
   }
 ]
@@ -325,34 +325,34 @@ Date: REGEX(.*)
 10. Get the list of geo-indexes
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 339
+Content-Length: 306
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "tenant": "ftest-tn3",
+    "tenant": "tn3",
     "attribute": "g1"
   },
   {
-    "tenant": "ftest-tn1",
+    "tenant": "tn1",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest-tn1",
+    "tenant": "tn1",
     "attribute": "g1"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g3"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g2"
   },
   {
-    "tenant": "ftest",
+    "tenant": "",
     "attribute": "g1"
   }
 ]

@@ -217,12 +217,10 @@ static RestService getServiceV[] =
   { SemStateRequest,                               2, { "admin", "sem"                                                                 },  semStateTreat                                    },
   { MetricsRequest,                                2, { "admin", "metrics"                                                             },  getMetrics                                       },
 
-#ifdef DEBUG
   { ExitRequest,                                   2, { "exit", "*"                                                                    },  exitTreat                                        },
   { ExitRequest,                                   1, { "exit"                                                                         },  exitTreat                                        },
   { LeakRequest,                                   2, { "leak", "*"                                                                    },  leakTreat                                        },
   { LeakRequest,                                   1, { "leak"                                                                         },  leakTreat                                        },
-#endif
 
   ORION_REST_SERVICE_END
 };
@@ -558,8 +556,6 @@ void orionRestServicesInit
    unsigned int        connectionMemory,
    unsigned int        maxConnections,
    unsigned int        mhdThreadPoolSize,
-   const std::string&  rushHost,
-   unsigned short      rushPort,
    const char*         allowedOrigin,
    int                 corsMaxAge,
    int                 mhdTimeoutInSeconds,
@@ -584,8 +580,6 @@ void orionRestServicesInit
            connectionMemory,
            maxConnections,
            mhdThreadPoolSize,
-           rushHost,
-           rushPort,
            allowedOrigin,
            corsMaxAge,
            mhdTimeoutInSeconds,

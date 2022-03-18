@@ -40,7 +40,7 @@
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 {
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   ParseData       parseData;
   const char*     infile    = "ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.json";
   const char*     outfile1  = "ngsi9.updateContextAvailabilitySubscriptionRequest.expected1.valid.json";
@@ -50,8 +50,9 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 
   utInit();
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf,     sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -89,12 +90,13 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
   ParseData       reqData;
   const char*     infile  = "updateContextAvailabilitySubscriptionRequest_invalidIsPattern.json";
   const char*     outfile = "ngsi9.updateContextAvailabilitySubscriptionResponse.invalidIsPattern.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

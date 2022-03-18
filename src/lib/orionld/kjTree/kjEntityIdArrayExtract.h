@@ -36,6 +36,6 @@ extern "C"
 //
 // kjEntityIdArrayExtract -
 //
-extern KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode* errorArray);
+extern KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYIDARRAYEXTRACT_H_

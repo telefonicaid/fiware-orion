@@ -54,14 +54,14 @@ echo
 01. PATCH /ngsi-ld/v1/gentities, see 404 Not Found
 ==================================================
 HTTP/1.1 404 Not Found
-Content-Length: 122
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/gentities",
     "title": "Service Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

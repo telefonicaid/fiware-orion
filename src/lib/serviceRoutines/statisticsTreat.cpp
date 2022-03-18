@@ -52,7 +52,7 @@
 */
 #define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outtrue)
 #define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outtrue)
-#define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outMimeType, comma)
+#define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, orionldState.out.contentType, comma)
 
 
 
@@ -301,7 +301,7 @@ std::string statisticsTreat
 
   JsonHelper js;
 
-  if (ciP->method == "DELETE")
+  if (orionldState.verb == DELETE)
   {
     resetStatistics();
     js.addString("message", "All statistics counter reset");
@@ -336,7 +336,7 @@ std::string statisticsTreat
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
   renderUsedCounter(&js, "simulatedNotifications", nSimNotif);
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return js.str();
 }
 
@@ -358,7 +358,7 @@ std::string statisticsCacheTreat
 
   JsonHelper js;
 
-  if (ciP->method == "DELETE")
+  if (orionldState.verb == DELETE)
   {
     subCacheStatisticsReset("statisticsTreat::DELETE");
     js.addString("message", "All statistics counter reset");
@@ -386,6 +386,6 @@ std::string statisticsCacheTreat
   js.addNumber("updates", (long long)mscUpdates);
   js.addNumber("items", (long long)cacheItems);
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return js.str();
 }

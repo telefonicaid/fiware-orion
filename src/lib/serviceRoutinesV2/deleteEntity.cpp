@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -66,16 +68,16 @@ std::string deleteEntity
 {
   Entity* eP;
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, compV[2].c_str() , NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
   eP       = new Entity();
   eP->id   = compV[2];
-  eP->type = ciP->uriParam["type"];
+  eP->type = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
   if (compV.size() == 5)  // Deleting an attribute
   {
@@ -95,12 +97,10 @@ std::string deleteEntity
   if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    orionldState.httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
+    orionldState.httpStatusCode = SccNoContent;
 
   // Cleanup and return result
   eP->release();

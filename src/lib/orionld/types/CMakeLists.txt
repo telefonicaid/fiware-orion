@@ -22,7 +22,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     OrionldProblemDetails.cpp
-    AttributeType.cpp
+    OrionldHeader.cpp
+    OrionldAttributeType.cpp
+    OrionldGeoJsonType.cpp
 )
 
 # Include directories

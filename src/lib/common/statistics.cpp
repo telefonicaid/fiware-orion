@@ -281,13 +281,13 @@ void timingStatisticsReset(void)
 * FIXME P6: No statistics for received QueryResponses (Response from Provider Application
 *           after forwarding a query)
 */
-void statisticsUpdate(RequestType request, MimeType inMimeType)
+void statisticsUpdate(RequestType request, MimeType inContentType)
 {
-  if (inMimeType == JSON)
+  if (inContentType == JSON)
   {
     ++noOfJsonRequests;
   }
-  else if (inMimeType == NOMIMETYPE)
+  else if (inContentType == NOMIMETYPE)
   {
     // FIXME P4: Include this counter in the statistics (Issue #1400)
     ++noOfRequestsWithoutPayload;

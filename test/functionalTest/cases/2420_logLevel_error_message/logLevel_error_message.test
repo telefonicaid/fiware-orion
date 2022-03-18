@@ -43,13 +43,14 @@ echo
 01. Try to change logLevel but without supplying the value
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 55
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "error": "Empty right-hand-side for URI param /level/"
+    "description": "Empty right-hand-side for a URI parameter",
+    "error": "BadRequest"
 }
 
 

@@ -30,8 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"      // Own interface
 
@@ -51,20 +49,17 @@ extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 */
 MHD_Result orionldMhdConnectionPayloadRead
 (
-  ConnectionInfo*  ciP,
   size_t*          upload_data_size,
   const char*      upload_data
 )
 {
   size_t  dataLen = *upload_data_size;
 
-  LM_T(LmtMhd, ("Reading %d bytes of payload", dataLen));
-
   //
   // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
   // just silently "eat" the entire message.
   //
-  // The problem occurs when the broker is lied to and there aren't ciP->httpHeaders.contentLength
+  // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
   // bytes to read.
   // When this happens, MHD blocks until it times out (MHD_OPTION_CONNECTION_TIMEOUT defaults to 5 seconds),
   // and the broker isn't able to respond. MHD just closes the connection.
@@ -73,7 +68,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
   {
     //
     // Errors can't be returned yet, postpone ...
@@ -89,27 +84,32 @@ MHD_Result orionldMhdConnectionPayloadRead
   // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
   //           Once we *really* look to scratch some efficiency, this change should be made.
   //
-  if (ciP->payloadSize == 0)  // First call with payload
+  if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-      ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+    if (orionldState.in.contentLength > STATIC_BUFFER_SIZE)
+    {
+      orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
+      if (orionldState.in.payload == NULL)
+      {
+        LM_E(("Out of memory!!!"));
+        return MHD_NO;
+      }
+    }
     else
-      ciP->payload = static_buffer;
+      orionldState.in.payload = static_buffer;
   }
 
   // Copy the chunk
-  memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+  memcpy(&orionldState.in.payload[orionldState.in.payloadSize], upload_data, dataLen);
 
   // Add to the size of the accumulated read buffer
-  ciP->payloadSize += dataLen;
+  orionldState.in.payloadSize += dataLen;
 
   // Zero-terminate the payload
-  ciP->payload[ciP->payloadSize] = 0;
+  orionldState.in.payload[orionldState.in.payloadSize] = 0;
 
   // Acknowledge the data and return
   *upload_data_size = 0;
-
-  LM_T(LmtMhd, ("Got payload '%s'", ciP->payload));
 
   return MHD_YES;
 }

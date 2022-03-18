@@ -24,19 +24,14 @@ SET (SOURCES
     orionldRequestSend.cpp
     orionldErrorResponse.cpp
     urlParse.cpp
-    urlCheck.cpp
-    urnCheck.cpp
     linkCheck.cpp
     httpStatusCodeToOrionldErrorType.cpp
-    geoJsonCreate.cpp
     numberToDate.cpp
     orionldState.cpp
     QNode.cpp
     qLex.cpp
     qLexCheck.cpp
-    qLexRender.cpp
     qParse.cpp
-    qTreePresent.cpp
     qTreeToBsonObj.cpp
     uuidGenerate.cpp
     orionldServerConnect.cpp
@@ -51,15 +46,19 @@ SET (SOURCES
     typeCheckForNonExistingEntities.cpp
     entityIdAndTypeGet.cpp
     qAliasCompact.cpp
+    orionldTenantInit.cpp
     orionldTenantLookup.cpp
     orionldTenantCreate.cpp
+    orionldTenantGet.cpp
     attributeUpdated.cpp
     attributeNotUpdated.cpp
-    isSpecialAttribute.cpp
     isSpecialSubAttribute.cpp
     duplicatedInstances.cpp
     troeIgnored.cpp
-    # qTreeToBson.cpp
+    tenantList.cpp
+    mimeTypeFromString.cpp
+    attributeTypeFromUriParam.cpp
+    orionldError.cpp
 )
 
 # Include directories

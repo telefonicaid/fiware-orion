@@ -1,0 +1,259 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Delete AND RELOAD a @context from the context cache 
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a context in the context server
+# 02. Create an entity using the context from step 01, just to get the context inside the context cache of the broker
+# 03. GET the context (from step 01) from the broker
+# 04. Update the context in the context server
+# 05. DELETE and RELOAD the context in the broker's context cache
+# 06. GET the context (from step 05) from the broker and make sure it's been updated
+# 07. Delete the context in the context server
+# 08. Get the context in the context server
+# 09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead
+# 10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
+#
+
+echo "01. Create a context in the context server"
+echo "=========================================="
+payload='{
+  "@context": {
+    "p1": "urn:p1",
+    "p2": "urn:p2"
+  }
+}'
+cServerCurl --url /jsonldContexts/testContext2 --payload "$payload" --verb POST
+echo
+echo
+
+
+echo "02. Create an entity using the context from step 01, just to get the context inside the context cache of the broker"
+echo "==================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A3": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <http://localhost:7080/jsonldContexts/testContext2>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "03. GET the context (from step 01) from the broker"
+echo "=================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
+echo
+echo
+
+
+echo "04. Update the context in the context server"
+echo "============================================"
+cServerCurl --url /jsonldContexts/testContext2 --verb DELETE
+echo
+payload='{
+  "@context": {
+    "p1": "urn:step04:p1",
+    "p2": "urn:step04:p2"
+  }
+}'
+cServerCurl --url /jsonldContexts/testContext2 --payload "$payload" --verb POST
+echo
+echo
+
+
+echo "05. DELETE and RELOAD the context in the broker's context cache"
+echo "==============================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?reload=true' -X DELETE
+echo
+echo
+
+
+echo "06. GET the context (from step 05) from the broker and make sure it's been updated"
+echo "=================================================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
+echo
+echo
+
+
+echo "07. Delete the context in the context server"
+echo "============================================"
+cServerCurl --url /jsonldContexts/testContext2 --verb DELETE
+echo
+echo
+
+
+echo "08. Get the context in the context server"
+echo "========================================="
+cServerCurl --url /jsonldContexts/testContext2 --verb GET
+echo
+echo
+
+
+echo "09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead"
+echo "================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?reload=true' -X DELETE
+echo
+echo
+
+
+echo "10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06"
+echo "======================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a context in the context server
+==========================================
+HTTP/1.1 201 Created
+Location: http://localhost:8080/jsonldContexts/testContext2
+Date: REGEX(.*)
+connection: keep-alive
+transfer-encoding: chunked
+
+
+
+02. Create an entity using the context from step 01, just to get the context inside the context cache of the broker
+===================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+03. GET the context (from step 01) from the broker
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 42
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": {
+        "p1": "urn:p1",
+        "p2": "urn:p2"
+    }
+}
+
+
+04. Update the context in the context server
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+connection: keep-alive
+
+
+HTTP/1.1 201 Created
+Location: http://localhost:8080/jsonldContexts/testContext2
+Date: REGEX(.*)
+connection: keep-alive
+transfer-encoding: chunked
+
+
+
+05. DELETE and RELOAD the context in the broker's context cache
+===============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. GET the context (from step 05) from the broker and make sure it's been updated
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": {
+        "p1": "urn:step04:p1",
+        "p2": "urn:step04:p2"
+    }
+}
+
+
+07. Delete the context in the context server
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+connection: keep-alive
+
+
+
+08. Get the context in the context server
+=========================================
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+content-length: 159
+connection: keep-alive
+
+{"type":"https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound ","title":"Context does not exist.","status":404,"detail":"Requested context was not available."}
+
+09. Attempt to DELETE and RELOAD the context in the broker's context cache - fails as the context server is dead
+================================================================================================================
+HTTP/1.1 503 Service Unavailable
+Content-Length: 166
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "http://localhost:7080/jsonldContexts/testContext2",
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
+}
+
+
+10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
+=======================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "@context": {
+        "p1": "urn:step04:p1",
+        "p2": "urn:step04:p2"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

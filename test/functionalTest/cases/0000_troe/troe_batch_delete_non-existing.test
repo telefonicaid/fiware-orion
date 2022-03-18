@@ -92,35 +92,34 @@ echo
 --REGEXPECT--
 01. Create three entities, E1, E2, and E3
 =========================================
-HTTP/1.1 200 OK
-Content-Length: 103
+HTTP/1.1 201 Created
+Content-Length: 79
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entities:E1",
-        "urn:ngsi-ld:entities:E2",
-        "urn:ngsi-ld:entities:E3"
-    ]
-}
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2",
+    "urn:ngsi-ld:entities:E3"
+]
 
 
 02. Delete E1 and E4 using Batch Delete
 =======================================
-HTTP/1.1 200 OK
-Content-Length: 129
+HTTP/1.1 207 Multi-Status
+Content-Length: 201
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
     "errors": [
         {
             "entityId": "urn:ngsi-ld:entities:E4",
-            "error": "Entity not found in database."
+            "error": {
+                "status": 404,
+                "title": "Entity not found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
         }
     ],
     "success": [

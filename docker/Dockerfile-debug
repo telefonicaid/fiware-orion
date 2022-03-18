@@ -1,0 +1,20 @@
+FROM fiware/orion-ld-base
+
+ARG PATH_TO_SRC='opt/orion/'
+
+
+RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
+RUN rm -r /usr/local/lib/
+
+ADD ./docker/debug/gdbinit gdbinit
+RUN yum -y --nogpgcheck install gdb
+
+COPY . ${PATH_TO_SRC}
+
+WORKDIR ${PATH_TO_SRC}
+
+RUN make debug install
+
+ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+
+EXPOSE 1026

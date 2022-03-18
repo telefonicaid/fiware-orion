@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -37,7 +34,7 @@
 //
 // Not static so that it can be used in unit testing
 //
-extern void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP);
+extern void orionldPartialUpdateResponseCreate(void);
 
 
 
@@ -45,6 +42,6 @@ extern void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP);
 //
 // orionldPostEntity -
 //
-extern bool orionldPostEntity(ConnectionInfo* ciP);
+extern bool orionldPostEntity(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITY_H_

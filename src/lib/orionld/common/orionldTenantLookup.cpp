@@ -27,7 +27,8 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/common/orionldState.h"                       // tenantV, tenants
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/common/tenantList.h"                         // tenantList, tenant0, tenantCache
 #include "orionld/common/orionldTenantLookup.h"                // Own interface
 
 
@@ -36,14 +37,35 @@
 //
 // orionldTenantLookup
 //
-char* orionldTenantLookup(const char* tenant)
+OrionldTenant* orionldTenantLookup(const char* tenantName)
 {
-  for (unsigned int ix = 0; ix < tenants; ix++)
-  {
-    char* withoutPrefix = &tenantV[ix][dbNameLen + 1];
+  if ((tenantName == NULL) || (tenantName[0] == 0))
+    return &tenant0;
 
-    if (strcmp(tenant, withoutPrefix) == 0)
-      return tenantV[ix];
+  //
+  // cachedTenantP - if I don't do this, I'd have to semaphore-protect 'tenantCache' -
+  //
+  // as 'tenantCache' could be modified between the strcmp and the "return tenantCache"
+  // Let's avoid semaphores by simply using a help variable !!!
+  //
+  OrionldTenant* cachedTenantP;
+
+  if ((cachedTenantP = tenantCache) != NULL)
+  {
+    if (strcmp(tenantName, cachedTenantP->tenant) == 0)
+      return cachedTenantP;
+  }
+
+
+  // OK ... we'll have to look it up then :(
+  OrionldTenant* tenantP = tenantList;
+
+  while (tenantP != NULL)
+  {
+    if (strcmp(tenantName, tenantP->tenant) == 0)
+      return tenantP;
+
+    tenantP = tenantP->next;
   }
 
   return NULL;

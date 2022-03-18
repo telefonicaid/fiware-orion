@@ -22,6 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -37,14 +42,14 @@
 //
 // The cSumV values are interesting only for URL paths without wildcard of just uptil the first wildcard
 // The longest URL path without/before first wildcard is "/ngsi-ld/v1/csourceRegistrations/".
-// The initial part ("/ngsi-ld/") doesn't count, so ... 24 chars is all we need for the cSumV.
+// The initial part ("/ngsi-ld/") doesn't count, so ... 34 chars is all we need for the cSumV.
 //
-// strlen("/ngsi-ld/v1/entityOperations/delete")   == 35
-// strlen("/ngsi-ld/")                           == 9   (ORION_LD_SERVICE_PREFIX_LEN)
+// strlen("/ngsi-ld/v1/temporal/entityOperations/query") == 43
+// strlen("/ngsi-ld/")                                   == 9   (ORION_LD_SERVICE_PREFIX_LEN)
 //
-//  35 - 9 == 26
+//   43 - 9 == 34
 //
-#define MAX_CHARS_BEFORE_WILDCARD 26
+#define MAX_CHARS_BEFORE_WILDCARD 34
 static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
 {
   // First of all, skip the first 9 characters in the URL path ("/ngsi-ld/")
@@ -110,29 +115,31 @@ OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV)
     }
     else if (serviceP->wildcards == 1)
     {
+      char* url = kaStrdup(&orionldState.kalloc, orionldState.urlPath);
+
       if (serviceP->charsBeforeFirstWildcard < sLen)
       {
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[serviceP->charsBeforeFirstWildcard - 1])
         {
-          if (strncmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->charsBeforeFirstWildcard) == 0)
+          if (strncmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &url[ORION_LD_SERVICE_PREFIX_LEN], serviceP->charsBeforeFirstWildcard) == 0)
           {
             // Ending the same?
             if (serviceP->matchForSecondWildcardLen != 0)  // An ending to match
             {
               int indexOfIncomingUrlPath = ORION_LD_SERVICE_PREFIX_LEN + sLen - serviceP->matchForSecondWildcardLen;
 
-              if (strncmp(&orionldState.urlPath[indexOfIncomingUrlPath], serviceP->matchForSecondWildcard, serviceP->matchForSecondWildcardLen) == 0)
+              if (strncmp(&url[indexOfIncomingUrlPath], serviceP->matchForSecondWildcard, serviceP->matchForSecondWildcardLen) == 0)
               {
-                orionldState.wildcard[0] = &orionldState.urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+                orionldState.wildcard[0] = &url[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
 
-                // Destroying the incoming URL path, to extract the wildcard string
-                orionldState.urlPath[sLen - serviceP->matchForSecondWildcardLen + ORION_LD_SERVICE_PREFIX_LEN] = 0;
+                // NOT Destroying the incoming URL path, to extract the wildcard string - as 'url' is kaStrdupped from orionldState.urlPath
+                url[sLen - serviceP->matchForSecondWildcardLen + ORION_LD_SERVICE_PREFIX_LEN] = 0;
                 return serviceP;
               }
             }
             else
             {
-              orionldState.wildcard[0] = &orionldState.urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+              orionldState.wildcard[0] = &url[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
               return serviceP;
             }
           }
@@ -141,15 +148,17 @@ OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV)
     }
     else
     {
+      char* url = kaStrdup(&orionldState.kalloc, orionldState.urlPath);
+
       if (serviceP->charsBeforeFirstWildcard < sLen)
       {
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[serviceP->charsBeforeFirstWildcard - 1])
         {
           char* matchP;
-          if ((matchP = strstr(&orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN], serviceP->matchForSecondWildcard)) != NULL)
+          if ((matchP = strstr(&url[ORION_LD_SERVICE_PREFIX_LEN], serviceP->matchForSecondWildcard)) != NULL)
           {
             {
-              orionldState.wildcard[0] = &orionldState.urlPath[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
+              orionldState.wildcard[0] = &url[serviceP->charsBeforeFirstWildcard + ORION_LD_SERVICE_PREFIX_LEN];
               orionldState.wildcard[1] = &matchP[serviceP->matchForSecondWildcardLen];
 
               // Destroying the incoming URL path, to extract first wildcard string

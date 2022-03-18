@@ -49,9 +49,9 @@
 *
 * mongoSetRegistrationId -
 */
-void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 {
-  regP->id = getFieldF(r, "_id").OID().toString();
+  regP->id = getFieldF(rP, "_id").OID().toString();
 }
 
 
@@ -60,11 +60,11 @@ void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * mongoSetDescription -
 */
-void mongoSetDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+void mongoSetDescription(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 {
-  if (r.hasField(REG_DESCRIPTION))
+  if (rP->hasField(REG_DESCRIPTION))
   {
-    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
+    regP->description         = getStringFieldF(rP, REG_DESCRIPTION);
     regP->descriptionProvided = true;
   }
   else
@@ -80,9 +80,9 @@ void mongoSetDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * mongoSetProvider -
 */
-void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 {
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
+  regP->provider.http.url = (rP->hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(rP, REG_PROVIDING_APPLICATION): "";
 
   //
   // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
@@ -90,7 +90,7 @@ void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
   //
   regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
 
-  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
+  std::string format = rP->hasField(REG_FORMAT)? getStringFieldF(rP, REG_FORMAT) : "JSON";
   if (format == "JSON")
   {
     regP->provider.legacyForwardingMode = true;
@@ -107,9 +107,9 @@ void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * mongoSetEntities -
 */
-void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+static void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj* cr0P)
 {
-  std::vector<mongo::BSONElement>  dbEntityV  = getFieldF(cr0, REG_ENTITIES).Array();
+  std::vector<mongo::BSONElement>  dbEntityV  = getFieldF(cr0P, REG_ENTITIES).Array();
   bool                             typeGiven  = false;
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
@@ -119,40 +119,40 @@ void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 
     if (ce.hasField(REG_ENTITY_ISPATTERN))
     {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
+      std::string isPattern = getStringFieldF(&ce, REG_ENTITY_ISPATTERN);
 
       if (isPattern == "true")
       {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
+        entity.idPattern = getStringFieldF(&ce, REG_ENTITY_ID);
       }
       else
       {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
+        entity.id = getStringFieldF(&ce, REG_ENTITY_ID);
       }
     }
     else
     {
-      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
+      entity.id = getStringFieldF(&ce, REG_ENTITY_ID);
     }
 
     if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
     {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
+      std::string isPattern = getStringFieldF(&ce, REG_ENTITY_ISTYPEPATTERN);
 
       if (isPattern == "true")
       {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
+        entity.typePattern = getStringFieldF(&ce, REG_ENTITY_TYPE);
       }
       else
       {
         typeGiven = true;
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
+        entity.type = getStringFieldF(&ce, REG_ENTITY_TYPE);
       }
     }
     else
     {
       typeGiven = true;
-      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
+      entity.type = getStringFieldF(&ce, REG_ENTITY_TYPE);
 
       if (orionldState.apiVersion == NGSI_LD_V1)
         entity.type = orionldContextItemAliasLookup(orionldState.contextP, entity.type.c_str(), NULL, NULL);
@@ -171,14 +171,14 @@ void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 *
 * mongoSetAttributes -
 */
-void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
+static void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj* cr0P)
 {
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
+  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0P, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
   {
     mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
+    std::string     attrName = getStringFieldF(&aobj, REG_ATTRS_NAME);
 
     if (attrName != "")
     {
@@ -198,9 +198,9 @@ void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 * possible in V2 and we cannot respond to the request using the current implementation of V2.
 * This function will be changed to work in a different way once issue #3044 is dealt with.
 */
-bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
+bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj* rP, bool arrayAllowed)
 {
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+  std::vector<mongo::BSONElement> crV = getFieldF(rP, REG_CONTEXT_REGISTRATION).Array();
 
   if (crV.size() > 1)
   {
@@ -212,13 +212,13 @@ bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, b
   //
   mongo::BSONObj cr0 = crV[0].embeddedObject();
 
-  mongoSetEntities(regP, cr0);
-  mongoSetAttributes(regP, cr0);
-  mongoSetProvider(regP, cr0);
+  mongoSetEntities(regP, &cr0);
+  mongoSetAttributes(regP, &cr0);
+  mongoSetProvider(regP, &cr0);
 
 #ifdef ORIONLD
-  mongoSetLdPropertyV(regP, cr0);
-  mongoSetLdRelationshipV(regP, cr0);
+  mongoSetLdPropertyV(regP, &cr0);
+  mongoSetLdRelationshipV(regP, &cr0);
 #endif
 
   return true;
@@ -232,7 +232,7 @@ bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, b
 */
 void mongoSetExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(&r, REG_EXPIRATION) : -1;
 }
 
 
@@ -241,7 +241,7 @@ void mongoSetExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * mongoSetStatus -
 */
-void mongoSetStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+void mongoSetStatus(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 {
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
+  regP->status = (rP->hasField(REG_STATUS))? getStringFieldF(rP, REG_STATUS): "";
 }

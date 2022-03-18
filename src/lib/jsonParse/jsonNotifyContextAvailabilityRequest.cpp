@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 
 #include "logMsg/logMsg.h"
@@ -384,5 +386,5 @@ void jsonNcarRelease(ParseData* parseDataP)
 */
 std::string jsonNcarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncar.res.check(ciP->apiVersion, parseDataP->errorString);
+  return parseDataP->ncar.res.check(orionldState.apiVersion, parseDataP->errorString);
 }

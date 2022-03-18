@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"
+
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -43,7 +45,7 @@
 */
 TEST(jsonRequest, jsonTreat)
 {
-  ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
+  ConnectionInfo  ci;
   ParseData       parseData;
   std::string     out;
   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
@@ -51,9 +53,12 @@ TEST(jsonRequest, jsonTreat)
 
   utInit();
 
-  ci.outMimeType  = JSON;
-  ci.apiVersion   = V1;
+  orionldState.verb        = POST;
+  orionldState.apiVersion  = V1;
+
   ci.restServiceP = &restService;
+
+  orionldState.apiVersion = V1;
 
   out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, NULL);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,

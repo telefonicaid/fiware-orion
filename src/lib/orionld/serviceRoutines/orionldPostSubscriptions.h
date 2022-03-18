@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldPostSubscriptions -
 //
-extern bool orionldPostSubscriptions(ConnectionInfo* ciP);
+extern bool orionldPostSubscriptions(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTSUBSCRIPTIONS_H_

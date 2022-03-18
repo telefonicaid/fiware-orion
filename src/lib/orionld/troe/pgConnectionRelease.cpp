@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn, PQfinish
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 
 
 
@@ -30,7 +30,8 @@
 //
 // pgConnectionRelease - release a connection to a postgres database
 //
-void pgConnectionRelease(PGconn* connectionP)
+void pgConnectionRelease(PgConnection* connectionP)
 {
-  PQfinish(connectionP);
+  // Return the connection to its pool
+  connectionP->busy = false;
 }

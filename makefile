@@ -82,23 +82,26 @@ compile_info: branchFile
 compile_info_release: branchFile
 	./scripts/build/compileInfo.sh --release
 
-prepare_release: compile_info_release
+src/lib/orionld/troe/dbCreationCommand.cpp: database/sql/current.sql scripts/build/troeDbCreationCommand.sh
+	./scripts/build/troeDbCreationCommand.sh
+
+prepare_release: compile_info_release src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_RELEASE || true
 	cd BUILD_RELEASE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_debug: compile_info
+prepare_debug: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_DEBUG || true
 	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_coverage_func:
+prepare_coverage_func: src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_COVERAGE || true
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=False -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_coverage: compile_info
+prepare_coverage: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 	mkdir -p  BUILD_COVERAGE || true
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_unit_test: compile_info
+prepare_unit_test: compile_info src/lib/orionld/troe/dbCreationCommand.cpp
 	@echo '------------------------------- prepare_unit_test starts ---------------------------------'
 	mkdir -p  BUILD_UNITTEST || true
 	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
@@ -316,6 +319,7 @@ coverage: install_coverage
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
+	rm -f coverage/broker.init.info
 	lcov -i --zerocounters --directory BUILD_COVERAGE/
 	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 	# Execute test for coverage

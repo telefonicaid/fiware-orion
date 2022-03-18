@@ -25,15 +25,16 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
+
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoCreateSubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
-#include "rest/HttpHeaders.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
-
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 
@@ -57,7 +58,7 @@ extern std::string postSubscriptions
   {
     const size_t  MSG_SIZE        = 96;  // strlen(msg) + enough room for digits
     char          errMsg[MSG_SIZE];
-    ciP->httpStatusCode           = SccBadRequest;
+    orionldState.httpStatusCode           = SccBadRequest;
 
     snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%lu given)",
              (unsigned long) ciP->servicePathV.size());
@@ -71,28 +72,26 @@ extern std::string postSubscriptions
   OrionError  beError;
   std::string subsID;
 
-  TIMED_MONGO(subsID = mongoCreateSubscription(
-                          parseDataP->subsV2,
-                          &beError,
-                          ciP->tenant,
-                          ciP->servicePathV,
-                          ciP->httpHeaders.xauthToken,
-                          ciP->httpHeaders.correlator,
-                          ""));
+  TIMED_MONGO(subsID = mongoCreateSubscription(parseDataP->subsV2,
+                                               &beError,
+                                               orionldState.tenantP,
+                                               ciP->servicePathV,
+                                               orionldState.xAuthToken,
+                                               orionldState.correlator,
+                                               ""));
 
   // Check potential error
   if (beError.code != SccNone)
   {
     TIMED_RENDER(answer = beError.toJson());
-    ciP->httpStatusCode = beError.code;
+    orionldState.httpStatusCode = beError.code;
   }
   else
   {
     std::string location = "/v2/subscriptions/" + subsID;
-    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-    ciP->httpHeaderValue.push_back(location);
 
-    ciP->httpStatusCode = SccCreated;
+    orionldHeaderAdd(&orionldState.out.headers, HttpLocation, (char*) location.c_str(), 0);
+    orionldState.httpStatusCode = 201;
   }
 
   return answer;

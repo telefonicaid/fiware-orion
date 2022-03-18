@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"    // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
@@ -61,12 +62,12 @@ std::string getEntityTypes
   unsigned int              totalTypes   = 0;
   unsigned int*             totalTypesP  = NULL;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   response.statusCode.fill(SccOk);
 
   // NGSIv1 uses details=on to request count
-  if (ciP->uriParam["details"] == "on")
+  if (orionldState.uriParams.details == true)
   {
     totalTypesP = &totalTypes;
   }
@@ -77,13 +78,13 @@ std::string getEntityTypes
   //   set to true (meaning to skip the attribute detail) for NGSIv1 requests.
   //   The parameter is only used for NGSIv2
   //
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, totalTypesP, true));
+  TIMED_MONGO(mongoEntityTypes(&response, orionldState.tenantP, ciP->servicePathV, orionldState.apiVersion, totalTypesP, true));
 
   std::string rendered;
-  TIMED_RENDER(rendered = response.render(ciP->apiVersion,
+  TIMED_RENDER(rendered = response.render(orionldState.apiVersion,
                                           asJsonObject,
-                                          ciP->outMimeType == JSON,
-                                          ciP->uriParam[URI_PARAM_COLLAPSE] == "true"));
+                                          orionldState.out.contentType == JSON,
+                                          orionldState.uriParams.collapse));
 
   response.release();
 

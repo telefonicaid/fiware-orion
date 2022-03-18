@@ -29,6 +29,8 @@
 #include <vector>
 
 #include "mongo/client/dbclient.h"
+
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "apiTypesV2/Subscription.h"
 
 
@@ -69,7 +71,7 @@ extern void setThrottling(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder
 *
 * setServicePath -
 */
-extern void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder* b);
+extern void setServicePath(const char* servicePath, mongo::BSONObjBuilder* b);
 
 
 
@@ -119,9 +121,9 @@ extern void setCondsAndInitialNotify
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist,
   RenderFormat                     attrsFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   mongo::BSONObjBuilder*           b,
   bool*                            notificationDone

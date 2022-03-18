@@ -59,7 +59,7 @@ typedef struct ContextElementResponse
   ContextElementResponse();
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP);
-  ContextElementResponse(const mongo::BSONObj&  entityDoc,
+  ContextElementResponse(const mongo::BSONObj*  entityDocP,
                          const StringList&      attrL,
                          bool                   includeEmpty = true,
                          ApiVersion             apiVersion   = V1);

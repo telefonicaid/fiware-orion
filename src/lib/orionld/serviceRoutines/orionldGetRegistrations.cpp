@@ -37,10 +37,11 @@ extern "C"
 #include "common/defaultValues.h"
 #include "common/string.h"                                    // toString
 #include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "rest/ConnectionInfo.h"                              // ConnectionInfo
-#include "orionld/mongoBackend/mongoLdRegistrationsGet.h"     // mongoLdRegistrationsGet
+
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldErrorResponse.h"              // orionldErrorResponseCreate
+#include "orionld/types/OrionldHeader.h"                      // orionldHeaderAdd
+#include "orionld/mongoBackend/mongoLdRegistrationsGet.h"     // mongoLdRegistrationsGet
 #include "orionld/kjTree/kjTreeFromRegistration.h"            // kjTreeFromRegistration
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"  // Own Interface
 
@@ -68,15 +69,13 @@ extern "C"
 // - offset
 // - options=count
 //
-bool orionldGetRegistrations(ConnectionInfo* ciP)
+bool orionldGetRegistrations(void)
 {
   std::vector<ngsiv2::Registration>  registrationVec;
   OrionError                         oe;
   long long                          count;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetCSourceRegistrations"));
-
-  if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenant, &count, &oe))
+  if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenantP, &count, &oe))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str());
     orionldState.httpStatusCode = SccBadRequest;
@@ -84,16 +83,13 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
   }
 
   if (orionldState.uriParams.count == true)
-  {
-    ciP->httpHeader.push_back("NGSILD-Results-Count");
-    ciP->httpHeaderValue.push_back(toString(count));
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
 
   for (unsigned int ix = 0; ix < registrationVec.size(); ix++)
   {
-    KjNode* registrationNodeP = kjTreeFromRegistration(ciP, &registrationVec[ix]);
+    KjNode* registrationNodeP = kjTreeFromRegistration(&registrationVec[ix]);
     kjChildAdd(orionldState.responseTree, registrationNodeP);
   }
 

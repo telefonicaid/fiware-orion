@@ -30,6 +30,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+
 #include "common/defaultValues.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -203,10 +206,10 @@ void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 *
 * setServicePath -
 */
-void setServicePath(const std::string& servicePath, BSONObjBuilder* b)
+void setServicePath(const char* servicePath, BSONObjBuilder* b)
 {
   b->append(CSUB_SERVICE_PATH, servicePath);
-  LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath.c_str()));
+  LM_T(LmtMongo, ("Subscription servicePath: %s", servicePath));
 }
 
 
@@ -335,9 +338,9 @@ void setCondsAndInitialNotify
   const HttpInfo&                  httpInfo,
   bool                             blacklist,
   RenderFormat                     attrsFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone
@@ -360,7 +363,7 @@ void setCondsAndInitialNotify
                                             httpInfo,
                                             notificationDone,
                                             attrsFormat,
-                                            tenant,
+                                            tenantP,
                                             xauthToken,
                                             servicePathV,
                                             &(sub.restriction),

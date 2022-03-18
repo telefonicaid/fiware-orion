@@ -25,15 +25,18 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttributeValue.h"
 #include "rest/OrionError.h"
+#include "rest/EntityTypeInfo.h"
+#include "rest/RestService.h"
 #include "parse/forbiddenChars.h"
 
 
@@ -63,13 +66,12 @@ std::string putEntityAttributeValue
 {
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
-  std::string  type           = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(),      NULL) ||
-      forbiddenIdChars(ciP->apiVersion, attributeName.c_str(), NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, entityId.c_str(),      NULL) ||
+      forbiddenIdChars(orionldState.apiVersion, attributeName.c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
@@ -78,14 +80,16 @@ std::string putEntityAttributeValue
   parseDataP->av.attribute.type = "";  // Overwrite 'none', as no type can be given in 'value' payload
   parseDataP->av.attribute.onlyValue = true;
 
-  std::string err = parseDataP->av.attribute.check(ciP->apiVersion, ciP->requestType);
+  std::string err = parseDataP->av.attribute.check(orionldState.apiVersion, ciP->restServiceP->request);
   if (err != "OK")
   {
     OrionError oe(SccBadRequest, err, "BadRequest");
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
-  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, ActionTypeUpdate, type);
+
+  char* entityType = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
+  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, ActionTypeUpdate, entityType);
 
 
   // 02. Call standard op postUpdateContext
@@ -96,12 +100,10 @@ std::string putEntityAttributeValue
   if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    orionldState.httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
+    orionldState.httpStatusCode = SccNoContent;
 
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();

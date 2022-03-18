@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -33,17 +31,14 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgAttributeTreat.h"                     // pgAttyributeTreat
-#include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePatchAttribute.h"                   // Own interface
 
 
@@ -57,40 +52,29 @@ extern "C"
 // Sub-attributes that have a NULL value are marked as DELETED.
 // Updating the type of an attribute is not allowed - 'type' if present, is removed by the Service Routine.
 //
-bool troePatchAttribute(ConnectionInfo* ciP)
+bool troePatchAttribute(void)
 {
-  // Expand names of sub-attributes - FIXME - let the Service Routine do this for us!
-  troeSubAttrsExpand(orionldState.requestTree);
+  char*           entityId       = orionldState.wildcard[0];
+  PgAppendBuffer  attributes;
+  PgAppendBuffer  subAttributes;
 
-  PGconn* connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+  pgAppendInit(&attributes, 1024);  // Just a single attribute - 1024 should be enough
+  pgAppendInit(&subAttributes, 4 * 1024);
 
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);  // pgAppend does strlen of PG_ATTRIBUTE_INSERT_START - for now!
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);  // pgAppend does strlen of PG_SUB_ATTRIBUTE_INSERT_START - for now!
 
-  char* entityId       = orionldState.wildcard[0];
-  char* attributeName  = orionldState.wildcard[1];
+  pgAttributeBuild(&attributes, "Update", entityId, orionldState.requestTree, &subAttributes);
 
-  //
-  // pgAttributeTreat assumes the name of the attribute comes as part of the tree.
-  // So, let's name the tree then! :)
-  //
-  orionldState.requestTree->name = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);  // FIXME: unitCode, datasetId, ... no expansion!!!
+  char* sqlV[2];
+  int   sqlIx = 0;
 
-  if (pgAttributeTreat(connectionP, orionldState.requestTree, entityId, TROE_ATTRIBUTE_UPDATE) == false)
-  {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
-  pgConnectionRelease(connectionP);
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }
+

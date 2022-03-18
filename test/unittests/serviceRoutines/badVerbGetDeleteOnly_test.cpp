@@ -63,7 +63,7 @@ static RestService badVerbV[] =
 */
 TEST(badVerbGetDeleteOnly, ok)
 {
-  ConnectionInfo  ci("/statistics",  "PUT", "1.1");
+  ConnectionInfo  ci;
   std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
   RestService     restService = { StatisticsRequest, 1, { "statistics" }, NULL };

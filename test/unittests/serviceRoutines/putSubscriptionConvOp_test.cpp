@@ -67,11 +67,10 @@ TEST(putSubscriptionConvOp, put)
 
   utInit();
 
-  ci1.outMimeType    = JSON;
-  ci1.inMimeType     = JSON;
-  ci1.payload        = NULL;
-  ci1.payloadSize    = 0;
-  ci1.restServiceP   = &restService;
+  orionldState.in.contentType  = JSON;
+  orionldState.in.payload      = NULL;
+  orionldState.in.payloadSize  = 0;
+  ci1.restServiceP             = &restService;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orion::requestServe(&ci1);

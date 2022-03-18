@@ -39,18 +39,19 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/httpHeaderAdd.h"
 
 #ifdef ORIONLD
-extern "C" {
+extern "C"
+{
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjson.h"                                       // Kjson
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
 }
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
+
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "cache/subCache.h"                                    // CachedSubscription
@@ -86,7 +87,7 @@ void Notifier::sendNotifyContextRequest
     NotifyContextRequest*            ncrP,
     const ngsiv2::HttpInfo&          httpInfo,
     const std::string&               tenant,
-    const std::string&               xauthToken,
+    const char*                      xauthToken,
     const std::string&               fiwareCorrelator,
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsOrder,
@@ -180,7 +181,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->renderFormat     = renderFormatToString(renderFormat);
     params->registration     = true;
 
-    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId) - 1);
 
     std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>;
     paramsV->push_back(params);
@@ -207,7 +208,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const ContextElementResponseVector&  cv,
     const ngsiv2::HttpInfo&              httpInfo,
     const std::string&                   tenant,
-    const std::string&                   xauthToken,
+    const char*                          xauthToken,
     const std::string&                   fiwareCorrelator,
     RenderFormat                         renderFormat,
     const std::vector<std::string>&      attrsOrder,
@@ -217,6 +218,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
   std::vector<SenderThreadParams*>*  paramsV;
 
   paramsV = new std::vector<SenderThreadParams*>;
+
+  if (xauthToken == NULL)
+    xauthToken = "";
 
   for (unsigned ix = 0; ix < cv.size(); ix++)
   {
@@ -408,7 +412,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 *
 * notificationDataToGeoJson -
 */
-static void notificationDataToGeoJson(KjNode* notificationNodeP, bool keyValues)
+static void notificationDataToGeoJson(KjNode* notificationNodeP)
 {
   KjNode* dataP = kjLookup(notificationNodeP, "data");
 
@@ -416,7 +420,7 @@ static void notificationDataToGeoJson(KjNode* notificationNodeP, bool keyValues)
   {
     kjChildRemove(notificationNodeP, dataP);
 
-    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP, keyValues);
+    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP);
 
     geojsonTree->name = (char*) "data";
     kjChildAdd(notificationNodeP, geojsonTree);
@@ -436,7 +440,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   NotifyContextRequest*            ncrP,
   const ngsiv2::HttpInfo&          httpInfo,
   const std::string&               tenant,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsOrder,
@@ -444,7 +448,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   bool                             blackList
 )
 {
-    ConnectionInfo                    ci;
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 #ifdef ORIONLD
@@ -521,16 +524,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       spathList = "";
     }
 
-    ci.outMimeType = JSON;
-
     std::string payloadString;
 
     if (renderFormat == NGSI_V1_LEGACY)
-    {
-      bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncrP->render(ci.apiVersion, asJsonObject);
-    }
-#ifdef ORIONLD
+      payloadString = ncrP->render(V2, false);
     else if ((renderFormat >= NGSI_LD_V1_NORMALIZED) && (renderFormat <= NGSI_LD_V1_V2_KEYVALUES_COMPACT))
     {
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
@@ -550,19 +547,15 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       }
 
       if (httpInfo.mimeType == GEOJSON)
-      {
-        bool keyValues = (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT);
-        notificationDataToGeoJson(kjTree, keyValues);
-      }
+        notificationDataToGeoJson(kjTree);
 
-      int   bufSize = 512 * 1024;
-      char* buf     = (char*) malloc(bufSize);  // FIXME: Use kjFastRenderSize for better allocation
+      int   bufSize = kjFastRenderSize(kjTree);
+      char* buf     = (char*) malloc(bufSize);
 
-      kjFastRender(orionldState.kjsonP, kjTree, buf, bufSize);
+      kjFastRender(kjTree, buf);
       payloadString = buf;
       toFree        = buf;
     }
-#endif
     else
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
 
@@ -600,7 +593,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->verb             = verbName(verb);
     params->tenant           = tenant;
     params->servicePath      = spathList;
-    params->xauthToken       = xauthToken;
+    params->xauthToken       = (xauthToken == NULL)? "" : xauthToken;
     params->resource         = uriPath;
     params->content_type     = contentType;
     params->content          = payloadString;
@@ -614,11 +607,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->mqttPassword[0] = 0;
 
     if (httpInfo.mqtt.version[0] != 0)
-      strncpy(params->mqttVersion, httpInfo.mqtt.version, sizeof(params->mqttVersion));
+      strncpy(params->mqttVersion, httpInfo.mqtt.version, sizeof(params->mqttVersion) - 1);
     if (httpInfo.mqtt.username[0] != 0)
-      strncpy(params->mqttUserName, httpInfo.mqtt.username, sizeof(params->mqttUserName));
+      strncpy(params->mqttUserName, httpInfo.mqtt.username, sizeof(params->mqttUserName) - 1);
     if (httpInfo.mqtt.password[0] != 0)
-      strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword));
+      strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword) - 1);
 #else
     params->mimeType         = JSON;
 #endif
@@ -660,7 +653,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         if (httpInfo.mimeType == JSON)
         {
           if (subP->ldContext == "")
-            params->extraHeaders["Link"] = std::string("<") + ORIONLD_CORE_CONTEXT_URL + ">; " + LINK_REL_AND_TYPE;
+            params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
           else
             params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
         }

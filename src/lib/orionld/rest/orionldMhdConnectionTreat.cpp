@@ -23,14 +23,16 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strncpy
-#include <string>                                                // std::string
+#include <semaphore.h>                                           // sem_wait, sem_post
 
 extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kStringSplit.h"                                  // kStringSplit
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
+#include "kjson/kjRenderSize.h"                                  // kjRenderSize, kjFastRenderSize
 #include "kjson/kjRender.h"                                      // kjRender, kjFastRender
 #include "kjson/kjClone.h"                                       // kjClone
 #include "kjson/kjFree.h"                                        // kjFree
@@ -44,34 +46,40 @@ extern "C"
 
 #include "common/string.h"                                       // FT
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd, httpHeaderLinkAdd
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "rest/restReply.h"                                      // restReply
 
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
-#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName
+#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
+#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
+#include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/common/performance.h"                          // PERFORMANCE
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"           // kjGeojsonEntitiesTransform
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
+#include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
@@ -95,9 +103,9 @@ extern "C"
 //   For this function to work properly, the payload must have been parsed, so that we know whether there is
 //   a "@context" member as part of the payload or not.
 //
-static bool contentTypeCheck(ConnectionInfo* ciP)
+static bool contentTypeCheck(void)
 {
-  if ((ciP->verb != POST) && (ciP->verb != PATCH))
+  if ((orionldState.verb != POST) && (orionldState.verb != PATCH))
     return true;
 
   if (orionldState.requestTree == NULL)
@@ -119,10 +127,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
   char* errorTitle           = NULL;
   char* errorDetails         = NULL;
 
-  if (orionldState.ngsildContent == true)
+  if (orionldState.in.contentType == JSONLD)
   {
-    LM_T(LmtContext, ("Content-Type is: application/ld+json"));
-
     if (orionldState.linkHttpHeaderPresent == true)
     {
       errorTitle   = (char*) "@context in Link HTTP Header";
@@ -137,8 +143,6 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
   }
   else
   {
-    LM_T(LmtContext, ("Content-Type is: application/json"));
-
     if (orionldState.payloadContextNode != NULL)
     {
       errorTitle   = (char*) "Mismatch between /Content-Type/ and contents of the request payload body";
@@ -163,94 +167,12 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
-// acceptHeaderExtractAndCheck -
-//
-static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
-{
-  bool  explicit_application_json   = false;
-  bool  explicit_application_jsonld = false;
-  float weight_application_json     = 0;
-  float weight_application_jsonld   = 0;
-
-  if (ciP->httpHeaders.acceptHeaderV.size() == 0)
-  {
-    orionldState.acceptJson   = true;   // Default Accepted MIME-type is application/json
-    orionldState.acceptJsonld = false;
-    ciP->outMimeType          = JSON;
-  }
-
-  for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
-  {
-    const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
-
-    if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
-    {
-      const char* appType = &mediaRange[12];
-
-      if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
-      {
-        orionldState.acceptJsonld   = true;
-        explicit_application_jsonld = true;
-        weight_application_jsonld   = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
-      }
-      else if (SCOMPARE9(appType, 'g', 'e', 'o', '+', 'j', 's', 'o', 'n', 0))
-        orionldState.acceptGeojson  = true;
-      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))
-      {
-        orionldState.acceptJson     = true;
-        explicit_application_json   = true;
-        weight_application_json     = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
-      }
-      else if (SCOMPARE2(appType, '*', 0))
-      {
-        orionldState.acceptJsonld = true;
-        orionldState.acceptJson   = true;
-      }
-    }
-    else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
-    {
-      orionldState.acceptJsonld = true;
-      orionldState.acceptJson   = true;
-    }
-  }
-
-  if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false) && (orionldState.acceptGeojson == false))
-  {
-    const char* title   = "invalid mime-type";
-    const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
-
-    LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
-    orionldErrorResponseCreate(OrionldBadRequestData, title, details);
-    orionldState.httpStatusCode = SccNotAcceptable;
-
-    return false;
-  }
-
-  if ((explicit_application_json == true) && (explicit_application_jsonld == false))
-    orionldState.acceptJsonld = false;
-
-  if ((weight_application_json != 0) || (weight_application_jsonld != 0))
-  {
-    if (weight_application_json > weight_application_jsonld)
-      orionldState.acceptJsonld = false;
-  }
-
-  if (orionldState.acceptJsonld == true)
-    ciP->outMimeType = JSONLD;
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // payloadEmptyCheck -
 //
-static bool payloadEmptyCheck(ConnectionInfo* ciP)
+static bool payloadEmptyCheck(void)
 {
   // No payload?
-  if (ciP->payload == NULL)
+  if (orionldState.in.payload == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
     orionldState.httpStatusCode = 400;
@@ -258,7 +180,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   }
 
   // Empty payload?
-  if (ciP->payload[0] == 0)
+  if (orionldState.in.payload[0] == 0)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
     orionldState.httpStatusCode = 400;
@@ -292,18 +214,14 @@ static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
 //
 // payloadParseAndExtractSpecialFields -
 //
-static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* contextToBeCashedP)
+static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 {
   //
   // Parse the payload
   //
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.parseStart);
-#endif
-  orionldState.requestTree = kjParse(orionldState.kjsonP, ciP->payload);
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.parseEnd);
-#endif
+  PERFORMANCE(parseStart);
+  orionldState.requestTree = kjParse(orionldState.kjsonP, orionldState.in.payload);
+  PERFORMANCE(parseEnd);
 
   //
   // Parse Error?
@@ -345,8 +263,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     return false;
   }
 
-  LM_T(LmtPayloadParse, ("All good - payload parsed. orionldState.requestTree at %p", orionldState.requestTree));
-
   //
   // Looking up "@context" attribute at first level in payload
   // Checking also for duplicates.
@@ -379,7 +295,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
         orionldState.payloadContextNode = attrNodeP;
-        LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.payloadContextNode));
 
         attrNodeP = orionldState.payloadContextNode->next;
         kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
@@ -394,11 +309,11 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
 
-        orionldState.payloadIdNode = attrNodeP;
-        STRING_CHECK(orionldState.payloadIdNode, "entity id");
-        LM_T(LmtContext, ("Found Entity::id in the payload (%p)", orionldState.payloadIdNode));
+        STRING_CHECK(attrNodeP, "entity id");
+        URI_CHECK(attrNodeP->value.s, "id", true);
 
-        attrNodeP = orionldState.payloadIdNode->next;
+        orionldState.payloadIdNode = attrNodeP;
+        attrNodeP                  = attrNodeP->next;
         kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
       }
       else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(attrNodeP->name, '@', 't', 'y', 'p', 'e', 0))
@@ -411,20 +326,11 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
 
+        STRING_CHECK(attrNodeP, "entity type");
+        URI_CHECK(attrNodeP->value.s, "type", false);
+
         orionldState.payloadTypeNode = attrNodeP;
-
-        STRING_CHECK(orionldState.payloadTypeNode, "entity type");
-
-        char* detail;
-        if (pcheckName(orionldState.payloadTypeNode->value.s, &detail) == false)
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", orionldState.payloadTypeNode->value.s);
-          orionldState.httpStatusCode = 400;
-          return false;
-        }
-        LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.payloadTypeNode));
-
-        attrNodeP = orionldState.payloadTypeNode->next;
+        attrNodeP                    = attrNodeP->next;
         kjNodeDecouple(orionldState.payloadTypeNode, prev, orionldState.requestTree);
       }
       else
@@ -438,31 +344,32 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   {
     KjNode* prev = NULL;
 
-    for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+    if (orionldState.requestTree->type == KjObject)
     {
-      if (attrNodeP->name == NULL)
-        continue;
-
-      if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+      for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
       {
-        if (orionldState.payloadContextNode != NULL)
+        if (attrNodeP->name == NULL)
+          continue;
+
+        if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         {
-          LM_W(("Bad Input (duplicated attribute: '@context'"));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
-          orionldState.httpStatusCode = 400;
-          return false;
+          if (orionldState.payloadContextNode != NULL)
+          {
+            LM_W(("Bad Input (duplicated attribute: '@context'"));
+            orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
+            orionldState.httpStatusCode = 400;
+            return false;
+          }
+
+          orionldState.payloadContextNode = attrNodeP;
+
+          kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
         }
 
-        orionldState.payloadContextNode = attrNodeP;
-        LM_T(LmtContext, ("Found a @context in the payload (%p)", orionldState.payloadContextNode));
-
-        kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
+        prev = attrNodeP;
       }
-
-      prev = attrNodeP;
     }
   }
-
 
   if (orionldState.payloadContextNode != NULL)
   {
@@ -496,7 +403,7 @@ void orionldErrorResponseFromProblemDetails(OrionldProblemDetails* pdP)
 //
 // linkHeaderCheck -
 //
-static bool linkHeaderCheck(ConnectionInfo* ciP)
+static bool linkHeaderCheck(void)
 {
   char* details;
 
@@ -526,7 +433,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   char*                  url = kaStrdup(&kalloc, orionldState.link);
   OrionldProblemDetails  pd;
 
-  orionldState.contextP = orionldContextFromUrl(url, &pd);
+  orionldState.contextP = orionldContextFromUrl(url, NULL, &pd);
   if (orionldState.contextP == NULL)
   {
     LM_W(("Bad Input? (%s: %s)", pd.title, pd.detail));
@@ -552,7 +459,7 @@ static void contextToPayload(void)
   if (orionldState.payloadContextNode == NULL)
   {
     if (orionldState.link == NULL)
-      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", coreContextUrl);
     else
       orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
   }
@@ -572,19 +479,27 @@ static void contextToPayload(void)
   //
   if (orionldState.responseTree->type == KjObject)
   {
-    orionldState.payloadContextNode->next        = orionldState.responseTree->value.firstChildP;
-    orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
+    KjNode* contextNode = kjLookup(orionldState.responseTree, "@context");
+
+    if (contextNode == NULL)  // Not present - must add it
+    {
+      orionldState.payloadContextNode->next        = orionldState.responseTree->value.firstChildP;
+      orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
+    }
   }
   else if (orionldState.responseTree->type == KjArray)
   {
     for (KjNode* rTreeItemP = orionldState.responseTree->value.firstChildP; rTreeItemP != NULL; rTreeItemP = rTreeItemP->next)
     {
-      KjNode* contextNode;
+      KjNode* contextNode = kjLookup(rTreeItemP, "@context");
+
+      if (contextNode != NULL)  // @context already present in payload
+        continue;
 
       if (orionldState.payloadContextNode == NULL)
       {
         if (orionldState.link == NULL)
-          contextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+          contextNode = kjString(orionldState.kjsonP, "@context", coreContextUrl);
         else
           contextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
       }
@@ -616,22 +531,11 @@ static void contextToPayload(void)
 //
 static void dbGeoIndexes(void)
 {
-  char  tenant[64];
-  char* tenantP;
-
-  if ((orionldState.tenant == NULL) || (orionldState.tenant[0] == 0))
-    tenantP = dbName;
-  else
-  {
-    snprintf(tenant, sizeof(tenant), "%s-%s", dbName, orionldState.tenant);
-    tenantP = tenant;
-  }
-
   // sem_take
   for (int ix = 0; ix < orionldState.geoAttrs; ix++)
   {
-    if (dbGeoIndexLookup(tenantP, orionldState.geoAttrV[ix]->name) == NULL)
-      dbGeoIndexCreate(tenantP, orionldState.geoAttrV[ix]->name);
+    if (dbGeoIndexLookup(orionldState.tenantP->tenant, orionldState.geoAttrV[ix]->name) == NULL)
+      dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
   }
   // sem_give
 }
@@ -660,6 +564,268 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
     given = given >> 1;
     ++shifts;
   }
+
+  return true;
+}
+
+
+static int commaCount(char* s)
+{
+  int commas = 0;
+
+  while (*s != 0)
+  {
+    if (*s == ',')
+      ++commas;
+    ++s;
+  }
+
+  return commas;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamAttrs -
+//
+static bool pCheckUriParamAttrs(void)
+{
+  if (orionldState.uriParams.attrs == NULL)
+    return true;
+
+  int   items     = commaCount(orionldState.uriParams.attrs) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
+
+  orionldState.in.attrsList.items = items;
+  orionldState.in.attrsList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.attrsList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /attrs/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /attrs/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.attrsList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamId -
+//
+// NOTE
+//   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
+//   is only alloowed by those services that need expansion (GET /entities and GET /registrations)
+//
+static bool pCheckUriParamId(void)
+{
+  if (orionldState.uriParams.id == NULL)
+    return true;
+
+  if (orionldState.uriParams.id[0] == 0)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Entity ID", "Empty String", 400);
+    return false;
+  }
+
+  int   items     = commaCount(orionldState.uriParams.id) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.id);  // Keep original value of 'id'
+
+  orionldState.in.idList.items = items;
+  orionldState.in.idList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.idList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /id/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /id/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.idList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    if (pCheckUri(orionldState.in.idList.array[item], "Entity ID in URI param", true) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamType -
+//
+// NOTE
+//   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
+//   is only allowed by those services that need expansion (GET /entities and GET /registrations)
+//
+static bool pCheckUriParamType(void)
+{
+  if (orionldState.uriParams.type == NULL)
+    return true;
+
+  int   items     = commaCount(orionldState.uriParams.type) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.type);  // Keep original value of 'type'
+
+  orionldState.in.typeList.items = items;
+  orionldState.in.typeList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.typeList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /type/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /type/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.typeList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  for (int item = 0; item < items; item++)
+  {
+    orionldState.in.typeList.array[item] = orionldContextItemExpand(orionldState.contextP, orionldState.in.typeList.array[item], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamGeoProperty -
+//
+static bool pCheckUriParamGeoProperty()
+{
+  if (orionldState.uriParams.geoproperty == NULL)
+    return true;
+
+  if ((strcmp(orionldState.uriParams.geoproperty, "location")         != 0) &&
+      (strcmp(orionldState.uriParams.geoproperty, "observationSpace") != 0) &&
+      (strcmp(orionldState.uriParams.geoproperty, "operationSpace")   != 0))
+  {
+    orionldState.uriParams.geoproperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUriParamGeometryProperty -
+//
+static bool pCheckUriParamGeometryProperty()
+{
+  if (orionldState.uriParams.geometryProperty == NULL)
+  {
+    orionldState.uriParams.geometryProperty  = (char*) "location";
+    orionldState.in.geometryPropertyExpanded = (char*) "location";
+  }
+  else
+  {
+    if ((strcmp(orionldState.uriParams.geometryProperty, "location")         != 0) &&
+        (strcmp(orionldState.uriParams.geometryProperty, "observationSpace") != 0) &&
+        (strcmp(orionldState.uriParams.geometryProperty, "operationSpace")   != 0))
+    {
+      orionldState.in.geometryPropertyExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geometryProperty, true, NULL);
+    }
+    else
+      orionldState.in.geometryPropertyExpanded = orionldState.uriParams.geometryProperty;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckPayloadEntityType -
+//
+static bool pCheckPayloadEntityType(void)
+{
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_TYPE) == ORIONLD_SERVICE_OPTION_EXPAND_TYPE)
+  {
+    if (orionldState.payloadTypeNode != NULL)
+      orionldState.payloadTypeNode->value.s = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUrlPathAttributeName -
+//
+static bool pCheckUrlPathAttributeName(void)
+{
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_EXPAND_ATTR) == ORIONLD_SERVICE_OPTION_EXPAND_ATTR)
+  {
+    orionldState.in.pathAttrExpanded = orionldAttributeExpand(orionldState.contextP, orionldState.wildcard[1], true, NULL);  // Expand-function
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamExpansion -
+//
+// Expand attribute names and entity types.
+// Convert comma separated lists (attrs + type + id + ...) into arrays.
+//
+// Doing the "type" node from the payload body as well. Not a URI param, but close enough
+//
+static bool uriParamExpansion(void)
+{
+  if (pCheckUriParamId()               == false) return false;
+  if (pCheckUriParamType()             == false) return false;
+  if (pCheckUriParamAttrs()            == false) return false;
+  if (pCheckUriParamGeoProperty()      == false) return false;
+  if (pCheckUriParamGeometryProperty() == false) return false;
+  if (pCheckPayloadEntityType()        == false) return false;
+  if (pCheckUrlPathAttributeName()     == false) return false;
+
+  // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/common/qParse.cpp'
 
   return true;
 }
@@ -704,29 +870,36 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //   17. Call the SERVICE ROUTINE
 //   18. If the service routine failed (returned FALSE), but no HTTP status ERROR code is set, the HTTP status code defaults to 400
 //   19. Check for existing responseTree, in case of httpStatusCode >= 400 (except for 405)
-//   20. If (orionldState.acceptNgsild): Add orionldState.payloadContextTree to orionldState.responseTree
-//   21. If (orionldState.acceptNgsi):   Set HTTP Header "Link" to orionldState.contextP->url
+//   20. If (Accept: JSONLD): Add orionldState.payloadContextTree to orionldState.responseTree
+//   21. If (Accept: JSON):   Set HTTP Header "Link" to orionldState.contextP->url
 //   22. Render response tree
 //   23. IF accept == app/json, add the Link HTTP header
 //   24. REPLY
 //   25. Cleanup
 //   26. DONE
 //
-//
-//
-static __thread char responsePayload[1024 * 1024];
-MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
+MHD_Result orionldMhdConnectionTreat(void)
 {
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
-  LM_T(LmtMhd, ("Read all the payload - treating the request!"));
+  // If OPTIONS verb, we skip all checks, go straight to the service routine
+  if (orionldState.verb == OPTIONS)
+    goto serviceRoutine;
 
   //
   // Predetected Error from orionldMhdConnectionInit?
   //
   if (orionldState.httpStatusCode != 200)
     goto respond;
+
+  if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT))
+  {
+    LM_W(("Bad Input (payload body - of %d bytes - for a %s request", orionldState.in.contentLength, verbName(orionldState.verb)));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb));
+    orionldState.httpStatusCode = 400;
+    goto respond;
+  }
 
   //
   // Any URI param given but not supported?
@@ -747,25 +920,44 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //   * POST /ngsi-ld/v1/entityOperations/upsert
   // then if the tenant doesn't exist, an error must be returned (404)
   //
-  if ((orionldState.tenant != NULL) && (*orionldState.tenant != 0))
+  // The characteristics of the service (if create ot just check for existence) is taken care of by setting (or not)
+  // serviceP->options to ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS in orionldServiceInit.cpp (restServicePrepare)
+  //
+  if (orionldState.tenantName != NULL)
   {
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS) == ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS)
     {
-      if (orionldTenantLookup(orionldState.tenant) == NULL)
+      orionldState.tenantP = orionldTenantLookup(orionldState.tenantName);
+      if (orionldState.tenantP == NULL)
       {
-        LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenant));
-        orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenant);
-        orionldState.httpStatusCode = 404;
-        goto respond;
+        //
+        // Tenant does not exist in the tenant cache of this broker
+        // However, some other broker (load balancer) might have created the tenant!
+        //
+        if (dbTenantExists(orionldState.tenantName) == false)
+        {
+          LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenantName));
+          orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName);
+          orionldState.httpStatusCode = 404;
+          goto respond;
+        }
+        else
+        {
+          // Add tenant to the tenant cache
+          orionldState.tenantP = orionldTenantCreate(orionldState.tenantName);
+        }
       }
     }
+    else
+      orionldState.tenantP = orionldTenantGet(orionldState.tenantName);
   }
-
+  else
+    orionldState.tenantP = &tenant0;  // No tenant give - default tenant used
 
   //
   // 03. Check for empty payload for POST/PATCH/PUT
   //
-  if (((ciP->verb == POST) || (ciP->verb == PATCH) || (ciP->verb == PUT)) && (payloadEmptyCheck(ciP) == false))
+  if (((orionldState.verb == POST) || (orionldState.verb == PATCH) || (orionldState.verb == PUT)) && (payloadEmptyCheck() == false))
     goto respond;
 
 
@@ -773,40 +965,34 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Save a copy of the incoming payload before it is destroyed during kjParse AND
   // parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
-  if (ciP->payload != NULL)
+  if (orionldState.in.payload != NULL)
   {
-    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == 0)
-      orionldState.requestPayload = ciP->payload;
-    else
-      orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD)
+      orionldState.in.payloadCopy = kaStrdup(&orionldState.kalloc, orionldState.in.payload);
 
-    if (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false)
+    if (payloadParseAndExtractSpecialFields(&contextToBeCashed) == false)
       goto respond;
   }
 
   //
   // 05. Check the Content-Type
   //
-  if (contentTypeCheck(ciP) == false)
-    goto respond;
-
-
-  //
-  // 06. Check the Accept header and ...
-  //
-  if (acceptHeaderExtractAndCheck(ciP) == false)
-    goto respond;
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK) == 0)
+  {
+    if (contentTypeCheck() == false)
+      goto respond;
+  }
 
   //
   // 07. Check the @context in HTTP Header, if present
   //
-  // NOTE: orionldState.link is set by httpHeaderGet() in rest.cpp, called by orionldMhdConnectionInit()
+  // NOTE: orionldState.link is set by orionldHttpHeaderReceive() called by orionldMhdConnectionInit()
   //
   // NOTE: Some requests don't use the context and thus should simplt ignore the Link header
   //
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED) == 0)
   {
-    if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck(ciP) == false))
+    if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck() == false))
       goto respond;
 
     //
@@ -819,23 +1005,23 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       char* id  = NULL;
       char* url = NULL;
 
-      if (orionldState.payloadContextNode->type == KjString)
-        url = NULL;  // orionldState.payloadContextNode->value.s
-      else
+      //
+      // Inline contexts in sub/reg-creation go to the context cache
+      // But, not if the context is a simple string, e.g.:
+      //   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+      //
+      if (((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CREATE_CONTEXT) != 0) && (orionldState.payloadContextNode->type != KjString))
         url = orionldContextUrlGenerate(&id);
 
-      orionldState.contextP = orionldContextFromTree(url, true, orionldState.payloadContextNode, &pd);
+      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, id, orionldState.payloadContextNode, &pd);
       if (orionldState.contextP == NULL)
       {
-        LM_W(("Bad Input (invalid inline context. %s: %s)", pd.title, pd.detail));
+        LM_W(("Bad Input (invalid context - %s: %s)", pd.title, pd.detail));
         orionldErrorResponseFromProblemDetails(&pd);
         orionldState.httpStatusCode = (HttpStatusCode) pd.status;
 
         goto respond;
       }
-
-      if (id != NULL)
-        orionldState.contextP->id = id;
 
       if (pd.status == 200)  // got an array with only Core Context
         orionldState.contextP = orionldCoreContextP;
@@ -854,22 +1040,27 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (orionldState.contextP == NULL)
     orionldState.contextP = orionldCoreContextP;
 
-  orionldState.link = orionldState.contextP->url;
+  if (orionldState.link == NULL)
+    orionldState.link = orionldState.contextP->url;
 
+
+  //
+  // @context is in place, even if in the payload body.
+  // It is now possible to expand attribute names and entity types for the URI parameters.
+  // Only exception is for batch operations that can have a number of @contexts in their entity arrays.
+  // But, those operations don't support the affected URI params anyways, so, no probs
+  //
+  if (uriParamExpansion() == false)
+    goto respond;
 
   // -----------------------------------------------------------------------------
   //
   // Call the SERVICE ROUTINE
   //
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.serviceRoutineStart);
-#endif
-
-  serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
-
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.serviceRoutineEnd);
-#endif
+  PERFORMANCE(serviceRoutineStart);
+ serviceRoutine:
+  serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+  PERFORMANCE(serviceRoutineEnd);
 
   //
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
@@ -884,24 +1075,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     if (orionldState.geoAttrs > 0)
       dbGeoIndexes();
-
-    // New tenant?
-    if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
-    {
-      if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
-      {
-        if (orionldTenantLookup(orionldState.tenant) == NULL)
-        {
-          char prefixed[64];
-
-          snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
-          orionldTenantCreate(prefixed);
-
-          if (idIndex == true)
-            dbIdIndexCreate(prefixed);
-        }
-      }
-    }
   }
 
  respond:
@@ -914,8 +1087,16 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((orionldState.httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (orionldState.httpStatusCode != 405))
   {
-    orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
-    orionldState.httpStatusCode = 500;
+    if (orionldState.pd.status != 0)  // Perhaps the error is in orionldState.pd ?
+    {
+      orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
+      orionldState.httpStatusCode = orionldState.pd.status;
+    }
+    else
+    {
+      orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
+      orionldState.httpStatusCode = 500;
+    }
   }
 
   //
@@ -946,7 +1127,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false) && (orionldState.responseTree != NULL))
   {
-    if (orionldState.acceptGeojson == true)
+    if (orionldState.out.contentType == GEOJSON)
     {
       //
       // Default is: @context in payload body
@@ -957,14 +1138,14 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
         orionldState.linkHeaderAdded = false;  // To indicate @context in payload body for geojsonEntityTransform
     }
-    else if (orionldState.acceptJsonld == false)
+    else if (orionldState.out.contentType != JSONLD)
       linkHeader = true;
     else if (orionldState.responseTree == NULL)
       linkHeader = true;
   }
 
-  if (linkHeader == true)
-    httpHeaderLinkAdd(ciP, orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
+  if ((linkHeader == true) && (orionldState.httpStatusCode != 204))
+    httpHeaderLinkAdd(orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
 
   //
   // Is there a KJSON response tree to render?
@@ -974,75 +1155,88 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Should a @context be added to the response payload?
     //
-    bool addContext = ((orionldState.serviceP != NULL) && (orionldState.linkHeaderAdded == false) &&
+    bool addContext = ((orionldState.serviceP        != NULL)    &&
+                       (orionldState.linkHeaderAdded == false)   &&
                        ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0) &&
-                       (orionldState.acceptJsonld == true));
+                       (orionldState.out.contentType == JSONLD)  &&
+                       (orionldState.httpStatusCode   < 300));
 
     if (addContext)
-    {
-      if ((orionldState.acceptJsonld == true) && (orionldState.httpStatusCode < 300))
-        contextToPayload();
-    }
+      contextToPayload();
 
     //
     // Render the payload to get a string for restReply to send the response
     //
     // FIXME: Smarter allocation !!!
     //
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.renderStart);
-#endif
+    PERFORMANCE(renderStart);
 
-    if ((orionldState.acceptGeojson == true) && (serviceRoutineResult == true))
+    if ((orionldState.out.contentType == GEOJSON) && (serviceRoutineResult == true))
     {
       if (orionldState.serviceP->serviceRoutine == orionldGetEntity)
-        orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.uriParamOptions.keyValues);
+        orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
       else if (orionldState.serviceP->serviceRoutine == orionldGetEntities)
-        orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree, orionldState.uriParamOptions.keyValues);
+        orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree);
       else
         LM_W(("Bad Input (Accept: application/geo+json for non-compatible request)"));
     }
 
-    kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+
+    //
+    // Smart allocation of the response buffer
+    //
+    // If there is room in the current kalloc biffer (no extra malloc needed), then use it.
+    // If not, then it's better to do a separate call to malloc, as:
+    //   - the rest of the kalloc buffer isn't thrown away
+    //   - the entire logic of kalloc is avoided (not much, but still ...)
+    //
+    unsigned int responsePayloadSize;
 
     if (orionldState.uriParams.prettyPrint == false)
-      kjFastRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+      responsePayloadSize = kjFastRenderSize(orionldState.responseTree);
     else
-      kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+      responsePayloadSize = kjRenderSize(orionldState.kjsonP, orionldState.responseTree);
 
+    if (responsePayloadSize < orionldState.kalloc.bytesLeft + 8)
+      orionldState.responsePayload = kaAlloc(&orionldState.kalloc, responsePayloadSize);
+    else
+    {
+      orionldState.responsePayload = (char*) malloc(responsePayloadSize);
 
-#ifdef REQUEST_PERFORMANCE
-    kTimeGet(&timestamps.renderEnd);
-#endif
-    orionldState.responsePayload = responsePayload;
+      if (orionldState.responsePayload == NULL)
+      {
+        LM_E(("Out of memory"));
+        orionldState.responsePayload = (char*) "{ \"error\": \"Out of memory\"}";
+      }
+      else
+        orionldStateDelayedFreeEnqueue(orionldState.responsePayload);
+    }
+
+    if (orionldState.uriParams.prettyPrint == false)
+      kjFastRender(orionldState.responseTree, orionldState.responsePayload);
+    else
+      kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
+
+    PERFORMANCE(renderEnd);
   }
 
-  //
-  // restReply assumes that the HTTP Status Code for the response is in 'ciP->httpStatusCode'
-  // FIXME: make the HTTP Status Code a parameter for restReply
-  //
-  ciP->httpStatusCode = (HttpStatusCode) orionldState.httpStatusCode;
-
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.restReplyStart);
-#endif
+  PERFORMANCE(restReplyStart);
 
   if (orionldState.responsePayload != NULL)
-    restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
+    restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
-    restReply(ciP, "");
+    restReply(NULL, NULL);
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.restReplyEnd);
-#endif
+  PERFORMANCE(restReplyEnd);
 
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
   //
   // Call TRoE Routine (if there is one) to save the TRoE data.
   // Only if the Service Routine was successful, of course
+  // AND if there is any request tree to process
   //
-  if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
+  if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300) && (orionldState.noDbUpdate == false))
   {
     if ((orionldState.serviceP != NULL) && (orionldState.serviceP->troeRoutine != NULL))
     {
@@ -1055,15 +1249,27 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
 
-#ifdef REQUEST_PERFORMANCE
-        kTimeGet(&timestamps.troeStart);
-#endif
 
-        orionldState.serviceP->troeRoutine(ciP);
+        //
+        // Special case - Entity creation with no attribute
+        // As both the entity id and the entity type have been removed from the payload body, the payload body is now empty.
+        // We still have to record the creation of the entity in the TRoE database!
+        //
+        // If the incoming request an empty array/object, then don't call the TRoE routine
+        // - EXCEPT if it's a POST /entities request (service routine is orionldPostEntities)
+        //
+        bool invokeTroe = false;
 
-#ifdef REQUEST_PERFORMANCE
-        kTimeGet(&timestamps.troeEnd);
-#endif
+        if (orionldState.verb == DELETE)                                                                  invokeTroe = true;
+        if (orionldState.serviceP->serviceRoutine == orionldPostEntities)                                 invokeTroe = true;
+        if ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  invokeTroe = true;
+
+        if (invokeTroe == true)
+        {
+          PERFORMANCE(troeStart);
+          orionldState.serviceP->troeRoutine();
+          PERFORMANCE(troeEnd);
+        }
       }
     }
   }
@@ -1073,9 +1279,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   orionldStateRelease();
 
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.requestPartEnd);
-#endif
+  PERFORMANCE(requestPartEnd);
 
   return MHD_YES;
-}
+  }

@@ -22,18 +22,211 @@
 *
 * Author: Ken Zangelin
 */
+#include <bson/bson.h>                                           // bson_t, ...
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/db/dbNameGet.h"                                // dbNameGet
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
+#include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocEntityUpdate.h"                   // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongocKjTreeToUpdateBson -
+//
+// { $set: { "a.2": <new value>, "a.10": <new value> }, $push: {}, ... }
+//
+//
+static void mongocKjTreeToUpdateBson
+(
+  KjNode*      tree,
+  bson_t*      setP,
+  bson_t*      unsetP,
+  const char*  bsonPath,
+  KjNode*      attrsAdded,
+  KjNode*      attrsRemoved,
+  bool*        nullsP,
+  int          level
+)
+{
+  char path[1024];
+
+  for (KjNode* attrP = tree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if      (strcmp(attrP->name, "scope")      == 0)  {}
+    else if (strcmp(attrP->name, "location")   == 0)  {}
+    else if (strcmp(attrP->name, ".attrNames") == 0)  { continue; }
+    else
+      dotForEq(attrP->name);
+
+    if (attrP->type == KjObject)
+    {
+      int jx = 0;
+
+      for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+      {
+        bool isValue = false;
+
+        if      (strcmp(subAttrP->name, "value")     == 0)     { isValue = true; }
+//      else if (strcmp(subAttrP->name, "type")      == 0)     { continue; }  - needed only if the attribute did not previously exist
+        else if (strcmp(subAttrP->name, "object")    == 0)     { subAttrP->name = (char*) "value"; }
+        else if (strcmp(subAttrP->name, "datasetId") == 0)     { }
+        else if (strcmp(subAttrP->name, "unitCode")  == 0)     { }
+        else if (strcmp(subAttrP->name, "mdNames")   == 0)     { isValue = true; }
+        else
+          dotForEq(subAttrP->name);
+
+        int pathLen = snprintf(path, sizeof(path), "%s.%s.%s", bsonPath, attrP->name, subAttrP->name);
+
+        if      (subAttrP->type == KjString)   bson_append_utf8(setP,   path, pathLen, subAttrP->value.s, -1);
+        else if (subAttrP->type == KjInt)      bson_append_int32(setP,  path, pathLen, subAttrP->value.i);
+        else if (subAttrP->type == KjFloat)    bson_append_double(setP, path, pathLen, subAttrP->value.f);
+        else if (subAttrP->type == KjBoolean)  bson_append_bool(setP,   path, pathLen, subAttrP->value.b);
+        else if (subAttrP->type == KjObject)
+        {
+          if (isValue)
+          {
+            bson_t compound;
+            mongocKjTreeToBson(subAttrP, &compound);
+            bson_append_document(setP, path, pathLen, &compound);
+          }
+          else
+          {
+            int    bsonPathLen = strlen(bsonPath) + 1 + strlen(attrP->name) + 1;
+            char*  bsonPath2   = kaAlloc(&orionldState.kalloc, bsonPathLen);
+
+            snprintf(bsonPath2, bsonPathLen, "%s.%s", bsonPath, attrP->name);
+            mongocKjTreeToUpdateBson(subAttrP, setP, unsetP, bsonPath2, NULL, NULL, NULL, level + 1);  // Perhaps another function for sub-attributes ...?
+          }
+        }
+        else if (subAttrP->type == KjArray)
+        {
+          if (isValue)
+          {
+            bson_t compound;
+
+            mongocKjTreeToBson(subAttrP, &compound);
+            bson_append_array(setP, path, pathLen, &compound);
+          }
+        }
+
+        ++jx;
+      }
+
+      // Set the modifiedAt timestamp for the Attribute
+      int pathLen = snprintf(path, sizeof(path), "attrs.%s.modDate", attrP->name);
+      bson_append_double(setP, path, pathLen, orionldState.requestTime);
+    }
+    else if (attrP->type == KjNull)
+    {
+      int pathLen = snprintf(path, sizeof(path), "attrs.%s", attrP->name);
+      bson_append_utf8(unsetP, path, pathLen, "", 0);
+      *nullsP = true;
+    }
+  }
+
+  // Set the modifiedAt timestamp for the Entity
+  bson_append_double(setP, "modDate", 7, orionldState.requestTime);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// patchApply -
+//
+bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, bson_t* pullP, int* pullsP, bson_t* pushP, int* pushesP)
+{
+  for (KjNode* patchObject = patchTree->value.firstChildP; patchObject != NULL; patchObject = patchObject->next)
+  {
+    KjNode* pathNode  = kjLookup(patchObject, "PATH");
+    KjNode* tree      = kjLookup(patchObject, "TREE");
+    KjNode* op        = kjLookup(patchObject, "op");
+    char*   path      = pathNode->value.s;
+    bson_t  compound;
+
+    if (op != NULL)
+    {
+      if (strcmp(op->value.s, "PULL") == 0)
+      {
+        // if "op" == "PULL", then "tree" is an array of strings
+        // { $pull: { fruits: { $in: [ "apples", "oranges" ] }}
+        bson_t inBson;
+        bson_t commaArrayBson;
+
+        bson_append_document_begin(pullP, path, -1,  &inBson);
+        bson_append_array_begin(&inBson, "$in", -1, &commaArrayBson);
+
+        for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
+        {
+          bson_append_utf8(&commaArrayBson, "0", 1, itemNameP->value.s, -1);
+          *pullsP += 1;
+        }
+        bson_append_array_end(&inBson, &commaArrayBson);
+        bson_append_document_end(pullP, &inBson);
+      }
+      else if (strcmp(op->value.s, "PUSH") == 0)
+      {
+        // if "op" == "PUSH", then "tree" is an array of strings
+        // { $push: { fruits: { $in: [ "apples", "oranges" ] }}
+        bson_t eachBson;
+        bson_t commaArrayBson;
+
+        bson_append_document_begin(pushP, path, -1,  &eachBson);
+        bson_append_array_begin(&eachBson, "$each", -1, &commaArrayBson);
+
+        for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
+        {
+          bson_append_utf8(&commaArrayBson, "0", 1, itemNameP->value.s, -1);
+          *pushesP += 1;
+        }
+        bson_append_array_end(&eachBson, &commaArrayBson);
+        bson_append_document_end(pushP, &eachBson);
+      }
+      else if (strcmp(op->value.s, "DELETE") == 0)
+      {
+        LM_TMP(("KZ: DELETE '%s'", path));
+        bson_append_utf8(unsetP, path, -1, "", 0);
+        *unsetsP += 1;
+      }
+    }
+    else if (tree->type == KjNull)
+    {
+      LM_TMP(("KZ: UNSET '%s'", path));
+      bson_append_utf8(unsetP, path, -1, "", 0);
+      *unsetsP += 1;
+    }
+    else if (tree->type == KjString)   bson_append_utf8(setP,   path, -1, tree->value.s, -1);
+    else if (tree->type == KjInt)      bson_append_int32(setP,  path, -1, tree->value.i);
+    else if (tree->type == KjFloat)    bson_append_double(setP, path, -1, tree->value.f);
+    else if (tree->type == KjBoolean)  bson_append_bool(setP,   path, -1, tree->value.b);
+    else if (tree->type == KjArray)
+    {
+      mongocKjTreeToBson(tree, &compound);
+      bson_append_array(setP, path, -1, &compound);
+    }
+    else if (tree->type == KjObject)
+    {
+      mongocKjTreeToBson(tree, &compound);
+      bson_append_document(setP, path, -1, &compound);
+    }
+  }
+
+  return true;
+}
 
 
 
@@ -41,8 +234,64 @@ extern "C"
 //
 // mongocEntityUpdate -
 //
-bool mongocEntityUpdate(const char* entityId, KjNode* requestTree)
+// For now, only PATCH /entities/{entityId} uses this function
+//
+bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
 {
-  LM_E(("mongocEntityUpdate is not implemented"));
-  return false;
+  mongocConnectionGet();
+
+  if (orionldState.mongoc.entitiesP == NULL)
+    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+
+  bson_t selector;
+  bson_init(&selector);
+  bson_append_utf8(&selector, "_id.id", 6, entityId, -1);
+
+  bson_t reply;
+  bson_t set;    // No counter needed - there's always at least one 'set' - modDate on the Entity
+  bson_t unset;
+  bson_t pull;
+  bson_t push;
+  bson_t request;
+  int    unsets  = 0;
+  int    pulls   = 0;
+  int    pushes  = 0;
+
+  bson_init(&set);
+  bson_init(&unset);
+  bson_init(&pull);
+  bson_init(&push);
+  bson_init(&request);
+
+  patchApply(patchTree, &set, &unset, &unsets, &pull, &pulls, &push, &pushes);
+
+  bson_append_document(&request, "$set", 4, &set);
+
+  if (unsets > 0)
+    bson_append_document(&request, "$unset", 6, &unset);
+
+  if (pulls > 0)
+    bson_append_document(&request, "$pull", 5, &pull);
+
+  if (pushes > 0)
+    bson_append_document(&request, "$push", 5, &push);
+
+  bool b = mongoc_collection_update_one(orionldState.mongoc.entitiesP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
+  if (b == false)
+  {
+    bson_error_t* errP = &orionldState.mongoc.error;
+    LM_E(("KZ: mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
+    return false;
+  }
+
+  // bson_error_t* errP = &orionldState.mongoc.error;
+  //
+  // FIXME:  MUST go inside 'reply' and make sure it worked
+  //
+  // Should look something like this:
+  //   { "modifiedCount" : { "$numberInt" : "1" }, "matchedCount" : { "$numberInt" : "1" }, "upsertedCount" : { "$numberInt" : "0" } }
+  //
+  // char* s = bson_as_canonical_extended_json(&reply, NULL);
+
+  return true;
 }

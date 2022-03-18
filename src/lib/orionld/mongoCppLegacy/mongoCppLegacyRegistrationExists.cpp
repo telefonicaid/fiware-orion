@@ -22,12 +22,13 @@
 *
 * Author: Ken Zangelin
 */
+#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 
 
 
@@ -37,10 +38,7 @@
 //
 bool mongoCppLegacyRegistrationExists(const char* registrationId)
 {
-  char collectionPath[256];
   int  hits = 0;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   //
   // Populate filter - only Entity ID for this operation - FOR NOW ...
@@ -53,9 +51,7 @@ bool mongoCppLegacyRegistrationExists(const char* registrationId)
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  connectionP->query(collectionPath, query);
-
-  cursorP = connectionP->query(collectionPath, query);
+  cursorP = connectionP->query(orionldState.tenantP->registrations, query);
 
   while (cursorP->more())
   {

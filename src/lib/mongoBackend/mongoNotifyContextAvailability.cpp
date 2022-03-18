@@ -25,9 +25,12 @@
 #include <string>
 #include <map>
 
-#include "common/sem.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+#include "orionld/common/orionldState.h"             // orionldState
+
+#include "common/sem.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 
@@ -48,12 +51,14 @@ HttpStatusCode mongoNotifyContextAvailability
 (
   NotifyContextAvailabilityRequest*    requestP,
   NotifyContextAvailabilityResponse*   responseP,
-  std::map<std::string, std::string>&  uriParam,
   const std::string&                   fiwareCorrelator,
-  const std::string&                   tenant,
-  const std::string&                   servicePath
+  OrionldTenant*                       tenantP,
+  const char*                          servicePath
 )
 {
+  if (tenantP == NULL)
+    tenantP = orionldState.tenantP;
+
   bool                    reqSemTaken;
   RegisterContextRequest  rcr;
 
@@ -75,7 +80,7 @@ HttpStatusCode mongoNotifyContextAvailability
    * received in the notification message)
    */
   RegisterContextResponse rcRes;
-  processRegisterContext(&rcr, &rcRes, NULL, tenant, servicePath, "JSON", fiwareCorrelator);
+  processRegisterContext(&rcr, &rcRes, NULL, tenantP, servicePath, "JSON", fiwareCorrelator);
 
   responseP->responseCode.fill(SccOk);
 

@@ -125,22 +125,26 @@ std::string HttpInfo::toJson()
 *
 * HttpInfo::fill -
 */
-void HttpInfo::fill(const BSONObj& bo)
+void HttpInfo::fill(const BSONObj* boP)
 {
-  this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
-  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
+  this->url    = boP->hasField(CSUB_REFERENCE)? getStringFieldF(boP,  CSUB_REFERENCE) : "";
+  this->custom = boP->hasField(CSUB_CUSTOM)?    getBoolFieldF(boP,    CSUB_CUSTOM)    : false;
 
   bool mqtt = (strncmp(url.c_str(), "mqtt", 4) == 0);
 
 #ifdef ORIONLD
-  std::string mimeTypeString;
+  char* mimeTypeString = (char*) getStringFieldF(boP, CSUB_MIMETYPE);
 
-  mimeTypeString = bo.hasField(CSUB_MIMETYPE)? getStringFieldF(bo, CSUB_MIMETYPE) : "application/json";  // Default
+  if (mimeTypeString[0] == 0)
+    mimeTypeString = (char*) "application/json";  // Default value
+
   this->mimeType = longStringToMimeType(mimeTypeString);
 
-  if (bo.hasField("notifierInfo"))
+  if (boP->hasField("notifierInfo"))
   {
-    BSONObj ni = getObjectFieldF(bo, "notifierInfo");
+    mongo::BSONObj ni;
+
+    getObjectFieldF(&ni, boP, "notifierInfo");  // If it fails, 'ni' is empty and the for-loop will not be entered
 
     for (BSONObj::iterator iter = ni.begin(); iter.more();)
     {
@@ -150,8 +154,8 @@ void HttpInfo::fill(const BSONObj& bo)
       const char*  value = be.String().c_str();
       KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));  // FIXME: what about initial cache fill?
 
-      strncpy(kvP->key,   key,   sizeof(kvP->key));
-      strncpy(kvP->value, value, sizeof(kvP->value));
+      strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
+      strncpy(kvP->value, value, sizeof(kvP->value) - 1);
 
       notifierInfo.push_back(kvP);
     }
@@ -160,17 +164,19 @@ void HttpInfo::fill(const BSONObj& bo)
 
   if (this->custom)
   {
-    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+    this->payload  = boP->hasField(CSUB_PAYLOAD)? getStringFieldF(boP, CSUB_PAYLOAD) : "";
 
-    if (bo.hasField(CSUB_METHOD))
+    if (boP->hasField(CSUB_METHOD))
     {
-      this->verb = str2Verb(getStringFieldF(bo, CSUB_METHOD));
+      this->verb = str2Verb(getStringFieldF(boP, CSUB_METHOD));
     }
 
     // qs
-    if (bo.hasField(CSUB_QS))
+    if (boP->hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(bo, CSUB_QS);
+      mongo::BSONObj qs;
+
+      getObjectFieldF(&qs, boP, CSUB_QS);  // If it fails, 'qs' is empty and the for-loop will not be entered
 
       for (BSONObj::iterator i = qs.begin(); i.more();)
       {
@@ -184,9 +190,11 @@ void HttpInfo::fill(const BSONObj& bo)
   if (this->custom || mqtt)
   {
     // headers
-    if (bo.hasField(CSUB_HEADERS))
+    if (boP->hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
+      BSONObj headers;
+
+      getObjectFieldF(&headers, boP, CSUB_HEADERS);  // If it fails, 'headers' is empty and the for-loop will not be entered
 
       for (BSONObj::iterator i = headers.begin(); i.more();)
       {
@@ -215,10 +223,10 @@ void HttpInfo::fill(const BSONObj& bo)
       return;
     }
 
-    if (mqttUser     != NULL) strncpy(this->mqtt.username, mqttUser,     sizeof(this->mqtt.username));
-    if (mqttPassword != NULL) strncpy(this->mqtt.password, mqttPassword, sizeof(this->mqtt.password));
-    if (mqttHost     != NULL) strncpy(this->mqtt.host,     mqttHost,     sizeof(this->mqtt.host));
-    if (mqttTopic    != NULL) strncpy(this->mqtt.topic,    mqttTopic,    sizeof(this->mqtt.topic));
+    if (mqttUser     != NULL) strncpy(this->mqtt.username, mqttUser,     sizeof(this->mqtt.username) - 1);
+    if (mqttPassword != NULL) strncpy(this->mqtt.password, mqttPassword, sizeof(this->mqtt.password) - 1);
+    if (mqttHost     != NULL) strncpy(this->mqtt.host,     mqttHost,     sizeof(this->mqtt.host) - 1);
+    if (mqttTopic    != NULL) strncpy(this->mqtt.topic,    mqttTopic,    sizeof(this->mqtt.topic) - 1);
 
     this->mqtt.mqtts = mqtts;
     this->mqtt.port  = mqttPort;

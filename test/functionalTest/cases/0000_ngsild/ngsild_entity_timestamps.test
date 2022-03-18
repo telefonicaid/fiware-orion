@@ -215,7 +215,7 @@ Date: REGEX(.*)
 05. GET E1 and make sure all 6 createdAt,modifiedAt are as they should (modifiedAt for entity and A1 new - all others as in step 3)
 ===================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 481
+Content-Length: 441
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

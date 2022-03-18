@@ -28,6 +28,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"                           // OrionldTenant
+
 #include "common/defaultValues.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "rest/OrionError.h"
@@ -75,7 +78,7 @@ static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_EXPIRATION))
     {
-      double expires = getNumberFieldAsDoubleF(subOrig, CSUB_EXPIRATION);
+      double expires = getNumberFieldAsDoubleF(&subOrig, CSUB_EXPIRATION);
 
       b->append(CSUB_EXPIRATION, expires);
       LM_T(LmtMongo, ("Subscription expiration: %f", expires));
@@ -98,8 +101,8 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   else
   {
     // 'reference' is a mandatory field and 'custom' has a clear mapping to false in the case of missing field
-    std::string reference = getStringFieldF(subOrig, CSUB_REFERENCE);
-    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(subOrig, CSUB_CUSTOM) : false;
+    std::string reference = getStringFieldF(&subOrig, CSUB_REFERENCE);
+    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(&subOrig, CSUB_CUSTOM) : false;
 
     b->append(CSUB_REFERENCE, reference);
     b->append(CSUB_CUSTOM,    custom);
@@ -109,7 +112,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_METHOD))
     {
-      std::string method = getStringFieldF(subOrig, CSUB_METHOD);
+      std::string method = getStringFieldF(&subOrig, CSUB_METHOD);
 
       b->append(CSUB_METHOD, method);
       LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
@@ -117,7 +120,8 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_HEADERS))
     {
-      BSONObj headers = getObjectFieldF(subOrig, CSUB_HEADERS);
+      BSONObj headers;
+      getObjectFieldF(&headers, &subOrig, CSUB_HEADERS);
 
       b->append(CSUB_HEADERS, headers);
       LM_T(LmtMongo, ("Subscription headers: %s", headers.toString().c_str()));
@@ -125,7 +129,8 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_QS))
     {
-      BSONObj qs = getObjectFieldF(subOrig, CSUB_QS);
+      BSONObj qs;
+      getObjectFieldF(&qs, &subOrig, CSUB_QS);
 
       b->append(CSUB_QS, qs);
       LM_T(LmtMongo, ("Subscription qs: %s", qs.toString().c_str()));
@@ -133,7 +138,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
 
     if (subOrig.hasField(CSUB_PAYLOAD))
     {
-      std::string payload = getStringFieldF(subOrig, CSUB_PAYLOAD);
+      std::string payload = getStringFieldF(&subOrig, CSUB_PAYLOAD);
 
       b->append(CSUB_PAYLOAD, payload);
       LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
@@ -157,7 +162,7 @@ static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_THROTTLING))
     {
-      double throttling = getNumberFieldAsDoubleF(subOrig, CSUB_THROTTLING);
+      double throttling = getNumberFieldAsDoubleF(&subOrig, CSUB_THROTTLING);
 
       b->append(CSUB_THROTTLING, throttling);
       LM_T(LmtMongo, ("Subscription throttling: %f", throttling));
@@ -181,7 +186,7 @@ static void setDescription(const SubscriptionUpdate& subUp, const BSONObj& subOr
   {
     if (subOrig.hasField(CSUB_DESCRIPTION))
     {
-      std::string description = getStringFieldF(subOrig, CSUB_DESCRIPTION);
+      std::string description = getStringFieldF(&subOrig, CSUB_DESCRIPTION);
 
       b->append(CSUB_DESCRIPTION, description);
       LM_T(LmtMongo, ("Subscription description: %s", description.c_str()));
@@ -205,7 +210,7 @@ static void setStatus(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
   {
     if (subOrig.hasField(CSUB_STATUS))
     {
-      std::string status = getStringFieldF(subOrig, CSUB_STATUS);
+      std::string status = getStringFieldF(&subOrig, CSUB_STATUS);
 
       b->append(CSUB_STATUS, status);
       LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
@@ -231,10 +236,13 @@ static void setEntities(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
   }
   else
   {
-    BSONArray entities = getArrayFieldF(subOrig, CSUB_ENTITIES);
-
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
+    BSONArray entities;
+    getArrayField(&entities, &subOrig, CSUB_ENTITIES, __FILE__, __LINE__);
     b->append(CSUB_ENTITIES, entities);
-    LM_T(LmtMongo, ("Subscription entities: %s", entities.toString().c_str()));
   }
 }
 
@@ -252,10 +260,13 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
   }
   else
   {
-    BSONArray attrs = getArrayFieldF(subOrig, CSUB_ATTRS);
-
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
+    BSONArray attrs;
+    getArrayField(&attrs, &subOrig, CSUB_ATTRS, __FILE__, __LINE__);
     b->append(CSUB_ATTRS, attrs);
-    LM_T(LmtMongo, ("Subscription attrs: %s", attrs.toString().c_str()));
   }
 }
 
@@ -270,14 +281,14 @@ static void setAttrs(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BS
 static void setCondsAndInitialNotifyNgsiv1
 (
   const Subscription&              sub,
-  const BSONObj&                   subOrig,
+  const BSONObj*                   subOrigP,
   const std::string&               subId,
   const std::string&               status,
   const std::string&               url,
   RenderFormat                     attrsFormat,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone
@@ -291,14 +302,14 @@ static void setCondsAndInitialNotifyNgsiv1
   //
 
   std::vector<EntID>        entities;
-  std::vector<BSONElement>  ents = getFieldF(subOrig, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  ents = getFieldF(subOrigP, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj     ent       = ents[ix].embeddedObject();
-    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    std::string id        = getStringFieldF(&ent, CSUB_ENTITY_ID);
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(&ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern = getStringFieldF(&ent, CSUB_ENTITY_ISPATTERN);
     EntID       en;
 
     if (isFalse(isPattern))
@@ -317,11 +328,11 @@ static void setCondsAndInitialNotifyNgsiv1
   std::vector<std::string> attributes;
   std::vector<std::string> metadata;
 
-  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
+  setStringVectorF(subOrigP, CSUB_ATTRS, &attributes);
 
-  if (subOrig.hasField(CSUB_METADATA))
+  if (subOrigP->hasField(CSUB_METADATA))
   {
-    setStringVectorF(subOrig, CSUB_METADATA, &metadata);
+    setStringVectorF(subOrigP, CSUB_METADATA, &metadata);
   }
 
   /* Conds vector (and maybe an initial notification) */
@@ -335,7 +346,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             ngsiv2::HttpInfo(url),
                                             notificationDone,
                                             attrsFormat,
-                                            tenant,
+                                            tenantP,
                                             xauthToken,
                                             servicePathV,
                                             &(sub.restriction),
@@ -357,10 +368,10 @@ static void setCondsAndInitialNotifyNgsiv1
 static void setCondsAndInitialNotify
 (
   const SubscriptionUpdate&        subUp,
-  const BSONObj&                   subOrig,
-  const std::string&               tenant,
+  const BSONObj*                   subOrigP,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
   BSONObjBuilder*                  b,
   bool*                            notificationDone
@@ -384,7 +395,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
+      status = subOrigP->hasField(CSUB_STATUS)? getStringFieldF(subOrigP, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
     if (subUp.notificationProvided)
@@ -396,13 +407,13 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      httpInfo.fill(subOrig);
-      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
-      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
+      httpInfo.fill(subOrigP);
+      blacklist = subOrigP->hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrigP, CSUB_BLACKLIST) : false;
+      setStringVectorF(subOrigP, CSUB_ATTRS, &notifAttributesV);
 
-      if (subOrig.hasField(CSUB_METADATA))
+      if (subOrigP->hasField(CSUB_METADATA))
       {
-        setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+        setStringVectorF(subOrigP, CSUB_METADATA, &metadataV);
       }
     }
 
@@ -410,9 +421,9 @@ static void setCondsAndInitialNotify
     {
       attrsFormat = subUp.attrsFormat;
     }
-    else if (subOrig.hasField(CSUB_FORMAT))
+    else if (subOrigP->hasField(CSUB_FORMAT))
     {
-      attrsFormat = stringToRenderFormat(getStringFieldF(subOrig, CSUB_FORMAT));
+      attrsFormat = stringToRenderFormat(getStringFieldF(subOrigP, CSUB_FORMAT));
     }
 
     if (subUp.fromNgsiv1)
@@ -426,12 +437,12 @@ static void setCondsAndInitialNotify
       // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
       //
       setCondsAndInitialNotifyNgsiv1(subUp,
-                                     subOrig,
+                                     subOrigP,
                                      subUp.id,
                                      status,
                                      httpInfo.url,
                                      attrsFormat,
-                                     tenant,
+                                     tenantP,
                                      servicePathV,
                                      xauthToken,
                                      fiwareCorrelator,
@@ -448,7 +459,7 @@ static void setCondsAndInitialNotify
                                httpInfo,
                                blacklist,
                                attrsFormat,
-                               tenant,
+                               tenantP,
                                servicePathV,
                                xauthToken,
                                fiwareCorrelator,
@@ -458,10 +469,13 @@ static void setCondsAndInitialNotify
   }
   else
   {
-    BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
-
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
+    BSONArray conds;
+    getArrayField(&conds, subOrigP, CSUB_CONDITIONS, __FILE__, __LINE__);
     b->append(CSUB_CONDITIONS, conds);
-    LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
   }
 }
 
@@ -475,7 +489,7 @@ static void setCount(long long inc, const BSONObj& subOrig, BSONObjBuilder* b)
 {
   if (subOrig.hasField(CSUB_COUNT))
   {
-    long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
+    long long count = getIntOrLongFieldAsLongF(&subOrig, CSUB_COUNT);
     setCount(count + inc, b);
   }
   else
@@ -514,7 +528,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
     return;
   }
 
-  double lastNotification = getNumberFieldAsDoubleF(subOrig, CSUB_LASTNOTIFICATION);
+  double lastNotification = getNumberFieldAsDoubleF(&subOrig, CSUB_LASTNOTIFICATION);
 
   //
   // Compare with 'lastNotificationTime', that might come from the sub-cache.
@@ -536,7 +550,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static double setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  double lastFailure = subOrig.hasField(CSUB_LASTFAILURE)? getNumberFieldAsDoubleF(subOrig, CSUB_LASTFAILURE) : 0;
+  double lastFailure = subOrig.hasField(CSUB_LASTFAILURE)? getNumberFieldAsDoubleF(&subOrig, CSUB_LASTFAILURE) : 0;
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -560,7 +574,7 @@ static double setLastFailure(const BSONObj& subOrig, CachedSubscription* subCach
 */
 static double setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  double lastSuccess = getNumberFieldAsDoubleF(subOrig, CSUB_LASTSUCCESS);
+  double lastSuccess = getNumberFieldAsDoubleF(&subOrig, CSUB_LASTSUCCESS);
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -594,7 +608,7 @@ static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOri
 
     if (subOrig.hasField(CSUB_EXPR))
     {
-      expression = getObjectFieldF(subOrig, CSUB_EXPR);
+      getObjectFieldF(&expression, &subOrig, CSUB_EXPR);
     }
     else
     {
@@ -626,7 +640,7 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
   }
   else
   {
-    std::string format = getStringFieldF(subOrig, CSUB_FORMAT);
+    std::string format = getStringFieldF(&subOrig, CSUB_FORMAT);
 
     b->append(CSUB_FORMAT, format);
     LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
@@ -647,7 +661,7 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
   }
   else
   {
-    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(&subOrig, CSUB_BLACKLIST) : false;
 
     b->append(CSUB_BLACKLIST, bList);
     LM_T(LmtMongo, ("Subscription blacklist: %s", bList? "true" : "false"));
@@ -672,15 +686,14 @@ static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
     // Note that if subOrig doesn't have CSUB_METADATA (e.g. old subscription in the DB created before
     // this feature) BSONArray constructor ensures an empty array
     //
+
+    //
+    // Ignoring bool response from getArrayField
+    // If not found, an empty array is added to 'b'
+    //
     BSONArray metadata;
-
-    if (subOrig.hasField(CSUB_METADATA))
-    {
-      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
-    }
-
+    getArrayField(&metadata, &subOrig, CSUB_METADATA, __FILE__, __LINE__);
     b->append(CSUB_METADATA, metadata);
-    LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
   }
 }
 
@@ -694,7 +707,7 @@ void updateInCache
 (
   const BSONObj&             doc,
   const SubscriptionUpdate&  subUp,
-  const std::string&         tenant,
+  OrionldTenant*             tenantP,
   double                     lastNotification,
   double                     lastFailure,
   double                     lastSuccess
@@ -758,7 +771,7 @@ void updateInCache
   //
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
-  CachedSubscription* subCacheP        = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  CachedSubscription* subCacheP        = subCacheItemLookup(tenantP->tenant, subUp.id.c_str());
   char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
   std::string         q;
   std::string         mq;
@@ -769,30 +782,31 @@ void updateInCache
 
   if (doc.hasField(CSUB_FORMAT))
   {
-    renderFormat = stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT));
+    renderFormat = stringToRenderFormat(getStringFieldF(&doc, CSUB_FORMAT));
   }
 
   if (doc.hasField(CSUB_EXPR))
   {
-    BSONObj expr = getObjectFieldF(doc, CSUB_EXPR);
+    BSONObj expr;
+    getObjectFieldF(&expr, &doc, CSUB_EXPR);
 
-    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(expr, CSUB_EXPR_Q)      : "";
-    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
-    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
-    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
-    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(&expr, CSUB_EXPR_Q)      : "";
+    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(&expr, CSUB_EXPR_MQ)     : "";
+    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(&expr, CSUB_EXPR_GEOM)   : "";
+    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(&expr, CSUB_EXPR_COORDS) : "";
+    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(&expr, CSUB_EXPR_GEOREL) : "";
   }
 
 
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+  int mscInsert = mongoSubCacheItemInsert(tenantP->tenant,
                                           doc,
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotification,
                                           lastFailure,
                                           lastSuccess,
-                                          doc.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
+                                          doc.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&doc, CSUB_EXPIRATION) : 0,
+                                          doc.hasField(CSUB_STATUS)? getStringFieldF(&doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
                                           mq,
                                           geom,
@@ -831,9 +845,9 @@ std::string mongoUpdateSubscription
 (
   const SubscriptionUpdate&        subUp,
   OrionError*                      oe,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator
 )
 {
@@ -847,7 +861,7 @@ std::string mongoUpdateSubscription
   OID            id;
   BSONObj        subOrig;
 
-  if (!safeGetSubId(subId, &id, &sc))
+  if (!safeGetSubId(&subId, &id, &sc))
   {
     std::string details;
 
@@ -869,7 +883,7 @@ std::string mongoUpdateSubscription
   }
 
   std::string err;
-  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &subOrig, &err))
+  if (!collectionFindOne(tenantP->subscriptions, BSON("_id" << id), &subOrig, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
@@ -887,7 +901,7 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder      b;
-  std::string         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
+  const char*         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0].c_str();
   bool                notificationDone = false;
   double              lastNotification = 0;
   double              lastFailure      = 0;
@@ -896,7 +910,7 @@ std::string mongoUpdateSubscription
 
   if (!noCache)
   {
-    subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+    subCacheP = subCacheItemLookup(tenantP->tenant, subUp.id.c_str());
   }
 
   setExpiration(subUp, subOrig, &b);
@@ -911,8 +925,8 @@ std::string mongoUpdateSubscription
   setBlacklist(subUp, subOrig, &b);
 
   setCondsAndInitialNotify(subUp,
-                           subOrig,
-                           tenant,
+                           &subOrig,
+                           tenantP,
                            servicePathV,
                            xauthToken,
                            fiwareCorrelator,
@@ -956,10 +970,9 @@ std::string mongoUpdateSubscription
   BSONObj doc = b.obj();
 
   // Update in DB
-  std::string  colName = getSubscribeContextCollectionName(tenant);
   BSONObj      bson    = BSON("_id" << OID(subUp.id));
 
-  if (!collectionUpdate(colName, bson, doc, false, &err))
+  if (!collectionUpdate(tenantP->subscriptions, bson, doc, false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
@@ -970,7 +983,7 @@ std::string mongoUpdateSubscription
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification, lastFailure, lastSuccess);
+    updateInCache(doc, subUp, tenantP, lastNotification, lastFailure, lastSuccess);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);

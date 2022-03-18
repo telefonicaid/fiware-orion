@@ -63,12 +63,12 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 {
   ParseData       reqData;
   const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -90,12 +90,12 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 {
   ParseData       reqData;
   const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.badIsPattern.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -116,12 +116,12 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noEntityId.invalid.json";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.noEntityId.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -143,12 +143,12 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.badDuration.invalid.json";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.badDuration.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
   utInit();
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

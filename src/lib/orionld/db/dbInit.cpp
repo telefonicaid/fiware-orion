@@ -30,8 +30,13 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"             // mongoCppLegacyEntityUpdate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"             // mongoCppLegacyEntityLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"    // mongoCppLegacyEntityAttributeLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeInstanceLookup.h"    // mongoCppLegacyEntityAttributeInstanceLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesAttributeLookup.h"  // mongoCppLegacyEntitiesAttributeLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeWithDatasetsLookup.h"  // mongoCppLegacyEntityAttributeWithDatasetsLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"   // mongoCppLegacyEntityAttributesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypeGet.h"            // mongoCppLegacyEntityTypeGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"       // mongoCppLegacyEntityFieldReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldDelete.h"        // mongoCppLegacyEntityFieldDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"             // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"          // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityDelete.h"             // mongoCppLegacyEntityDelete
@@ -52,6 +57,8 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyIdIndexCreate.h"            // mongoCppLegacyIdIndexCreate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"           // mongoCppLegacyEntityRetrieve
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"            // mongoCppLegacyEntitiesQuery
+#include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"               // mongoCppLegacyDatasetGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyTenantExists.h"             // mongoCppLegacyTenantExists
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -77,9 +84,14 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntityLookup                           = mongoCppLegacyEntityLookup;
   dbEntityRetrieve                         = mongoCppLegacyEntityRetrieve;
   dbEntityAttributeLookup                  = mongoCppLegacyEntityAttributeLookup;
+  dbEntityAttributeInstanceLookup          = mongoCppLegacyEntityAttributeInstanceLookup;
+  dbEntityAttributeWithDatasetsLookup      = mongoCppLegacyEntityAttributeWithDatasetsLookup;
+  dbEntitiesAttributeLookup                = mongoCppLegacyEntitiesAttributeLookup;
   dbEntityAttributesDelete                 = mongoCppLegacyEntityAttributesDelete;
+  dbEntityTypeGet                          = mongoCppLegacyEntityTypeGet;
   dbEntityUpdate                           = mongoCppLegacyEntityUpdate;
   dbEntityFieldReplace                     = mongoCppLegacyEntityFieldReplace;
+  dbEntityFieldDelete                      = mongoCppLegacyEntityFieldDelete;
   dbDataToKjTree                           = mongoCppLegacyDataToKjTree;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityDelete                           = mongoCppLegacyEntityDelete;
@@ -99,6 +111,8 @@ void dbInit(const char* dbHost, const char* dbName)
   dbGeoIndexCreate                         = mongoCppLegacyGeoIndexCreate;
   dbIdIndexCreate                          = mongoCppLegacyIdIndexCreate;
   dbEntitiesQuery                          = mongoCppLegacyEntitiesQuery;
+  dbDatasetGet                             = mongoCppLegacyDatasetGet;
+  dbTenantExists                           = mongoCppLegacyTenantExists;
 
   mongoCppLegacyInit(dbHost, dbName);
 

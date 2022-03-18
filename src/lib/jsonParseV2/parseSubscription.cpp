@@ -31,6 +31,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
@@ -84,14 +86,14 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
 {
   rapidjson::Document document;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -101,7 +103,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -192,7 +194,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = (uint64_t) parse8601Time(expires);
+      eT = (uint64_t) parse8601Time((char*) expires.c_str());
       if (eT == -1)
       {
         return badInput(ciP, "expires has an invalid format");
@@ -550,7 +552,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
   else if (attrsFormatOpt.given)
   {
-    std::string   attrsFormatString = attrsFormatOpt.value;
+    const char*   attrsFormatString = attrsFormatOpt.value.c_str();
     RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
     if (nFormat == NO_FORMAT)

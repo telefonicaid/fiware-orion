@@ -59,7 +59,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       DUPLICATE_CHECK(idP, "entities[X]::id", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::id");
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::id");
-      URI_CHECK(entityItemP, "entities[X]::id");
+      URI_CHECK(entityItemP->value.s, "entities[X]::id", true);
     }
     else if (strcmp(entityItemP->name, "idPattern") == 0)
     {
@@ -73,13 +73,14 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       DUPLICATE_CHECK(typeP, "entities[X]::type", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::type");
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::type");
+      URI_CHECK(entityItemP->value.s, "entities[X]::type", false);
 
       //
       // Expand, unless already expanded
       // If a ':' is found inside the first 10 chars, the value is assumed to be expanded ...
       //
       if (orionldContextItemAlreadyExpanded(entityItemP->value.s) == false)
-        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);
+        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);  // entity type
     }
     else
     {

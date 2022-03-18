@@ -22,15 +22,25 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
 #include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
 #include "orionld/troe/pgDatabaseTableCreateAll.h"             // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// The variable 'dbCreationCommand' comes from an auto-generated file:
+//  src/lib/orionld/troe/dbCreationCommand.cpp
+//
+// No need to auto-generate also a header file - the variable is only used in this file.
+//
+extern const char* dbCreationCommand;
 
 
 
@@ -45,99 +55,16 @@
 //
 bool pgDatabaseTableCreateAll(PGconn* connectionP)
 {
-  const char* valueTypeSql = "CREATE TYPE ValueType AS ENUM("
-    "'String',"
-    "'Number',"
-    "'Boolean',"
-    "'Relationship',"
-    "'Compound',"
-    "'DateTime',"
-    "'GeoPoint',"
-    "'GeoPolygon',"
-    "'GeoMultiPolygon',"
-    "'GeoLineString',"
-    "'GeoMultiLineString',"
-    "'LanguageMap')";
-
-  const char* opModeSql = "CREATE TYPE OperationMode AS ENUM("
-    "'Create',"
-    "'Append',"
-    "'Update',"
-    "'Replace',"
-    "'Delete')";
-
-  const char* entitiesSql = "CREATE TABLE IF NOT EXISTS entities ("
-    "instanceId   TEXT PRIMARY KEY,"
-    "ts           TIMESTAMP NOT NULL,"
-    "opMode       OperationMode,"
-    "id           TEXT NOT NULL,"
-    "type         TEXT NOT NULL)";
-
-  const char* attributesSql = "CREATE TABLE IF NOT EXISTS attributes ("
-    "instanceId          TEXT PRIMARY KEY,"
-    "id                  TEXT NOT NULL,"
-    "opMode              OperationMode,"
-    "entityId            TEXT NOT NULL,"
-    "observedAt          TIMESTAMP,"
-    "subProperties       BOOL,"
-    "unitCode            TEXT,"
-    "datasetId           TEXT,"
-    "valueType           ValueType,"
-    "text                TEXT,"
-    "boolean             BOOL,"
-    "number              FLOAT8,"
-    "datetime            TIMESTAMP,"
-    "compound            JSONB,"
-    "geoPoint            GEOGRAPHY(POINTZ, 4326),"
-    "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
-    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
-    "geoLineString       GEOGRAPHY(LINESTRING),"
-    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
-    "ts                  TIMESTAMP NOT NULL)";
-
-  const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
-    "instanceId          TEXT PRIMARY KEY,"
-    "id                  TEXT NOT NULL,"
-    "entityId            TEXT NOT NULL,"
-    "attrInstanceId      TEXT NOT NULL,"
-    "observedAt          TIMESTAMP,"
-    "unitCode            TEXT,"
-    "valueType           ValueType,"
-    "text                TEXT,"
-    "boolean             BOOL,"
-    "number              FLOAT8,"
-    "datetime            TIMESTAMP,"
-    "compound            JSONB,"
-    "geoPoint            GEOGRAPHY(POINTZ, 4326),"
-    "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
-    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
-    "geoLineString       GEOGRAPHY(LINESTRING),"
-    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
-    "ts                  TIMESTAMP NOT NULL)";
-
-#if 0
-  const char* entitiesTimescale      = "SELECT create_hypertable('entities', 'ts')";
-  const char* attributesTimescale    = "SELECT create_hypertable('attributes', 'ts')";
-  const char* subAttributesTimescale = "SELECT create_hypertable('subAttributes', 'ts')";
-  const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql, entitiesTimescale, attributesTimescale, subAttributesTimescale };
-#endif
-
-  const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
-
   if (pgTransactionBegin(connectionP) == false)
     LM_RE(false, ("pgTransactionBegin failed"));
 
-  for (unsigned int ix = 0; ix < sizeof(sqlV) / sizeof(sqlV[0]); ix++)
+  PGresult* res = PQexec(connectionP, dbCreationCommand);
+  if (res == NULL)
   {
-    LM_TMP(("SQL[%p]: %s", connectionP, sqlV[ix]));
-    PGresult*  res = PQexec(connectionP, sqlV[ix]);
-    if (res == NULL)
-    {
-      pgTransactionRollback(connectionP);
-      LM_RE(false, ("Database Error (PQexec(%s): %s)", sqlV[ix], PQresStatus(PQresultStatus(res))));
-    }
-    PQclear(res);
+    pgTransactionRollback(connectionP);
+    LM_RE(false, ("Database Error (PQexec(%s): %s)", dbCreationCommand, PQresStatus(PQresultStatus(res))));
   }
+  PQclear(res);
 
   pgTransactionCommit(connectionP);
   return true;

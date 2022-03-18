@@ -25,13 +25,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 // ----------------------------------------------------------------------------
 //
 // troePostEntities -
 //
-extern bool troePostEntities(ConnectionInfo* ciP);
+extern bool troePostEntities(void);
 
 #endif  // SRC_LIB_ORIONLD_TROE_TROEPOSTENTITIES_H_

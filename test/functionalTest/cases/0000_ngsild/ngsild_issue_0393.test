@@ -58,7 +58,7 @@ payload=' [
       "type": "Property",
       "value": "unhealthy"
     },
-    "refPointOfInterest": {
+    "refPointOfHinterest": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict"
     },
@@ -102,7 +102,7 @@ payload=' [
       "type": "Property",
       "value": "unhealthy"
     },
-    "refPointOfInterest": {
+    "refPointOfHinterest": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict"
     },
@@ -127,9 +127,14 @@ echo
 --REGEXPECT--
 01. Create an entity 'urn:ngsi-ld:testunit:125' using batch upsert
 ==================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 28
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:testunit:125"
+]
 
 
 02. See the entity in the database
@@ -144,13 +149,13 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dateObserved",
-		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/airQualityLevel",
+		"https://uri.fiware.org/ns/data-models#dateObserved",
+		"https://uri.fiware.org/ns/data-models#airQualityLevel",
 		"https://uri.etsi.org/ngsi-ld/default-context/CO_Level",
-		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/refPointOfInterest"
+		"https://uri.etsi.org/ngsi-ld/default-context/refPointOfHinterest"
 	],
 	"attrs" : {
-		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/dateObserved" : {
+		"https://uri=fiware=org/ns/data-models#dateObserved" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -160,7 +165,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [ ]
 		},
-		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/airQualityLevel" : {
+		"https://uri=fiware=org/ns/data-models#airQualityLevel" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -174,7 +179,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "unhealthy",
 			"mdNames" : [ ]
 		},
-		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/refPointOfInterest" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/refPointOfHinterest" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -199,7 +204,7 @@ Date: REGEX(.*)
 04. GET the entity, see the updated values
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 623
+Content-Length: 478
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -209,22 +214,22 @@ Date: REGEX(.*)
         "type": "Property",
         "value": "unhealthy"
     },
-    "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/airQualityLevel": {
+    "https://uri.fiware.org/ns/data-models#airQualityLevel": {
         "type": "Property",
         "value": "BAD"
     },
-    "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dateObserved": {
+    "https://uri.fiware.org/ns/data-models#dateObserved": {
         "type": "Property",
         "value": {
             "@type": "DateTime",
             "@value": "2018-08-12T12:00:00Z"
         }
     },
-    "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/refPointOfInterest": {
+    "id": "urn:ngsi-ld:testunit:125",
+    "refPointOfHinterest": {
         "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict",
         "type": "Relationship"
     },
-    "id": "urn:ngsi-ld:testunit:125",
     "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
 }
 

@@ -131,15 +131,15 @@ class MetricsManager
   void            semGive(void);
   void            _reset(void);
   std::string     _toJson(void);
-  bool            serviceValid(const std::string& srv);
-  bool            subServiceValid(const std::string& subsrv);
-  bool            servicePathForMetrics(const std::string& spath, std::string* subServiceP);
+  bool            serviceValid(const char* srv);
+  bool            subServiceValid(const char* subsrv);
+  bool            servicePathForMetrics(const char* spath, std::string* subServiceP);
 
  public:
   MetricsManager();
 
   bool         init(bool _on, bool _semWaitStatistics);
-  void         add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value);
+  void         add(const char* srv, const char* subServ, const char* metric, uint64_t value);
   void         reset(void);
   std::string  toJson(bool doReset);
   bool         isOn(void);

@@ -1,0 +1,139 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications with subscription-id as URL parameter
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription with sub-id urn:ngsi-ld:subscriptions:s1
+# 02. Create a matching Entity
+# 03. Dump the accumulator to see the notification, and in particular, see the subscription id as a URL parameter
+#
+
+echo "01. Create a subscription with sub-id urn:ngsi-ld:subscriptions:s1"
+echo "=================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscription:s1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "Vehicle"
+    }
+  ],
+  "description": "Notify me of all product vehicles changes",
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a matching Entity"
+echo "============================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:A4501",
+  "type": "Vehicle",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump the accumulator to see the notification, and in particular, see the subscription id as a URL parameter"
+echo "==============================================================================================================="
+sleep .5
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with sub-id urn:ngsi-ld:subscriptions:s1
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:s1
+Date: REGEX(.*)
+
+
+
+02. Create a matching Entity
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4501
+Date: REGEX(.*)
+
+
+
+03. Dump the accumulator to see the notification, and in particular, see the subscription id as a URL parameter
+===============================================================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscription:s1
+Fiware-Servicepath: /
+Content-Length: 336
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "P1": {
+                "type": "Property", 
+                "value": 1
+            }, 
+            "id": "urn:ngsi-ld:Vehicle:A4501", 
+            "type": "Vehicle"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:subscription:s1", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

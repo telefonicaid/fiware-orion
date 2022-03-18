@@ -25,41 +25,11 @@
 #include <string>
 #include <map>
 
+#include "orionld/common/orionldState.h"                    // orionldState
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "rest/ConnectionInfo.h"
-
-#ifdef ORIONLD
-#include "orionld/common/orionldState.h"                    // orionldState
-#endif
-
-
-
-/* ****************************************************************************
-*
-* validOptions -
-*
-* Text definitions OPT_* found in common/globals.h
-*/
-static const char* validOptions[] =
-{
-  OPT_COUNT,
-  OPT_NORMALIZED,
-  OPT_VALUES,
-  OPT_KEY_VALUES,
-  OPT_APPEND,
-  OPT_UNIQUE_VALUES,
-  OPT_DATE_CREATED,
-  OPT_DATE_MODIFIED,
-  OPT_NO_ATTR_DETAIL,
-  OPT_UPSERT
-#ifdef ORIONLD
-  , OPT_SYS_ATTRS
-  , OPT_NO_OVERWRITE
-  , OPT_UPDATE
-  , OPT_REPLACE
-#endif
-};
 
 
 
@@ -68,25 +38,7 @@ static const char* validOptions[] =
 * ConnectionInfo::ConnectionInfo - 
 */
 ConnectionInfo::ConnectionInfo():
-  connection             (NULL),
-  verb                   (NOVERB),
-  badVerb                (false),
-  inMimeType             (JSON),
-  outMimeType            (JSON),
-  tenant                 (""),
-  restServiceP           (NULL),
-  payload                (NULL),
-  payloadSize            (0),
-  callNo                 (1),
-  parseDataP             (NULL),
-  port                   (0),
-  ip                     (""),
-  apiVersion             (V1),
-  transactionStart       { 0, 0 },
-  inCompoundValue        (false),
-  compoundValueP         (NULL),
-  compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk)
+  restServiceP           (NULL)
 {
 }
 
@@ -96,69 +48,20 @@ ConnectionInfo::ConnectionInfo():
 *
 * ConnectionInfo::ConnectionInfo - 
 */
-ConnectionInfo::ConnectionInfo(MimeType _outMimeType):
-  connection             (NULL),
-  verb                   (NOVERB),
-  badVerb                (false),
-  inMimeType             (JSON),
-  outMimeType            (_outMimeType),
-  tenant                 (""),
-  restServiceP           (NULL),
-  payload                (NULL),
-  payloadSize            (0),
-  callNo                 (1),
-  parseDataP             (NULL),
-  port                   (0),
-  ip                     (""),
-  apiVersion             (V1),
-  transactionStart       { 0, 0 },
-  inCompoundValue        (false),
-  compoundValueP         (NULL),
-  compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk)
+ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
+  restServiceP           (NULL)
 {
-}
+  orionldState.mhdConnection = _connection;
 
-
-
-/* ****************************************************************************
-*
-* ConnectionInfo::ConnectionInfo - 
-*/
-ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection):
-  connection             (_connection),
-  verb                   (NOVERB),
-  badVerb                (false),
-  inMimeType             (JSON),
-  outMimeType            (JSON),
-  url                    (_url),
-  method                 (_method),
-  version                (_version),
-  tenant                 (""),
-  restServiceP           (NULL),
-  payload                (NULL),
-  payloadSize            (0),
-  callNo                 (1),
-  parseDataP             (NULL),
-  port                   (0),
-  ip                     (""),
-  apiVersion             (V1),
-  transactionStart       { 0, 0 },
-  inCompoundValue        (false),
-  compoundValueP         (NULL),
-  compoundValueRoot      (NULL),
-  httpStatusCode         (SccOk)
-{
-  if      (_method == "POST")    verb = POST;
-  else if (_method == "PUT")     verb = PUT;
-  else if (_method == "GET")     verb = GET;
-  else if (_method == "DELETE")  verb = DELETE;
-  else if (_method == "PATCH")   verb = PATCH;
-  else if (_method == "OPTIONS") verb = OPTIONS;
-  else
+  if ((orionldState.verb != POST)    &&
+      (orionldState.verb != PUT)     &&
+      (orionldState.verb != GET)     &&
+      (orionldState.verb != DELETE)  &&
+      (orionldState.verb != PATCH)   &&
+      (orionldState.verb != OPTIONS))
   {
-    badVerb = true;
-    verb    = NOVERB;
+    orionldState.badVerb = true;
+    orionldState.verb    = NOVERB;
   }
 }
 
@@ -170,80 +73,7 @@ ConnectionInfo::ConnectionInfo(std::string _url, std::string _method, std::strin
 */
 ConnectionInfo::~ConnectionInfo()
 {
-  if (compoundValueRoot != NULL)
-  {
-    delete compoundValueRoot;
-    compoundValueRoot = NULL;
-  }
-
   servicePathV.clear();
-  httpHeaders.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* isValidOption -
-*/
-static bool isValidOption(std::string item)
-{
-  for (unsigned int ix = 0; ix < sizeof(validOptions) / sizeof(validOptions[0]); ++ix)
-  {
-    if (item == validOptions[ix])
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* uriParamOptionsParse - parse the URI param 'options' into uriParamOptions map
-*
-* RETURN VALUE
-*  0  on success
-* <0  on error
-*/
-int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
-{
-  std::vector<std::string> vec;
-
-  stringSplit(value, ',', vec);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    if (!isValidOption(vec[ix]))
-    {
-      return -1;
-    }
-
-    ciP->uriParamOptions[vec[ix]] = true;
-
-#ifdef ORIONLD
-    if (strcmp(vec[ix].c_str(), "noOverwrite") == 0)
-      orionldState.uriParamOptions.noOverwrite = true;
-    else if (strcmp(vec[ix].c_str(), "update") == 0)
-      orionldState.uriParamOptions.update = true;
-    else if (strcmp(vec[ix].c_str(), "replace") == 0)
-      orionldState.uriParamOptions.replace = true;
-    else if (strcmp(vec[ix].c_str(), "keyValues") == 0)
-      orionldState.uriParamOptions.keyValues = true;
-#endif
-  }
-
-  //
-  // Check of invalid combinations
-  //
-  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_VALUES])        return -1;
-  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_UNIQUE_VALUES]) return -1;
-  if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] && ciP->uriParamOptions[OPT_VALUES])        return -1;
-
-  return 0;
 }
 
 

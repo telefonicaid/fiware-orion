@@ -45,11 +45,11 @@
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/NotifyContextResponse.h"
 
+#include "rest/HttpHeaders.h"                                    // HTTP_* defines
 #include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "rest/HttpStatusCode.h"
-#include "rest/HttpHeaders.h"
 #include "rest/mhd.h"
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
@@ -63,142 +63,112 @@
 
 /* ****************************************************************************
 *
-* replyIx - counter of the replies
-*/
-static int replyIx = 0;
-
-
-
-/* ****************************************************************************
-*
 * restReply -
 */
-void restReply(ConnectionInfo* ciP, const std::string& answer)
+void restReply(ConnectionInfo* ciP, const char* answer)
 {
   MHD_Response*  response;
+  int            answerLen = (answer != NULL)? strlen(answer) : 0;
+  char*          spath     = NULL;
 
-  uint64_t       answerLen = answer.length();
-  std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+  if ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))
+    spath = (char*) ciP->servicePathV[0].c_str();
 
-  ++replyIx;
-  LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
-  LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
+  response = MHD_create_response_from_buffer(answerLen, (char*) answer, MHD_RESPMEM_MUST_COPY);
 
-  response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
+  bool metrics = (orionldState.apiVersion != NGSI_LD_V1) && metricsMgr.isOn();
   if (!response)
   {
-    if (ciP->apiVersion != NGSI_LD_V1)
-    {
-      if (metricsMgr.isOn())
-        metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
-    }
-    
+    if (metrics == true)
+      metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
 
-#ifdef ORIONLD
     if (orionldState.responsePayloadAllocated == true)
     {
       free(orionldState.responsePayload);
       orionldState.responsePayload = NULL;
     }
-#endif    
 
     return;
   }
 
-  if (answerLen > 0)
+  if ((metrics == true) && (answerLen > 0))
+    metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
+
+  //
+  // Get the HTTP headers from orionldState.out.headers
+  //
+  for (int ix = 0; ix < orionldState.out.headers.ix; ix++)
   {
-    if (ciP->apiVersion != NGSI_LD_V1)
-    {
-      if (metricsMgr.isOn())
-        metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
-    }
+    OrionldHeader* hP = &orionldState.out.headers.headerV[ix];
+
+    MHD_add_response_header(response, orionldHeaderName[hP->type], hP->sValue);
   }
 
-  for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
+  if ((answer != NULL) && (*answer != 0))
   {
-    MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
-  }
+    char* contentType = (char*) "application/json";
+    if (orionldState.apiVersion == NGSI_LD_V1)
+    {
+      if      (answerLen <= 2)                          contentType = (char*) "application/json";
+      else if (orionldState.httpStatusCode  >= 400)     contentType = (char*) "application/json";
+      else if (orionldState.out.contentType == JSONLD)  contentType = (char*) "application/ld+json";
+      else if (orionldState.out.contentType == GEOJSON) contentType = (char*) "application/geo+json";
+    }
+    else
+    {
+      if (orionldState.out.contentType == TEXT)
+        contentType = (char*) "text/plain";
+    }
 
-  if (answer != "")
-  {
-    //
-    // For error-responses, never respond with application/ld+json
-    //
-    if ((ciP->httpStatusCode >= 400) && (ciP->outMimeType == JSONLD))
-      ciP->outMimeType = JSON;
-
-    if (orionldState.acceptGeojson == true)
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/geo+json");
-    else if (ciP->outMimeType == JSON)
-    {
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
-    }
-#ifdef ORIONLD
-    else if ((ciP->outMimeType == JSONLD) || (ciP->httpHeaders.accept == "application/ld+json"))
-    {
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/ld+json");
-    }
-#endif
-    else if (ciP->outMimeType == TEXT)
-    {
-      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "text/plain");
-    }
+    MHD_add_response_header(response, HTTP_CONTENT_TYPE, contentType);
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
+  if (orionldState.apiVersion != NGSI_LD_V1)
   {
-    // Only GET method is supported for V1 API
-    if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
+    if ((corsEnabled == true) && (orionldState.in.origin != NULL) && (orionldState.httpStatusCode != SccBadVerb))
     {
-      bool originAllowed = true;
+      // Only GET method is supported for V1 API
+      if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == GET))
+      {
+        //
+        // If any origin is allowed, the header is sent always with "any" as value
+        // If a specific origin is allowed, the header is only sent if the origins match
+        //
+        char* allowOrigin  = NULL;
 
-      // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(corsOrigin, "__ALL") == 0)
-      {
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
-      }
-      // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
-      {
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
-      }
-      // If there is no match, originAllowed flag is set to false
-      else
-      {
-        originAllowed = false;
-      }
+        if      (strcmp(corsOrigin, "__ALL")                == 0)  allowOrigin = (char*) "*";
+        else if (strcmp(orionldState.in.origin, corsOrigin) == 0)  allowOrigin = corsOrigin;
 
-      // If the origin is not allowed, no headers are added to the response
-      if (originAllowed)
-      {
-        // Add Access-Control-Expose-Headers to the response
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
-
-        if (ciP->verb == OPTIONS)
+        // If the origin is not allowed, no headers are added to the response
+        if (allowOrigin != NULL)
         {
-          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN,   allowOrigin);
+          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
 
-          char maxAge[STRING_SIZE_FOR_INT];
-          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
+          if (orionldState.verb == OPTIONS)
+          {
+            char maxAge[16];
+            snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
 
-          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE, maxAge);
+            MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
+            MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE,       maxAge);
+          }
         }
       }
     }
   }
 
-  MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
+  MHD_queue_response(orionldState.mhdConnection, orionldState.httpStatusCode, response);
   MHD_destroy_response(response);
 
-#ifdef ORIONLD
   if ((orionldState.responsePayloadAllocated == true) && (orionldState.responsePayload != NULL))
   {
     free(orionldState.responsePayload);
     orionldState.responsePayload = NULL;
   }
-#endif    
 }
 
 
@@ -214,11 +184,11 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::string& details, std::string* outStringP)
+void restErrorReplyGet(ConnectionInfo* ciP, int statusCode, const std::string& details, std::string* outStringP)
 {
-  StatusCode  errorCode(code, details, "errorCode");
+  StatusCode  errorCode((HttpStatusCode) statusCode, details, "errorCode");
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
 
   if (ciP->restServiceP->request == RegisterContext)
   {
@@ -253,8 +223,8 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == QueryContext)
   {
     QueryContextResponse  qcr(errorCode);
-    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
-    *outStringP = qcr.render(ciP->apiVersion, asJsonObject);
+    bool                  asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
+    *outStringP = qcr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
   {
@@ -274,8 +244,8 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == UpdateContext)
   {
     UpdateContextResponse ucr(errorCode);
-    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && ((ciP->outMimeType == JSON) || (ciP->outMimeType == JSONLD));
-    *outStringP = ucr.render(ciP->apiVersion, asJsonObject);
+    bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
+    *outStringP = ucr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)
   {
@@ -286,8 +256,8 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     OrionError oe(errorCode);
 
-    LM_T(LmtRest, ("Unknown request type: '%d'", ciP->restServiceP->request));
-    ciP->httpStatusCode = oe.code;
-    *outStringP = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &ciP->httpStatusCode);
+    LM_E(("Unknown request type: '%d'", ciP->restServiceP->request));
+    orionldState.httpStatusCode = oe.code;
+    *outStringP = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
   }
 }

@@ -38,7 +38,7 @@ brokerStart CB 212-249
 echo "01. POST /ngsi-ld/v1/entities, with an entity whose ID is a URN"
 echo "==============================================================="
 payload='{
-  "id": "urn:ngsi-ld:T:xxx;y",
+  "id": "urn:ngsi-ld:T:xxx:y",
   "type": "T",
   "name": {
     "type": "Property",
@@ -63,14 +63,14 @@ echo
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:xxx;y
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:xxx:y
 Date: REGEX(.*)
 
 
 
 02. Checking mongo to find the correct entity ID
 ================================================
-		"id" : "urn:ngsi-ld:T:xxx;y",
+		"id" : "urn:ngsi-ld:T:xxx:y",
 
 
 --TEARDOWN--

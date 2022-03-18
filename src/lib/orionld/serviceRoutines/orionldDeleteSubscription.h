@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldDeleteSubscription -
 //
-extern bool orionldDeleteSubscription(ConnectionInfo* ciP);
+extern bool orionldDeleteSubscription(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETESUBSCRIPTION_H_

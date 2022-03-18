@@ -22,11 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/troe/pgTransactionCommit.h"                  // Own interface
 
 
@@ -39,20 +38,21 @@ bool pgTransactionCommit(PGconn* connectionP)
 {
   PGresult* res;
 
-  LM_TMP(("SQL[%p]: COMMIT", connectionP));
   res = PQexec(connectionP, "COMMIT");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
   PQclear(res);
 
   if (PQstatus(connectionP) != CONNECTION_OK)
-    LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
+    LM_E(("Database Error (SQL: bad connection: %d)", PQstatus(connectionP)));  // FIXME: string! (last error?)
 
   PGTransactionStatusType st;
   if ((st = PQtransactionStatus(connectionP)) != PQTRANS_IDLE)
-    LM_E(("SQL[%p]: transaction error: %d", connectionP, st));  // FIXME: string! (last error?)
+    LM_E(("Database Error (SQL transaction error: %d)", st));  // FIXME: string! (last error?)
 
-  // LM_TMP(("SQL: PQerrorMessage: %s", PQerrorMessage(connectionP)));
+  char* errorMsg = PQerrorMessage(connectionP);
+  if ((errorMsg != NULL) && (errorMsg[0] != 0))
+    LM_E(("Database Error (SQL Commit Error: %s)", errorMsg));
 
   return true;
 }

@@ -25,13 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-
+#include "orionld/types/OrionldTenant.h"                          // OrionldTenant
 
 
 // -----------------------------------------------------------------------------
 //
 // mongoEntityExists -
 //
-extern bool mongoEntityExists(const char* entityId, const char* tenant);
+extern bool mongoEntityExists(const char* entityId, OrionldTenant* tenantP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOBACKEND_MONGOENTITYEXISTS_H_

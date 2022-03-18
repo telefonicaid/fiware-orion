@@ -33,7 +33,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 #include "apiTypesV2/Registration.h"                             // Registration
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
@@ -41,7 +40,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeFromRegistration.h"               // Own interface
 
 
@@ -50,7 +49,7 @@ extern "C"
 //
 // kjTreeFromRegistration -
 //
-KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* registrationP)
+KjNode* kjTreeFromRegistration(ngsiv2::Registration* registrationP)
 {
   KjNode*          topP = kjObject(orionldState.kjsonP, NULL);
   KjNode*          objectP;

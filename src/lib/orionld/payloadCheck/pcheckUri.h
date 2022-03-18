@@ -25,13 +25,22 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/payloadCheck/pCheckUri.h"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckUri -
+// pCheckUri -
 //
-extern bool pcheckUri(char* uri, char** detailP);
+extern bool pCheckUri(const char* uri, const char* name, bool mustBeUri);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pcheckUri - older, now deprecated, function to check the validity of a URI
+//
+extern bool pcheckUri(char* uri, bool strict, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_

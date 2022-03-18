@@ -25,6 +25,7 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/pcheckName.h"                     // Own interface
 
 
@@ -54,13 +55,56 @@ bool pcheckName(char* name, char** detailsPP)
     //   ''',
     //   '\b',
     //   '\t',
-    //   '\n', and
-    //   '#'
+    //   '\n',
+    //   '#', and
+    //   ' '
     //
     if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
-        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#'))
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#') || (*name == ' '))
     {
       *detailsPP = (char*) "invalid character in name";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckName -
+//
+bool pCheckName(char* name)
+{
+  if (name == NULL)
+  {
+    orionldError(OrionldBadRequestData, "Invalid attribute name", "empty string", 400);
+    return false;
+  }
+
+  for (; *name != 0; ++name)
+  {
+    //
+    // Invalid chars:
+    //   '=',
+    //   '[',
+    //   ']',
+    //   '&',
+    //   '?',
+    //   '"',
+    //   ''',
+    //   '\b',
+    //   '\t',
+    //   '\n',
+    //   '#', and
+    //   ' '
+    //
+    if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#') || (*name == ' '))
+    {
+      orionldError(OrionldBadRequestData, "Invalid attribute name", "invalid character", 400);
       return false;
     }
   }

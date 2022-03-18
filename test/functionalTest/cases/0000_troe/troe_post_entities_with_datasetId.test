@@ -149,7 +149,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 04. See the attributes in the temporal database, with special care to the datasetIds
 ====================================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,text,number,boolean,datasetid,observedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID1_DEFAULT,,,,2020-12-30 16:00:00.001
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID1_DEFAULT,,,None,2020-12-30 16:00:00.001
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID2,,,urn:ngsi-ld:datasetId:2,2020-12-30 16:00:00.002
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID3,,,urn:ngsi-ld:datasetId:3,2020-12-30 16:00:00.003
 

@@ -39,8 +39,8 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextCreate.h"                // orionldContextCreate
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
-#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
-#include "orionld/context/orionldContextCache.h"                 // ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE
+#include "orionld/contextCache/orionldContextCache.h"            // ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE
+#include "orionld/contextCache/orionldContextCacheInsert.h"      // orionldContextCacheInsert
 #include "orionld/context/orionldContextHashTablesFill.h"        // orionldContextHashTablesFill
 #include "orionld/context/orionldContextFromObject.h"            // Own interface
 
@@ -100,16 +100,19 @@ static int valueCompareFunction(const char* longname, void* itemP)
 // Served contexts need to be cloned so that they can be copied back to the caller (GET /ngsi-ld/ex/contexts/xxx).
 // For example, the URL "http:/x.y.z/contexts/context1.jsonld" was downloaded and its content is a key-value object.
 //
-OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromObject
+(
+  char*                   url,
+  OrionldContextOrigin    origin,
+  char*                   id,
+  KjNode*                 contextObjectP,
+  OrionldProblemDetails*  pdP
+)
 {
   OrionldContext*  contextP;
-  char*            id = NULL;
   bool             ok = true;
 
-  if (url == NULL)
-    url  = orionldContextUrlGenerate(&id);
-
-  contextP = orionldContextCreate(url, id, contextObjectP, true, toBeCloned);
+  contextP = orionldContextCreate(url, origin, id, contextObjectP, true);
   if (contextP == NULL)
   {
     LM_E(("orionldContextCreate failed"));
@@ -139,11 +142,13 @@ OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* con
 
   if (ok == false)
   {
-    if (toBeCloned == true)
+    if (url != NULL)  // If URL present, the tree of the context has been cloned by orionldContextCreate
       kjFree(contextP->tree);
     return NULL;
   }
 
-  orionldContextCacheInsert(contextP);
+  if (url != NULL)
+    orionldContextCacheInsert(contextP);
+
   return contextP;
 }

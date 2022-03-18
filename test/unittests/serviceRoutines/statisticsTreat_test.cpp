@@ -67,14 +67,13 @@ static RestService badVerbV[] =
 */
 TEST(statisticsTreat, delete)
 {
-  ConnectionInfo ci("/statistics",  "DELETE", "1.1");
+  ConnectionInfo ci;
   std::string    out;
   RestService    restService = { StatisticsRequest, 1, { "statistics" }, NULL };
   utInit();
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
   out             = orion::requestServe(&ci);
 
@@ -99,7 +98,6 @@ TEST(statisticsTreat, get)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
   out             = orion::requestServe(&ci);
 
@@ -124,7 +122,6 @@ TEST(statisticsTreat, deleteCache)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
   out             = orion::requestServe(&ci);
 
@@ -149,7 +146,6 @@ TEST(statisticsTreat, getCache)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
   out             = orion::requestServe(&ci);
 
@@ -174,7 +170,6 @@ TEST(statisticsTreat, badVerb)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);
 
-  ci.outMimeType  = JSON;
   ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
 

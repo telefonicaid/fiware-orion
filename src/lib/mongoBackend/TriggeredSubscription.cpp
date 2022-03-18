@@ -27,6 +27,8 @@
 #include <sstream>
 
 #include "logMsg/logMsg.h"
+
+#include "orionld/common/tenantList.h"               // tenant0
 #include "apiTypesV2/HttpInfo.h"
 #include "common/RenderFormat.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -45,7 +47,7 @@ TriggeredSubscription::TriggeredSubscription
   const ngsiv2::HttpInfo&  _httpInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
-  const char*              _tenant
+  OrionldTenant*           _tenantP
 )
 :
   throttling(_throttling),
@@ -54,7 +56,7 @@ TriggeredSubscription::TriggeredSubscription
   httpInfo(_httpInfo),
   attrL(_attrL),
   cacheSubId(_cacheSubId),
-  tenant((_tenant == NULL)? "" : _tenant),
+  tenantP(&tenant0),
   stringFilterP(NULL),
   mdStringFilterP(NULL),
   blacklist(false)
@@ -82,7 +84,7 @@ TriggeredSubscription::TriggeredSubscription
   httpInfo(_httpInfo),
   attrL(_attrL),
   cacheSubId(""),
-  tenant(""),
+  tenantP(&tenant0),
   stringFilterP(NULL),
   mdStringFilterP(NULL),
   blacklist(false)

@@ -189,10 +189,10 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,,P2,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,None,P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,None,P2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
@@ -207,7 +207,7 @@ https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:ent
 06. Append P1 and R3 with noOverwrite set (P1 will be ignored as it already existed)
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 211
+Content-Length: 118
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -215,12 +215,12 @@ Date: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P1",
-            "reason": "attribute already exists and overwrite is not allowed"
+            "attributeName": "P1",
+            "reason": "attribute already exists: overwrite is not allowed"
         }
     ],
     "updated": [
-        "https://uri.etsi.org/ngsi-ld/default-context/R3"
+        "R3"
     ]
 }
 
@@ -234,11 +234,11 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 08. See the attributes in the temporal database - especially the new overwritten P1
 ===================================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,,REGEX(202.*)
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,,P2,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R3,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,None,P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,None,P2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,t,,None,urn:ngsi-ld:relationships:R3,,,REGEX(202.*)
 
 
 09. See the sub-attributes in the temporal database

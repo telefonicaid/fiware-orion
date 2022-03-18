@@ -23,21 +23,20 @@
 * Author: Ken Zangelin
 */
 #include <string>                                              // std::string
+#include <vector>                                              // std::vector
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "rest/OrionError.h"                                   // OrionError
 #include "apiTypesV2/Registration.h"                           // Registration
 #include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
 #include "mongoBackend/mongoRegistrationCreate.h"              // mongoRegistrationCreate
 
-#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
 
@@ -47,7 +46,7 @@
 //
 // orionldPostRegistrations -
 //
-bool orionldPostRegistrations(ConnectionInfo* ciP)
+bool orionldPostRegistrations(void)
 {
   ngsiv2::Registration  reg;
   std::string           regId;
@@ -64,7 +63,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
     char*   details;
 
     // mongoLdRegistrationGet takes the req semaphore
-    if (mongoLdRegistrationGet(NULL, regId, orionldState.tenant, &statusCode, &details) == true)
+    if (mongoLdRegistrationGet(NULL, regId, orionldState.tenantP, &statusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId);
       return false;
@@ -77,7 +76,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     reg.ldContext = orionldState.contextP->url;
   else
-    reg.ldContext = ORIONLD_CORE_CONTEXT_URL;
+    reg.ldContext = coreContextUrl;
 
   //
   // Translate the incoming KjNode tree into a ngsiv2::Registration
@@ -93,16 +92,18 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   //
   // Create the Registration
   //
+  std::vector<std::string>  servicePathV;
+
   mongoRegistrationCreate(&reg,
-                          orionldState.tenant,
-                          ciP->servicePathV[0],
+                          orionldState.tenantP,
+                          "/",
                           &regId,
                           &oError);
 
   // FIXME: Check oError for failure!
   orionldState.httpStatusCode = SccCreated;
 
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/csourceRegistrations/", regIdP);
+  httpHeaderLocationAdd("/ngsi-ld/v1/csourceRegistrations/", regIdP);
 
   return true;
 }

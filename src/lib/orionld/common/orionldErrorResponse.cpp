@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_VEC_SIZE
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString
 }
@@ -64,7 +65,9 @@ static const char* errorTypeStringV[] =
 //
 const char* orionldErrorTypeToString(OrionldResponseErrorType type)
 {
-  return errorTypeStringV[type];
+  if (type < K_VEC_SIZE(errorTypeStringV))
+    return errorTypeStringV[type];
+  return "UnknownError";
 }
 
 
@@ -84,7 +87,20 @@ void orionldErrorResponseCreate
   const char*               detail
 )
 {
-  LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, detail));
+  orionldState.pd.title  = (char*) title;
+  orionldState.pd.detail = (char*) detail;
+
+  if ((title  != NULL) && (detail != NULL))
+  {
+    snprintf(orionldState.pd.titleAndDetailBuffer, sizeof(orionldState.pd.titleAndDetailBuffer), "%s: %s", title, detail);
+    orionldState.pd.titleAndDetail = orionldState.pd.titleAndDetailBuffer;
+  }
+  else if (title != NULL)
+    orionldState.pd.titleAndDetail = (char*) title;
+  else if (detail != NULL)
+    orionldState.pd.titleAndDetail = (char*) detail;
+  else
+    orionldState.pd.titleAndDetail = (char*) "no error info available";
 
   KjNode* typeP     = kjString(orionldState.kjsonP, "type",    orionldErrorTypeToString(errorType));
   KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
@@ -100,4 +116,17 @@ void orionldErrorResponseCreate
   kjChildAdd(orionldState.responseTree, typeP);
   kjChildAdd(orionldState.responseTree, titleP);
   kjChildAdd(orionldState.responseTree, detailP);
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorResponseCreate -
+//
+void orionldErrorResponseCreate(OrionldProblemDetails* pdP)
+{
+  orionldState.httpStatusCode = pdP->status;
+  orionldState.pd             = *pdP;
+  orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
 }

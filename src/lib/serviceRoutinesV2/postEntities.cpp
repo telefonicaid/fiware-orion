@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/types/OrionldHeader.h"                        // orionldHeaderAdd
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -32,7 +35,6 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
@@ -47,10 +49,11 @@ static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 *
 * Check if the entity length is supported by Mongo
 */
-
-static bool legalEntityLength(Entity* eP, const std::string& servicePath)
+static bool legalEntityLength(Entity* eP, char* servicePath)
 {
-  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
+  int spathLen = (servicePath == NULL)? 0 : strlen(servicePath);
+
+  return (spathLen + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
 }
 
 
@@ -81,17 +84,16 @@ std::string postEntities
   ParseData*                 parseDataP
 )
 {
-  Entity*   eP = &parseDataP->ent.res;
-  bool  upsert = ciP->uriParamOptions[OPT_UPSERT];
+  Entity* eP = &parseDataP->ent.res;
 
-  if (!legalEntityLength(eP, ciP->httpHeaders.servicePath))
+  if (!legalEntityLength(eP, orionldState.in.servicePath))
   {
     OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination", "BadRequest");
     eP->release();
 
     std::string out;
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
 
     return out;
   }
@@ -100,7 +102,8 @@ std::string postEntities
   ActionType      actionType;
   Ngsiv2Flavour   ngsiv2flavour;
   HttpStatusCode  sccCodeOnSuccess;
-  if (upsert)
+
+  if (orionldState.uriParamOptions.upsert)
   {
     actionType       = ActionTypeAppend;
     ngsiv2flavour    = NGSIV2_NO_FLAVOUR;
@@ -127,11 +130,11 @@ std::string postEntities
   if (parseDataP->upcrs.res.oe.code != SccNone)
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    orionldState.httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else if (parseDataP->upcrs.res.errorCode.code != SccOk)
   {
-    ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
+    orionldState.httpStatusCode = parseDataP->upcrs.res.errorCode.code;
     TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson(true));
     ciP->answer         = answer;
   }
@@ -148,9 +151,8 @@ std::string postEntities
       location += "?type=none";
     }
 
-    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-    ciP->httpHeaderValue.push_back(location);
-    ciP->httpStatusCode = sccCodeOnSuccess;
+    orionldHeaderAdd(&orionldState.out.headers, HttpLocation, (char*) location.c_str(), 0);
+    orionldState.httpStatusCode = sccCodeOnSuccess;
   }
 
   // 04. Cleanup and return result

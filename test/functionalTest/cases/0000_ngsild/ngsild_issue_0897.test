@@ -1,0 +1,206 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI-LD Forward of GET /entities?id=entityId?attrs=location
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB 0 IPv4 -forwarding
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Create an entity urn:ngsi-ld:Building:store001 in CB, with a location GeoProperty, and many more attributes
+# 02. Create an entity urn:ngsi-ld:Building:store001 in CP1, with only a 'weather' attribute
+# 03. Register CP1's urn:ngsi-ld:Building:store001 in CB, with properties=weather
+# 04. Ask CB for urn:ngsi-ld:Building:store001 with attrs=location, make sure only location is present
+#
+
+echo "01. Create an entity urn:ngsi-ld:Building:store001 in CB, with a location GeoProperty, and many more attributes"
+echo "==============================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store001",
+  "type": "Building",
+  "furniture": [
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:1",
+      "object": "urn:ngsi-ld:Shelf:unit001"
+    },
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:2",
+      "object": "urn:ngsi-ld:Shelf:unit002"
+    },
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:3",
+      "object": "urn:ngsi-ld:Shelf:unit003"
+    }
+  ],
+  "category": {
+    "type": "Property",
+    "value": "commercial"
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Bornholmer Strasse 65",
+      "addressRegion": "Berlin",
+      "addressLocality": "Prenzlauer Berg",
+      "postalCode": "10439"
+    },
+    "verified": {
+      "type": "Property",
+      "value": true
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.3986,
+        52.5547
+      ]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bosebrucke Einkauf"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity urn:ngsi-ld:Building:store001 in CP1, with only a 'weather' attribute"
+echo "=========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store001",
+  "type": "Building",
+  "weather": {
+    "type": "Property",
+    "value": "rain"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Register CP1's urn:ngsi-ld:Building:store001 in CB, with properties=weather"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:60d3e04c6abeb9e44004755b",
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Building:store001",
+          "type": "Building"
+        }
+      ],
+      "properties": [
+        "weather"
+      ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Ask CB for urn:ngsi-ld:Building:store001 with attrs=location, make sure only location is present"
+echo "===================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:Building:store001&attrs=location'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:Building:store001 in CB, with a location GeoProperty, and many more attributes
+===============================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
+Date: REGEX(.*)
+
+
+
+02. Create an entity urn:ngsi-ld:Building:store001 in CP1, with only a 'weather' attribute
+==========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
+Date: REGEX(.*)
+
+
+
+03. Register CP1's urn:ngsi-ld:Building:store001 in CB, with properties=weather
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:60d3e04c6abeb9e44004755b
+Date: REGEX(.*)
+
+
+
+04. Ask CB for urn:ngsi-ld:Building:store001 with attrs=location, make sure only location is present
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 149
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:Building:store001",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3986,
+                    52.5547
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Building"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

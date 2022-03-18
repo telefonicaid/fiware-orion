@@ -140,6 +140,8 @@ MongoDB server version: REGEX(.*)
 			},
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/verified" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : true
 				}

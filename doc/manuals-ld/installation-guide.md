@@ -68,9 +68,9 @@ kz@ubuntu:~$ curl localhost:1026/ngsi-ld/ex/v1/version
 {
   "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "branch": "develop",
-  "kbase version": "0.2",
-  "kalloc version": "0.2",
-  "kjson version": "0.2",
+  "kbase version": "0.8",
+  "kalloc version": "0.8",
+  "kjson version": "0.8",
   "boost version": "1_65_1",
   "microhttpd version": "0.9.48-0",
   "openssl version": "OpenSSL 1.0.2n  7 Dec 2017",
@@ -252,3 +252,7 @@ please follow the instructions in your respective Installation Guide for Functio
 
 
 And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).
+
+## Kubernetes
+
+To run Orion-LD on [Kubernetes](https://kubernetes.io/) a [Helm-Chart](https://github.com/FIWARE/helm-charts/tree/main/charts/orion) is provided. More detailed information for configuration and load-numbers can be found at the [Loadtest-Repository](https://github.com/FIWARE/orion-loadtest). 

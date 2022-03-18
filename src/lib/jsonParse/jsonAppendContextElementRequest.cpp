@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "jsonParse/jsonParse.h"
@@ -330,6 +332,7 @@ void jsonAcerRelease(ParseData* reqData)
 */
 std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqData->acer.res.check(ciP->apiVersion, asJsonObject, AppendContextElement, reqData->errorString);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+
+  return reqData->acer.res.check(orionldState.apiVersion, asJsonObject, AppendContextElement, reqData->errorString);
 }

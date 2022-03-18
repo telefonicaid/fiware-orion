@@ -53,13 +53,13 @@ echo
 01. POST /ngsi-ld/v1/entities with a relationship attribute without object
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "R1",
-    "title": "relationship attribute without 'object' field",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "Forbidden field for a Relationship: value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

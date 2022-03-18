@@ -1,0 +1,25 @@
+name: Valgrind check
+
+on:
+  schedule:
+    # every night at one
+    - cron: '0 1 * * *'
+  # or on a manual trigger
+  workflow_dispatch:
+
+jobs:
+  valgrind-suite:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # since the test are very slow, we use a very high degree of parallelism
+        testIndexToStartAt: [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550]
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Execute valgrind
+        run: |
+          ./test/valgrind/valgrindTestSuite.sh -fromIx ${{ matrix.testIndexToStartAt }} -toIx ${{ matrix.testIndexToStartAt }}+49

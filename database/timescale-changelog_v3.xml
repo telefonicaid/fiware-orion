@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v3_step_1">
+        <comment>Add multipoint for attributes.</comment>
+        <addColumn
+                   schemaName= "public"
+                   tableName="attributes" >
+            <column name="geoMultiPoint"
+                    position="8"
+                    type="GEOGRAPHY(MULTIPOINTZ, 4326)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn
+                         columnName="geoMultiPoint"
+                         schemaName="public"
+                         tableName="attributes">
+            </dropColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v3_step_2">
+        <comment>Add multipoint for subAttributes.</comment>
+        <addColumn
+                schemaName= "public"
+                tableName="subAttributes" >
+            <column name="geoMultiPoint"
+                    position="8"
+                    type="GEOGRAPHY(MULTIPOINTZ, 4326)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn
+                    columnName="geoMultiPoint"
+                    schemaName="public"
+                    tableName="subAttributes">
+            </dropColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

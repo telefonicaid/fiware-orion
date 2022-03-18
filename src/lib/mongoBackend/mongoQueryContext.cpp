@@ -26,8 +26,15 @@
 #include <vector>
 #include <map>
 
+extern "C"
+{
+#include "kbase/kTime.h"                                       // kTimeGet, kTimeDiff
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "common/string.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -36,6 +43,7 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "orionld/common/orionldState.h"
+#include "orionld/common/performance.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 
@@ -299,28 +307,21 @@ static void processGenericEntities
 * mongoQueryContext - 
 *
 * NOTE
-*   If the in/out-parameter countP is non-NULL then the number of matching entities
-*   must be returned in *countP.
-*
-*   This replaces the 'uriParams[URI_PARAM_PAGINATION_DETAILS]' way of passing this information.
-*   The old method was one-way, using the new method 
+*   If the in/out-parameter countP is non-NULL then the number of matching entities must be returned in *countP.
 */
 HttpStatusCode mongoQueryContext
 (
   QueryContextRequest*                 requestP,
   QueryContextResponse*                responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
-  std::map<std::string, bool>&         options,
   long long*                           countP,
   ApiVersion                           apiVersion
 )
 {
-  int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-
-  std::string sortOrderList  = uriParams[URI_PARAM_SORTED];
+  int   offset   = orionldState.uriParams.offset;
+  int   limit    = orionldState.uriParams.limit;
+  char* orderBy  = orionldState.uriParams.orderBy;
 
   LM_T(LmtMongo, ("QueryContext Request"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (countP != NULL)? "true" : "false"));
@@ -342,7 +343,7 @@ HttpStatusCode mongoQueryContext
   // Note that we check for attr list emptyness, as in that case the "*" needs
   // to be added to print also user attributes
   //
-  if (options[DATE_CREATED])
+  if (orionldState.uriParamOptions.dateCreated)
   {
     if (requestP->attributeList.size() == 0)
     {
@@ -352,7 +353,7 @@ HttpStatusCode mongoQueryContext
     requestP->attributeList.push_back(DATE_CREATED);
   }
 
-  if (options[DATE_MODIFIED])
+  if (orionldState.uriParamOptions.dateModified)
   {
     if (requestP->attributeList.size() == 0)
     {
@@ -363,6 +364,9 @@ HttpStatusCode mongoQueryContext
   }
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
+
+  PERFORMANCE_BEGIN(0, "entitiesQuery");
+
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->metadataList,
@@ -370,14 +374,16 @@ HttpStatusCode mongoQueryContext
                      &rawCerV,
                      &err,
                      true,
-                     tenant,
+                     tenantP,
                      servicePathV,
                      offset,
                      limit,
                      &limitReached,
                      countP,
-                     sortOrderList,
+                     orderBy,
                      apiVersion);
+
+  PERFORMANCE_END(0, NULL);
 
   if (!ok)
   {
@@ -398,7 +404,7 @@ HttpStatusCode mongoQueryContext
     /* In the case of empty response, if only generic processing is needed */
     if (rawCerV.size() == 0)
     {
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
@@ -412,7 +418,7 @@ HttpStatusCode mongoQueryContext
     /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
     if (someContextElementNotFound(rawCerV))
     {
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
@@ -429,7 +435,7 @@ HttpStatusCode mongoQueryContext
 
     if (someContextElementNotFound(rawCerV))
     {
-      if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
@@ -446,7 +452,7 @@ HttpStatusCode mongoQueryContext
      */
     if (requestP->attributeList.size() == 0)
     {
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenantP, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {

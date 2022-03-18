@@ -28,7 +28,7 @@ dbInit CB
 dbInit CB tenant1
 dbInit CB tenant2
 dbInit CB tenant3
-brokerStart CB
+brokerStart CB 0 IPv4 -multiservice
 
 --SHELL--
 

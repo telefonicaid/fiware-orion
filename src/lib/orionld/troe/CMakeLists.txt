@@ -27,62 +27,51 @@ SET (SOURCES
     troeDeleteEntity.cpp
     troePatchAttribute.cpp
     troePatchEntity.cpp
+    troePatchEntity2.cpp
     troePostBatchCreate.cpp
     troePostBatchDelete.cpp
     troePostBatchUpdate.cpp
     troePostBatchUpsert.cpp
     troePostEntities.cpp
     troePostEntity.cpp
-    troePostEntityNoOverwrite.cpp
     troePatchAttribute.cpp
     pgInit.cpp
     pgConnectionGet.cpp
     pgConnectionRelease.cpp
     pgDatabaseCreate.cpp
     pgDatabasePrepare.cpp
-    pgDatabaseTableExists.cpp
     pgDatabaseTableCreateAll.cpp
     pgTransactionBegin.cpp
     pgTransactionCommit.cpp
     pgTransactionRollback.cpp
-    pgEntityTreat.cpp
-    pgEntityPush.cpp
-    pgAttributeTreat.cpp
-    pgAttributePush.cpp
-    pgSubAttributePush.cpp
-    pgRelationshipPush.cpp
-    pgStringPropertyPush.cpp
-    pgNumberPropertyPush.cpp
-    pgCompoundPropertyPush.cpp
-    pgBoolPropertyPush.cpp
-    pgSubAttributeTreat.cpp
-    pgSubRelationshipPush.cpp
-    pgStringSubPropertyPush.cpp
-    pgBoolSubPropertyPush.cpp
-    pgCompoundSubPropertyPush.cpp
-    pgNumberSubPropertyPush.cpp
-    pgEntityDelete.cpp
-    pgAttributeDelete.cpp
-    pgGeoPropertyPush.cpp
-    pgGeoPointPush.cpp
-    pgGeoPolygonPush.cpp
-    pgGeoMultiPolygonPush.cpp
-    pgGeoLineStringPush.cpp
-    pgGeoMultiLineStringPush.cpp
     kjGeoPointExtract.cpp
+    kjGeoMultiPointExtract.cpp
     kjGeoPolygonExtract.cpp
     kjGeoMultiPolygonExtract.cpp
     kjGeoLineStringExtract.cpp
     kjGeoMultiLineStringExtract.cpp
-    troeEntityArrayExpand.cpp
-    troeSubAttrsExpand.cpp
     pgObservedAtExtract.cpp
-    pgGeoSubPropertyPush.cpp
-    pgGeoSubPointPush.cpp
-    pgGeoSubPolygonPush.cpp
-    pgGeoSubLineStringPush.cpp
-    pgGeoSubMultiPolygonPush.cpp
-    pgGeoSubMultiLineStringPush.cpp
+    dbCreationCommand.cpp
+    pgAppendInit.cpp
+    pgAppend.cpp
+    pgEntityBuild.cpp
+    pgAttributeBuild.cpp
+    pgAttributeAppend.cpp
+    pgAttributesBuild.cpp
+    pgSubAttributeBuild.cpp
+    pgSubAttributeAppend.cpp
+    pgQuotedString.cpp
+    pgCommands.cpp
+    pgEntityAppend.cpp
+    pgConnect.cpp
+    pgConnectionPools.cpp
+    pgConnectionPoolsPresent.cpp
+    pgConnectionPoolsFree.cpp
+    pgConnectionPoolFree.cpp
+    pgConnectionPoolGet.cpp
+    pgConnectionPoolCreate.cpp
+    pgConnectionPoolInsert.cpp
+    pgConnectionPoolInit.cpp
 )
 
 SET (HEADERS
@@ -98,53 +87,41 @@ SET (HEADERS
     troePostBatchUpsert.h
     troePostEntities.h
     troePostEntity.h
-    troePostEntityNoOverwrite.h
     troePatchAttribute.h
     pgInit.h
     pgConnectionGet.h
     pgConnectionRelease.h
     pgDatabaseCreate.h
     pgDatabasePrepare.h
-    pgDatabaseTableExists.h
     pgDatabaseTableCreateAll.h
     pgTransactionBegin.h
     pgTransactionCommit.h
     pgTransactionRollback.h
-    pgEntityTreat.h
-    pgEntityPush.h
-    pgAttributeTreat.h
-    pgAttributePush.h
-    pgSubAttributePush.h
-    pgRelationshipPush.h
-    pgNumberPropertyPush.h
-    pgCompoundPropertyPush.h
-    pgBoolPropertyPush.h
-    pgStringSubPropertyPush.h
-    pgBoolSubPropertyPush.h
-    pgCompoundSubPropertyPush.h
-    pgNumberSubPropertyPush.h
-    pgEntityDelete.h
-    pgAttributeDelete.h
-    pgGeoPropertyPush.h
-    pgGeoPointPush.h
-    pgGeoPolygonPush.h
-    pgGeoMultiPolygonPush.h
-    pgGeoLineStringPush.h
-    pgGeoMultiLineStringPush.h
     kjGeoPointExtract.h
+    kjGeoMultiPointExtract.h
     kjGeoPolygonExtract.h
     kjGeoMultiPolygonExtract.h
     kjGeoLineStringExtract.h
     kjGeoMultiLineStringExtract.h
-    troeEntityArrayExpand.h
-    troeSubAttrsExpand.h
     pgObservedAtExtract.h
-    pgGeoSubPropertyPush.h
-    pgGeoSubPointPush.h
-    pgGeoSubPolygonPush.h
-    pgGeoSubLineStringPush.h
-    pgGeoSubMultiPolygonPush.h
-    pgGeoSubMultiLineStringPush.h
+    pgAppendInit.h
+    pgAppend.h
+    pgEntityBuild.h
+    pgAttributeBuild.h
+    pgSubAttributeBuild.h
+    pgQuotedString.h
+    pgCommands.h
+    pgEntityAppend.h
+    pgAttributeAppend.h
+    pgConnect.h
+    pgConnectionPools.h
+    pgConnectionPoolsPresent.h
+    pgConnectionPoolsFree.h
+    pgConnectionPoolFree.h
+    pgConnectionPoolGet.h
+    pgConnectionPoolCreate.h
+    pgConnectionPoolInsert.h
+    pgConnectionPoolInit.h
 )
 
 

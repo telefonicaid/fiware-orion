@@ -31,10 +31,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
 
@@ -43,7 +42,7 @@ extern "C"
 //
 // orionldGetContext -
 //
-bool orionldGetContext(ConnectionInfo* ciP)
+bool orionldGetContext(void)
 {
   OrionldContext* contextP    = orionldContextCacheLookup(orionldState.wildcard[0]);
 
@@ -51,14 +50,12 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
   if (contextP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0]);
-    orionldState.httpStatusCode = SccContextElementNotFound;
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;
     return false;
   }
 
-  orionldState.responseTree = kjObject(orionldState.kjsonP, "@context");
-  // NOTE: No need to free - as the kjObject is allocated in "orionldState.kjsonP", it gets deleted when the thread is reused.
-
+  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
   if (orionldState.responseTree == NULL)
   {
     LM_E(("Internal Error (out of memory)"));
@@ -67,7 +64,9 @@ bool orionldGetContext(ConnectionInfo* ciP)
     return false;
   }
 
-  orionldState.responseTree->value.firstChildP = contextP->tree;
+  contextP->tree->name = (char*) "@context";
+
+  kjChildAdd(orionldState.responseTree, contextP->tree);
 
   return true;
 }

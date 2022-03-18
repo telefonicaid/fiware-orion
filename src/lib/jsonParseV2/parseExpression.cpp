@@ -223,13 +223,13 @@ std::string parseExpression
   //
   if (allThem)
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
-    std::string  err;
+    Scope*  scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+    char*   err;
 
-    if (scopeP->fill(V2, geometry, coords, georel, &err) != 0)
+    if (scopeP->fill(V2, geometry.c_str(), coords.c_str(), georel.c_str(), &err) != 0)
     {
       delete scopeP;
-      return "error parsing geo-query fields: " + err;
+      return std::string("error parsing geo-query fields: ") + err;
     }
     svP->push_back(scopeP);
   }

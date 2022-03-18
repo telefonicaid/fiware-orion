@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -82,18 +84,18 @@ std::string getAttributeValueInstanceWithTypeAndId
   std::string              entityId             = compV[5];
   std::string              attributeName        = compV[7];
   std::string              metaID               = compV[8];
-  std::string              entityTypeFromParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string              entityTypeFromParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo           typeInfo             = EntityTypeEmptyOrNotEmpty;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
 
   // 01. Get values from URL (entityId::type, exist, !exist)
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }
@@ -124,7 +126,7 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, AttributeValueInstance));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, AttributeValueInstance));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();

@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                                 // NULL
+
 #include "mongo/client/dbclient.h"                                  // MongoDB C++ Client Legacy Driver
 
 extern "C"
@@ -32,19 +34,21 @@ extern "C"
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjLookup.h"                                         // kjLookup
 #include "kjson/kjBuilder.h"                                        // kjObject, ...
+#include "kjson/kjRender.h"                                        // TmP
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
+#include "orionld/common/orionldState.h"                         // orionldState
 
+#include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/numberToDate.h"                            // numberToDate
 #include "orionld/common/eqForDot.h"                                // eqForDot
-#include "orionld/common/performance.h"                             // REQUEST_PERFORMANCE
-#include "orionld/db/dbCollectionPathGet.h"                         // dbCollectionPathGet
+#include "orionld/common/performance.h"                             // PERFORMANCE
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"             // kjEntityNormalizedToConcise
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"    // Own interface
 
 
@@ -129,7 +133,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (valueP == NULL)
     {
       LM_E(("Database Error (the %s '%s' has no value)", typeP->value.s, attrP->name));
-      return false;
+      valueP = kjString(orionldState.kjsonP, "value", "Internal Error - attribute value lost");
     }
 
     // Inherit the value field
@@ -147,8 +151,19 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 
     if (modifiedAtP != NULL)
       kjChildRemove(attrP, modifiedAtP);
+
+    for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+    {
+      createdAtP  = kjLookup(mdP, "createdAt");
+      modifiedAtP = kjLookup(mdP, "modifiedAt");
+
+      if (createdAtP != NULL)
+        kjChildRemove(mdP, createdAtP);
+      if (modifiedAtP != NULL)
+        kjChildRemove(mdP, modifiedAtP);
+    }
   }
-  else
+  else  // Normalized
   {
     KjNode* createdAtP  = kjLookup(attrP, "createdAt");
     KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
@@ -158,6 +173,18 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 
     if (modifiedAtP != NULL)
       timestampToString(modifiedAtP);
+
+    for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+    {
+      createdAtP  = kjLookup(mdP, "createdAt");
+      modifiedAtP = kjLookup(mdP, "modifiedAt");
+
+    if (createdAtP != NULL)
+      timestampToString(createdAtP);
+
+    if (modifiedAtP != NULL)
+      timestampToString(modifiedAtP);
+    }
   }
 
   return true;
@@ -341,15 +368,23 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 //                   is present in the entity
 //   sysAttrs        include 'createdAt' and 'modifiedAt'
 //   keyValues       short representation of the attributes
+//   geoProperty     long name of geopoperty - only if geo-json represenatation (else NULL)
 //
-KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool attrMandatory, bool sysAttrs, bool keyValues, const char* datasetId)
+KjNode* mongoCppLegacyEntityRetrieve
+(
+  const char*  entityId,
+  char**       attrs,
+  bool         attrMandatory,
+  bool         sysAttrs,
+  bool         keyValues,
+  bool         concise,
+  const char*  datasetId,
+  const char*  geoPropertyName,
+  KjNode**     geoPropertyP
+)
 {
-  char    collectionPath[256];
   KjNode* attrTree  = NULL;
   KjNode* dbTree    = NULL;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
 
   //
   // Populate 'queryBuilder' - only Entity ID for this operation
@@ -388,13 +423,9 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   //
   // Querying mongo and retrieving the results
   //
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbStart);
-#endif
-  cursorP = connectionP->query(collectionPath, query, 0, 0, &retFieldsObj);
-#ifdef REQUEST_PERFORMANCE
-  kTimeGet(&timestamps.dbEnd);
-#endif
+  PERFORMANCE(dbStart);
+  cursorP = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &retFieldsObj, 1 << 2);
+  PERFORMANCE(dbEnd);
 
   while (cursorP->more())
   {
@@ -414,6 +445,10 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     return NULL;
 
 
+  //
+  // FIXME: The DB stuff is over - everything that follows just manipulates the KjNode tree
+  //        So, all of it should be moved to a module under src/lib/orionsld/db/
+  //
   KjNode*  dbAttrsP           = kjLookup(dbTree, "attrs");      // Must be there
   KjNode*  dbDataSetsP        = kjLookup(dbTree, "@datasets");  // May not be there
 
@@ -479,6 +514,24 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     }
     else  // No datasets - simply use dbAttrsP
       attrTree = dbAttrsP;
+
+
+    // Is it really a GeoProperty?
+    *geoPropertyP = NULL;
+
+    KjNode* geoP = kjLookup(dbAttrsP, geoPropertyName);
+
+    if ((geoP != NULL) && (geoP->type == KjObject))
+    {
+      KjNode* typeP = kjLookup(geoP, "type");
+
+      if ((typeP != NULL) && (typeP->type == KjString) && (strcmp(typeP->value.s, "GeoProperty") == 0))
+        *geoPropertyP = geoP;
+      else
+        orionldState.geoPropertyMissing = true;
+    }
+    else
+      orionldState.geoPropertyMissing = true;
   }
   else  // Filter attributes according to the 'attrs' URI param
   {
@@ -488,11 +541,18 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     KjNode* datasetP;
     int     includedAttributes = 0;
     int     ix                 = 0;
+    bool    geoPropertyPresent = false;  // The special geo-property is present in the attrs list (URI param)
 
     while (attrs[ix] != NULL)
     {
       attrP    = kjLookup(dbAttrsP, attrs[ix]);
       datasetP = (dbDataSetsP == NULL)? NULL : kjLookup(dbDataSetsP, attrs[ix]);
+
+      if ((geoPropertyName != NULL) && (geoPropertyPresent == false) && (strcmp(attrs[ix], geoPropertyName) == 0))
+      {
+        geoPropertyPresent = true;
+        *geoPropertyP      = attrP;
+      }
 
       if (attrP != NULL)
       {
@@ -523,6 +583,19 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
       }
 
       ++ix;
+    }
+
+    if ((geoPropertyName != NULL) && (geoPropertyPresent == false))
+    {
+      KjNode* geoP = kjLookup(dbAttrsP, geoPropertyName);
+
+      if (geoP != NULL)
+      {
+        KjNode* typeP = kjLookup(geoP, "type");
+
+        if ((typeP != NULL) && (strcmp(typeP->value.s, "GeoProperty") == 0))
+          *geoPropertyP = kjLookup(geoP, "value");
+      }
     }
 
     if ((includedAttributes == 0) && (attrMandatory == true))
@@ -653,6 +726,10 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     idP->lastChild->next = attrTree->value.firstChildP;
     idP->lastChild       = attrTree->lastChild;
   }
+
+  // Finally, if "Concise Output Format", fix the tree accordingly
+  if (concise == true)
+    kjEntityNormalizedToConcise(idP);
 
   return idP;
 }

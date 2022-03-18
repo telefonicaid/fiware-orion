@@ -68,8 +68,6 @@ TEST(getIndividualContextEntityAttributes, notFound)
 
   utInit();
 
-  ci.outMimeType = JSON;
-
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
   out = orionServe(&ci);
 

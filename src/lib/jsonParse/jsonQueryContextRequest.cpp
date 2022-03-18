@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
@@ -768,6 +770,7 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-  return reqDataP->qcr.res.check(ciP->apiVersion, asJsonObject, reqDataP->errorString);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+
+  return reqDataP->qcr.res.check(orionldState.apiVersion, asJsonObject, reqDataP->errorString);
 }

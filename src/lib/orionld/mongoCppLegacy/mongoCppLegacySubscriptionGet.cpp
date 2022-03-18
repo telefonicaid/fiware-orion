@@ -33,9 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                         // LM_*
 #include "logMsg/traceLevels.h"                                    // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                              // getMongoConnection, releaseMongoConnection, ...
+#include "orionld/common/orionldState.h"                           // orionldState
 
-#include "orionld/db/dbCollectionPathGet.h"                        // dbCollectionPathGet
+#include "mongoBackend/MongoGlobal.h"                              // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/db/dbConfiguration.h"                            // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h"  // Own interface
 
@@ -47,10 +47,7 @@ extern "C"
 //
 KjNode* mongoCppLegacySubscriptionGet(const char* subscriptionId)
 {
-  char     collectionPath[256];
   KjNode*  kjTree = NULL;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "csubs");
 
   //
   // Populate filter - only Subscription ID for this operation
@@ -63,7 +60,7 @@ KjNode* mongoCppLegacySubscriptionGet(const char* subscriptionId)
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  cursorP = connectionP->query(collectionPath, query);
+  cursorP = connectionP->query(orionldState.tenantP->subscriptions, query);
 
   while (cursorP->more())
   {

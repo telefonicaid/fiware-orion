@@ -68,7 +68,7 @@
 TEST(QueryContextRequest, ok_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   const char*     infile  = "ngsi10.queryContextRequest_ok.valid.json";
   const char*     outfile = "ngsi10.queryContextRequest_ok.expected.valid.json";
   std::string     rendered;
@@ -77,8 +77,9 @@ TEST(QueryContextRequest, ok_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   lmTraceLevelSet(LmtDump, true);
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
@@ -110,14 +111,15 @@ TEST(QueryContextRequest, ok_json)
 TEST(QueryContextRequest, badIsPattern_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   const char*     infile  = "ngsi10.queryContextRequest.badIsPattern.invalid.json";
   const char*     outfile = "ngsi10.queryContextResponse.badIsPattern.valid.json";
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -136,14 +138,15 @@ TEST(QueryContextRequest, badIsPattern_json)
 TEST(QueryContextRequest, emptyAttribute_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   const char*     infile  = "ngsi10.queryContextRequest.emptyAttribute.valid.json";
   const char*     outfile = "ngsi10.queryContextResponse.emptyAttribute.valid.json";
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -162,14 +165,15 @@ TEST(QueryContextRequest, emptyAttribute_json)
 TEST(QueryContextRequest, emptyAttributeExpression_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   const char*     infile  = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.json";
   const char*     outfile = "ngsi10.queryContextResponse.emptyAttributeExpression.valid.json";
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -189,13 +193,14 @@ TEST(QueryContextRequest, scopeGeolocationCircleOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
@@ -214,13 +219,14 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
@@ -240,13 +246,14 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedBadValueJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleInvertedBadValue.postponed.json";
   const char*     outFile = "ngsi10.queryContextRequest.circleInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -267,13 +274,14 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.circleZeroRadius.postponed.json";
   const char*     outFile = "ngsi10.queryContextRequest.circleZeroRadius.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -293,13 +301,14 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
@@ -318,13 +327,14 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
@@ -344,13 +354,14 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonInvertedBadValue.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -372,13 +383,14 @@ TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonNoVertices.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonNoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -400,13 +412,14 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonOneVertex.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonOneVertex.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -428,13 +441,14 @@ TEST(QueryContextRequest, scopeGeolocationPolygonTwoVerticesJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.queryContextRequest.polygonTwoVertices.postponed.json";
   const char*     outfile = "ngsi10.queryContextResponse.polygonTwoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -52,11 +54,10 @@ std::string postSubscribeContextAvailability
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res,
-                                                                      &scar,
-                                                                      ciP->uriParam,
-                                                                      ciP->httpHeaders.correlator,
-                                                                      ciP->tenant));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res,
+                                                                              &scar,
+                                                                              orionldState.correlator,
+                                                                              orionldState.tenantP));
   TIMED_RENDER(answer = scar.render());
 
   return answer;

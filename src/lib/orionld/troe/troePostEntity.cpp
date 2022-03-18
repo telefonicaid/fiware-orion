@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -33,17 +31,15 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
-#include "orionld/troe/troePostEntityNoOverwrite.h"            // troePostEntityNoOverwrite
-#include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
+
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostEntity.h"                       // Own interface
 
 
@@ -52,50 +48,29 @@ extern "C"
 //
 // troePostEntity -
 //
-bool troePostEntity(ConnectionInfo* ciP)
+bool troePostEntity(void)
 {
-  //
-  // The service routine leaves us with the attributes expanded but the sub attributes NOT expanded
-  //
-  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    if (attrP->type == KjObject)      // Normal attribute
-      troeSubAttrsExpand(attrP);
-    else if (attrP->type == KjArray)  // An array with datasetId instances of the attribute
-    {
-      for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
-      {
-        troeSubAttrsExpand(attrInstanceP);
-      }
-    }
-  }
+  const char*     opMode   = (orionldState.uriParamOptions.noOverwrite == true)? "Append" : "Replace";
+  char*           entityId = orionldState.wildcard[0];
+  PgAppendBuffer  attributesBuffer;
+  PgAppendBuffer  subAttributesBuffer;
 
-  if (orionldState.uriParamOptions.noOverwrite == true)
-    return troePostEntityNoOverwrite(ciP);
+  pgAppendInit(&attributesBuffer, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&subAttributesBuffer, 2*1024);  // ditto
 
-  PGconn* connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+  pgAppend(&attributesBuffer,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributesBuffer, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
+  pgAttributesBuild(&attributesBuffer, orionldState.requestTree, entityId, opMode, &subAttributesBuffer);
 
-  char* entityId   = orionldState.wildcard[0];
-  char* entityType = (char*) "REPLACE";
-  LM_TMP(("TEMP: Calling pgEntityTreat for entity '%s'", entityId));
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ATTRIBUTE_REPLACE) == false)
-  {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  char* sqlV[2];
+  int   sqlIx = 0;
 
-  pgConnectionRelease(connectionP);
+  if (attributesBuffer.values    > 0) sqlV[sqlIx++] = attributesBuffer.buf;
+  if (subAttributesBuffer.values > 0) sqlV[sqlIx++] = subAttributesBuffer.buf;
+
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

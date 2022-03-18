@@ -31,6 +31,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/statistics.h"
@@ -38,7 +41,6 @@
 #include "common/RenderFormat.h"
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
-#include "orionld/common/orionldState.h"             // orionldState
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -77,7 +79,7 @@ static bool processSubscriptions
   const EntityIdVector&                           triggerEntitiesV,
   std::map<std::string, TriggeredSubscription*>&  subs,
   std::string&                                    err,
-  const std::string&                              tenant,
+  OrionldTenant*                                  tenantP,
   const std::string&                              fiwareCorrelator
 )
 {
@@ -94,7 +96,7 @@ static bool processSubscriptions
                                          mapSubId,
                                          trigs->httpInfo.url,
                                          trigs->renderFormat,
-                                         tenant,
+                                         tenantP,
                                          fiwareCorrelator))
     {
       LM_T(LmtMongo, ("Notification failure"));
@@ -124,7 +126,7 @@ static bool addTriggeredSubscriptions
   ContextRegistration                             cr,
   std::map<std::string, TriggeredSubscription*>&  subs,
   std::string&                                    err,
-  std::string                                     tenant
+  OrionldTenant*                                  tenantP
 )
 {
   BSONArrayBuilder          entitiesNoPatternA;
@@ -237,7 +239,7 @@ static bool addTriggeredSubscriptions
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->avSubscriptions, query, &cursor, &err))
   {
     TIME_STAT_MONGO_READ_WAIT_STOP();
     releaseMongoConnection(connection);
@@ -256,7 +258,7 @@ static bool addTriggeredSubscriptions
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
-    BSONElement idField = getFieldF(sub, "_id");
+    BSONElement idField = getFieldF(&sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -279,7 +281,7 @@ static bool addTriggeredSubscriptions
     {
       ngsiv2::HttpInfo httpInfo;
 
-      httpInfo.url = getStringFieldF(sub, CASUB_REFERENCE);
+      httpInfo.url = getStringFieldF(&sub, CASUB_REFERENCE);
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
@@ -287,8 +289,8 @@ static bool addTriggeredSubscriptions
       // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
       //           the first parameter for TriggeredSubscription will have "normalized" as default value
       //
-      RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_LEGACY;
-      TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(sub));
+      RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(&sub, CASUB_FORMAT)) : NGSI_V1_LEGACY;
+      TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(&sub));
 
       subs.insert(std::pair<std::string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -318,8 +320,8 @@ HttpStatusCode processRegisterContext
   RegisterContextRequest*   requestP,
   RegisterContextResponse*  responseP,
   OID*                      id,
-  const std::string&        tenant,
-  const std::string&        servicePath,
+  OrionldTenant*            tenantP,
+  const char*               servicePath,
   const std::string&        format,
   const std::string&        fiwareCorrelator
 )
@@ -354,7 +356,7 @@ HttpStatusCode processRegisterContext
   reg.append(REG_EXPIRATION, expiration);
 
   // FIXME P4: See issue #3078
-  reg.append(REG_SERVICE_PATH, servicePath == "" ? SERVICE_PATH_ROOT : servicePath);
+  reg.append(REG_SERVICE_PATH, (servicePath == NULL)? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
 
@@ -419,7 +421,7 @@ HttpStatusCode processRegisterContext
 
     std::string err;
 
-    if (!addTriggeredSubscriptions(*cr, subsToNotify, err, tenant))
+    if (!addTriggeredSubscriptions(*cr, subsToNotify, err, tenantP))
     {
       responseP->errorCode.fill(SccReceiverInternalError, err);
       return SccOk;
@@ -431,7 +433,7 @@ HttpStatusCode processRegisterContext
    * exist in the collection, it is created. Thus, this way both uses of registerContext are OK
    * (either new registration or updating an existing one)
    */
-  if (!collectionUpdate(getRegistrationsCollectionName(tenant), BSON("_id" << oid), reg.obj(), true, &err))
+  if (!collectionUpdate(tenantP->registrations, BSON("_id" << oid), reg.obj(), true, &err))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
     releaseTriggeredSubscriptions(&subsToNotify);
@@ -442,7 +444,7 @@ HttpStatusCode processRegisterContext
   // Send notifications for each one of the subscriptions accumulated by
   // previous addTriggeredSubscriptions() invocations
   //
-  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant, fiwareCorrelator);
+  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenantP, fiwareCorrelator);
 
   // Fill the response element
   responseP->duration = requestP->duration;

@@ -34,6 +34,6 @@
 //
 // orionldContextFromUrl -
 //
-extern OrionldContext* orionldContextFromUrl(char* url, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMURL_H_

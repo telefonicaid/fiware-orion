@@ -41,6 +41,22 @@ SET (SOURCES
      pcheckAttrs.cpp
      pcheckQ.cpp
      pcheckUri.cpp
+     pcheckAttribute.cpp
+     pCheckAttribute.cpp
+     pCheckUri.cpp
+     pCheckEntity.cpp
+     pCheckEntityId.cpp
+     pCheckEntityType.cpp
+     pCheckGeoPointCoordinates.cpp
+     pCheckGeoPolygonCoordinates.cpp
+     pCheckGeoLineStringCoordinates.cpp
+     pCheckGeoMultiPointCoordinates.cpp
+     pCheckGeoMultiPolygonCoordinates.cpp
+     pCheckGeoMultiLineStringCoordinates.cpp
+     pCheckGeoPropertyCoordinates.cpp
+     pCheckGeoPropertyType.cpp
+     pCheckGeoPropertyValue.cpp
+     pCheckAttributeType.cpp
 )
 
 # Include directories

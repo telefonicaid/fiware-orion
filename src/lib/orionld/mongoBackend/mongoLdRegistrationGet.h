@@ -25,7 +25,8 @@
 *
 * Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
-#include "apiTypesV2/Registration.h"
+#include "apiTypesV2/Registration.h"                           // ngsiv2::Registration
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 
 
 
@@ -37,7 +38,7 @@ extern bool mongoLdRegistrationGet
 (
   ngsiv2::Registration*  regP,
   const char*            regId,
-  const char*            tenant,
+  OrionldTenant*         tenantP,
   int*                   statusCodeP,
   char**                 detailsP
 );

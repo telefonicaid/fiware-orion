@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
 
 
@@ -63,13 +64,27 @@ typedef bool    (*DbSubscriptionMatchCallback)(const char* entityId, KjNode* sub
 //
 // Function pointer types for the DB interface
 //
+typedef KjNode* (*DbEntityRetrieveFunction)(const char*  entityId,
+                                            char**       attrs,
+                                            bool         attrMandatory,
+                                            bool         sysAttrs,
+                                            bool         keyValues,
+                                            bool         concise,
+                                            const char*  datasetId,
+                                            const char*  geoProperty,
+                                            KjNode**     geoPropertyP);
+
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
-typedef KjNode* (*DbEntityRetrieveFunction)(const char* entityId, char** attrs, bool attrMandatory, bool sysAttrs, bool keyValues, const char* datasetId);
 typedef KjNode* (*DbEntityLookupManyFunction)(KjNode* requestTree);
 typedef KjNode* (*DbEntityAttributeLookupFunction)(const char* entityId, const char* attributeName);
+typedef KjNode* (*DbEntityAttributeInstanceLookupFunction)(const char* entityId, const char* attributeName, const char* datasetId);
+typedef KjNode* (*DbEntityAttributeWithDatasetsLookup)(const char* entityId, const char* attributeName);
+typedef KjNode* (*DbEntitiesAttributeLookupFunction)(char** entityArray, int entitiesInArray, const char* attributeName);
 typedef bool    (*DbEntityAttributesDeleteFunction)(const char* entityId, char** attrNameV, int vecSize);
+typedef KjNode* (*DbEntityTypeGet)(OrionldProblemDetails* pdP, const char* typeLongName, int* noOfEntitiesP);
 typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestTree);
 typedef bool    (*DbEntityFieldReplaceFunction)(const char* entityId, const char* fieldName, KjNode* fieldValeNodeP);
+typedef bool    (*DbEntityFieldDeleteFunction)(const char* entityId, const char* fieldPath);
 typedef bool    (*DbEntityDeleteFunction)(const char* entityId);
 typedef bool    (*DbEntitiesDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, bool isArray, char** titleP, char** detailsP);
@@ -85,10 +100,12 @@ typedef bool    (*DbSubscriptionDelete)(const char* subscriptionId);
 typedef KjNode* (*DbRegistrationGet)(const char* registrationId);
 typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbRegistrationP);
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
-typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
-typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
-typedef bool    (*DbIdIndexCreate)(const char* tenant);
+typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(bool details);
+typedef bool    (*DbGeoIndexCreate)(OrionldTenant* tenantP, const char* attrName);
+typedef bool    (*DbIdIndexCreate)(OrionldTenant* tenantP);
 typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
+typedef KjNode* (*DbDatasetGet)(const char* entityId, const char* attributeNameExpandedEq, const char* datasetId);
+typedef bool    (*DbTenantExists)(const char* tenantName);
 
 
 
@@ -100,9 +117,14 @@ extern DbEntityLookupFunction                    dbEntityLookup;
 extern DbEntityRetrieveFunction                  dbEntityRetrieve;
 extern DbEntityLookupManyFunction                dbEntityLookupMany;
 extern DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
+extern DbEntityAttributeWithDatasetsLookup       dbEntityAttributeWithDatasetsLookup;
+extern DbEntityAttributeInstanceLookupFunction   dbEntityAttributeInstanceLookup;
+extern DbEntitiesAttributeLookupFunction         dbEntitiesAttributeLookup;
 extern DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
+extern DbEntityTypeGet                           dbEntityTypeGet;
 extern DbEntityUpdateFunction                    dbEntityUpdate;
 extern DbEntityFieldReplaceFunction              dbEntityFieldReplace;
+extern DbEntityFieldDeleteFunction               dbEntityFieldDelete;
 extern DbEntityDeleteFunction                    dbEntityDelete;
 extern DbEntitiesDeleteFunction                  dbEntitiesDelete;
 extern DbDataToKjTreeFunction                    dbDataToKjTree;
@@ -122,5 +144,7 @@ extern DbEntitiesGet                             dbEntitiesGet;
 extern DbGeoIndexCreate                          dbGeoIndexCreate;
 extern DbIdIndexCreate                           dbIdIndexCreate;
 extern DbEntitiesQuery                           dbEntitiesQuery;
+extern DbDatasetGet                              dbDatasetGet;
+extern DbTenantExists                            dbTenantExists;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

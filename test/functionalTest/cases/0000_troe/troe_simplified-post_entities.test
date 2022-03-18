@@ -1,0 +1,136 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of an Entity (Simplified format)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes of all types, and sub-attrs of all types, using Simplified format
+# 02. See E1 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity E1 with attributes of all types, and sub-attrs of all types, using Simplified format"
+echo "========================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "String": "String",
+  "Int": 1,
+  "Float": 3.14,
+  "Bool": "true",
+  "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+  "Array": [ 5, 6 ],
+  "Dataset": [{"value": 1}, {"value": 2, "datasetId": "urn:ngsi-ld:dataset:1"}],
+  "Rel": { "object": "urn:ngsi-ld:entities:E2" },
+  "Sub": {
+    "value": 6,
+    "String": "String",
+    "Int": 1,
+    "Float": 3.14,
+    "Bool": "true",
+    "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+    "Array": [ 5, 6 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E2" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attributes of all types, and sub-attrs of all types, using Simplified format
+=========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the temporal database
+===================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/String,String,urn:ngsi-ld:entities:E1,f,,None,String,,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Int,Number,urn:ngsi-ld:entities:E1,f,,None,,1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Float,Number,urn:ngsi-ld:entities:E1,f,,None,,3.14,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Bool,String,urn:ngsi-ld:entities:E1,f,,None,true,,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Geo,GeoPoint,urn:ngsi-ld:entities:E1,f,,None,,,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,None,,,,"[5, 6]",
+Create,https://uri.etsi.org/ngsi-ld/default-context/Dataset,Number,urn:ngsi-ld:entities:E1,f,,None,,1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Dataset,Number,urn:ngsi-ld:entities:E1,f,,urn:ngsi-ld:dataset:1,,2,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Rel,Relationship,urn:ngsi-ld:entities:E1,f,,None,urn:ngsi-ld:entities:E2,,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/Sub,Number,urn:ngsi-ld:entities:E1,t,,None,,6,,,
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,compound,observedat
+https://uri.etsi.org/ngsi-ld/default-context/String,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,String,,,,
+https://uri.etsi.org/ngsi-ld/default-context/Int,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,1,,,
+https://uri.etsi.org/ngsi-ld/default-context/Float,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,3.14,,,
+https://uri.etsi.org/ngsi-ld/default-context/Bool,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,true,,,,
+https://uri.etsi.org/ngsi-ld/default-context/Geo,GeoPoint,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,,
+https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,"[5, 6]",
+https://uri.etsi.org/ngsi-ld/default-context/Rel,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:entities:E2,,,,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

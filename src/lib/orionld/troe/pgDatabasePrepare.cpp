@@ -22,11 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/common/orionldState.h"                       // dbName
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgDatabaseCreate.h"                     // pgDatabaseCreate
@@ -42,43 +41,30 @@
 //
 bool pgDatabasePrepare(const char* dbName)
 {
-  LM_TMP(("PGPOOL: new tenant '%s'", dbName));
-
   // Connect to the "NULL" database
-  PGconn*         connectionP = pgConnectionGet(NULL);
-  ConnStatusType  status      = (connectionP != NULL)? PQstatus(connectionP) : CONNECTION_BAD;
+  PgConnection*   nullConnectionP = pgConnectionGet(NULL);
+  ConnStatusType  status          = ((nullConnectionP != NULL) && (nullConnectionP->connectionP != NULL))? PQstatus(nullConnectionP->connectionP) : CONNECTION_BAD;
 
   if (status != CONNECTION_OK)
-    LM_RE(false, ("Database Error (unable to connect to postgres - connection / status: %p / %d)", connectionP, status));
+    LM_RE(false, ("Database Error (unable to connect to postgres - connection/status: %p/%d)", nullConnectionP->connectionP, status));
 
-  LM_TMP(("PGPOOL: creating db '%s'", dbName));
 
   //
-  // For now, we just create the Postgres database for the default tenant
-  // This will fail if the database already exists - that's OK
-  LM_TMP(("PGPOOL: creating db '%s'", dbName));
-  if (pgDatabaseCreate(connectionP, dbName) == false)  // FIXME: return the connection to the new DB ?
+  // DB-Creation fails if the database already exists - that's OK
+  //
+  PgConnection* connectionP = pgDatabaseCreate(nullConnectionP, dbName);
+  if (connectionP == NULL)
   {
-    LM_TMP(("PGPOOL: database '%s' seems to exist already", dbName));
-    pgConnectionRelease(connectionP);
+    pgConnectionRelease(nullConnectionP);
     return true;
   }
-  LM_TMP(("PGPOOL: db '%s' has been created", dbName));
 
-  // Disconnect from the "NULL" DB
-  pgConnectionRelease(connectionP);
-
-  // Connect to the newly created database
-  LM_TMP(("PGPOOL: connecting to db '%s' to create the tables", dbName));
-
-  connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("unable to connect to newly created postgres db '%s'", dbName));
+  // Release the connection for the "NULL" DB
+  pgConnectionRelease(nullConnectionP);
 
   bool r;
-  if ((r = pgDatabaseTableCreateAll(connectionP)) == false)
+  if ((r = pgDatabaseTableCreateAll(connectionP->connectionP)) == false)
     LM_E(("Database Error (error creating postgres database tables)"));
-  LM_TMP(("PGPOOL: created tables for db '%s'", dbName));
 
   pgConnectionRelease(connectionP);
 

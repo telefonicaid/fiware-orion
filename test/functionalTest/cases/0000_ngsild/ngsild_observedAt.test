@@ -34,6 +34,8 @@ brokerStart CB 0-255
 # 01. Create an entity with an attribute 'speed' that has an 'observedAt'
 # 02. Get the entity from broker, see speed::observedAt as a string
 # 03. Get the entity with attrList, see speed::observedAt as a string
+# 04. Create another entity with an attribute 'speed' that has an 'observedAt' with 10 decimals
+# 05. Get the new entity and see only 3 decimals (correctly rounded) for speed::observedAt
 #
 
 
@@ -63,6 +65,29 @@ echo
 echo "03. Get the entity with attrList, see speed::observedAt as a string"
 echo "==================================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:E1a?attrs=speed&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Create another entity with an attribute 'speed' that has an 'observedAt' with 10 decimals"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E2",
+  "type": "T",
+  "speed": {
+    "type": "Property",
+    "value": 22,
+    "observedAt": "2022-01-31T13:14:15.0123456789Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Get the new entity and see only 3 decimals (correctly rounded) for speed::observedAt"
+echo "========================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2
 echo
 echo
 
@@ -117,6 +142,34 @@ Date: REGEX(.*)
   }
 }
 
+
+
+04. Create another entity with an attribute 'speed' that has an 'observedAt' with 10 decimals
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2
+Date: REGEX(.*)
+
+
+
+05. Get the new entity and see only 3 decimals (correctly rounded) for speed::observedAt
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 115
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:T:E2",
+    "speed": {
+        "observedAt": "2022-01-31T13:14:15.012Z",
+        "type": "Property",
+        "value": 22
+    },
+    "type": "T"
+}
 
 
 --TEARDOWN--

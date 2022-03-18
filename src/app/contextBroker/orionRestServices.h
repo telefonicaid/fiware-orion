@@ -50,8 +50,6 @@ extern void orionRestServicesInit
    unsigned int        _connectionMemory,
    unsigned int        _maxConnections,
    unsigned int        _mhdThreadPoolSize,
-   const std::string&  _rushHost,
-   unsigned short      _rushPort,
    const char*         _allowedOrigin,
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,

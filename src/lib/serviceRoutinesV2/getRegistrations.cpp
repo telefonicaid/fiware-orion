@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
@@ -32,9 +35,9 @@
 #include "apiTypesV2/Registration.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+#include "rest/HttpHeaders.h"                   // HTTP_*
 #include "mongoBackend/mongoRegistrationGet.h"  // FIXME P0: Two external functions in the same module ...
 #include "alarmMgr/alarmMgr.h"
 #include "serviceRoutinesV2/getRegistrations.h"
@@ -67,25 +70,22 @@ std::string getRegistrations
   std::vector<ngsiv2::Registration>  registrationV;
   OrionError                         oe;
   std::string                        out;
-  int                                offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int                                limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+  int                                offset = orionldState.uriParams.offset;
+  int                                limit  = orionldState.uriParams.limit;
   long long                          count  = 0;
 
-  TIMED_MONGO(mongoRegistrationsGet(&registrationV, ciP->tenant, ciP->servicePathV, offset, limit, &count, &oe));
+  TIMED_MONGO(mongoRegistrationsGet(&registrationV, orionldState.tenantP, ciP->servicePathV, offset, limit, &count, &oe));
 
   if (oe.code != SccOk)
   {
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
 
     return out;
   }
 
-  if ((ciP->uriParamOptions["count"]))
-  {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(toString(count));
-  }
+  if (orionldState.uriParams.count)
+    orionldHeaderAdd(&orionldState.out.headers, HttpNgsiv2Count, NULL, count);
 
   TIMED_RENDER(out = vectorToJson(registrationV));
 

@@ -37,8 +37,6 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECKx(U)
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // Own interface
@@ -112,7 +110,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
       // The entity id must be a URI
       char* detail;
 
-      if (pcheckUri(idP, &detail) == false)
+      if (pcheckUri(idP, true, &detail) == false)
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include 'detail' and name (id)
         orionldState.httpStatusCode = SccBadRequest;
@@ -131,7 +129,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
     if (idP)        entityInfo.id        = idP;
     if (idPatternP) entityInfo.idPattern = idPatternP;
 
-    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);
+    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);  // Expansion for Regs+Subs
     entitiesP->push_back(entityInfo);
   }
 

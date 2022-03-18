@@ -44,7 +44,7 @@ typedef struct StringList
   void         fill(const std::vector<std::string>& aVec);
   void         fill(const std::string& commaSeparatedList);
   std::string  render(bool comma, const std::string& fieldName);
-  std::string  toString(void);
+  void         toString(std::string* sP);
   void         release(void);
   bool         lookup(const std::string& string) const;
   void         push_back(const std::string& string);

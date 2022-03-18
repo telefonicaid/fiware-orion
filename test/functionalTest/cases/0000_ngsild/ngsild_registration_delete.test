@@ -252,14 +252,14 @@ Date: REGEX(.*)
 06. Attempt to delete the non-existent registration R3 - see 404 Not Found
 ==========================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 161
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:ContextSourceRegistration:R3",
     "title": "Context Source Registration not found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

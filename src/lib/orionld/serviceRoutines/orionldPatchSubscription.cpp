@@ -31,8 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
@@ -90,7 +88,7 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
+static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
   KjNode* next;
@@ -459,12 +457,12 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 // 6. Call dbSubscriptionReplace(char* subscriptionId, KjNode* subscriptionTree) to replace the old sub with the new
 //    Or, dbSubscriptionUpdate(char* subscriptionId, KjNode* toAddP, KjNode* toRemoveP, KjNode* toUpdate)
 //
-bool orionldPatchSubscription(ConnectionInfo* ciP)
+bool orionldPatchSubscription(void)
 {
   char* subscriptionId = orionldState.wildcard[0];
   char* detail;
 
-  if (pcheckUri(subscriptionId, &detail) == false)
+  if (pcheckUri(subscriptionId, true, &detail) == false)
   {
     orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);  // FIXME: Include 'detail' and name (subscriptionId)
@@ -486,7 +484,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
 
   if (dbSubscriptionP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription not found", subscriptionId);
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", subscriptionId);
     orionldState.httpStatusCode = 404;
     return false;
   }
@@ -551,7 +549,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // modified.
   // ngsildSubscriptionPatch() performs that modification
   //
-  if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
+  if (ngsildSubscriptionPatch(dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
     return false;
 
   // Update modifiedAt

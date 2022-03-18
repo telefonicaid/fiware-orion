@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                           // orionldState
+
 #include "common/globals.h"
 #include "common/limits.h"
 #include "common/tag.h"
@@ -41,7 +43,7 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
-#include "mongoBackend/dbFieldEncoding.h"
+#include "orionld/common/eqForDot.h"
 
 using namespace mongo;
 
@@ -70,6 +72,8 @@ Metadata::Metadata()
   valueType       = orion::ValueTypeNotGiven;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -80,8 +84,6 @@ Metadata::Metadata()
 */
 Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
-  LM_T(LmtClone, ("'cloning' Metadata '%s'", mP->name.c_str()));
-
   name            = mP->name;
   type            = mP->type;
   valueType       = mP->valueType;
@@ -89,8 +91,8 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   numberValue     = mP->numberValue;
   boolValue       = mP->boolValue;
   typeGiven       = mP->typeGiven;
-
-  LM_T(LmtClone, ("mP->compoundValueP at %p", mP->compoundValueP));
+  createdAt       = mP->createdAt;
+  modifiedAt      = mP->modifiedAt;
   compoundValueP  = (mP->compoundValueP != NULL)? mP->compoundValueP->clone() : NULL;
 
   if (useDefaultType && !typeGiven)
@@ -120,6 +122,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
   stringValue     = std::string(_value);
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -136,6 +140,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
   stringValue     = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -152,6 +158,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
   numberValue     = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -168,6 +176,8 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   boolValue       = _value;
   typeGiven       = false;
   compoundValueP  = NULL;
+  createdAt       = 0;
+  modifiedAt      = 0;
 }
 
 
@@ -176,34 +186,36 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 *
 * Metadata::Metadata -
 */
-Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
+Metadata::Metadata(const char* _name, BSONObj* mdBsonP)
 {
   name            = _name;
-  type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
+  type            = mdBsonP->hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdBsonP, ENT_ATTRS_MD_TYPE) : "";
   typeGiven       = (type == "")? false : true;
   compoundValueP  = NULL;
+  createdAt       = mdBsonP->hasField("createdAt")  ? getNumberFieldF(mdBsonP, "createdAt") : 0;
+  modifiedAt      = mdBsonP->hasField("modifiedAt") ? getNumberFieldF(mdBsonP, "modifiedAt") : 0;
 
-  BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
+  BSONType bsonType = getFieldF(mdBsonP, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
   {
   case String:
     valueType   = orion::ValueTypeString;
-    stringValue = getStringFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    stringValue = getStringFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case NumberInt:
     valueType   = orion::ValueTypeNumber;
-    numberValue = (double) getIntFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = (double) getIntFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = getNumberFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case Bool:
     valueType = orion::ValueTypeBoolean;
-    boolValue = getBoolFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    boolValue = getBoolFieldF(mdBsonP, ENT_ATTRS_MD_VALUE);
     break;
 
   case jstNULL:
@@ -214,7 +226,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
   case Array:
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
-    compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
+    compoundObjectResponse(compoundValueP, getFieldF(mdBsonP, ENT_ATTRS_VALUE));
     compoundValueP->container = compoundValueP;
     compoundValueP->name      = "value";
     compoundValueP->valueType = (bsonType == Object)? orion::ValueTypeObject : orion::ValueTypeVector;
@@ -222,7 +234,7 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
 
   default:
     valueType = orion::ValueTypeNotGiven;
-    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdBsonP, ENT_ATTRS_MD_VALUE).type()));
     break;
   }
 }
@@ -302,6 +314,16 @@ std::string Metadata::render(bool comma)
     //   a method that it SHOULD NOT USE !
     //
     out += "\n";
+  }
+
+  // Adding sysAttrs, if NGSI-LD and if explicitly requested
+  if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
+  {
+    std::string dateTime = isodate2str(createdAt);
+    out += JSON_STR("createdAt") + ":" + dateTime;
+
+    dateTime = isodate2str(modifiedAt);
+    out += JSON_STR("modifiedAt") + ":" + dateTime;
   }
 
   out += endTag(comma);
@@ -535,6 +557,16 @@ std::string Metadata::toJson(bool isLastElement)
     out += JSON_VALUE("value", stringValue);
   }
 
+  // Adding sysAttrs, if NGSI-LD and if explicitly requested
+  if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
+  {
+    std::string dateTime = isodate2str(createdAt);
+    out += JSON_STR("createdAt") + ":" + dateTime;
+
+    dateTime = isodate2str(modifiedAt);
+    out += JSON_STR("modifiedAt") + ":" + dateTime;
+  }
+
   out += "}";
 
   if (!isLastElement)
@@ -577,10 +609,14 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
   for (int ix = 0; ix < levels; ++ix)
   {
     bool found = false;
+    char compoundPathEncoded[256];
+
+    strncpy(compoundPathEncoded, compoundPathV[ix].c_str(), sizeof(compoundPathEncoded) - 1);
+    eqForDot(compoundPathEncoded);
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
+      if (strcmp(current->childV[cIx]->name.c_str(), compoundPathEncoded) == 0)
       {
         current = current->childV[cIx];
         found   = true;

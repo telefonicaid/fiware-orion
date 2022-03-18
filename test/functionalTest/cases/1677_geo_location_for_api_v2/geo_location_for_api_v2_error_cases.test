@@ -229,13 +229,13 @@ Date: REGEX(.*)
 04. Non-supported area-type in geometry - see error
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 96
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid query: error parsing geometry: Invalid selector in geometry specification",
+    "description": "Invalid query: Invalid selector in geometry specification",
     "error": "BadRequest"
 }
 

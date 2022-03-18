@@ -26,6 +26,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/kjRenderSize.h"                                 // kjFastRenderSize
 #include "kjson/kjRender.h"                                     // kjFastRender
 }
 
@@ -37,7 +38,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/common/dotForEq.h"                            // dotForEq
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckGeoType.h"                 // pcheckGeoType
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"         // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoqGeorel.h"              // pcheckGeoqGeorel
@@ -89,8 +90,9 @@ bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldNa
   }
   else
   {
-    buf = kaAlloc(&orionldState.kalloc, 1024);
-    kjFastRender(orionldState.kjsonP, coordinatesP, buf, 1024);
+    int bufSize = kjFastRenderSize(coordinatesP);
+    buf = kaAlloc(&orionldState.kalloc, bufSize);
+    kjFastRender(coordinatesP, buf);
   }
 
   coordinatesP->name    = (char*) "coords";
@@ -204,7 +206,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
 
     if (strcmp(pName, "location") != 0)
     {
-      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, true, NULL);
+      geopropertyP->value.s = orionldAttributeExpand(orionldState.contextP, pName, true, NULL);
       dotForEq(geopropertyP->value.s);
     }
   }

@@ -41,13 +41,13 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 {
   ParseData       parseData;
   const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok2.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 

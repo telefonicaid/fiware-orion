@@ -22,6 +22,9 @@
 *
 * Author: Gabriel Quaresma and Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
@@ -29,14 +32,13 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjRender.h"                                    // kjFastRender    - DEBUG
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/globals.h"                                    // parse8601Time
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
@@ -64,12 +66,13 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"      // kjEntityIdLookupInEntityArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
+#include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
+#include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
 
 
@@ -118,6 +121,43 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 }
 
 
+// ----------------------------------------------------------------------------
+//
+// entityLookupInDb - lookup an entioty id in an array of entities
+//
+// idTypeAndCreDateFromDb looks like this:
+// [
+//   {
+//     "id":"urn:ngsi-ld:entity:E1",
+//     "type":"https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+//     "creDate":1619077285.144012
+//   },
+//   {
+//     "id":"urn:ngsi-ld:entity:E2",
+//     "type":"https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+//     "creDate":1619077285.144012
+//   }
+// ]
+static KjNode* entityLookupInDb(KjNode* idTypeAndCreDateFromDb, const char* entityId)
+{
+  if (idTypeAndCreDateFromDb == NULL)
+    return NULL;
+
+  for (KjNode* entityP = idTypeAndCreDateFromDb->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    KjNode* idNodeP = kjLookup(entityP, "id");
+
+    if ((idNodeP != NULL) && (idNodeP->type == KjString))
+    {
+      if (strcmp(idNodeP->value.s, entityId) == 0)
+        return entityP;
+    }
+  }
+
+  return NULL;
+}
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -135,8 +175,19 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 //   Replace:  All the existing Entity content shall be replaced  - like PUT
 //   Update:   Existing Entity content shall be updated           - like PATCH
 //
-bool orionldPostBatchUpsert(ConnectionInfo* ciP)
+bool orionldPostBatchUpsert(void)
 {
+  KjNode* incomingTree   = orionldState.requestTree;
+  KjNode* createdArrayP  = kjArray(orionldState.kjsonP, "created");
+  KjNode* updatedArrayP  = kjArray(orionldState.kjsonP, "updated");
+  KjNode* errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
+
+  // Error or not, the Link header should never be present in the reponse
+  orionldState.noLinkHeader = true;
+
+  // The response is never JSON-LD
+  orionldState.out.contentType = JSON;
+
   //
   // Prerequisites for URI params:
   // * both 'update' and 'replace' cannot be set in options (replace is default)
@@ -159,18 +210,60 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
 
 
-  KjNode* incomingTree   = orionldState.requestTree;
-  KjNode* successArrayP  = kjArray(orionldState.kjsonP, "success");
-  KjNode* errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
+  //
+  // 00. Checking and expanding items in the incoming payload
+  //
+  // FIXME: pCheckEntity/pCheckAttribute use orionldState.contextP as context
+  //        Because of this, I need to save it, modify it before each call to pCheckEntity
+  //        and then out it back after the loop
+  //        Would be better to have the context as a parameter to pCheckEntity/pCheckAttribute
+  //
+  OrionldContext*  savedContextP = orionldState.contextP;
+  KjNode*          entityP       = orionldState.requestTree->value.firstChildP;
+  KjNode*          next;
+
+  while (entityP != NULL)
+  {
+    next = entityP->next;
+
+    KjNode*                idNodeP      = kjLookup(entityP, "id");        // To populate removeArray
+    KjNode*                atidNodeP    = kjLookup(entityP, "@id");       // To populate removeArray
+    KjNode*                contextNodeP = kjLookup(entityP, "@context");
+    OrionldContext*        contextP     = NULL;
+    OrionldProblemDetails  pd;
+
+    // Error if both - taken care of by pCheckEntity ... I hope!
+    if (idNodeP == NULL)
+      idNodeP = atidNodeP;
+
+    if (contextNodeP != NULL)
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
+
+    if (contextP != NULL)
+      orionldState.contextP = contextP;
+
+    // No Entity from DB needed as all attributes are always overwritten
+    if (pCheckEntity(entityP, true, NULL) == false)
+    {
+      const char* entityId = (idNodeP == NULL)? "No entity::id" : (idNodeP->type == KjString)? idNodeP->value.s : "Invalid entity::id";
+
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, false);
+      kjChildRemove(orionldState.requestTree, entityP);
+    }
+
+    entityP = next;
+  }
+  orionldState.contextP = savedContextP;
+
 
   //
-  // Entities that already exist in the DB cannot have a type != type-in-db
-  // To assure this, we need to extract all existing entities from the database
-  // Also, those entities that do not exist MUST have an entity type present.
+  // 01. Entities that already exist in the DB cannot have a type != type-in-db
+  //     To assure this, we need to extract all existing entities from the database
+  //     Also, those entities that do not exist MUST have an entity type present.
   //
-  // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  //     Create idArray as an array of entity IDs, extracted from orionldState.requestTree
   //
-  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
+  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, errorsArrayP);
 
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
@@ -178,6 +271,9 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
+
+  orionldState.batchEntities = idTypeAndCreDateFromDb;  // So that TRoE knows what entities existed prior to the upsert call
+
 
   //
   // 03. Creation Date from DB entities, and type-check
@@ -190,6 +286,10 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
   if (idTypeAndCreDateFromDb != NULL)
   {
+    //
+    // This loop loops over the results from the DB query (over the entity ids from the incoming payload)
+    // As what already exists will be overwritten, we might as well REMOVE those entities before we push to DB
+    //
     for (KjNode* dbEntityP = idTypeAndCreDateFromDb->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
     {
       char*                  idInDb        = NULL;
@@ -197,9 +297,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       double                 creDateInDb   = 0;
       char*                  typeInPayload = NULL;
       KjNode*                contextNodeP  = NULL;
-      OrionldContext*        contextP      = NULL;
       KjNode*                entityP;
-      OrionldProblemDetails  pd;
 
       // Get entity id, type and creDate from the DB
       entityTypeAndCreDateGet(dbEntityP, &idInDb, &typeInDb, &creDateInDb);
@@ -210,15 +308,13 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       //
       entityP = entityLookupById(incomingTree, idInDb);
       if (entityP == NULL)
+      {
+        // DB entity not part of incoming payload ... is that not a bit weird ... ?
         continue;
+      }
 
-      typeInPayload = entityTypeGet(entityP, &contextNodeP);
+      typeInPayload = entityTypeGet(entityP, &contextNodeP);  // Already expanded (by pCheckEntity)
 
-      if (contextNodeP != NULL)
-        contextP = orionldContextFromTree(NULL, true, contextNodeP, &pd);
-
-      if (contextP == NULL)
-        contextP = orionldState.contextP;
 
       //
       // If type exists in the incoming payload, it must be equal to the type in the DB
@@ -231,16 +327,14 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       //
       if (typeInPayload != NULL)
       {
-        char* typeInPayloadExpanded = orionldContextItemExpand(contextP, typeInPayload, true, NULL);
-
-        if (strcmp(typeInPayloadExpanded, typeInDb) != 0)
+        if (strcmp(typeInPayload, typeInDb) != 0)
         {
           //
           // As the entity type differed, this entity will not be updated in DB, nor will it be removed:
           // - removed from incomingTree
           // - not added to "removeArray"
           //
-          LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayloadExpanded));
+          LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayload));
           entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400, false);
           kjChildRemove(incomingTree, entityP);
           continue;
@@ -319,6 +413,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
   KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
   UpdateContextRequest  mongoRequest;
+
   mongoRequest.updateActionType = ActionTypeAppend;
 
   kjTreeToUpdateContextRequest(&mongoRequest, treeP, errorsArrayP, idTypeAndCreDateFromDb);
@@ -336,17 +431,18 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 08. Call mongoBackend - to create/modify the entities
   //     In case of REPLACE, all entities have been removed from the DB prior to this call, so, they will all be created.
   //
-  UpdateContextResponse mongoResponse;
+  UpdateContextResponse    mongoResponse;
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
 
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
-                                                   orionldState.tenant,
-                                                   ciP->servicePathV,
-                                                   ciP->uriParam,
-                                                   ciP->httpHeaders.xauthToken,
-                                                   ciP->httpHeaders.correlator,
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
-                                                   ciP->apiVersion,
+                                                   orionldState.tenantP,
+                                                   servicePathV,
+                                                   orionldState.xAuthToken,
+                                                   orionldState.correlator,
+                                                   orionldState.attrsFormat,
+                                                   orionldState.apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
   //
@@ -355,17 +451,22 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // bool partialUpdate = (orionldState.errorAttributeArrayP[0] == 0)? false : true;
   // bool retValue      = true;
   //
-
   if (orionldState.httpStatusCode == SccOk)
   {
-    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
     {
       const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
       if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
-        entitySuccessPush(successArrayP, entityId);
+      {
+        // Creation or Update?
+        KjNode* dbEntityP = entityLookupInDb(idTypeAndCreDateFromDb, entityId);
+
+        if (dbEntityP == NULL)
+          entitySuccessPush(createdArrayP, entityId);
+        else
+          entitySuccessPush(updatedArrayP, entityId);
+      }
       else
         entityErrorPush(errorsArrayP,
                         entityId,
@@ -380,39 +481,106 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     {
       const char* entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
 
-      if (kjStringValueLookupInArray(successArrayP, entityId) == NULL)
-        entitySuccessPush(successArrayP, entityId);
+      // Creation or Update?
+      KjNode* dbEntityP = entityLookupInDb(idTypeAndCreDateFromDb, entityId);
+
+      if (dbEntityP == NULL)
+      {
+        if (kjStringValueLookupInArray(createdArrayP, entityId) == NULL)
+          entitySuccessPush(createdArrayP, entityId);
+      }
+      else
+      {
+        if (kjStringValueLookupInArray(updatedArrayP, entityId) == NULL)
+          entitySuccessPush(updatedArrayP, entityId);
+      }
     }
+  }
+
+  //
+  // We have entity ids in three arrays:
+  //   errorsArrayP
+  //   updatedArrayP
+  //   createdArrayP
+  //
+  // 1. The broker returns 201 if all entities have been created:
+  //    - errorsArrayP  EMPTY
+  //    - updatedArrayP EMPTY
+  //    - createdArrayP NOT EMPTY
+  //
+  // 2. The broker returns 204 if all entities have been updated:
+  //    - errorsArrayP  EMPTY
+  //    - createdArrayP EMPTY
+  //    - updatedArrayP NOT EMPTY
+  //
+  // 3. Else, 207 is returned
+  //
+  KjNode* successArrayP  = NULL;
+
+  if ((errorsArrayP->value.firstChildP == NULL) && (updatedArrayP->value.firstChildP == NULL))
+  {
+    orionldState.httpStatusCode = 201;
+    orionldState.responseTree   = createdArrayP;
+    successArrayP               = createdArrayP;  // for kjEntityArrayErrorPurge
+    successArrayP->name         = (char*) "success";
+  }
+  else if ((errorsArrayP->value.firstChildP == NULL) && (createdArrayP->value.firstChildP == NULL))
+  {
+    orionldState.httpStatusCode = 204;
+    orionldState.responseTree   = NULL;
+    successArrayP               = updatedArrayP;  // for kjEntityArrayErrorPurge
+    successArrayP->name         = (char*) "success";
+  }
+  else
+  {
+    orionldState.httpStatusCode = 207;
+
+    //
+    // For v1.3.1, merge updatedArrayP and createdArrayP into successArrayP
+    // FIXME:  This will be amended in the spec and this code will need to change
+    //
+    if (updatedArrayP->value.firstChildP != NULL)
+    {
+      successArrayP = updatedArrayP;
+
+      if (createdArrayP->value.firstChildP != NULL)
+      {
+        // Concatenate arrays
+        successArrayP->lastChild->next = createdArrayP->value.firstChildP;
+        successArrayP->lastChild       = createdArrayP->lastChild;
+      }
+    }
+    else if (createdArrayP->value.firstChildP != NULL)
+    {
+      successArrayP = createdArrayP;
+
+      if (updatedArrayP->value.firstChildP != NULL)
+      {
+        // Concatenate arrays
+        successArrayP->lastChild->next = updatedArrayP->value.firstChildP;
+        successArrayP->lastChild       = updatedArrayP->lastChild;
+      }
+    }
+    else
+      successArrayP = updatedArrayP;  // Empty array
+
+    successArrayP->name = (char*) "success";
 
     //
     // Add the success/error arrays to the response-tree
     //
+    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);
-
-    orionldState.httpStatusCode = SccOk;
   }
+
 
   mongoRequest.release();
   mongoResponse.release();
 
-  if (orionldState.httpStatusCode != SccOk)
-  {
-    LM_E(("mongoUpdateContext flagged an error"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
-    orionldState.httpStatusCode = SccReceiverInternalError;
-    return false;
-  }
-  else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
-  {
-    orionldState.httpStatusCode = SccMultiStatus;
-    orionldState.noLinkHeader   = true;
-  }
-  else
-  {
-    orionldState.httpStatusCode = SccNoContent;
-    orionldState.responseTree = NULL;
-  }
+  if (troe == true)
+    kjEntityArrayErrorPurge(orionldState.requestTree, errorsArrayP, successArrayP);
 
   return true;
 }

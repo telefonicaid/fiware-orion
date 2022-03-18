@@ -32,6 +32,7 @@ extern "C"
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
 // OrionldContextHashTables -
@@ -65,6 +66,40 @@ typedef union OrionldContextInfo
 
 
 
+// -----------------------------------------------------------------------------
+//
+// OrionldContextOrigin -
+//
+typedef enum OrionldContextOrigin
+{
+  OrionldContextUnknownOrigin,
+  OrionldContextFromInline,
+  OrionldContextDownloaded,
+  OrionldContextFileCached,
+  OrionldContextForNotifications,
+  OrionldContextForForwarding,
+  OrionldContextUserCreated
+} OrionldContextOrigin;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextOriginName -
+//
+extern const char* orionldContextOriginName(OrionldContextOrigin origin);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldOriginFromString -
+//
+extern OrionldContextOrigin orionldOriginFromString(const char* s);
+
+
+
+
 // ----------------------------------------------------------------------------
 //
 // OrionldContext -
@@ -74,11 +109,17 @@ typedef union OrionldContextInfo
 //
 typedef struct OrionldContext
 {
-  char*               url;
-  char*               id;         // For contexts that were created by the broker itself
-  KjNode*             tree;
-  bool                keyValues;
-  OrionldContextInfo  context;
+  char*                 id;
+  char*                 url;
+  char*                 parent;
+  KjNode*               tree;
+  bool                  coreContext;
+  double                createdAt;
+  double                usedAt;
+  int                   lookups;
+  bool                  keyValues;
+  OrionldContextInfo    context;
+  OrionldContextOrigin  origin;
 } OrionldContext;
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXT_H_

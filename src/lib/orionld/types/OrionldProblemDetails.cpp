@@ -22,8 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldResponseErrorType.h"            // OrionldResponseErrorType
-#include "orionld/types/OrionldProblemDetails.h"               // Own interface
+#include "orionld/common/orionldState.h"                          // orionldState
+#include "orionld/types/OrionldResponseErrorType.h"               // OrionldResponseErrorType
+#include "orionld/types/OrionldProblemDetails.h"                  // Own interface
 
 
 
@@ -44,4 +45,6 @@ void orionldProblemDetailsFill
   pdP->title  = (char*) title;
   pdP->detail = (char*) detail;
   pdP->status = status;
+
+  orionldState.httpStatusCode = status;
 }

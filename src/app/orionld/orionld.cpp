@@ -66,6 +66,7 @@
 #include <string>
 #include <vector>
 #include <limits.h>
+#include <sys/mman.h>                    // mlockall
 
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
@@ -108,22 +109,30 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/common/orionldState.h"                    // orionldStateRelease, kalloc, ...
-#include "orionld/common/branchName.h"                      // ORIONLD_BRANCH
-#include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
-#include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
-#include "orionld/db/dbInit.h"                              // dbInit
-#include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
-#include "orionld/troe/troeInit.h"                          // troeInit
+#include "orionld/common/orionldTenantInit.h"                 // orionldTenantInit
+#include "orionld/common/orionldState.h"                      // orionldStateRelease, kalloc, ...
+#include "orionld/common/tenantList.h"                        // tenantList, tenant0
+#include "orionld/common/branchName.h"                        // ORIONLD_BRANCH
+#include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
+#include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
+#include "orionld/db/dbInit.h"                                // dbInit
+#include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
+#include "orionld/troe/troeInit.h"                            // troeInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
 #include "orionld/orionldRestServices.h"
 
-#include "orionld/socketService/socketServiceInit.h"        // socketServiceInit
-#include "orionld/socketService/socketServiceRun.h"         // socketServiceRun
+#include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
+#include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
+#include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
+#include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
 
 using namespace orion;
+
+
+extern void contextDownloadListInit(void);     // FIXME PR: include header ...
+extern void contextDownloadListRelease(void);  // FIXME PR: include header ...
 
 
 
@@ -163,7 +172,6 @@ char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
 bool            multitenancy;
-char            rush[256];
 char            allowedOrigin[64];
 int             maxAge;
 long            dbTimeout;
@@ -199,15 +207,18 @@ int             contextDownloadTimeout;
 bool            troe;
 bool            disableFileLog;
 bool            lmtmp;
-char            troeHost[64];
+char            troeHost[256];
 unsigned short  troePort;
-char            troeUser[64];
-char            troePwd[64];
+char            troeUser[256];
+char            troePwd[256];
 int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            forwarding;
+bool            noNotifyFalseUpdate;
 bool            idIndex;
+bool            noswap;
+bool            experimental;
 
 
 
@@ -238,7 +249,6 @@ bool            idIndex;
 #define HTTPS_DESC             "use the https 'protocol'"
 #define HTTPSKEYFILE_DESC      "private server key file (for https)"
 #define HTTPSCERTFILE_DESC     "certificate key file (for https)"
-#define RUSH_DESC              "rush host (IP:port)"
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
@@ -281,7 +291,9 @@ bool            idIndex;
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 #define FORWARDING_DESC        "turn on forwarding"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
-
+#define NOSWAP_DESC            "no swapping - for testing only!!!"
+#define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
+#define EXPERIMENTAL_DESC      "enable experimental implementation"
 
 
 /* ****************************************************************************
@@ -295,9 +307,10 @@ bool            idIndex;
 */
 PaArgument paArgs[] =
 {
+  { "-noswap",                &noswap,                  "NOSWAP",                    PaBool,    PaHid,  false,           false,  true,             NOSWAP_DESC              },
   { "-fg",                    &fg,                      "FOREGROUND",                PaBool,    PaOpt,  false,           false,  true,             FG_DESC                  },
   { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC             },
-  { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            PaNL,   PaNL,             PORT_DESC                },
+  { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            1024,   65535,            PORT_DESC                },
   { "-pidpath",               pidPath,                  "PID_PATH",                  PaString,  PaOpt,  PIDPATH,         PaNL,   PaNL,             PIDPATH_DESC             },
   { "-dbhost",                dbHost,                   "MONGO_HOST",                PaString,  PaOpt,  LOCALHOST,       PaNL,   PaNL,             DBHOST_DESC              },
   { "-rplSet",                rplSet,                   "MONGO_REPLICA_SET",         PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RPLSET_DESC              },
@@ -314,7 +327,6 @@ PaArgument paArgs[] =
   { "-https",                 &https,                   "HTTPS",                     PaBool,    PaOpt,  false,           false,  true,             HTTPS_DESC               },
   { "-key",                   httpsKeyFile,             "HTTPS_KEYFILE",             PaString,  PaOpt,  _i "",           PaNL,   PaNL,             HTTPSKEYFILE_DESC        },
   { "-cert",                  httpsCertFile,            "HTTPS_CERTFILE",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             HTTPSCERTFILE_DESC       },
-  { "-rush",                  rush,                     "RUSH",                      PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RUSH_DESC                },
   { "-multiservice",          &multitenancy,            "MULTI_SERVICE",             PaBool,    PaOpt,  false,           false,  true,             MULTISERVICE_DESC        },
   { "-httpTimeout",           &httpTimeout,             "HTTP_TIMEOUT",              PaLong,    PaOpt,  -1,              -1,     MAX_L,            HTTP_TMO_DESC            },
   { "-reqTimeout",            &reqTimeout,              "REQ_TIMEOUT",               PaLong,    PaOpt,   0,              0,      PaNL,             REQ_TMO_DESC             },
@@ -354,6 +366,8 @@ PaArgument paArgs[] =
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
+  { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
+  { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -395,71 +409,6 @@ static const char* validLogLevels[] =
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
-
-
-
-/* ****************************************************************************
-*
-* fileExists -
-*/
-static bool fileExists(char* path)
-{
-  if (access(path, F_OK) == 0)
-  {
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* pidFile -
-*
-* When run "interactively" (with the CLI option '-fg' set), the error messages get really ugly.
-* However, that is a minor bad, compared to what would happen to a 'nice printf message' when started as a service.
-* It would be lost. The log file is important and we can't just use 'fprintf(stderr, ...)' ...
-*/
-int pidFile(bool justCheck)
-{
-  if (fileExists(pidPath))
-  {
-    LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
-    return 1;
-  }
-
-  if (justCheck == true)
-  {
-    return 0;
-  }
-
-  int    fd = open(pidPath, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-  pid_t  pid;
-  char   buffer[32];
-  int    sz;
-  int    nb;
-
-  if (fd == -1)
-  {
-    LM_E(("PID File (open '%s': %s)", pidPath, strerror(errno)));
-    return 2;
-  }
-
-  pid = getpid();
-
-  snprintf(buffer, sizeof(buffer), "%d", pid);
-  sz = strlen(buffer);
-  nb = write(fd, buffer, sz);
-  if (nb != sz)
-  {
-    LM_E(("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
-    return 3;
-  }
-
-  return 0;
-}
 
 
 
@@ -551,12 +500,6 @@ void orionExit(int code, const std::string& reason)
   }
 
   orionldStateRelease();
-
-  //
-  // Contexts that have been cloned must be freed
-  //
-  orionldContextCacheRelease();
-
   exit(code);
 }
 
@@ -576,9 +519,7 @@ void exitFunc(void)
 
 #ifdef DEBUG
   // Take mongo req-sem ?
-  LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
-  LM_T(LmtSubCache, ("calling subCacheDestroy"));
   subCacheDestroy();
 #endif
 
@@ -592,22 +533,39 @@ void exitFunc(void)
   // Or, is freeing up the global KAlloc instance sufficient ... ?
   //
 
+  // Free up the context download list, if needed
+  contextDownloadListRelease();
+
+  //
+  // Contexts that have been cloned must be freed
+  //
+  orionldContextCacheRelease();
+
+  // Free the tenant list
+  OrionldTenant* tenantP = tenantList;
+  while (tenantP != NULL)
+  {
+    OrionldTenant* next = tenantP->next;
+    free(tenantP);
+    tenantP = next;
+  }
+
+  // Disconnect from all MQTT brokers and free the connections
+  mqttRelease();
+
   //
   // Free the kalloc buffer
   //
   kaBufferReset(&kalloc, false);
 
-  if (unlink(pidPath) != 0)
+  //
+  // Freeing the postgres connection pools
+  //
+  if (troe)
   {
-    LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
+    pgConnectionPoolsPresent();
+    pgConnectionPoolsFree();
   }
-
-  // Free the tenant list
-  for (unsigned int ix = 0; ix < tenants; ix++)
-    free(tenantV[ix]);
-
-  // Disconnect from all MQTT btokers and free the connections
-  mqttRelease();
 }
 
 
@@ -667,83 +625,42 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 *
 * loadFile -
 */
-static int loadFile(char* path, char* out, int outSize)
+static char* loadFile(char* path)
 {
   struct stat  statBuf;
   int          nb;
   int          fd = open(path, O_RDONLY);
+  char*        buf;
 
   if (fd == -1)
-  {
-    LM_E(("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
-    return -1;
-  }
+    LM_RE(NULL, ("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
 
   if (stat(path, &statBuf) != 0)
   {
     close(fd);
-    LM_E(("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
-    return -1;
+    LM_RE(NULL, ("HTTPS Error (stat '%s': %s)", path, strerror(errno)));
   }
 
-  if (statBuf.st_size > outSize)
+  buf = (char*) malloc(statBuf.st_size + 1);
+
+  if (buf == NULL)
   {
     close(fd);
-    LM_E(("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
-    return -1;
+    LM_RE(NULL, ("HTTPS Error (out of memory allocating room for https key/cert file of %d bytes)", statBuf.st_size + 1));
   }
 
-  nb = read(fd, out, statBuf.st_size);
+  nb = read(fd, buf, statBuf.st_size);
   close(fd);
 
   if (nb == -1)
-  {
-    LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
-    return -1;
-  }
+    LM_RE(NULL, ("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
 
   if (nb != statBuf.st_size)
-  {
-    LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
-    return -1;
-  }
+    LM_RE(NULL, ("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
 
-  return 0;
-}
+  buf[statBuf.st_size] = 0;  // Zero-terminate the buffer
 
-
-
-/* ****************************************************************************
-*
-* rushParse - parse rush host and port from CLI argument
-*
-* The '-rush' CLI argument has the format "host:port" and this function
-* splits that argument into rushHost and rushPort.
-* If there is a syntax error in the argument, the function exists the program
-* with an error message
-*/
-static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
-{
-  char* colon = strchr(rush, ':');
-  char* copy  = strdup(rush);
-
-  if (colon == NULL)
-  {
-    LM_X(1, ("Fatal Error (Bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", rush));
-  }
-
-  *colon = 0;
-  ++colon;
-
-  *rushHostP = rush;
-  *rushPortP = atoi(colon);
-
-  if ((*rushHostP == "") || (*rushPortP == 0))
-  {
-    LM_X(1, ("Fatal Error (bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", copy));
-  }
-
-  free(copy);
+  return buf;
 }
 
 
@@ -858,12 +775,15 @@ static void versionInfo(void)
 */
 int main(int argC, char* argV[])
 {
-  int s;
+#if LEAK_TEST
+  char* allocated = strdup("123");
+  if (allocated == NULL)
+    exit(7);
+  else
+    allocated = NULL;
+#endif
 
   lmTransactionReset();
-
-  uint16_t       rushPort = 0;
-  std::string    rushHost = "";
 
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
@@ -955,11 +875,16 @@ int main(int argC, char* argV[])
   // If trace levels are set, turn set logLevel to DEBUG, so that the trace messages will actually pass through
   //
   if (paIsSet(argC, argV, paArgs, "-t"))
-    strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel));
+    strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+  if (noswap == true)
+  {
+    LM_W(("All the broker's memory is locked in RAM - swapping disabled!!!"));
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+  }
 
   //
   // Set portNo
@@ -972,32 +897,7 @@ int main(int argC, char* argV[])
   //
   dbNameLen = strlen(dbName);
 
-
-  //
-  // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
-  //       The exit-function removes the PID-file and we don't want that. We want
-  //       the PID-file to remain.
-  //       Calling '_exit()' instead of 'exit()' makes sure that the exit-function is not called.
-  //
-  //       This call here is just to check for the existance of the PID-file.
-  //       If the file exists, the broker dies here.
-  //       The creation of the PID-file must be done AFTER "daemonize()" as here we still don't know the
-  //       PID of the broker. The father process dies and the son-process continues, in "daemonize()".
-  //
-  if ((s = pidFile(true)) != 0)
-  {
-    _exit(s);
-  }
-
   paCleanup();
-
-#ifdef DEBUG_develenv
-  //
-  // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved
-  //           See issue #652
-  //
-  lmTraceLevelSet(LmtBug, true);
-#endif
 
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
@@ -1021,8 +921,7 @@ int main(int argC, char* argV[])
     }
   }
 
-  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
-  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum);
 
   LM_I(("Orion Context Broker is running"));
 
@@ -1034,23 +933,6 @@ int main(int argC, char* argV[])
   }
 
 
-  if ((s = pidFile(false)) != 0)
-  {
-    _exit(s);
-  }
-
-#if 0
-  //
-  // This 'almost always outdeffed' piece of code is used whenever a change is done to the
-  // valgrind test suite, just to make sure that the tool actually detects memory leaks.
-  //
-  char* x = (char*) malloc(100000);
-  snprintf(x, sizeof(x), "A hundred thousand bytes lost here");
-  LM_M(("x: '%s'", x));  // Outdeffed
-  x = (char*) "LOST";
-  LM_M(("x: '%s'", x));  // Outdeffed
-#endif
-
   IpVersion ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
@@ -1060,6 +942,11 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+
+  //
+  // Initialize Tenant list
+  //
+  orionldTenantInit();
 
   mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
@@ -1074,12 +961,6 @@ int main(int argC, char* argV[])
   if (curl_global_init(CURL_GLOBAL_SSL) != 0)
   {
     LM_X(1, ("Fatal Error (could not initialize libcurl)"));
-  }
-
-  if (rush[0] != 0)
-  {
-    rushParse(rush, &rushHost, &rushPort);
-    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
   }
 
   if (noCache == false)
@@ -1099,10 +980,6 @@ int main(int argC, char* argV[])
     }
     orionldStartup = false;
   }
-  else
-  {
-    LM_T(LmtSubCache, ("noCache == false"));
-  }
 
   //
   // If the Env Var ORIONLD_CACHED_CONTEXT_DIRECTORY is set, then at startup, the broker will read all context files
@@ -1119,8 +996,8 @@ int main(int argC, char* argV[])
   //
   // Initialize orionld
   //
+  contextDownloadListInit();
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
-  dbInit(dbHost, dbName);
 
   //
   // The database for Temporal Representation of Entities must be initialized before mongodb
@@ -1130,10 +1007,13 @@ int main(int argC, char* argV[])
   if (troe)
   {
     // Close stderr, as postgres driver prints garbage to it!
-    close(2);
+    // close(2);
+
     if (troeInit() == false)
       LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
   }
+
+  dbInit(dbHost, dbName);
 
   //
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
@@ -1144,20 +1024,24 @@ int main(int argC, char* argV[])
 
   if (https)
   {
-    char* httpsPrivateServerKey = (char*) malloc(2048);
-    char* httpsCertificate      = (char*) malloc(2048);
+    char* httpsPrivateServerKey = loadFile(httpsKeyFile);
+    char* httpsCertificate      = loadFile(httpsCertFile);
 
-    if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
+    if (httpsPrivateServerKey == NULL)
     {
-      LM_X(1, ("Fatal Error (loading private server key from '%s')", httpsKeyFile));
-    }
-    if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
-    {
-      LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
+      if (httpsCertificate != NULL)
+        free(httpsCertificate);
+      LM_E(("Fatal Error (loading private server key from '%s')", httpsKeyFile));
+      exit(1);
     }
 
-    LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
-    LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
+    if (httpsCertificate == NULL)
+    {
+      if (httpsPrivateServerKey != NULL)
+        free(httpsPrivateServerKey);
+      LM_E(("Fatal Error (loading certificate from '%s')", httpsCertFile));
+      exit(1);
+    }
 
     orionRestServicesInit(ipVersion,
                           bindAddress,
@@ -1166,8 +1050,6 @@ int main(int argC, char* argV[])
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
-                          rushHost,
-                          rushPort,
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
@@ -1186,8 +1068,6 @@ int main(int argC, char* argV[])
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
-                          rushHost,
-                          rushPort,
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
@@ -1203,7 +1083,7 @@ int main(int argC, char* argV[])
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_K(("Initialization ready - accepting REST requests on port %d", port));
+  LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
 
   if (socketService == true)
   {

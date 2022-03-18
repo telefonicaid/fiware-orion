@@ -84,7 +84,7 @@ RestService badVerbs2[] =
 */
 TEST(RestService, payloadParse)
 {
-  ConnectionInfo            ci("/ngsi9/registerContext", "POST", "1.1");
+  ConnectionInfo            ci;
   ParseData                 parseData;
   const char*               infile1  = "ngsi9.registerContext.ok.valid.json";
   std::string               out;
@@ -96,6 +96,8 @@ TEST(RestService, payloadParse)
 
   utInit();
 
+  orionldState.verb = POST;
+
   //
   // 1. JSON
   //
@@ -103,10 +105,9 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inMimeType     = JSON;
-  ci.outMimeType    = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
+  orionldState.in.contentType     = JSON;
+  orionldState.in.payload         = testBuf;
+  orionldState.in.payloadSize     = strlen(testBuf);
 
   out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
@@ -119,13 +120,12 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inMimeType     = NOMIMETYPE;
-  ci.outMimeType    = JSON;
-  ci.payload        = (char*) "123";
-  ci.payloadSize    = strlen(ci.payload);
+  orionldState.in.contentType    = NOMIMETYPE;
+  orionldState.in.payload        = (char*) "123";
+  orionldState.in.payloadSize    = strlen(orionldState.in.payload);
 
   out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
-  EXPECT_EQ("Bad inMimeType", out);
+  EXPECT_EQ("Bad Input", out);
 
   utExit();
 }
@@ -138,7 +138,7 @@ TEST(RestService, payloadParse)
 */
 TEST(RestService, DISABLED_noSuchServiceAndNotFound)
 {
-  ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
+  ConnectionInfo ci;
   ci.servicePathV.push_back("");
 
   const char*    infile      = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
@@ -149,6 +149,8 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
 
   utInit();
 
+  orionldState.verb = POST;
+
   // No such service
   EXPECT_EQ("OK", testDataFromFile(testBuf,
                                    sizeof(testBuf),
@@ -157,11 +159,10 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci.outMimeType    = JSON;
-  ci.inMimeType     = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
-  ci.restServiceP   = &restService;
+  orionldState.in.contentType   = JSON;
+  orionldState.in.payload       = testBuf;
+  orionldState.in.payloadSize   = strlen(testBuf);
+  ci.restServiceP               = &restService;
 
   serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
   out = orion::requestServe(&ci);
@@ -175,10 +176,9 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
 
-  ci.outMimeType    = JSON;
-  ci.inMimeType     = JSON;
-  ci.payload        = testBuf;
-  ci.payloadSize    = strlen(testBuf);
+  orionldState.in.contentType    = JSON;
+  orionldState.in.payload        = testBuf;
+  orionldState.in.payloadSize    = strlen(testBuf);
 
   serviceVectorsSet(NULL, NULL, postV2, NULL, NULL, NULL, badVerbs2);
   out = orion::requestServe(&ci);

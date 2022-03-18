@@ -91,7 +91,7 @@ static void* workerFunc(void* pSyncQ)
   }
 
   // Initialize kjson and kalloc libs - needed for MQTT
-  orionldStateInit();
+  orionldStateInit(NULL);
   orionldState.kjson.spacesPerIndent    = 0;
   orionldState.kjson.stringBeforeColon  = (char*) "";
   orionldState.kjson.stringAfterColon   = (char*) "";
@@ -102,11 +102,17 @@ static void* workerFunc(void* pSyncQ)
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
     for (unsigned ix = 0; ix < paramsV->size(); ix++)
     {
-      struct timespec     now;
-      struct timespec     howlong;
-      size_t              estimatedQSize;
+      struct timespec      now;
+      struct timespec      howlong;
+      size_t               estimatedQSize;
+      SenderThreadParams*  params             = (*paramsV)[ix];
+      char*                subscriptionId     = (char*) params->subscriptionId.c_str();
+      const char*          tenant             = params->tenant.c_str();
+      bool                 ngsildSubscription = false;
+      CachedSubscription*  subP               = subCacheItemLookup(tenant, subscriptionId);
 
-      SenderThreadParams* params = (*paramsV)[ix];
+      if ((subP != NULL) && (subP->ldContext != ""))
+        ngsildSubscription = true;
 
       QueueStatistics::incOut();
       clock_gettime(CLOCK_REALTIME, &now);
@@ -114,7 +120,11 @@ static void* workerFunc(void* pSyncQ)
       estimatedQSize = queue->size();
       QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
 
-      strncpy(transactionId, params->transactionId, sizeof(transactionId));
+      // To avoid buffer size complaints from the compiler
+      // Delicate problem, as copies are made in both directions
+      // Seems like I have to avoid strncpy here :(
+      //
+      strcpy(transactionId, params->transactionId);
 
       LM_T(LmtNotifier, ("worker sending '%s' message to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
                          params->protocol.c_str(),
@@ -149,28 +159,34 @@ static void* workerFunc(void* pSyncQ)
                              params->mqttVersion,
                              params->xauthToken.c_str(),
                              params->extraHeaders);
+        // FIXME: +subscriptionId
       }
       else // Send HTTP notification
       {
-        std::string  out;
+        std::string out;
+
+        if (ngsildSubscription == false)
+          subscriptionId = NULL;
 
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,
                                     params->protocol,
                                     params->verb,
-                                    params->tenant,
+                                    params->tenant.c_str(),
                                     params->servicePath,
-                                    params->xauthToken,
+                                    params->xauthToken.c_str(),
                                     params->resource,
                                     params->content_type,
                                     params->content,
                                     params->fiwareCorrelator,
                                     params->renderFormat,
-                                    true,
                                     NOTIFICATION_WAIT_MODE,
                                     &out,
-                                    params->extraHeaders);
+                                    params->extraHeaders,
+                                    "",
+                                    -1,
+                                    subscriptionId);  // Subscription ID as URL param
       }
 
       if (params->toFree != NULL)

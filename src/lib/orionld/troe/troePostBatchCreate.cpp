@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -32,16 +30,13 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
-#include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostEntities.h"                     // Own interface
 
 
@@ -50,49 +45,34 @@ extern "C"
 //
 // troePostBatchCreate -
 //
-bool troePostBatchCreate(ConnectionInfo* ciP)
+bool troePostBatchCreate(void)
 {
-  PGconn* connectionP;
+  PgAppendBuffer  entities;
+  PgAppendBuffer  attributes;
+  PgAppendBuffer  subAttributes;
 
-  //
-  // FIXME: the tree should be served expanded + with erroneous entities removed
-  //
+  pgAppendInit(&entities, 4*1024);       // 4k - will be reallocated if necessary
+  pgAppendInit(&attributes, 8*1024);     // 8k - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 8*1024);  // ditto
 
+  pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchCreate.cpp has been fixed to do that
-  troeEntityArrayExpand(orionldState.requestTree);
-
-  connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
-
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
-
-  bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
-    if (pgEntityTreat(connectionP, entityP, NULL, NULL, TROE_ENTITY_CREATE) == false)
-    {
-      ok = false;
-      break;
-    }
+    pgEntityBuild(&entities, "Create", entityP, NULL, NULL, &attributes, &subAttributes);
   }
 
-  if (ok == false)
-  {
-    LM_E(("Database Error (batch create TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  char* sqlV[3];
+  int   sqlIx = 0;
 
-  pgConnectionRelease(connectionP);
+  if (entities.values      > 0) sqlV[sqlIx++] = entities.buf;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
+
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

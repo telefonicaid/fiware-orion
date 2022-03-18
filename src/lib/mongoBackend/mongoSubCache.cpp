@@ -142,14 +142,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  std::string    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(sub, CSUB_LDCONTEXT) : "";
-  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+  const char*    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(&sub, CSUB_LDCONTEXT) : NULL;
+  const char*    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
-  if (ldContext != "")  // NGSI-LD subscription
+  if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
   {
     if (orionldStartup == false)
-      cSubP->ldContext = kaStrdup(&orionldState.kalloc, ldContext.c_str());
+      cSubP->ldContext = kaStrdup(&orionldState.kalloc, ldContext);
     else
       cSubP->ldContext = ldContext;
 
@@ -164,16 +164,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
   }
 
-  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
+  cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(&sub, CSUB_SERVICE_PATH) : "/");
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(sub, CSUB_EXPIRATION)       : 0;
-  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
-  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(sub, CSUB_LASTSUCCESS)      : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(&sub, CSUB_EXPIRATION)       : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(&sub, CSUB_STATUS)                   : "active";
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&sub, CSUB_BLACKLIST)                  : false;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(&sub, CSUB_LASTFAILURE)      : -1;
+  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(&sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -183,7 +183,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
+  cSubP->httpInfo.fill(&sub);
 
 
   //
@@ -191,63 +191,59 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
+    BSONObj expression;
 
-    if (expression.hasField(CSUB_EXPR_Q))
+    if (getObjectFieldF(&expression, &sub, CSUB_EXPR) == true)
     {
-      std::string errorString;
-
-      cSubP->expression.q = getStringFieldF(expression, CSUB_EXPR_Q);
-      if (cSubP->expression.q != "")
+      if (expression.hasField(CSUB_EXPR_Q))
       {
-        if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+        std::string errorString;
+
+        cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
+        if (cSubP->expression.q != "")
         {
-          LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
-          subCacheItemDestroy(cSubP);
-          delete cSubP;
-          return -5;
+          if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+          {
+            LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
+            subCacheItemDestroy(cSubP);
+            delete cSubP;
+            return -5;
+          }
         }
       }
-    }
 
-    if (expression.hasField(CSUB_EXPR_MQ))
-    {
-      std::string errorString;
-
-      cSubP->expression.mq = getStringFieldF(expression, CSUB_EXPR_MQ);
-      if (cSubP->expression.mq != "")
+      if (expression.hasField(CSUB_EXPR_MQ))
       {
-        if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
+        std::string errorString;
+
+        cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
+        if (cSubP->expression.mq != "")
         {
-          LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
-          subCacheItemDestroy(cSubP);
-          delete cSubP;
-          return -6;
+          if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
+          {
+            LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
+            subCacheItemDestroy(cSubP);
+            delete cSubP;
+            return -6;
+          }
         }
       }
-    }
 
-    if (expression.hasField(CSUB_EXPR_GEOM))
-    {
-      cSubP->expression.geometry = getStringFieldF(expression, CSUB_EXPR_GEOM);
-    }
+      if (expression.hasField(CSUB_EXPR_GEOM))
+        cSubP->expression.geometry = getStringFieldF(&expression, CSUB_EXPR_GEOM);
 
-    if (expression.hasField(CSUB_EXPR_COORDS))
-    {
-      cSubP->expression.coords = getStringFieldF(expression, CSUB_EXPR_COORDS);
-    }
+      if (expression.hasField(CSUB_EXPR_COORDS))
+        cSubP->expression.coords = getStringFieldF(&expression, CSUB_EXPR_COORDS);
 
-    if (expression.hasField(CSUB_EXPR_GEOREL))
-    {
-      cSubP->expression.georel = getStringFieldF(expression, CSUB_EXPR_GEOREL);
+      if (expression.hasField(CSUB_EXPR_GEOREL))
+        cSubP->expression.georel = getStringFieldF(&expression, CSUB_EXPR_GEOREL);
     }
   }
-
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
-  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  eVec = getFieldF(&sub, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
     BSONObj entity = eVec[ix].embeddedObject();
@@ -258,16 +254,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       continue;
     }
 
-    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string id            = getStringFieldF(&entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(&entity, CSUB_ENTITY_ISPATTERN) : "false";
     if (isPattern.empty() && id.empty())
     {
       id = ".*";
       isPattern = "true";
     }
 
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
-    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?          getStringFieldF(&entity, CSUB_ENTITY_TYPE)        : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(&entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
@@ -285,13 +281,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
+  setStringVectorF(&sub, CSUB_ATTRS, &(cSubP->attributes));
 
 
   //
   // 07. Fill in cSubP->notifyConditionV from condVec
   //
-  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+  setStringVectorF(&sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
 
   subCacheItemInsert(cSubP);
@@ -372,7 +368,7 @@ int mongoSubCacheItemInsert
   //     NOTE that if there is no patterned entity in the entity-vector,
   //     then the subscription is not valid for the sub-cache and is rejected.
   //
-  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  eVec = getFieldF(&sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
@@ -384,16 +380,16 @@ int mongoSubCacheItemInsert
       continue;
     }
 
-    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string id            = getStringFieldF(&entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(&entity, CSUB_ENTITY_ISPATTERN) : "false";
     if (isPattern.empty() && id.empty())
     {
       id = ".*";
       isPattern = "true";
     }
 
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
-    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?          getStringFieldF(&entity, CSUB_ENTITY_TYPE)        : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(&entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
@@ -417,14 +413,14 @@ int mongoSubCacheItemInsert
     // if the database objuect contains lastNotificationTime,
     // then use the value from the database
     //
-    lastNotificationTime = getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION);
+    lastNotificationTime = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION);
   }
 
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
@@ -435,14 +431,14 @@ int mongoSubCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(&sub, CSUB_BLACKLIST) : false;
 
   //
   // httpInfo
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
+  cSubP->httpInfo.fill(&sub);
 
 
   //
@@ -475,24 +471,43 @@ int mongoSubCacheItemInsert
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
+  setStringVectorF(&sub, CSUB_ATTRS, &(cSubP->attributes));
 
   //
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   //
   if (sub.hasField(CSUB_METADATA))
   {
-    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+    setStringVectorF(&sub, CSUB_METADATA, &(cSubP->metadata));
   }
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
   //
-  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+  setStringVectorF(&sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   subCacheItemInsert(cSubP);
 
   return 0;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// tenantFromDb - extract the tenant path of a database name
+//
+// E.g., the database name "orion-openiot" => "openiot"
+// If the database name is just "orion" (no tenant), then NULL is returned
+//
+char* tenantFromDb(const char* db)
+{
+  char* hyphen = strchr((char*) db, '-');
+
+  if (hyphen == NULL)
+    return NULL;  // No tenant
+
+  return &hyphen[1];
 }
 
 
@@ -516,15 +531,17 @@ void mongoSubCacheRefresh(const std::string& database)
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                        query;      // empty query (all subscriptions)
-  std::string                    db          = database;
-  std::string                    tenant      = tenantFromDb(db);
-  std::string                    collection  = getSubscribeContextCollectionName(tenant);
+  char*                          tenant      = tenantFromDb(database.c_str());
+  char                           collectionPath[80];
+
+  snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", database.c_str());
+
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    errorString;
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
+  if (collectionQuery(connection, collectionPath, query, &cursor, &errorString) != true)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -544,7 +561,7 @@ void mongoSubCacheRefresh(const std::string& database)
       continue;
     }
 
-    int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
+    int r = mongoSubCacheItemInsert(tenant, sub);
     if (r == 0)
     {
       ++subNo;
@@ -575,7 +592,7 @@ static void mongoSubCountersUpdateCount
   condition = BSON("_id"  << OID(subId));
   update    = BSON("$inc" << BSON(CSUB_COUNT << count));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));
   }
@@ -603,7 +620,7 @@ static void mongoSubCountersUpdateLastNotificationTime
                      BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
   }
@@ -631,7 +648,7 @@ static void mongoSubCountersUpdateLastFailure
                      BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
   }
@@ -659,7 +676,7 @@ static void mongoSubCountersUpdateLastSuccess
                      BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastSuccess' for a subscription)"));
   }
@@ -682,31 +699,36 @@ void mongoSubCountersUpdate
   double             lastSuccess
 )
 {
-  std::string  collection = getSubscribeContextCollectionName(tenant);
-
   if (subId == "")
   {
     LM_E(("Runtime Error (empty subscription id)"));
     return;
   }
 
+  char collectionPath[84];
+
+  if (tenant != "")  // make char* !!!
+    snprintf(collectionPath, sizeof(collectionPath), "%s-%s.csubs", dbName, tenant.c_str());
+  else
+    snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", dbName);
+
   if (count > 0)
   {
-    mongoSubCountersUpdateCount(collection, subId, count);
+    mongoSubCountersUpdateCount(collectionPath, subId, count);
   }
 
   if (lastNotificationTime > 0)
   {
-    mongoSubCountersUpdateLastNotificationTime(collection, subId, lastNotificationTime);
+    mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime);
   }
 
   if (lastFailure > 0)
   {
-    mongoSubCountersUpdateLastFailure(collection, subId, lastFailure);
+    mongoSubCountersUpdateLastFailure(collectionPath, subId, lastFailure);
   }
 
   if (lastSuccess > 0)
   {
-    mongoSubCountersUpdateLastSuccess(collection, subId, lastSuccess);
+    mongoSubCountersUpdateLastSuccess(collectionPath, subId, lastSuccess);
   }
 }

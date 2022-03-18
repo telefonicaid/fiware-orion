@@ -32,6 +32,6 @@
 //
 // orionldContextItemAlreadyExpanded -
 //
-extern bool orionldContextItemAlreadyExpanded(char* value);
+extern bool orionldContextItemAlreadyExpanded(const char* value);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTITEMALREADYEXPANDED_H_

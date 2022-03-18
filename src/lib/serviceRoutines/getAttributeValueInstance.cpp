@@ -27,6 +27,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -81,20 +82,20 @@ std::string getAttributeValueInstance
 {
   std::string               answer;
   std::string               entityId       = compV[2];
-  std::string               entityType     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string               entityType     = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string               attributeName  = compV[4];
   std::string               metaIdValue    = compV[5];
   EntityTypeInfo            typeInfo       = EntityTypeEmptyOrNotEmpty;
   ContextAttributeResponse  response;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   // 0. Take care of URI params
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }
@@ -127,7 +128,7 @@ std::string getAttributeValueInstance
     //
     for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
     {
-      if (cerP->contextElement.contextAttributeVector[i]->getId() == metaIdValue)
+      if (metaIdValue == cerP->contextElement.contextAttributeVector[i]->getMetadataId())
       {
         response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector[i]);
       }
@@ -157,7 +158,7 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, IndividualContextEntityAttribute));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

@@ -33,7 +33,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckEndpoint.h"                // pcheckEndpoint
 #include "orionld/payloadCheck/pcheckNotification.h"            // Own interface
 
@@ -63,7 +63,7 @@ bool pcheckNotification(KjNode* notificationP)
       for (KjNode* attrP = nItemP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         STRING_CHECK(attrP, "attributes array item");
-        attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
+        attrP->value.s = orionldAttributeExpand(orionldState.contextP, attrP->value.s, true, NULL);
       }
     }
     else if (strcmp(nItemP->name, "format") == 0)

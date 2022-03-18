@@ -27,6 +27,7 @@ Tenant test
 export BROKER=orionld
 dbInit CB
 dbInit CB tn1
+dbResetAll
 brokerStart CB 0-255 IPv4 -multiservice
 
 --SHELL--
@@ -334,13 +335,12 @@ bye
 09. Get all tenants - see 'ftest' and 'tn1'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 29
+Content-Length: 12
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-  "ftest",
-  "ftest-tn1"
+  "tn1"
 ]
 
 

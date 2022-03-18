@@ -22,20 +22,26 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgAttributeDelete.h"                    // pgAttributeDelete
+#include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ENTITY_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributeAppend.h"                    // pgAttributeAppend
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troeDeleteAttribute.h"                  // Own interface
 
 
@@ -44,35 +50,70 @@
 //
 // troeDeleteAttribute -
 //
-bool troeDeleteAttribute(ConnectionInfo* ciP)
+bool troeDeleteAttribute(void)
 {
-  PGconn* connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
-
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
-
   char* entityId      = orionldState.wildcard[0];
-  char* attributeName = orionldState.wildcard[1];
-
+  char* attributeName = orionldState.wildcard[1];  // Already expanded by the service routine (orionldDeleteAttribute)
+  char* attributeNameEq;
   char  instanceId[80];
+
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
-  attributeName = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
-  if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.requestTimeString) == false)
+  attributeNameEq = kaStrdup(&orionldState.kalloc, attributeName);
+  dotForEq(attributeNameEq);
+
+  //
+  // Prepare attributesBuffer
+  //
+  PgAppendBuffer  attributesBuffer;
+  pgAppendInit(&attributesBuffer, 1024);       // Will grow if needed
+  pgAppend(&attributesBuffer, PG_ATTRIBUTE_INSERT_START, 0);
+
+  if (orionldState.uriParams.datasetId != NULL)
+    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
+  else if (orionldState.uriParams.deleteAll == true)
   {
-    LM_E(("Database Error (delete attribute troe layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
+    if (orionldState.dbAttrWithDatasetsP == NULL)
+      LM_W(("DA: orionldState.dbAttrWithDatasetsP == NULL ... how?"));
+    else
+    {
+      KjNode* attrsP = kjLookup(orionldState.dbAttrWithDatasetsP, "attrs");
+
+      if (attrsP != NULL)
+      {
+        KjNode* defaultInstanceP = kjLookup(attrsP, attributeNameEq);
+        if (defaultInstanceP != NULL)
+          pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
+      }
+
+      KjNode* datasetsP = kjLookup(orionldState.dbAttrWithDatasetsP, "@datasets");
+
+      if (datasetsP != NULL)
+      {
+        KjNode* attrV = kjLookup(datasetsP, attributeNameEq);
+
+        if (attrV != NULL)
+        {
+          for (KjNode* aP = attrV->value.firstChildP; aP != NULL; aP = aP->next)
+          {
+            KjNode* datasetIdNodeP = kjLookup(aP, "datasetId");
+
+            if (datasetIdNodeP != NULL)
+              pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, datasetIdNodeP->value.s, NULL, NULL);
+          }
+        }
+      }
+    }
   }
   else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
-  }
+    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, NULL, NULL, NULL);
 
-  pgConnectionRelease(connectionP);
+  if (attributesBuffer.values > 0)
+  {
+    char* sqlV[1] = { attributesBuffer.buf };
+
+    pgCommands(sqlV, 1);
+  }
 
   return true;
 }

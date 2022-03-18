@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/string.h"
 
 #include "rest/ConnectionInfo.h"
@@ -32,19 +34,20 @@
 #include "serviceRoutines/badVerbPostOnly.h"
 
 
+
 /* ****************************************************************************
 *
 * restServiceLookup -
 */
 RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 {
-  Verb          verb      = (*badVerbP == false)? ciP->verb : NOVERB;
+  Verb          verb      = (*badVerbP == false)? orionldState.verb : NOVERB;
   RestService*  serviceV  = restServiceVectorGet(verb);
   int           serviceIx = 0;
   bool          match     = false;
 
   // Split URI PATH into components
-  ciP->urlComponents = stringSplit(ciP->url.c_str(), '/', ciP->urlCompV, true);
+  ciP->urlComponents = stringSplit(orionldState.urlPath, '/', ciP->urlCompV, true);
 
   while (serviceV[serviceIx].request != InvalidRequest)
   {
@@ -66,7 +69,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
         continue;
       }
 
-      if (ciP->apiVersion == V1)
+      if (orionldState.apiVersion == V1)
       {
         if (strcasecmp(component, ciP->urlCompV[compNo].c_str()) != 0)
         {
@@ -96,8 +99,8 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
   {
     if (serviceV == restBadVerbV)
     {
-      ciP->httpStatusCode = SccBadVerb;
-      ciP->badVerb        = true;
+      orionldState.httpStatusCode = SccBadVerb;
+      orionldState.badVerb        = true;
     }
 
     return &serviceV[serviceIx];

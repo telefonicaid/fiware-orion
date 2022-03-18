@@ -91,7 +91,7 @@ struct HttpInfo
   explicit HttpInfo(const std::string& _url);
 
   std::string  toJson();
-  void         fill(const mongo::BSONObj& bo);
+  void         fill(const mongo::BSONObj* boP);
 };
 }
 

@@ -26,6 +26,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
@@ -46,13 +48,13 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   rapidjson::Document  document;
   OrionError           oe;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 
@@ -61,7 +63,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", "BadRequest");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
 

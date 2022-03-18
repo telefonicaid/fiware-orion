@@ -65,8 +65,8 @@ char* orionldContextItemExpand
   OrionldContextItem**  contextItemPP
 )
 {
-  OrionldContextItem* contextItemP;
-  char*               colonP;
+  OrionldContextItem*  contextItemP;
+  char*                colonP;
 
   if (contextP == NULL)
     contextP = orionldCoreContextP;

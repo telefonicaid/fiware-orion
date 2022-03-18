@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                       // orionldState
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -58,6 +60,6 @@ std::string entryPointsTreat
 
   out += "}";
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return out;
 }

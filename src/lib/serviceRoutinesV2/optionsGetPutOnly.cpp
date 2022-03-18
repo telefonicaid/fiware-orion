@@ -25,9 +25,11 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "serviceRoutinesV2/optionsGetPutOnly.h"
 
@@ -47,12 +49,10 @@ std::string optionsGetPutOnly
   ParseData*                 parseDataP
 )
 {
-  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
-  {
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_METHODS);
-    ciP->httpHeaderValue.push_back("GET, PUT, OPTIONS");
-  }
-  ciP->httpStatusCode = SccOk;
+  if (isOriginAllowedForCORS(orionldState.in.origin))
+    orionldHeaderAdd(&orionldState.out.headers, HttpAllowMethods, (char*) "GET, PUT, OPTIONS", 0);
+
+  orionldState.httpStatusCode = SccOk;
 
   return "";
 }

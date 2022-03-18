@@ -88,7 +88,7 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
-  std::string  getId() const;
+  const char*  getMetadataId() const;
   std::string  getLocation(ApiVersion apiVersion = V1) const;
 
   std::string  render(ApiVersion   apiVersion,
@@ -103,11 +103,9 @@ public:
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
   std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
-                             bool             acceptedJson,
                              MimeType         outFormatSelection,
-                             MimeType*        outMimeTypeP,
-                             HttpStatusCode*  scP);
+                             MimeType*        outContentTypeP,
+                             int*             scP);
   void         release(void);
   std::string  getName(void);
 

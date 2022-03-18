@@ -41,7 +41,6 @@ extern "C"
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // Own interface
 
@@ -115,11 +114,15 @@ static bool kjTreeToContextElementAttributes
       continue;
     else if (SCOMPARE8(itemP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
       continue;
+    else if (SCOMPARE10(itemP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
+      continue;
+    else if (SCOMPARE11(itemP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
+      continue;
     else if (itemP->type != KjObject)  // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate')
     {
       LM_E(("Attribute '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
-      *titleP  = (char*) "invalid entity";
-      *detailP = (char*) "attribute must be a JSON object";
+      *titleP  = (char*) "attribute must be a JSON object";
+      *detailP = (char*) itemP->name;
 
       return false;
     }
@@ -180,13 +183,12 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     char*           detail;
     char*           entityId           = NULL;
     char*           entityType         = NULL;
-    char*           entityTypeExpanded = NULL;
     KjNode*         contextNodeP       = NULL;
     OrionldContext* contextP           = orionldState.contextP;
 
     entityFieldsExtractSimple(entityP, &entityId, &entityType, &contextNodeP);
 
-    if (orionldState.ngsildContent == true)
+    if (orionldState.in.contentType == JSONLD)
     {
       if (contextNodeP == NULL)
       {
@@ -197,7 +199,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       }
 
       OrionldProblemDetails pd;
-      contextP = orionldContextFromTree(NULL, false, contextNodeP, &pd);
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
 
       if (contextP == NULL)
       {
@@ -279,11 +281,9 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       entityType = dbEntityTypeP->value.s;
     }
 
-    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, true, NULL);
-    if (entityTypeExpanded == NULL)
+    if (entityType == NULL)
     {
-      LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to expand entity::type", detail, 400, false);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to find entity::type", "not in payload nor in database", 400, false);
       entityP = next;
       continue;
     }
@@ -292,7 +292,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     EntityId*       entityIdP    = &ceP->entityId;
 
     entityIdP->id        = entityId;
-    entityIdP->type      = entityTypeExpanded;
+    entityIdP->type      = entityType;
     entityIdP->isPattern = "false";
 
     if (kjTreeToContextElementAttributes(contextP, entityP, NULL, NULL, ceP, &title, &detail) == false)

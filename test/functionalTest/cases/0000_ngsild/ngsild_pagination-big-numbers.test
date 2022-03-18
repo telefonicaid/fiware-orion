@@ -1,0 +1,386 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Pagination and offset of 100
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB 0
+
+--SHELL--
+
+#
+# Issue reported in SOF:
+#   https://stackoverflow.com/questions/67968349/fiware-orion-ld-offset-parameter-does-not-provide-any-results-after-threshold
+#
+# 01. Create 200 entities
+# 02. GET entities, with offset 100 - see entities 100-119
+# 03. GET entities, with offset 150 and limit 14 - see entities 150-164
+#
+
+echo "01. Create 200 entities"
+echo "======================="
+
+typeset -i eNo
+eNo=0
+
+while [ $eNo -lt 200 ]
+do
+  payload='{
+    "id": "urn:ngsi-ld:entity:'$eNo'",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": '$eNo'
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities/ --payload "$payload"
+  eNo=$eNo+1
+done | grep "HTTP/1.1 201 Created" | wc -l
+echo
+echo
+
+
+echo "02. GET entities, with offset 100 - see entities 100-119"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&offset=100&count=true'
+echo
+echo
+
+
+echo "03. GET entities, with offset 150 and limit 14 - see entities 150-163"
+echo "====================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&offset=150&limit=14&count=true'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 200 entities
+=======================
+200
+
+
+02. GET entities, with offset 100 - see entities 100-119
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 1601
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 200
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": 100
+        },
+        "id": "urn:ngsi-ld:entity:100",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 101
+        },
+        "id": "urn:ngsi-ld:entity:101",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 102
+        },
+        "id": "urn:ngsi-ld:entity:102",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 103
+        },
+        "id": "urn:ngsi-ld:entity:103",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 104
+        },
+        "id": "urn:ngsi-ld:entity:104",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 105
+        },
+        "id": "urn:ngsi-ld:entity:105",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 106
+        },
+        "id": "urn:ngsi-ld:entity:106",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 107
+        },
+        "id": "urn:ngsi-ld:entity:107",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 108
+        },
+        "id": "urn:ngsi-ld:entity:108",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 109
+        },
+        "id": "urn:ngsi-ld:entity:109",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 110
+        },
+        "id": "urn:ngsi-ld:entity:110",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 111
+        },
+        "id": "urn:ngsi-ld:entity:111",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 112
+        },
+        "id": "urn:ngsi-ld:entity:112",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 113
+        },
+        "id": "urn:ngsi-ld:entity:113",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 114
+        },
+        "id": "urn:ngsi-ld:entity:114",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 115
+        },
+        "id": "urn:ngsi-ld:entity:115",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 116
+        },
+        "id": "urn:ngsi-ld:entity:116",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 117
+        },
+        "id": "urn:ngsi-ld:entity:117",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 118
+        },
+        "id": "urn:ngsi-ld:entity:118",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 119
+        },
+        "id": "urn:ngsi-ld:entity:119",
+        "type": "T"
+    }
+]
+
+
+03. GET entities, with offset 150 and limit 14 - see entities 150-163
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 1121
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 200
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": 150
+        },
+        "id": "urn:ngsi-ld:entity:150",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 151
+        },
+        "id": "urn:ngsi-ld:entity:151",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 152
+        },
+        "id": "urn:ngsi-ld:entity:152",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 153
+        },
+        "id": "urn:ngsi-ld:entity:153",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 154
+        },
+        "id": "urn:ngsi-ld:entity:154",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 155
+        },
+        "id": "urn:ngsi-ld:entity:155",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 156
+        },
+        "id": "urn:ngsi-ld:entity:156",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 157
+        },
+        "id": "urn:ngsi-ld:entity:157",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 158
+        },
+        "id": "urn:ngsi-ld:entity:158",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 159
+        },
+        "id": "urn:ngsi-ld:entity:159",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 160
+        },
+        "id": "urn:ngsi-ld:entity:160",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 161
+        },
+        "id": "urn:ngsi-ld:entity:161",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 162
+        },
+        "id": "urn:ngsi-ld:entity:162",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": 163
+        },
+        "id": "urn:ngsi-ld:entity:163",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

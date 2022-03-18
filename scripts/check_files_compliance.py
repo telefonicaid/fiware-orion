@@ -159,7 +159,7 @@ def ignore(root, file):
         return True
 
     # Some files in docker/ directory are not processed
-    if 'docker' in root and file in ['Dockerfile', 'Dockerfile-base', 'Dockerfile-test', 'docker-compose.yml']:
+    if 'docker' in root and file in ['Dockerfile', 'Dockerfile-base', 'Dockerfile-ubi-base', 'Dockerfile-ubi', 'Dockerfile-test', 'Dockerfile-debug', 'Dockerfile-gdb', 'gdbinit', 'docker-compose.yml', 'subscription-manager.conf', 'ubi.repo']:
         return True
 
     # Some files in test/acceptance/behave directory are not processed
@@ -186,6 +186,10 @@ def ignore(root, file):
 
     # JSON files in test/jMeter/cases are ignored
     if 'cases' in root and file.endswith('.json'):
+        return True
+
+    # Database migration files in /databases are ignored
+    if 'database' in root:
         return True
 
     # Particular cases of files that are also ignored
@@ -282,7 +286,9 @@ for root, dirs, files in os.walk(dir):
             is_orionld = True
         elif 'test/unittests/orionld' in filename:
             is_orionld = True
-        elif 'archive/temporal' in filename:
+        elif 'test/stress' in filename:
+            is_orionld = True
+        elif 'archive/orionld' in filename:
             is_orionld = True
         else:
             is_orionld = False

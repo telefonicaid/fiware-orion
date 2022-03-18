@@ -150,8 +150,8 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T1,R
 05. See TRoE attributes - see two rows, one for P1 and one for P2
 =================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,Step_01,,,REGEX(202.*)
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,Step_02,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,None,Step_01,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,None,Step_02,,,REGEX(202.*)
 
 
 06. See TRoE sub-attributes - there aren't any

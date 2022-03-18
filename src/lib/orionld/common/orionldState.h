@@ -25,7 +25,11 @@
 *
 * Author: Ken Zangelin
 */
-#include <time.h>                                                // struct timespec
+#include <time.h>                                                // struct timespec, struct timeval
+#include <semaphore.h>                                           // sem_t
+#include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
+#include <microhttpd.h>                                          // MHD_Connection
+#include <bson/bson.h>                                           // bson_error_t
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -40,13 +44,18 @@ extern "C"
 #include "common/MimeType.h"                                     // MimeType
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
+#include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
+#include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
@@ -63,7 +72,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v0.6"
+#define ORIONLD_VERSION "post-v1.0.0"
 
 
 
@@ -80,7 +89,6 @@ extern "C"
 // Forward declarations -
 //
 struct OrionLdRestService;
-struct ConnectionInfo;
 
 
 
@@ -94,6 +102,15 @@ typedef struct OrionldUriParamOptions
   bool update;
   bool replace;
   bool keyValues;
+  bool concise;
+  bool normalized;
+  bool values;         // Only NGSIv2
+  bool uniqueValues;   // Only NGSIv2
+  bool dateCreated;    // Only NGSIv2
+  bool dateModified;   // Only NGSIv2
+  bool append;         // Only NGSIv2
+  bool noAttrDetail;   // Only NGSIv2
+  bool upsert;         // Only NGSIv2
   bool sysAttrs;
 } OrionldUriParamOptions;
 
@@ -107,6 +124,7 @@ typedef struct OrionldUriParams
 {
   char*     id;
   char*     type;
+  char*     typePattern;
   char*     idPattern;
   char*     attrs;
   char*     options;
@@ -114,6 +132,7 @@ typedef struct OrionldUriParams
   int       limit;
   bool      count;
   char*     q;
+  char*     mq;
   char*     geometry;
   char*     coordinates;
   char*     georel;
@@ -127,9 +146,24 @@ typedef struct OrionldUriParams
   char*     timeAt;
   char*     endTimeAt;
   bool      details;
-  uint32_t  mask;
   bool      prettyPrint;
   int       spaces;
+  char*     subscriptionId;
+  bool      location;
+  char*     url;
+  bool      reload;
+  char*     exists;
+  char*     notExists;
+  char*     metadata;
+  char*     orderBy;
+  bool      collapse;
+  bool      reset;
+  char*     attributeFormat;
+  char*     level;
+  char*     relationships;
+  char*     geoproperties;
+  char*     languageproperties;
+  uint64_t  mask;
 } OrionldUriParams;
 
 
@@ -160,6 +194,87 @@ typedef enum OrionldPhase
 
 // -----------------------------------------------------------------------------
 //
+// OrionldStateOut - data for the response
+//
+typedef struct OrionldStateOut
+{
+  // Outgoing HTTP headers
+  OrionldHeaderSet headers;
+  MimeType         contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
+
+  // Errors
+  char*     acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
+} OrionldStateOut;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// UriParamList -
+//
+typedef struct UriParamList
+{
+  int     items;
+  char**  array;
+} UriParamList;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldStateIn - data of the request
+//
+typedef struct OrionldStateIn
+{
+  // Incoming HTTP headers
+  MimeType  contentType;
+  char*     contentTypeString;
+  int       contentLength;
+  char*     origin;
+  char*     host;
+  char*     xRealIp;
+  char*     xForwardedFor;
+  char*     connection;
+  char*     servicePath;
+
+  // Incoming payload
+  char*     payload;
+  int       payloadSize;
+  char*     payloadCopy;
+
+  // Meta info for URL parameters
+  bool      attributeFormatAsObject;
+  bool      entityTypeDoesNotExist;
+  bool      entityTypeExists;
+  char*     geometryPropertyExpanded;
+
+  // Processed URI params
+  UriParamList  idList;
+  UriParamList  typeList;
+  UriParamList  attrsList;
+
+  // Processed wildcards
+  char*         pathAttrExpanded;
+} OrionldStateIn;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldMongoC -
+//
+typedef struct OrionldMongoC
+{
+  mongoc_client_t*      client;
+  mongoc_collection_t*  contextsP;
+  mongoc_collection_t*  entitiesP;
+  bson_error_t          error;
+} OrionldMongoC;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionldConnectionState - the state of the connection
 //
 // This struct contains all the state of a connection, like the Kjson pointer, the pointer to
@@ -172,36 +287,39 @@ typedef enum OrionldPhase
 typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
-  ConnectionInfo*         ciP;
+  MHD_Connection*         mhdConnection;
+  struct timeval          transactionStart;       // For metrics
   struct timespec         timestamp;              // The time when the request entered
-  double                  requestTime;            // Same same, but at a floating point
+  double                  requestTime;            // Same same (timestamp), but at a floating point
   char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
   KAlloc                  kalloc;
   char                    kallocBuffer[8 * 1024];
-  char*                   requestPayload;
   KjNode*                 requestTree;
   KjNode*                 responseTree;
   char*                   responsePayload;
   bool                    responsePayloadAllocated;
-  char*                   tenant;
-  char*                   servicePath;
+  char*                   tenantName;
+  OrionldTenant*          tenantP;
   bool                    linkHttpHeaderPresent;
   char*                   link;
   bool                    linkHeaderAdded;
   bool                    noLinkHeader;
   char*                   preferHeader;
-  char*                   xauthHeader;
+  char*                   authorizationHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;
-  KjNode*                 geoAttrV[100];                // Array of GeoProperty attributes
+
+  KjNode*                 geoAttr[10];                 // Preallocated array of GeoProperties
+  KjNode**                geoAttrV;                    // Array of GeoProperty attributes
   int                     geoAttrs;
+  int                     geoAttrMax;
+
   char*                   geoType;
   KjNode*                 geoCoordsP;
-  bool                    entityCreated;                // If an entity is created, if complex context, it must be stored
   char*                   entityId;
   OrionldUriParamOptions  uriParamOptions;
   OrionldUriParams        uriParams;
@@ -212,21 +330,18 @@ typedef struct OrionldConnectionState
   OrionLdRestService*     serviceP;
   char*                   wildcard[2];
   char*                   urlPath;
+  char*                   httpVersion;
   Verb                    verb;
-  char*                   verbString;
-  bool                    acceptJson;
-  bool                    acceptJsonld;
-  bool                    acceptGeojson;
-  bool                    ngsildContent;
+  bool                    badVerb;             // ToDo: verb == NOVERB should cover this
+  char*                   verbString;          // For error handling the incorrect verb is needed for the error response
   KjNode*                 payloadContextNode;
   KjNode*                 payloadIdNode;
   KjNode*                 payloadTypeNode;
   char                    contextId[256];
   QNode                   qNodeV[QNODE_SIZE];
   int                     qNodeIx;
-  char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
-  char*                   jsonBuf;    // Used by kjTreeFromBsonObj
+  char*                   jsonBuf;           // Used by kjTreeFromBsonObj
 
 #if 0
   //
@@ -240,7 +355,7 @@ typedef struct OrionldConnectionState
   //
   // Array of allocated buffers that are to be freed when the request thread ends
   //
-  void*                   delayedFreeVec[1001];
+  void*                   delayedFreeVec[1001];  // FIXME: try to make this number smaller ...
   int                     delayedFreeVecIndex;
   int                     delayedFreeVecSize;
 
@@ -250,19 +365,19 @@ typedef struct OrionldConnectionState
   void*                   delayedFreePointer;
 
   int                     notificationRecords;
-  OrionldNotificationInfo notificationInfo[100];
+  OrionldNotificationInfo notificationInfo[16];
   bool                    notify;
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;
 
-#ifdef DB_DRIVER_MONGOC
   //
-  // MongoDB stuff
+  // MongoDB stuff - Context Cache uses mongoc regardless of which mongo client lib is in use
   //
-  mongoc_uri_t*           mongoUri;
-  mongoc_client_t*        mongoClient;
-  mongoc_database_t*      mongoDatabase;
-#endif
+  // mongoc_uri_t*           mongoUri;
+  // mongoc_client_t*        mongoClient;
+  // mongoc_database_t*      mongoDatabase;
+
+  OrionldMongoC           mongoc;
 
   //
   // Instructions for mongoBackend
@@ -275,24 +390,69 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    forwardAttrsCompacted;
+  uint32_t                acceptMask;            // "1 << MimeType" mask for all accepted Mime Types, regardless of which is chosen and of weight
 
   //
   // TRoE
   //
+  bool                    noDbUpdate;        // If nothing changed in DB - troe is not invoked
   bool                    troeError;
-  char                    troeDbName[128];
   KjNode*                 duplicateArray;
   KjNode*                 troeIgnoreV[20];
   unsigned int            troeIgnoreIx;
+  KjNode*                 batchEntities;
+  KjNode*                 dbAttrWithDatasetsP;  // Used in TRoE for DELETE Attribute with ?deleteAll=true
+  TroeMode                troeOpMode;           // Used in troePostEntities as both POST /entities and POST /temporal/entities use troePostEntities
+  KjNode*                 patchBase;            // Used in troePatchEntity2 as base to where apply the patchTree and then REPLACE those attrs in postgres
+  KjNode*                 patchTree;            // Used in troePatchEntity (set by troePatchEntity2) for inclusion of deleted attrs/sub-attrs
+
+  //
+  // GeoJSON - help vars for the case:
+  // - Accept: application/geo+json
+  // - URI param 'attrs' used
+  // - The geometryproperty is not part of 'attrs' URI param
+  //
+  KjNode*                 geoPropertyNode;     // Must point to the "value" of the GeoProperty (for Retrieve Entity only)
+  bool                    geoPropertyMissing;  // The gro-property is really not present in the DB - must be NULL is the response (for Retrieve Entity only)
+  KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
+
+
+  OrionldStateOut out;
+  OrionldStateIn  in;
+
+  // NGSI-LD Scope (or NGSIv2 ServicePath)
+  char* scopeV[10];
+  int   scopes;
+
+  // Attribute Format
+  char* attrsFormat;
+
+  // X-Auth-Token
+  char* xAuthToken;
+
+  // FIWARE Correlator
+  char* correlator;
+
+  //
+  // Compounds
+  //
+  bool                                      inCompoundValue;
+  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
+  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
+
+  //
+  // Error Handling
+  //
+  OrionldProblemDetails   pd;
 } OrionldConnectionState;
 
 
 
+#ifdef REQUEST_PERFORMANCE
 // -----------------------------------------------------------------------------
 //
 // Timestamps - timestamps for performance tests
 //
-#ifdef REQUEST_PERFORMANCE
 typedef struct Timestamps
 {
   struct timespec reqStart;               // Start of          Request
@@ -301,6 +461,8 @@ typedef struct Timestamps
   struct timespec parseEnd;               // End of            Request Payload body JSON parse
   struct timespec serviceRoutineStart;    // Start of          Service Routine
   struct timespec serviceRoutineEnd;      // End of            Service Routine
+  struct timespec mongoBackendStart;      // Start of          Mongo Backend Command
+  struct timespec mongoBackendEnd;        // End of            Mongo Backend Command
   struct timespec dbStart;                // Start of    Main  DB query/update
   struct timespec dbEnd;                  // End of      Main  DB query/update
   struct timespec extraDbStart;           // Start of "extra"  DB query, e.g. query before an update
@@ -321,12 +483,15 @@ typedef struct Timestamps
   struct timespec troeEnd;                // End of            TRoE processing
   struct timespec requestPartEnd;         // End of            MHD-1-2-3 processing
   struct timespec requestCompletedStart;  // Start of          Request Completed
+  struct timespec srStart[50];            // Start of          Service Routine Sample
+  struct timespec srEnd[50];              // End of            Service Routine Sample
+  char*           srDesc[50];             // Description for   Service Routine Sample
+  double          mongoConnectAccumulated;
+  int             getMongoConnectionCalls;
 } Timestamps;
 
-extern __thread Timestamps timestamps;
-
+extern __thread Timestamps performanceTimestamps;
 #endif
-
 
 
 // -----------------------------------------------------------------------------
@@ -341,6 +506,7 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
+extern char*             coreContextUrl;
 extern char              orionldHostName[128];
 extern int               orionldHostNameLen;
 extern char              kallocBuffer[32 * 1024];
@@ -349,28 +515,32 @@ extern KAlloc            kalloc;
 extern Kjson             kjson;
 extern Kjson*            kjsonP;
 extern uint16_t          portNo;
+extern char              dbHost[];                 // From orionld.cpp
 extern char              dbName[];                 // From orionld.cpp
 extern int               dbNameLen;
 extern char              dbUser[];                 // From orionld.cpp
 extern char              dbPwd[];                  // From orionld.cpp
 extern bool              multitenancy;             // From orionld.cpp
-extern char*             tenant;                   // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
 extern bool              troe;                     // From orionld.cpp
-extern char              troeHost[64];             // From orionld.cpp
+extern char              troeHost[256];            // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
-extern char              troeUser[64];             // From orionld.cpp
-extern char              troePwd[64];              // From orionld.cpp
+extern char              troeUser[256];            // From orionld.cpp
+extern char              troePwd[256];             // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
+extern char              pgPortString[16];
 extern bool              forwarding;               // From orionld.cpp
 extern const char*       orionldVersion;
-extern char*             tenantV[100];
-extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
+extern bool              noNotifyFalseUpdate;      // From orionld.cpp
+extern char              mongoServerVersion[32];
+extern bool              experimental;             // From orionld.cpp
+extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
+extern int               maxAge;                   // From orionld.cpp (CORS)
 
 
 
@@ -378,10 +548,12 @@ extern bool              idIndex;                  // From orionld.cpp
 //
 // Global variables for Mongo C Driver
 //
-#ifdef DB_DRIVER_MONGOC
-extern mongoc_collection_t*  mongoEntitiesCollectionP;
-extern mongoc_collection_t*  mongoRegistrationsCollectionP;
-#endif
+extern mongoc_collection_t*  mongoEntitiesCollectionP;       // Deprecated
+extern mongoc_collection_t*  mongoRegistrationsCollectionP;  // Deprecated
+
+extern mongoc_uri_t*          mongocUri;
+extern mongoc_client_pool_t*  mongocPool;
+extern sem_t                  mongocContextsSem;
 
 
 
@@ -389,7 +561,7 @@ extern mongoc_collection_t*  mongoRegistrationsCollectionP;
 //
 // orionldStateInit - initialize the thread-local variable orionldState
 //
-extern void orionldStateInit(void);
+extern void orionldStateInit(MHD_Connection* connection);
 
 
 

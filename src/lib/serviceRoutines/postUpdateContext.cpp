@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
@@ -108,7 +110,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   int              port;
   std::string      prefix;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -131,31 +133,29 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   // 2. Render the string of the request we want to forward
   //
-  MimeType     outMimeType = ciP->outMimeType;
+  MimeType     savedContentType = orionldState.out.contentType;
   std::string  payload;
   char*        cleanPayload;
 
-  ciP->outMimeType  = JSON;
+  orionldState.out.contentType  = JSON;
 
   //
   // FIXME: Forwards are done using NGSIv1 only, for now
   //        This will hopefully change soon ...
   //        Once we implement forwards in NGSIv2, this render() should be like this:
-  //        TIMED_RENDER(payload = upcrP->render(ciP->apiVersion, asJsonObject, ""));
+  //        TIMED_RENDER(payload = upcrP->render(orionldState.apiVersion, asJsonObject, ""));
   //
   TIMED_RENDER(payload = upcrP->render(V1, asJsonObject));
 
-  ciP->outMimeType  = outMimeType;
-  cleanPayload      = (char*) payload.c_str();
+  orionldState.out.contentType = savedContentType;
+  cleanPayload                 = (char*) payload.c_str();
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
-  // FIXME P7: Should Rush be used?
   //
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
-  std::string     tenant       = ciP->tenant;
-  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+  char*           servicePath  = (orionldState.in.servicePath != NULL)? orionldState.in.servicePath : (char*) "";
   std::string     mimeType     = "application/json";
   std::string     out;
   int             r;
@@ -167,16 +167,15 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       port,
                       protocol,
                       verb,
-                      tenant,
+                      orionldState.tenantP->tenant,
                       servicePath,
-                      ciP->httpHeaders.xauthToken,
+                      orionldState.xAuthToken,
                       resource,
                       mimeType,
                       cleanPayload,
-                      ciP->httpHeaders.correlator,
+                      orionldState.correlator,
                       "",
                       false,
-                      true,
                       &out,
                       noHeaders,
                       mimeType);
@@ -219,8 +218,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   ParseData parseData;
 
-  ciP->verb   = POST;
-  ciP->method = "POST";
+  // Overriding original verb to be a POST, now that this service routine has been invoked
+  orionldState.verb = POST;
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
@@ -375,7 +374,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   //
   // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  if (ciP->method != "DELETE")
+  if (orionldState.verb != DELETE)
   {
     if (upcrsP->contextElementResponseVector.size() == 0)
     {
@@ -450,7 +449,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   //
   // 01. Check service-path consistency
@@ -465,7 +464,7 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
     upcrP->release();
 
     return answer;
@@ -480,7 +479,7 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -496,22 +495,18 @@ std::string postUpdateContext
   HttpStatusCode httpStatusCode;
   TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP,
                                                   upcrsP,
-                                                  ciP->tenant,
+                                                  orionldState.tenantP,
                                                   ciP->servicePathV,
-                                                  ciP->uriParam,
-                                                  ciP->httpHeaders.xauthToken,
-                                                  ciP->httpHeaders.correlator,
-                                                  ciP->httpHeaders.ngsiv2AttrsFormat,
-                                                  ciP->apiVersion,
+                                                  orionldState.xAuthToken,
+                                                  orionldState.correlator,
+                                                  orionldState.attrsFormat,
+                                                  orionldState.apiVersion,
                                                   ngsiV2Flavour));
 
-  if (ciP->httpStatusCode != SccCreated)
-  {
-    ciP->httpStatusCode = httpStatusCode;
-  }
+  if (orionldState.httpStatusCode != SccCreated)
+    orionldState.httpStatusCode = httpStatusCode;
 
   foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
-
 
 
   //
@@ -522,7 +517,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
 
     upcrP->release();
     return answer;
@@ -675,7 +670,7 @@ std::string postUpdateContext
   // Note this is a slight break in the separation of concerns among the different layers (i.e.
   // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
   // a smart way of dealing with partial update situations
-  if (ciP->apiVersion == V2)
+  if (orionldState.apiVersion == V2)
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
@@ -732,7 +727,7 @@ std::string postUpdateContext
   {
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
-    TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject));
+    TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject));
   }
 
   //

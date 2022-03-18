@@ -31,12 +31,12 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create an entity with inline context and attr-names usibng prefix expansion
+# 01. Create an entity with inline context and attr-names using prefix expansion
 # 02. Check mongo content
 #
 
-echo "01. Create an entity with inline context and attr-names usibng prefix expansion"
-echo "==============================================================================="
+echo "01. Create an entity with inline context and attr-names using prefix expansion"
+echo "=============================================================================="
 payload='{
   "id": "urn:ngsi-ld:EntityWithPrefixExpansion",
   "type": "me:T1",
@@ -61,8 +61,8 @@ echo
 
 
 --REGEXPECT--
-01. Create an entity with inline context and attr-names usibng prefix expansion
-===============================================================================
+01. Create an entity with inline context and attr-names using prefix expansion
+==============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:EntityWithPrefixExpansion

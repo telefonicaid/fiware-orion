@@ -49,15 +49,16 @@
 TEST(UpdateContextRequest, ok_json)
 {
    ParseData       reqData;
-   ConnectionInfo  ci("", "POST", "1.1");
+   ConnectionInfo  ci;
    const char*     infile = "ngsi10.updateContext.ok.valid.json";
 
    utInit();
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-   ci.inMimeType  = JSON;
-   ci.outMimeType = JSON;
+   orionldState.verb = POST;
+
+   orionldState.in.contentType  = JSON;
 
    lmTraceLevelSet(LmtDump, true);
    std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -83,15 +84,15 @@ TEST(UpdateContextRequest, ok_json)
 TEST(UpdateContextRequest, badIsPattern_json)
 {
    ParseData       parseData;
-   ConnectionInfo  ci("", "POST", "1.1");
+   ConnectionInfo  ci;
    const char*     infile  = "ngsi10.updateContextRequest.badIsPattern.invalid.json";
    const char*     outfile = "ngsi10.updateContextResponse.badIsPattern.invalid.json";
    JsonRequest*    reqP;
 
    utInit();
 
-   ci.inMimeType  = JSON;
-   ci.outMimeType = JSON;
+   orionldState.verb = POST;
+   orionldState.in.contentType  = JSON;
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile;

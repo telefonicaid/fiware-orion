@@ -90,7 +90,5 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
   out = ucasP->render();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  free(ucasP);
-
   utExit();
 }

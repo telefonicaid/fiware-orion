@@ -1,0 +1,154 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of an Entity with all types of Attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+pgInit $CB_DB_NAME
+pgInit ${CB_DB_NAME}_t1
+brokerStart CB 0 IPv4 -troe -multiservice
+
+--SHELL--
+
+#
+# 01. Create 201 entities in a loop on the default tenant
+# 02. Count the entities in the TRoE DB, on	the default tenant
+# 03. Create 202 entities in a loop on tenant t1
+# 04. Count the entities in the TRoE DB, on	tenant t1
+#
+
+echo "01. Create 201 entities in a loop on the default tenant"
+echo "======================================================="
+typeset -i eNo
+eNo=1
+
+while [ $eNo -le 201 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E1",
+      "observedAt": "2020-12-10T07:11:00.123Z",
+      "Sub-R": {
+       "type": "Relationship",
+        "object": "urn:ngsi-ld:rel:R1",
+        "observedAt": "2020-12-10T07:12:00.123Z"
+      },
+      "Sub-String": {
+        "type": "Property",
+        "value": "string sub-property",
+        "observedAt": "2020-12-10T07:12:00.124Z"
+      }
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+done | grep 'Location:' | wc -l
+echo
+echo
+
+
+echo "02. Count the entities in the TRoE DB"
+echo "====================================="
+postgresCmd -sql "SELECT count(*) FROM entities" 
+echo
+echo
+
+
+echo "03. Create 202 entities in a loop on tenant t1"
+echo "=============================================="
+eNo=1
+
+while [ $eNo -le 202 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='[{
+    "id": "'$eId'",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E1",
+      "observedAt": "2020-12-10T07:11:00.123Z",
+      "Sub-R": {
+       "type": "Relationship",
+        "object": "urn:ngsi-ld:rel:R1",
+        "observedAt": "2020-12-10T07:12:00.123Z"
+      },
+      "Sub-String": {
+        "type": "Property",
+        "value": "string sub-property",
+        "observedAt": "2020-12-10T07:12:00.124Z"
+      }
+    }
+  }]'
+  orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "NGSILD-Tenant: t1"
+done | grep "HTTP/1.1 201 Created" | wc -l
+echo
+echo
+
+
+echo "04. Count the entities in the TRoE DB, on tenant t1"
+echo "==================================================="
+postgresCmd -t ftest_t1 -sql "SELECT count(*) FROM entities" 
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 201 entities in a loop on the default tenant
+=======================================================
+201
+
+
+02. Count the entities in the TRoE DB
+=====================================
+count
+201
+
+
+03. Create 202 entities in a loop on tenant t1
+==============================================
+202
+
+
+04. Count the entities in the TRoE DB, on tenant t1
+===================================================
+count
+202
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t1
+pgDrop $CB_DB_NAME
+pgDrop ${CB_DB_NAME}_t1

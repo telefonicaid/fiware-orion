@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
@@ -38,11 +37,11 @@
 //
 // orionldDeleteRegistration -
 //
-bool orionldDeleteRegistration(ConnectionInfo* ciP)
+bool orionldDeleteRegistration(void)
 {
   char* detail;
 
-  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
+  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
   {
     LM_E(("uriCheck: %s", detail));
     orionldState.httpStatusCode = SccBadRequest;
@@ -53,16 +52,16 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
   if (dbRegistrationExists(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbRegistrationExists says that the registration '%s' doesn't exist", orionldState.wildcard[0]));
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0]);
     return false;
   }
 
   if (dbRegistrationDelete(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbRegistrationDelete failed - not found?"));
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0]);
     return false;
   }
 

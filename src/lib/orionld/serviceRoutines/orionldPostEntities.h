@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"           // ConnectionInfo
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldPostEntities -
 //
-extern bool orionldPostEntities(ConnectionInfo* ciP);
+extern bool orionldPostEntities(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_

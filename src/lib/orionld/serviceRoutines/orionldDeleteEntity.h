@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -35,6 +32,6 @@
 //
 // orionldDeleteEntity -
 //
-extern bool orionldDeleteEntity(ConnectionInfo* ciP);
+extern bool orionldDeleteEntity(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEENTITY_H_

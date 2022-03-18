@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 //
 // orionldBadVerb -
 //
-extern bool orionldBadVerb(ConnectionInfo* ciP);
+extern bool orionldBadVerb(void);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDBADVERB_H_

@@ -30,6 +30,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "common/errorMessages.h"
 #include "orionTypes/OrionValueType.h"
@@ -432,7 +435,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -614,7 +617,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -798,7 +801,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -984,7 +987,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1177,7 +1180,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1356,7 +1359,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1534,7 +1537,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1711,7 +1714,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     req.updateActionType = ActionTypeDelete;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1888,7 +1891,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1951,12 +1954,17 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -1987,7 +1995,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2046,12 +2054,17 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2082,7 +2095,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2141,12 +2154,17 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2177,7 +2195,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2237,15 +2255,21 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1",     getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val",   getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",     getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val",   getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3",     getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2276,7 +2300,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2336,15 +2360,21 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3", getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2377,7 +2407,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2440,15 +2470,21 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("new_val2", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1",     getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val",   getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",     getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("new_val2", getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3",     getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2481,7 +2517,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2544,15 +2580,21 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("new_val2", getStringField(mds.getField("MD2").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("TMD3", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_EQ("new_val3", getStringField(mds.getField("MD3").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+
+    EXPECT_STREQ("TMD1",     getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val",   getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",     getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("new_val2", getStringField(&mdObj2, "value"));
+    EXPECT_STREQ("TMD3",     getStringField(&mdObj3, "type"));
+    EXPECT_STREQ("new_val3", getStringField(&mdObj3, "value"));
 
     utExit();
 }
@@ -2583,7 +2625,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2642,12 +2684,17 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",    getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",    getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val",  getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2678,7 +2725,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2737,12 +2784,17 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("new_val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("new_val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2", getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2774,7 +2826,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2833,12 +2885,17 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",   getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",   getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2869,7 +2926,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2928,12 +2985,17 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     ASSERT_EQ(2, mdNames.size());
     EXPECT_TRUE(findAttr(mdNames, "MD1"));
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("TMD1", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("MD1val", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("TMD2", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ("MD2val", getStringField(mds.getField("MD2").embeddedObject(), "value"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+
+    EXPECT_STREQ("TMD1",   getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("MD1val", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("TMD2",   getStringField(&mdObj2, "type"));
+    EXPECT_STREQ("MD2val", getStringField(&mdObj2, "value"));
 
     utExit();
 }
@@ -2968,7 +3030,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3134,7 +3196,7 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     uriParams[URI_PARAM_NOT_EXIST] = "entity::type";
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3294,7 +3356,7 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3503,7 +3565,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "", V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3676,7 +3738,7 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3786,7 +3848,7 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3930,17 +3992,25 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
     EXPECT_TRUE(findAttr(mdNames, "MD4"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("s", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_FALSE(mds.getField("MD3").embeddedObject().getBoolField("value"));
     EXPECT_TRUE(mds.hasField("MD4"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+    BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
+
+    EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("s", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
+    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_STREQ("T", getStringField(&mdObj3, "type"));
+    EXPECT_FALSE(mdObj3.getBoolField("value"));
+
+    EXPECT_STREQ("T", getStringField(&mdObj4, "type"));
     EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
@@ -3996,7 +4066,7 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4064,17 +4134,24 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
     EXPECT_TRUE(findAttr(mdNames, "MD4"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("ss", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ(44.4, mds.getField("MD2").embeddedObject().getField("value").Number());
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_TRUE(mds.getField("MD3").embeddedObject().getBoolField("value"));
     EXPECT_TRUE(mds.hasField("MD4"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+    BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
+
+    EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("ss", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
+    EXPECT_EQ(44.4, mds.getField("MD2").embeddedObject().getField("value").Number());
+    EXPECT_STREQ("T", getStringField(&mdObj3, "type"));
+    EXPECT_TRUE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_STREQ("T", getStringField(&mdObj4, "type"));
     EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     utExit();
@@ -4106,7 +4183,7 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4162,17 +4239,24 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     EXPECT_TRUE(findAttr(mdNames, "MD2"));
     EXPECT_TRUE(findAttr(mdNames, "MD3"));
     EXPECT_TRUE(findAttr(mdNames, "MD4"));
+
     EXPECT_TRUE(mds.hasField("MD1"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD1").embeddedObject(), "type"));
-    EXPECT_EQ("s", getStringField(mds.getField("MD1").embeddedObject(), "value"));
     EXPECT_TRUE(mds.hasField("MD2"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD2").embeddedObject(), "type"));
-    EXPECT_EQ(55.5, mds.getField("MD2").embeddedObject().getField("value").Number());
+
+    BSONObj mdObj1 = mds.getField("MD1").embeddedObject();
+    BSONObj mdObj2 = mds.getField("MD2").embeddedObject();
+    BSONObj mdObj3 = mds.getField("MD3").embeddedObject();
+    BSONObj mdObj4 = mds.getField("MD4").embeddedObject();
+
+    EXPECT_STREQ("T", getStringField(&mdObj1, "type"));
+    EXPECT_STREQ("s", getStringField(&mdObj1, "value"));
+    EXPECT_STREQ("T", getStringField(&mdObj2, "type"));
+    EXPECT_EQ(55.5, mdObj2.getField("value").Number());
     EXPECT_TRUE(mds.hasField("MD3"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD3").embeddedObject(), "type"));
-    EXPECT_FALSE(mds.getField("MD3").embeddedObject().getBoolField("value"));
+    EXPECT_STREQ("T", getStringField(&mdObj3, "type"));
+    EXPECT_FALSE(mdObj3.getBoolField("value"));
     EXPECT_TRUE(mds.hasField("MD4"));
-    EXPECT_EQ("T", getStringField(mds.getField("MD4").embeddedObject(), "type"));
+    EXPECT_STREQ("T", getStringField(&mdObj4, "type"));
     EXPECT_TRUE(mds.getField("MD4").embeddedObject().getField("value").isNull());
 
     utExit();
@@ -4209,7 +4293,7 @@ TEST(mongoUpdateContextRequest, replace)
     req.updateActionType = ActionTypeReplace;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4373,7 +4457,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4523,7 +4607,7 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "", V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4729,7 +4813,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4799,7 +4883,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4857,7 +4941,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -4955,7 +5039,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+  ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -5059,7 +5143,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     servicePathVector.push_back("/home/fg");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5176,7 +5260,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     servicePathVector.push_back("/home/fg/01");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5291,7 +5375,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     servicePathVector.push_back("/home/kz/01");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5369,7 +5453,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   servicePathVector.push_back("/home/fg");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&ucReq, &ucRes, "", servicePathVector, uriParams, "", "", "");
+  ms = mongoUpdateContext(&ucReq, &ucRes, &tenant0, servicePathVector, uriParams, "", "", "");
 
 
   /* Check response is as expected */

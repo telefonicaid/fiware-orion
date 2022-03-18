@@ -22,43 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
+#include <stdio.h>                                               // snprintf
+
+#include "logMsg/logMsg.h"
 
 #include "orionld/common/orionldState.h"                         // orionldState
-
-#include "rest/ConnectionInfo.h"
-#include "rest/httpHeaderAdd.h"
-
-
-
-// -----------------------------------------------------------------------------
-//
-// httpHeaderAdd -
-//
-void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value)
-{
-  ciP->httpHeader.push_back(key);
-  ciP->httpHeaderValue.push_back(value);
-}
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "rest/httpHeaderAdd.h"                                  // Own interface
 
 
-
-#ifdef ORIONLD
-#include "orionld/context/orionldCoreContext.h" // orionldCoreContext
 
 // -----------------------------------------------------------------------------
 //
 // httpHeaderLocationAdd -
 //
-void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, const char* entityId)
+void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId)
 {
   char location[512];
 
-  snprintf(location, sizeof(location), "%s%s", uriPathWithSlash, entityId);
+  if (entityId != NULL)
+    snprintf(location, sizeof(location), "%s%s", uriPathWithSlash, entityId);
+  else
+    snprintf(location, sizeof(location), "%s", uriPathWithSlash);
 
-  ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-  ciP->httpHeaderValue.push_back(location);
+  orionldHeaderAdd(&orionldState.out.headers, HttpLocation, location, 0);
 }
 
 
@@ -67,7 +55,7 @@ void httpHeaderLocationAdd(ConnectionInfo* ciP, const char* uriPathWithSlash, co
 //
 // httpHeaderLinkAdd -
 //
-void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
+void httpHeaderLinkAdd(const char* _url)
 {
   char             link[256];
   char*            linkP = link;
@@ -80,7 +68,7 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
 
   // If no context URL is given, the Core Context is used
   if (_url == NULL)
-    url = ORIONLD_CORE_CONTEXT_URL;
+    url = coreContextUrl;
   else
   {
     url = (char*) _url;
@@ -114,12 +102,10 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
 
   sprintf(linkP, "<%s>; %s", url, LINK_REL_AND_TYPE);
 
-  ciP->httpHeader.push_back("Link");
-  ciP->httpHeaderValue.push_back(linkP);
+  orionldHeaderAdd(&orionldState.out.headers, HttpLink, linkP, 0);
 
   if (freeLinkP == true)
     free(linkP);
 
   orionldState.linkHeaderAdded = true;
 }
-#endif

@@ -1,0 +1,453 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+OPTIONS method for all API endpoints
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. OPTIONS request for /entities
+# 02. OPTIONS request for /entities/{entityId}
+# 03. OPTIONS request for /entities/{entityId}/attrs
+# 04. OPTIONS request for /entities/{entityId}/attrs/{attrName}
+# 05. OPTIONS request for /entityOperations/create
+# 06. OPTIONS request for /entityOperations/upsert
+# 07. OPTIONS request for /entityOperations/update
+# 08. OPTIONS request for /entityOperations/delete
+# 09. OPTIONS request for /entityOperations/query
+# 10. OPTIONS request for /types
+# 11. OPTIONS request for /types/{typeName}
+# 12. OPTIONS request for /attributes
+# 13. OPTIONS request for /attributes/{attrName}
+# 14. OPTIONS request for /subscriptions/
+# 15. OPTIONS request for /subscriptions/{subscriptionId}
+# 16. OPTIONS request for /csourceRegistrations/
+# 17. OPTIONS request for /csourceRegistrations/{registrationId}
+# 18. OPTIONS request for /jsonldContexts
+# 19. OPTIONS request for /jsonldContexts/{contextId}
+# 20. OPTIONS request for /temporal/entities
+# 21. OPTIONS request for /temporal/entities/{entityId}
+# 22. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
+# 23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}/{instanceId}
+# 24. OPTIONS request for /temporal/entityOperations/query
+#
+
+echo "01. OPTIONS request for /entities"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/entities -X OPTIONS
+echo
+echo
+
+
+echo "02. OPTIONS request for /entities/{entityId}"
+echo "============================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X OPTIONS
+echo
+echo
+
+
+echo "03. OPTIONS request for /entities/{entityId}/attrs"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs -X OPTIONS
+echo
+echo
+
+
+echo "04. OPTIONS request for /entities/{entityId}/attrs/{attrName}"
+echo "============================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 -X OPTIONS
+echo
+echo
+
+
+echo "05. OPTIONS request for /entityOperations/create"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entityOperations/create -X OPTIONS
+echo
+echo
+
+
+echo "06. OPTIONS request for /entityOperations/upsert"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X OPTIONS
+echo
+echo
+
+
+echo "07. OPTIONS request for /entityOperations/update"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entityOperations/update -X OPTIONS
+echo
+echo
+
+
+echo "08. OPTIONS request for /entityOperations/delete"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X OPTIONS
+echo
+echo
+
+
+echo "09. OPTIONS request for /entityOperations/query"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/entityOperations/query -X OPTIONS
+echo
+echo
+
+
+echo "10. OPTIONS request for /types"
+echo "=============================="
+orionCurl --url /ngsi-ld/v1/types -X OPTIONS
+echo
+echo
+
+
+echo "11. OPTIONS request for /types/{typeName}"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/types/{typeName} -X OPTIONS
+echo
+echo
+
+
+echo "12. OPTIONS request for /attributes"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/attributes -X OPTIONS
+echo
+echo
+
+
+echo "13. OPTIONS request for /attributes/{attrName}"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/attributes/P1 -X OPTIONS
+echo
+echo
+
+
+echo "14. OPTIONS request for /subscriptions/"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/ -X OPTIONS
+echo
+echo
+
+
+echo "15. OPTIONS request for /subscriptions/{subscriptionId}"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/{subscriptionId} -X OPTIONS
+echo
+echo
+
+
+echo "16. OPTIONS request for /csourceRegistrations/"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/ -X OPTIONS
+echo
+echo
+
+
+echo "17. OPTIONS request for /csourceRegistrations/{registrationId}"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/{registrationId} -X OPTIONS
+echo
+echo
+
+
+echo "18. OPTIONS request for /jsonldContexts"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts -X OPTIONS
+echo
+echo
+
+
+echo "19. OPTIONS request for /jsonldContexts/{contextId}"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts/{contextId} -X OPTIONS
+echo
+echo
+
+
+echo "20. OPTIONS request for /temporal/entities"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/temporal/entities -X OPTIONS
+echo
+echo
+
+
+echo "21. OPTIONS request for /temporal/entities/{entityId}"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:E1 -X OPTIONS
+echo
+echo
+
+
+echo "22. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:E1/attrs/P1 -X OPTIONS
+echo
+echo
+
+
+echo "23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}/{instanceId}"
+echo "==================================================================================="
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:E1/attrs/P1/urn:instance:a -X OPTIONS
+echo
+echo
+
+
+echo "24. OPTIONS request for /temporal/entityOperations/query"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/temporal/entityOperations/query -X OPTIONS
+echo
+echo
+
+
+--REGEXPECT--
+01. OPTIONS request for /entities
+=================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+02. OPTIONS request for /entities/{entityId}
+============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,OPTIONS
+Date: REGEX(.*)
+
+
+
+03. OPTIONS request for /entities/{entityId}/attrs
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,POST,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json
+Date: REGEX(.*)
+
+
+
+04. OPTIONS request for /entities/{entityId}/attrs/{attrName}
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json
+Date: REGEX(.*)
+
+
+
+05. OPTIONS request for /entityOperations/create
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+06. OPTIONS request for /entityOperations/upsert
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+07. OPTIONS request for /entityOperations/update
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+08. OPTIONS request for /entityOperations/delete
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+09. OPTIONS request for /entityOperations/query
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+10. OPTIONS request for /types
+==============================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,OPTIONS
+Date: REGEX(.*)
+
+
+
+11. OPTIONS request for /types/{typeName}
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,OPTIONS
+Date: REGEX(.*)
+
+
+
+12. OPTIONS request for /attributes
+===================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,OPTIONS
+Date: REGEX(.*)
+
+
+
+13. OPTIONS request for /attributes/{attrName}
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,OPTIONS
+Date: REGEX(.*)
+
+
+
+14. OPTIONS request for /subscriptions/
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+15. OPTIONS request for /subscriptions/{subscriptionId}
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json
+Date: REGEX(.*)
+
+
+
+16. OPTIONS request for /csourceRegistrations/
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+17. OPTIONS request for /csourceRegistrations/{registrationId}
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json
+Date: REGEX(.*)
+
+
+
+18. OPTIONS request for /jsonldContexts
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+19. OPTIONS request for /jsonldContexts/{contextId}
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,OPTIONS
+Date: REGEX(.*)
+
+
+
+20. OPTIONS request for /temporal/entities
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+21. OPTIONS request for /temporal/entities/{entityId}
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,OPTIONS
+Date: REGEX(.*)
+
+
+
+22. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json
+Date: REGEX(.*)
+
+
+
+23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}/{instanceId}
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: GET,DELETE,PATCH,OPTIONS
+Accept-Patch: application/json, application/ld+json
+Date: REGEX(.*)
+
+
+
+24. OPTIONS request for /temporal/entityOperations/query
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Allow: POST,OPTIONS
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

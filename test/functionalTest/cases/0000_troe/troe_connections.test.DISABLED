@@ -1,0 +1,245 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of 200 entities, one after the other, to make dure there are connections enough
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create entities E001 to E100 in a loop, using POST /entities
+# 02. Count the entities in mongo - see 100
+# 03. See the TRoE entities table - there should be 100 entries
+# 04. Create entities E101 to E200 in a loop, using POST /entityOperations/upsert
+# 05. Count the entities in mongo - see 200
+# 06. See the TRoE entities table - there should be 200 entries
+# 07. Modify entities E101 to E200 in a loop, using POST /entityOperations/upsert
+# 08. Count the entities in mongo - see 200
+# 09. See the TRoE entities table - there should be 200 entries
+#
+
+echo "01. Create entities E001 to E100 in a loop, using POST /entities"
+echo "================================================================"
+typeset -i eNo
+eNo=1
+rm -f /tmp/Location
+while [ $eNo -le 100 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%03d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:' >> /tmp/Location
+done
+cat /tmp/Location | wc -l
+rm -f /tmp/Location
+echo
+echo
+
+
+echo "02. Count the entities in mongo - see 100"
+echo "========================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=count&limit=0'
+echo
+echo
+
+
+echo "03. See the TRoE entities table - there should be 100 entries"
+echo "============================================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" | egrep ^Create,urn:ngsi-ld:entities:E | wc -l
+echo
+echo
+
+
+echo "04. Create entities E101 to E200 in a loop, using POST /entityOperations/upsert"
+echo "==============================================================================="
+eNo=101
+
+rm -f /tmp/Location
+while [ $eNo -le 200 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%03d" $eNo)
+  eNo=$eNo+1
+
+  payload='[
+    {
+      "id": "'$eId'",
+      "type": "T",
+      "A1": {
+        "type": "Property",
+        "value": "E'$eNo':A1"
+      }
+    }
+  ]'
+  orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" | grep "204 No Content" >> /tmp/Location
+done
+cat /tmp/Location | wc -l
+rm -f /tmp/Location
+echo
+echo
+
+
+echo "05. Count the entities in mongo - see 200"
+echo "========================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=count&limit=0'
+echo
+echo
+
+
+echo "06. See the TRoE entities table - there should be 200 entries"
+echo "============================================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" | egrep ^Create,urn:ngsi-ld:entities:E | wc -l
+echo
+echo
+
+
+echo "07. Modify entities E101 to E200 in a loop, using POST /entityOperations/upsert"
+echo "==============================================================================="
+eNo=101
+
+rm -f /tmp/Location
+while [ $eNo -le 200 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%03d" $eNo)
+  eNo=$eNo+1
+
+  payload='[
+    {
+      "id": "'$eId'",
+      "type": "T",
+      "A2": {
+        "type": "Property",
+        "value": "E'$eNo':A2"
+      }
+    }
+  ]'
+  orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" | grep "204 No Content" >> /tmp/Location
+done
+cat /tmp/Location | wc -l
+rm -f /tmp/Location
+echo
+echo
+
+
+echo "08. Count the entities in mongo - see 200"
+echo "========================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=count&limit=0'
+echo
+echo
+
+
+echo "09. See the TRoE entities table - there should be 200 entries for Create and 100 for Replace"
+echo "============================================================================================"
+echo Create:
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" | egrep ^Create,urn:ngsi-ld:entities:E | wc -l
+echo
+echo Replace:
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities" | egrep ^Replace,urn:ngsi-ld:entities:E | wc -l
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E001 to E100 in a loop, using POST /entities
+================================================================
+100
+
+
+02. Count the entities in mongo - see 100
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+NGSILD-Results-Count: 100
+Date: REGEX(.*)
+
+[]
+
+
+03. See the TRoE entities table - there should be 100 entries
+=============================================================
+100
+
+
+04. Create entities E101 to E200 in a loop, using POST /entityOperations/upsert
+===============================================================================
+100
+
+
+05. Count the entities in mongo - see 200
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+NGSILD-Results-Count: 200
+Date: REGEX(.*)
+
+[]
+
+
+06. See the TRoE entities table - there should be 200 entries
+=============================================================
+200
+
+
+07. Modify entities E101 to E200 in a loop, using POST /entityOperations/upsert
+===============================================================================
+100
+
+
+08. Count the entities in mongo - see 200
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+NGSILD-Results-Count: 200
+Date: REGEX(.*)
+
+[]
+
+
+09. See the TRoE entities table - there should be 200 entries for Create and 100 for Replace
+============================================================================================
+Create:
+200
+
+Replace:
+100
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+pgDrop $CB_DB_NAME

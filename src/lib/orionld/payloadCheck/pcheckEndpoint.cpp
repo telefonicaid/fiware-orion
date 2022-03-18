@@ -51,8 +51,7 @@ bool pcheckEndpoint(KjNode* endpointP)
     {
       DUPLICATE_CHECK(uriP, "endpoint::uri", epItemP);
       STRING_CHECK(uriP, "endpoint::uri");
-      EMPTY_STRING_CHECK(uriP, "endpoint::uri");
-      URI_CHECK(uriP, "endpoint::uri");
+      URI_CHECK(uriP->value.s, "endpoint::uri", true);
     }
     else if (strcmp(epItemP->name, "accept") == 0)
     {

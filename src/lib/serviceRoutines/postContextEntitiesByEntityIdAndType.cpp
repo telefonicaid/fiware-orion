@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -73,16 +75,16 @@ std::string postContextEntitiesByEntityIdAndType
   std::string              entityType            = compV[4];
   std::string              entityId              = compV[6];
   EntityTypeInfo           typeInfo              = EntityTypeEmptyOrNotEmpty;
-  std::string              typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string              typeNameFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   std::string              answer;
   RegisterContextResponse  response;
 
   // 01. Get values from URL (entityId::type, exist, !exist)
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }

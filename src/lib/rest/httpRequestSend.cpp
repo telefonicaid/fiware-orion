@@ -41,15 +41,16 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                  // orionldState
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
-#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
 
@@ -245,24 +246,24 @@ int httpRequestSendWithCurl
    unsigned short                             port,
    const std::string&                         _protocol,
    const std::string&                         verb,
-   const std::string&                         tenant,
+   const char*                                tenant,
    const std::string&                         servicePath,
-   const std::string&                         xauthToken,
+   const char*                                xauthToken,
    const std::string&                         resource,
    const std::string&                         orig_content_type,
    const std::string&                         content,
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
-   bool                                       useRush,
    bool                                       waitForResponse,
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   const char*                                subscriptionId
 )
 {
   char                            portAsString[STRING_SIZE_FOR_INT];
-  static unsigned long long       callNo             = 0;
+  static unsigned long long       sendReqNo          = 0;
   std::string                     ip                 = _ip;
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
@@ -276,7 +277,7 @@ int httpRequestSendWithCurl
   if (metricsMgr.isOn())
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
-  ++callNo;
+  ++sendReqNo;
 
   // For content-type application/json we add charset=utf-8
   if ((orig_content_type == "application/json") || (orig_content_type == "text/plain"))
@@ -366,54 +367,6 @@ int httpRequestSendWithCurl
   httpResponse->memory = (char*) malloc(1); // will grow as needed
   httpResponse->size   = 0; // no data at this point
 
-  //
-  // Rush
-  // Every call to httpRequestSend specifies whether RUSH should be used or not.
-  // But, this depends also on how the broker was started, so here the 'useRush'
-  // parameter is cancelled in case the broker was started without rush.
-  //
-  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
-  // after that, the host and port of rush is set as ip/port for the message, that is
-  // now sent to rush instead of to its final destination.
-  // Also, a few HTTP headers for rush must be setup.
-  //
-  if ((rushPort == 0) || (rushHost == ""))
-  {
-    useRush = false;
-  }
-
-  if (useRush)
-  {
-    char         rushHeaderPortAsString[STRING_SIZE_FOR_INT];
-    uint16_t     rushHeaderPort         = port;
-    std::string  rushHeaderIP           = ip;
-    std::string  rushHeaderValue;
-    std::string  rushHostHeaderName     = "X-relayer-host";
-    std::string  rushProtocolHeaderName = "X-relayer-protocol";
-
-    ip    = rushHost;
-    port  = rushPort;
-
-    snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
-    rushHeaderValue = rushHeaderIP + ":" + rushHeaderPortAsString;
-    LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (rushHostHeaderName + ": " + rushHeaderValue).c_str()));
-    httpHeaderAdd(&headers,
-                  rushHostHeaderName,
-                  rushHeaderValue,
-                  &outgoingMsgSize,
-                  extraHeaders,
-                  usedExtraHeaders);
-
-    if (protocol == "https://")
-    {
-      // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
-      protocol        = "http://";
-      rushHeaderValue = "https";
-      LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (rushProtocolHeaderName + ": " + rushHeaderValue).c_str()));
-      httpHeaderAdd(&headers, rushProtocolHeaderName, rushHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
-    }
-  }
-
   snprintf(portAsString, sizeof(portAsString), "%u", port);
 
   // ----- User Agent
@@ -422,7 +375,6 @@ int httpRequestSendWithCurl
   std::string userAgentHeaderName = HTTP_USER_AGENT;
 
   snprintf(userAgentHeaderValue, sizeof(userAgentHeaderValue), "orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (userAgentHeaderName + ": " + userAgentHeaderValue).c_str()));
 
   httpHeaderAdd(&headers, userAgentHeaderName, userAgentHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
@@ -431,14 +383,15 @@ int httpRequestSendWithCurl
   std::string hostHeaderName = HTTP_HOST;
 
   snprintf(hostHeaderValue, sizeof(hostHeaderValue), "%s:%d", ip.c_str(), (int) port);
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (hostHeaderName + ": " + hostHeaderValue).c_str()));
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
-  if (tenant != "")
+  if ((tenant != NULL) && (tenant[0] != 0))
   {
-    std::string fiwareServiceHeaderValue = tenant;
-    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    if (subscriptionId == NULL)  // NGSIv2 subscription
+      httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+    else
+      httpHeaderAdd(&headers, "NGSILD-Tenant", tenant, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path
@@ -446,7 +399,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_SERVICEPATH, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
-  if (xauthToken != "")
+  if ((xauthToken != NULL) && (xauthToken[0] != 0))
   {
     std::string xauthTokenHeaderValue = xauthToken;
     httpHeaderAdd(&headers, HTTP_X_AUTH_TOKEN, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -471,7 +424,6 @@ int httpRequestSendWithCurl
   std::string contentLengthHeaderName  = HTTP_CONTENT_LENGTH;
   std::string contentLengthHeaderValue = contentLengthStringStream.str();
 
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (contentLengthHeaderName + ": " + contentLengthHeaderValue).c_str()));
   httpHeaderAdd(&headers, contentLengthHeaderName, contentLengthHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   //
@@ -501,6 +453,7 @@ int httpRequestSendWithCurl
 
     httpHeaderAdd(&headers, HTTP_NGSIV2_ATTRSFORMAT, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
+
 
   // Extra headers
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
@@ -562,6 +515,17 @@ int httpRequestSendWithCurl
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
   }
 
+  // Is there a subscription ID to be added as an HTTP header?
+  if ((subscriptionId != NULL) && (*subscriptionId != 0))
+  {
+    const char* qMark = strchr(resource.c_str(), '?');  // '?' already present?
+
+    if (qMark == NULL)
+      url += std::string("?subscriptionId=") + subscriptionId;
+    else
+      url += std::string("&subscriptionId=") + subscriptionId;
+  }
+
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
@@ -597,7 +561,7 @@ int httpRequestSendWithCurl
   // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed
   // to check logs in a .test case (case 000 notification_different_sizes.test)
   //
-  LM_I(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  LM_K(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", sendReqNo, outgoingMsgSize));
 
   res = curl_easy_perform(curl);
   if (res != CURLE_OK)
@@ -671,20 +635,20 @@ int httpRequestSend
    unsigned short                             port,
    const std::string&                         protocol,
    const std::string&                         verb,
-   const std::string&                         tenant,
+   const char*                                tenant,
    const std::string&                         servicePath,
-   const std::string&                         xauthToken,
+   const char*                                xauthToken,
    const std::string&                         resource,
    const std::string&                         orig_content_type,
    const std::string&                         content,
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
-   bool                                       useRush,
    bool                                       waitForResponse,
    std::string*                               outP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   const char*                                subscriptionId
 )
 {
   struct curl_context  cc;
@@ -724,12 +688,12 @@ int httpRequestSend
                                      content,
                                      fiwareCorrelation,
                                      ngsiv2AttrFormat,
-                                     useRush,
                                      waitForResponse,
                                      outP,
                                      extraHeaders,
                                      acceptFormat,
-                                     timeoutInMilliseconds);
+                                     timeoutInMilliseconds,
+                                     subscriptionId);
 
   release_curl_context(&cc);
   return response;

@@ -36,8 +36,10 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
+
+#include "orionld/common/orionldState.h"                // orionldState
+#include "orionld/common/eqForDot.h"                    // eqForDot
 
 using namespace mongo;
 
@@ -55,7 +57,7 @@ ContextElementResponse::ContextElementResponse()
 
 /* ****************************************************************************
 *
-* ContextElementResponse::ContextElementResponse - 
+* ContextElementResponse::ContextElementResponse -
 */
 ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* aP)
 {
@@ -73,7 +75,7 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
 
 /* ****************************************************************************
 *
-* ContextElementResponse::ContextElementResponse - 
+* ContextElementResponse::ContextElementResponse -
 */
 ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 {
@@ -96,7 +98,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 * get implemented.
 *
 */
-static bool includedAttribute(const ContextAttribute& attr, const StringList& attrsV)
+static bool includedAttribute(const ContextAttribute* attrP, const StringList& attrsV)
 {
   //
   // This is the case in which the queryContextRequest doesn't include attributes,
@@ -109,7 +111,7 @@ static bool includedAttribute(const ContextAttribute& attr, const StringList& at
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV[ix] == attr.name)
+    if (attrsV[ix] == attrP->name)
     {
       return true;
     }
@@ -131,8 +133,8 @@ static bool includedAttribute(const ContextAttribute& attr, const StringList& at
 */
 ContextElementResponse::ContextElementResponse
 (
-  const mongo::BSONObj&  entityDoc,
-  const StringList&   attrL,
+  const mongo::BSONObj*  entityDocP,
+  const StringList&      attrL,
   bool                   includeEmpty,
   ApiVersion             apiVersion
 )
@@ -140,19 +142,21 @@ ContextElementResponse::ContextElementResponse
   prune = false;
 
   // Entity
-  BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
+  BSONObj id = getFieldF(entityDocP, "_id").embeddedObject();
 
-  std::string entityId   = getStringFieldF(id, ENT_ENTITY_ID);
-  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "";
+  const char* entityId   = getStringFieldF(&id, ENT_ENTITY_ID);
+  const char* entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(&id, ENT_ENTITY_TYPE) : "";
 
   contextElement.entityId.fill(entityId, entityType, "false");
-  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(id, ENT_SERVICE_PATH) : "";
+  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(&id, ENT_SERVICE_PATH) : "";
 
   /* Get the location attribute (if it exists) */
   std::string locAttr;
-  if (entityDoc.hasElement(ENT_LOCATION))
+  if (entityDocP->hasElement(ENT_LOCATION))
   {
-    locAttr = getStringFieldF(getObjectFieldF(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
+    BSONObj objField;
+    getObjectFieldF(&objField, entityDocP, ENT_LOCATION);
+    locAttr = getStringFieldF(&objField, ENT_LOCATION_ATTRNAME);
   }
 
 
@@ -160,24 +164,37 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
+  BSONObj                attrs;
   std::set<std::string>  attrNames;
 
+  getObjectFieldF(&attrs, entityDocP, ENT_ATTRS);
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
-    std::string        attrName = *i;
-    BSONObj            attr     = getObjectFieldF(attrs, attrName);
+    const char*        attrName = i->c_str();
+    BSONObj            attr;
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
+    char               aName[512];
+    char*              delimiterP;
+    char*              metadataId = NULL;
 
-    // Name and type
-    ca.name           = dbDotDecode(basePart(attrName));
-    std::string mdId  = idPart(attrName);
-    ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
+    getObjectFieldF(&attr, &attrs, attrName);    
+
+    strncpy(aName, attrName, sizeof(aName) - 1);
+    delimiterP = strstr(aName, "()");
+    if (delimiterP != NULL)
+    {
+      *delimiterP = 0;
+      metadataId  = &delimiterP[2];
+    }
+    eqForDot(aName);
+
+    ca.name = aName;
+    ca.type = getStringFieldF(&attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
-    if (!includedAttribute(ca, attrL))
+    if (!includedAttribute(&ca, attrL))
     {
       continue;
     }
@@ -190,10 +207,10 @@ ContextElementResponse::ContextElementResponse
     }
     else
     {
-      switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
+      switch (getFieldF(&attr, ENT_ATTRS_VALUE).type())
       {
       case String:
-        ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
+        ca.stringValue = getStringFieldF(&attr, ENT_ATTRS_VALUE);
         if (!includeEmpty && ca.stringValue.length() == 0)
         {
           continue;
@@ -202,17 +219,17 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberDouble:
-        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
+        ca.numberValue = getNumberFieldF(&attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
       case NumberInt:
-        ca.numberValue = (double) getIntFieldF(attr, ENT_ATTRS_VALUE);
+        ca.numberValue = (double) getIntFieldF(&attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
       case Bool:
-        ca.boolValue = getBoolFieldF(attr, ENT_ATTRS_VALUE);
+        ca.boolValue = getBoolFieldF(&attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
@@ -225,7 +242,7 @@ ContextElementResponse::ContextElementResponse
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
         caP->valueType = orion::ValueTypeObject;
-        compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        compoundObjectResponse(caP->compoundValueP, getFieldF(&attr, ENT_ATTRS_VALUE));
         break;
 
       case Array:
@@ -235,18 +252,18 @@ ContextElementResponse::ContextElementResponse
         // we need to use ValueTypeObject here? Because otherwise Metadata::toJson()
         // method doesn't work. A littely crazy... it should be fixed.
         caP->valueType = orion::ValueTypeObject;
-        compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        compoundVectorResponse(caP->compoundValueP, getFieldF(&attr, ENT_ATTRS_VALUE));
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d ('value' field of attribute: %s))", getFieldF(attr, ENT_ATTRS_VALUE).type(), ca.name.c_str()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d ('value' field of attribute: %s))", getFieldF(&attr, ENT_ATTRS_VALUE).type(), ca.name.c_str()));
       }
     }
 
     /* Setting ID (if found) */
-    if (mdId != "")
+    if (metadataId != NULL)
     {
-      Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
+      Metadata* md = new Metadata(NGSI_MD_ID, "string", metadataId);
       caP->metadataVector.push_back(md);
     }
 
@@ -262,44 +279,53 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
+
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
+      BSONObj                mds;
       std::set<std::string>  mdsSet;
 
+      getObjectFieldF(&mds, &attr, ENT_ATTRS_MD);
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
-        std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
-        caP->metadataVector.push_back(md);
+        char*   currentMd = (char*) i->c_str();
+        BSONObj mdObj;
+        char    mdName[512];
+
+        getObjectFieldF(&mdObj, &mds, currentMd);
+        strncpy(mdName, currentMd, sizeof(mdName) - 1);
+        eqForDot(mdName);
+
+        Metadata* mdP = new Metadata((const char*) mdName, &mdObj);
+        caP->metadataVector.push_back(mdP);
       }
     }
 
     /* Set creDate and modDate at attribute level */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
-      caP->creDate = getNumberFieldAsDoubleF(attr, ENT_ATTRS_CREATION_DATE);
+      caP->creDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE);
     }
 
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      caP->modDate = getNumberFieldAsDoubleF(attr, ENT_ATTRS_MODIFICATION_DATE);
+      caP->modDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE);
     }
 
     contextElement.contextAttributeVector.push_back(caP);
   }
 
   /* Set creDate and modDate at entity level */
-  if (entityDoc.hasField(ENT_CREATION_DATE))
+  if (entityDocP->hasField(ENT_CREATION_DATE))
   {
-    contextElement.entityId.creDate = getNumberFieldAsDoubleF(entityDoc, ENT_CREATION_DATE);
+    contextElement.entityId.creDate = getNumberFieldAsDoubleF(entityDocP, ENT_CREATION_DATE);
   }
 
-  if (entityDoc.hasField(ENT_MODIFICATION_DATE))
+  if (entityDocP->hasField(ENT_MODIFICATION_DATE))
   {
-    contextElement.entityId.modDate = getNumberFieldAsDoubleF(entityDoc, ENT_MODIFICATION_DATE);
+    contextElement.entityId.modDate = getNumberFieldAsDoubleF(entityDocP, ENT_MODIFICATION_DATE);
   }
 }
 
@@ -320,7 +346,7 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefa
 
 /* ****************************************************************************
 *
-* ContextElementResponse::render - 
+* ContextElementResponse::render -
 */
 std::string ContextElementResponse::render
 (
@@ -345,7 +371,7 @@ std::string ContextElementResponse::render
 
 /* ****************************************************************************
 *
-* ContextElementResponse::toJson - 
+* ContextElementResponse::toJson -
 */
 std::string ContextElementResponse::toJson
 (
@@ -366,7 +392,7 @@ std::string ContextElementResponse::toJson
 
 /* ****************************************************************************
 *
-* ContextElementResponse::release - 
+* ContextElementResponse::release -
 */
 void ContextElementResponse::release(void)
 {
@@ -378,7 +404,7 @@ void ContextElementResponse::release(void)
 
 /* ****************************************************************************
 *
-* ContextElementResponse::check - 
+* ContextElementResponse::check -
 */
 std::string ContextElementResponse::check
 (
@@ -407,7 +433,7 @@ std::string ContextElementResponse::check
 
 /* ****************************************************************************
 *
-* ContextElementResponse::fill - 
+* ContextElementResponse::fill -
 */
 void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType)
 {
@@ -433,7 +459,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
   //           A better approach would be to change this convop to return a vector of responses.
-  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the 
+  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the
   //           query needs to avoid using this conv op to make any queries that can give more than
   //           one unique context element :-).
   //           This FIXME is related to github issue #588 and (probably) #650.
@@ -456,7 +482,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
 
 /* ****************************************************************************
 *
-* ContextElementResponse::fill - 
+* ContextElementResponse::fill -
 */
 void ContextElementResponse::fill(ContextElementResponse* cerP)
 {
@@ -468,7 +494,7 @@ void ContextElementResponse::fill(ContextElementResponse* cerP)
 
 /* ****************************************************************************
 *
-* ContextElementResponse::clone - 
+* ContextElementResponse::clone -
 */
 ContextElementResponse* ContextElementResponse::clone(void)
 {

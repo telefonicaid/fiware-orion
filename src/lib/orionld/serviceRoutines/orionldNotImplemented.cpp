@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccNotImplemented
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
@@ -35,11 +33,11 @@
 //
 // orionldNotImplemented -
 //
-bool orionldNotImplemented(ConnectionInfo* ciP)
+bool orionldNotImplemented(void)
 {
-  orionldState.httpStatusCode = SccNotImplemented;
+  orionldState.httpStatusCode = 501;
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
 
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
+  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", orionldState.serviceP->url);
   return false;
 }

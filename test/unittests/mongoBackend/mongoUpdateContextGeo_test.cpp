@@ -30,6 +30,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
@@ -166,7 +169,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -296,7 +299,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -413,7 +416,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -518,7 +521,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -623,7 +626,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -742,7 +745,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -852,7 +855,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -963,7 +966,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1076,7 +1079,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1189,7 +1192,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1299,7 +1302,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1409,7 +1412,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1521,7 +1524,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+    ms = mongoUpdateContext(&req, &res, &tenant0, servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

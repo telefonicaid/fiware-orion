@@ -31,14 +31,14 @@ brokerStart CB
 
 echo "+++++ 1. bad characters in URI param 'limit'"
 url="/v1/queryContext?limit=abc"
-payload='NO PAYLOAD NECESSARY'
+payload='{}'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
 echo "+++++ 2. bad characters in URI param 'offset'"
 url="/v1/queryContext?offset=qwe"
-payload='NO PAYLOAD NECESSARY'
+payload='{}'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -46,7 +46,7 @@ echo
 
 echo "+++++ 3. URI param 'limit' == 0"
 url="/v1/queryContext?limit=000000"
-payload='NO PAYLOAD NECESSARY'
+payload='{}'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -54,15 +54,16 @@ echo
 
 echo "+++++ 4. URI param 'details' == 'Yes'"
 url="/v1/queryContext?details=Yes"
-payload='NO PAYLOAD NECESSARY'
+payload='{}'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
+
 --REGEXPECT--
 +++++ 1. bad characters in URI param 'limit'
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 110
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -70,7 +71,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "Bad pagination limit: /abc/ [must be a decimal number]",
+        "details": "Invalid value for URI parameter /limit/",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -78,7 +79,7 @@ Date: REGEX(.*)
 
 +++++ 2. bad characters in URI param 'offset'
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 111
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -86,7 +87,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "Bad pagination offset: /qwe/ [must be a decimal number]",
+        "details": "Invalid value for URI parameter /offset/",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -110,7 +111,7 @@ Date: REGEX(.*)
 
 +++++ 4. URI param 'details' == 'Yes'
 HTTP/1.1 400 Bad Request
-Content-Length: 156
+Content-Length: 112
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -118,7 +119,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "Bad value for /details/: /Yes/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]",
+        "details": "Invalid value for uri parameter /details/",
         "reasonPhrase": "Bad Request"
     }
 }

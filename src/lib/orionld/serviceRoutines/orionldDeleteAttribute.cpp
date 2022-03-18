@@ -30,7 +30,6 @@ extern "C"
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjClone.h"                                       // kjClone
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
@@ -38,18 +37,114 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/HttpStatusCode.h"                                 // SccContextElementNotFound
-
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldDeleteAttributeDatasetId -
+//
+// PARAMETERS
+//   entityId             The ID of the entity
+//   attrNameExpanded     Expanded Attribute Name
+//   attrNameExpandedEq   Expanded Attribute Name with dots already replaced for EQ signs
+//   datasetId            If NULL - all datasets for the attribute are deleted, else only the matching one
+//
+bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameExpanded, const char* attrNameExpandedEq, const char* datasetId)
+{
+  char fieldPath[512];
+
+  //
+  // Remove the entire dataset?
+  //
+  if (datasetId == NULL)
+  {
+    snprintf(fieldPath, sizeof(fieldPath), "@datasets.%s", attrNameExpandedEq);
+    if (dbEntityFieldDelete(entityId, fieldPath) == false)
+    {
+      orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
+      return false;
+    }
+
+    orionldState.httpStatusCode = 204;
+
+    return true;
+  }
+
+
+  //
+  // Remove a single dataset instance
+  //   1. Get the @datasets for 'attrNameExpandedEq':
+  //      KjTree* datasetsP = dbDatasetGet(entityId, attrName, attrNameExpandedEq);
+  //   2. Lookup the matching object (not found? 404)
+  //   3. Remove the matching object from datasetsP
+  //   4. Replace @datasets.attrNameExpandedEq with what's left in datasetsP
+  //      mongoCppLegacyEntityFieldReplace(entityId, fieldPath, datasetsP);
+  KjNode* datasetsP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
+
+  if (datasetsP == NULL)
+  {
+    orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
+    return false;
+  }
+
+  char datasetPath[512];
+  snprintf(datasetPath, sizeof(datasetPath), "@datasets.%s", attrNameExpandedEq);
+
+  if (datasetsP->type == KjArray)
+  {
+    bool found = false;
+
+    for (KjNode* instanceP = datasetsP->value.firstChildP; instanceP != NULL; instanceP = instanceP->next)
+    {
+      KjNode* datasetIdNode = kjLookup(instanceP, "datasetId");
+
+      if ((datasetIdNode != NULL) && (strcmp(datasetIdNode->value.s, datasetId) == 0))
+      {
+        // Found it
+        kjChildRemove(datasetsP, instanceP);
+        found = true;
+        break;
+      }
+    }
+
+    if (found == false)
+    {
+      orionldError(OrionldResourceNotFound, "Attribute dataset not found", datasetId, 404);
+      return false;
+    }
+
+    dbEntityFieldReplace(entityId, datasetPath, datasetsP);
+  }
+  else
+  {
+    //
+    // One single instance - if it matches, the entire item in @datasets is removed
+    //                                      else: 404
+    //
+    KjNode* datasetIdNode = kjLookup(datasetsP, "datasetId");
+
+    if ((datasetIdNode == NULL) || (strcmp(datasetIdNode->value.s, datasetId) != 0))
+    {
+      orionldError(OrionldResourceNotFound, "Attribute dataset not found", datasetId, 404);
+      return false;
+    }
+
+    // It matched - the entire item in @datasets is removed
+    dbEntityFieldDelete(entityId, datasetPath);
+  }
+
+  orionldState.httpStatusCode = 204;
+  return true;
+}
 
 
 
@@ -57,59 +152,99 @@ extern "C"
 //
 // orionldDeleteAttribute -
 //
-bool orionldDeleteAttribute(ConnectionInfo* ciP)
+bool orionldDeleteAttribute(void)
 {
-  char*    entityId = orionldState.wildcard[0];
-  char*    attrName = orionldState.wildcard[1];
-  char*    attrNameP;
-  char*    detail;
+  char*    entityId         = orionldState.wildcard[0];
+  char*    attrName         = orionldState.wildcard[1];
+  char*    attrNameExpanded = orionldState.in.pathAttrExpanded;
+  char*    attrNameExpandedEq;
 
+  //
+  // URI param check: both datasetId and deleteAll cannot be set
+  //
+  if ((orionldState.uriParams.datasetId != NULL) && (orionldState.uriParams.deleteAll == true))
+  {
+    orionldError(OrionldBadRequestData, "Invalid URI param combination", "both datasetId and deleteAll are set", 400);
+    return false;
+  }
+
+  //
   // Make sure the Entity ID is a valid URI
-  if (pcheckUri(entityId, &detail) == false)
-  {
-    LM_W(("Bad Input (Invalid Entity ID '%s' - not a URI)", entityId));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include name (entityId) and value ($entityId)
-    orionldState.httpStatusCode = SccBadRequest;
+  //
+  if (pCheckUri(entityId, "Entity ID from URL PATH", true) == false)
     return false;
-  }
 
-  if (dbEntityLookup(entityId) == NULL)
-  {
-    LM_T(LmtService, ("Entity Not Found: %s", entityId));
-    orionldErrorResponseCreate(OrionldResourceNotFound, "The requested entity has not been found. Check its id", entityId);
-    orionldState.httpStatusCode = SccNotFound;  // 404
+  //
+  // Make sure the Attribute Name is valid
+  //
+  if (pCheckUri(attrName, "Attribute Name from URL PATH", false) == false)
     return false;
-  }
 
-  if ((strncmp(attrName, "http://", 7) == 0) || (strncmp(attrName, "https://", 8) == 0))
-    attrNameP = attrName;
+
+  //
+  // Expand the attribute name and save it in the orionldState.wildcard array, so that the TROE won't have to expand it as well
+  //
+  orionldState.wildcard[1] = orionldState.in.pathAttrExpanded;
+
+  attrNameExpandedEq = kaStrdup(&orionldState.kalloc, orionldState.in.pathAttrExpanded);
+  dotForEq(attrNameExpandedEq);
+
+
+  //
+  // Three possibilities here (well, four, if we count the error of "both SET"):
+  //
+  // URI Param datasetId   URI Param deleteAll  Action
+  // -------------------   -------------------  ---------------------
+  //      SET                    SET            Error - already taken care of
+  //      SET                    NOT SET        Delete only the dataset instance with the matching datasetId
+  //      NOT SET                SET            Delete both the default attribute and ALL dataset instances
+  //      NOT SET                NOT SET        Delete only the default attribute
+  //
+  if (orionldState.uriParams.datasetId != NULL)
+  {
+    if (dbEntityAttributeInstanceLookup(entityId, attrNameExpandedEq, orionldState.uriParams.datasetId) == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Entity/Attribute/datasetId not found", attrNameExpanded, 404);
+      return false;
+    }
+  }
+  else if (orionldState.uriParams.deleteAll == true)
+  {
+    // GET attribute AND its dataset
+    orionldState.dbAttrWithDatasetsP = dbEntityAttributeWithDatasetsLookup(entityId, attrNameExpandedEq);
+    if (orionldState.dbAttrWithDatasetsP == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
+      return false;
+    }
+  }
   else
   {
-    attrNameP = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
-    // attrNameP might point to a field inside the context cache - must make our own copy as 'dotForEq' will modifyit
-    attrNameP = kaStrdup(&orionldState.kalloc, attrNameP);
+    if (dbEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
+      return false;
+    }
   }
 
-  // IMPORTANT: Must call dbEntityAttributeLookup before replacing dots for eqs
-  if (dbEntityAttributeLookup(entityId, attrNameP) == NULL)
+  if (orionldState.uriParams.datasetId != NULL)
   {
-    LM_T(LmtService, ("Attribute Not Found: %s/%s", entityId, attrNameP));
-    orionldState.httpStatusCode = SccContextElementNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", attrNameP);
-    return false;
+    return orionldDeleteAttributeDatasetId(entityId, attrNameExpanded, attrNameExpandedEq, orionldState.uriParams.datasetId);
+  }
+  else if (orionldState.uriParams.deleteAll == true)
+  {
+    if (orionldDeleteAttributeDatasetId(entityId, attrName, attrNameExpandedEq, NULL) == false)
+      return false;
   }
 
-  dotForEq(attrNameP);
-
-  char* attrNameV[1]  = { attrNameP };
+  char* attrNameV[1] = { attrNameExpandedEq };
   if (dbEntityAttributesDelete(entityId, attrNameV, 1) == false)
   {
     LM_W(("dbEntityAttributesDelete failed"));
-    orionldState.httpStatusCode = SccContextElementNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", attrNameP);
+    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", attrNameExpanded, 404);
     return false;
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
   return true;
 }

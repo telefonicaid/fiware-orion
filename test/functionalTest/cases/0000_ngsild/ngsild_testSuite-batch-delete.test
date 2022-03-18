@@ -98,19 +98,9 @@ Date: REGEX(.*)
 
 03. Delete both entities and check success in the response
 ==========================================================
-HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
 
 
 --TEARDOWN--

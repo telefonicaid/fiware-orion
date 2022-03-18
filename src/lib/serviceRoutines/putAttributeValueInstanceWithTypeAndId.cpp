@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -75,7 +77,7 @@ std::string putAttributeValueInstanceWithTypeAndId
 
 
   // 01. Get values from URI parameters
-  entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  entityTypeFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
 
   // 02. Check validity of URI params VS URI path components

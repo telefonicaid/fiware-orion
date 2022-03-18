@@ -113,15 +113,13 @@ echo
 echo "05. Update the E2 relationship attr_A3"
 echo "======================================"
 payload='{
-"@context": [
+  "@context": [
     {
       "attr_A3": "http://a.b.c/A3",
       "type_T": "http://a.b.c/T"
     }
-    ],
-
+  ],
   "object": "urn:ngsi-ld:entity:E3"
- 
  }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs/attr_A3 -X PATCH --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo

@@ -49,7 +49,12 @@ void* startSenderThread(void* p)
     snprintf(portV, sizeof(portV), "%d", params->port);
     url = params->ip + ":" + portV + params->resource;
 
-    strncpy(transactionId, params->transactionId, sizeof(transactionId));
+
+    // To avoid buffer size complaints from the compiler
+    // Delicate problem, as copies are made in both directions
+    // Seems like I have to avoid strncpy here :(
+    //
+    strcpy(transactionId, params->transactionId);
 
     LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
                        params->ip.c_str(),
@@ -70,18 +75,20 @@ void* startSenderThread(void* p)
                           params->port,
                           params->protocol,
                           params->verb,
-                          params->tenant,
+                          params->tenant.c_str(),
                           params->servicePath,
-                          params->xauthToken,
+                          params->xauthToken.c_str(),
                           params->resource,
                           params->content_type,
                           params->content,
                           params->fiwareCorrelator,
                           params->renderFormat,
-                          true,
                           NOTIFICATION_WAIT_MODE,
                           &out,
-                          params->extraHeaders);
+                          params->extraHeaders,
+                          "",
+                          -1,
+                          params->subscriptionId.c_str());  // Subscription ID as URL param
 
       if (params->toFree != NULL)
       {

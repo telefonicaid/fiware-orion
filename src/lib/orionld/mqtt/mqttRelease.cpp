@@ -43,8 +43,10 @@ void mqttRelease(void)
   {
     MqttConnection* mcP = &mqttConnectionList[ix];
 
-    if (mcP->host != NULL)
-      free(mcP->host);
+    if (mcP->host     != NULL)      free(mcP->host);
+    if (mcP->username != NULL)      free(mcP->username);
+    if (mcP->password != NULL)      free(mcP->password);
+    if (mcP->version  != NULL)      free(mcP->version);
 
     MQTTClient_disconnect(&mcP->client, 10000);
     MQTTClient_destroy(&mcP->client);

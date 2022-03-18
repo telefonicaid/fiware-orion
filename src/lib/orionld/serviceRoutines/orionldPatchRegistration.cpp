@@ -34,13 +34,11 @@ extern "C"
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
 #include "common/globals.h"                                     // parse8601Time
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
 
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/common/numberToDate.h"                        // numberToDate
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
+#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
 #include "orionld/payloadCheck/pcheckUri.h"                     // pcheckUri
@@ -412,7 +410,7 @@ void ngsildExpiresToAPIv1Datamodel(KjNode* expiresP)
 //  }
 // }
 //
-static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patchTree, KjNode* dbRegistrationP)
+static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegistrationP)
 {
   KjNode* informationP         = NULL;
   KjNode* endpointP            = NULL;
@@ -541,13 +539,13 @@ static void ngsildRegistrationPatch(KjNode* dbRegistrationP, KjNode* patchTree)
 //
 // orionldPatchRegistration -
 //
-bool orionldPatchRegistration(ConnectionInfo* ciP)
+bool orionldPatchRegistration(void)
 {
   char*    registrationId = orionldState.wildcard[0];
   KjNode*  propertyTree;
   char*    detail;
 
-  if (pcheckUri(registrationId, &detail) == false)
+  if (pcheckUri(registrationId, true, &detail) == false)
   {
     orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);  // FIXME: Include 'detail' and name (registrationId)
@@ -564,8 +562,8 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   if (dbRegistrationP == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration not found", registrationId);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Registration not found", registrationId);
     return false;
   }
 
@@ -603,8 +601,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
     next = propertyP->next;
 
-    if (orionldContextItemAlreadyExpanded(propertyP->name) == false)
-      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, true, NULL);
+    propertyP->name = orionldAttributeExpand(orionldState.contextP, propertyP->name, true, NULL);
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)
     {
@@ -630,7 +627,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
   fixDbRegistration(dbRegistrationP);
 
   // Convert the patch-payload to valid APIv1 Database model
-  ngsildRegistrationToAPIv1Datamodel(ciP, orionldState.requestTree, dbRegistrationP);
+  ngsildRegistrationToAPIv1Datamodel(orionldState.requestTree, dbRegistrationP);
 
   // Now we're ready to merge to patch into what's already there ...
   ngsildRegistrationPatch(dbRegistrationP, orionldState.requestTree);

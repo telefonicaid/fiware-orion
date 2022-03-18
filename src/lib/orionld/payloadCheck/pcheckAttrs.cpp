@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckAttrs.h"                    // Own interface
 
 
@@ -60,7 +60,7 @@ bool pcheckAttrs(KjNode* tree)
       return false;
     }
 
-    attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
+    attrP->value.s = orionldAttributeExpand(orionldState.contextP, attrP->value.s, true, NULL);
   }
 
   return true;

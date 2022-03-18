@@ -28,8 +28,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
@@ -42,13 +40,13 @@
 //
 // orionldDeleteEntity -
 //
-bool orionldDeleteEntity(ConnectionInfo* ciP)
+bool orionldDeleteEntity(void)
 {
   char* entityId = orionldState.wildcard[0];
   char* detail;
 
   // Make sure the Entity ID is a valid URI
-  if (pcheckUri(entityId, &detail) == false)
+  if (pcheckUri(entityId, true, &detail) == false)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include value (entityId) and name ("entityId")
     orionldState.httpStatusCode = SccBadRequest;
@@ -57,8 +55,8 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
 
   if (dbEntityLookup(entityId) == NULL)
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "The requested entity has not been found. Check its id", entityId);
-    orionldState.httpStatusCode = SccNotFound;  // 404
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity not found", entityId);
+    orionldState.httpStatusCode = 404;  // Not Found
     return false;
   }
 

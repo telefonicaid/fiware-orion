@@ -25,8 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode

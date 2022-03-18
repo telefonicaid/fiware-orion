@@ -161,7 +161,7 @@ Output cut as we can't possibly know how many updates are done during the three 
 
 04. Get number of notifications from accumulator - see 6 notifications
 ======================================================================
-6
+REGEX((5|6))
 
 
 --TEARDOWN--

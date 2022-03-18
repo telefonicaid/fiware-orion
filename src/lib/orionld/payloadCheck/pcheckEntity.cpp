@@ -45,8 +45,6 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/payloadCheck/pcheckEntity.h"                   // Own interface
@@ -130,13 +128,14 @@ bool pcheckEntity
       {
         DUPLICATE_CHECK(batchIdP, "id", kNodeP);
         STRING_CHECK(batchIdP, "id");
-        URI_CHECK(batchIdP, "id");
+        URI_CHECK(batchIdP->value.s, "id", true);
         orionldState.payloadIdNode = kNodeP;  // FIXME: Is this necessary?
       }
       else if (strcmp(kNodeP->name, "type") == 0 || strcmp(kNodeP->name, "@type") == 0)
       {
         DUPLICATE_CHECK(batchTypeP, "type", kNodeP);
         STRING_CHECK(batchTypeP, "type");
+        URI_CHECK(batchTypeP->value.s, "type", false);
         orionldState.payloadTypeNode = kNodeP;  // FIXME: Is this necessary?
       }
     }
@@ -187,11 +186,11 @@ bool pcheckEntity
   //
   // Prepare output
   //
-  *locationNodePP         = locationNodeP;
-  *observationSpaceNodePP = observationSpaceNodeP;
-  *operationSpaceNodePP   = operationSpaceNodeP;
-  *createdAtPP            = createdAtP;
-  *modifiedAtPP           = modifiedAtP;
+  if (locationNodePP         != NULL)  *locationNodePP         = locationNodeP;
+  if (observationSpaceNodePP != NULL)  *observationSpaceNodePP = observationSpaceNodeP;
+  if (operationSpaceNodePP   != NULL)  *operationSpaceNodePP   = operationSpaceNodeP;
+  if (createdAtPP            != NULL)  *createdAtPP            = createdAtP;
+  if (modifiedAtPP           != NULL)  *modifiedAtPP           = modifiedAtP;
 
   return true;
 }

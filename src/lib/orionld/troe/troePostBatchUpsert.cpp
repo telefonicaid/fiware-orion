@@ -22,28 +22,46 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
-#include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
+
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
+#include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostBatchUpsert.h"                  // Own interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// entityIdLookup - find an entity id in an array of objects containing "id" as one member
+//
+static KjNode* entityIdLookup(KjNode* tree, const char* entityId)
+{
+  for (KjNode* itemP = tree->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    KjNode* idP = kjLookup(itemP, "id");
+
+    if ((idP != NULL) && (strcmp(idP->value.s, entityId) == 0))
+      return idP;
+  }
+
+  return NULL;
+}
 
 
 
@@ -51,66 +69,72 @@ extern "C"
 //
 // troePostBatchUpsert -
 //
-bool troePostBatchUpsert(ConnectionInfo* ciP)
+bool troePostBatchUpsert(void)
 {
-  PGconn* connectionP;
+  PgAppendBuffer  entities;
+  PgAppendBuffer  attributes;
+  PgAppendBuffer  subAttributes;
+  char*           troeEntityMode     = (char*) "Replace";
 
-  connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+  pgAppendInit(&entities, 4*1024);       // 4k - will be reallocated if necessary
+  pgAppendInit(&attributes, 8*1024);     // 8k - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 8*1024);  // ditto
 
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
-
-  bool     ok       = true;
-  TroeMode troeMode = (orionldState.uriParamOptions.update == true)? TROE_ATTRIBUTE_REPLACE : TROE_ENTITY_REPLACE;
+  pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
   if (orionldState.duplicateArray != NULL)
   {
-    troeEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do this
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
-      {
-        LM_E(("Database Error (pgEntityTreat failed)"));
-        ok = false;
-        break;
-      }
+      pgEntityBuild(&entities, "Replace", entityP, NULL, NULL, &attributes, &subAttributes);
     }
   }
 
-  if (ok == true)
+  for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do that
-    troeEntityArrayExpand(orionldState.requestTree);
+    if (troeIgnored(entityP) == true)
+      continue;
 
-    for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    KjNode* entityIdP    = kjLookup(entityP, "id");
+    bool    entityUpdate = false;  // Updated of entities aren't recorded in the "entities" table
+
+    if (entityIdP != NULL)  // Can't be NULL, really ...
     {
-      if (troeIgnored(entityP) == true)
-        continue;
-
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
+      if (orionldState.batchEntities != NULL)
       {
-        LM_E(("Database Error (pgEntityTreat failed)"));
-        ok = false;
-        break;
+        // If the entity already existed, the entity op mode must be "REPLACE"
+        if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
+          troeEntityMode = (char*) "Create";
+        else
+        {
+          if (orionldState.uriParamOptions.update == true)
+            entityUpdate = true;
+          else
+            troeEntityMode = (char*) "Replace";
+        }
       }
+      else
+        troeEntityMode = (char*) "Create";
     }
+
+    if (entityUpdate == true)
+      pgAttributesBuild(&attributes, entityP, NULL, "Replace", &subAttributes);
+    else
+      pgEntityBuild(&entities, troeEntityMode, entityP, NULL, NULL, &attributes, &subAttributes);
   }
 
-  if (ok == false)
-  {
-    LM_E(("Database Error (batch create TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
-  }
 
-  pgConnectionRelease(connectionP);
+  char* sqlV[3];
+  int   sqlIx = 0;
+
+  if (entities.values      > 0) sqlV[sqlIx++] = entities.buf;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
+
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

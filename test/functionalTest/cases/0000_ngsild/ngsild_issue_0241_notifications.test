@@ -251,10 +251,14 @@ MongoDB server version: REGEX(.*)
 					"value" : 1543924800
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/providedBy" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:Person:Bob"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/subProp" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "prop-subProp"
 				}
@@ -272,10 +276,14 @@ MongoDB server version: REGEX(.*)
 			"value" : "prop with sub-prop",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/providedBy" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:Person:Bob2"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/subProp" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "prop-subProp"
 				}

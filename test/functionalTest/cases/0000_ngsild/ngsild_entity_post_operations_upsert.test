@@ -230,9 +230,17 @@ echo
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities
 ========================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 113
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:Vehicle:00001",
+    "urn:ngsi-ld:Vehicle:00002",
+    "urn:ngsi-ld:Vehicle:00003",
+    "urn:ngsi-ld:Vehicle:00004"
+]
 
 
 02. See the entity urn:ngsi-ld:Vehicle:00001 in mongo
@@ -268,6 +276,8 @@ MongoDB server version: REGEX(.*)
 					"value" : 1501329604
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/providedBy" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:Person:Bob"
 				}

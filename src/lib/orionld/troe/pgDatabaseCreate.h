@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
+#include "orionld/troe/PgConnection.h"                         // PgConnection
 
 
 
@@ -33,6 +33,6 @@
 //
 // pgDatabaseCreate - create a postgres database
 //
-extern bool pgDatabaseCreate(PGconn* connection, const char* dbName);
+extern PgConnection* pgDatabaseCreate(PgConnection* nullConnectionP, const char* dbName);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGDATABASECREATE_H_

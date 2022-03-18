@@ -1,0 +1,263 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a registration with inline key-value context 
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration with an inline context that is a key-value object
+# 02. GET the registration
+# 03. See the registration in mongo
+#
+
+echo "01. Create a registration with an inline context that is a key-value object"
+echo "==========================================================================="
+payload='{
+  "@context": {
+    "myT": "http://example.org/T1",
+    "myP1": "http://example.org/P1",
+    "myP2": "http://example.org/P2",
+    "myRel1": "http://example.org/Rel1",
+    "myRel2": "http://example.org/Rel2"
+  },
+  "id": "urn:ngsi-ld:registrations:R1",
+  "type": "ContextSourceRegistration",
+  "name": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00.123Z",
+    "end": "2028-12-31T10:00:00.456"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00.798",
+    "end": "2027-12-31T10:00:00.120"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [ 100.0, 0.0 ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 100.0, 0.0 ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 100.0, 0.0 ]
+  },
+  "expires": "2028-12-31T10:00:01.234Z",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the registration"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
+echo
+echo
+
+
+echo "03. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with an inline context that is a key-value object
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
+Date: REGEX(.*)
+
+
+
+02. GET the registration
+========================
+HTTP/1.1 200 OK
+Content-Length: 698
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": 1,
+    "description": "description of reg 1",
+    "endpoint": "http://my.csource.org:1026",
+    "expires": "2028-12-31T10:00:01.234Z",
+    "id": "urn:ngsi-ld:registrations:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:A456",
+                    "type": "Vehicle"
+                }
+            ],
+            "properties": [
+                "brandName",
+                "speed"
+            ],
+            "relationships": [
+                "isParked"
+            ]
+        }
+    ],
+    "location": {
+        "coordinates": [
+            100,
+            0
+        ],
+        "type": "Point"
+    },
+    "managementInterval": {
+        "end": "2027-12-31T10:00:00.120Z",
+        "start": "2017-12-31T10:00:00.798Z"
+    },
+    "name": "R1",
+    "observationInterval": {
+        "end": "2028-12-31T10:00:00.456Z",
+        "start": "2018-12-31T10:00:00.123Z"
+    },
+    "observationSpace": {
+        "coordinates": [
+            100,
+            0
+        ],
+        "type": "Point"
+    },
+    "operationSpace": {
+        "coordinates": [
+            100,
+            0
+        ],
+        "type": "Point"
+    },
+    "type": "ContextSourceRegistration"
+}
+
+
+03. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:registrations:R1",
+	"description" : "description of reg 1",
+	"name" : "R1",
+	"expiration" : 1861869601.234,
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"observationInterval" : {
+		"start" : 1546250400.123,
+		"end" : 1861869600.456
+	},
+	"managementInterval" : {
+		"start" : 1514714400.7979999,
+		"end" : 1830247200.12
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			100,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			100,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			100,
+			0
+		]
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1
+	}
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

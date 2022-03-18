@@ -43,10 +43,8 @@ std::string Restriction::check(int counter)
 {
   std::string res;
 
-  LM_T(LmtRestriction, ("In Restriction::check"));
   if (counter == 0)  // Restriction is always optional
   {
-    LM_T(LmtRestriction, ("Restriction::check returns OK (counter == 0)"));
     return "OK";
   }
 
@@ -59,13 +57,11 @@ std::string Restriction::check(int counter)
   if (((res = scopeVector.check())         != "OK") ||
       ((res = attributeExpression.check()) != "OK"))
   {
-    LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
     alarmMgr.badInput(clientIp, res);
 
     return res;
   }
 
-  LM_T(LmtRestriction, ("Restriction::check returns OK (2)"));
   return "OK";
 }
 

@@ -3,16 +3,48 @@ name: Deploy
 on:
   push:
     branches:
-      - develop
 
 env:
-  IMAGE_NAME: fiware/orion-ld
+  IMAGE_ORG: fiware
+  IMAGE_NAME: orion-ld
   IMAGE_TAG_LATEST:  latest
   IMAGE_TAG_DEBUG: debug
-  IMAGE_TAG_PRE: 0.6-PRE-${{ github.run_number }}
+  IMAGE_TAG_PRE: 1.0.0-PRE-${{ github.run_number }}
 
 jobs:
-  deploy-release:
+
+  # push to redhat's certification scan registry
+  deploy-to-redhat-scan:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to podman
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: scan.connect.redhat.com
+          username: unused
+          password: ${{ secrets.CERTIFICATION_PUSH_SECRET }}
+
+      - name: Build image
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}
+          containerfiles: |
+            ./docker/Dockerfile-ubi
+
+      - name: Push To certification registry
+        id: push-to-cert
+        run: |
+          podman tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }} scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+
+  # push to dockerhub
+  deploy-release-dockerhub:
 
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
@@ -38,14 +70,42 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
-            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
-          file: docker/Dockerfile
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          file: docker/Dockerfile-ubi
+          no-cache: true
 
-  deploy-debug:
+      - name: Build and push with gdb
+        id: docker_build_gdb
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-GDB
+          build-args: |
+            BASE_VERSION=${{ env.IMAGE_TAG_PRE }}
+          file: docker/Dockerfile-gdb
+          no-cache: true
+
+
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
+          args: --file=docker/Dockerfile-ubi
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
+
+  deploy-debug-dockerhub:
 
     runs-on: ubuntu-18.04
-    if: ${{ github.event_name == 'push' && GITHUB_REPOSITORY == 'FIWARE/context.Orion-LD' }}
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
@@ -67,7 +127,89 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          tags: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+          file: docker/Dockerfile-debug
+          no-cache: true
+
+  # quay.io
+
+  deploy-release-quay:
+
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
+          oci: true
+          tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
+          dockerfiles: |
+            ./docker/Dockerfile-ubi
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Build with gdb
+        id: build-image-gdb
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}-GDB
+          oci: true
+          dockerfiles: |
+            ./docker/Dockerfile-gdb
           build-args: |
-            DEBUG=true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_DEBUG }}
-          file: docker/Dockerfile
+            BASE_VERSION=${{ env.IMAGE_TAG_PRE }}
+
+      - name: Push To quay.io
+        id: push-gdb-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image-gdb.outputs.image }}
+          tags: ${{ steps.build-image-gdb.outputs.tags }}
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+
+  deploy-debug-quay:
+
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+          oci: true
+          dockerfiles: |
+            ./docker/Dockerfile-debug
+
+      - name: Push To quay.io
+        id: push-debug-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+

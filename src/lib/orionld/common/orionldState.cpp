@@ -23,21 +23,25 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strlen
+#include <semaphore.h>                                           // sem_t
 
 extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kMacros.h"                                       // K_VEC_SIZE
+#include "kalloc/kaBufferInit.h"                                 // kaBufferInit
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjFree.h"                                        // kjFree
-#include "kalloc/kaBufferInit.h"                                 // kaBufferInit
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
-#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL_V*
+#include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // Own interface
@@ -51,9 +55,6 @@ extern "C"
 const char* orionldVersion = ORIONLD_VERSION;
 
 
-#ifdef REQUEST_PERFORMANCE
-const bool performanceTestInluded = true;
-#endif
 
 // -----------------------------------------------------------------------------
 //
@@ -61,8 +62,14 @@ const bool performanceTestInluded = true;
 //
 __thread OrionldConnectionState orionldState;
 
+
+
+// -----------------------------------------------------------------------------
+//
+// timestamps -
+//
 #ifdef REQUEST_PERFORMANCE
-__thread Timestamps timestamps;
+__thread Timestamps performanceTimestamps;
 #endif
 
 
@@ -87,22 +94,25 @@ Kjson             kjson;
 Kjson*            kjsonP;
 uint16_t          portNo                   = 0;
 int               dbNameLen;
+char*             coreContextUrl           = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
 char              orionldHostName[128];
 int               orionldHostNameLen       = -1;
-char*             tenantV[100];
-unsigned int      tenants                  = 0;
 OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
 bool              orionldStartup           = true;
+char              pgPortString[16];
+char              mongoServerVersion[32];
 
 
 //
 // Variables for Mongo C Driver
 //
-#ifdef DB_DRIVER_MONGOC
-mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;
-mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;
-#endif
+mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;    // Deprecated
+mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;    // Deprecated
+
+mongoc_uri_t*          mongocUri;
+mongoc_client_pool_t*  mongocPool;
+sem_t                  mongocContextsSem;
 
 
 
@@ -110,7 +120,7 @@ mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;
 //
 // orionldStateInit - initialize the thread-local variable orionldState
 //
-void orionldStateInit(void)
+void orionldStateInit(MHD_Connection* connection)
 {
   //
   // NOTE
@@ -122,14 +132,13 @@ void orionldStateInit(void)
   //
   // Creating kjson environment for KJson parse and render
   //
-  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 16 * 1024, NULL, "Thread KAlloc buffer");
+  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 64 * 1024, NULL, "Thread KAlloc buffer");
 
   kTimeGet(&orionldState.timestamp);
+  orionldState.mhdConnection           = connection;
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;
-  orionldState.tenant                  = (char*) "";  // FIXME: not NULL due to std::string ... ?
-  orionldState.servicePath             = (char*) "";
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);
   orionldState.contextP                = orionldCoreContextP;
@@ -143,8 +152,74 @@ void orionldStateInit(void)
   orionldState.uriParams.limit         = 20;
 
   // orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
+
+  // TRoE
+  orionldState.troeOpMode = TROE_ENTITY_CREATE;
+
+  // GeoProperty array
+  orionldState.geoAttrMax = K_VEC_SIZE(orionldState.geoAttr);
+  orionldState.geoAttrV   = orionldState.geoAttr;
+
+  //  Default values for HTTP headers
+  orionldState.attrsFormat = (char*) "normalized";
+  orionldState.correlator  = (char*) "";
+
+  //
+  // Outgoing HTTP headers
+  //
+  orionldState.out.contentType    = JSON;              // Default response Content-Type is "application/json"
+  orionldHeaderSetInit(&orionldState.out.headers, 5);  // 5 response headers, to start with
+
+
+  //
+  // Default response status code is 200 OK
+  //
+  orionldState.httpStatusCode = 200;
 }
 
+
+#if 0
+// -----------------------------------------------------------------------------
+//
+// orionldOutHeaderAdd -
+//
+void orionldOutHeaderAdd(char* key, char* sValue, int iValue)
+{
+  if (orionldState.out.httpHeaderIx >= orionldState.out.httpHeaderSize)
+  {
+    char** oldArray = orionldState.out.httpHeader;
+
+    orionldState.out.httpHeaderSize += 5;
+    orionldState.out.httpHeader      = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * orionldState.out.httpHeaderSize);
+    if (orionldState.out.httpHeader == NULL)
+      LM_X(1, ("Out of memory trying to allocate room for %d outgoing HTTP headers", orionldState.out.httpHeaderSize));
+
+    // Copying the already existing header pointers to the new buffer
+    memcpy(orionldState.out.httpHeader, oldArray, orionldState.out.httpHeaderSize - 5);
+  }
+
+  int size = strlen(key) + 2;  // 2: colon + end-of-string
+
+  if (sValue != NULL)
+    size += strlen(sValue);
+  else
+    size += 16;  // 16: plenty of room for an integer
+
+  char* header = kaAlloc(&orionldState.kalloc, size);
+
+  if (header == NULL)
+    LM_X(1, ("Out of memory trying to allocate %d bytes for an outgoing HTTP header", size));
+
+  orionldState.out.httpHeader[orionldState.out.httpHeaderIx] = header;
+
+  if (sValue != NULL)
+    snprintf(header, size - 1, "%s:%s", key, sValue);
+  else
+    snprintf(header, size - 1, "%s:%d", key, iValue);
+
+  ++orionldState.out.httpHeaderIx;
+}
+#endif
 
 
 // -----------------------------------------------------------------------------
@@ -196,6 +271,12 @@ void orionldStateRelease(void)
 
   if (orionldState.qMongoFilterP != NULL)
     delete orionldState.qMongoFilterP;
+
+  if (orionldState.compoundValueRoot != NULL)
+  {
+    delete orionldState.compoundValueRoot;
+    orionldState.compoundValueRoot = NULL;
+  }
 }
 
 

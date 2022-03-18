@@ -86,7 +86,7 @@ static QNode* qRegexpPush(QNode* prev, char* regexpValue)
 //
 // qTermPush -
 //
-static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
+static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, char** titleP, char** detailsP)
 {
   //
   // Trim the term
@@ -100,6 +100,11 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
     term[termLen - 1] = 0;
     --termLen;
   }
+
+  if ((strcmp(&term[termLen-9], "createdAt") == 0) || (strcmp(&term[termLen-10], "modifiedAt") == 0) || (strcmp(&term[termLen-10], "observedAt") == 0))
+    *lastTermIsTimestampP = true;
+  else
+    *lastTermIsTimestampP = false;
 
   if (*term != 0)
   {
@@ -219,11 +224,12 @@ static QNode* qOpPush(QNode* prev, QNodeType type)
 //
 QNode* qLex(char* s, char** titleP, char** detailsP)
 {
-  char*  sP          = s;
-  QNode  dummy;                   // this 'dummy is only used to not lose the pointer to the first QNode in the list
-  QNode* current     = &dummy;
-  char*  stringStart = s;
-  int    level       = 0;
+  QNode  dummy;              // this 'dummy is only used to not lose the pointer to the first QNode in the list
+  char*  sP                  = s;
+  QNode* current             = &dummy;
+  char*  stringStart         = s;
+  int    level               = 0;
+  bool   lastTermIsTimestamp = false;
 
   *titleP = NULL;
 
@@ -249,8 +255,9 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
-      current = qOpPush(current, type);
+      current  = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
+      current  = qOpPush(current, type);
+
       stringStart = sP;
     }
     else if ((*sP == '=') && (sP[1] == '='))
@@ -260,7 +267,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeEQ);
       stringStart = sP;
     }
@@ -269,7 +276,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeOr);
       stringStart = sP;
     }
@@ -278,7 +285,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeComma);
       stringStart = sP;
     }
@@ -289,7 +296,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeRange);
       stringStart = sP;
     }
@@ -300,7 +307,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeMatch);
       stringStart = sP;
     }
@@ -326,7 +333,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, type);
       stringStart = sP;
     }
@@ -335,7 +342,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeAnd);
       stringStart = sP;
     }
@@ -344,7 +351,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeOpen);
       current->value.level = level;
       ++level;
@@ -355,7 +362,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       current = qOpPush(current, QNodeClose);
       --level;
       current->value.level = level;
@@ -363,7 +370,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
     }
     else if (*sP == 0)
     {
-      current = qTermPush(current, stringStart, titleP, detailsP);
+      current = qTermPush(current, stringStart, &lastTermIsTimestamp, titleP, detailsP);
       break;
     }
     else if (*sP == '"')
@@ -373,7 +380,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
-      while ((*sP != 0) && (*sP != '"'))
+      while ((*sP != 0) && (*sP != '"'))  // Accept anything inside double quotes
         ++sP;
 
       if (*sP == 0)
@@ -390,7 +397,12 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       uint64_t  sLen = (uint64_t) (sP - start - 2);
 
       if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
-        current = qDateTimePush(current, dateTime);
+      {
+        if (lastTermIsTimestamp)
+          current = qDateTimePush(current, dateTime);
+        else
+          current = qStringPush(current, start);
+      }
       else
         current = qStringPush(current, start);
     }
@@ -446,6 +458,11 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       // - Variable: a-zA-Z0-9_.
       // - DateTime: Z0-9_:.
       //
+
+      //
+      // Pretty much ALL characters should be accepted ...
+      //
+#if 0
       if ((*sP >= '0') && (*sP <= '9'))
       {}
       else if ((*sP >= 'a') && (*sP <= 'z'))
@@ -470,6 +487,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         sP[1] = 0;
         return NULL;
       }
+#endif
       ++sP;
     }
   }

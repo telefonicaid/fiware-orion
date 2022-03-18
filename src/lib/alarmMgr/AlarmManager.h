@@ -53,6 +53,7 @@ class AlarmManager
   bool                        badInputLogAlways;
   bool                        dbErrorLogAlways;
   sem_t                       sem;
+  int                         stage;
 
  public:
   AlarmManager();

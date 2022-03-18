@@ -1,4 +1,4 @@
-Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2019 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -127,20 +127,16 @@ echo
 --REGEXPECT--
 01. Create three entities
 =========================
-HTTP/1.1 200 OK
-Content-Length: 133
+HTTP/1.1 201 Created
+Content-Length: 109
 Content-Type: application/json
-Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:TemperatureSensor:002",
-        "urn:ngsi-ld:TemperatureSensor:003",
-        "urn:ngsi-ld:TemperatureSensor:004"
-    ]
-}
+[
+    "urn:ngsi-ld:TemperatureSensor:002",
+    "urn:ngsi-ld:TemperatureSensor:003",
+    "urn:ngsi-ld:TemperatureSensor:004"
+]
 
 
 02. Update two of them using batch update

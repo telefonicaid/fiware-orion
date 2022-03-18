@@ -105,6 +105,8 @@ MongoDB server version: REGEX(.*)
 			"value" : 12,
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/M" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : {
 						"a" : 1,

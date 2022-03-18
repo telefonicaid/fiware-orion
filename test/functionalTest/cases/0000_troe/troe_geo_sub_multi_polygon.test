@@ -80,7 +80,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoMultiPolygon,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM subAttributes"
 echo
 echo
 
@@ -94,21 +94,21 @@ echo
 
 echo "06. GET the attribute from TRoE"
 echo "==============================="
-postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,geoMultiPolygon,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM attributes"
 echo
 echo
 
 
 echo "07. GET the sub-attribute from TRoE using postgis"
 echo "================================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4267;POINT(2 2)'::geography, 10000000)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(2 2)'::geography, 10000000)"
 echo
 echo
 
 
 echo "08. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT valueType,entityId,id,unitcode,geoMultiPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4267;POINT(11 12)'::geography, 10)"
+postgresCmd -sql "SELECT valueType,entityId,id,unitcode,ST_AsText(geoMultiPolygon),observedAt FROM subAttributes WHERE ST_DWithin(geoMultiPolygon, 'SRID=4326;POINT(11 12)'::geography, 10)"
 echo
 echo
 
@@ -137,8 +137,8 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Relationship,urn:ngsi-ld:
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attrinstanceid,unitcode,geomultipolygon,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mpol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,0106000020AB10000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
+id,valuetype,entityid,unitcode,st_astext,observedat
+https://uri.etsi.org/ngsi-ld/default-context/mpol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
 
 
 05. GET the entity
@@ -217,19 +217,19 @@ Date: REGEX(.*)
 
 06. GET the attribute from TRoE
 ===============================
-opmode,valuetype,entityid,id,unitcode,geomultipolygon,observedat
+opmode,valuetype,entityid,id,unitcode,st_astext,observedat
 Create,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,,
 
 
 07. GET the sub-attribute from TRoE using postgis
 =================================================
-valuetype,entityid,id,unitcode,geomultipolygon,observedat
-GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/mpol,,0106000020AB10000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
+valuetype,entityid,id,unitcode,st_astext,observedat
+GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/mpol,,"MULTIPOLYGON Z (((0 0 0,4 0 0,4 -2 0,0 -2 0,0 0 0),(10 0 0,14 0 0,14 -2 0,10 -2 0,10 0 0)))",
 
 
 08. GET nothing from TRoE using postgis
 =======================================
-valuetype,entityid,id,unitcode,geomultipolygon,observedat
+valuetype,entityid,id,unitcode,st_astext,observedat
 
 
 --TEARDOWN--

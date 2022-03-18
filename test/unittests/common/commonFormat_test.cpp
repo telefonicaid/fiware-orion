@@ -72,6 +72,7 @@ TEST(commonMimeType, stringTomimeType)
 
 
 
+extern MimeType contentTypeParse(const char* contentType, char** charsetP);
 /* ****************************************************************************
 *
 * mimeTypeParse -
@@ -80,20 +81,20 @@ TEST(commonMimeType, mimeTypeParse)
 {
    MimeType mimeType;
 
-   mimeType = mimeTypeParse("*/*", NULL);
+   mimeType = contentTypeParse("*/*", NULL);
    EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (*/*)";
 
-   mimeType = mimeTypeParse("text/json", NULL);
+   mimeType = contentTypeParse("text/json", NULL);
    EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (text/json)";
 
-   mimeType = mimeTypeParse("application/json", NULL);
+   mimeType = contentTypeParse("application/json", NULL);
    EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
 
-   mimeType = mimeTypeParse("XXX", NULL);
+   mimeType = contentTypeParse("XXX", NULL);
    EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (XXX - unknown )";
 
-   std::string charset;
-   mimeType = mimeTypeParse("application/json; charset=CHSET", &charset);
+   char* charset;
+   mimeType = contentTypeParse("application/json; charset=CHSET", &charset);
    EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
-   EXPECT_EQ("CHSET", charset);
+   EXPECT_STREQ("CHSET", charset);
 }

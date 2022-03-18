@@ -158,7 +158,11 @@ static bool getGeoJson
 
     // Autocast doesn't make sense in this context
     caP->valueBson(bo, "", false);
-    geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
+
+    mongo::BSONObj boObj = bo.obj();
+    mongo::BSONObj attrs;
+    getObjectFieldF(&attrs, &boObj, ENT_ATTRS_VALUE);
+    geoJson->appendElements(attrs);
 
     return true;
   }

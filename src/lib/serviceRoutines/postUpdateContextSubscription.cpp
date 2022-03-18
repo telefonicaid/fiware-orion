@@ -28,6 +28,8 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
@@ -54,12 +56,12 @@ std::string postUpdateContextSubscription
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                                   &ucsr,
-                                                                   ciP->tenant,
-                                                                   ciP->httpHeaders.xauthToken,
-                                                                   ciP->servicePathV,
-                                                                   ciP->httpHeaders.correlator));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
+                                                                           &ucsr,
+                                                                           orionldState.tenantP,
+                                                                           orionldState.xAuthToken,
+                                                                           ciP->servicePathV,
+                                                                           orionldState.correlator));
 
   TIMED_RENDER(answer = ucsr.render());
 

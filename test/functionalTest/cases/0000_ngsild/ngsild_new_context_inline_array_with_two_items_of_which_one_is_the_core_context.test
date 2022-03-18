@@ -26,6 +26,7 @@ Alternative Context implementation - inline context that is an array with two it
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 0-255
 
 --SHELL--
@@ -58,7 +59,7 @@ echo
 
 echo "02. Ask for the entire list of contexts in the context cache"
 echo "============================================================"
-orionCurl --url "/ngsi-ld/ex/v1/contexts?prettyPrint=yes&spaces=2" --noPayloadCheck --linkHeaderFix
+orionCurl --url "/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&spaces=2&details=true" --noPayloadCheck --linkHeaderFix
 echo
 echo
 
@@ -78,14 +79,15 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
     "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
     "hash-table": {
       "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -96,8 +98,12 @@ Date: REGEX(.*)
   },
   {
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-    "id": "None",
+    "id": "REGEX(.*)",
     "type": "hash-table",
+    "origin": "Downloaded",
+    "createdAt": "REGEX(.*)",
+    "lastUse": "REGEX(.*)",
+    "lookups": 0,
     "hash-table": {
       "T": "http://example.org/T",
       "P1": "http://example.org/P1",
@@ -105,14 +111,6 @@ Date: REGEX(.*)
       "R1": "http://example.org/R1",
       "P3": "http://example.org/P3"
     }
-  },
-  {
-    "url": "REGEX(.*)",
-    "id": "REGEX(.*)",
-    "type": "array",
-    "URLs": [
-      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
-    ]
   }
 ]
 

@@ -42,7 +42,7 @@ sudo apt -y install python3-virtualenv
 Now we can create our virtual python environment executing:
 
 ```bash
-virtualenv -ppython3 .venv
+virtualenv -p python3 .venv
 ```
 
 This operation will create the .venv environment that we use to execute our scripts. Active the environment with the 
@@ -50,12 +50,11 @@ following command:
 
 ```bash
 . .venv/bin/activate
-```
 
 Finally, install the corresponding requirements files executing:
 
 ```bash
-pip install -r requirements.txt
+pip install -r scripts/requirements.txt
 ```
 
 That should be all for the accumulator python script.
@@ -85,12 +84,13 @@ Test it by launching:
 test/functionalTest/testHarness.sh
 ```
 
-There are over 1250 test cases (each with a number of steps), so, it will take a while.
-Orion-LD has inherited the functional test suite from `orion` and added some 250 test cases only for NGSI-LD.
-If you want to run only the NGSi-LD test cases, run the suite with the `-ld` option:
+There are over 1500 test cases (each with a number of steps), so, it will take a while.
+Orion-LD has inherited the functional test suite from `orion` and added some 450 test cases only for NGSI-LD.
+If you want to run only the NGSi-LD test cases, run the suite with the `-ld`, or/and the `-troe` option:
 
 ```bash
 test/functionalTest/testHarness.sh -ld
+test/functionalTest/testHarness.sh -troe
 ```
 
 There are lots of command line options for the test suite; use the `-u` option to see all of them.

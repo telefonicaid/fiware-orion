@@ -50,19 +50,19 @@ extern "C"
 *
 * mongoSetLdPropertyV -
 */
-void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj* rP)
 {
-  std::vector<mongo::BSONElement> dbPropertyV = getFieldF(r, REG_ATTRS).Array();
+  std::vector<mongo::BSONElement> dbPropertyV = getFieldF(rP, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbPropertyV.size(); ++ix)
   {
     mongo::BSONObj  pobj = dbPropertyV[ix].embeddedObject();
-    std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
+    std::string     type = getStringFieldF(&pobj, REG_ATTRS_TYPE);
     std::string     propName;
 
     if (type == REG_PROPERTIES_TYPE)
     {
-      propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
+      propName = getStringFieldF(&pobj, REG_PROPERTIES_NAME);
 
       if (propName != "")
       {
@@ -79,23 +79,23 @@ void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 *
 * mongoSetLdRelationshipV -
 */
-void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj* rP)
 {
-  std::vector<mongo::BSONElement> dbRelationshipV = getFieldF(r, REG_ATTRS).Array();
+  std::vector<mongo::BSONElement> dbRelationshipV = getFieldF(rP, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbRelationshipV.size(); ++ix)
   {
     mongo::BSONObj  robj = dbRelationshipV[ix].embeddedObject();
-    std::string     type = getStringFieldF(robj, REG_ATTRS_TYPE);
+    std::string     type = getStringFieldF(&robj, REG_ATTRS_TYPE);
     std::string     relName;
 
     if (type == REG_RELATIONSHIPS_TYPE)
     {
-      relName = getStringFieldF(robj, REG_RELATIONSHIPS_NAME);
+      const char* relName = getStringFieldF(&robj, REG_RELATIONSHIPS_NAME);
 
-      if (relName != "")
+      if (relName[0] != 0)
       {
-        char* alias = orionldContextItemAliasLookup(orionldState.contextP, relName.c_str(), NULL, NULL);
+        char* alias = orionldContextItemAliasLookup(orionldState.contextP, relName, NULL, NULL);
         reg->dataProvided.relationshipV.push_back(alias);
       }
     }
@@ -108,9 +108,9 @@ void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 *
 * mongoSetLdRegistrationId -
 */
-void mongoSetLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdRegistrationId(ngsiv2::Registration* reg, mongo::BSONObj* bobjP)
 {
-  reg->id = getStringFieldF(r, "_id");
+  reg->id = getStringFieldF(bobjP, "_id");
 }
 
 
@@ -119,9 +119,9 @@ void mongoSetLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r
 *
 * mongoSetLdName -
 */
-void mongoSetLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+void mongoSetLdName(ngsiv2::Registration* reg, mongo::BSONObj* bobjP)
 {
-  reg->name = r.hasField(REG_NAME) ? getStringFieldF(r, REG_NAME) : "";
+  reg->name = bobjP->hasField(REG_NAME) ? getStringFieldF(bobjP, REG_NAME) : "";
 }
 
 
@@ -132,7 +132,7 @@ void mongoSetLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 */
 void mongoSetExpiration(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(&r, REG_EXPIRATION) : -1;
 }
 
 
@@ -145,10 +145,11 @@ void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONO
 {
   if (r.hasField(REG_OBSERVATION_INTERVAL))
   {
-    mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
+    mongo::BSONObj obj;
+    getObjectFieldF(&obj, &r, REG_OBSERVATION_INTERVAL);
 
-    reg->observationInterval.start  = getNumberFieldAsDoubleF(obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(obj, REG_INTERVAL_END) : -1;
+    reg->observationInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
+    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
   }
   else
   {
@@ -167,10 +168,11 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
 {
   if (r.hasField(REG_MANAGEMENT_INTERVAL))
   {
-    mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
+    mongo::BSONObj obj;
+    getObjectFieldF(&obj, &r, REG_MANAGEMENT_INTERVAL);
 
-    reg->managementInterval.start  = getNumberFieldAsDoubleF(obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(obj, REG_INTERVAL_END) : -1;
+    reg->managementInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
+    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
   }
   else
   {
@@ -188,7 +190,7 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
 void mongoSetLdTimestamp(double* timestampP, const char* name, const mongo::BSONObj& bobj)
 {
   if (bobj.hasField(name))
-    *timestampP = getNumberFieldAsDoubleF(bobj, name);
+    *timestampP = getNumberFieldAsDoubleF(&bobj, name);
   else
     *timestampP = -1;
 }
@@ -206,7 +208,8 @@ bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, 
 {
   if (bobj.hasField(name))
   {
-    mongo::BSONObj   locBobj   = getObjectFieldF(bobj, name);
+    mongo::BSONObj   locBobj;
+    getObjectFieldF(&locBobj, &bobj, name);
     KjNode*          tree      = mongoCppLegacyDataToKjTree(&locBobj, false, titleP, detailP);
 
     for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
@@ -237,7 +240,8 @@ bool mongoSetLdProperties(ngsiv2::Registration* regP, const char* name, const mo
 {
   if (bobj.hasField(name))
   {
-    mongo::BSONObj  propertiesObj = getObjectFieldF(bobj, name);
+    mongo::BSONObj  propertiesObj;
+    getObjectFieldF(&propertiesObj, &bobj, name);
 
     regP->properties = mongoCppLegacyDataToKjTree(&propertiesObj, false, titleP, detailP);
 

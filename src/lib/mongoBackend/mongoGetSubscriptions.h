@@ -31,6 +31,7 @@
 
 #include "rest/OrionError.h"
 #include "apiTypesV2/Subscription.h"
+#include "orionld/types/OrionldTenant.h"
 
 
 
@@ -42,8 +43,7 @@ extern void mongoListSubscriptions
 (
   std::vector<ngsiv2::Subscription>*   vec,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::string&                   servicePath,
   int                                  limit,
   int                                  offset,
@@ -61,8 +61,7 @@ extern void mongoGetSubscription
   ngsiv2::Subscription*                sub,
   OrionError*                          oe,
   const std::string&                   idSub,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant
+  OrionldTenant*                       tenantP
 );
 
 
@@ -76,7 +75,7 @@ extern bool mongoGetLdSubscription
 (
   ngsiv2::Subscription*  subP,
   const char*            subId,
-  const char*            tenant,
+  OrionldTenant*         tenantP,
   int*                   statusCodeP,
   char**                 detailsP
 );
@@ -89,9 +88,9 @@ extern bool mongoGetLdSubscription
 */
 extern bool mongoGetLdSubscriptions
 (
-  ConnectionInfo*                     ciP,
+  const char*                         servicePath,
   std::vector<ngsiv2::Subscription>*  subVecP,
-  const char*                         tenant,
+  OrionldTenant*                      tenantP,
   long long*                          countP,
   OrionError*                         oeP
 );

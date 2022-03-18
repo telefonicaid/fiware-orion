@@ -45,16 +45,13 @@ extern "C"
 //
 // orionldContextDownload -
 //
-char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProblemDetails* pdP)
+char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP)
 {
-  bool reqOk = false;
-
-  *downloadFailedP = true;
-
-  char                 protocol[16];
-  char                 ip[256];
-  uint16_t             port    = 0;
-  char*                urlPath = NULL;
+  char        protocol[16];
+  char        ip[256];
+  uint16_t    port    = 0;
+  char*       urlPath = NULL;
+  bool        reqOk   = false;
 
   if ((url == NULL || *url == 0))
   {
@@ -76,8 +73,9 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     return NULL;
   }
 
-  *downloadFailedP = false;
-
+  //
+  // Downloading the context
+  //
   for (int tries = 0; tries < contextDownloadAttempts; tries++)
   {
     orionldState.httpResponse.buf       = NULL;  // orionldRequestSend allocates
@@ -89,8 +87,10 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     // detailsPP is filled in by orionldRequestSend()
     // orionldState.httpResponse.buf freed by orionldRequestSend() in case of error
     //
-    bool              tryAgain = false;
+    bool              tryAgain       = false;
+    bool              downloadFailed = false;
     OrionldHttpHeader headerV[1];
+
     headerV[0].type = HttpHeaderNone;
 
     reqOk = orionldRequestSend(&orionldState.httpResponse,
@@ -103,7 +103,7 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
                                NULL,
                                &pdP->detail,
                                &tryAgain,
-                               downloadFailedP,
+                               &downloadFailed,
                                "Accept: application/ld+json",
                                NULL,
                                NULL,
@@ -118,7 +118,7 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
       break;
   }
 
-  if (reqOk == false)
+  if (reqOk == false)  // && (downloadFailed == true)? - could get better error handling with 'downloadFailed'
   {
     pdP->type   = OrionldLdContextNotAvailable;
     pdP->title  = (char*) "Unable to download context";

@@ -83,6 +83,9 @@ function dbInit()
   if [ "$role" == "CB" ]
   then
     baseDbName=${CB_DB_NAME}
+  elif [ "$role" == "CB2" ]
+  then
+    baseDbName=${CB_DB_NAME}
   elif [ "$role" == "CP1" ]
   then
     baseDbName=${CP1_DB_NAME}
@@ -122,7 +125,22 @@ function dbInit()
 #
 function dbDrop()
 {
-  if [ "$CB_DB_DROP" != "No" ]
+  if [ "$1" == "orionld" ]
+  then
+    host="${CB_DATABASE_HOST}"
+    if [ "$host" == "" ]
+    then
+      host="localhost"
+    fi
+
+    port="${CB_DATABASE_PORT}"
+    if [ "$port" == "" ]
+    then
+      port="27017"
+    fi
+
+    echo 'db.dropDatabase()' | mongo mongodb://$host:$port/orionld --quiet
+  elif [ "$CB_DB_DROP" != "No" ]
   then
     # FIXME: Not sure if $@ should be better...
     dbInit $*
@@ -177,10 +195,11 @@ function dbResetAll()
   then
     port="27017"
   fi
-  
+
   all=$(echo show dbs | mongo mongodb://$host:$port --quiet | grep ftest | awk '{ print $1 }')
   for db in $all
   do
+    echo Dropping mongo database $db
     dbDrop $db
   done
 }
@@ -353,6 +372,11 @@ function localBrokerStart()
   then
     port=$CB_PORT
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+  elif [ "$role" == "CB2" ]
+  then
+    mkdir -p $CB2_LOG_DIR
+    port=$CB2_PORT
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CB2_PORT  -pidpath $CB2_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CB2_LOG_DIR $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
@@ -412,7 +436,8 @@ function localBrokerStart()
     # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
     #
     # Use the CLI --gen-suppressions=all for valgrind to get suppressions (to put in suppressions.supp)
-    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=../valgrind/suppressions.supp $CB_START_CMD > /tmp/valgrind.out 2>&1 &
+    #   valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=$REPO_HOME/test/valgrind/suppressions.supp --gen-suppressions=all $CB_START_CMD > /tmp/valgrind.out 2>&1 &
+    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=$REPO_HOME/test/valgrind/suppressions.supp $CB_START_CMD > /tmp/valgrind.out 2>&1 &
   fi
 
   # Waiting for broker/valgrind to start
@@ -465,6 +490,9 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
+  elif [ "$role" == "CB2" ]
+  then
+    port=$CB2_PORT
   elif [ "$role" == "CP1" ]
   then
     port=$CP1_PORT
@@ -621,6 +649,10 @@ function brokerStop
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
+  elif [ "$role" == "CB2" ]
+  then
+    pidFile=$CB2_PID_FILE
+    port=$CB2_PORT
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE
@@ -643,19 +675,24 @@ function brokerStop
     port=$CP5_PORT
   fi
 
+  logMsg "killing broker by sending /exit/harakiri request"
   if [ "$VALGRIND" == "" ]
   then
-    logMsg "killing with PID from pidFile"
-    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
-    logMsg "should be dead"
-    rm -f /tmp/orion_${port}.pid 2> /dev/null
+    curl localhost:${port}/exit/harakiri > /dev/null 2> /dev/null
+    # In case that didn't work, let's try with killall
+    sleep .1
+    killall orionld > /dev/null 2> /dev/null
   else
-    logMsg "killing broker by sending /exit/harakiri request"
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
-    # Waiting for valgrind to terminate (sleep a max of 10)
-    logMsg "waiting broker to stop"
-    brokerStopAwait $port
-    logMsg "broker seems to have stopped"
+
+
+    # The following three lines makes the valgrind runs TWO seconds slower
+    #
+    #   logMsg "awaiting broker to stop"
+    #   brokerStopAwait $port
+    #   logMsg "broker seems to have stopped"
+    #
+    # It seems to work just find without them
   fi
 }
 
@@ -1233,12 +1270,13 @@ function orionCurl()
   fi
 
   # Note that payloadCheckFormat is also json in the case of --in xml, as the CB also returns error in JSON in this case
-  if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='json'
-  elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
-  elif [ "$_out" == "text" ];  then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
-  elif [ "$_out" == "any" ];   then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
-  elif [ "$_out" == "EMPTY" ]; then _outFormat='--header "Accept:"'
-  elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
+  if   [ "$_out" == "xml" ];    then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='json'
+  elif [ "$_out" == "json" ];   then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
+  elif [ "$_out" == "jsonld" ]; then _outFormat='--header "Accept: application/ld+json"'; payloadCheckFormat='json'
+  elif [ "$_out" == "text" ];   then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
+  elif [ "$_out" == "any" ];    then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
+  elif [ "$_out" == "EMPTY" ];  then _outFormat='--header "Accept:"'
+  elif [ "$_out" != "" ];       then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
   if [ "$_payloadCheck" != "" ]
@@ -1279,15 +1317,15 @@ function orionCurl()
   if [ "$_xtra"        != "" ]; then  command=${command}' '${_xtra};        fi
 
   command=${command}' --header "Expect:"'
-  command=${command}' -s -S --dump-header /tmp/httpHeaders.out'
+  command=${command}' -k -s -S --dump-header /tmp/httpHeaders.out'
   logMsg command: $command
 
 
   #
   # Execute the command
   #
-  logMsg Executing the curl-command
-  eval $command > /tmp/orionCurl.response 2> /dev/null
+  logMsg Executing the curl-command: $command
+  eval $command > /tmp/orionCurl.response 2> /tmp/curl-stderr
   _response=$(cat /tmp/orionCurl.response)
 
   if [ ! -f /tmp/httpHeaders.out ]
@@ -1423,6 +1461,9 @@ function neqTimestamp()
 function pgDrop()
 {
   dbName="$1"
+  logMsg "Dropping postgres DB $dbName"
+  ps aux | grep orionld >> /tmp/testHarness.log
+
   echo "DROP DATABASE IF EXISTS $dbName" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01 > /tmp/pg-stdout
   egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
   egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
@@ -1431,10 +1472,12 @@ function pgDrop()
   if [ "$lines" != 0 ]
   then
     cat /tmp/pg-stderr-01
-    echo FT unable to drop DB $dbName 1>&2
+    # If the broker is already running (-eb option), then it's OK not being able to drop the DB - already done from elsewhere
+    #echo Unable to drop Postgres DB $dbName 1>&2
   else
     echo Postgres DB $dbName has been dropped
   fi
+  logMsg "Dropped postgres DB $dbName"
 }
 
 
@@ -1446,76 +1489,20 @@ function pgDrop()
 function pgCreate()
 {
   dbName="$1"
-  echo "Creating postgres DB $dbName"
+
   dbCreation="CREATE DATABASE $dbName"
   postgis="CREATE EXTENSION IF NOT EXISTS postgis;"
-  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'GeoMultiPolygon', 'GeoLineString', 'GeoMultiLineString', 'LanguageMap')"
-  operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
-  entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, ts TIMESTAMP NOT NULL, opMode OperationMode, id TEXT NOT NULL, type TEXT NOT NULL)"
-  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, subProperties BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING), ts TIMESTAMP NOT NULL)"
-  subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityId TEXT NOT NULL, attrInstanceId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING), ts TIMESTAMP NOT NULL)"
 
-  # timescaledb="CREATE EXTENSION IF NOT EXISTS timescaledb;"
-  # entitiesTimescale="SELECT create_hypertable('entities', 'ts')"
-  # attributesTimescale="SELECT create_hypertable('attributes', 'ts')"
-  # subAttributesTimescale="SELECT create_hypertable('subAttributes', 'ts')"
+  echo "Creating postgres DB $dbName"
+  echo $dbCreation:                                                                                                       > /tmp/pqsql 2>&1
+  echo $dbCreation            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER                            >> /tmp/pqsql 2>&1
+  echo                                                                                                                   >> /tmp/pqsql 2>&1
 
-  echo $dbCreation:                                                                                          > /tmp/pqsql 2>&1
-  echo $dbCreation            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER               >> /tmp/pqsql 2>&1
-  echo                                                                                                      >> /tmp/pqsql 2>&1
+  echo $postgis:                                                                                                         >> /tmp/pqsql 2>&1
+  echo $postgis               | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"               >> /tmp/pqsql 2>&1
+  echo                                                                                                                   >> /tmp/pqsql 2>&1
 
-  echo $timescaledb:                                                                                        >> /tmp/pqsql 2>&1
-  echo $timescaledb           | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                                      >> /tmp/pqsql 2>&1
-
-  echo $postgis:                                                                                    >> /tmp/pqsql 2>&1
-  echo $postgis               | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  echo "SELECT * FROM pg_extension:"                                                                >> /tmp/pqsql 2>&1
-  echo "SELECT * FROM pg_extension" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER         >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  echo $operationMode:                                                                              >> /tmp/pqsql 2>&1
-  echo $operationMode         | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  echo $valuetype:                                                                                  >> /tmp/pqsql 2>&1
-  echo $valuetype             | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  echo $entities:                                                                                   >> /tmp/pqsql 2>&1
-  echo $entities              | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  echo $attributes:                                                                                 >> /tmp/pqsql 2>&1
-  echo $attributes            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  echo $subAttributes:                                                                              >> /tmp/pqsql 2>&1
-  echo $subAttributes         | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                              >> /tmp/pqsql 2>&1
-
-  # echo $entitiesTimescale:                                                                          >> /tmp/pqsql 2>&1
-  # echo $entitiesTimescale     | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  # echo                                                                                              >> /tmp/pqsql 2>&1
-
-  # echo $attributesTimescale:                                                                        >> /tmp/pqsql 2>&1
-  # echo $attributesTimescale    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName" >> /tmp/pqsql 2>&1
-  # echo                                                                                              >> /tmp/pqsql 2>&1
-
-  # echo $subAttributesTimescale:                                                                     >> /tmp/pqsql 2>&1
-  # echo $subAttributesTimescale | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName" >> /tmp/pqsql 2>&1
-  # echo                                                                                              >> /tmp/pqsql 2>&1
-
-  #
-  # Not sure why, but the tables seem to survive the deletion of the database ... done by pgDrop
-  # This is pretty strange.
-  # To fix the problem, the tables are emptied here:
-  #
-  echo "DELETE FROM subattributes" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo "DELETE FROM attributes"    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo "DELETE FROM entities"      | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  cat ${REPO_HOME}/database/sql/current.sql | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
 }
 
 
@@ -1567,6 +1554,91 @@ function postgresCmd()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# cServerStart
+#
+function cServerStart
+{
+  cServerStop
+  $REPO_HOME/scripts/cServer.sh
+}
+
+
+# -----------------------------------------------------------------------------
+#
+# cServerStop
+#
+function cServerStop
+{
+  CID=$(docker ps | grep wistefan/context-server | awk '{print $1}')
+
+  if [ "$CID" != "" ]
+  then
+    docker kill $CID
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# cServerCurl [--verb <verb>] --url <url> [--payload <payload>]
+#
+function cServerCurl
+{
+  #
+  # Parsing parameters
+  #
+  verb=GET
+  url=""
+  _payload=""
+  hasPayload=no
+
+  while [ "$#" != 0 ]
+  do
+    if   [ "$1" == "--verb" ];    then  verb=$2;    shift;
+    elif [ "$1" == "--url" ];     then  url=$2;     shift;
+    elif [ "$1" == "--payload" ]; then  _payload=$2; hasPayload=yes; shift;
+    else
+      echo "Invalid option/parameter for cServerCurl: $1"
+      exit 1
+    fi
+    shift;
+  done
+
+  if [ "$url" == "" ]
+  then
+    echo "'--url' option missing ... (--url <url>)"
+    exit 1
+  fi
+
+  if [ "$verb" == "GET" ] && [ "$hasPayload" == "yes" ]
+  then
+    verb=POST
+  fi
+
+  if [ "$hasPayload" == "yes" ]
+  then
+    curl -s http://localhost:7080$url -X $verb -d "$_payload" -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    r=$?
+  else
+    curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+#    curl -s http://localhost:7080$url -X $verb -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    r=$?
+  fi
+
+  if [ $r != 0 ]
+  then
+    echo curl error $r
+    echo curl command: curl http:localhost:7080$url -d "$_payload"
+    echo curl response:
+  fi
+  cat /tmp/cServerHeaders
+  cat /tmp/cServerOut
+}
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1602,3 +1674,6 @@ export -f postgresCmd
 export -f pgDrop
 export -f pgInit
 export -f pgCreate
+export -f cServerStart
+export -f cServerStop
+export -f cServerCurl

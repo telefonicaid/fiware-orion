@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -33,6 +32,6 @@
 *
 * orionldMhdConnectionTreat - 
 */
-extern MHD_Result orionldMhdConnectionTreat(ConnectionInfo*  ciP);
+extern MHD_Result orionldMhdConnectionTreat(void);
 
 #endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONTREAT_H_

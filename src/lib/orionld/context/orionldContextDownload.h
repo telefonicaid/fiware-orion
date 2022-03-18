@@ -38,6 +38,6 @@ extern "C"
 //
 // orionldContextDownload -
 //
-extern char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProblemDetails* pdP);
+extern char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTDOWNLOAD_H_

@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                       // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -60,7 +62,7 @@ std::string leakTreat
   {
     OrionError orionError(SccBadRequest, "no such service");
 
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
     TIMED_RENDER(out = orionError.render());
     return out;
   }
@@ -73,14 +75,14 @@ std::string leakTreat
   if (components == 1)
   {
     OrionError orionError(SccBadRequest, "Password requested");
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
 
     TIMED_RENDER(out = orionError.render());
   }
   else if (password != "harakiri")
   {
     OrionError orionError(SccBadRequest, "Request denied - password erroneous");
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
 
     TIMED_RENDER(out = orionError.render());
   }

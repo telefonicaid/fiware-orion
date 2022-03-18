@@ -1,0 +1,149 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Persisting a user created context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a context in the broker - a simple key-value context
+# 02. See the context cache in mongo - make sure the user created context is present
+# 03. GET all contexts in the cache - see the core context and the user created one
+# 04. Restart the broker
+# 05. GET all contexts in the cache - see the core context and the user created one
+#
+
+echo "01. Create a context in the broker - a simple key-value context"
+echo "==============================================================="
+payload='{
+  "@context": {
+    "key1": "value1",
+    "key2": "value2",
+    "key3": "value3"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
+echo
+echo
+
+
+echo "02. See the context cache in mongo - make sure the user created context is present"
+echo "=================================================================================="
+mongoCmd2 orionld 'db.contexts.find({}, {"value": 0}).pretty()'
+echo
+echo
+
+
+echo "03. GET all contexts in the cache - see the core context and the user created one"
+echo "================================================================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts
+echo
+echo
+
+
+echo "04. Restart the broker"
+echo "======================"
+brokerStop CB
+brokerStart CB
+echo
+echo
+
+
+echo "05. GET all contexts in the cache - see the core context and the user created one"
+echo "================================================================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a context in the broker - a simple key-value context
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. See the context cache in mongo - make sure the user created context is present
+==================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "REGEX(.*)",
+	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"parent" : null,
+	"origin" : "Downloaded",
+	"createdAt" : REGEX(.*)
+}
+{
+	"_id" : "REGEX(.*)",
+	"url" : "REGEX(.*)",
+	"parent" : null,
+	"origin" : "UserCreated",
+	"createdAt" : REGEX(.*)
+}
+bye
+
+
+03. GET all contexts in the cache - see the core context and the user created one
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "REGEX(.*)"
+]
+
+
+04. Restart the broker
+======================
+
+
+05. GET all contexts in the cache - see the core context and the user created one
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "REGEX(.*)"
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

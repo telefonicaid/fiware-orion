@@ -1,0 +1,184 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Status Codes (issue #803)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Batch Upsert E1 and E2 - see 201 and E1+E2 in the response payload body
+# 02. Batch Upsert E3 - see 201 and E3 in the response payload body
+# 03. Batch Upsert E1 and E2 - see 204 and no response payload body
+# 04. Batch Upsert E1 and E6 - see 207 and E1+E6 is the success array of the response payload body
+# 05. Batch Upsert E1-E4, with an error in E4 - see 207 and E1-E3 in "success" and E4 in "Error"
+#
+
+echo "01. Batch Upsert E1 and E2 - see 201 and E1+E2 in the response payload body"
+echo "==========================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "02. Batch Upsert E3 - see 201 and E3 in the response payload body"
+echo "================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 3
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "03. Batch Upsert E1 and E2 - see 204 and no response payload body"
+echo "================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 4
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 4
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "04. Batch Upsert E1 and E6 - see 207 and E1+E6 is the success array of the response payload body"
+echo "================================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 6
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E6",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": 6
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Upsert E1 and E2 - see 201 and E1+E2 in the response payload body
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:entity:E1",
+    "urn:ngsi-ld:entity:E2"
+]
+
+
+02. Batch Upsert E3 - see 201 and E3 in the response payload body
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:entity:E3"
+]
+
+
+03. Batch Upsert E1 and E2 - see 204 and no response payload body
+=================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Batch Upsert E1 and E6 - see 207 and E1+E6 is the success array of the response payload body
+================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E6"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

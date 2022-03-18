@@ -22,27 +22,28 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+
+#include "orionld/common/uuidGenerate.h"                       // uuidGenerate
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgAttributesBuild.h"                    // pgAttributesBuild
+#include "orionld/troe/pgAttributeAppend.h"                    // pgAttributeAppend
+#include "orionld/troe/pgSubAttributeAppend.h"                 // pgSubAttributeAppend
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePatchEntity.h"                      // Own interface
 
 
@@ -51,31 +52,73 @@ extern "C"
 //
 // troePatchEntity -
 //
-bool troePatchEntity(ConnectionInfo* ciP)
+bool troePatchEntity(void)
 {
-  PGconn* connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
-
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
-
   char* entityId   = orionldState.wildcard[0];
-  char* entityType = (char*) "REPLACE";
-  LM_TMP(("TEMP: Calling pgEntityTreat for entity '%s'", entityId));
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, TROE_ATTRIBUTE_REPLACE) == false)
+
+  PgAppendBuffer attributesBuffer;
+  PgAppendBuffer subAttributesBuffer;
+
+  pgAppendInit(&attributesBuffer, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&subAttributesBuffer, 2*1024);  // ditto
+
+  pgAppend(&attributesBuffer,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributesBuffer, PG_SUB_ATTRIBUTE_INSERT_START, 0);
+
+  pgAttributesBuild(&attributesBuffer, orionldState.requestTree, entityId, "Replace", &subAttributesBuffer);
+
+  if (orionldState.patchTree != NULL)
   {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
+    LM_TMP(("KZ: ------- To Be Marked as Deleted ----------------"));
+    for (KjNode* patchP = orionldState.patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+    {
+      KjNode* pathNode = kjLookup(patchP, "PATH");
+      KjNode* treeNode = kjLookup(patchP, "TREE");
+
+      if ((treeNode != NULL) && (treeNode->type == KjNull))
+      {
+        char* attrName = pathNode->value.s;
+        char* dotP     = strchr(attrName, '.');
+
+        if (dotP == NULL)
+        {
+          LM_TMP(("KZ: DELETE ATTRIBUTE %s", attrName));
+          char instanceId[80];
+          uuidGenerate(instanceId, sizeof(instanceId), true);
+          pgAttributeAppend(&attributesBuffer, instanceId, attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL, NULL);
+        }
+        else
+        {
+          char* subAttrName = &dotP[1];
+
+          *dotP = 0;
+          dotP  = strchr(subAttrName, '.');
+
+          if (dotP == NULL)
+          {
+            if ((strcmp(subAttrName, "value")      != 0) &&
+                (strcmp(subAttrName, "unitCode")   != 0) &&
+                (strcmp(subAttrName, "observedAt") != 0) &&
+                (strcmp(subAttrName, "datasetId")  != 0))
+            {
+              LM_TMP(("KZ: DELETE SUB-ATTRIBUTE %s", subAttrName));
+              pgSubAttributeAppend(&subAttributesBuffer, "urn:delete", subAttrName, entityId, "urn:attr-instance:unknown", NULL, "String", NULL, NULL, NULL, NULL);
+            }
+          }
+        }
+      }
+    }
+    LM_TMP(("KZ: ------------------------------------------------"));
   }
 
-  pgConnectionRelease(connectionP);
+  char* sqlV[2];
+  int   sqlIx = 0;
+
+  if (attributesBuffer.values    > 0) sqlV[sqlIx++] = attributesBuffer.buf;
+  if (subAttributesBuffer.values > 0) sqlV[sqlIx++] = subAttributesBuffer.buf;
+
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

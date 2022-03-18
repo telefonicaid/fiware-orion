@@ -25,12 +25,12 @@
 #include <unistd.h>                                          // read, write
 #include <errno.h>                                           // errno
 #include <string.h>                                          // strerror
+#include <poll.h>                                            // poll
 #include <netinet/in.h>                                      // sockaddr_in
 
 #include "logMsg/logMsg.h"                                   // LM_*
 #include "logMsg/traceLevels.h"                              // Lmt*
 
-#include "orionld/db/dbConfiguration.h"                      // dbEntityRetrieve
 #include "orionld/socketService/socketService.h"             // SsHeader, SsMsgCode
 #include "orionld/socketService/socketServiceRun.h"          // Own interface
 
@@ -56,195 +56,57 @@ int ssAccept(int listenFd)
 
 // -----------------------------------------------------------------------------
 //
-// ssRead - read a buffer from a socket
-//
-static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
-{
-  int nb = 0;
-
-  while (nb < dataLen)
-  {
-    int sz = read(fd, &dataP[nb], dataLen - nb);
-    if (sz == -1)
-      LM_RE(-1, ("error reading from Socket Service connection: %s", strerror(errno)));
-    else if (sz == 0)
-    {
-      *connectionClosedP = true;
-      return -1;
-    }
-    nb += sz;
-  }
-
-  dataP[nb] = 0;
-
-  return nb;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ssWrite -
-//
-static void ssWrite(int fd, const char* data, int dataLen)
-{
-  int nb = write(fd, data, dataLen);
-
-  if (nb == -1)
-    LM_E(("Internal Error (unable to write to socket service client: %s)", strerror(errno)));
-  else if (nb != dataLen)
-    LM_E(("Internal Error (written only %d bytes out of %d to socket service client)", nb, dataLen));
-}
-
-
-#if 0
-// -----------------------------------------------------------------------------
-//
-// ssWrite -
-//
-static void ssGetEntity(char* entityId)
-{
-  int     responseLen;
-  KjNode* responseTree = dbEntityRetrieve(entityId,
-                                          NULL,   // attrs
-                                          false,  // attrMandatory
-                                          false,  // sysAttrs
-                                          false,  // keyValues
-                                          NULL);  // datasetId
-
-  char response[2048];
-  kjFastRender(orionldState.kjsonP, responseTree, response, sizeof(response));
-  responseLen = strlen(response);
-  ssWrite(fd, response, responseLen);
-}
-#endif
-
-
-// -----------------------------------------------------------------------------
-//
-// ssTreat -
-//
-static void ssTreat(int fd, SsHeader* headerP, char* dataP)
-{
-  switch (headerP->msgCode)
-  {
-  case SsPing:
-    ssWrite(fd, "pong", 4);
-    break;
-
-  case SsGetEntity:
-#if 0
-    ssGetEntity(dataP);
-#else
-    ssWrite(fd, "GET Entity Is Not Implemented", 30);
-#endif
-    break;
-
-  default:
-    LM_E(("SS: unknown message code 0x%x", headerP->msgCode));
-    ssWrite(fd, "unknown message code", 20);
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // socketServiceRun -
 //
 // For now, one single connection is served at a time
 //
 void socketServiceRun(int listenFd)
 {
-  int            fd      = -1;
-  unsigned int   dataLen = 16 * 1024;  // If more is needed, realloc is used
-  char*          dataP   = (char*) malloc(dataLen + 1);
-
-  if (dataP == NULL)
-    LM_RVE(("error allocating Socket Service buffer of %d bytes: %s", dataLen, strerror(errno)));
+  int connectionFd = -1;
 
   while (1)
   {
-    int             fds;
-    int             fdMax;
-    fd_set          rFds;
-    struct timeval  tv = { 5, 0 };
+    int            fd = (connectionFd != -1)? connectionFd : listenFd;
+    int            rs;
+    struct pollfd  pollFd;
 
-    FD_ZERO(&rFds);
-    if (fd != -1)
+    pollFd.fd      = fd;
+    pollFd.events  = POLLIN;
+    pollFd.revents = 0;
+
+    rs = poll(&pollFd, 1, 5000);
+
+    if (rs == -1)
     {
-      FD_SET(fd, &rFds);
-      fdMax = fd;
+      if (errno != EINTR)
+        LM_RVE(("poll error for socket service: %s", strerror(errno)));
     }
-    else
+    else if (rs == 0)
+    {}
+    else if (rs == 1)
     {
-      FD_SET(listenFd, &rFds);
-      fdMax = listenFd;
-    }
-
-    fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
-    if ((fds == -1) && (errno != EINTR))
-      LM_RVE(("select error for socket service: %s", strerror(errno)));
-
-    if (FD_ISSET(listenFd, &rFds))
-    {
-      fd = ssAccept(listenFd);
-      if (fd == -1)
-        LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
-    }
-    else if (FD_ISSET(fd, &rFds))
-    {
-      SsHeader  header;
-      bool      connectionClosed = false;
-
-      //
-      // Read the message header
-      //
-      if (ssRead(fd, (char*) &header, sizeof(header), &connectionClosed) == -1)
+      if (fd == listenFd)
       {
-        if (connectionClosed)
-        {
-          close(fd);
-          fd = -1;
-          continue;  // back to 'while (1)'
-        }
-
-        LM_RVE(("Error reading SS header from Socket Service header: %s", strerror(errno)));
+        connectionFd = ssAccept(listenFd);
+        if (fd == -1)
+          LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
       }
-
-      //
-      // Is the data buffer big enough?
-      // If not, reallocate
-      //
-      if (header.dataLen >= dataLen)
+      else
       {
-        free(dataP);
-        dataLen = header.dataLen;
-        dataP   = (char*) malloc(dataLen + 1);
+        //
+        // Make sure it's just a "connection closed"
+        //
+        int  nb;
+        char buf[16];
 
-        if (dataP == NULL)
-          LM_RVE(("error allocating Socket Service buffer of %d bytes: %s", dataLen, strerror(errno)));
+        nb = read(connectionFd, buf, sizeof(buf));
+
+        if (nb != 0)
+          LM_W(("SS: A message was sent over the socket service - the broker is not ready for that - closing connection"));
+
+        close(connectionFd);
+        connectionFd = -1;
       }
-
-      //
-      // Read the data
-      //
-      if (ssRead(fd, dataP, header.dataLen, &connectionClosed) == -1)
-      {
-        if (connectionClosed)
-        {
-          close(fd);
-          fd = -1;
-          continue;  // back to 'while (1)'
-        }
-
-        LM_RVE(("Error reading SS body from Socket Service header: %s", strerror(errno)));
-      }
-
-      //
-      // Treat the request
-      //
-      ssTreat(fd, &header, dataP);
     }
   }
 }

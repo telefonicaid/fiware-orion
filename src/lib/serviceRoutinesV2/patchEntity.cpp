@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -68,13 +70,13 @@ std::string patchEntity
   std::string  answer = "";
   Entity*      eP     = &parseDataP->ent.res;
 
-  eP->id = compV[2];
-  eP->type = ciP->uriParam["type"];
+  eP->id   = compV[2];
+  eP->type = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
-  if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str() , NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, eP->id.c_str() , NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
@@ -89,12 +91,10 @@ std::string patchEntity
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    orionldState.httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else
-  {
-    ciP->httpStatusCode = SccNoContent;
-  }
+    orionldState.httpStatusCode = SccNoContent;
 
   // 05. Cleanup and return result
   eP->release();

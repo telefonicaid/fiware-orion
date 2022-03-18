@@ -29,13 +29,14 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/orionldState.h"                 // orionldState
+
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
-
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
@@ -70,7 +71,7 @@ using mongo::DBClientBase;
 */
 static void getAttributeTypes
 (
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const std::string&               entityType,
   const std::string&               attrName,
@@ -100,7 +101,7 @@ static void getAttributeTypes
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->entities, query, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -123,29 +124,28 @@ static void getAttributeTypes
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    /* Previous versions of this function used a simpler approach:
-     *
-     *   BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
-     *   BSONObj attr  = getObjectFieldF(attrs, attrName);
-     *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
-     *
-     * However, it doesn't work when the attribute uses metadata ID
-     *
-     */
-
-    BSONObj                attrs = getObjectFieldF(r, ENT_ATTRS);
+    BSONObj                attrs;
     std::set<std::string>  attrsSet;
 
+    getObjectFieldF(&attrs, &r, ENT_ATTRS);
     attrs.getFieldNames(attrsSet);
 
     for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
     {
-      std::string currentAttr = *i;
+      char*  currentAttr  = (char*) i->c_str();
+      char*  midSeparator = strstr(currentAttr, "()");
+      int    cmpLen;
 
-      if (basePart(currentAttr) == attrName)
+      if (midSeparator != NULL)
+        cmpLen = midSeparator - currentAttr;
+      else
+        cmpLen = strlen(currentAttr);
+
+      if (strncmp(currentAttr, attrName.c_str(), cmpLen) == 0)
       {
-        BSONObj attr = getObjectFieldF(attrs, currentAttr);
-        attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+        BSONObj attr;
+        getObjectFieldF(&attr, &attrs, currentAttr);
+        attrTypes->push_back(getStringFieldF(&attr, ENT_ATTRS_TYPE));
       }
     }
   }
@@ -158,11 +158,9 @@ static void getAttributeTypes
 /* ****************************************************************************
 *
 * countEntities -
-*
 */
 static long long countEntities
 (
-  const std::string&               tenant,
   const std::vector<std::string>&  servicePathV,
   const std::string&               entityType
 )
@@ -176,7 +174,7 @@ static long long countEntities
   std::string         err;
   unsigned long long  c;
 
-  if (!collectionCount(getEntitiesCollectionName(tenant), query, &c, &err))
+  if (!collectionCount(orionldState.tenantP->entities, query, &c, &err))
   {
     return -1;
   }
@@ -184,12 +182,13 @@ static long long countEntities
   return c;
 }
 
+
+
 /* ****************************************************************************
 *
 * countCmd -
-*
 */
-static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelineForCount)
+static unsigned int countCmd(OrionldTenant* tenantP, const BSONArray& pipelineForCount)
 {
   BSONObj result;
   BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
@@ -198,24 +197,25 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     LM_E(("Runtime Error (executing: %s, error %s)", cmd.toString().c_str(), err.c_str()));
     return 0;
   }
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
 
   if (result.hasField("cursor"))
   {
-    // abcense of "count" field in the "firtBatch" array means "zero result"
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    // absense of "count" field in the "firstBatch" array means "zero result"
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
-      return getIntFieldF(resultsArray[0].embeddedObject(), "count");
+      BSONObj bo = resultsArray[0].embeddedObject();
+      return getIntFieldF(&bo, "count");
     }
   }
   else
@@ -238,18 +238,12 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
 HttpStatusCode mongoEntityTypesValues
 (
   EntityTypeVectorResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   unsigned int*                        totalTypesP
 )
 {
-  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
-
-  LM_T(LmtMongo, ("Query Entity Types"));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (totalTypesP != NULL)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
@@ -300,8 +294,8 @@ HttpStatusCode mongoEntityTypesValues
     BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
     BSON("$group" << BSON("_id" << groupCond)) <<
     BSON("$sort"  << BSON("_id" << 1)) <<
-    BSON("$skip" << offset) <<
-    BSON("$limit" << limit));
+    BSON("$skip" << orionldState.uriParams.offset) <<
+    BSON("$limit" << orionldState.uriParams.limit));
 
   BSONArray pipelineForCount = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << spQuery)) <<
@@ -316,7 +310,7 @@ HttpStatusCode mongoEntityTypesValues
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -327,7 +321,7 @@ HttpStatusCode mongoEntityTypesValues
   // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
+    *totalTypesP = countCmd(tenantP, pipelineForCount);
   }
 
   // Processing result to build response
@@ -337,7 +331,9 @@ HttpStatusCode mongoEntityTypesValues
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
   if (resultsArray.size() == 0)
@@ -355,13 +351,13 @@ HttpStatusCode mongoEntityTypesValues
 
     LM_T(LmtMongo, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
 
-    if (getFieldF(resultItem, "_id").isNull())
+    if (getFieldF(&resultItem, "_id").isNull())
     {
       type = "";
     }
     else
     {
-      type = getStringFieldF(resultItem, "_id");
+      type = getStringFieldF(&resultItem, "_id");
     }
 
     responseP->entityTypeVector.push_back(new EntityType(type));
@@ -382,20 +378,14 @@ HttpStatusCode mongoEntityTypesValues
 HttpStatusCode mongoEntityTypes
 (
   EntityTypeVectorResponse*            responseP,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,
   ApiVersion                           apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
 )
 {
-  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
-
-  LM_T(LmtMongo, ("Query Entity Types"));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (totalTypesP != NULL)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
@@ -478,8 +468,8 @@ HttpStatusCode mongoEntityTypes
     BSON("$group" << BSON("_id"   << groupCond <<
                           "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
     BSON("$sort" << BSON("_id" << 1)) <<
-    BSON("$skip" << offset) <<
-    BSON("$limit" << limit));
+    BSON("$skip" << orionldState.uriParams.offset) <<
+    BSON("$limit" << orionldState.uriParams.limit));
 
   BSONArray pipelineForCount = BSON_ARRAY(
     BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
@@ -495,7 +485,7 @@ HttpStatusCode mongoEntityTypes
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -506,7 +496,7 @@ HttpStatusCode mongoEntityTypes
   // Get count if user requested (i.e. if totalTypesP is not NULL)
   if (totalTypesP != NULL)
   {
-    *totalTypesP = countCmd(tenant, pipelineForCount);
+    *totalTypesP = countCmd(tenantP, pipelineForCount);
   }
 
   // Processing result to build response
@@ -516,7 +506,9 @@ HttpStatusCode mongoEntityTypes
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
   // Early return if no element was found
@@ -525,7 +517,7 @@ HttpStatusCode mongoEntityTypes
     if (totalTypesP != NULL)
     {
       char detailsMsg[256];
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, orionldState.uriParams.offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
@@ -541,12 +533,12 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
+    std::vector<BSONElement>  attrsArray  = getFieldF(&resultItem, "attrs").Array();
     EntityType*               entityType;
 
-    entityType = new EntityType(getStringFieldF(resultItem, "_id"));
+    entityType = new EntityType(getStringFieldF(&resultItem, "_id"));
 
-    entityType->count = countEntities(tenant, servicePathV, entityType->type);
+    entityType->count = countEntities(servicePathV, entityType->type);
 
     if (!attrsArray[0].isNull())
     {
@@ -564,7 +556,7 @@ HttpStatusCode mongoEntityTypes
         {
           std::vector<std::string> attrTypes;
 
-          getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
+          getAttributeTypes(orionldState.tenantP, servicePathV, entityType->type, attrsArray[jx].str(), &attrTypes);
 
           for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
           {
@@ -620,31 +612,24 @@ HttpStatusCode mongoAttributesForEntityType
 (
   const std::string&                    entityType,
   EntityTypeResponse*                   responseP,
-  const std::string&                    tenant,
+  OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams,
   bool                                  noAttrDetail,
   ApiVersion                            apiVersion
 )
 {
-  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
   bool           count          = false;
 
   // Count only makes sense for this operation in the case of NGSIv1
   if (apiVersion == V1)
-  {
-    std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-
-    count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-  }
+    count = orionldState.uriParams.details;
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
 
   LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (count == true)? "true" : "false"));
+  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", orionldState.uriParams.offset, orionldState.uriParams.limit, (count == true)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
@@ -653,7 +638,7 @@ HttpStatusCode mongoAttributesForEntityType
    *
    * db.runCommand({aggregate: "entities",
    *                cursor: { batchSize: 1000 },
-   *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
+   *                pipeline: [ {$match: { "_id.type": "TYPE", "_id.servicePath": /.../ } },
    *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
    *                            {$unwind: "$attrNames"},
    *                (2)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
@@ -690,7 +675,7 @@ HttpStatusCode mongoAttributesForEntityType
            BSON("$sort" << BSON("_id" << 1))));
 
   std::string err;
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!runCollectionCommand(tenantP->mongoDbName, cmd, &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -705,10 +690,12 @@ HttpStatusCode mongoAttributesForEntityType
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    BSONObj cursor;
+    getObjectFieldF(&cursor, &result, "cursor");
+    resultsArray = getFieldF(&cursor, "firstBatch").Array();
   }
 
-  responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
+  responseP->entityType.count = countEntities(servicePathV, entityType);
 
   if (resultsArray.size() == 0)
   {
@@ -719,9 +706,11 @@ HttpStatusCode mongoAttributesForEntityType
   }
 
   /* See comment above in the other method regarding this strategy to implement pagination */
-  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
+  unsigned int total = orionldState.uriParams.offset + orionldState.uriParams.limit;
+  for (unsigned int ix = orionldState.uriParams.offset; ix < MIN(resultsArray.size(), total); ++ix)
   {
-    BSONElement idField = getFieldF(resultsArray[ix].embeddedObject(), "_id");
+    BSONObj      result  = resultsArray[ix].embeddedObject();
+    BSONElement  idField = getFieldF(&result, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -746,7 +735,7 @@ HttpStatusCode mongoAttributesForEntityType
     {
       std::vector<std::string> attrTypes;
 
-      getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
+      getAttributeTypes(tenantP, servicePathV, entityType, idField.str(), &attrTypes);
 
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
@@ -790,7 +779,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (count)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), orionldState.uriParams.offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else

@@ -29,6 +29,8 @@
 #include <vector>
 #include <map>
 
+#include "orionld/types/OrionldTenant.h"               // OrionldTenant
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
@@ -37,14 +39,13 @@
 
 /* ****************************************************************************
 *
-* mongoDiscoverContextAvailability - 
+* mongoDiscoverContextAvailability -
 */
 extern HttpStatusCode mongoDiscoverContextAvailability
 (
   DiscoverContextAvailabilityRequest*        requestP,
   DiscoverContextAvailabilityResponse*       responseP,
-  const std::string&                         tenant,
-  std::map<std::string, std::string>&        uriParams,
+  OrionldTenant*                             tenantP,
   const std::vector<std::string>&            servicePathV
 );
 

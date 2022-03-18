@@ -28,6 +28,8 @@
 #include <string>
 #include <map>
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -42,9 +44,8 @@ extern HttpStatusCode mongoRegisterContext
 (
   RegisterContextRequest*              requestP,
   RegisterContextResponse*             responseP,
-  std::map<std::string, std::string>&  uriParam,
   const std::string&                   fiwareCorrelator = "no correlator",
-  const std::string&                   tenant           = "",
+  OrionldTenant*                       tenantP          = NULL,
   const std::string&                   servicePath      = ""
 );
 

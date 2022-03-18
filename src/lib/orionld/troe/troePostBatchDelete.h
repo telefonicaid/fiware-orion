@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
@@ -33,6 +32,6 @@
 //
 // troePostBatchDelete -
 //
-extern bool troePostBatchDelete(ConnectionInfo* ciP);
+extern bool troePostBatchDelete(void);
 
 #endif  // SRC_LIB_ORIONLD_TROE_TROEPOSTBATCHDELETE_H_

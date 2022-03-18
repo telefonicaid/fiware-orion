@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/limits.h"
@@ -71,7 +73,7 @@ std::string postSubscribeContext
   {
     char  noOfV[STRING_SIZE_FOR_LONG + 3];
     snprintf(noOfV, sizeof(noOfV) - 1, "%lu", ciP->servicePathV.size());
-    ciP->httpStatusCode           = SccOk;  // NGSIv1 is weird... it uses 200 OK at HTTP level for errors
+    orionldState.httpStatusCode   = SccOk;  // NGSIv1 is weird... it uses 200 OK at HTTP level for errors
     std::string details           = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
 
     alarmMgr.badInput(clientIp, details);
@@ -82,7 +84,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, orionldState.tenantP, orionldState.xAuthToken, ciP->servicePathV, orionldState.correlator));
   TIMED_RENDER(answer = scr.render());
 
   parseDataP->scr.res.release();

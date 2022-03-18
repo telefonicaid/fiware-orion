@@ -28,6 +28,7 @@
 
 extern "C"
 {
+#include "kjson/kjRenderSize.h"                                  // kjFastRenderSize
 #include "kjson/kjRender.h"                                      // kjFastRender
 #include "kjson/kjBuilder.h"                                     // kjObject, kjArray, kjString, kjChildAdd, ...
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
@@ -36,11 +37,11 @@ extern "C"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/serviceRoutines/orionldNotify.h"               // Own interface
 
 
@@ -124,7 +125,7 @@ static void responseTreat(OrionldNotificationInfo* niP, char* buf, int bufLen)
 
 // -----------------------------------------------------------------------------
 //
-// orionldNotify -
+// orionldNotify - SHOULD BE MOVED to another directory/library
 //
 // This function assumes that the vector orionldState.notificationInfo is
 // correctly filled in.
@@ -183,7 +184,7 @@ void orionldNotify(void)
 
     notificationTree = kjObject(orionldState.kjsonP, NULL);
 
-    strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId));
+    strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId) - 1);
     uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
 
     ipPortAndRest(niP->reference, &ip, &port, &rest);
@@ -206,7 +207,7 @@ void orionldNotify(void)
       if ((orionldState.contextP == NULL) || (orionldState.contextP == orionldCoreContextP))
       {
         orionldState.contextP = orionldCoreContextP;
-        KjNode* contextStringNodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+        KjNode* contextStringNodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
         kjChildAdd(notificationTree, contextStringNodeP);
       }
       else if (orionldState.contextP->tree != NULL)
@@ -260,7 +261,15 @@ void orionldNotify(void)
     kjChildAdd(notificationTree, dataNodeP);
     kjChildAdd(dataNodeP, niP->attrsForNotification);
 
-    kjFastRender(orionldState.kjsonP, notificationTree, payload, payloadLen);
+    int renderedSize = kjFastRenderSize(notificationTree);
+
+    if (renderedSize > payloadLen)
+    {
+      LM_W(("No Room in the notification buffer"));
+      strncpy(payload, "{\"error\": \"Implementation problem in Orion-LD - the notification buffer size needs a smarter allocation algorithm\"}", payloadLen);
+    }
+    else
+      kjFastRender(notificationTree, payload);
 
     int sizeLeftForLen = 16;  // sizeof(contentLenHeader) - 16
     contentLength = strlen(payload);

@@ -27,6 +27,8 @@
 */
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"        // OrionldTenant
+
 #include "rest/OrionError.h"
 #include "apiTypesV2/Registration.h"
 
@@ -39,7 +41,7 @@
 extern bool mongoLdRegistrationsGet
 (
   std::vector<ngsiv2::Registration>*  regVecP,
-  const char*                         tenant,
+  OrionldTenant*                      tenantP,
   long long*                          countP,
   OrionError*                         oeP
 );

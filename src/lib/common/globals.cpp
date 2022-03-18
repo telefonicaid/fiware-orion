@@ -181,7 +181,7 @@ void orionInit
   timingStatistics     = _timingStatistics;
   notifQueueStatistics = _notifQueueStatistics;
 
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+  strncpy(transactionId, "N/A", sizeof(transactionId) - 1);
 
   checkIdv1 = _checkIdv1;
 }
@@ -497,7 +497,7 @@ static int timezoneOffset(const char* tz)
 * Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */
-double parse8601Time(const std::string& ss)
+double parse8601Time(char* ss)
 {
   int    y = 0;
   int    M = 0;
@@ -505,13 +505,13 @@ double parse8601Time(const std::string& ss)
   int    h = 0;
   int    m = 0;
   double s = 0;
-  char   tz[10];
+  char   tz[32];
 
   // Length check, to avoid buffer overflow in tz[]. Calculation is as follows:
   //
   //  5 (year with "-") + 3 * 2 (day and month with "-" or "T")
-  //  3 * 3 (hour/minute/second with ":" or ".") + 3 (miliseconds) + 6 (worst case timezone: "+01:00" = 29
-  if (ss.length() > 29)
+  //  3 * 3 (hour/minute/second with ":" or ".") + 9 (nanosecs) + 6 (worst case timezone: "+01:00" = 41
+  if (strlen(ss) > 41)
   {
     return -1;
   }
@@ -531,21 +531,23 @@ double parse8601Time(const std::string& ss)
   tz[0] = 'Z';
   tz[1] = 0;
 
-  bool validDate = ((sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d:%lf%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  ||  // Trying hh:mm:ss.sss or hh:mm:ss
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%lf%s", &y, &M, &d, &h, &m, &s, tz) >= 6)    ||  // Trying hhmmss.sss or hhmmss
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)          ||  // Trying hh:mm
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)           ||  // Trying hhmm
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)                  ||  // Trying hh
-                    (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3));                            // Trying just date (in this case tz is not allowed)
+  bool validDate = ((sscanf(ss, "%4d-%2d-%2dT%2d:%2d:%lf%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  ||  // Trying hh:mm:ss.sss or hh:mm:ss
+                    (sscanf(ss, "%4d-%2d-%2dT%2d%2d%lf%s", &y, &M, &d, &h, &m, &s, tz) >= 6)    ||  // Trying hhmmss.sss or hhmmss
+                    (sscanf(ss, "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)          ||  // Trying hh:mm
+                    (sscanf(ss, "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)           ||  // Trying hhmm
+                    (sscanf(ss, "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)                  ||  // Trying hh
+                    (sscanf(ss, "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3));                            // Trying just date (in this case tz is not allowed)
 
   if (!validDate)
   {
+    LM_E(("Not a valid date: %s", ss));
     return -1;
   }
 
   int offset = timezoneOffset(tz);
   if (offset == -1)
   {
+    LM_E(("invalid timezone: %s", ss));
     return -1;
   }
 

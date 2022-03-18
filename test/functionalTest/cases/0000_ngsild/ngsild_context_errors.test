@@ -26,6 +26,7 @@ Parse Contexts - all errors
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbDrop orionld
 brokerStart CB 212-249
 
 --SHELL--
@@ -80,7 +81,7 @@ echo
 
 echo "02. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -103,7 +104,7 @@ echo
 
 echo "04. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -126,7 +127,7 @@ echo
 
 echo "06. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -149,7 +150,7 @@ echo
 
 echo "08. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -172,7 +173,7 @@ echo
 
 echo "10. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -195,7 +196,7 @@ echo
 
 echo "12. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -218,7 +219,7 @@ echo
 
 echo "14. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -241,7 +242,7 @@ echo
 
 echo "16. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -264,7 +265,7 @@ echo
 
 echo "18. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -290,7 +291,7 @@ echo
 
 echo "20. GET Contexts - see only Core Context"
 echo "========================================"
-orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?prettyPrint=yes&details=true'
 echo
 echo
 
@@ -313,13 +314,13 @@ Date: REGEX(.*)
 02. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -327,7 +328,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -351,13 +353,13 @@ Date: REGEX(.*)
 04. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -365,7 +367,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -389,13 +392,13 @@ Date: REGEX(.*)
 06. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -403,7 +406,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -428,13 +432,13 @@ Date: REGEX(.*)
 08. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -442,7 +446,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -466,13 +471,13 @@ Date: REGEX(.*)
 10. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -480,7 +485,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -504,13 +510,13 @@ Date: REGEX(.*)
 12. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -518,7 +524,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -542,13 +549,13 @@ Date: REGEX(.*)
 14. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -556,7 +563,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -580,13 +588,13 @@ Date: REGEX(.*)
 16. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -594,7 +602,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -618,13 +627,13 @@ Date: REGEX(.*)
 18. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -632,7 +641,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }
@@ -656,13 +666,13 @@ Date: REGEX(.*)
 20. GET Contexts - see only Core Context
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 575
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "createdAt": "REGEX(.*)",
         "hash-table": {
             "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -670,7 +680,8 @@ Date: REGEX(.*)
             "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
             "properties": "https://uri.etsi.org/ngsi-ld/properties"
         },
-        "id": "None",
+        "id": "REGEX(.*)",
+        "origin": "Downloaded",
         "type": "hash-table",
         "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     }

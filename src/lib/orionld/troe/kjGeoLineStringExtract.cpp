@@ -59,16 +59,13 @@ bool kjGeoLineStringExtract(KjNode* coordinatesP, char* lineStringCoordsString, 
   {
     double  longitude;
     double  latitude;
-    double  altitude;
+    double  altitude = 0;
     char    pointBuffer[64];
 
     if (kjGeoPointExtract(pointP, &longitude, &latitude, &altitude) == false)
       LM_RE(false, ("Internal Error (unable to extract longitude/latitude/altitude for a Point) "));
 
-    if (altitude != 0)
-      snprintf(pointBuffer, sizeof(pointBuffer), "%f %f %f", longitude, latitude, altitude);
-    else
-      snprintf(pointBuffer, sizeof(pointBuffer), "%f %f", longitude, latitude);
+    snprintf(pointBuffer, sizeof(pointBuffer), "%f %f %f", longitude, latitude, altitude);
 
     int pointBufferLen = strlen(pointBuffer);
 
@@ -81,14 +78,11 @@ bool kjGeoLineStringExtract(KjNode* coordinatesP, char* lineStringCoordsString, 
       ++lineStringCoordsIx;
     }
 
-    LM_TMP(("Appending '%s' to lineStringCoordsString", pointBuffer));
     strncpy(&lineStringCoordsString[lineStringCoordsIx], pointBuffer, lineStringCoordsLen - lineStringCoordsIx);
     lineStringCoordsIx += pointBufferLen;
 
     pointP = pointP->next;
   }
-
-  LM_TMP(("FINAL lineStringCoordsString: '%s'", lineStringCoordsString));
 
   return true;
 }

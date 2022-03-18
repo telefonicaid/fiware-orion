@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -43,9 +45,9 @@
 
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
+#include "orionld/common/eqForDot.h"
 #include "mongoBackend/compoundValueBson.h"
-#include "mongoBackend/dbFieldEncoding.h"
+
 
 using namespace mongo;
 using namespace orion;
@@ -59,7 +61,7 @@ using namespace orion;
 */
 void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
-  std::string effectiveStringValue = stringValue;
+  char*       effectiveStringValue = (char*) stringValue.c_str();
   bool        effectiveBoolValue   = boolValue;
   double      effectiveNumberValue = numberValue;
   ValueType   effectiveValueType   = valueType;
@@ -70,7 +72,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     // Autocast only for selected attribute types
     if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
     {
-      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
+      if (str2double(effectiveStringValue, &effectiveNumberValue))
       {
         effectiveValueType = ValueTypeNumber;
       }
@@ -80,12 +82,12 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     {
       // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
       // valid true/false values and JSON spec mandates exactly true or false
-      if (effectiveStringValue == "true")
+      if (strcmp(effectiveStringValue, "true") == 0)
       {
         effectiveBoolValue = true;
         effectiveValueType = ValueTypeBoolean;
       }
-      else if (effectiveStringValue == "false")
+      else if (strcmp(effectiveStringValue, "false") == 0)
       {
         effectiveBoolValue = false;
         effectiveValueType = ValueTypeBoolean;
@@ -198,7 +200,6 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& at
 */
 ContextAttribute::ContextAttribute()
 {
-  LM_T(LmtClone, ("Creating a ContextAttribute 1"));
   name                  = "";
   type                  = "";
   stringValue           = "";
@@ -256,15 +257,9 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setMimeType(caP->providingApplication.getMimeType());
 
-  LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
-                  compoundValueP,
-                  name.c_str(),
-                  this));
-
   // Cloning metadata
   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
   {
-    LM_T(LmtClone, ("Copying metadata %d ('%s' of type '%s')", mIx, caP->metadataVector[mIx]->name.c_str(),  valueTypeName(caP->metadataVector[mIx]->valueType)));
     Metadata* mP = new Metadata(caP->metadataVector[mIx], useDefaultType);
     metadataVector.push_back(mP);
   }
@@ -302,11 +297,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a string ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value));
-
   name                  = _name;
   type                  = _type;
   stringValue           = std::string(_value);
@@ -340,11 +330,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a string ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value.c_str()));
-
   name                  = _name;
   type                  = _type;
   stringValue           = _value;
@@ -378,11 +363,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a number ContextAttribute '%s':'%s':'%d', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value));
-
   name                  = _name;
   type                  = _type;
   numberValue           = _value;
@@ -415,11 +395,6 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a boolean ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(),
-                  _type.c_str(),
-                  _value ? "true" : "false"));
-
   name                  = _name;
   type                  = _type;
   boolValue             = _value;
@@ -452,8 +427,6 @@ ContextAttribute::ContextAttribute
   orion::CompoundValueNode*  _compoundValueP
 )
 {
-  LM_T(LmtClone, ("Creating a ContextAttribute, maintaining a pointer to compound value (at %p)", _compoundValueP));
-
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
@@ -475,21 +448,22 @@ ContextAttribute::ContextAttribute
 
 /* ****************************************************************************
 *
-* ContextAttribute::getId() -
+* ContextAttribute::getMetadataId -
 */
-std::string ContextAttribute::getId(void) const
+const char* ContextAttribute::getMetadataId() const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
-    if (metadataVector[ix]->name == NGSI_MD_ID)
+    const char* mdName = metadataVector[ix]->name.c_str();
+
+    if ((mdName[0] == 'I') && (mdName[1] == 'D') && (mdName[2] == 0))
     {
-      return metadataVector[ix]->stringValue;
+      return metadataVector[ix]->stringValue.c_str();
     }
   }
 
-  return "";
+  return NULL;
 }
-
 
 
 /* ****************************************************************************
@@ -963,23 +937,21 @@ std::string ContextAttribute::toJson
 */
 std::string ContextAttribute::toJsonAsValue
 (
-  ApiVersion       apiVersion,          // in parameter
-  bool             acceptedTextPlain,   // in parameter
-  bool             acceptedJson,        // in parameter
-  MimeType         outFormatSelection,  // in parameter
-  MimeType*        outMimeTypeP,        // out parameter
-  HttpStatusCode*  scP                  // out parameter
+  ApiVersion       apiVersion,
+  MimeType         outFormat,
+  MimeType*        outContentTypeP,
+  int*             scP
 )
 {
   std::string  out;
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (acceptedTextPlain)
+    if (orionldState.acceptMask & (1 << TEXT))
     {
       char buf[64];
 
-      *outMimeTypeP = TEXT;
+      *outContentTypeP = TEXT;
 
       switch (valueType)
       {
@@ -1034,7 +1006,7 @@ std::string ContextAttribute::toJsonAsValue
   }
   else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if (!acceptedJson && !acceptedTextPlain)
+    if ((orionldState.acceptMask & ((1 << TEXT) | (1 << JSON))) == 0)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
       *scP = SccNotAcceptable;
@@ -1043,7 +1015,7 @@ std::string ContextAttribute::toJsonAsValue
     }
     else
     {
-      *outMimeTypeP = outFormatSelection;
+      *outContentTypeP = outFormat;
 
       if (compoundValueP->isVector())
       {
@@ -1250,10 +1222,14 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
   for (int ix = 0; ix < levels; ++ix)
   {
     bool found = false;
+    char compoundPathEncoded[256];
+
+    strncpy(compoundPathEncoded, compoundPathV[ix].c_str(), sizeof(compoundPathEncoded) - 1);
+    eqForDot(compoundPathEncoded);
 
     for (unsigned int cIx = 0; cIx < current->childV.size(); ++cIx)
     {
-      if (dbDotEncode(current->childV[cIx]->name) == compoundPathV[ix])
+      if (strcmp(current->childV[cIx]->name.c_str(), compoundPathEncoded) == 0)
       {
         current = current->childV[cIx];
         found   = true;

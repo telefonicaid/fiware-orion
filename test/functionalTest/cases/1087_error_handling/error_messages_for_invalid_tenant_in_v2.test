@@ -25,7 +25,7 @@ POST /v2/entities with invalid tenant
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -multiservice
 
 --SHELL--
 

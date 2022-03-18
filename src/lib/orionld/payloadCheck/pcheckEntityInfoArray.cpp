@@ -39,13 +39,8 @@ extern "C"
 //
 // pcheckEntityInfoArray -
 //
-// This function is used by the "POST Query" request, where the entity type is NOT mandatory
-// Another function doing the same, but with argument 2 for pcheckEntityInfo set to true is used by:
-// * Batch Create
-// * Patch Subscription
-// * Patch Registration
-//
-// The two functions should merge into one single function
+// This function is used by the "POST Query" request, where the entity type is NOT mandatory.
+// It is also used for Subscriptions and Registrations, where entity type IS mandatory.
 //
 bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory)
 {

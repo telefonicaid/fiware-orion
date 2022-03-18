@@ -22,12 +22,13 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>                                           // sem_init
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState, mongocPool, ...
 
 
 
@@ -40,7 +41,12 @@ void mongocInit(const char* dbHost, const char* dbName)
   bson_error_t mongoError;
   char         mongoUri[512];
 
-  snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s", dbHost);
+  if ((dbUser[0] != 0) && (dbPwd[0] != 0))
+    snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s:%s@%s", dbUser, dbPwd, dbHost);
+  else
+    snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s", dbHost);
+
+  LM_K(("Connecting to mongo for the C driver, with URI '%s'", mongoUri));
 
   //
   // Initialize libmongoc's internals
@@ -50,37 +56,32 @@ void mongocInit(const char* dbHost, const char* dbName)
   //
   // Safely create a MongoDB URI object from the given string
   //
-  orionldState.mongoUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
-  if (orionldState.mongoUri == NULL)
-    LM_X(1, ("mongoc_uri_new_with_error(%s): %s", orionldState.mongoUri, mongoError.message));
+  mongocUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
+  if (mongocUri == NULL)
+  {
+    if ((dbUser[0] != 0) && (dbPwd[0] != 0))
+      LM_W(("Database username: '%s', password: '%s'", dbUser, dbPwd));
+    else if (dbUser[0] != 0)
+      LM_W(("Database username given but no database password"));
+    else if (dbPwd[0] != 0)
+      LM_W(("Database password given but no database username"));
+
+    LM_X(1, ("Unable to connect to mongo(URI: %s): %s", mongoUri, mongoError.message));
+  }
 
   //
-  // Create a new client instance
+  // Initialize the connection pool
   //
-  orionldState.mongoClient = mongoc_client_new_from_uri(orionldState.mongoUri);
-  if (orionldState.mongoClient == NULL)
-    LM_X(1, ("mongoc_client_new_from_uri failed"));
+  mongocPool = mongoc_client_pool_new(mongocUri);
 
   //
-  // Register the application name (to get tracking possibilities in the profile logs on the server)
+  // We want the newer, better, error handling
   //
-  mongoc_client_set_appname(orionldState.mongoClient, "orionld");
+  mongoc_client_pool_set_error_api(mongocPool, 2);
+
 
   //
-  // Get a handle on the database
+  // Semaphore for the 'contexts' collection on DB 'orionld' - hopefully not needed in the end ...
   //
-  orionldState.mongoDatabase = mongoc_client_get_database(orionldState.mongoClient, dbName);
-  if (orionldState.mongoDatabase == NULL)
-    LM_X(1, ("DB: mongoc_client_get_database FAILED"));
-
-  //
-  // Get a handle on the collections
-  //
-  mongoEntitiesCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "entities");
-  if (mongoEntitiesCollectionP == NULL)
-    LM_X(1, ("mongoc_client_get_collection(%s, 'entities') failed", dbName));
-
-  mongoRegistrationsCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "registrations");
-  if (mongoRegistrationsCollectionP == NULL)
-    LM_X(1, ("mongoc_client_get_collection(%s, 'regiatrations') failed", dbName));
+  sem_init(&mongocContextsSem, 0, 1);  // 0: shared between threads of the same process. 1: free to be taken
 }

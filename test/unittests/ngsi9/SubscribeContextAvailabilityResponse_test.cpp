@@ -112,7 +112,5 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
-  free(scarP);
-
   utExit();
 }

@@ -26,7 +26,7 @@ Forwarding of PATCH Entity-Attribute requests
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-dbInit C1
+dbInit CP1
 brokerStart CB 0 IPv4 -forwarding
 brokerStart CP1
 
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 05. GET the entity E1 from CP1 - see A1 changed
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 299
+Content-Length: 248
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

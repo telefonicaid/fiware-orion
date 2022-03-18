@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"        // orionldState
+#include "orionld/types/OrionldHeader.h"        // orionldHeaderAdd
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/JsonHelper.h"
@@ -33,9 +36,9 @@
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "serviceRoutinesV2/getAllSubscriptions.h"
 
 
@@ -58,16 +61,13 @@ std::string getAllSubscriptions
   std::vector<ngsiv2::Subscription> subs;
   OrionError                        oe;
   long long                         count  = 0;
-  int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
   TIMED_MONGO(mongoListSubscriptions(&subs,
                                      &oe,
-                                     ciP->uriParam,
-                                     ciP->tenant,
+                                     orionldState.tenantP,
                                      ciP->servicePathV[0],
-                                     limit,
-                                     offset,
+                                     orionldState.uriParams.limit,
+                                     orionldState.uriParams.offset,
                                      &count));
 
   if (oe.code != SccOk)
@@ -75,16 +75,13 @@ std::string getAllSubscriptions
     std::string out;
 
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
 
     return out;
   }
 
-  if ((ciP->uriParamOptions["count"]))
-  {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(toString(count));
-  }
+  if (orionldState.uriParams.count)
+    orionldHeaderAdd(&orionldState.out.headers, HttpNgsiv2Count, NULL, count);
 
   std::string out;
   TIMED_RENDER(out = vectorToJson(subs));

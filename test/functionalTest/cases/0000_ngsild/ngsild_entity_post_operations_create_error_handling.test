@@ -40,7 +40,6 @@ brokerStart CB 212-249
 # 07. Attempt to create with an entity with 2 TYPE fields - see error
 # 08. Attempt to create with an empty array - see error
 # 09. Attempt to create with an empty without @context field - see error
-#
 # 10. Create an entity E10
 # 11. Attempt to create entities E10 and E11 - see error for E10, ok for E11
 #
@@ -342,10 +341,9 @@ echo
 --REGEXPECT--
 01. Attempt to create with an entity having an ID that is not a string - see error
 ==================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 315
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -369,10 +367,9 @@ Date: REGEX(.*)
 
 02. Attempt to create with an entity without ID field - see error
 =================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 494
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -402,10 +399,9 @@ Date: REGEX(.*)
 
 03. Attempt to create with an entity having an ID with URI invalid - see error
 ==============================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 461
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -435,10 +431,9 @@ Date: REGEX(.*)
 
 04. Attempt to create with an entity having a TYPE that is not a string - see error
 ===================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 504
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -468,10 +463,9 @@ Date: REGEX(.*)
 
 05. Attempt to create with an entity without TYPE field - see error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 522
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -501,10 +495,9 @@ Date: REGEX(.*)
 
 06. Attempt to create with an entity with 2 ID fields - see error
 =================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 311
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -528,10 +521,9 @@ Date: REGEX(.*)
 
 07. Attempt to create with an entity with 2 TYPE fields - see error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 497
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -576,10 +568,9 @@ Date: REGEX(.*)
 
 09. Attempt to create with an empty without @context field - see error
 ======================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 284
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -611,10 +602,9 @@ Date: REGEX(.*)
 
 11. Attempt to create entities E10 and E11 - see error for E10, ok for E11
 ==========================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 286
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

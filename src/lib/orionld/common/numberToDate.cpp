@@ -27,7 +27,6 @@
 #include <time.h>                                                   // time, gmtime_r
 
 #include "logMsg/logMsg.h"                                          // LM_*
-#include "logMsg/traceLevels.h"                                     // Lmt*
 
 
 

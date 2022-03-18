@@ -24,7 +24,6 @@ SET (SOURCES
     orionldCoreContext.cpp
     orionldContextCreate.cpp
     orionldContextInit.cpp
-    orionldContextCache.cpp
     orionldContextPresent.cpp
     orionldContextTreePresent.cpp
     orionldContextHashTablesFill.cpp
@@ -39,15 +38,10 @@ SET (SOURCES
     orionldContextSimplify.cpp
     orionldContextFromTree.cpp
     orionldContextFromObject.cpp
-    orionldContextCacheInsert.cpp
     orionldContextUrlGenerate.cpp
-    orionldContextFromArray.cpp
-    orionldContextCacheInit.cpp
-    orionldContextCacheLookup.cpp
-    orionldContextCachePresent.cpp
-    orionldContextCacheGet.cpp
-    orionldContextCacheRelease.cpp
     orionldContextItemAlreadyExpanded.cpp
+    orionldAttributeExpand.cpp
+    orionldSubAttributeExpand.cpp
 )
 
 # Include directories

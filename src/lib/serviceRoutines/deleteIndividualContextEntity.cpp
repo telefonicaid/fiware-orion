@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
@@ -74,7 +76,7 @@ std::string deleteIndividualContextEntity
 {
   std::string  answer;
   std::string  entityId   = compV[2];
-  std::string  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string  entityType = orionldState.uriParams.type? orionldState.uriParams.type : "";
   StatusCode   response;
 
   // 01. Fill in UpdateContextRequest fromURL-data + URI params

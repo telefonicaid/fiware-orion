@@ -40,12 +40,11 @@
 *
 * Some macros to make the usage of these functions prettier
 */
-#define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__, __LINE__)
-#define getArrayFieldF(b, field)            getArrayField(b, field, __FUNCTION__, __LINE__)
+#define getObjectFieldF(outP, b, field)     getObjectField(outP, b, field, __FUNCTION__, __LINE__)
+#define getArrayFieldF(outP, b, field)      getArrayField(outP, b, field, __FUNCTION__, __LINE__)
 #define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
 #define getNumberFieldF(b, field)           getNumberField(b, field, __FUNCTION__, __LINE__)
 #define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
-#define getLongFieldF(b, field)             getLongField(b, field, __FUNCTION__, __LINE__)
 #define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
 #define getNumberFieldAsDoubleF(b, field)   getNumberFieldAsDouble(b, field, __FUNCTION__, __LINE__)
 #define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__, __LINE__)
@@ -59,11 +58,12 @@
 *
 * getObjectField -
 */
-extern mongo::BSONObj getObjectField
+extern bool getObjectField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  mongo::BSONObj*        outObjectP,
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -73,11 +73,12 @@ extern mongo::BSONObj getObjectField
 *
 * getArrayField -
 */
-extern mongo::BSONArray getArrayField
+extern bool getArrayField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  mongo::BSONArray*      outArrayP,
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -87,12 +88,12 @@ extern mongo::BSONArray getArrayField
 *
 * getStringField -
 */
-extern std::string getStringField
+extern const char* getStringField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
-  int                    line   = 0
+  const mongo::BSONObj* bP,
+  const char*           field,
+  const char*           caller = "<none>",
+  int                   line   = 0
 );
 
 
@@ -103,9 +104,9 @@ extern std::string getStringField
 */
 extern double getNumberField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller,
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller,
   int                    line
 );
 
@@ -117,24 +118,10 @@ extern double getNumberField
 */
 extern int getIntField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
-);
-
-
-
-/* ****************************************************************************
-*
-* getLongField -
-*/
-extern long long getLongField
-(
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
-  int                    line = 0
 );
 
 
@@ -145,9 +132,9 @@ extern long long getLongField
 */
 extern long long getIntOrLongFieldAsLong
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -159,9 +146,9 @@ extern long long getIntOrLongFieldAsLong
 */
 extern double getNumberFieldAsDouble
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -173,9 +160,9 @@ extern double getNumberFieldAsDouble
 */
 extern bool getBoolField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -187,9 +174,9 @@ extern bool getBoolField
 */
 extern mongo::BSONElement getField
 (
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
+  const mongo::BSONObj*  bP,
+  const char*            field,
+  const char*            caller = "<none>",
   int                    line   = 0
 );
 
@@ -201,10 +188,10 @@ extern mongo::BSONElement getField
 */
 extern void setStringVector
 (
-  const mongo::BSONObj&      b,
-  const std::string&         field,
+  const mongo::BSONObj*      bP,
+  const char*                field,
   std::vector<std::string>*  v,
-  const std::string&         caller,
+  const char*                caller,
   int                        line
 );
 
@@ -227,7 +214,7 @@ extern bool nextSafeOrError
   const std::auto_ptr<mongo::DBClientCursor>&  cursor,
   mongo::BSONObj*                              r,
   std::string*                                 err,
-  const std::string&                           caller = "<none>",
+  const char*                                  caller = "<none>",
   int                                          line   = 0
 );
 
@@ -237,7 +224,7 @@ extern bool nextSafeOrError
 *
 * safeGetSubId -
 */
-extern bool safeGetSubId(const SubscriptionId& subId, mongo::OID* id, StatusCode* sc);
+extern bool safeGetSubId(const SubscriptionId* subIdP, mongo::OID* id, StatusCode* sc);
 
 
 
@@ -245,6 +232,6 @@ extern bool safeGetSubId(const SubscriptionId& subId, mongo::OID* id, StatusCode
 *
 * safeGetRegId -
 */
-extern bool safeGetRegId(const RegistrationId& regId, mongo::OID* id, StatusCode* sc);
+extern bool safeGetRegId(const char* regId, mongo::OID* id, StatusCode* sc);
 
 #endif  // SRC_LIB_MONGOBACKEND_SAFEMONGO_H_

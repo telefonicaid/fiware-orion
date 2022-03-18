@@ -120,11 +120,11 @@ std::string OrionError::smartRender(ApiVersion apiVersion)
 *
 * OrionError::setStatusCodeAndSmartRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP)
+std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, int* scP)
 {
   if ((apiVersion == V2) || (apiVersion == ADMIN_API))
   {
-    *scP = code;
+    *scP = (HttpStatusCode) code;
   }
 
   return smartRender(apiVersion);
@@ -212,7 +212,7 @@ void OrionError::shrinkReasonPhrase(void)
   char buf[80];  // 80 should be enough to hold any reason phrase
 
 #if 0
-  strncpy(buf, reasonPhrase.c_str(), sizeof(buf));
+  strncpy(buf, reasonPhrase.c_str(), sizeof(buf) - 1);
 
   // See: http://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
   if (*j != ' ')

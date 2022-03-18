@@ -25,8 +25,6 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
@@ -39,14 +37,12 @@
 //
 // orionldGetRegistration -
 //
-bool orionldGetRegistration(ConnectionInfo* ciP)
+bool orionldGetRegistration(void)
 {
   ngsiv2::Registration  registration;
   char*                 details;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetRegistration (%s)", orionldState.wildcard[0]));
-
-  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
+  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenantP, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoLdRegistrationGet error: %s", details));
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
@@ -55,7 +51,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
 
   // Transform to KjNode tree
   orionldState.httpStatusCode  = SccOk;
-  orionldState.responseTree    = kjTreeFromRegistration(ciP, &registration);
+  orionldState.responseTree    = kjTreeFromRegistration(&registration);
 
   return true;
 }

@@ -1,0 +1,217 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #1050, part 4 - deletion with json literal
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# We need to define how to treat "non-needed" JSON literals, in ETSI ISG CIM.
+# Until then, Orion-LD ignores JSON literals (except for null) and just accepts the object as a compound.
+#
+# 01. Create an entity TemperatureSensor:001 with two attributes, category and temperature
+# 02. PATCH the entity setting 'category' to JSON literal { "@type": "@json", "@value": 2 }
+# 03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later
+# 04. Now remove 'category' with the JSON literal { "@type": "@json", "@value": null }
+# 05. GET the entity, making sure 'category' has been removed
+# 06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }
+# 07. GET the entity, see temperature is now a stupid compound ...
+#
+
+echo "01. Create an entity TemperatureSensor:001 with two attributes, category and temperature"
+echo "========================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:TemperatureSensor:001",
+  "type": "TemperatureSensor",
+  "category": "sensor",
+  "temperature": {
+    "value": 25,
+    "unitCode": "CEL"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH the entity setting 'category' to JSON literal { @type: @json, @value: 2 }"
+echo "==================================================================================="
+payload='{
+  "category": { "@type": "@json", "@value": 2 }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later"
+echo "======================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+echo
+echo
+
+
+echo "04. Now remove 'category' with the JSON literal { '@type': '@json', '@value': null }"
+echo "===================================================================================="
+payload='{
+  "category": { "@type": "@json", "@value": null }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET the entity, making sure 'category' has been removed"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+echo
+echo
+
+
+echo "06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }"
+echo "===================================================================================================="
+payload='{
+  "temperature": { "value": { "@type": "@json", "@value": 6 } }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. GET the entity, see temperature is now a stupid compound ..."
+echo "================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity TemperatureSensor:001 with two attributes, category and temperature
+========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+Date: REGEX(.*)
+
+
+
+02. PATCH the entity setting 'category' to JSON literal { @type: @json, @value: 2 }
+===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "@json",
+    "title": "Invalid value for /type/",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later
+=======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 179
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "category": {
+        "type": "Property",
+        "value": "sensor"
+    },
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 25
+    },
+    "type": "TemperatureSensor"
+}
+
+
+04. Now remove 'category' with the JSON literal { '@type': '@json', '@value': null }
+====================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET the entity, making sure 'category' has been removed
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 25
+    },
+    "type": "TemperatureSensor"
+}
+
+
+06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }
+====================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET the entity, see temperature is now a stupid compound ...
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 157
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": {
+            "@type": "@json",
+            "@value": 6
+        }
+    },
+    "type": "TemperatureSensor"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

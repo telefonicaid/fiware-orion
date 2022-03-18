@@ -49,7 +49,7 @@
 TEST(UpdateContextSubscriptionRequest, badLength_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
   const char*     infile   = "ngsi10.updateContextSubscriptionRequest.badLength.invalid.json";
   const char*     outfile1 = "ngsi10.updateContextSubscriptionRequest.badLength.expected1.valid.json";
@@ -60,8 +60,9 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   lmTraceLevelSet(LmtDump, true);
@@ -97,7 +98,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 {
   ParseData       parseData;
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
   const char*     infile   = "ngsi10.updateContextSubscriptionRequest.duration.invalid.json";
   const char*     outfile  = "ngsi10.updateContextSubscriptionResponse.invalidDuration.valid.json";
 
@@ -106,8 +107,9 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -125,13 +127,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -150,13 +153,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -176,13 +180,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJso
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInvertedBadValue.postponed.json";
   const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -204,13 +209,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleZeroRadius.postponed.json";
   const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleZeroRadius.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -231,13 +237,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOk.postponed.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -256,13 +263,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInverted.postponed.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     result;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -282,13 +290,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJs
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInvertedBadValue.postponed.json";
   const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonInvertedBadValue.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -310,13 +319,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonNoVertices.postponed.json";
   const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonNoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -338,13 +348,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOneVertex.postponed.json";
   const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonOneVertex.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -366,13 +377,14 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonTwoVertices.postponed.json";
   const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonTwoVertices.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  ConnectionInfo  ci;
   std::string     out;
 
   utInit();
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

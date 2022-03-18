@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
@@ -66,13 +68,13 @@ std::string getEntityAttributeValue
 {
   Attribute    attribute;
   std::string  answer;
-  std::string  type       = ciP->uriParam["type"];
+  std::string  type       = (orionldState.uriParams.type != NULL)? orionldState.uriParams.type : (char*) "";
 
-  if (forbiddenIdChars(ciP->apiVersion,  compV[2].c_str(), NULL) ||
-      (forbiddenIdChars(ciP->apiVersion, compV[4].c_str(), NULL)))
+  if (forbiddenIdChars(orionldState.apiVersion,  compV[2].c_str(), NULL) ||
+      (forbiddenIdChars(orionldState.apiVersion, compV[4].c_str(), NULL)))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
@@ -86,7 +88,7 @@ std::string getEntityAttributeValue
   if (attribute.oe.code != SccNone)
   {
     TIMED_RENDER(answer = attribute.oe.toJson());
-    ciP->httpStatusCode = attribute.oe.code;
+    orionldState.httpStatusCode = attribute.oe.code;
   }
   else
   {
@@ -94,24 +96,22 @@ std::string getEntityAttributeValue
     std::string attributeType = attribute.pcontextAttribute->type;
 
     // the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    orionldState.httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
     // Remove unwanted fields from attribute before rendering
     attribute.pcontextAttribute->type = "";
     attribute.pcontextAttribute->metadataVector.release();
 
-    if (ciP->outMimeType == JSON)
+    if (orionldState.out.contentType == JSON)
     {
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP->httpHeaders.accepted("text/plain"),
-                                             ciP->httpHeaders.accepted("application/json"),
-                                             ciP->httpHeaders.outformatSelect(),
-                                             &(ciP->outMimeType),
-                                             &(ciP->httpStatusCode),
-                                             ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             ciP->uriParam[URI_PARAM_METADATA],
+      TIMED_RENDER(answer = attribute.render(orionldState.out.contentType,
+                                             &orionldState.out.contentType,
+                                             &orionldState.httpStatusCode,
+                                             orionldState.uriParamOptions.keyValues,
+                                             orionldState.uriParams.metadata? orionldState.uriParams.metadata : "",
                                              EntityAttributeValueRequest,
                                              false));
     }
@@ -119,7 +119,7 @@ std::string getEntityAttributeValue
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP->apiVersion));
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(orionldState.apiVersion));
 
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {

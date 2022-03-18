@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"
+
 #include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
 #include "apiTypesV2/Registration.h"
@@ -41,7 +43,7 @@
 extern void mongoRegistrationDelete
 (
   const std::string&     regId,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePathV,
   OrionError*            oeP
 );

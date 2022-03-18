@@ -53,6 +53,6 @@ bool mongoCppLegacyDbObjectFieldGet(const mongo::BSONObj* boP, const char* field
     return true;
   }
 
-  LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d", type));
+  LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d", fieldName, type));
   return false;
 }

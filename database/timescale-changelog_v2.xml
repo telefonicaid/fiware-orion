@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v2_step_1">
+        <comment>Change type of dataset id and add constraint.</comment>
+        <modifyDataType columnName="datasetid"
+                        schemaName="public"
+                        tableName="attributes"
+                        newDataType="varchar"/>
+        <addNotNullConstraint columnName="datasetid"
+                              schemaName="public"
+                              tableName="attributes"
+                              defaultNullValue="migration-notNull"
+                              columnDataType="varchar"
+                              constraintName="dataset_id_not_null_attr"/>
+        <rollback>
+            <dropNotNullConstraint columnDataType="varchar"
+                                   columnName="datasetid"
+                                   schemaName="public"
+                                   tableName="attributes"/>
+            <modifyDataType columnName="datasetid"
+                            schemaName="public"
+                            tableName="attributes"
+                            newDataType="text"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="stefan.wiedemann@fiware.org" id="v2_step_2">
+        <comment>Add dataset id to combined primary key for the attributes table.</comment>
+        <dropPrimaryKey constraintName="attributes_pkey"
+                        dropIndex="true"
+                        schemaName="public"
+                        tableName="attributes"/>
+        <addPrimaryKey
+                columnNames="instanceid, ts, datasetid"
+                constraintName="attributes_pkey"
+                schemaName="public"
+                tableName="attributes"
+                validate="true"/>
+        <rollback>
+            <dropPrimaryKey constraintName="attributes_pkey"
+                            dropIndex="true"
+                            schemaName="public"
+                            tableName="attributes"/>
+            <addPrimaryKey
+                    columnNames="instanceid, ts"
+                    constraintName="attributes_pkey"
+                    schemaName="public"
+                    tableName="attributes"
+                    validate="true"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

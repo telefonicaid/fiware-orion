@@ -43,4 +43,12 @@ typedef enum OrionldGeoJsonType
   GeoJsonMultiPolygon
 } GeoJsonType;
 
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldGeoJsonTypeFromString -
+//
+extern OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type);
+
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_

@@ -1,0 +1,159 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simultaneous download of a context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# This test exercises the 'wait for context download feature', implemented in end of February 2021, by ...
+# - Sending a request to create an entity E1 with context X, in the bacground, so another request can enter the broker simultaneously
+# - Sending another request, with the same context X, to create another entity (E2)
+#
+# As the first request is already downloading context X when the second request is received, the second request will await the download of
+# context X. Finally, both request will succeed.
+#
+# Context X: https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld
+#
+#
+# 01. Create entity E1, with context X - in the background
+# 02. Simultaneously, create entity E2, using the same context
+# 03. Sleep a second, just in case. Should not be necessary
+# 04. GET all entities - make sure both E1 and E2 have been created
+#
+
+echo "01. Create entity E1, with context X - in the background"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "TX",
+  "name": {
+    "type": "Property",
+    "value": "the one that downloads the context"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+curl localhost:9999/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: application/ld+json" -s -S --dump-header /tmp/headers.out > /tmp/ngsild_context_simultaneous_download.01 &
+
+
+echo "02. Simultaneously, create entity E2, using the same context"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "TX",
+  "name": {
+    "type": "Property",
+    "value": "the one that waits"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" > /tmp/ngsild_context_simultaneous_download.02
+
+#
+# Show the output of step 01 and 02 - in order
+#
+cat /tmp/headers.out
+cat /tmp/ngsild_context_simultaneous_download.01
+echo
+echo
+cat /tmp/ngsild_context_simultaneous_download.02
+echo
+echo
+
+
+echo "03. Sleep a second, just in case. Should not be necessary"
+echo "========================================================="
+sleep 1
+echo slept 1
+echo
+echo
+
+
+echo "04. GET all entities - make sure both E1 and E2 have been created"
+echo "================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=TX
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1, with context X - in the background
+========================================================
+02. Simultaneously, create entity E2, using the same context
+============================================================
+HTTP/1.1 201 Created
+Connection: Keep-Alive
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+03. Sleep a second, just in case. Should not be necessary
+=========================================================
+slept 1
+
+
+04. GET all entities - make sure both E1 and E2 have been created
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 219
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:entities:E1",
+        "name": {
+            "type": "Property",
+            "value": "the one that downloads the context"
+        },
+        "type": "TX"
+    },
+    {
+        "id": "urn:ngsi-ld:entities:E2",
+        "name": {
+            "type": "Property",
+            "value": "the one that waits"
+        },
+        "type": "TX"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop C

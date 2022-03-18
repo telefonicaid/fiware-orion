@@ -136,10 +136,14 @@ MongoDB server version: REGEX(.*)
 			"value" : "Property with Property as sub-attr",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "sub-attr for Prop/Prop"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "http://a.b.c/x.jsonld"
 				}
@@ -156,10 +160,14 @@ MongoDB server version: REGEX(.*)
 			"value" : "http://a.b.c/x.jsonld",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "sub-attr for Rel/Prop"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "http://a.b.c/x.jsonld"
 				}
@@ -208,10 +216,14 @@ MongoDB server version: REGEX(.*)
 			"value" : "Property with Property as sub-attr",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "sub-attr for Prop/Prop"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "http://a.b.c/x.jsonld"
 				}
@@ -228,10 +240,14 @@ MongoDB server version: REGEX(.*)
 			"value" : "http://a.b.c/x.jsonld",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "sub-attr for Rel/Prop"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Relationship",
 					"value" : "http://a.b.c/x.jsonld"
 				}
@@ -246,6 +262,8 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "sub-attr Prop2/Prop2"
 				}

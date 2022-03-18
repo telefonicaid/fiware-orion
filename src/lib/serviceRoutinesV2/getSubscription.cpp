@@ -22,11 +22,10 @@
 *
 * Author: Orion dev team
 */
-
-#include "serviceRoutinesV2/getSubscription.h"
-
 #include <string>
 #include <vector>
+
+#include "orionld/common/orionldState.h"        // orionldState
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -39,6 +38,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "common/idCheck.h"
+#include "serviceRoutinesV2/getSubscription.h"
 
 
 
@@ -66,16 +66,16 @@ std::string getSubscription
   if ((err = idCheck(idSub)) != "OK")
   {
     oe.fill(SccBadRequest, "Invalid subscription ID: " + err, "BadRequest");
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
-  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
+  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, orionldState.tenantP));
 
   if (oe.code != SccOk)
   {
     TIMED_RENDER(out = oe.toJson());
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return out;
   }
 

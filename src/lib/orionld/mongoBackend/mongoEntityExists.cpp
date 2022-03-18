@@ -36,7 +36,9 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
 
-#include "orionld/mongoBackend/mongoEntityExists.h"     // Own Interface
+#include "orionld/types/OrionldTenant.h"                          // OrionldTenant
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"      // mongoCppLegacyDbFieldGet
+#include "orionld/mongoBackend/mongoEntityExists.h"               // Own Interface
 
 
 
@@ -55,7 +57,7 @@ using mongo::DBClientCursor;
 //
 // mongoEntityExists -
 //
-bool mongoEntityExists(const char* entityId, const char* tenant)
+bool mongoEntityExists(const char* entityId, OrionldTenant* tenantP)
 {
   BSONObjBuilder bob;
 
@@ -70,7 +72,7 @@ bool mongoEntityExists(const char* entityId, const char* tenant)
   DBClientBase* connection = getMongoConnection();
   std::string   err;
 
-  if (collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err) == false)
+  if (collectionQuery(connection, tenantP->entities, query, &cursor, &err) == false)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -86,7 +88,22 @@ bool mongoEntityExists(const char* entityId, const char* tenant)
     try
     {
       bo = cursor->nextSafe();
-      ++docs;
+
+      mongo::BSONElement _id;
+
+      if (mongoCppLegacyDbFieldGet(&bo, "_id", &_id) == true)
+      {
+        mongo::BSONElement id;
+        mongo::BSONObj     obj = _id.Obj();
+
+        if (mongoCppLegacyDbFieldGet(&obj, "id", &id) == true)
+        {
+          const char* idString = id.valuestr();
+
+          if ((idString != NULL) && (strcmp(idString, entityId) == 0))
+            ++docs;
+        }
+      }
     }
     catch (...)
     {

@@ -173,7 +173,7 @@
 #
 # Is the broker compiled with performance tests included?
 #
-nm /usr/bin/orionld | grep performanceTestInluded 2> /dev/null
+nm /usr/bin/orionld | grep performanceTimestamps 2> /dev/null
 if [ $? != 0 ]
 then
   echo

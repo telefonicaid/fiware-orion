@@ -1,0 +1,189 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Having one broker subscribe to another broker, and keep a copy of the entities incoming via notification
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# This is a test of the NGSI-LD /notify endpoint
+#
+# 01. Make CP1 subscribe to changes in E1 on CB
+# 02. Create entity E1 in the main broker - CB
+# 03. Query CP1 for Ei - see the same entity as in CB
+# 04. Modify E1 in CB
+# 05. Query CP1 for Ei - see the change propagated
+#
+
+echo "01. Make CP1 subscribe to changes in E1 on CB"
+echo "============================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:copy-e1",
+  "type": "Subscription",
+  "name": "notification on E1",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:entities:E1",
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${CP1_PORT}'/ngsi-ld/ex/v1/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 in the main broker - CB"
+echo "============================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Query CP1 for Ei - see the same entity as in CB"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T1 --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Modify E1 in CB"
+echo "==================="
+payload='{
+  "value": 2
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/P1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Query CP1 for Ei - see the change propagated"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T1 --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Make CP1 subscribe to changes in E1 on CB
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:copy-e1
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 in the main broker - CB
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+03. Query CP1 for Ei - see the same entity as in CB
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": 1
+        },
+        "R1": {
+            "object": "urn:ngsi-ld:entities:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T1"
+    }
+]
+
+
+04. Modify E1 in CB
+===================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Query CP1 for Ei - see the change propagated
+================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": 2
+        },
+        "R1": {
+            "object": "urn:ngsi-ld:entities:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

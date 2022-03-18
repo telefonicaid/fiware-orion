@@ -158,9 +158,14 @@ echo
 --REGEXPECT--
 01. Create entity E1
 ====================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E1"
+]
 
 
 02. Sleep 2 secs
@@ -170,9 +175,14 @@ Slept 2 seconds
 
 03. Create entity E2
 ====================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:entity:E2"
+]
 
 
 04. Get the creDates of E1 and E2

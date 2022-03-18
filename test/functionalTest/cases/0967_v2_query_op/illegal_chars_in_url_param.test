@@ -118,13 +118,13 @@ echo
 01. GET /v2/entities/E1 with illegal char 1 in URI param 'w1' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -132,13 +132,13 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 with illegal char 2 in URI param 'w2' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -146,13 +146,13 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1 with illegal char 3 in URI param 'w3' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -160,13 +160,13 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 with illegal char 4 in URI param 'w4' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -174,13 +174,13 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1 with illegal char 5 in URI param 'w5' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -188,13 +188,13 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 with illegal char 6 in URI param 'w6' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -202,13 +202,13 @@ Date: REGEX(.*)
 07. GET /v2/entities/E1 with illegal char 7 in URI param 'w7' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 
@@ -216,13 +216,13 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 with illegal char 8 in URI param 'w8' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI parameter",
+    "description": "invalid character in a URI parameter",
     "error": "BadRequest"
 }
 

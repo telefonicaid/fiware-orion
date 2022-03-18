@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "jsonParse/jsonParse.h"
@@ -167,5 +169,5 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(ciP->apiVersion, reqData->errorString);
+  return reqData->upcar.res.check(orionldState.apiVersion, reqData->errorString);
 }

@@ -28,17 +28,18 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/compileInfo.h"
 #include "common/defaultValues.h"
-#include "orionld/common/orionldState.h"
-#include "rest/HttpHeaders.h"
-#include "rest/rest.h"
-
 #include "ngsi/ParseData.h"
+#include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"                                  // CORS_EXPOSED_HEADERS
 #include "serviceRoutines/versionTreat.h"
 
 
@@ -84,21 +85,12 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
-  if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
+  if (isOriginAllowedForCORS(orionldState.in.origin))
   {
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
-    // If any origin is allowed, the header is always sent with the value "*"
-    if (strcmp(corsOrigin, "__ALL") == 0)
-    {
-      ciP->httpHeaderValue.push_back("*");
-    }
-    // If a specific origin is allowed, the header is only sent if the origins match
-    else
-    {
-      ciP->httpHeaderValue.push_back(corsOrigin);
-    }
-    ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_EXPOSE_HEADERS);
-    ciP->httpHeaderValue.push_back(CORS_EXPOSED_HEADERS);
+    char* allowOrigin = (strcmp(corsOrigin, "__ALL") == 0)? (char*) "*" : corsOrigin;
+
+    orionldHeaderAdd(&orionldState.out.headers, HttpAllowOrigin,   allowOrigin, 0);
+    orionldHeaderAdd(&orionldState.out.headers, HttpExposeHeaders, (char*) CORS_EXPOSED_HEADERS, 0);
   }
   
   std::string out     = "";
@@ -122,6 +114,6 @@ std::string versionTreat
   out += "  \"doc\":             \"" + std::string(API_DOC)        + "\"\n";
   out += "}\n";
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
   return out;
 }

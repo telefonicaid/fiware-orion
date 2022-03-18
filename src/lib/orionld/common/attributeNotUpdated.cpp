@@ -40,10 +40,17 @@ extern "C"
 //
 // attributeNotUpdated -
 //
-void attributeNotUpdated(KjNode* notUpdatedP, const char* attrName, const char* reason)
+void attributeNotUpdated(KjNode* notUpdatedP, const char* attrName, const char* title, const char* detail)
 {
   KjNode* notUpdatedDetailsP = kjObject(orionldState.kjsonP, NULL);
   KjNode* attrNameP          = kjString(orionldState.kjsonP, "attributeName", attrName);
+  char    reason[512];
+
+  if (detail != NULL)
+    snprintf(reason, sizeof(reason), "%s: %s", title, detail);
+  else
+    snprintf(reason, sizeof(reason), "%s", title);
+
   KjNode* reasonP            = kjString(orionldState.kjsonP, "reason", reason);
 
   kjChildAdd(notUpdatedDetailsP, attrNameP);

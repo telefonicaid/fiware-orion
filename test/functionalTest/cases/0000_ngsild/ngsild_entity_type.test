@@ -1,0 +1,471 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Type - simple test with only local entities, no registrations
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create Entity E1 with type T2, and attrs P1 and R1
+# 02. GET Entity Type T1 - see 404
+# 03. Create Entity E3 with type T1, and attrs P1 and R1
+# 04. GET Entity Type T1 - see T1, count 1, and attrs P1 and R1
+# 05. Create Entity E5 with type T1 and attrs P2 and R2
+# 06. GET Entity Type T1 - see T1, count 2, and attrs P1, P2, R1, and R2
+# 07. Create Entity E7 with type T1 and attrs P1, P2, R1, and R2, but with opposite attr types
+# 08. GET Entity Type T1 - see T1, count 3, and attrs P1, P2, R1, and R2
+# 09. Same same, but Accept: application/ld+json
+# 10. Same same, but type in URL as long name
+#
+
+echo "01. Create Entity E1 with type T2, and attrs P1 and R1"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T2",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET Entity Type T1 - see 404"
+echo "================================"
+orionCurl --url /ngsi-ld/v1/types/T1
+echo
+echo
+
+
+echo "03. Create Entity E3 with type T1, and attrs P1 and R1"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E3",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. GET Entity Type T1 - see T1, count 1, and attrs P1 and R1"
+echo "============================================================="
+orionCurl --url /ngsi-ld/v1/types/T1
+echo
+echo
+
+
+echo "05. Create Entity E5 with type T1 and attrs P2 and R2"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E5",
+  "type": "T1",
+  "P2": {
+    "type": "Property",
+    "value": 1
+  },
+  "R2": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET Entity Type T1 - see T1, count 2, and attrs P1, P2, R1, and R2"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/types/T1
+echo
+echo
+
+
+echo "07. Create Entity E7 with type T1 and attrs P1, P2, R1, and R2, but with opposite attr types"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E7",
+  "type": "T1",
+  "P1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  },
+  "P2": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  },
+  "R1": {
+    "type": "Property",
+    "value": 1
+  },
+  "R2": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GET Entity Type T1 - see T1, count 3, and attrs P1, P2, R1, and R2"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/types/T1
+echo
+echo
+
+
+echo "09. Same same, but Accept: application/ld+json"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/types/T1 -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "10. Same same, but type in URL as long name"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/types/https://uri.etsi.org/ngsi-ld/default-context/T1 -H "Accept: application/ld+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity E1 with type T2, and attrs P1 and R1
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET Entity Type T1 - see 404
+================================
+HTTP/1.1 404 Not Found
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+    "title": "Entity Type Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+03. Create Entity E3 with type T1, and attrs P1 and R1
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E3
+Date: REGEX(.*)
+
+
+
+04. GET Entity Type T1 - see T1, count 1, and attrs P1 and R1
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeDetails": [
+        {
+            "attributeName": "P1",
+            "attributeTypes": [
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R1",
+            "attributeTypes": [
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+            "type": "Attribute"
+        }
+    ],
+    "entityCount": 1,
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+    "type": "EntityTypeInformation",
+    "typeName": "T1"
+}
+
+
+05. Create Entity E5 with type T1 and attrs P2 and R2
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E5
+Date: REGEX(.*)
+
+
+
+06. GET Entity Type T1 - see T1, count 2, and attrs P1, P2, R1, and R2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 656
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeDetails": [
+        {
+            "attributeName": "P1",
+            "attributeTypes": [
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R1",
+            "attributeTypes": [
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "P2",
+            "attributeTypes": [
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R2",
+            "attributeTypes": [
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R2",
+            "type": "Attribute"
+        }
+    ],
+    "entityCount": 2,
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+    "type": "EntityTypeInformation",
+    "typeName": "T1"
+}
+
+
+07. Create Entity E7 with type T1 and attrs P1, P2, R1, and R2, but with opposite attr types
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E7
+Date: REGEX(.*)
+
+
+
+08. GET Entity Type T1 - see T1, count 3, and attrs P1, P2, R1, and R2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 708
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "attributeDetails": [
+        {
+            "attributeName": "P1",
+            "attributeTypes": [
+                "Property",
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R1",
+            "attributeTypes": [
+                "Relationship",
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "P2",
+            "attributeTypes": [
+                "Property",
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R2",
+            "attributeTypes": [
+                "Relationship",
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R2",
+            "type": "Attribute"
+        }
+    ],
+    "entityCount": 3,
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+    "type": "EntityTypeInformation",
+    "typeName": "T1"
+}
+
+
+09. Same same, but Accept: application/ld+json
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 781
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "attributeDetails": [
+        {
+            "attributeName": "P1",
+            "attributeTypes": [
+                "Property",
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R1",
+            "attributeTypes": [
+                "Relationship",
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "P2",
+            "attributeTypes": [
+                "Property",
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R2",
+            "attributeTypes": [
+                "Relationship",
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R2",
+            "type": "Attribute"
+        }
+    ],
+    "entityCount": 3,
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+    "type": "EntityTypeInformation",
+    "typeName": "T1"
+}
+
+
+10. Same same, but type in URL as long name
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 781
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "attributeDetails": [
+        {
+            "attributeName": "P1",
+            "attributeTypes": [
+                "Property",
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R1",
+            "attributeTypes": [
+                "Relationship",
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "P2",
+            "attributeTypes": [
+                "Property",
+                "Relationship"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "type": "Attribute"
+        },
+        {
+            "attributeName": "R2",
+            "attributeTypes": [
+                "Relationship",
+                "Property"
+            ],
+            "id": "https://uri.etsi.org/ngsi-ld/default-context/R2",
+            "type": "Attribute"
+        }
+    ],
+    "entityCount": 3,
+    "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+    "type": "EntityTypeInformation",
+    "typeName": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

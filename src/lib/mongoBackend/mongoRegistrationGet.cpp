@@ -30,8 +30,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "rest/ConnectionInfo.h"
+#include "orionld/types/OrionldTenant.h"
 
+#include "rest/ConnectionInfo.h"
 #include "common/idCheck.h"
 #include "common/sem.h"
 #include "common/statistics.h"
@@ -57,7 +58,7 @@ void mongoRegistrationGet
 (
   ngsiv2::Registration*  regP,
   const std::string&     regId,
-  const std::string&     tenant,
+  OrionldTenant*         tenantP,
   const std::string&     servicePath,
   OrionError*            oeP
 )
@@ -67,7 +68,7 @@ void mongoRegistrationGet
   mongo::OID   oid;
   StatusCode   sc;
 
-  if (safeGetRegId(regId, &oid, &sc) == false)
+  if (safeGetRegId(regId.c_str(), &oid, &sc) == false)
   {
     oeP->fill(sc);
     return;
@@ -84,7 +85,7 @@ void mongoRegistrationGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->registrations, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -112,10 +113,10 @@ void mongoRegistrationGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    mongoSetRegistrationId(regP, bob);
-    mongoSetDescription(regP, bob);
+    mongoSetRegistrationId(regP, &bob);
+    mongoSetDescription(regP, &bob);
 
-    if (mongoSetDataProvided(regP, bob, false) == false)
+    if (mongoSetDataProvided(regP, &bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -130,7 +131,7 @@ void mongoRegistrationGet
     mongoSetLdManagementInterval(regP, bob);
 #endif
     mongoSetExpires(regP, bob);
-    mongoSetStatus(regP, bob);
+    mongoSetStatus(regP, &bob);
 
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -166,7 +167,7 @@ void mongoRegistrationGet
 void mongoRegistrationsGet
 (
   std::vector<ngsiv2::Registration>*  regV,
-  const std::string&                  tenant,
+  OrionldTenant*                      tenantP,
   const std::vector<std::string>&     servicePathV,
   int                                 offset,
   int                                 limit,
@@ -197,7 +198,7 @@ void mongoRegistrationsGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, countP, &err))
+  if (!collectionRangedQuery(connection, tenantP->registrations, q, limit, offset, &cursor, countP, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -226,10 +227,10 @@ void mongoRegistrationsGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    mongoSetRegistrationId(&reg, bob);
-    mongoSetDescription(&reg, bob);
+    mongoSetRegistrationId(&reg, &bob);
+    mongoSetDescription(&reg, &bob);
 
-    if (mongoSetDataProvided(&reg, bob, false) == false)
+    if (mongoSetDataProvided(&reg, &bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -239,7 +240,7 @@ void mongoRegistrationsGet
     }
 
     mongoSetExpires(&reg, bob);
-    mongoSetStatus(&reg, bob);
+    mongoSetStatus(&reg, &bob);
 
     regV->push_back(reg);
   }

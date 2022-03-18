@@ -60,13 +60,9 @@ Entities::~Entities()
 * Entities::render -
 *
 */
-std::string Entities::render
-(
-  std::map<std::string, bool>&         uriParamOptions,
-  std::map<std::string, std::string>&  uriParam
-)
+std::string Entities::render()
 {
-  return vec.render(uriParamOptions, uriParam);
+  return vec.render();
 }
 
 

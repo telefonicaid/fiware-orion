@@ -32,9 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
+
+#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"   // Own interface
 
@@ -46,10 +46,8 @@ extern "C"
 //
 bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree)
 {
-  char                   collectionPath[256];
   mongo::BSONObj         payloadAsBsonObj;
 
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
   dbDataFromKjTree(requestTree, &payloadAsBsonObj);
 
 
@@ -59,14 +57,12 @@ bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree)
   mongo::BSONObjBuilder  filter;
   filter.append("_id.id", entityId);
 
-
-  // semTake()
   bool                  upsert      = false;
   mongo::DBClientBase*  connectionP = getMongoConnection();
   mongo::Query          query(filter.obj());
-  connectionP->update(collectionPath, query, payloadAsBsonObj, upsert, false);
+
+  connectionP->update(orionldState.tenantP->entities, query, payloadAsBsonObj, upsert, false);
   releaseMongoConnection(connectionP);
-  // semGive()
 
   return true;
 }

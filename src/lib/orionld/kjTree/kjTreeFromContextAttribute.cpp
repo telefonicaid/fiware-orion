@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                            // NULL
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -32,9 +34,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/RenderFormat.h"                               // RenderFormat
-#include "orionld/common/numberToDate.h"                       // numberToDate
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -85,6 +86,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       attrName = alias;
   }
 
+
+  //
+  // keyValues
+  //
   if ((renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
   {
     //
@@ -118,7 +123,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
       if (nodeP == NULL)
         return NULL;
-      nodeP->name = (char*) caP->name.c_str();  // FIXME: WORKAROUND - kjTreeFromCompoundValue should be fixed instead!
+      nodeP->name = attrName;
       break;
 
     case orion::ValueTypeNotGiven:
@@ -130,6 +135,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     return nodeP;
   }
 
+
+  //
+  // Normalized
+  //
   KjNode* aTopNodeP = kjObject(orionldState.kjsonP, attrName);  // Top node for the attribute
 
   if (aTopNodeP == NULL)
@@ -157,7 +166,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   }
 
   // Value
-  const char* valueName = (isRelationship == false)? "value" : "object";
+  char* valueName = (isRelationship == false)? (char*) "value" : (char*) "object";
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
@@ -183,9 +192,9 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
     nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
-    nodeP->name = (char*) "value";
     if (nodeP == NULL)
       return NULL;
+    nodeP->name = valueName;
     break;
 
   case orion::ValueTypeNotGiven:
@@ -223,14 +232,13 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     if ((isGeoProperty == true) && (strcmp(mdName, "location") == 0))
     {
-      //
-      // FIXME
-      //   Skipping the metadata "location" for GeoProperty attributes - for now
-      //   In the future we might want to keep this metadata, but the unit must be looked over (WGS84).
-      //   What was default unit in orion v1 is not default for orionld
-      //
-      LM_TMP(("FIXME: something needs to be implemented here!"));
-      continue;
+      nodeP = kjObject(orionldState.kjsonP, mdName);
+
+      KjNode* typeP  = kjString(orionldState.kjsonP, "type", "GeoProperty");
+      KjNode* valueP = kjObject(orionldState.kjsonP, "value");
+
+      kjChildAdd(nodeP, typeP);
+      kjChildAdd(nodeP, valueP);
     }
 
     //
@@ -263,9 +271,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       nodeP = kjObject(orionldState.kjsonP, mdLongName);
 
       kjChildAdd(nodeP, typeNodeP);
+
       if (strcmp(mdP->type.c_str(), "Relationship") == 0)
       {
-        if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
+        if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_CONCISE))
           valueNodeP = kjString(orionldState.kjsonP, "object", mdP->stringValue.c_str());
         else
           valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
@@ -293,6 +302,8 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
           valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, false, detailsP);
+          if (valueNodeP != NULL)
+            valueNodeP->name = (char*) "value";
           break;
 
         case orion::ValueTypeNotGiven:

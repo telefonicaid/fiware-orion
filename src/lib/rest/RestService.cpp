@@ -29,6 +29,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"
+
 #include "common/limits.h"
 #include "common/globals.h"
 #include "common/statistics.h"
@@ -181,14 +183,9 @@ std::string payloadParse
 {
   std::string result = "NONE";
 
-  LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
-  LM_T(LmtParsedPayload, ("outMimeType: %s", mimeTypeToString(ciP->outMimeType)));
-
-  ciP->requestType = service->request;
-
-  if (ciP->inMimeType == JSON)
+  if (orionldState.in.contentType == JSON)
   {
-    if (ciP->apiVersion == V2)
+    if (orionldState.apiVersion == V2)
     {
       //
       // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
@@ -200,26 +197,21 @@ std::string payloadParse
     }
     else
     {
-      result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, jsonPP);
+      result = jsonTreat(orionldState.in.payload, ciP, parseDataP, service->request, jsonPP);
     }
   }
-  else if (ciP->inMimeType == TEXT)
+  else if (orionldState.in.contentType == TEXT)
   {
     result = textRequestTreat(ciP, parseDataP, service->request);
   }
   else
   {
     alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
-    return "Bad inMimeType";
+    return "Bad Input";
   }
-
-  LM_T(LmtParsedPayload, ("result:      '%s'", result.c_str()));
-  LM_T(LmtParsedPayload, ("outMimeType: '%s'", mimeTypeToString(ciP->outMimeType)));
 
   if (result != "OK")
-  {
-    restReply(ciP, result);
-  }
+    restReply(ciP, result.c_str());
 
   return result;
 }
@@ -285,7 +277,7 @@ static void commonFilters
   //
   // 1. ?!exist=entity::type
   //
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     Restriction* restrictionP = NULL;
 
@@ -323,7 +315,7 @@ static void commonFilters
   //
   // 2. ?exist=entity::type
   //
-  if (ciP->uriParam[URI_PARAM_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+  if (orionldState.in.entityTypeExists == true)
   {
     Restriction* restrictionP = NULL;
 
@@ -538,14 +530,14 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
-  // FIXME P2: this empty url check seems not necessary ... 
-  if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
+  if ((orionldState.urlPath == NULL) || (orionldState.urlPath[0] == 0) || ((orionldState.urlPath[0] == '/') && (orionldState.urlPath[1] == 0)))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.render();
 
+    orionldState.httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
-    restReply(ciP, response);
+    restReply(ciP, response.c_str());
 
     return std::string("Empty URL");
   }
@@ -554,11 +546,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError oe;
 
-    if (compErrorDetect(ciP->apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
+    if (compErrorDetect(orionldState.apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.details);
-      ciP->httpStatusCode = SccBadRequest;
-      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      orionldState.httpStatusCode = SccBadRequest;
+      restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
       return "URL PATH component error";
     }
   }
@@ -566,27 +558,23 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // Check the payload, if any
   //
-  if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
+  if ((orionldState.in.payload != NULL) && (orionldState.in.payloadSize != 0) && (orionldState.in.payload[0] != 0))
   {
-    std::string response;
-    std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+    std::string  response;
+    const char*  spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0].c_str() : "";
 
-    ciP->parseDataP = &parseData;
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
-    LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-
+    metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN_REQ_SIZE, orionldState.in.payloadSize);
     response = payloadParse(ciP, &parseData, ciP->restServiceP, &jsonReqP, &jsonRelease, ciP->urlCompV);
-    LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
     if (response != "OK")
     {
       alarmMgr.badInput(clientIp, response);
-      restReply(ciP, response);
+      restReply(ciP, response.c_str());
 
       if (jsonReqP != NULL)
         jsonReqP->release(&parseData);
 
-      if (ciP->apiVersion == V2)
+      if (orionldState.apiVersion == V2)
       {
         delayedRelease(&jsonRelease);
       }
@@ -595,38 +583,37 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
-  LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
-  if (ciP->payloadSize == 0)
+  // LM_TMP(("Treating service %s %s", verbName(orionldState.verb), orionldState.urlPath)); // Sacred - used in 'heavyTest'
+  if (orionldState.in.payloadSize == 0)
   {
-    ciP->inMimeType = NOMIMETYPE;
+    orionldState.in.contentType = NOMIMETYPE;
   }
-  statisticsUpdate(ciP->restServiceP->request, ciP->inMimeType);
+  statisticsUpdate(ciP->restServiceP->request, orionldState.in.contentType);
 
   // Tenant to connectionInfo
-  ciP->tenant = ciP->tenantFromHttpHeader;
-  lmTransactionSetService(ciP->tenant.c_str());
+  lmTransactionSetService(orionldState.tenantP->tenant);
 
   //
   // A tenant string must not be longer than 50 characters and may only contain
   // underscores and alphanumeric characters.
   //
   std::string result;
-  if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+  if ((orionldState.tenantName != NULL) && ((result = tenantCheck(orionldState.tenantName)) != "OK"))
   {
     OrionError  oe(SccBadRequest, result);
 
-    std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    std::string  response = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
 
     alarmMgr.badInput(clientIp, result);
 
-    restReply(ciP, response);
+    restReply(ciP, response.c_str());
 
     if (jsonReqP != NULL)
     {
       jsonReqP->release(&parseData);
     }
 
-    if (ciP->apiVersion == V2)
+    if (orionldState.apiVersion == V2)
     {
       delayedRelease(&jsonRelease);
     }
@@ -634,7 +621,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
-  LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
   commonFilters(ciP, &parseData, ciP->restServiceP);
   scopeFilter(ciP, &parseData, ciP->restServiceP);
 
@@ -655,7 +641,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     jsonReqP->release(&parseData);
   }
 
-  if (ciP->apiVersion == V2)
+  if (orionldState.apiVersion == V2)
   {
     delayedRelease(&jsonRelease);
   }
@@ -665,7 +651,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     orionExitFunction(0, "Received a 'DIE' request on REST interface");
   }
 
-  restReply(ciP, response);
+  restReply(ciP, response.c_str());
   return response;
 }
 
@@ -679,12 +665,12 @@ namespace orion
 */
 std::string requestServe(ConnectionInfo* ciP)
 {
-  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
-  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
-  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
-  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
-  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
-  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
+  if      ((orionldState.verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
+  else if ((orionldState.verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
+  else if ((orionldState.verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
+  else if ((orionldState.verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
+  else if ((orionldState.verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
+  else if ((orionldState.verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
   else                                                             return restService(ciP, restBadVerbV);
 }
 

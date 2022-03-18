@@ -41,14 +41,17 @@ TEST(compoundValue, updateNoCompoundValue)
 {
   ParseData         reqData;
   const char*       inFileJson  = "ngsi10.updateContextRequest.updateNoCompoundValue.valid.json";
-  ConnectionInfo    ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo    ci;
   ContextAttribute* caP;
   std::string       result;
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
-  ci.inMimeType = JSON;
+
+  orionldState.verb = POST;
+
+  orionldState.in.contentType = JSON;
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -68,17 +71,18 @@ TEST(compoundValue, updateUnknownPath)
   ParseData       reqData;
   const char*     inFileJson  = "ngsi10.updateContextRequest.updateUnknownPath.invalid.json";
   const char*     outFileJson = "ngsi10.updateContextResponse.updateUnknownPath.valid.json";
-  ConnectionInfo  ciJson("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo  ciJson;
   std::string     result;
   RestService     restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFileJson)) << "Error getting test data from '" << outFileJson << "'";
 
-  ciJson.inMimeType   = JSON;
-  ciJson.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ciJson.restServiceP = &restService;
 
   result = jsonTreat(testBuf, &ciJson, &reqData, UpdateContext, NULL);
@@ -97,7 +101,7 @@ TEST(compoundValue, updateOneStringJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateOneString.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -105,10 +109,11 @@ TEST(compoundValue, updateOneStringJson)
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -164,7 +169,7 @@ TEST(compoundValue, updateTwoStringsJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateTwoStrings.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -172,10 +177,11 @@ TEST(compoundValue, updateTwoStringsJson)
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -246,16 +252,17 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
   ParseData       reqData;
   const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.valid.json";
   const char*     outFile = "ngsi10.updateContextResponse.updateTwoItemsSameNameInStruct.valid.json";
-  ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo  ci;
   RestService     restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -275,7 +282,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorOneItem.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -283,10 +290,11 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -341,7 +349,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItems.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -349,10 +357,11 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -412,17 +421,18 @@ TEST(compoundValue, updateTwoStructsJson)
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.updateTwoStructs.valid.json";
   const char*                renderedFile  = "ngsi.contextAttribute.updateTwoStructsRendered.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   std::string                rendered;
   RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -434,7 +444,6 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  ci.outMimeType = JSON;
   rendered = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -565,17 +574,18 @@ TEST(compoundValue, sixLevelsJson)
   ParseData                  reqData;
   const char*                inFile        = "ngsi10.updateContextRequest.sixLevels.valid.json";
   const char*                renderedFile  = "ngsi.contextAttribute.updateSixLevelsRendered.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   std::string                rendered;
   RestService                restService = { UpdateContext, 2, { "ngsi10", "updateContext" }, NULL };
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -586,7 +596,6 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  ci.outMimeType = JSON;
   rendered = caP->render(V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -882,7 +891,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 {
   ParseData                  reqData;
   const char*                inFile  = "ngsi10.updateContextRequest.updateOneStringAndOneVectorInSeparateContextValues.valid.json";
-  ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
+  ConnectionInfo             ci;
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
   orion::CompoundValueNode*  childP;
@@ -890,10 +899,11 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   utInit();
 
+  orionldState.verb = POST;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.in.contentType   = JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -978,27 +988,6 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
     EXPECT_EQ(1,                       childP->level);
     EXPECT_EQ(ix,                      childP->siblingNo);
   }
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* tenCompounds -
-*
-*/
-TEST(compoundValue, tenCompounds)
-{
-  ParseData                  reqData;
-  UpdateContextRequest*      upcrP;
-  std::string                rendered;
-
-  utInit();
-
-  upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(V1, false);
 
   utExit();
 }

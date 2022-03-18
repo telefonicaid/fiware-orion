@@ -95,10 +95,9 @@ echo
 --REGEXPECT--
 01. Batch Create request with more than one entry for the same entity: E1,E1,E2 - SR supposed to clean up the array before calling TRoE
 =======================================================================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi-Status
 Content-Length: 229
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -129,8 +128,8 @@ Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T
 03. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,f,,,P of E1,,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E2,f,,,P of E2,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,f,,None,P of E1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E2,f,,None,P of E2,,,
 
 
 04. See the sub-attributes in the temporal database

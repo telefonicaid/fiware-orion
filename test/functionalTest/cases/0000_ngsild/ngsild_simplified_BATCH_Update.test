@@ -1,0 +1,513 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+BATCH Update with Simplified Format
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create 3 entities with attributes of all types, and sub-attrs of all types, using Simplified format and BATCH Create
+# 02. BATCH Update on all three entities and a fourth that doesn't exist
+# 03. GET urn:ngsi-ld:entities:E1 and see the change in step 02 (replaced)
+#
+
+echo "01. Create 3 entities with attributes of all types, and sub-attrs of all types, using Simplified format and BATCH Create"
+echo "========================================================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "String": "String",
+    "Int": 1,
+    "Float": 3.14,
+    "Bool": "true",
+    "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+    "Array": [ 5, 6 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E2" },
+    "Sub": {
+      "value": 6,
+      "String": "String",
+      "Int": 1,
+      "Float": 3.14,
+      "Bool": "true",
+      "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+      "Array": [ 5, 6 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E2" }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "String": "String",
+    "Int": 1,
+    "Float": 3.14,
+    "Bool": "true",
+    "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+    "Array": [ 5, 6 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E2" },
+    "Sub": {
+      "value": 6,
+      "String": "String",
+      "Int": 1,
+      "Float": 3.14,
+      "Bool": "true",
+      "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+      "Array": [ 5, 6 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E2" }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "String": "String",
+    "Int": 1,
+    "Float": 3.14,
+    "Bool": "true",
+    "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+    "Array": [ 5, 6 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E2" },
+    "Sub": {
+      "value": 6,
+      "String": "String",
+      "Int": 1,
+      "Float": 3.14,
+      "Bool": "true",
+      "Geo": { "type": "Point", "coordinates": [ 1, 2 ] },
+      "Array": [ 5, 6 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E2" }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create  --payload "$payload"
+echo
+echo
+
+echo "02. BATCH Update on all three entities and a fourth that doesn't exist"
+echo '======================================================================'
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "String": "Step 2",
+    "Int": 22222,
+    "Float": 22.22,
+    "Bool": "false",
+    "Geo": { "type": "Point", "coordinates": [ 22, 22, 22 ] },
+    "Array": [ 2222, 22 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E22" },
+    "Sub": {
+      "value": 2222,
+      "String": "Sub-String 2",
+      "Int": 2,
+      "Float": 2.2,
+      "Bool": "false",
+      "Geo": { "type": "Point", "coordinates": [ 22, 22 ] },
+      "Array": [ 22, 2222 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E22" }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "String": "3333",
+    "Int": 33,
+    "Float": 3.33,
+    "Bool": "false",
+    "Geo": { "type": "Point", "coordinates": [ 33, 33, 33 ] },
+    "Array": [ 33, 33 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E33" },
+    "Sub": {
+      "value": 33,
+      "String": "Sub-String 3",
+      "Int": 333,
+      "Float": 33.33,
+      "Bool": "false",
+      "Geo": { "type": "Point", "coordinates": [ 33, 33 ] },
+      "Array": [ 33, 3333 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E33" }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "String": "String 4",
+    "Int": 44,
+    "Float": 4.44,
+    "Bool": "false",
+    "Geo": { "type": "Point", "coordinates": [ 44, 44 ] },
+    "Array": [ 44, 44 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E44" },
+    "Sub": {
+      "value": 4,
+      "String": "String",
+      "Int": 44,
+      "Float": 4.4444444,
+      "Bool": "false",
+      "Geo": { "type": "Point", "coordinates": [ 44, 44, 44 ] },
+      "Array": [ 4, 4 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E4444" }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E4",
+    "type": "T",
+    "String": "String4",
+    "Int": 13,
+    "Float": 6.14,
+    "Bool": "false",
+    "Geo": { "type": "Point", "coordinates": [ 31, 32 ] },
+    "Array": [ 5, 6 ],
+    "Rel": { "object": "urn:ngsi-ld:entities:E52" },
+    "Sub": {
+      "value": 6,
+      "String": "String",
+      "Int": 1,
+      "Float": 3.14,
+      "Bool": "false",
+      "Geo": { "type": "Point", "coordinates": [ 41, 42 ] },
+      "Array": [ 5, 6 ],
+      "Rel": { "object": "urn:ngsi-ld:entities:E62" }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update  --payload "$payload"
+echo
+echo
+
+echo "03. GET the three entities"
+echo "=========================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 3 entities with attributes of all types, and sub-attrs of all types, using Simplified format and BATCH Create
+========================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2",
+    "urn:ngsi-ld:entities:E3"
+]
+
+
+02. BATCH Update on all three entities and a fourth that doesn't exist
+======================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 256
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E4",
+            "error": {
+                "status": 400,
+                "title": "entity does not exist",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E2",
+        "urn:ngsi-ld:entities:E3"
+    ]
+}
+
+
+03. GET the three entities
+==========================
+HTTP/1.1 200 OK
+Content-Length: 2398
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "Array": {
+            "type": "Property",
+            "value": [
+                2222,
+                22
+            ]
+        },
+        "Bool": {
+            "type": "Property",
+            "value": "false"
+        },
+        "Float": {
+            "type": "Property",
+            "value": 22.22
+        },
+        "Geo": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    22,
+                    22,
+                    22
+                ],
+                "type": "Point"
+            }
+        },
+        "Int": {
+            "type": "Property",
+            "value": 22222
+        },
+        "Rel": {
+            "object": "urn:ngsi-ld:entities:E22",
+            "type": "Relationship"
+        },
+        "String": {
+            "type": "Property",
+            "value": "Step 2"
+        },
+        "Sub": {
+            "Array": {
+                "type": "Property",
+                "value": [
+                    22,
+                    2222
+                ]
+            },
+            "Bool": {
+                "type": "Property",
+                "value": "false"
+            },
+            "Float": {
+                "type": "Property",
+                "value": 2.2
+            },
+            "Geo": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        22,
+                        22
+                    ],
+                    "type": "Point"
+                }
+            },
+            "Int": {
+                "type": "Property",
+                "value": 2
+            },
+            "Rel": {
+                "object": "urn:ngsi-ld:entities:E22",
+                "type": "Relationship"
+            },
+            "String": {
+                "type": "Property",
+                "value": "Sub-String 2"
+            },
+            "type": "Property",
+            "value": 2222
+        },
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T"
+    },
+    {
+        "Array": {
+            "type": "Property",
+            "value": [
+                33,
+                33
+            ]
+        },
+        "Bool": {
+            "type": "Property",
+            "value": "false"
+        },
+        "Float": {
+            "type": "Property",
+            "value": 3.33
+        },
+        "Geo": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    33,
+                    33,
+                    33
+                ],
+                "type": "Point"
+            }
+        },
+        "Int": {
+            "type": "Property",
+            "value": 33
+        },
+        "Rel": {
+            "object": "urn:ngsi-ld:entities:E33",
+            "type": "Relationship"
+        },
+        "String": {
+            "type": "Property",
+            "value": "3333"
+        },
+        "Sub": {
+            "Array": {
+                "type": "Property",
+                "value": [
+                    33,
+                    3333
+                ]
+            },
+            "Bool": {
+                "type": "Property",
+                "value": "false"
+            },
+            "Float": {
+                "type": "Property",
+                "value": 33.33
+            },
+            "Geo": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        33,
+                        33
+                    ],
+                    "type": "Point"
+                }
+            },
+            "Int": {
+                "type": "Property",
+                "value": 333
+            },
+            "Rel": {
+                "object": "urn:ngsi-ld:entities:E33",
+                "type": "Relationship"
+            },
+            "String": {
+                "type": "Property",
+                "value": "Sub-String 3"
+            },
+            "type": "Property",
+            "value": 33
+        },
+        "id": "urn:ngsi-ld:entities:E2",
+        "type": "T"
+    },
+    {
+        "Array": {
+            "type": "Property",
+            "value": [
+                44,
+                44
+            ]
+        },
+        "Bool": {
+            "type": "Property",
+            "value": "false"
+        },
+        "Float": {
+            "type": "Property",
+            "value": 4.44
+        },
+        "Geo": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    44,
+                    44
+                ],
+                "type": "Point"
+            }
+        },
+        "Int": {
+            "type": "Property",
+            "value": 44
+        },
+        "Rel": {
+            "object": "urn:ngsi-ld:entities:E44",
+            "type": "Relationship"
+        },
+        "String": {
+            "type": "Property",
+            "value": "String 4"
+        },
+        "Sub": {
+            "Array": {
+                "type": "Property",
+                "value": [
+                    4,
+                    4
+                ]
+            },
+            "Bool": {
+                "type": "Property",
+                "value": "false"
+            },
+            "Float": {
+                "type": "Property",
+                "value": 4.444444
+            },
+            "Geo": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        44,
+                        44,
+                        44
+                    ],
+                    "type": "Point"
+                }
+            },
+            "Int": {
+                "type": "Property",
+                "value": 44
+            },
+            "Rel": {
+                "object": "urn:ngsi-ld:entities:E4444",
+                "type": "Relationship"
+            },
+            "String": {
+                "type": "Property",
+                "value": "String"
+            },
+            "type": "Property",
+            "value": 4
+        },
+        "id": "urn:ngsi-ld:entities:E3",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

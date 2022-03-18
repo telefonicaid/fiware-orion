@@ -22,12 +22,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     dbInit.cpp
-    dbNameGet.cpp
-    dbCollectionPathGet.cpp
     dbConfiguration.cpp
     dbEntityTypesGet.cpp
+    dbEntityAttributesGet.cpp
     dbGeoIndexAdd.cpp
     dbGeoIndexLookup.cpp
+    dbModelFromApiEntity.cpp
+    dbModelFromApiAttribute.cpp
+    dbModelFromApiSubAttribute.cpp
+    dbModelToApiAttribute.cpp
+    dbModelToApiSubAttribute.cpp
 )
 
 # Include directories

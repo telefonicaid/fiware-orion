@@ -34,7 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/qAliasCompact.h"                        // qAliasCompact
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray
 #include "orionld/payloadCheck/pcheckNotification.h"             // pcheckNotification
@@ -93,8 +93,7 @@ bool pcheckSubscription
 
       DUPLICATE_CHECK(idP, "id", nodeP);
       STRING_CHECK(nodeP, nodeP->name);
-      EMPTY_STRING_CHECK(nodeP, nodeP->name);
-      URI_CHECK(nodeP, nodeP->name);
+      URI_CHECK(nodeP->value.s, nodeP->name, true);
     }
     else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {
@@ -135,7 +134,7 @@ bool pcheckSubscription
       for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
       {
         STRING_CHECK(itemP, "watchedAttributes item");
-        itemP->value.s = orionldContextItemExpand(orionldState.contextP, itemP->value.s, true, NULL);
+        itemP->value.s = orionldAttributeExpand(orionldState.contextP, itemP->value.s, true, NULL);
       }
       *watchedAttributesPP = watchedAttributesP;
     }

@@ -28,6 +28,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"               // OrionldTenant
+#include "orionld/common/orionldState.h"               // orionldState
 #include "common/statistics.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -49,7 +52,7 @@ static HttpStatusCode processDiscoverContextAvailability
 (
   DiscoverContextAvailabilityRequest*   requestP,
   DiscoverContextAvailabilityResponse*  responseP,
-  const std::string&                    tenant,
+  OrionldTenant*                        tenantP,
   int                                   offset,
   int                                   limit,
   bool                                  details,
@@ -65,7 +68,7 @@ static HttpStatusCode processDiscoverContextAvailability
                           requestP->attributeList,
                           &responseP->responseVector,
                           &err,
-                          tenant,
+                          tenantP,
                           servicePathV,
                           offset,
                           limit,
@@ -127,15 +130,10 @@ HttpStatusCode mongoDiscoverContextAvailability
 (
   DiscoverContextAvailabilityRequest*   requestP,
   DiscoverContextAvailabilityResponse*  responseP,
-  const std::string&                    tenant,
-  std::map<std::string, std::string>&   uriParams,
+  OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV
 )
 {
-  int          offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int          limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
   bool         reqSemTaken;
 
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request", SemReadOp, &reqSemTaken);
@@ -144,10 +142,10 @@ HttpStatusCode mongoDiscoverContextAvailability
 
   HttpStatusCode hsCode = processDiscoverContextAvailability(requestP,
                                                              responseP,
-                                                             tenant,
-                                                             offset,
-                                                             limit,
-                                                             details,
+                                                             tenantP,
+                                                             orionldState.uriParams.offset,
+                                                             orionldState.uriParams.limit,
+                                                             orionldState.uriParams.details,
                                                              servicePathV);
   if (hsCode != SccOk)
   {

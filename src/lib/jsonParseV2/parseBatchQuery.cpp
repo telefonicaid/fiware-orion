@@ -26,6 +26,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
@@ -47,13 +49,13 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   rapidjson::Document    document;
   OrionError             oe;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -62,7 +64,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -70,7 +72,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   {
     alarmMgr.badInput(clientIp, "Empty JSON payload");
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -79,7 +81,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   {
     alarmMgr.badInput(clientIp, "Invalid JSON payload, no relevant fields found");
     oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
   }
@@ -97,7 +99,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return oe.toJson();
       }
@@ -111,7 +113,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return oe.toJson();
       }
@@ -124,7 +126,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return oe.toJson();
       }
@@ -137,7 +139,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return oe.toJson();
       }
@@ -150,7 +152,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return oe.toJson();
       }
@@ -161,7 +163,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       alarmMgr.badInput(clientIp, description);
       oe.fill(SccBadRequest, description, "BadRequest");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
 
       return oe.toJson();
     }

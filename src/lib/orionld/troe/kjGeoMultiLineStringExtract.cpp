@@ -73,6 +73,5 @@ bool kjGeoMultiLineStringExtract(KjNode* coordinatesP, char* coordsString, int c
     ++coordsIx;
   }
 
-  LM_TMP(("FINAL coordsString: %s", coordsString));
   return true;
 }

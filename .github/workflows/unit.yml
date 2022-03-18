@@ -16,7 +16,7 @@ jobs:
         ports:
           - 5000:5000
       mongodb:
-        image: mongo:4.0
+        image: mongo:4.4
         ports:
           - 27017:27017
 
@@ -40,4 +40,4 @@ jobs:
 
       - name: Run unit test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s unit -qt
+          docker run --rm -v $(pwd):/opt/orion -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON localhost:5000/orion-ld-test:latest -s unit -dqt

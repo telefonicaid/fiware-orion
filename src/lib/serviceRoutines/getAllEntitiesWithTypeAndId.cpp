@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -79,22 +81,22 @@ std::string getAllEntitiesWithTypeAndId
   std::string             answer;
   std::string             entityType              = compV[3];
   std::string             entityId                = compV[5];
-  std::string             entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string             entityTypeFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo          typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
 
   // 00. Default value for response: OK
   response.statusCode.fill(SccOk);
 
 
   // 01. Get values from URL (entityId::type, exist, !exist)
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  if (orionldState.in.entityTypeDoesNotExist == true)
   {
     typeInfo = EntityTypeEmpty;
   }
-  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  else if (orionldState.in.entityTypeExists == true)
   {
     typeInfo = EntityTypeNotEmpty;
   }
@@ -136,7 +138,7 @@ std::string getAllEntitiesWithTypeAndId
 
   // 06. Translate QueryContextResponse to ContextElementResponse
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  TIMED_RENDER(answer = response.render(ciP->apiVersion, asJsonObject, RtContextElementResponse));
+  TIMED_RENDER(answer = response.render(orionldState.apiVersion, asJsonObject, RtContextElementResponse));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

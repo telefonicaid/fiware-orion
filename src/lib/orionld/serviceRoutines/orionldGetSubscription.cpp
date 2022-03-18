@@ -25,8 +25,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 #include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -39,7 +37,7 @@
 //
 // orionldGetSubscription -
 //
-bool orionldGetSubscription(ConnectionInfo* ciP)
+bool orionldGetSubscription(void)
 {
   ngsiv2::Subscription  subscription;
   char*                 details;
@@ -49,9 +47,7 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   subscription.throttling          = -1;  // 0?
   subscription.timeInterval        = -1;  // 0?
 
-  LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", orionldState.wildcard[0]));
-
-  if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
+  if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenantP, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoGetLdSubscription error: %s", details));
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);

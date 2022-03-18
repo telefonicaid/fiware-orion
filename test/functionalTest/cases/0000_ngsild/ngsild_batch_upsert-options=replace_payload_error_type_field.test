@@ -193,15 +193,23 @@ echo
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entityOperations/upsert?options=replace - 4 entities
 =========================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 113
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:ngsi-ld:Vehicle:00001",
+    "urn:ngsi-ld:Vehicle:00002",
+    "urn:ngsi-ld:Vehicle:00003",
+    "urn:ngsi-ld:Vehicle:00004"
+]
 
 
 02. Update all four entities. Vehicle:00001 with a entity::type that differs
 ============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 289
+Content-Length: 334
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -210,7 +218,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:Vehicle:00001",
             "error": {
-                "detail": "Motorcycle",
+                "detail": "https://uri.etsi.org/ngsi-ld/default-context/Motorcycle",
                 "status": 400,
                 "title": "non-matching entity type",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

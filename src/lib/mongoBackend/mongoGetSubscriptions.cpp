@@ -30,6 +30,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldTenant.h"
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/idCheck.h"
@@ -74,9 +76,9 @@ using ngsiv2::EntID;
 *
 * setSubscriptionId -
 */
-static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
+static void setNewSubscriptionId(Subscription* s, const BSONObj* rP)
 {
-  s->id = getFieldF(r, "_id").OID().toString();
+  s->id = getFieldF(rP, "_id").OID().toString();
 }
 
 
@@ -85,9 +87,9 @@ static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
 *
 * setDescription -
 */
-static void setDescription(Subscription* s, const BSONObj& r)
+static void setDescription(Subscription* s, const BSONObj* bobjP)
 {
-  s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
+  s->description = bobjP->hasField(CSUB_DESCRIPTION) ? getStringFieldF(bobjP, CSUB_DESCRIPTION) : "";
 }
 
 
@@ -96,18 +98,17 @@ static void setDescription(Subscription* s, const BSONObj& r)
 *
 * setSubject -
 */
-static void setSubject(Subscription* s, const BSONObj& r)
+static void setSubject(Subscription* s, const BSONObj* rP)
 {
   // Entities
-  std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
+  std::vector<BSONElement> ents = getFieldF(rP, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj ent               = ents[ix].embeddedObject();
-    std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
-    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
-                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string id            = getStringFieldF(&ent, CSUB_ENTITY_ID);
+    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(&ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern     = getStringFieldF(&ent, CSUB_ENTITY_ISPATTERN);
+    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(&ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -133,57 +134,59 @@ static void setSubject(Subscription* s, const BSONObj& r)
   }
 
   // Condition
-  setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
+  setStringVectorF(rP, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
-  if (r.hasField(CSUB_EXPR))
+  if (rP->hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
+    mongo::BSONObj expression;
+    getObjectFieldF(&expression, rP, CSUB_EXPR);
 
-    std::string  q           = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
-    std::string  mq          = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
-    std::string  geo         = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
-    std::string  coords      = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
-    std::string  georel      = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
-    std::string  geoproperty = expression.hasField("geoproperty") ?    getStringFieldF(expression, "geoproperty")    : "";
+    const char*  q           = getStringFieldF(&expression, CSUB_EXPR_Q);
+    const char*  mq          = getStringFieldF(&expression, CSUB_EXPR_MQ);
+    const char*  geo         = getStringFieldF(&expression, CSUB_EXPR_GEOM);
+    const char*  coords      = getStringFieldF(&expression, CSUB_EXPR_COORDS);
+    const char*  georel      = getStringFieldF(&expression, CSUB_EXPR_GEOREL);
+    const char*  geoproperty = getStringFieldF(&expression, "geoproperty");
 
-    if (q  != "")          s->subject.condition.expression.q           = q;
-    if (mq != "")          s->subject.condition.expression.mq          = mq;
-    if (geo != "")         s->subject.condition.expression.geometry    = geo;
-    if (coords != "")      s->subject.condition.expression.coords      = coords;
-    if (georel != "")      s->subject.condition.expression.georel      = georel;
-    if (geoproperty != "") s->subject.condition.expression.geoproperty = geoproperty;
+    if (q[0]  != 0)           s->subject.condition.expression.q           = q;
+    if (mq[0] != 0)           s->subject.condition.expression.mq          = mq;
+    if (geo[0] != 0)          s->subject.condition.expression.geometry    = geo;
+    if (coords[0] != 0)       s->subject.condition.expression.coords      = coords;
+    if (georel[0] != 0)       s->subject.condition.expression.georel      = georel;
+    if (geoproperty[0] != 0)  s->subject.condition.expression.geoproperty = geoproperty;
   }
 }
+
 
 
 /* ****************************************************************************
 *
 * setNotification -
 */
-static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
+static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant* tenantP)
 {
   // Attributes
-  setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
+  setStringVectorF(rP, CSUB_ATTRS, &(subP->notification.attributes));
 
   // Metadata
-  if (r.hasField(CSUB_METADATA))
+  if (rP->hasField(CSUB_METADATA))
   {
-    setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
+    setStringVectorF(rP, CSUB_METADATA, &(subP->notification.metadata));
   }
 
-  subP->notification.httpInfo.fill(r);
+  subP->notification.httpInfo.fill(rP);
 
   ngsiv2::Notification* nP = &subP->notification;
 
-  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(r, CSUB_THROTTLING)       : -1;
-  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(r, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)           : -1;
-  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                  : false;
-  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(r, CSUB_LASTFAILURE)      : -1;
-  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(r, CSUB_LASTSUCCESS)      : -1;
+  subP->throttling      = rP->hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(rP, CSUB_THROTTLING)       : -1;
+  nP->lastNotification  = rP->hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(rP, CSUB_LASTNOTIFICATION) : -1;
+  nP->timesSent         = rP->hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(rP, CSUB_COUNT)           : -1;
+  nP->blacklist         = rP->hasField(CSUB_BLACKLIST)?        getBoolFieldF(rP, CSUB_BLACKLIST)                  : false;
+  nP->lastFailure       = rP->hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(rP, CSUB_LASTFAILURE)      : -1;
+  nP->lastSuccess       = rP->hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(rP, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
-  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : NGSI_V1_LEGACY;
 
 
   //
@@ -192,7 +195,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
   // NOTE: only 'lastNotificationTime' and 'count'
   //
   cacheSemTake(__FUNCTION__, "get lastNotification and count");
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subP->id.c_str());
   if (cSubP)
   {
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
@@ -234,7 +237,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 */
 static void setStatus(Subscription* s, const BSONObj& r)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(r, CSUB_EXPIRATION) : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&r, CSUB_EXPIRATION) : -1;
 
   //
   // Status
@@ -246,7 +249,7 @@ static void setStatus(Subscription* s, const BSONObj& r)
   //
   if ((s->expires > orionldState.requestTime) || (s->expires == -1))
   {
-    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(&r, CSUB_STATUS) : STATUS_ACTIVE;
   }
   else
   {
@@ -261,9 +264,9 @@ static void setStatus(Subscription* s, const BSONObj& r)
 *
 * setSubscriptionId -
 */
-static void setSubscriptionId(Subscription* s, const BSONObj& r)
+static void setSubscriptionId(Subscription* s, const BSONObj* rP)
 {
-  s->id = getStringFieldF(r, "_id");
+  s->id = getStringFieldF(rP, "_id");
 }
 
 
@@ -272,9 +275,9 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 *
 * setName -
 */
-static void setName(Subscription* s, const BSONObj& r)
+static void setName(Subscription* s, const BSONObj* rP)
 {
-  s->name = r.hasField(CSUB_NAME) ? getStringFieldF(r, CSUB_NAME) : "";
+  s->name = getStringFieldF(rP, CSUB_NAME);
 }
 
 
@@ -283,9 +286,9 @@ static void setName(Subscription* s, const BSONObj& r)
 *
 * setContext -
 */
-static void setContext(Subscription* s, const BSONObj& r)
+static void setContext(Subscription* s, const BSONObj* rP)
 {
-  s->ldContext = r.hasField(CSUB_LDCONTEXT) ? getStringFieldF(r, CSUB_LDCONTEXT) : "";
+  s->ldContext = getStringFieldF(rP, CSUB_LDCONTEXT);
 }
 
 
@@ -294,9 +297,9 @@ static void setContext(Subscription* s, const BSONObj& r)
 *
 * setCsf -
 */
-static void setCsf(Subscription* s, const BSONObj& r)
+static void setCsf(Subscription* s, const BSONObj* rP)
 {
-  s->csf = r.hasField("csf") ? getStringFieldF(r, "csf") : "";
+  s->csf = getStringFieldF(rP, "csf");
 }
 
 
@@ -305,11 +308,11 @@ static void setCsf(Subscription* s, const BSONObj& r)
 *
 * setMimeType -
 */
-static void setMimeType(Subscription* s, const BSONObj& r)
+static void setMimeType(Subscription* s, const BSONObj* rP)
 {
-  if (r.hasField(CSUB_NAME))
+  if (rP->hasField(CSUB_NAME))
   {
-    std::string mimeTypeString = getStringFieldF(r, CSUB_MIMETYPE);
+    const char* mimeTypeString = getStringFieldF(rP, CSUB_MIMETYPE);
 
     s->notification.httpInfo.mimeType = longStringToMimeType(mimeTypeString);
   }
@@ -323,7 +326,7 @@ static void setMimeType(Subscription* s, const BSONObj& r)
 */
 static void setTimeInterval(Subscription* s, const BSONObj& r)
 {
-  s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(r, "timeInterval") : -1);
+  s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(&r, "timeInterval") : -1);
 }
 
 #endif
@@ -337,8 +340,7 @@ void mongoListSubscriptions
 (
   std::vector<Subscription>*           subs,
   OrionError*                          oe,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant,
+  OrionldTenant*                       tenantP,
   const std::string&                   servicePath,  // FIXME P4: vector of strings and not just a single string? See #3100
   int                                  limit,
   int                                  offset,
@@ -370,7 +372,7 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection,
-                             getSubscribeContextCollectionName(tenant),
+                             tenantP->subscriptions,
                              q,
                              limit,
                              offset,
@@ -402,15 +404,15 @@ void mongoListSubscriptions
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Subscription  s;
+    Subscription  sub;
 
-    setNewSubscriptionId(&s, r);
-    setDescription(&s, r);
-    setSubject(&s, r);
-    setStatus(&s, r);
-    setNotification(&s, r, tenant);
+    setNewSubscriptionId(&sub, &r);
+    setDescription(&sub, &r);
+    setSubject(&sub, &r);
+    setStatus(&sub, r);
+    setNotification(&sub, &r, tenantP);
 
-    subs->push_back(s);
+    subs->push_back(sub);
   }
 
   releaseMongoConnection(connection);
@@ -427,11 +429,10 @@ void mongoListSubscriptions
 */
 void mongoGetSubscription
 (
-  ngsiv2::Subscription*               sub,
+  ngsiv2::Subscription*               subP,
   OrionError*                         oe,
   const std::string&                  idSub,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant
+  OrionldTenant*                      tenantP
 )
 {
   bool         reqSemTaken = false;
@@ -439,7 +440,8 @@ void mongoGetSubscription
   OID          oid;
   StatusCode   sc;
 
-  if (safeGetSubId(idSub, &oid, &sc) == false)
+  SubscriptionId id(idSub);
+  if (safeGetSubId(&id, &oid, &sc) == false)
   {
     *oe = OrionError(sc);
     return;
@@ -450,11 +452,11 @@ void mongoGetSubscription
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
-  BSONObj                        q     = BSON("_id" << oid);
+  BSONObj                        q = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->subscriptions, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -479,11 +481,11 @@ void mongoGetSubscription
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    setNewSubscriptionId(sub, r);
-    setDescription(sub, r);
-    setSubject(sub, r);
-    setNotification(sub, r, tenant);
-    setStatus(sub, r);
+    setNewSubscriptionId(subP, &r);
+    setDescription(subP, &r);
+    setSubject(subP, &r);
+    setNotification(subP, &r, tenantP);
+    setStatus(subP, r);
 
     if (moreSafe(cursor))
     {
@@ -523,7 +525,7 @@ bool mongoGetLdSubscription
 (
   ngsiv2::Subscription*  subP,
   const char*            subId,
-  const char*            tenant,
+  OrionldTenant*         tenantP,
   int*                   statusCodeP,
   char**                 detailsP
 )
@@ -539,7 +541,7 @@ bool mongoGetLdSubscription
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, tenantP->subscriptions, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -566,15 +568,15 @@ bool mongoGetLdSubscription
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    setSubscriptionId(subP, r);
-    setDescription(subP, r);
-    setMimeType(subP, r);
-    setSubject(subP, r);
-    setNotification(subP, r, tenant);
+    setSubscriptionId(subP, &r);
+    setDescription(subP, &r);
+    setMimeType(subP, &r);
+    setSubject(subP, &r);
+    setNotification(subP, &r, tenantP);
     setStatus(subP, r);
-    setName(subP, r);
-    setContext(subP, r);
-    setCsf(subP, r);
+    setName(subP, &r);
+    setContext(subP, &r);
+    setCsf(subP, &r);
     setTimeInterval(subP, r);
     mongoSetLdTimestamp(&subP->createdAt, "createdAt", r);
     mongoSetLdTimestamp(&subP->modifiedAt, "modifiedAt", r);
@@ -616,25 +618,14 @@ bool mongoGetLdSubscription
 */
 bool mongoGetLdSubscriptions
 (
-  ConnectionInfo*                     ciP,
+  const char*                         servicePath,
   std::vector<ngsiv2::Subscription>*  subVecP,
-  const char*                         tenant,
+  OrionldTenant*                      tenantP,
   long long*                          countP,
   OrionError*                         oeP
 )
 {
-  bool      reqSemTaken = false;
-  int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int       limit;
-
-  if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
-  {
-    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
-    if (limit <= 0)
-      limit = DEFAULT_PAGINATION_LIMIT_INT;
-  }
-  else
-    limit = DEFAULT_PAGINATION_LIMIT_INT;
+  bool reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "Mongo GET Subscriptions", SemReadOp, &reqSemTaken);
 
@@ -649,9 +640,9 @@ bool mongoGetLdSubscriptions
   Query                          q;
 
   // FIXME P6: This here is a bug ... See #3099 for more info
-  if (!ciP->servicePathV[0].empty() && (ciP->servicePathV[0] != "/#"))
+  if ((servicePath != NULL) && (strcmp(servicePath, "/#") != 0))
   {
-    q = Query(BSON(CSUB_SERVICE_PATH << ciP->servicePathV[0]));
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath));
   }
 
   q.sort(BSON("_id" << 1));
@@ -659,10 +650,10 @@ bool mongoGetLdSubscriptions
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection,
-                             getSubscribeContextCollectionName(tenant),
+                             tenantP->subscriptions,
                              q,
-                             limit,
-                             offset,
+                             orionldState.uriParams.limit,
+                             orionldState.uriParams.offset,
                              &cursor,
                              countP,
                              &err))
@@ -695,15 +686,15 @@ bool mongoGetLdSubscriptions
 
     Subscription s;
 
-    setSubscriptionId(&s, r);
-    setDescription(&s, r);
-    setMimeType(&s, r);
-    setSubject(&s, r);
-    setNotification(&s, r, tenant);
+    setSubscriptionId(&s, &r);
+    setDescription(&s, &r);
+    setMimeType(&s, &r);
+    setSubject(&s, &r);
+    setNotification(&s, &r, tenantP);
     setStatus(&s, r);
-    setName(&s, r);
-    setContext(&s, r);
-    setCsf(&s, r);
+    setName(&s, &r);
+    setContext(&s, &r);
+    setCsf(&s, &r);
     setTimeInterval(&s, r);
 
     subVecP->push_back(s);

@@ -35,10 +35,11 @@ extern "C"
 
 #include "common/string.h"                                     // toString
 #include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // Own Interface
 
@@ -48,21 +49,16 @@ extern "C"
 //
 // orionldGetSubscriptions -
 //
-bool orionldGetSubscriptions(ConnectionInfo* ciP)
+bool orionldGetSubscriptions(void)
 {
   std::vector<ngsiv2::Subscription> subVec;
   OrionError                        oe;
   int64_t                           count  = 0;
 
-  LM_T(LmtServiceRoutine, ("In orionldGetSubscription"));
-
-  mongoGetLdSubscriptions(ciP, &subVec, orionldState.tenant, (long long*) &count, &oe);
+  mongoGetLdSubscriptions("/#", &subVec, orionldState.tenantP, (long long*) &count, &oe);
 
   if (orionldState.uriParams.count == true)
-  {
-    ciP->httpHeader.push_back("NGSILD-Results-Count");
-    ciP->httpHeaderValue.push_back(toString(count));
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
 

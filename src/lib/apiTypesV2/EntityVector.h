@@ -41,10 +41,7 @@ typedef struct EntityVector
 {
   std::vector<Entity*>  vec;
 
-  std::string   render(std::map<std::string, bool>&         uriParamOptions,
-                       std::map<std::string, std::string>&  uriParam);
-
-
+  std::string   render(void);
   std::string   check(RequestType requestType);
   void          push_back(Entity* item);
   unsigned int  size(void);

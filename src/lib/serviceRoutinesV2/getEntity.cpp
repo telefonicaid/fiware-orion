@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
@@ -66,19 +68,19 @@ std::string getEntity
 )
 {
   std::string entityId        = compV[2];
-  std::string type            = ciP->uriParam[URI_PARAM_TYPE];
+  char*       type            = (orionldState.uriParams.type == NULL)? (char*) "" : orionldState.uriParams.type;
 
   if (entityId == "")
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
+  if (forbiddenIdChars(orionldState.apiVersion, entityId.c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = oe.code;
+    orionldState.httpStatusCode = oe.code;
     return oe.toJson();
   }
 
@@ -101,17 +103,17 @@ std::string getEntity
   entity.fill(&parseDataP->qcrs.res);
 
   std::string answer;
-  TIMED_RENDER(answer = entity.render(ciP->uriParamOptions, ciP->uriParam, false));
+  TIMED_RENDER(answer = entity.render(false));
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
     // No problem found, but we expect only one entity
-    ciP->httpStatusCode = SccConflict;
+    orionldState.httpStatusCode = SccConflict;
   }
   else
   {
     // the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    orionldState.httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
 
   // 04. Cleanup and return result

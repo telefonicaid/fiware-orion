@@ -275,7 +275,7 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     if      (treeP->type == QNodeGT)  op = (char*) "$gt";
     else if (treeP->type == QNodeGE)  op = (char*) "$gte";
     else if (treeP->type == QNodeLT)  op = (char*) "$lt";
-    else if (treeP->type == QNodeLE)  op = (char*) "$lte";
+    else                              op = (char*) "$lte";
 
     if      (rightP->type == QNodeIntegerValue)  gtObj.append(op, rightP->value.i);
     else if (rightP->type == QNodeFloatValue)    gtObj.append(op, rightP->value.f);

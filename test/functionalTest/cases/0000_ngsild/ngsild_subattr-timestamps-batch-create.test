@@ -1,0 +1,238 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sub-Attribute system attributes for Batch Create
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Batch Create two entities E1 and E2 with attributes A1 having a sub-property MD1
+# 02. See E1 in mongo - see createdAt and modifiedAt for the sub-property MD1
+# 03. See E2 in mongo - see createdAt and modifiedAt for the sub-property MD1
+# 04. Query entities with sysAttrs
+#
+
+echo "01. Batch Create two entities E1 and E2 with attributes A1 having a sub-property MD1"
+echo "===================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E1:A1",
+      "MD1": {
+        "type": "Property",
+        "value": "E1:A1:MD1"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1",
+      "MD1": {
+        "type": "Property",
+        "value": "E2:A1:MD1"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in mongo - see createdAt and modifiedAt for the sub-property MD1"
+echo "==========================================================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entities:E1"})'
+echo
+echo
+
+
+echo "03. See E2 in mongo - see createdAt and modifiedAt for the sub-property MD1"
+echo "==========================================================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entities:E2"})'
+echo
+echo
+
+
+echo "04. Query entities with sysAttrs"
+echo "================================"
+orionCurl --url "/ngsi-ld/v1/entities?type=T&options=sysAttrs"
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Create two entities E1 and E2 with attributes A1 having a sub-property MD1
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 53
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:entities:E1",
+    "urn:ngsi-ld:entities:E2"
+]
+
+
+02. See E1 in mongo - see createdAt and modifiedAt for the sub-property MD1
+===========================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "E1:A1",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/MD1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : "E1:A1:MD1"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/MD1"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. See E2 in mongo - see createdAt and modifiedAt for the sub-property MD1
+===========================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "E2:A1",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/MD1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : "E2:A1:MD1"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/MD1"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+04. Query entities with sysAttrs
+================================
+HTTP/1.1 200 OK
+Content-Length: 737
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "MD1": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "type": "Property",
+                "value": "E1:A1:MD1"
+            },
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": "E1:A1"
+        },
+        "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:entities:E1",
+        "modifiedAt": "REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "MD1": {
+                "createdAt": "REGEX(.*)",
+                "modifiedAt": "REGEX(.*)",
+                "type": "Property",
+                "value": "E2:A1:MD1"
+            },
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": "E2:A1"
+        },
+        "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:entities:E2",
+        "modifiedAt": "REGEX(.*)",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

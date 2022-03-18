@@ -122,7 +122,6 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
-  free(dcarP);
 
 
   // 2. One contextRegistrationResponse - errorCode inside ContextRegistrationResponse - only providingApplication in ContextRegistration
@@ -430,8 +429,6 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), emptyFilename)) << "Error getting test data from '" << emptyFilename << "'";
   rendered = dcarP->render();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  free(dcarP);
 
   utExit();
 }

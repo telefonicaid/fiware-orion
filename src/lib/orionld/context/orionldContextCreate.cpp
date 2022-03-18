@@ -39,19 +39,79 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// orionldContextOriginName - FIXME: move to its own module
+//
+const char* orionldContextOriginName(OrionldContextOrigin origin)
+{
+  switch (origin)
+  {
+  case OrionldContextUnknownOrigin:     return "UnknownOrigin";
+  case OrionldContextFromInline:        return "Inline";
+  case OrionldContextDownloaded:        return "Downloaded";
+  case OrionldContextFileCached:        return "FileCached";
+  case OrionldContextForNotifications:  return "ForNotifications";
+  case OrionldContextForForwarding:     return "ForForwarding";
+  case OrionldContextUserCreated:       return "UserCreated";
+  }
+
+  return "Unknown Origin II";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldOriginFromString - FIXME: move to its own module
+//
+OrionldContextOrigin orionldOriginFromString(const char* s)
+{
+  if      (strcmp(s, "UnknownOrigin")    == 0) return OrionldContextUnknownOrigin;
+  else if (strcmp(s, "Inline")           == 0) return OrionldContextFromInline;
+  else if (strcmp(s, "Downloaded")       == 0) return OrionldContextDownloaded;
+  else if (strcmp(s, "FileCached")       == 0) return OrionldContextFileCached;
+  else if (strcmp(s, "ForNotifications") == 0) return OrionldContextForNotifications;
+  else if (strcmp(s, "ForForwarding")    == 0) return OrionldContextForForwarding;
+  else if (strcmp(s, "UserCreated")      == 0) return OrionldContextUserCreated;
+
+  return OrionldContextUnknownOrigin;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextCreate -
 //
-OrionldContext* orionldContextCreate(const char* url, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
+OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues)
 {
   OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
   if (contextP == NULL)
     LM_X(1, ("out of memory - trying to allocate a OrionldContext of %d bytes", sizeof(OrionldContext)));
 
-  contextP->url       = (url == NULL)? (char*) "no URL" : kaStrdup(&kalloc, url);
-  contextP->id        = (id == NULL)? NULL : kaStrdup(&kalloc, id);
-  contextP->tree      = (toBeCloned == true)? kjClone(NULL, tree) : NULL;
+  contextP->origin    = origin;
+  contextP->parent    = NULL;
+
+  // NULL URL means NOT to be saved - will live just inside the request-thread
+  if (url != NULL)
+  {
+    contextP->url   = kaStrdup(&kalloc, url);
+    contextP->id    = (id != NULL)? kaStrdup(&kalloc, id) : NULL;
+
+    //
+    // If just a string, no clone needed
+    //
+    contextP->tree = (tree->type != KjString)? kjClone(NULL, tree) : tree;
+  }
+  else
+  {
+    contextP->tree = tree;
+    contextP->url  = NULL;
+    contextP->id   = NULL;
+  }
+
   contextP->keyValues = keyValues;
+  contextP->lookups   = 0;
 
   return contextP;
 }

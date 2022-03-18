@@ -35,8 +35,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesGet.h"    // Own interface
 
@@ -48,10 +49,7 @@ extern "C"
 //
 KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields)
 {
-  char collectionPath[256];
   bool idPresent = false;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
 
   mongo::BSONObjBuilder  dbFields;
 
@@ -70,7 +68,7 @@ KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields)
   mongo::Query                          query(filter.obj());
   mongo::BSONObj                        fieldsToReturn = dbFields.obj();
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
-  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
+  std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(orionldState.tenantP->entities, query, 0, 0, &fieldsToReturn);
   KjNode*                               entityArray    = NULL;
 
   while (cursorP->more())

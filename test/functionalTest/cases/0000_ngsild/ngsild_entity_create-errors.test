@@ -1,0 +1,527 @@
+# Copyright 2018 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
+# 02. POST /ngsi-ld/v1/entities, with an 'id' that is not a string - see error
+# 03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error
+# 04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector nor a string - see error
+# 06. POST /ngsi-ld/v1/entities, with all OK - see a 201
+# 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
+#
+# 08. POST /ngsi-ld/v1/entities, with an attribute without a value - see error
+# 09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
+# 10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
+#
+# 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
+# 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
+# 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
+#
+# 14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
+# 15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
+#
+# 16. Create an entity with an expanded entity type, containing a '#' sign
+# 17. GET the E16 entity - see the entity type expanded
+#
+
+echo "01. POST /ngsi-ld/v1/entities, with a non-object payload - see error"
+echo "===================================================================="
+payload='[
+  "http://a.b.c/1.xxx",
+  "http://a.b.c/2.xxx",
+  "http://a.b.c/3.xxx"
+]'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /ngsi-ld/v1/entities, with an 'id' that is not a string - see error"
+echo "============================================================================"
+payload='{
+  "id": 2,
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "@context": [
+    "http://a.b.c/4.xxx",
+    "http://a.b.c/5.xxx",
+    "http://a.b.c/6.xxx"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error"
+echo "============================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": 12,
+  "@context": [
+    "http://a.b.c/7.xxx",
+    "http://a.b.c/8.xxx",
+    "http://a.b.c/9.xxx"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector nor a string - see error"
+echo "=============================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 4"
+  },
+  "@context": true
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "06. POST /ngsi-ld/v1/entities, with all OK - see a 201"
+echo "======================================================"
+payload='{
+  "id": "http://a.b.c/entity/E6",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 6"
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error"
+echo "========================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 7"
+  },
+  "@context": [
+    1,
+    "https://json-ld.org/contexts/personX.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "08. POST /ngsi-ld/v1/entities, with an attribute without a value - see error"
+echo "============================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "valueh": "John 7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error"
+echo "==========================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": [ 1, 2, 3 ],
+    "value": "John 7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error"
+echo "=========================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Propperty",
+    "value": "John 7"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "11. POST /ngsi-ld/v1/entities, with a Property without a 'value'"
+echo "==============================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Property"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'"
+echo "======================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Relationship"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'"
+echo "==================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "GeoProperty"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error"
+echo "================================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "@id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 6"
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error"
+echo "===================================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "@type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 6"
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "16. Create an entity with an expanded entity type, containing a '#' sign"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Person:0001",
+  "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person",
+  "name": {
+    "type": "Property",
+    "value": "test0001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "17. GET the E16 entity - see the entity type expanded"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Person:0001
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "To create an Entity, a JSON OBJECT describing the entity must be provided",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. POST /ngsi-ld/v1/entities, with an 'id' that is not a string - see error
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "entity id",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. POST /ngsi-ld/v1/entities, with a '@context' that is not a vector nor a string - see error
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 132
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "@context",
+    "title": "Not a JSON Array nor Object nor a String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. POST /ngsi-ld/v1/entities, with all OK - see a 201
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
+Date: REGEX(.*)
+
+
+
+07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Int",
+    "title": "Invalid @context - invalid type for @context array item",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. POST /ngsi-ld/v1/entities, with an attribute without a value - see error
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 186
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/name",
+    "title": "Missing value/object/languageMap field for Attribute at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 187
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/name",
+    "title": "Invalid JSON type for /type/ field of an Attribute (not a JSON String)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Propperty",
+    "title": "Invalid value for /type/",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 168
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/name",
+    "title": "Missing /value/ field for Property at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 173
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/name",
+    "title": "Missing /object/ field for Relationship at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 171
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/name",
+    "title": "Missing /value/ field for GeoProperty at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity:id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity:type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. Create an entity with an expanded entity type, containing a '#' sign
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Person:0001
+Date: REGEX(.*)
+
+
+
+17. GET the E16 entity - see the entity type expanded
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:Person:0001",
+    "name": {
+        "type": "Property",
+        "value": "test0001"
+    },
+    "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

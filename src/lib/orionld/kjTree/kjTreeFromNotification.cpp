@@ -22,28 +22,30 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                            // NULL
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjObject, kjString, kjBoolean, ...
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "ngsi10/NotifyContextRequest.h"                         // NotifyContextRequest
-#include "mongoBackend/MongoGlobal.h"                            // mongoIdentifier
+#include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
+#include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
-#include "orionld/kjTree/kjTreeFromContextAttribute.h"           // kjTreeFromContextAttribute
-#include "orionld/kjTree/kjTreeFromNotification.h"               // Own interface
+#include "common/RenderFormat.h"                               // RenderFormat
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
+#include "orionld/common/numberToDate.h"                       // numberToDate
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
+#include "orionld/contextCache/orionldContextCacheLookup.h"    // orionldContextCacheLookup
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
+#include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
+#include "orionld/kjTree/kjTreeFromNotification.h"             // Own interface
 
 
 
@@ -55,12 +57,13 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
 {
   KjNode*          nodeP;
   char             buf[32];
-  KjNode*          rootP      = kjObject(orionldState.kjsonP, NULL);
-  char*            id         = mongoIdentifier(buf);
-  char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
-  OrionldContext*  contextP   = orionldContextCacheLookup(context);
+  KjNode*          rootP             = kjObject(orionldState.kjsonP, NULL);
+  char*            id                = mongoIdentifier(buf);
+  char             idBuffer[]        = "urn:ngsi-ld:Notification:012345678901234567890123";  // '012345678901234567890123' will be overwritten
+  OrionldContext*  contextP          = orionldContextCacheLookup(context);
+  bool             crossNotification = (renderFormat >= NGSI_LD_V1_V2_NORMALIZED);           // NGSI_LD_V1_V2_[NORMALIZED|KEYVALUES|NORMALIZED_COMPACT|KEYVALUES_COMPACT]
 
-  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+  if (crossNotification == false)  // Meaning: NGSI-LD format
   {
     // id
     strcpy(&idBuffer[25], id);
@@ -80,7 +83,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   if ((mimeType == JSONLD) && (renderFormat != NGSI_LD_V1_V2_NORMALIZED))
   {
     if (context == NULL)
-      nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+      nodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
     else
       nodeP = kjString(orionldState.kjsonP, "@context", context);
 
@@ -92,7 +95,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   }
 
   // notifiedAt
-  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+  if (crossNotification == false)  // Meaning: NGSI-LD format
   {
     char date[128];
 
@@ -150,6 +153,12 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
       kjChildAdd(objectP, nodeP);
     }
+
+    //
+    // Concise - transform/simplify the normalized format
+    //
+    if (renderFormat == NGSI_LD_V1_CONCISE)
+      kjEntityNormalizedToConcise(objectP);
   }
 
   return rootP;

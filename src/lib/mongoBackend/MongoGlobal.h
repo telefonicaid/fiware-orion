@@ -35,6 +35,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "rest/uriParamNames.h"                // Default values for URI parameters
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -49,10 +50,10 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsiNotify/Notifier.h"
-#include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/TriggeredSubscription.h"
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 
 
 
@@ -186,79 +187,6 @@ extern std::string tenantFromDb(const std::string& database);
 
 /* ****************************************************************************
 *
-* setEntitiesCollectionName -
-*/
-extern void setEntitiesCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-extern void setRegistrationsCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-extern void setSubscribeContextCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setSubscribeContextAvailabilityCollectionName -
-*/
-extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* composeDatabaseName -
-*
-*/
-extern std::string composeDatabaseName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-extern std::string getEntitiesCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-extern std::string getRegistrationsCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-extern std::string getSubscribeContextCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
 * mongoLocationCapable -
 */
 extern bool mongoLocationCapable(void);
@@ -277,7 +205,7 @@ extern bool mongoExpirationCapable(void);
 *
 * ensureIdIndex -
 */
-extern void ensureIdIndex(const std::string& tenant);
+extern void ensureIdIndex(OrionldTenant* tenantP);
 
 
 
@@ -285,7 +213,7 @@ extern void ensureIdIndex(const std::string& tenant);
 *
 * ensureLocationIndex -
 */
-extern void ensureLocationIndex(const std::string& tenant);
+extern void ensureLocationIndex(OrionldTenant* tenantP);
 
 
 
@@ -293,7 +221,7 @@ extern void ensureLocationIndex(const std::string& tenant);
 *
 * ensureDateExpirationIndex -
 */
-extern void ensureDateExpirationIndex(const std::string& tenant);
+extern void ensureDateExpirationIndex(OrionldTenant* tenantP);
 
 
 
@@ -343,13 +271,13 @@ extern bool entitiesQuery
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePath,
   int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
   bool*                            limitReached   = NULL,
   long long*                       countP         = NULL,
-  const std::string&               sortOrderList  = "",
+  char*                            sortOrderList  = NULL,
   ApiVersion                       apiVersion     = V1
 );
 
@@ -373,7 +301,7 @@ extern bool registrationsQuery
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
-  const std::string&                  tenant,
+  OrionldTenant*                      tenantP,
   const std::vector<std::string>&     servicePathV,
   int                                 offset       = DEFAULT_PAGINATION_OFFSET_INT,
   int                                 limit        = DEFAULT_PAGINATION_LIMIT_INT,
@@ -408,7 +336,7 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern StringList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList(const mongo::BSONObj* subP);
 
 
 
@@ -428,8 +356,8 @@ extern mongo::BSONArray processConditionVector
   const ngsiv2::HttpInfo&            httpInfo,
   bool*                              notificationDone,
   RenderFormat                       renderFormat,
-  const std::string&                 tenant,
-  const std::string&                 xauthToken,
+  OrionldTenant*                     tenantP,
+  const char*                        xauthToken,
   const std::vector<std::string>&    servicePathV,
   const Restriction*                 resP,
   const std::string&                 status,
@@ -450,7 +378,7 @@ extern bool processAvailabilitySubscription(
     const std::string&    subId,
     const std::string&    notifyUrl,
     RenderFormat          renderFormat,
-    const std::string&    tenant,
+    OrionldTenant*        tenantP,
     const std::string&    fiwareCorrelator
 );
 

@@ -250,7 +250,7 @@ class NotifierMock : public Notifier
                                          const std::vector<std::string>&  metadataFilter,
                                          bool                             blacklist = false)
     {
-      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken, fiwareCorrelator, renderFormat, attrsFilter, metadataFilter, blacklist);
+      Notifier::sendNotifyContextRequest(ncr, httpInfo, tenant, xauthToken.c_str(), fiwareCorrelator, renderFormat, attrsFilter, metadataFilter, blacklist);
     }
 
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest*  ncar,

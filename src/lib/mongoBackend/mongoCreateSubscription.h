@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/OrionldTenant.h"                    // OrionldTenant
 #include "rest/OrionError.h"
 #include "apiTypesV2/Subscription.h"
 
@@ -47,9 +48,9 @@ extern std::string mongoCreateSubscription
 (
   const ngsiv2::Subscription&      sub,
   OrionError*                      oe,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               xauthToken,
+  const char*                      xauthToken,
   const std::string&               fiwareCorrelator
 #ifdef ORIONLD
   , const std::string&             ldContext = ""

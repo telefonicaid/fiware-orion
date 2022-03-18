@@ -25,110 +25,62 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjChildRemove
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
-#include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
-#include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
-#include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
-#include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
+#include "orionld/troe/pgAppend.h"                             // pgAppend
+#include "orionld/troe/pgEntityBuild.h"                        // pgEntityBuild
+#include "orionld/troe/pgCommands.h"                           // pgCommands
 #include "orionld/troe/troePostEntities.h"                     // Own interface
 
-
-
-// -----------------------------------------------------------------------------
-//
-// troeEntityExpand -
-//
-void troeEntityExpand(KjNode* entityP)
-{
-  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    if (strcmp(attrP->name, "type") == 0)
-    {
-      LM_TMP(("EXPAND: FROM '%s' (entity type value)", attrP->value.s));
-      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
-      LM_TMP(("EXPAND: TO '%s' (entity type value)", attrP->value.s));
-    }
-    else if (strcmp(attrP->name, "id")       == 0) {}
-    else if (strcmp(attrP->name, "location") == 0) {}
-    else
-    {
-      attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
-
-      if (attrP->type == KjObject)
-      {
-        for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
-        {
-          if      (strcmp(subAttrP->name, "type")        == 0) {}
-          else if (strcmp(subAttrP->name, "id")          == 0) {}
-          else if (strcmp(subAttrP->name, "value")       == 0) {}
-          else if (strcmp(subAttrP->name, "object")      == 0) {}
-          else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
-          else if (strcmp(subAttrP->name, "location")    == 0) {}
-          else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
-          else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
-          else
-          {
-            LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
-            subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name,  true, NULL);
-            LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
-          }
-        }
-      }
-    }
-  }
-}
 
 
 // ----------------------------------------------------------------------------
 //
 // troePostEntities -
 //
-bool troePostEntities(ConnectionInfo* ciP)
+bool troePostEntities(void)
 {
-  PGconn* connectionP;
-  KjNode* entityP = orionldState.requestTree;
+  char*    entityId    = (orionldState.payloadIdNode   != NULL)? orionldState.payloadIdNode->value.s   : NULL;
+  char*    entityType  = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
+  KjNode*  entityP     = orionldState.requestTree;
 
   //
-  // FIXME: the tree should be served expanded by orionldPostEntities()
+  // orionldPostTemporalEntities/orionldPostEntities does all the expansion
   //
 
+  PgAppendBuffer entities;
+  PgAppendBuffer attributes;
+  PgAppendBuffer subAttributes;
 
-  // Expand entity type and attribute names - FIXME: Remove once orionldPostEntities() has been fixed to do that
-  troeEntityExpand(entityP);
+  pgAppendInit(&entities, 1024);         // Just a single entity - 1024 should be more than enough
+  pgAppendInit(&attributes, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&subAttributes, 2*1024);  // ditto
 
-  connectionP = pgConnectionGet(orionldState.troeDbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
+  pgAppend(&entities,      PG_ENTITY_INSERT_START,        0);
+  pgAppend(&attributes,    PG_ATTRIBUTE_INSERT_START,     0);
+  pgAppend(&subAttributes, PG_SUB_ATTRIBUTE_INSERT_START, 0);
 
-  if (pgTransactionBegin(connectionP) != true)
-    LM_RE(false, ("pgTransactionBegin failed"));
+  const char* opModeString = (orionldState.troeOpMode == TROE_ENTITY_CREATE)? "Create" : "Replace";
 
-  LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
-  char* entityId   = orionldState.payloadIdNode->value.s;
-  char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
-  if (pgEntityTreat(connectionP, entityP, entityId, entityType, TROE_ENTITY_CREATE) == false)
-  {
-    LM_E(("Database Error (post entities TRoE layer failed)"));
-    if (pgTransactionRollback(connectionP) == false)
-      LM_RE(false, ("pgTransactionRollback failed"));
-  }
-  else
-  {
-    if (pgTransactionCommit(connectionP) != true)
-      LM_RE(false, ("pgTransactionCommit failed"));
-  }
+  pgEntityBuild(&entities, opModeString, entityP, entityId, entityType, &attributes, &subAttributes);
 
-  pgConnectionRelease(connectionP);
+  char* sqlV[3];
+  int   sqlIx = 0;
+
+  if (entities.values      > 0) sqlV[sqlIx++] = entities.buf;
+  if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
+  if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
+
+  if (sqlIx > 0)
+    pgCommands(sqlV, sqlIx);
 
   return true;
 }

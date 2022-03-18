@@ -113,8 +113,6 @@ extern void restInit
    unsigned int        _connectionMemory,
    unsigned int        _maxConnections,
    unsigned int        _mhdThreadPoolSize,
-   const std::string&  _rushHost,
-   unsigned short      _rushPort,
    const char*         _allowedOrigin,
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,
@@ -145,6 +143,6 @@ extern void firstServicePath(const char* servicePath, char* servicePath0, int se
 * isOriginAllowedForCORS - checks the Origin header of the request and returns
 * true if that Origin is allowed to make a CORS request
 */
-extern bool isOriginAllowedForCORS(const std::string& requestOrigin);
+extern bool isOriginAllowedForCORS(const char* requestOrigin);
 
 #endif

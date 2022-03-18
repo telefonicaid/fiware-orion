@@ -80,13 +80,16 @@ typedef struct Metadata
   bool                       boolValue;    // "value" as a Boolean
   orion::CompoundValueNode*  compoundValueP;
 
+  double                     createdAt;
+  double                     modifiedAt;
+
   Metadata();
   Metadata(Metadata* mP, bool useDefaultType = false);
   Metadata(const std::string& _name, const std::string& _type, const char* _value);
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);
   Metadata(const std::string& _name, const std::string& _type, bool _value);
-  Metadata(const std::string& _name, const mongo::BSONObj& mdB);
+  Metadata(const char* _name, mongo::BSONObj* mdB);
   ~Metadata();
 
   std::string  render(bool comma);

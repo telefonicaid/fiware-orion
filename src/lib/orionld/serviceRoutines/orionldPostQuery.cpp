@@ -36,9 +36,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
@@ -56,7 +53,42 @@ extern "C"
 //
 KjNode* dmodelMetadata(KjNode* dbMetadataP, bool sysAttrs, OrionldProblemDetails* pdP)
 {
-  return NULL;
+  char*   longName = kaStrdup(&orionldState.kalloc, dbMetadataP->name);
+  eqForDot(longName);
+
+  char*   alias    = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+  KjNode* mdP      = kjObject(orionldState.kjsonP, alias);
+  KjNode* nodeP    = dbMetadataP->value.firstChildP;
+  KjNode* next;
+
+  while (nodeP != NULL)
+  {
+    next = nodeP->next;
+    if      (strcmp(nodeP->name, "type")       == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "value")      == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "object")     == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "unitCode")   == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "observedAt") == 0) kjChildAdd(mdP, nodeP);
+    else if (sysAttrs == true)
+    {
+      if (strcmp(nodeP->name, "creDate") == 0)
+      {
+        nodeP->name = (char*) "createdAt";
+        kjChildAdd(mdP, nodeP);
+      }
+      else if (strcmp(nodeP->name, "modDate") == 0)
+      {
+        nodeP->name = (char*) "modifiedAt";
+        kjChildAdd(mdP, nodeP);
+      }
+    }
+    else
+      LM_W(("Skipping sub-sub-attribute '%s'", nodeP->name));
+
+    nodeP = next;
+  }
+
+  return mdP;
 }
 
 
@@ -74,7 +106,7 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
   char*   alias = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
   KjNode* attrP = kjObject(orionldState.kjsonP, alias);
   KjNode* nodeP = dbAttrP->value.firstChildP;
-  KjNode* mdsP   = NULL;
+  KjNode* mdsP  = NULL;
   KjNode* next;
 
   while (nodeP != NULL)
@@ -84,6 +116,8 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
     if (strcmp(nodeP->name, "type") == 0)
       kjChildAdd(attrP, nodeP);
     else if (strcmp(nodeP->name, "value") == 0)
+      kjChildAdd(attrP, nodeP);
+    else if (strcmp(nodeP->name, "object") == 0)
       kjChildAdd(attrP, nodeP);
     else if (sysAttrs == true)
     {
@@ -110,7 +144,7 @@ KjNode* dmodelAttribute(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* p
     {
       KjNode* metadataP;
 
-      if ((metadataP = dmodelMetadata(attrP, sysAttrs, pdP)) == NULL)
+      if ((metadataP = dmodelMetadata(mdP, sysAttrs, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
         return NULL;
@@ -260,7 +294,7 @@ KjNode* dmodelEntity(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pd
 //
 // POST /ngsi-ld/v1/entityOperations/query
 //
-bool orionldPostQuery(ConnectionInfo* ciP)
+bool orionldPostQuery(void)
 {
   if (orionldState.requestTree->type != KjObject)
   {
@@ -279,7 +313,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   if (pcheckQuery(orionldState.requestTree, &entitiesP, &attrsP, &qTree, &geoqP) == false)
     return false;
 
-  int      count;
+  int      count  = 0;
   int      limit  = orionldState.uriParams.limit;
   int      offset = orionldState.uriParams.offset;
   int*     countP = (orionldState.uriParams.count == true)? &count : NULL;
@@ -290,15 +324,12 @@ bool orionldPostQuery(ConnectionInfo* ciP)
     // Not an error - just "nothing found" - return an empty array
     orionldState.responsePayload = (char*) "[]";
     if (countP != NULL)
-    {
-      char number[16];
+      orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, 0);
 
-      snprintf(number, sizeof(number), "%d", count);
-      httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
-    }
     return true;
   }
 
+  //
   // Now the "raw db entities" must be fixed.
   // Also, do we need another field in the payload for filtering out which attrs to be returned???
   //
@@ -327,13 +358,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   orionldState.httpStatusCode = 200;
 
   if (countP != NULL)
-  {
-    char number[16];
-
-    snprintf(number, sizeof(number), "%d", count);
-    httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
-  }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   return true;
 }
-

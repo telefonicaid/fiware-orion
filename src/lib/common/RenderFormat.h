@@ -52,10 +52,11 @@ typedef enum RenderFormat
   NGSI_V2_CUSTOM                    = 6,
   NGSI_LD_V1_NORMALIZED             = 10,  // normalized (default) - but inside an NGSI-LD subscription
   NGSI_LD_V1_KEYVALUES              = 11,  // keyValues - but inside an NGSI-LD subscription
-  NGSI_LD_V1_V2_NORMALIZED          = 12,  // x-ngsiv2-normalized
-  NGSI_LD_V1_V2_KEYVALUES           = 13,  // x-ngsiv2-keyValues
-  NGSI_LD_V1_V2_NORMALIZED_COMPACT  = 14,  // x-ngsiv2-normalized-compacted
-  NGSI_LD_V1_V2_KEYVALUES_COMPACT   = 15   // x-ngsiv2-keyValues-compacted
+  NGSI_LD_V1_CONCISE                = 12,  // concise format - as compact as possible while still lossless
+  NGSI_LD_V1_V2_NORMALIZED          = 13,  // x-ngsiv2-normalized
+  NGSI_LD_V1_V2_KEYVALUES           = 14,  // x-ngsiv2-keyValues
+  NGSI_LD_V1_V2_NORMALIZED_COMPACT  = 15,  // x-ngsiv2-normalized-compacted
+  NGSI_LD_V1_V2_KEYVALUES_COMPACT   = 16   // x-ngsiv2-keyValues-compacted
 } RenderFormat;
 
 
@@ -72,6 +73,6 @@ extern const char* renderFormatToString(RenderFormat format, bool noDefault = tr
 *
 * stringToRenderFormat
 */
-extern RenderFormat stringToRenderFormat(const std::string& s, bool noDefault = false);
+extern RenderFormat stringToRenderFormat(const char* s, bool noDefault = false);
 
 #endif  // SRC_LIB_COMMON_RENDERFORMAT_H_

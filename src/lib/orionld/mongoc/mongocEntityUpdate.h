@@ -37,6 +37,6 @@ extern "C"
 //
 // mongocEntityUpdate -
 //
-extern bool mongocEntityUpdate(const char* entityId, KjNode* requestTree);
+extern bool mongocEntityUpdate(const char* entityId, KjNode* patchTree);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYUPDATE_H_

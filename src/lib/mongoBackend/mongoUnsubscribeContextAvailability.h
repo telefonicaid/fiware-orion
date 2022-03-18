@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "orionld/types/OrionldTenant.h"                     // OrionldTenant
+#include "orionld/common/tenantList.h"                       // tenant0
+
 #include "rest/HttpStatusCode.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
@@ -41,7 +44,7 @@ extern HttpStatusCode mongoUnsubscribeContextAvailability
 (
   UnsubscribeContextAvailabilityRequest*   requestP,
   UnsubscribeContextAvailabilityResponse*  responseP,
-  const std::string&                       tenant = ""
+  OrionldTenant*                           tenantP = &tenant0
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXTAVAILABILITY_H_

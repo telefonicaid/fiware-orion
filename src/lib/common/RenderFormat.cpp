@@ -49,10 +49,11 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
   case NGSI_V2_CUSTOM:                    return "custom";
   case NGSI_LD_V1_NORMALIZED:             return "normalized";
   case NGSI_LD_V1_KEYVALUES:              return "keyValues";
-  case NGSI_LD_V1_V2_NORMALIZED:          return "x-ngsiv2-normalized";
-  case NGSI_LD_V1_V2_KEYVALUES:           return "x-nsgiv2-keyValues";
-  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "x-ngsiv2-normalized-compacted";
-  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "x-nsgiv2-keyValues-compacted";
+  case NGSI_LD_V1_V2_NORMALIZED:          return "normalized";
+  case NGSI_LD_V1_V2_KEYVALUES:           return "keyValues";
+  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "normalized";
+  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "keyValues";
+  case NGSI_LD_V1_CONCISE:                return "concise";
   case NO_FORMAT:
     if (noDefault == true)
     {
@@ -73,21 +74,22 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
 *
 * stringToRenderFormat -
 */
-RenderFormat stringToRenderFormat(const std::string& s, bool noDefault)
+RenderFormat stringToRenderFormat(const char* s, bool noDefault)
 {
-  if (s == "JSON")         { return NGSI_V1_LEGACY;        }  // DB content for NGSIv1 rendering due to legacy reasons
-  if (s == "legacy")       { return NGSI_V1_LEGACY;        }
-  if (s == "normalized")   { return NGSI_V2_NORMALIZED;    }
-  if (s == "keyValues")    { return NGSI_V2_KEYVALUES;     }
-  if (s == "values")       { return NGSI_V2_VALUES;        }
-  if (s == "uniqueValues") { return NGSI_V2_UNIQUE_VALUES; }
-  if (s == "custom")       { return NGSI_V2_CUSTOM;        }
+  if (strcmp(s, "JSON")         == 0) return NGSI_V1_LEGACY;          // DB content for NGSIv1 rendering due to legacy reasons
+  if (strcmp(s, "legacy")       == 0) return NGSI_V1_LEGACY;
+  if (strcmp(s, "normalized")   == 0) return NGSI_V2_NORMALIZED;
+  if (strcmp(s, "keyValues")    == 0) return NGSI_V2_KEYVALUES;
+  if (strcmp(s, "concise")      == 0) return NGSI_LD_V1_CONCISE;
+  if (strcmp(s, "values")       == 0) return NGSI_V2_VALUES;
+  if (strcmp(s, "uniqueValues") == 0) return NGSI_V2_UNIQUE_VALUES;
+  if (strcmp(s, "custom")       == 0) return NGSI_V2_CUSTOM;
 
-  if (s == "x-ngsiv2")                      { return NGSI_LD_V1_V2_NORMALIZED_COMPACT; }
-  if (s == "x-ngsiv2-normalized")           { return NGSI_LD_V1_V2_NORMALIZED;         }
-  if (s == "x-ngsiv2-keyValues")            { return NGSI_LD_V1_V2_KEYVALUES;          }
-  if (s == "x-ngsiv2-normalized-compacted") { return NGSI_LD_V1_V2_NORMALIZED_COMPACT; }
-  if (s == "x-ngsiv2-keyValues-compacted")  { return NGSI_LD_V1_V2_KEYVALUES_COMPACT;  }
-  
+  if (strcmp(s, "x-ngsiv2")                      == 0) return NGSI_LD_V1_V2_NORMALIZED_COMPACT;
+  if (strcmp(s, "x-ngsiv2-normalized")           == 0) return NGSI_LD_V1_V2_NORMALIZED;
+  if (strcmp(s, "x-ngsiv2-keyValues")            == 0) return NGSI_LD_V1_V2_KEYVALUES;
+  if (strcmp(s, "x-ngsiv2-normalized-compacted") == 0) return NGSI_LD_V1_V2_NORMALIZED_COMPACT;
+  if (strcmp(s, "x-ngsiv2-keyValues-compacted")  == 0) return NGSI_LD_V1_V2_KEYVALUES_COMPACT;
+
   return (noDefault == false)? DEFAULT_RENDER_FORMAT : NO_FORMAT;
 }

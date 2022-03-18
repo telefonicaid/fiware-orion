@@ -1,0 +1,138 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification with keyValues and compaction - issue #823
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription with accumulator receiving notifications with keyValues
+# 02. Create an Entity B001
+# 03. Dump accumulator to see the notification - make sure dateObserved comes compacted
+#
+
+echo "01. Create a subscription with accumulator receiving notifications with keyValues"
+echo "================================================================================="
+payload='{
+  "description": "Notify Nifi when values updated",
+  "type": "Subscription",
+  "entities": [
+    { "type": "Beach" }
+  ],
+  "notification": {
+    "attributes": ["occupationRate", "peopleOccupancy", "dateObserved"],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Link: <https://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "02. Create an Entity B001"
+echo "========================="
+payload='{
+  "id": "urn:ngsi-ld:Beach:Benidorm:Playa-Levante:B001",
+  "type": "Beach",
+  "dateObserved": {"type": "Property", "value": {"type": "DateTime", "value": "2021-04-27T09:26:17+02:00"}},
+  "occupationRate": {"type": "Property", "value": "low"},
+  "peopleOccupancy": {"type": "Property", "value": 4}
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Link: <https://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "03. Dump accumulator to see the notification"
+echo "============================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with accumulator receiving notifications with keyValues
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. Create an Entity B001
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Beach:Benidorm:Playa-Levante:B001
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see the notification
+============================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 382
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: keyValues
+Host: REGEX(.*)
+Accept: application/json
+Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "dateObserved": {
+                "type": "DateTime", 
+                "value": "2021-04-27T09:26:17+02:00"
+            }, 
+            "id": "urn:ngsi-ld:Beach:Benidorm:Playa-Levante:B001", 
+            "occupationRate": "low", 
+            "peopleOccupancy": 4, 
+            "type": "Beach"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

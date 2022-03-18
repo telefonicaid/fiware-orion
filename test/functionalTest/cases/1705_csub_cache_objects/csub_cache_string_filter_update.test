@@ -192,7 +192,7 @@ Date: REGEX(.*)
 
 04. See notification of E1 in accumulator
 =========================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -239,7 +239,7 @@ Date: REGEX(.*)
 
 07. See no new notification in accumulator (only E1)
 ====================================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

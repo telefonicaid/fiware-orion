@@ -82,12 +82,13 @@ TEST(RegisterContextRequest, json_ok)
   const char*              inFile   = "ngsi9.registerContextRequest.ok.valid.json";
   const char*              outFile  = "ngsi9.registerContextRequestRendered.ok.valid.json";
   RegisterContextRequest*  rcrP     = &parseData.rcr.res;
-  ConnectionInfo           ci("", "POST", "1.1");
+  ConnectionInfo           ci;
   JsonRequest*             reqP;
   std::string              out;
 
-  ci.inMimeType      = JSON;
-  ci.outMimeType     = JSON;
+  orionldState.verb = POST;
+
+  orionldState.in.contentType      = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -113,10 +114,11 @@ TEST(RegisterContextRequest, json_noContextRegistration)
   const char*     inFile  = "ngsi9.registerContextRequest.noContextRegistration.invalid.json";
   const char*     outFile = "ngsi9.registerContextResponse.noContextRegistration.valid.json";
 
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.in.contentType  = JSON;
+
+  orionldState.verb = POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -136,10 +138,10 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.noProvidingApplication.invalid.json";
   const char*     outFile = "ngsi9.registerContextResponse.noProvidingApplication.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -159,10 +161,10 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.emptyProvidingApplication.invalid.json";
   const char*     outFile = "ngsi9.registerContextResponse.emptyProvidingApplication.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -182,10 +184,10 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.valid.json";
   const char*     outFile = "ngsi9.registerContextResponse.entityIdWithIsPatternTrue.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType   = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -205,10 +207,10 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
   ParseData       parseData;
   const char*     inFile = "ngsi9.registerContextRequest.invalidIsPatternString.invalid.json";
   const char*     expect = "OK";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType   = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -226,10 +228,10 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 {
   ParseData       parseData;
   const char*     inFile = "ngsi9.registerContextRequest.overwriteEntityIdType.invalid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -248,10 +250,10 @@ TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.badContextRegistrationAttributeIsDomain.invalid.json";
   const char*     outFile = "ngsi9.registerContextResponse.badContextRegistrationAttributeIsDomain.valid.json";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType   = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -271,10 +273,10 @@ TEST(RegisterContextRequest, json_reregistration)
   ParseData       parseData;
   const char*     inFile = "ngsi9.registerContextRequest.reregistration.valid.json";
   const char*     expect = "OK";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ConnectionInfo  ci;
 
-  ci.inMimeType   = JSON;
-  ci.outMimeType  = JSON;
+  orionldState.verb = POST;
+  orionldState.in.contentType   = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 

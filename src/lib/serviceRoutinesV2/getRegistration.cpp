@@ -29,6 +29,8 @@
 #include "common/clockFunctions.h"
 #include "common/string.h"
 
+#include "orionld/common/orionldState.h"
+
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -60,7 +62,7 @@ std::string getRegistration
   ngsiv2::Registration  registration;
   OrionError            oe;
 
-  TIMED_MONGO(mongoRegistrationGet(&registration, regId, ciP->tenant, ciP->servicePathV[0], &oe));
+  TIMED_MONGO(mongoRegistrationGet(&registration, regId, orionldState.tenantP, ciP->servicePathV[0], &oe));
 
   if (oe.code != SccOk)
   {

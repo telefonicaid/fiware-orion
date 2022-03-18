@@ -43,7 +43,6 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
@@ -55,95 +54,16 @@ extern "C"
 //
 // inAttrList -
 //
-static bool inAttrList(const char* attrName, char** attrListExpanded, int attrsInAttrList)
+static bool inAttrList(const char* attrName, char** attrList, int attrsInList)
 {
-  for (int ix = 0; ix < attrsInAttrList; ix++)
+  for (int ix = 0; ix < attrsInList; ix++)
   {
-    if (strcmp(attrName, attrListExpanded[ix]) == 0)
+    if (strcmp(attrName, attrList[ix]) == 0)
       return true;
   }
 
   return false;
 }
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attrListParseAndExpand -
-//
-static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpandedVecP, char* attrList)
-{
-  int   attrs = 0;
-  char* cP;
-
-  //
-  // attrList is a comma-separated list.
-  // First we need to find out how many attributes are in the list (== number of commas + 1)
-  //
-  if (*attrList != 0)
-  {
-    cP = attrList;
-    while (*cP != 0)
-    {
-      if (*cP == ',')
-      {
-        if (cP[1] != 0)  // If the comma is the last character - then there is no no next attribute
-          ++attrs;
-      }
-
-      ++cP;
-    }
-  }
-
-  ++attrs;  // Number of attributes == number of commas + 1
-
-
-  //
-  // Allocate room for the attribute name pointers
-  //
-  char** expandedV = (char**) kaAlloc(&orionldState.kalloc, attrs * sizeof(char*));
-
-  //
-  // And, parse attrList, to make the items in the vector point to each attribute name
-  //
-
-  // The first one is given:
-  expandedV[0] = attrList;
-
-  int aIx = 1;
-  cP = attrList;
-  while (*cP != 0)
-  {
-    if (*cP == ',')
-    {
-      *cP = 0;
-
-      if (cP[1] != 0)  // If the comma is the last character - then there is no no next attribute
-      {
-        ++cP;
-        expandedV[aIx++] = cP;
-      }
-      else
-        ++cP;
-    }
-    else
-      ++cP;
-  }
-
-
-  //
-  // Expand attribute names, overwriting the shortnames
-  //
-  for (int ix = 0; ix < attrs; ix++)
-  {
-    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], true, NULL);
-  }
-
-  *attrListExpandedVecP = expandedV;
-  *attrsInAttrListP     = attrs;
-}
-
 
 
 // -----------------------------------------------------------------------------
@@ -154,8 +74,6 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 {
   char     date[128];
   KjNode*  nodeP;
-
-  // FIXME: Always "keyValues" for 'createdAt' and 'modifiedAt' ?
 
   // createdAt
   if (numberToDate(creDate, date, sizeof(date)) == false)
@@ -199,11 +117,10 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 // The context for the entity is found in the context-cache.
 // If not present, it is retreived from the "@context" attribute of the entity and put in the cache
 //
-KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise, QueryContextResponse* responseP)
 {
   char* details  = NULL;
   bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
-
 
   //
   // No hits when "oneHit == false" is not an error.
@@ -269,30 +186,22 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
   if (oneHit == true)
     top = root;
 
-  //
-  // Expanding attrList, if present
-  //
-  int    attrsInAttrList  = 0;
-  char** attrListExpanded = NULL;
-
-  if (attrList)
-    attrListParseAndExpand(&attrsInAttrList, &attrListExpanded, attrList);
-
   for (int ix = 0; ix < hits; ix++)
   {
-    ContextElement* ceP = &responseP->contextElementResponseVector[ix]->contextElement;
+    ContextElement*  ceP = &responseP->contextElementResponseVector[ix]->contextElement;
+    KjNode*          nodeP;
 
+    //
+    // Creating the KjNode tree for the entity - 'top'
+    // If more than one hit, 'top' is added to the array 'root'
+    // If just one hit, 'top' points directly to root, whioch is then not an array but an Object
+    //
     if (oneHit == false)
     {
       top = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(root, top);
     }
 
-
-    //
-    // Time to create the KjNode tree
-    //
-    KjNode*  nodeP;
 
     // id
     nodeP = kjString(orionldState.kjsonP, "id", ceP->entityId.id.c_str());
@@ -345,10 +254,13 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
       attrName = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, &valueMayBeCompacted, NULL);
 
       //
-      // If URI param attrList has been used, only matching attributes should be included in the response
+      // If URI param 'attrs' has been used, only matching attributes should be included in the response
       //
-      if ((attrListExpanded != NULL) && (inAttrList(attrLongName, attrListExpanded, attrsInAttrList) == false))
-        continue;
+      if (orionldState.in.attrsList.items > 0)
+      {
+        if (inAttrList(attrLongName, orionldState.in.attrsList.array, orionldState.in.attrsList.items) == false)
+          continue;
+      }
 
       if (keyValues)
       {
@@ -397,7 +309,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
 
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
       }
-      else
+      else  // Normalized   AND    Concise  - concise is dealt with later!
       {
         //
         // NOT keyValues - create entire attribute tree
@@ -509,7 +421,8 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
 
           if ((strcmp(mdName, "observedAt") != 0) &&
               (strcmp(mdName, "createdAt")  != 0) &&
-              (strcmp(mdName, "modifiedAt") != 0))
+              (strcmp(mdName, "modifiedAt") != 0) &&
+              (strcmp(mdName, "unitCode")   != 0))
           {
             //
             // Looking up short name for the sub-attribute
@@ -527,6 +440,16 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
 
             typeP = kjString(orionldState.kjsonP, "type", mdP->type.c_str());
             kjChildAdd(nodeP, typeP);
+
+            // System Attributes?
+            if (sysAttrs == true)
+            {
+              if (orionldSysAttrs(mdP->createdAt, mdP->modifiedAt, nodeP) == false)
+              {
+                LM_E(("sysAttrs error"));
+                return NULL;
+              }
+            }
 
             details = NULL;
             switch (mdP->valueType)

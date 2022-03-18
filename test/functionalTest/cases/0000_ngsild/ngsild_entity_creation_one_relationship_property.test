@@ -101,6 +101,8 @@ MongoDB server version: REGEX(.*)
 			"value" : "urn:ngsi-ld:T2:6789",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/R1_P1" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
 					"value" : "V"
 				}

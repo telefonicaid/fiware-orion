@@ -32,8 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"  // Own interface
 
@@ -50,15 +51,12 @@ extern "C"
 //
 bool mongoCppLegacyEntityAttributesDelete(const char* entityId, char** attrNameV, int vecSize)
 {
-  char                     collectionPath[256];
   mongo::BSONObjBuilder    filter;
   mongo::BSONObjBuilder    command;
   mongo::BSONObjBuilder    unset;
   mongo::BSONObjBuilder    pull;
   mongo::BSONObjBuilder    pullIn;
   mongo::BSONArrayBuilder  pullInVec;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
 
   //
   // Entity ID
@@ -95,7 +93,7 @@ bool mongoCppLegacyEntityAttributesDelete(const char* entityId, char** attrNameV
   mongo::BSONObj          commandObj  = command.obj();
   mongo::Query            query(filter.obj());
 
-  connectionP->update(collectionPath, query, commandObj, true, false);
+  connectionP->update(orionldState.tenantP->entities, query, commandObj, true, false);
 
   releaseMongoConnection(connectionP);
   // semGive()

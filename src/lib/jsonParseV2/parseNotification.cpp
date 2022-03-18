@@ -26,6 +26,8 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/errorMessages.h"
 #include "apiTypesV2/Entity.h"
 #include "alarmMgr/alarmMgr.h"
@@ -132,13 +134,13 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 {
   rapidjson::Document  document;
 
-  document.Parse(ciP->payload);
+  document.Parse(orionldState.in.payload);
 
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return false;
   }
@@ -147,7 +149,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return false;
   }
@@ -155,7 +157,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   {
     alarmMgr.badInput(clientIp, "Empty JSON payload");
     oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return false;
   }
@@ -163,7 +165,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   {
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID);
     oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID, "BadRequest");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return false;
   }
@@ -173,7 +175,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
     alarmMgr.badInput(clientIp, details);
     oeP->fill(SccBadRequest, details, "BadRequest");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return false;
   }
@@ -190,7 +192,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, "BadRequest");
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return false;
       }
@@ -204,7 +206,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, "BadRequest");
 
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return false;
       }
@@ -212,7 +214,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
       if (parseNotificationData(ciP, iter, ncrP, oeP) == false)
       {
         alarmMgr.badInput(clientIp, oeP->details);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
 
         return false;
       }
@@ -223,7 +225,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
       alarmMgr.badInput(clientIp, description);
       oeP->fill(SccBadRequest, description, "BadRequest");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
 
       return false;
     }
@@ -244,19 +246,19 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
   OrionError  oe;
   bool        ok = false;
 
-  if ((ciP->httpHeaders.ngsiv2AttrsFormat == "normalized") || (ciP->httpHeaders.ngsiv2AttrsFormat == ""))
+  if ((orionldState.attrsFormat == NULL) || (strcmp(orionldState.attrsFormat, "normalized") == 0))
   {
     ok = parseNotificationNormalized(ciP, ncrP, &oe);
   }
-  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "keyValues")
+  else if (strcmp(orionldState.attrsFormat, "keyValues") == 0)
   {
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_KEYVALUES);
   }
-  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "uniqueValues")
+  else if (strcmp(orionldState.attrsFormat, "uniqueValues") == 0)
   {
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_UNIQUEVALUES);
   }
-  else if (ciP->httpHeaders.ngsiv2AttrsFormat == "custom")
+  else if (strcmp(orionldState.attrsFormat, "custom") == 0)
   {
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM);
   }

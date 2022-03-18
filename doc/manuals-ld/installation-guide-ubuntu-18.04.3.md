@@ -35,16 +35,17 @@ sudo aptitude install libssl1.0-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev 
 
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
-* Mongo Driver:   legacy-1.1.2
-* libmicrohttpd:  0.9.72
-* rapidjson:      1.0.2
-* kbase:          0.5
-* klog:           0.5
-* kalloc:         0.5
-* kjson:          0.5
-* khash:          0.5
-* gtest:          1.5 (needed for unit testing only)
-* gmock:          1.5 (needed for unit testing only)
+* Mongo C++ Driver:   legacy-1.1.2
+* Mongo C driver:     1.17.5
+* libmicrohttpd:      0.9.72
+* rapidjson:          1.0.2
+* kbase:              0.8
+* klog:               0.8
+* kalloc:             0.8
+* kjson:              0.8
+* khash:              0.8
+* gtest:              1.5 (needed for unit testing only)
+* gmock:              1.5 (needed for unit testing only)
 
 For those libraries that are cloned repositories, I myself keep all repositories in a directory I call *git* directly under my home directory: `~/git`.
 For this guide to work, you will need to do the same.
@@ -60,7 +61,7 @@ And, as `git` will be used, we might as well install it right away:
 sudo aptitude install git
 ```
 
-### Mongo Driver
+### Mongo C++ Driver
 As Orion-LD is based on Orion, and Orion uses the old Legacy C++ driver of the mongo client library, Orion-LD also uses that old library.
 Plans are to migrate, at least all the NGSI-LD requests to the newest C driver of the mongo client, but that work has still not commenced.
 
@@ -83,6 +84,24 @@ export GROUP=kz
 ```
 
 After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header directory *mongo* under `/usr/local/include/`.
+
+### Mongo C driver
+The idea is to leave the old mongo legacy driver in the dust and new stuff is implemented using the new C driver.
+Install it like this:
+```
+cd /opt
+sudo mkdir mongoc
+sudo chown $USER:$GROUP mongoc
+cd mongoc
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
+tar xzf mongo-c-driver-1.17.5.tar.gz
+cd mongo-c-driver-1.17.5
+mkdir cmake-build
+cd cmake-build
+cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+cmake --build .
+sudo cmake --build . --target install
+```
 
 ### libmicrohttpd
 
@@ -387,7 +406,7 @@ Edit postgresql.conf
 ```bash
 sudo nano /etc/postgresql/12/main/postgresql.conf
 ```
-Add this line at then end of the file and save it
+Add this line at the end of the file and save it
 ```bash
 shared_preload_libraries = 'timescaledb'
 ```

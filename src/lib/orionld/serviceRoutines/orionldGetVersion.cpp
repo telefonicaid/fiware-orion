@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
 #include <boost/version.hpp>                                   // BOOST_LIB_VERSION
 #include <microhttpd.h>                                        // MHD_VERSION (returns a number)
 #include <openssl/opensslv.h>                                  // OPENSSL_VERSION_TEXT
 #include <mongo/version.h>                                     // MONGOCLIENT_VERSION
 #include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
-#include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <mongoc/mongoc.h>                                     // MONGOC_VERSION_S
 
 extern "C"
 {
@@ -42,14 +43,17 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "serviceRoutines/versionTreat.h"                      // versionGet
 #include "cache/subCache.h"                                    // subCacheItems
+#include "orionld/common/pqHeader.h"                           // Postgres header
 #include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
+#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
+#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
 
@@ -75,12 +79,32 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// pgVersionToString -
+//
+static void pgVersionToString(int version, char* versionString, int versionStringSize)
+{
+  int major;
+  int minor;
+  int bugfix;
+
+  major    = version / 10000;
+  version -= major * 10000;
+  minor    = version / 100;
+  version -= minor * 100;
+  bugfix   = version;
+
+  snprintf(versionString, versionStringSize - 1, "%d.%d.%d", major, minor, bugfix);
+}
+
+
 
 // ----------------------------------------------------------------------------
 //
 // orionldGetVersion -
 //
-bool orionldGetVersion(ConnectionInfo* ciP)
+bool orionldGetVersion(void)
 {
   KjNode*                  nodeP;
   char                     mhdVersion[32];
@@ -108,30 +132,83 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  // Lib versions
-  nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
-  kjChildAdd(orionldState.responseTree, nodeP);
+  // Direct libraries
+
+  // microhttpd
   nodeP = kjString(orionldState.kjsonP, "microhttpd version", mhdVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
-  kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "mongo version", mongo::client::kVersionString);
-  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // rapidjson
   nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  //
-  // CURL lib
-  //
+  // curl
   curlVersionP = curl_version_info(CURLVERSION_NOW);
   if (curlVersionP != NULL)
     nodeP = kjString(orionldState.kjsonP, "libcurl version", curlVersionP->version);
   else
     nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
-
   kjChildAdd(orionldState.responseTree, nodeP);
+
+  // libuuid
   nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
   kjChildAdd(orionldState.responseTree, nodeP);
+
+  // mongocpp
+  nodeP = kjString(orionldState.kjsonP, "mongocpp version", mongo::client::kVersionString);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // mongoc
+  nodeP = kjString(orionldState.kjsonP, "mongoc version", MONGOC_VERSION_S);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+
+  //
+  // Mongo Server
+  //
+  nodeP = kjString(orionldState.kjsonP, "mongodb server version", mongoServerVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+
+  // Libs needed by the "direct libs"
+  nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  if (troe)
+  {
+    //
+    // Postgres Client Lib
+    //
+    int     pgLibVersion = PQlibVersion();
+    char    pgLibVersionString[32];
+
+    pgVersionToString(pgLibVersion, pgLibVersionString, sizeof(pgLibVersionString));
+    nodeP = kjString(orionldState.kjsonP, "postgres libpq version", pgLibVersionString);
+    kjChildAdd(orionldState.responseTree, nodeP);
+
+    //
+    // Postgres Server
+    //
+    PgConnection*  connectionP     = pgConnectionGet(NULL);
+    int            pgServerVersion = -1;
+    char           pgServerVersionString[32];
+
+    if ((connectionP != NULL) && (connectionP->connectionP != NULL))
+    {
+      pgServerVersion = PQserverVersion(connectionP->connectionP);
+      pgConnectionRelease(connectionP);
+
+      pgVersionToString(pgServerVersion, pgServerVersionString, sizeof(pgServerVersionString));
+    }
+    else
+      strncpy(pgServerVersionString, "UNKNOWN", sizeof(pgServerVersionString) - 1);
+
+    nodeP = kjString(orionldState.kjsonP, "postgres server version", pgServerVersionString);
+    kjChildAdd(orionldState.responseTree, nodeP);
+  }
+
 
   // Branch
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);

@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
@@ -42,8 +44,8 @@ std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const st
    out += valueTag(what, value);
    out += '}';
 
-   ciP->httpStatusCode = SccOk;
-   restReply(ciP, out);
+   orionldState.httpStatusCode = SccOk;
+   restReply(ciP, out.c_str());
 
    return out;
 }

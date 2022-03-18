@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entityIdAndTypeGet.h"                 // entityIdAndTypeGet
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
+#include "orionld/payloadCheck/pcheckEntity.h"                 // pcheckEntity
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // Own interface
 
@@ -65,7 +66,7 @@ static KjNode* entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
 //
 // kjEntityIdArrayExtract -
 //
-KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode* errorArray)
+KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
 {
   KjNode* entityP = entityArray->value.firstChildP;
   KjNode* next;
@@ -91,7 +92,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode
     //
     KjNode* contextNodeP  = kjLookup(entityP, "@context");
 
-    if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
+    if ((orionldState.in.contentType == JSONLD) && (contextNodeP == NULL))
     {
       LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
       entityErrorPush(errorArray,
@@ -106,7 +107,8 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode
       continue;
     }
 
-    if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
+
+    if ((orionldState.in.contentType != JSONLD) && (contextNodeP != NULL))
     {
       LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
       entityErrorPush(errorArray,
@@ -135,6 +137,25 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode
       entityP = next;
       continue;
     }
+
+#if 0
+    // Call pcheckEntity() and move to errorArray if needed
+    // But, not until pcheckEntity is good enough
+    if (pcheckEntity(entityP->value.firstChildP, NULL, NULL, NULL, NULL, NULL, true) == false)
+    {
+      LM_W(("Bad Input (invalid payload body)"));
+      entityErrorPush(errorArray,
+                      entityId,
+                      OrionldBadRequestData,
+                      "invalid payload body",
+                      "no details",
+                      400,
+                      false);
+      kjChildRemove(entityArray, entityP);
+      entityP = next;
+      continue;
+    }
+#endif
 
     entityIdPush(idArray, entityId);
 

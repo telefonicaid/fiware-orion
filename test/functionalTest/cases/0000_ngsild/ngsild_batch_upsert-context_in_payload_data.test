@@ -200,9 +200,14 @@ Date: REGEX(.*)
 
 03. Batch Upsert, Content-Type is JSON, and no @context present in an item of the array - OK
 ============================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 15
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:test:E1"
+]
 
 
 04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header
@@ -221,9 +226,14 @@ Date: REGEX(.*)
 
 05. Issue a Batch upsert command, creating 3 new entities, each with a different context
 ========================================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
+Content-Length: 10
+Content-Type: application/json
 Date: REGEX(.*)
 
+[
+    "urn:E1"
+]
 
 
 06. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context

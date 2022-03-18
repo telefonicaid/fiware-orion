@@ -52,14 +52,14 @@ echo
 01. Append attributes to the entity X, that doesn't exist, see 404 Not Found
 ============================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 127
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:T:00.00.00",
     "title": "Entity does not exist",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "common/globals.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -429,5 +431,5 @@ void jsonRcrRelease(ParseData* reqDataP)
 */
 std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rcr.res.check(ciP->apiVersion, reqData->errorString, 0);
+  return reqData->rcr.res.check(orionldState.apiVersion, reqData->errorString, 0);
 }

@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "common/globals.h"                                      // noCache
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup, ...
 
@@ -41,11 +40,11 @@
 //
 // orionldDeleteSubscription -
 //
-bool orionldDeleteSubscription(ConnectionInfo* ciP)
+bool orionldDeleteSubscription(void)
 {
   char* detail;
 
-  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
+  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
   {
     LM_E(("uriCheck: %s", detail));
     orionldState.httpStatusCode = SccBadRequest;
@@ -56,22 +55,22 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
   if (dbSubscriptionGet(orionldState.wildcard[0]) == NULL)
   {
     LM_E(("dbSubscriptionGet says that the subscription '%s' doesn't exist", orionldState.wildcard[0]));
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "The requested subscription has not been found - check its id", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0]);
     return false;
   }
 
   if (dbSubscriptionDelete(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbSubscriptionDelete failed - not found?"));
-    orionldState.httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "The requested subscription has not been found - check its id", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = 404;  // Not Found
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0]);
     return false;
   }
 
   if (noCache == false)
   {
-    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenant, orionldState.wildcard[0]);
+    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
     if (cSubP != NULL)
       subCacheItemRemove(cSubP);
     else

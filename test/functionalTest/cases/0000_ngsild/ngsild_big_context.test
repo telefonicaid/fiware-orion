@@ -40,14 +40,14 @@ echo "==========================================================================
 payload='{
   "id": "urn:ngsi-ld:AirQualityObserved:RZ:Obsv4567",
   "type": "AirQualityObserved",
-  "dateObserved": {
+  "dateObserved2": {
     "type": "Property",
     "value": {
       "@type": "DateTime",
       "@value": "2018-08-07T12:00:00Z"
     }
   },
-  "NO2": {
+  "NO22": {
     "type": "Property",
     "value": 22,
     "unitCode": "GP",
@@ -56,7 +56,7 @@ payload='{
       "value": 0.95
     }
   },
-  "refPointOfInterest": {
+  "R1": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:PointOfInterest:RZ:MainSquare"
   },

@@ -348,7 +348,7 @@ Date: REGEX(.*)
 
 08. Dump the accumulator to see the notification
 ================================================
-POST http://localhost:9997/notify
+POST http://localhost:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:01
 Fiware-Servicepath: /
 Content-Length: 295
 User-Agent: REGEX(.*)

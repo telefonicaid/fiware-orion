@@ -30,6 +30,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"               // mongoServerVersion
+
 #include "common/clockFunctions.h"
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
@@ -46,8 +48,8 @@
 * RECONNECT_RETRIES - number of retries after connect
 * RECONNECT_DELAY   - number of millisecs to sleep between retries
 */
-#define RECONNECT_RETRIES 100
-#define RECONNECT_DELAY   1000  // One second
+#define RECONNECT_RETRIES 20
+#define RECONNECT_DELAY   500  // milliseconds
 
 
 
@@ -147,7 +149,7 @@ static DBClientBase* mongoConnect
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
@@ -156,7 +158,7 @@ static DBClientBase* mongoConnect
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
       }
 
-      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
+      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds, RECONNECT_DELAY is in millis
     }
   }
   else
@@ -170,7 +172,6 @@ static DBClientBase* mongoConnect
     std::vector<HostAndPort> rplSetHosts;
     for (int ix = 0; ix < components; ix++)
     {
-      LM_T(LmtMongo, ("rplSet host <%s>", hostTokens[ix].c_str()));
       rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
     }
 
@@ -182,7 +183,7 @@ static DBClientBase* mongoConnect
     //
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
-      if ( ((DBClientReplicaSet*)connection)->connect())
+      if (((DBClientReplicaSet*) connection)->connect() == true)
       {
         connected = true;
         break;
@@ -190,16 +191,12 @@ static DBClientBase* mongoConnect
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
-      else
-      {
-        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-      }
 
-      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
+      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds, RECONNECT_DELAY is in millis
     }
   }
 
@@ -213,8 +210,6 @@ static DBClientBase* mongoConnect
     return NULL;
   }
   alarmMgr.dbErrorReset();
-
-  LM_I(("Successful connection to database"));
 
   //
   // WriteConcern
@@ -269,7 +264,9 @@ static DBClientBase* mongoConnect
   BSONObj     result;
   std::string extra;
   runCollectionCommand(connection, "admin", BSON("buildinfo" << 1), &result, &err);
-  std::string versionString = std::string(getStringFieldF(result, "version"));
+
+  std::string versionString = std::string(getStringFieldF(&result, "version"));
+  strncpy(mongoServerVersion, versionString.c_str(), sizeof(mongoServerVersion) - 1);
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
     LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
@@ -324,11 +321,14 @@ int mongoConnectionPoolInit
   //
   // Initialize (connect) the pool
   //
+  LM_K(("Connecting to mongo for the C++ legacy driver"));
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     connectionPool[ix].free       = true;
-    connectionPool[ix].connection =
-        mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
+    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
+
+    if ((connectionPool[ix].connection == NULL) && (ix == 0))
+      LM_X(1, ("Database Error (unable connect to mongo after a number of retries)"));
   }
 
   //

@@ -63,7 +63,8 @@ AlarmManager::AlarmManager()
   dbOk(true),
   notificationErrorLogAlways(false),
   badInputLogAlways(false),
-  dbErrorLogAlways(false)
+  dbErrorLogAlways(false),
+  stage(1)
 {
 }
 
@@ -78,8 +79,14 @@ int AlarmManager::init(bool logAlreadyRaisedAlarms)
   notificationErrorLogAlways = logAlreadyRaisedAlarms;
   badInputLogAlways          = logAlreadyRaisedAlarms;
   dbErrorLogAlways           = logAlreadyRaisedAlarms;
+  stage                      = 2;
 
-  return semInit();
+  bool b = semInit();
+
+  if (b == true)
+    stage = 3;
+
+  return b;
 }
 
 
@@ -193,6 +200,9 @@ void AlarmManager::dbErrorLogAlwaysSet(bool _dbErrorLogAlways)
 */
 bool AlarmManager::dbError(const std::string& details)
 {
+  if (stage < 3)
+    return false;
+
   if (dbOk == false)
   {
     if (dbErrorLogAlways)

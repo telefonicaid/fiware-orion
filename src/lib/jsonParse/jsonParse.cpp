@@ -44,6 +44,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
@@ -168,7 +170,7 @@ static bool treat
         std::string details = std::string("found a forbidden value in '") + value + "'";
           
         alarmMgr.badInput(clientIp, details);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return false;
       }
@@ -269,7 +271,7 @@ void eatCompound
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
     containerP = new CompoundValueNode(ValueTypeObject);
-    ciP->compoundValueRoot = containerP;
+    orionldState.compoundValueRoot = containerP;
   }
   else
   {
@@ -280,7 +282,7 @@ void eatCompound
         std::string details = std::string("found a forbidden value in compound '") + nodeValue + "'";
         alarmMgr.badInput(clientIp, details);
 
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return;
       }
@@ -359,7 +361,7 @@ static std::string jsonParse
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
     // However, this restriction is not valid inside Compound Values.
-    if ((nodeName != arrayElementName) || (ciP->inCompoundValue == true))
+    if ((nodeName != arrayElementName) || (orionldState.inCompoundValue == true))
     {
       path = path + "/" + nodeName;
     }
@@ -385,7 +387,7 @@ static std::string jsonParse
     eatCompound(ciP, NULL, v, "");
     compoundValueEnd(ciP, parseDataP);
 
-    if (ciP->httpStatusCode != SccOk)
+    if (orionldState.httpStatusCode != SccOk)
     {
       return ciP->answer;
     }
@@ -394,7 +396,7 @@ static std::string jsonParse
   }
   else if (treated == false)
   {
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();

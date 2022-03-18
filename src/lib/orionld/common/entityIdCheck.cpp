@@ -63,7 +63,7 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
 
   // Entity ID must be a valid URI
   char* detail;
-  if (pcheckUri(entityIdNodeP->value.s, &detail) == false)
+  if (pcheckUri(entityIdNodeP->value.s, true, &detail) == false)
   {
     LM_W(("Bad Input (CREATE/UPSERT: entity::id is a string but not a valid URI)"));
     entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400, false);

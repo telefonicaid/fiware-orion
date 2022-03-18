@@ -61,13 +61,17 @@
 #ifdef ORIONLD
 extern "C"
 {
+#include "kbase/kTime.h"                                       // kTimeGet, kTimeDiff
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/common/orionldTenantGet.h"                   // orionldTenantGet
+#include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE, PERFORMANCE*, performanceTimestamps
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
 
@@ -75,7 +79,6 @@ extern "C"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 
@@ -106,9 +109,6 @@ using ngsiv2::EntID;
 * Globals
 */
 static std::string          dbPrefix;
-static std::string          entitiesCollectionName;
-static std::string          registrationsCollectionName;
-static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
@@ -245,10 +245,6 @@ void mongoInit
   }
 
   setDbPrefix(dbName);
-  setEntitiesCollectionName(COL_ENTITIES);
-  setRegistrationsCollectionName(COL_REGISTRATIONS);
-  setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
 
   //
   // Note that index creation operation is idempotent.
@@ -258,10 +254,10 @@ void mongoInit
   //
 
   if (idIndex == true)
-    ensureIdIndex("");
+    ensureIdIndex(&tenant0);
 
-  ensureLocationIndex("");
-  ensureDateExpirationIndex("");
+  ensureLocationIndex(&tenant0);
+  ensureDateExpirationIndex(&tenant0);
 
   if (mtenant)
   {
@@ -272,14 +268,15 @@ void mongoInit
 
     for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
     {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      std::string     orionDb     = orionDbs[ix];
+      std::string     tenantName  = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      OrionldTenant*  tenantP     = orionldTenantGet(tenantName.c_str());
 
       if (idIndex == true)
-        ensureIdIndex(tenant);
+        ensureIdIndex(tenantP);
 
-      ensureLocationIndex(tenant);
-      ensureDateExpirationIndex(tenant);
+      ensureLocationIndex(tenantP);
+      ensureDateExpirationIndex(tenantP);
     }
   }
 }
@@ -412,7 +409,31 @@ DBClientBase* getMongoConnection(void)
 #ifdef UNIT_TEST
   return connection;
 #else
+
+#ifdef REQUEST_PERFORMANCE
+  DBClientBase*     connectionP;
+  struct timespec   start;
+  struct timespec   end;
+  struct timespec   diff;
+  float             fDiff;
+
+  kTimeGet(&start);
+  connectionP = mongoPoolConnectionGet();
+  kTimeGet(&end);
+
+  //
+  // Accumulate
+  //
+  ++performanceTimestamps.getMongoConnectionCalls;
+
+  kTimeDiff(&start, &end, &diff, &fDiff);
+
+  performanceTimestamps.mongoConnectAccumulated += fDiff;
+  return connectionP;
+#else
   return mongoPoolConnectionGet();
+#endif
+
 #endif
 }
 
@@ -497,181 +518,18 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
     return false;
   }
 
-  std::vector<BSONElement> databases = getFieldF(result, "databases").Array();
+  std::vector<BSONElement> databases = getFieldF(&result, "databases").Array();
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
-    std::string  dbName  = getStringFieldF(db, "name");
+    const char*  dbName  = getStringFieldF(&db, "name");
     std::string  prefix  = dbPrefix + "-";
 
-    if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
-    {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+    if (strncmp(prefix.c_str(), dbName, strlen(prefix.c_str())) == 0)
       dbsP->push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
-    }
   }
 
   return true;
-}
-
-
-
-/* ***************************************************************************
-*
-* tenantFromDb -
-*
-* Given a database name as an argument (e.g. orion-myservice1) it returns the
-* corresponding tenant name as result (myservice1) or "" if the string doesn't
-* start with the database prefix
-*/
-std::string tenantFromDb(const std::string& database)
-{
-  std::string r;
-  std::string prefix  = dbPrefix + "-";
-
-  if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
-  {
-    char tenant[SERVICE_NAME_MAX_LEN];
-
-    strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant) - 1);
-    r = std::string(tenant);
-  }
-  else
-  {
-    r = "";
-  }
-
-  LM_T(LmtMongo, ("DB -> tenant: <%s> -> <%s>", database.c_str(), r.c_str()));
-  return r;
-}
-
-
-
-/* ***************************************************************************
-*
-* setEntitiesCollectionName -
-*/
-void setEntitiesCollectionName(const std::string& name)
-{
-  entitiesCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-void setRegistrationsCollectionName(const std::string& name)
-{
-  registrationsCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-void setSubscribeContextCollectionName(const std::string& name)
-{
-  subscribeContextCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setSubscribeContextAvailabilityCollectionName -
-*/
-void setSubscribeContextAvailabilityCollectionName(const std::string& name)
-{
-  subscribeContextAvailabilityCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* composeCollectionName -
-*
-* Common helper function for composing collection names
-*/
-static std::string composeCollectionName(const std::string& tenant, const std::string& colName)
-{
-  return composeDatabaseName(tenant) + "." + colName;
-}
-
-
-
-/* ***************************************************************************
-*
-* composeDatabaseName -
-*
-* Common helper function for composing database names
-*/
-std::string composeDatabaseName(const std::string& tenant)
-{
-  std::string result;
-
-  if (!multitenant || (tenant == ""))
-  {
-    result = dbPrefix;
-  }
-  else
-  {
-    /* Note that we can not use "." as database delimiter. A database cannot contain this
-     * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
-    result = dbPrefix + "-" + tenant;
-  }
-
-  LM_T(LmtBug, ("database name composed: '%s'", result.c_str()));
-  return result;
-}
-
-
-
-/* ***************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-std::string getEntitiesCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, entitiesCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-std::string getRegistrationsCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, registrationsCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-std::string getSubscribeContextCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
 
 
@@ -715,10 +573,10 @@ bool mongoExpirationCapable(void)
 *
 * ensureIdIndex -
 */
-void ensureIdIndex(const std::string& tenant)
+void ensureIdIndex(OrionldTenant* tenantP)
 {
   std::string err;
-  collectionCreateIndex(getEntitiesCollectionName(tenant), BSON("_id.id" << 1), false, &err);
+  collectionCreateIndex(tenantP->entities, BSON("_id.id" << 1), false, &err);
 }
 
 
@@ -727,7 +585,7 @@ void ensureIdIndex(const std::string& tenant)
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex(const std::string& tenant)
+void ensureLocationIndex(OrionldTenant* tenantP)
 {
   /* Ensure index for entity locations, in the case of using 2.4 */
   if (mongoLocationCapable())
@@ -735,8 +593,8 @@ void ensureLocationIndex(const std::string& tenant)
     std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << "2dsphere"), false, &err);
-    LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    collectionCreateIndex(tenantP->entities, BSON(index << "2dsphere"), false, &err);
+    LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -746,7 +604,7 @@ void ensureLocationIndex(const std::string& tenant)
  *
  * ensureDateExpirationIndex -
  */
-void ensureDateExpirationIndex(const std::string& tenant)
+void ensureDateExpirationIndex(OrionldTenant* tenantP)
 {
   /* Ensure index for entity expiration, in the case of using 2.4 */
   if (mongoExpirationCapable())
@@ -754,8 +612,8 @@ void ensureDateExpirationIndex(const std::string& tenant)
     std::string index = ENT_EXPIRATION;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << 1), true, &err);
-    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    collectionCreateIndex(tenantP->entities, BSON(index << 1), true, &err);
+    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -1334,16 +1192,18 @@ bool entitiesQuery
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  const std::string&               tenant,
+  OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePath,
   int                              offset,
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  const std::string&               sortOrderList,
+  char*                            sortOrderList,
   ApiVersion                       apiVersion
 )
 {
+  PERFORMANCE_BEGIN(1, "entitiesQuery, part 1");
+
   /* Query structure is as follows
    *
    * {
@@ -1354,6 +1214,9 @@ bool entitiesQuery
    *  }
    *
    */
+
+  if (tenantP == NULL)
+    tenantP = orionldState.tenantP;
 
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
@@ -1398,10 +1261,9 @@ bool entitiesQuery
     finalQuery.append(ENT_ATTRNAMES, BSON("$in" << attrs.arr()));
   }
 
-#ifdef ORIONLD
   if (orionldState.qMongoFilterP != NULL)
     finalQuery.appendElements(*orionldState.qMongoFilterP);
-#endif
+
   /* Part 5: scopes */
   std::vector<BSONObj>  filters;
   unsigned int          geoScopes = 0;
@@ -1427,46 +1289,36 @@ bool entitiesQuery
       else
       {
         BSONObj areaQuery;
+        bool    result;
 
-        bool result;
         if (scopeP->type == FIWARE_LOCATION_V2)
-        {
           result = processAreaScopeV2(scopeP, &areaQuery);
-        }
         else  // FIWARE Location NGSIv1 (legacy)
-        {
           result = processAreaScope(scopeP, &areaQuery);
-        }
 
-        if (result)
+        if (result == true)
         {
           if (orionldState.apiVersion == NGSI_LD_V1)
           {
-            char  locationCoordinates[512];
-            char* attrNameP = (char*) "location";  // Default geoproperty name
+            char  dbAttrValuePath[512];
 
-            //
-            // If uriParams.geoproperty not present, then "location" is the default name of the geoproperty to use
-            // If uriParams.geoproperty  IS present, then we need to replace all '.' for '='
-            //
-            // After that, "attrs.$ATTRNAME.coordinates" must be used
-            //
-            if (orionldState.uriParams.geoproperty != NULL)
+            if (orionldState.uriParams.geoproperty == NULL)
+              strncpy(dbAttrValuePath, "attrs.location.value", sizeof(dbAttrValuePath) - 1);
+            else
             {
-              attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);
-              dotForEq(attrNameP);
+              char* attrName = kaStrdup(&orionldState.kalloc, orionldState.uriParams.geoproperty);
+              dotForEq(attrName);
+              snprintf(dbAttrValuePath, sizeof(dbAttrValuePath), "attrs.%s.value", attrName);
             }
 
-            snprintf(locationCoordinates, sizeof(locationCoordinates), "attrs.%s.value", attrNameP);
-
-            finalQuery.append(locationCoordinates, areaQuery);
+            finalQuery.append(dbAttrValuePath, areaQuery);
           }
           else
           {
-            std::string locationCoordinates;
+            std::string dbAttrValuePath;
 
-            locationCoordinates = ENT_LOCATION "." ENT_LOCATION_COORDS;
-            finalQuery.append(locationCoordinates, areaQuery);
+            dbAttrValuePath = ENT_LOCATION "." ENT_LOCATION_COORDS;
+            finalQuery.append(dbAttrValuePath, areaQuery);
           }
         }
       }
@@ -1505,16 +1357,20 @@ bool entitiesQuery
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 
+  PERFORMANCE_END(1, NULL);
+  PERFORMANCE_BEGIN(2, "entitiesQuery, part 2");
+
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
-  // LM_TMP(("Q: finalQuery: %s (DESTRUCTIVE)", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
-  Query                          query(finalQuery.obj());
+  // LM_TMP(("***** WARNING: DESTRUCTIVE ***** - finalQuery: %s", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
 
-  if (sortOrderList == "")
+  Query  query(finalQuery.obj());
+
+  if (sortOrderList == NULL)
   {
     query.sort(BSON(ENT_CREATION_DATE << 1));
   }
-  else if ((sortOrderList == ORDER_BY_PROXIMITY))
+  else if (strcmp(sortOrderList, ORDER_BY_PROXIMITY) == 0)
   {
     // In this case the solution is not setting any query.sort(), as the $near operator will do the
     // sorting itself. Of course, using orderBy=geo:distance without using georel=near will return
@@ -1552,13 +1408,17 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
+  query.readPref(mongo::ReadPreference_Nearest, mongo::BSONArray());  // TEST ALSO: mongo::ReadPreference_PrimaryPreferred
+  if (!collectionRangedQuery(connection, tenantP->entities, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  PERFORMANCE_END(2, NULL);
+  PERFORMANCE_BEGIN(3, "entitiesQuery, part 3");
 
   /* Process query result */
   unsigned int docs = 0;
@@ -1573,7 +1433,9 @@ bool entitiesQuery
     try
     {
       // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
+      PERFORMANCE_BEGIN(4, "entitiesQuery, nextSafe");
       r = cursor->nextSafe();
+      PERFORMANCE_END(4, NULL);
     }
     catch (const AssertionException &e)
     {
@@ -1646,13 +1508,17 @@ bool entitiesQuery
       return false;
     }
 
+    PERFORMANCE_BEGIN(5, "entitiesQuery, part 5");
     alarmMgr.dbErrorReset();
 
     // Build CER from BSON retrieved from DB
     docs++;
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+
+    PERFORMANCE_BEGIN(8, "entitiesQuery, part 8");
+    ContextElementResponse*  cer = new ContextElementResponse(&r, attrL, includeEmpty, apiVersion);
+    PERFORMANCE_END(8, NULL);
 
     addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
@@ -1668,6 +1534,7 @@ bool entitiesQuery
         continue;
       }
 
+      PERFORMANCE_BEGIN(6, "entitiesQuery, 6: for");
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
         if (attrName == cer->contextElement.contextAttributeVector[jx]->name)
@@ -1682,13 +1549,16 @@ bool entitiesQuery
         ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
         cer->contextElement.contextAttributeVector.push_back(caP);
       }
+      PERFORMANCE_END(6, NULL);
     }
-
+    PERFORMANCE_END(5, NULL);
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
 
  release:
+  PERFORMANCE_END(3, NULL);
+  PERFORMANCE_BEGIN(7, "entitiesQuery, part 7");
   releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
@@ -1700,6 +1570,7 @@ bool entitiesQuery
     if (*limitReached)
     {
       LM_T(LmtMongo, ("entities limit reached"));
+      PERFORMANCE_END(7, "entitiesQuery, limits");
       return true;
     }
   }
@@ -1725,10 +1596,10 @@ bool entitiesQuery
 
       if (needToAdd)
       {
-        ContextElementResponse* cerP = new ContextElementResponse();
+        ContextElementResponse* cerP            = new ContextElementResponse();
 
-        cerP->contextElement.entityId.id = enV[ix]->id;
-        cerP->contextElement.entityId.type = enV[ix]->type;
+        cerP->contextElement.entityId.id        = enV[ix]->id;
+        cerP->contextElement.entityId.type      = enV[ix]->type;
         cerP->contextElement.entityId.isPattern = "false";
 
         //
@@ -1751,6 +1622,8 @@ bool entitiesQuery
       }
     }
   }
+
+  PERFORMANCE_END(7, NULL);
 
   return true;
 }
@@ -1818,8 +1691,8 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id   = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = entity.hasField(REG_ENTITY_TYPE) ? getStringFieldF(entity, REG_ENTITY_TYPE) : "";
+  en.id   = getStringFieldF(&entity, REG_ENTITY_ID);
+  en.type = getStringFieldF(&entity, REG_ENTITY_TYPE);
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct
@@ -1841,12 +1714,12 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const BSONObj& attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, BSONObj* attrObjP)
 {
   ContextRegistrationAttribute attr(
-    getStringFieldF(attribute, REG_ATTRS_NAME),
-    getStringFieldF(attribute, REG_ATTRS_TYPE),
-    getStringFieldF(attribute, REG_ATTRS_ISDOMAIN));
+    getStringFieldF(attrObjP, REG_ATTRS_NAME),
+    getStringFieldF(attrObjP, REG_ATTRS_TYPE),
+    getStringFieldF(attrObjP, REG_ATTRS_ISDOMAIN));
 
   // FIXME: we don't take metadata into account at the moment
   // attr.metadataV = ..
@@ -1875,10 +1748,10 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
+  crr.contextRegistration.providingApplication.set(getStringFieldF(&cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setMimeType(mimeType);
 
-  std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
+  std::vector<BSONElement> queryEntityV = getFieldF(&cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
@@ -1890,11 +1763,12 @@ static void processContextRegistrationElement
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
     {
-      std::vector<BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
+      std::vector<BSONElement> queryAttrV = getFieldF(&cr, REG_ATTRS).Array();
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
-        processAttribute(&crr, attrL, queryAttrV[ix].embeddedObject());
+        BSONObj qaObj =  queryAttrV[ix].embeddedObject();
+        processAttribute(&crr, attrL, &qaObj);
       }
     }
   }
@@ -1939,7 +1813,7 @@ bool registrationsQuery
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
-  const std::string&                  tenant,
+  OrionldTenant*                      tenantP,
   const std::vector<std::string>&     servicePathV,
   int                                 offset,
   int                                 limit,
@@ -2042,9 +1916,9 @@ bool registrationsQuery
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
-  std::string   colName    = getRegistrationsCollectionName(tenant);
 
-  if (!collectionRangedQuery(connection, colName, query, limit, offset, &cursor, countP, err))
+  query.readPref(mongo::ReadPreference_PrimaryPreferred, mongo::BSONArray());
+  if (!collectionRangedQuery(connection, tenantP->registrations, query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2067,7 +1941,7 @@ bool registrationsQuery
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
-    std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+    std::vector<BSONElement>  queryContextRegistrationV = getFieldF(&r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
@@ -2127,7 +2001,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 */
 bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
-  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<BSONElement>  conds = getFieldF(&sub, CSUB_CONDITIONS).Array();
 
   if (conds.size() == 0)
   {
@@ -2162,14 +2036,14 @@ bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modi
 EntityIdVector subToEntityIdVector(const BSONObj& sub)
 {
   EntityIdVector            enV;
-  std::vector<BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  subEnts = getFieldF(&sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
     BSONObj    subEnt = subEnts[ix].embeddedObject();
-    EntityId*  en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
-                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
+    EntityId*  en     = new EntityId(getStringFieldF(&subEnt, CSUB_ENTITY_ID),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(&subEnt, CSUB_ENTITY_TYPE) : "",
+                                     getStringFieldF(&subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 
@@ -2185,10 +2059,10 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 * Extract the attribute list from a BSON document (in the format of the csubs/casub
 * collection)
 */
-StringList subToAttributeList(const BSONObj& sub)
+StringList subToAttributeList(const BSONObj* subP)
 {
   StringList                attrL;
-  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<BSONElement>  subAttrs = getFieldF(subP, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
@@ -2255,8 +2129,8 @@ static bool processOnChangeConditionForSubscription
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
   RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
+  OrionldTenant*                   tenantP,
+  const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
   const std::string&               fiwareCorrelator,
@@ -2279,13 +2153,13 @@ static bool processOnChangeConditionForSubscription
 
   metadataList.fill(metadataV);
 
-  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenantP, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
     return false;
   }
-  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+  else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenantP, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -2302,7 +2176,7 @@ static bool processOnChangeConditionForSubscription
   {
     if (rawCerV.size() == 0)
     {
-      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenantP, servicePathV))
       {
         ncr.contextElementResponseVector.release();
         rawCerV.release();
@@ -2356,7 +2230,7 @@ static bool processOnChangeConditionForSubscription
        * Note that in this case we do a query for all the attributes, not restricted to attrV */
       ContextElementResponseVector  allCerV;
 
-      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenantP, servicePathV))
       {
 #ifdef WORKAROUND_2994
         delayedReleaseAdd(rawCerV);
@@ -2384,7 +2258,7 @@ static bool processOnChangeConditionForSubscription
         /* Send notification */
         getNotifier()->sendNotifyContextRequest(&ncr,
                                                 notifyHttpInfo,
-                                                tenant,
+                                                tenantP->tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
                                                 renderFormat,
@@ -2403,7 +2277,7 @@ static bool processOnChangeConditionForSubscription
     {
       getNotifier()->sendNotifyContextRequest(&ncr,
                                               notifyHttpInfo,
-                                              tenant,
+                                              tenantP->tenant,
                                               xauthToken,
                                               fiwareCorrelator,
                                               renderFormat,
@@ -2437,8 +2311,8 @@ static BSONArray processConditionVector
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
+  OrionldTenant*                   tenantP,
+  const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
   const std::string&               status,
@@ -2471,7 +2345,7 @@ static BSONArray processConditionVector
                                                     subId,
                                                     httpInfo,
                                                     renderFormat,
-                                                    tenant,
+                                                    tenantP,
                                                     xauthToken,
                                                     servicePathV,
                                                     resP,
@@ -2511,8 +2385,8 @@ BSONArray processConditionVector
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
   RenderFormat                     renderFormat,
-  const std::string&               tenant,
-  const std::string&               xauthToken,
+  OrionldTenant*                   tenantP,
+  const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
   const Restriction*               resP,
   const std::string&               status,
@@ -2538,7 +2412,7 @@ BSONArray processConditionVector
                                          httpInfo,
                                          notificationDone,
                                          renderFormat,
-                                         tenant,
+                                         tenantP,
                                          xauthToken,
                                          servicePathV,
                                          resP,
@@ -2559,7 +2433,7 @@ BSONArray processConditionVector
 *
 * mongoUpdateCasubNewNotification -
 */
-static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, std::string tenant)
+static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, OrionldTenant* tenantP)
 {
   LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
@@ -2568,7 +2442,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
   BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << orionldState.requestTime) <<
                             "$inc" << BSON(CASUB_COUNT << 1));
 
-  collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), query, update, false, err);
+  collectionUpdate(tenantP->avSubscriptions, query, update, false, err);
 
   return SccOk;
 }
@@ -2599,7 +2473,7 @@ bool processAvailabilitySubscription
   const std::string&    subId,
   const std::string&    notifyUrl,
   RenderFormat          renderFormat,
-  const std::string&    tenant,
+  OrionldTenant*        tenantP,
   const std::string&    fiwareCorrelator
 )
 {
@@ -2608,7 +2482,7 @@ bool processAvailabilitySubscription
   std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
   servicePathV.push_back("");                      // While this gets implemented, "" default is used.
 
-  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
+  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenantP, servicePathV))
   {
     ncar.contextRegistrationResponseVector.release();
     return false;
@@ -2619,11 +2493,11 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, renderFormat);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenantP->tenant, fiwareCorrelator, renderFormat);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */
-    if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk)
+    if (mongoUpdateCasubNewNotification(subId, &err, tenantP) != SccOk)
     {
       return false;
     }

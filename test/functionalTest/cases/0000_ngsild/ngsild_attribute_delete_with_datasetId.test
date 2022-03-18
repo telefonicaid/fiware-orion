@@ -1,0 +1,260 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute Delete with datasetId
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with an attribute A1 having 3 datasets (D1, D2, and D3) apart from the default
+# 02. Delete A1:D1 using the datasetId URI param
+# 03. See E1 in mongo - make sure A1:D1 is no longer present
+# 04. GET E1 via REST - make sure A1:D1 is no longer present
+# 05. Delete the entire attribute, using the deleteAll URI param
+# 06. See E1 in mongo - make sure A1 is completely gone, both default and datasets
+# 07. GET E1 - make sure A1 is completely gone, both default and datasets
+#
+
+echo "01. Create an entity E1 with an attribute A1 having 3 datasets (D1, D2, and D3) apart from the default"
+echo "======================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A1": [
+    {
+      "type": "Property",
+      "value": "A1:Default"
+    },
+    {
+      "type": "Property",
+      "value": "A1:D1",
+      "datasetId": "urn:ngsi-ld:dataset:D1"
+    },
+    {
+      "type": "Property",
+      "value": "A1:D2",
+      "datasetId": "urn:ngsi-ld:dataset:D2"
+    },
+    {
+      "type": "Property",
+      "value": "A1:D3",
+      "datasetId": "urn:ngsi-ld:dataset:D3"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Delete A1:D1 using the datasetId URI param"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/A1?datasetId=urn:ngsi-ld:dataset:D1 -X DELETE
+echo
+echo
+
+
+echo "03. See E1 in mongo - make sure A1:D1 is no longer present"
+echo "=========================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "04. GET E1 via REST - make sure A1:D1 is no longer present"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "05. Delete the entire attribute, using the deleteAll URI param"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/A1?deleteAll=true -X DELETE
+echo
+echo
+
+
+echo "06. See E1 in mongo - make sure A1 is completely gone, both default and datasets"
+echo "================================================================================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "07. GET E1 - make sure A1 is completely gone, both default and datasets"
+echo "======================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with an attribute A1 having 3 datasets (D1, D2, and D3) apart from the default
+======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Delete A1:D1 using the datasetId URI param
+==============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. See E1 in mongo - make sure A1:D1 is no longer present
+==========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "A1:Default",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : [
+			{
+				"type" : "Property",
+				"value" : "A1:D2",
+				"datasetId" : "urn:ngsi-ld:dataset:D2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "A1:D3",
+				"datasetId" : "urn:ngsi-ld:dataset:D3",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+04. GET E1 via REST - make sure A1:D1 is no longer present
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "A1": [
+        {
+            "type": "Property",
+            "value": "A1:Default"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D2",
+            "type": "Property",
+            "value": "A1:D2"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:dataset:D3",
+            "type": "Property",
+            "value": "A1:D3"
+        }
+    ],
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+05. Delete the entire attribute, using the deleteAll URI param
+==============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. See E1 in mongo - make sure A1 is completely gone, both default and datasets
+================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [ ],
+	"attrs" : {
+		
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		
+	}
+}
+bye
+
+
+07. GET E1 - make sure A1 is completely gone, both default and datasets
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 43
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

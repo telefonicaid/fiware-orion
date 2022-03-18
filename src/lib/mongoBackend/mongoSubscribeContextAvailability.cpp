@@ -28,16 +28,18 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
+#include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/tenantList.h"               // tenant0
+
 #include "common/globals.h"
 #include "common/sem.h"
-#include "orionld/common/orionldState.h"             // orionldState
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/dbConstants.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
-#include "rest/uriParamNames.h"
 
 
 
@@ -59,11 +61,13 @@ HttpStatusCode mongoSubscribeContextAvailability
 (
   SubscribeContextAvailabilityRequest*   requestP,
   SubscribeContextAvailabilityResponse*  responseP,
-  std::map<std::string, std::string>&    uriParam,
   const std::string&                     fiwareCorrelator,
-  const std::string&                     tenant
+  OrionldTenant*                         tenantP
 )
 {
+  if (tenantP == NULL)
+    tenantP = orionldState.tenantP;
+
   bool           reqSemTaken;
 
   reqSemTake(__FUNCTION__, "ngsi9 subscribe request", SemWriteOp, &reqSemTaken);
@@ -127,7 +131,7 @@ HttpStatusCode mongoSubscribeContextAvailability
 
   /* Insert document in database */
   std::string err;
-  if (!collectionInsert(getSubscribeContextAvailabilityCollectionName(tenant), sub.obj(), &err))
+  if (!collectionInsert(tenantP->avSubscriptions, sub.obj(), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -144,7 +148,7 @@ HttpStatusCode mongoSubscribeContextAvailability
                                   oid.toString(),
                                   requestP->reference.get(),
                                   NGSI_V1_LEGACY,
-                                  tenant,
+                                  tenantP,
                                   fiwareCorrelator);
 
   /* Fill the response element */

@@ -37,8 +37,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/mqtt/mqttCheck.h"                            // mqttCheck
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // Own interface
 
@@ -141,8 +140,8 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
 
     KeyValue* keyValueP = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
 
-    strncpy(keyValueP->key,   key,   sizeof(keyValueP->key));
-    strncpy(keyValueP->value, value, sizeof(keyValueP->value));
+    strncpy(keyValueP->key,   key,   sizeof(keyValueP->key) - 1);
+    strncpy(keyValueP->value, value, sizeof(keyValueP->value) - 1);
     httpInfoP->notifierInfo.push_back(keyValueP);
 
     //
@@ -157,7 +156,7 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
         return false;
       }
 
-      strncpy(httpInfoP->mqtt.version, value, sizeof(httpInfoP->mqtt.version));
+      strncpy(httpInfoP->mqtt.version, value, sizeof(httpInfoP->mqtt.version) - 1);
     }
     else if (strcmp(key, "MQTT-QoS") == 0)
     {
@@ -215,7 +214,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
           return false;
         }
       }
-      else if (!urlCheck(uriP, &detail) && !urnCheck(uriP, &detail))
+      else if (pcheckUri(uriP, true, &detail) == false)
       {
         LM_W(("Bad Input (endpoint is not a valid URI)"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid URI");
@@ -275,7 +274,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
 
   if (uriP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint::uri");
     return false;
   }
 

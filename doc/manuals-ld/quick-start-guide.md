@@ -474,7 +474,7 @@ The full URL to reach this context is then included in the HTTP headers of the r
 #### CURL
 The context can later be retrieved with the following command:
 ```bash
-GET /ngsi-ld/ex/v1/contexts<context-id>
+GET /ngsi-ld/v1/jsonldContexts/<context-id>
 ```
 
 So, let's try this, using the option `--dump-header` of `curl` so that we save the HTTP headers - that's where we'll find the URL to retrieve the context later:
@@ -508,21 +508,21 @@ cat /tmp/httpHeaders
 HTTP/1.1 201 Created
 Connection: Keep-Alive
 Content-Length: 0
-Link: <http://xps:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://xps:1026/ngsi-ld/v1/jsonldContexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:entities:E3
 Date: Fri, 22 Nov 2019 13:04:23 GMT
 ```
 Especially, check out the **Link** header:
 ```
 cat /tmp/httpHeaders | grep ^Link
-Link: <http://xps:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://xps:1026/ngsi-ld/v1/jsonldContexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 ```
 
 You will get a different ID (the ID in this example happens to be `9ad26df4-0d28-11ea-98e1-9cb6d0961dcd`), and a different hostname (mine is: `xps`,
 but the rest will be the same, and you **will** be able to retrieve the context with a command similar to this
 (change `9ad26df4-0d28-11ea-98e1-9cb6d0961dcd` for the ID you got previously):
 ```bash
-curl localhost:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd
+curl localhost:1026/ngsi-ld/v1/jsonldContexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd
 ```
 
 Not only can you retrieve the context, but you can also use it in subsequent requests, for example a GET request.
@@ -558,12 +558,12 @@ Here's the response:
 
 With the context used during creation (expect short names) - change hostname 'xps' and context ID '9ad26df4-0d28-11ea-98e1-9cb6d0961dcd' to your own values:
 ```bash
-curl 'xps:1026/ngsi-ld/v1/entities/urn:entities:E3?prettyPrint=yes' -H 'Link: <http://localhost:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>;rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+curl 'xps:1026/ngsi-ld/v1/entities/urn:entities:E3?prettyPrint=yes' -H 'Link: <http://localhost:1026/ngsi-ld/v1/jsonldContexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>;rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 ```
 Here's the response:
 ```json
 {
-  "@context": "http://xps:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd",
+  "@context": "http://xps:1026/ngsi-ld/v1/jsonldContexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd",
   "id": "urn:entities:E3",
   "type": "T",
   "P1": {

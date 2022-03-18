@@ -146,15 +146,13 @@ MongoDB server version: REGEX(.*)
 				"modifiedAt" : REGEX(.*)
 			}
 		],
-		"https://uri=etsi=org/ngsi-ld/default-context/name2" : [
-			{
-				"type" : "Property",
-				"value" : "dataset urn:ngsi-ld/dataset:1",
-				"datasetId" : "urn:ngsi-ld/dataset:1",
-				"createdAt" : REGEX(.*),
-				"modifiedAt" : REGEX(.*)
-			}
-		],
+		"https://uri=etsi=org/ngsi-ld/default-context/name2" : {
+			"type" : "Property",
+			"value" : "dataset urn:ngsi-ld/dataset:1",
+			"datasetId" : "urn:ngsi-ld/dataset:1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*)
+		},
 		"https://uri=etsi=org/ngsi-ld/default-context/name4" : {
 			"type" : "Property",
 			"value" : "dataset urn:ngsi-ld/dataset:1",

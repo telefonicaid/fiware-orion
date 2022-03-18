@@ -25,6 +25,10 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+
+#include "mongo/client/dbclient.h"
+
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "mongoBackend/safeMongo.h"
@@ -47,7 +51,13 @@
 #define RES_CER_STATUS(i)       res.contextElementResponseVector[i]->statusCode
 #define RES_CER_ATTR(i, j)      res.contextElementResponseVector[i]->contextElement.contextAttributeVector[j]
 
-#define C_STR_FIELD(b, f)       getStringField(b, f).c_str()
+
+
+/* ****************************************************************************
+*
+* C_STR_FIELD -
+*/
+extern const char* C_STR_FIELD(mongo::BSONObj bob, std::string f);
 
 
 
@@ -55,10 +65,22 @@
 *
 * setupDatabase -
 *
-* This function (which is called before every test) cleans the database and set
+* This function (which is called before every test) cleans the database and sets
 * collection names
 */
 extern void setupDatabase(void);
+
+
+
+//
+// There functions replace those that were removed inside mongoBackend
+// in the PR that fixed the "collection name compose problem", June 2021
+//
+extern void setDbPrefix(const char* prefix);
+extern void setRegistrationsCollectionName(const char* colName);
+extern void setEntitiesCollectionName(const char* colName);
+extern void setSubscribeContextCollectionName(const char* colName);
+extern void setSubscribeContextAvailabilityCollectionName(const char* colName);
 
 
 

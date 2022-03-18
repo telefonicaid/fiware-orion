@@ -44,12 +44,14 @@
 */
 typedef enum MimeType
 {
-  JSON       = 1,
-  TEXT       = 2,
-  HTML       = 3,
-  JSONLD     = 4,
-  GEOJSON    = 5,
-  NOMIMETYPE = 6
+  NOMIMETYPEGIVEN  = 0,
+  NOMIMETYPE       = 1,
+  JSON             = 2,
+  TEXT             = 3,
+  HTML             = 4,
+  JSONLD           = 5,
+  GEOJSON          = 6,
+  MERGEPATCHJSON   = 7
 } MimeType;
 
 
@@ -75,14 +77,6 @@ extern const char* mimeTypeToString(MimeType mimeType);
 * stringToMimeType
 */
 extern MimeType stringToMimeType(const std::string& s);
-extern MimeType longStringToMimeType(const std::string& s);
-
-
-
-/* ****************************************************************************
-*
-* mimeTypeParse - 
-*/
-extern MimeType mimeTypeParse(const std::string& mimeType, std::string* charsetP);
+extern MimeType longStringToMimeType(const char* s);
 
 #endif  // SRC_LIB_COMMON_MIMETYPE_H_

@@ -57,6 +57,13 @@ add_definitions(-std=c++11)
 
 # Baseline compiler flags, any change here will affect all build types
 
+
+#
+# Compile RELEASE optimized for size, not speed
+#
+# set (CMAKE_CXX_FLAGS_RELEASE "-Os")
+
+
 #
 # FIXME P4: https://github.com/telefonicaid/fiware-orion/issues/2979
 #   'template class std::auto_ptr' is deprecated in gcc 6.3.0 of Ubuntu 17.04, so -Werror cannot be used alone, at least not for now.
@@ -86,6 +93,8 @@ ELSEIF (${DISTRO} MATCHES "Ubuntu_18.*")
  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSEIF (${DISTRO} MATCHES "Debian_9.*")
  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+ELSEIF (${DISTRO} MATCHES "RedHat_8.*")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -DREDHAT_UBI=8.4 -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSE()
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ENDIF ()
@@ -181,11 +190,13 @@ SET (ORION_LIBS
     orionld_context
     orionld_common
     orionld_context
+    orionld_contextCache
     orionld_db
-#    orionld_mongoc
+    orionld_mongoc
     orionld_mongoCppLegacy
     orionld_db
     orionld_mongoBackend
+    orionld_mongoCppLegacy
     orionld_socketService
     orionld_troe
     serviceRoutines
@@ -202,12 +213,13 @@ SET (ORION_LIBS
     ngsi
     cache
     mongoBackend
-    orionld_common       # mongoBackend calls geoJsonCreate from orionld_common
     orionld_context      # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
     orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_payloadCheck
+    orionld_common
     orionld_mqtt
     orionld_types
+    orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     parse
     apiTypesV2
     orionTypes
@@ -237,8 +249,6 @@ SET (BOOST_MT
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
-#    mongoc-static-1.0.a
-#    bson-static-1.0.a
     kjson.a
     khash.a
     kalloc.a
@@ -261,6 +271,8 @@ SET (DYNAMIC_LIBS
     resolv
     paho-mqtt3c
     pq             # for TRoE & Postgres
+    libmongoc-1.0.so
+    libbson-1.0.so
 )
 
 #
@@ -280,7 +292,7 @@ endif (UNIT_TEST)
 #
 include_directories("/usr/include")
 include_directories("/usr/local/include/libbson-1.0")
-#include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("${PROJECT_SOURCE_DIR}/..")
 
 #
@@ -338,13 +350,14 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/common)
   ADD_SUBDIRECTORY(src/lib/orionld/types)
   ADD_SUBDIRECTORY(src/lib/orionld/context)
+  ADD_SUBDIRECTORY(src/lib/orionld/contextCache)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
+  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/orionld/payloadCheck)
   ADD_SUBDIRECTORY(src/lib/orionld/mqtt)
-#  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)

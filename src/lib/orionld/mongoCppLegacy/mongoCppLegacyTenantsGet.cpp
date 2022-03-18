@@ -35,6 +35,7 @@
 
 #include "orionld/common/orionldState.h"                       // orionldState, dbName, dbNameLen
 #include "orionld/common/orionldTenantCreate.h"                // orionldTenantCreate
+#include "orionld/common/orionldTenantLookup.h"                // orionldTenantLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"   // mongoCppLegacyDbStringFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"   // mongoCppLegacyDbFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyTenantsGet.h"   // Own interface
@@ -73,12 +74,17 @@ bool mongoCppLegacyTenantsGet(void)
       mongo::BSONObj  db   = dbV[ix].Obj();
       char*           name = mongoCppLegacyDbStringFieldGet(&db, "name");
 
-      // Don't include the base as a tenant
-      if (strcmp(name, dbName) == 0)
-        continue;
-
       if (strncmp(name, dbName, dbNameLen) == 0)
-        orionldTenantCreate(name);
+      {
+        // The prefix matches, now '-' + tenant
+        if ((name[dbNameLen] == '-') && (name[dbNameLen + 1] != 0))
+        {
+          char* tenantName = &name[dbNameLen + 1];
+
+          if (orionldTenantLookup(tenantName) == NULL)
+            orionldTenantCreate(tenantName);
+        }
+      }
     }
   }
   catch (const std::exception &e)

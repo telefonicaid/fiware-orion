@@ -26,7 +26,10 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "orionld/common/orionldState.h"  // orionldState
+
+#include "orionld/common/orionldState.h"   // orionldState
+#include "orionld/common/tenantList.h"     // tenant0
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
@@ -383,10 +386,10 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  orionldState.uriParams.details = true;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -486,10 +489,10 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+  orionldState.uriParams.details = false;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -589,12 +592,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "0";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 0;
+  orionldState.uriParams.limit   = 1;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -638,12 +641,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 1;
+  orionldState.uriParams.limit   = 1;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -687,12 +690,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 2;
+  orionldState.uriParams.limit   = 3;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -764,12 +767,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExisting)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "6";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 6;
+  orionldState.uriParams.limit   = 2;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -800,12 +803,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "4";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "4";
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 4;
+  orionldState.uriParams.limit   = 4;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -849,12 +852,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingDetails)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
-  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "6";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 6;
+  orionldState.uriParams.limit   = 2;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -887,9 +890,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E3", "T3");
   req.entityIdVector.push_back(&en);
+  orionldState.uriParams.details = false;
+  orionldState.uriParams.offset  = 0;
+  orionldState.uriParams.limit   = 20;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+  ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -951,7 +957,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1015,7 +1021,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     req.attributeList.push_back("A1");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1088,7 +1094,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1148,7 +1154,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1227,7 +1233,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1305,7 +1311,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1350,7 +1356,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     req.attributeList.push_back("A5");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1396,7 +1402,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1497,7 +1503,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1573,7 +1579,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1666,7 +1672,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1769,7 +1775,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1852,7 +1858,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1910,7 +1916,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1987,7 +1993,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2077,7 +2083,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2127,7 +2133,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2233,7 +2239,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2342,7 +2348,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
+    ms = mongoDiscoverContextAvailability(&req, &res, &tenant0, servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

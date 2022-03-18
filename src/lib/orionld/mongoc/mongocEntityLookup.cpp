@@ -32,10 +32,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
-#include "orionld/db/dbNameGet.h"                                // dbNameGet
-#include "orionld/mongoc/mongocKjTreeFromBsonObj.h"              // mongocKjTreeFromBsonObj
+#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
+#include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
 
 
@@ -46,7 +46,6 @@ extern "C"
 //
 KjNode* mongocEntityLookup(const char* entityId)
 {
-  char              dbName[512];
   bson_t            mongoFilter;
   const bson_t*     mongoDocP;
   mongoc_cursor_t*  mongoCursorP;
@@ -55,19 +54,22 @@ KjNode* mongocEntityLookup(const char* entityId)
   char*             details;
   KjNode*           entityNodeP = NULL;
 
-  if (dbNameGet(dbName, sizeof(dbName)) == -1)
-    return NULL;
-
   //
   // Create the filter for the query
   //
+  bson_init(&mongoFilter);
   bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
+
+  mongocConnectionGet();
+
+  if (orionldState.mongoc.entitiesP == NULL)
+    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
 
   //
   // Run the query
   //
   // semTake(&mongoEntitiesSem);
-  if ((mongoCursorP = mongoc_collection_find_with_opts(mongoEntitiesCollectionP, &mongoFilter, NULL, NULL)) == NULL)
+  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
     return NULL;
@@ -75,7 +77,7 @@ KjNode* mongocEntityLookup(const char* entityId)
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    entityNodeP = mongocKjTreeFromBsonObj(mongoDocP, &title, &details);
+    entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &details);
     break;  // Just using the first one - should be no more than one!
   }
 

@@ -37,6 +37,7 @@ test/jMeter/*.csv
 core*
 test/valgrind/*.out
 src/lib/common/compileInfo.h
+src/lib/orionld/troe/dbCreationCommand.cpp
 
 # Qt creator project files
 fiware-orion.config

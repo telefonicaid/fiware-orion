@@ -25,11 +25,13 @@
 #include <string>
 #include <vector>
 
+#include "orionld/common/orionldState.h"                  // orionldState
+#include "orionld/types/OrionldHeader.h"                  // orionldHeaderAdd
+
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
+#include "rest/HttpHeaders.h"                             // HTTP_*
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
@@ -61,39 +63,32 @@ std::string getEntityAllTypes
   EntityTypeVectorResponse  response;
   std::string               answer;
   unsigned int              totalTypes   = 0;
-  bool                      noAttrDetail = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
+  bool                      noAttrDetail = orionldState.uriParamOptions.noAttrDetail;
   unsigned int*             totalTypesP  = NULL;
 
   // NGSIv2 uses options=count to request count
-  if (ciP->uriParamOptions[OPT_COUNT])
+  if (orionldState.uriParams.count)
   {
     totalTypesP = &totalTypes;
   }
 
-  if (ciP->uriParamOptions[OPT_VALUES])
+  if (orionldState.uriParamOptions.values)
   {
-    TIMED_MONGO(mongoEntityTypesValues(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, totalTypesP));
+    TIMED_MONGO(mongoEntityTypesValues(&response, orionldState.tenantP, ciP->servicePathV, totalTypesP));
   }
   else  // default
   {
     TIMED_MONGO(mongoEntityTypes(&response,
-                                 ciP->tenant,
+                                 orionldState.tenantP,
                                  ciP->servicePathV,
-                                 ciP->uriParam,
-                                 ciP->apiVersion,
+                                 orionldState.apiVersion,
                                  totalTypesP,
                                  noAttrDetail));
   }
-  TIMED_RENDER(answer = response.toJson(ciP->uriParamOptions[OPT_VALUES]));
+  TIMED_RENDER(answer = response.toJson(orionldState.uriParamOptions.values));
 
-  if (ciP->uriParamOptions[OPT_COUNT])
-  {
-    char cVec[64];
-
-    snprintf(cVec, sizeof(cVec), "%u", totalTypes);
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(cVec);
-  }
+  if (orionldState.uriParams.count)
+    orionldHeaderAdd(&orionldState.out.headers, HttpNgsiv2Count, NULL, totalTypes);
 
   response.release();
   return answer;

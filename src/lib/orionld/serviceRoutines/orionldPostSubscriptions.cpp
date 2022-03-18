@@ -36,20 +36,14 @@ extern "C"
 
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
-#include "orionld/common/orionldState.h"                       // orionldState
+
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
-#include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
-#include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
-#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // kjTreeToSubscriptionExpression
-#include "orionld/kjTree/kjTreeToEndpoint.h"                   // kjTreeToEndpoint
-#include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
@@ -82,7 +76,7 @@ extern "C"
 // * Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them
 // * For now, 'timeInterval' will not be implemented. If ever ...
 //
-bool orionldPostSubscriptions(ConnectionInfo* ciP)
+bool orionldPostSubscriptions(void)
 {
   ngsiv2::Subscription sub;
   std::string          subId;
@@ -91,7 +85,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
   else
-    sub.ldContext = ORIONLD_CORE_CONTEXT_URL;
+    sub.ldContext = coreContextUrl;
 
   //
   // FIXME: attrsFormat etc. should be set to default by constructor
@@ -102,7 +96,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   sub.throttling          = -1;  // 0?
   sub.timeInterval        = -1;  // 0?
 
-  LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
   char*    subIdP    = NULL;
   KjNode*  endpointP = NULL;
 
@@ -136,10 +129,10 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
         return false;
       }
 
-      if (mqttUser     != NULL) strncpy(sub.notification.httpInfo.mqtt.username, mqttUser,     sizeof(sub.notification.httpInfo.mqtt.username));
-      if (mqttPassword != NULL) strncpy(sub.notification.httpInfo.mqtt.password, mqttPassword, sizeof(sub.notification.httpInfo.mqtt.password));
-      if (mqttHost     != NULL) strncpy(sub.notification.httpInfo.mqtt.host,     mqttHost,     sizeof(sub.notification.httpInfo.mqtt.host));
-      if (mqttTopic    != NULL) strncpy(sub.notification.httpInfo.mqtt.topic,    mqttTopic,    sizeof(sub.notification.httpInfo.mqtt.topic));
+      if (mqttUser     != NULL) strncpy(sub.notification.httpInfo.mqtt.username, mqttUser,     sizeof(sub.notification.httpInfo.mqtt.username) - 1);
+      if (mqttPassword != NULL) strncpy(sub.notification.httpInfo.mqtt.password, mqttPassword, sizeof(sub.notification.httpInfo.mqtt.password) - 1);
+      if (mqttHost     != NULL) strncpy(sub.notification.httpInfo.mqtt.host,     mqttHost,     sizeof(sub.notification.httpInfo.mqtt.host) - 1);
+      if (mqttTopic    != NULL) strncpy(sub.notification.httpInfo.mqtt.topic,    mqttTopic,    sizeof(sub.notification.httpInfo.mqtt.topic) - 1);
 
       sub.notification.httpInfo.mqtt.mqtts = mqtts;
       sub.notification.httpInfo.mqtt.port  = mqttPort;
@@ -163,7 +156,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
             if (strcmp(keyP->name, "MQTT-Version") == 0)
             {
               mqttVersion = valueP->value.s;
-              strncpy(sub.notification.httpInfo.mqtt.version, mqttVersion, sizeof(sub.notification.httpInfo.mqtt.version));
+              strncpy(sub.notification.httpInfo.mqtt.version, mqttVersion, sizeof(sub.notification.httpInfo.mqtt.version) - 1);
             }
             else if (strcmp(keyP->name, "MQTT-QoS") == 0)
             {
@@ -195,11 +188,11 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   if (subIdP != NULL)
   {
-    ngsiv2::Subscription  subscription;
-    char*                 details;
+    ngsiv2::Subscription      subscription;
+    char*                     details;
 
     // mongoGetLdSubscription takes the req semaphore
-    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &orionldState.httpStatusCode, &details) == true)
+    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenantP, &orionldState.httpStatusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "A subscription with that ID already exists", subIdP);
       orionldState.httpStatusCode = SccConflict;
@@ -210,17 +203,20 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Create the subscription
   //
+  std::vector<std::string> servicePathV;
+  servicePathV.push_back("/");
+
   subId = mongoCreateSubscription(sub,
                                   &oError,
-                                  orionldState.tenant,
-                                  ciP->servicePathV,
-                                  ciP->httpHeaders.xauthToken,
-                                  ciP->httpHeaders.correlator,
+                                  orionldState.tenantP,
+                                  servicePathV,
+                                  orionldState.xAuthToken,
+                                  orionldState.correlator,
                                   sub.ldContext);
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
 
   orionldState.httpStatusCode = SccCreated;
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
+  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str());
 
   return true;
 }

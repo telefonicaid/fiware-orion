@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+#include "orionld/common/pqHeader.h"                           // PGconn
 
 
 

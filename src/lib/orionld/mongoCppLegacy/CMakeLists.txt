@@ -24,6 +24,8 @@ SET (SOURCES
     mongoCppLegacyInit.cpp
     mongoCppLegacyEntityLookup.cpp
     mongoCppLegacyEntityAttributeLookup.cpp
+    mongoCppLegacyEntityAttributeInstanceLookup.cpp
+    mongoCppLegacyEntityAttributeWithDatasetsLookup.cpp
     mongoCppLegacyEntityUpdate.cpp
     mongoCppLegacyEntityDelete.cpp
     mongoCppLegacyEntitiesDelete.cpp
@@ -54,6 +56,11 @@ SET (SOURCES
     mongoCppLegacyEntityRetrieve.cpp
     mongoCppLegacyEntitiesQuery.cpp
     mongoCppLegacyEntityFieldReplace.cpp
+    mongoCppLegacyEntityFieldDelete.cpp
+    mongoCppLegacyEntitiesAttributeLookup.cpp
+    mongoCppLegacyDatasetGet.cpp
+    mongoCppLegacyEntityTypeGet.cpp
+    mongoCppLegacyTenantExists.cpp
 )
 
 # Include directories

@@ -25,8 +25,8 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
 #include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
@@ -38,12 +38,9 @@
 //
 // orionldBadVerb -
 //
-bool orionldBadVerb(ConnectionInfo* ciP)
+bool orionldBadVerb(void)
 {
   uint16_t  bitmask = 0;
-
-  LM_T(LmtBadVerb, ("PATH: %s", orionldState.urlPath));
-  LM_T(LmtBadVerb, ("VERB: %s", orionldState.verbString));
 
   //
   // There are nine verbs/methods, but only GET, POST, PATCH and DELETE are supported by ORIONLD
@@ -71,8 +68,7 @@ bool orionldBadVerb(ConnectionInfo* ciP)
   if (bitmask & (1 << DELETE)) strcat(allowValue, ",PATCH");
   if (bitmask & (1 << PATCH))  strcat(allowValue, ",DELETE");
 
-  ciP->httpHeader.push_back(HTTP_ALLOW);
-  ciP->httpHeaderValue.push_back(&allowValue[1]);  // Skipping first comma
+  orionldHeaderAdd(&orionldState.out.headers, HttpAllow, (char*) &allowValue[1], 0);  // Skipping first comma of 'allowValue'
 
   return true;
 }
