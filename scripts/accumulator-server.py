@@ -392,8 +392,8 @@ times = []
 
 
 if __name__ == '__main__':
-    # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
-    # makes the calle os.path.isfile(pidFile) return True, even if the file doesn't exist. Thus,
+    # Note that using debug=True breaks the procedure to write the PID into a file. In particular
+    # makes the call to os.path.isfile(pidFile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if https:
         # According to http://stackoverflow.com

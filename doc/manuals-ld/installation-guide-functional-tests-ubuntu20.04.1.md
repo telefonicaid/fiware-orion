@@ -1,25 +1,61 @@
 # Installation Guide for the Orion-LD Functional Test Suite on Ubuntu 20.04
 
-The functional test suite for Orion-LD, found in the Orion-LD repository, under `test/functionalTests`, needs some installation in order to work.
+The functional test suite for Orion-LD, found in the Orion-LD repository, under `test/functionalTests`, needs some 
+installation in order to work.
 
-First of all, there is a python script (`scripts/accumulator-server.py`) that is used as the receptor of the notifications during the functional tests.
+First, there is a python script (`scripts/accumulator-server.py`) that is used as the receptor of the notifications 
+during the functional tests.
 
-This python script (that needs python 2.7) needs a few packages to be installed:
+This python script (that needs python 3.8) needs a few packages to be installed, therefore it is needed to check the 
+current version of python. Nevertheless, Ubuntu 20.04 and other versions of Debian Linux ship with Python 3 
+pre-installed. To make sure that our versions are up-to-date, update your local package index:
 
-1. Install **python 2.7** (and make a softlink /usr/bin/python to point to it)
 ```bash
-sudo aptitude install python2
-sudo ln -s /usr/bin/python2 /usr/bin/python
+sudo apt update
 ```
 
-2. Install **OpenSSL** for Python:
+Then upgrade the packages installed on your system to ensure you have the last versions:
+
 ```bash
-sudo aptitude install python-openssl
+sudo apt -y upgrade
 ```
 
-3. Install **Flask**:
+The flag '-y' inform that we accept all the packages to be installed. Once this operation ends, we can check which 
+version of python 3 is installed in the system:
+
 ```bash
-pip2.7 install Flask
+python3 -V
+Python 3.8.10
+```
+
+> Note: If you want to use python and not python3, create the corresponding link with the following command:
+> ```bash
+> sudo ln -s /usr/bin/python2 /usr/bin/python
+> ```
+
+The next step is the installation of the python virtualenv:
+
+```bash
+sudo apt -y install python3-virtualenv
+```
+
+Now we can create our virtual python environment executing:
+
+```bash
+virtualenv -ppython3 .venv
+```
+
+This operation will create the .venv environment that we use to execute our scripts. Active the environment with the 
+following command:
+
+```bash
+. .venv/bin/activate
+```
+
+Finally, install the corresponding requirements files executing:
+
+```bash
+pip install -r requirements.txt
 ```
 
 That should be all for the accumulator python script.
@@ -59,15 +95,18 @@ test/functionalTest/testHarness.sh -ld
 
 There are lots of command line options for the test suite; use the `-u` option to see all of them.
 
-In case some functional test case fails, normally due to installation error, and you're not really interested in that case (might be for IPv6 and you aren't interested in IPv6), you can disable test cases.
+In case some functional test case fails, normally due to installation error, and you're not really interested in that 
+case (might be for IPv6 and you aren't interested in IPv6), you can disable test cases.
 
 Functional test cases can be disabled by exporting an environment variable called `CB_SKIP_FUNC_TESTS`.
-For example, to disable the test case 'direct_https_notifications.test' (you don't want https notification, so ...), do this:
+For example, to disable the test case 'direct_https_notifications.test' (you don't want https notification, so ...), 
+do this:
 
 ```bash
 export CB_SKIP_FUNC_TESTS=0706_direct_https_notifications/direct_https_notifications.test
 ```
-Note that not only the name of the test case file, but also the directoy where it resides is part of the "identifier".
+
+Note that not only the name of the test case file, but also the directory where it resides is part of the "identifier".
 This is so because different functional test case directories can have test case files with the same name.
 
 FYI: after following myself the instructions in the installation guides, the following functional tests failed for me:
@@ -77,7 +116,8 @@ FYI: after following myself the instructions in the installation guides, the fol
 
 Hmmm, something about https seems to be missing in the instructions ...
 
-Looking closer at the errors, it seems clear that it is the accumulator script that is having problems (the accumulator log-file says: **AttributeError: 'Context' object has no attribute 'wrap_socket'**).
+Looking closer at the errors, it seems clear that it is the accumulator script that is having problems (the accumulator 
+log-file says: **AttributeError: 'Context' object has no attribute 'wrap_socket'**).
 I will have to look into this, but for now, I simply do this:
 
 ```bash
