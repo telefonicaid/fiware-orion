@@ -1,9 +1,10 @@
 # Orion-LD Installation Guide for Ubuntu 20.04.1
 
-In order to write this guide, Ubuntu 20.04.01 LTS (Desktop image) was downloaded from [here](https://releases.ubuntu.com/20.04/), and installed as a virtual machine under VMWare.
+In order to write this guide, Ubuntu 20.04.01 LTS (Desktop image) was downloaded from 
+[here](https://releases.ubuntu.com/20.04/), and installed as a virtual machine under VMWare.
 
 ## Disclaimer
-Running Orion-LD in Ubuntu 20.04 is experimental. 18.04 is the official distibution.
+Running Orion-LD in Ubuntu 20.04 is experimental. 18.04 is the official distribution.
 While the Orion-LD development team has checked that it is possible to compile and run Orion-LD under Ubuntu 20.04,
 it has yet not been thoroughly tested and its use is not recommended until all tests have been performed.
 Once we are satisfied with the test results, this disclaimer will be removed and 20.04 will push out 18.04 as
@@ -20,29 +21,30 @@ To be installed via package manager:
 * libuuid
 * libz-dev
 
-Now, a whole bunch of packages are to be installed. Personally I prefer *aptitude* over *apt-get*, so the first thing I do is to install *aptitude*:
+Now, a bunch of packages are to be installed. Personally I prefer *aptitude* over *apt*, so the first thing I do is to 
+install *aptitude*:
 
 ```bash
-sudo apt-get install aptitude
+sudo apt -y install aptitude
 ```
 
 Tools needed for compilation and testing:
 
 ```bash
-sudo aptitude install build-essential cmake scons curl
+sudo aptitude -y install build-essential cmake scons curl
 ```
 
 Libraries that aren't built from source code:
 
 ```bash
-sudo aptitude install libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
+sudo aptitude -y install libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
                       libgcrypt-dev uuid-dev libboost1.67-dev libboost-regex1.67-dev libboost-thread1.67-dev \
                       libboost-filesystem1.67-dev libz-dev
-
 ```
 
 ## Download and build dependency libraries from source code
-Some libraries are built from source code and those sources must be downloaded and compiled.
+
+Some libraries are built from source code and those sources must be downloaded and compiled:
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.72
 * rapidjson:      1.0.2
@@ -54,8 +56,9 @@ Some libraries are built from source code and those sources must be downloaded a
 * gtest:          1.5 (needed for unit testing only)
 * gmock:          1.5 (needed for unit testing only)
 
-For those libraries that are cloned repositories, I myself keep all repositories in a directory I call *git* directly under my home directory: `~/git`.
-This guide follows that example, so, let's start by creating the directory for repositories:
+For those libraries that are cloned repositories, I myself keep all repositories in a directory I call *git* directly 
+under my home directory: `~/git`. This guide follows that example, so, let's start by creating the directory for 
+repositories:
 
 ```bash
 mkdir ~/git
@@ -68,8 +71,9 @@ sudo aptitude install git
 ```
 
 ### Mongo Driver
-As Orion-LD is based on Orion, and Orion uses the old Legacy C++ driver of the mongo client library, Orion-LD also uses that old library.
-Plans are to migrate, at least all the NGSI-LD requests to the newest C driver of the mongo client, but that work has still not commenced.
+As Orion-LD is based on Orion, and Orion uses the old Legacy C++ driver of the mongo client library, Orion-LD also uses 
+that old library. Plans are to migrate, at least all the NGSI-LD requests to the newest C driver of the mongo client, 
+but that work has still not commenced.
 
 To download, build and install:
 
@@ -77,7 +81,8 @@ To download, build and install:
 sudo aptitude install libmongoclient-dev
 ```
 
-After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header directory *mongo* under `/usr/local/include/`.
+After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header directory *mongo* 
+under `/usr/local/include/`.
 
 ### libmicrohttpd
 

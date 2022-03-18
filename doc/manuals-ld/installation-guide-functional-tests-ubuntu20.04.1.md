@@ -67,14 +67,16 @@ export PATH=$PATH:$PWD/scripts
 which accumulator-server.py
 ```
 
-The output of the `which` command should be:
+The output of the `which` command should be something similar to the following results depending on your local 
+repository cloned location:
 
 ```text
-~/git/context.Orion-LD/scripts/accumulator-server.py
+.../context.Orion-LD/scripts/accumulator-server.py
 ```
 
 Also, the test script uses `nc` to verify that the broker has started, and `bc` for simple calculations.
 Install both of them:
+
 ```bash
 sudo aptitude install netcat
 sudo aptitude install bc
