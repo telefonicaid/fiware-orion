@@ -51,10 +51,15 @@ following command:
 ```bash
 . .venv/bin/activate
 
+> Note: To deactivate the python virtual environemtn just execute:
+> ```bash
+> deactivate
+> ```
+
 Finally, install the corresponding requirements files executing:
 
 ```bash
-pip install -r scripts/requirements.txt
+pip install -r ~/git/context.Orion-LD/scripts/requirements.txt
 ```
 
 That should be all for the accumulator python script.
@@ -66,18 +71,15 @@ export PATH=$PATH:$PWD/scripts
 which accumulator-server.py
 ```
 
-The output of the `which` command should be:
+The output of the `which` command should be something similar to the following results depending on your local 
+repository cloned location:
 
 ```text
 ~/git/context.Orion-LD/scripts/accumulator-server.py
 ```
 
-Also, the test script uses `nc` to verify that the broker has started, and `bc` for simple calculations.
-Install both of them:
-```bash
-sudo aptitude install netcat
-sudo aptitude install bc
-```
+Also, the test script uses `nc` to verify that the broker has started, and `bc` for simple calculations. By default
+those commands are available in Ubuntu 20.04.
 
 Test it by launching:
 ```bash
