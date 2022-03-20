@@ -299,6 +299,7 @@ function orionldInstall()
   sudo chown $USER:$GROUP /usr/bin/orionld  /etc/init.d/orionld  etc/default/orionld
 
   make install
+  chmod 755 /usr/bin/orionld
 }
 
 
