@@ -166,9 +166,12 @@ function actionStart()
 #
 function errorCheck()
 {
-  errorLines=$(wc -l $errorFile | awk '{ print $1 }')
+  typeset -i errorLines
+  cat $errorFile | grep -v "WARNING" > ${errorFile}.check
+  errorLines=$(wc -l ${errorFile}.check | awk '{ print $1 }')
+  \rm -f ${errorFile}.check
 
-  if [ "$errorLines" != "1" ]
+  if [ $errorLines -gt 3 ]
   then
     Header "Installation Error"
     echo "  Error for $action: $target"
@@ -332,12 +335,12 @@ function Ubuntu20.04()
   Intro "Ubuntu 20.04"
 
   actionStart "Adding" "apt repository and updating apt"
-  sudo add-apt-repository -y ppa:timescale/timescaledb-ppa >> $logFile 2> $errorFile
-  sudo apt -y update >> $logFile 2> $errorFile
+  sudo add-apt-repository -y ppa:timescale/timescaledb-ppa >> $logFile 2>> $errorFile
+  sudo apt -y update >> $logFile 2>> $errorFile
   actionEnd
 
   actionStart "Installing" "aptitude"
-  sudo apt -y install aptitude >> $logFile 2> $errorFile
+  sudo apt -y install aptitude >> $logFile 2>> $errorFile
   actionEnd
 
   actionStart "Installing" "Tools needed for compilation and testing"
