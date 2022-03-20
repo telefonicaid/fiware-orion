@@ -55,7 +55,7 @@ if [ $? != 0 ]
 then
     echo "Unable to run as root (using sudo) - can't install - please fix and try again"
     exit 1
-fi    
+fi
 
 
 
@@ -70,9 +70,9 @@ fi
 # An alternative way would be to silently create the directory and continue ...
 #
 if [ ! -d ~/git ]
-then   
+then
   echo "No directory ~/git found - please create it and try again"
-  exit 1  
+  exit 1
 fi
 
 
@@ -122,7 +122,7 @@ function linux_version
 function Intro()
 {
   distro="$1"
-    
+
   echo -e "\n\nInstalling \033[1;34mOrion-LD\033[0m from source code for $distro\n"
 }
 
@@ -148,7 +148,7 @@ function Header()
 function actionStart()
 {
   action="$1"
-  target="$2"  
+  target="$2"
 
   if [ "$target" == "" ]
   then
@@ -162,11 +162,30 @@ function actionStart()
 
 # -----------------------------------------------------------------------------
 #
+# errorCheck -
+#
+function errorCheck()
+{
+  errorLines=$(wc -l $errorFile | awk '{ print $1 }')
+
+  if [ "$errorLines" != "1" ]
+  then
+    Header "Installation Error"
+    echo "  Error for $action: $target"
+    cat $errorFile
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
 # actionEnd -
 #
 function actionEnd()
 {
   echo -e "  \033[1;32mDone!\033[0m"
+  errorCheck
 }
 
 
@@ -219,7 +238,7 @@ function libmicrohttpd()
 # rapidjson -
 #
 function rapidjson
-{    
+{
   sudo mkdir -p /opt/rapidjson
   sudo chown $USER:$GROUP /opt/rapidjson
   cd /opt/rapidjson
@@ -240,7 +259,7 @@ function klibs
   do
     actionStart "Downloading, building, and installing" "$klib"
 
-    cd ~/git 
+    cd ~/git
     git clone https://gitlab.com/kzangeli/${klib}.git >> $logFile
     cd $klib
     if [ "$klib" == "kjson" ]
@@ -262,7 +281,7 @@ function klibs
 # mqttEclipsePaho -
 #
 function mqttEclipsePaho()
-{    
+{
   sudo rm -f /usr/local/lib/libpaho*
   cd ~/git
   git clone https://github.com/eclipse/paho.mqtt.c.git
@@ -311,7 +330,7 @@ function orionldInstall()
 function Ubuntu20.04()
 {
   Intro "Ubuntu 20.04"
-    
+
   actionStart "Adding" "apt repository and updating apt"
   sudo add-apt-repository -y ppa:timescale/timescaledb-ppa >> $logFile 2> $errorFile
   sudo apt -y update >> $logFile 2> $errorFile
@@ -334,7 +353,7 @@ function Ubuntu20.04()
   actionStart "Installing" "Mongo C++ Legacy driver"
   sudo aptitude -y install libmongoclient-dev >> $logFile 2>> $errorFile
   actionEnd
-    
+
   actionStart "Downloading, building, and installing" "Mongo C driver"
   mongocDriver >> $logFile 2>> $errorFile
   actionEnd
@@ -357,7 +376,7 @@ function Ubuntu20.04()
   actionStart "Installing" "MQTT Eclipse Paho"
   mqttEclipsePaho >> $logFile 2>> $errorFile
   actionEnd
-    
+
   actionStart "Installing python library for MQTT" "paho-mqtt"
   sudo aptitude -y install python3-pip >> $logFile 2>> $errorFile
   pip3 install paho-mqtt >> $logFile 2>> $errorFile
