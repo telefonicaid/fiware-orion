@@ -171,7 +171,7 @@ function errorCheck()
   errorLines=$(wc -l ${errorFile}.check | awk '{ print $1 }')
   \rm -f ${errorFile}.check
 
-  if [ $errorLines -gt 2 ]
+  if [ $errorLines -gt 3 ]
   then
     Header "Installation Error"
     echo "  Error for $action: $target"
