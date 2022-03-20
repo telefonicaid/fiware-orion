@@ -136,7 +136,7 @@ function Header()
 {
   pre="$1"
   what="$2"
-  echo -e "\n"$pre" \033[1;34m"$what"\033[0m:"
+  echo -e "\n  "$pre" \033[1;34m"$what"\033[0m:"
 }
 
 
@@ -152,9 +152,9 @@ function actionStart()
 
   if [ "$target" == "" ]
   then
-    echo -n -e "    ⏳"$action" ... "
+    echo -n -e "    ⏳ "$action" ... "
   else
-    echo -n -e "    ⏳"$action"\033[1;31m"$target"\033[0m ... "
+    echo -n -e "    ⏳ "$action"\033[1;31m "$target"\033[0m ... "
   fi
 }
 
@@ -312,7 +312,7 @@ function Ubuntu20.04()
 {
   Intro "Ubuntu 20.04"
     
-  actionStart "Adding apt repository and update apt"
+  actionStart "Adding apt repository and updating apt"
   sudo add-apt-repository -y ppa:timescale/timescaledb-ppa >> $logFile 2> $errorFile
   sudo apt -y update >> $logFile 2> $errorFile
   actionEnd
