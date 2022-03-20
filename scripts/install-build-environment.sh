@@ -81,8 +81,8 @@ fi
 #
 # errorFile -
 #
-logFile=/tmp/envInstallation.log
-errorFile=/tmp/envInstallation.err
+logFile=/tmp/orionldBuildEnvInstallation.log
+errorFile=/tmp/orionldBuildEnvInstallation.err
 date > $logFile
 date > $errorFile
 
@@ -177,7 +177,7 @@ function actionEnd()
 #
 function mongocDriver()
 {
-  sudo mkdir /opt/mongoc
+  sudo mkdir -p /opt/mongoc
   sudo chown $USER:$GROUP mongoc
   cd /opt/mongoc
 
@@ -185,7 +185,7 @@ function mongocDriver()
   tar xzf mongo-c-driver-1.17.5.tar.gz
 
   cd mongo-c-driver-1.17.5
-  mkdir cmake-build
+  mkdir -p cmake-build
 
   cd cmake-build
   cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
@@ -201,7 +201,7 @@ function mongocDriver()
 #
 function libmicrohttpd()
 {
-  sudo mkdir /opt/libmicrohttpd
+  sudo mkdir -p /opt/libmicrohttpd
   sudo chown $USER:$GROUP /opt/libmicrohttpd
   cd /opt/libmicrohttpd
   wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
@@ -220,7 +220,7 @@ function libmicrohttpd()
 #
 function rapidjson
 {    
-  sudo mkdir /opt/rapidjson
+  sudo mkdir -p /opt/rapidjson
   sudo chown $USER:$GROUP /opt/rapidjson
   cd /opt/rapidjson
   wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
@@ -312,7 +312,7 @@ function Ubuntu20.04()
 {
   Intro "Ubuntu 20.04"
     
-  actionStart "Adding apt repository and updating apt"
+  actionStart "Adding" "apt repository and updating apt"
   sudo add-apt-repository -y ppa:timescale/timescaledb-ppa >> $logFile 2> $errorFile
   sudo apt -y update >> $logFile 2> $errorFile
   actionEnd
@@ -380,7 +380,7 @@ function Ubuntu20.04()
   Header "Installing" "MongoDB Server"
   actionStart "Importing the MongoDB public GPG Key"
   sudo aptitude -y install gnupg >> $logFile 2>> $errorFile
-  wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+  wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add - >> $logFile 2>> $errorFile
   actionEnd
 
   actionStart "Creating list file /etc/apt/sources.list.d/mongodb-org-4.0.list"
