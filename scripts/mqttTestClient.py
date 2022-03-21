@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env .venv/bin/python
 # -*- coding: latin-1 -*-
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -50,7 +50,7 @@ import paho.mqtt.client as mqtt
 from getopt import getopt, GetoptError
 from os.path import basename
 from sys import argv
-from json import loads, dumps
+import json
 
 
 # -----------------------------------------------------------------------------
@@ -161,44 +161,55 @@ def on_message(client, userdata, msg):
     global notifications, notificationAcc
     global logFile, dumpFile
 
-    logFile.write("Topic:   " + msg.topic + "\n" + "Payload: " + str(msg.payload) + "\n")
+    payload = msg.payload.decode("utf-8")
+
+    logFile.write("-----------------------------------------------------------------------------------------\n")
+    logFile.write("Topic:   " + msg.topic + "\n" + "Payload: " + payload + "\n")
     logFile.flush()
 
-    if msg.payload == 'dump':
+    if (payload == 'dump'):
         logFile.write("Dumping received notifications to dump-file\n")
         logFile.flush()
         dumpFile.write("Notifications: " + str(notifications) + "\n")
         dumpFile.write(notificationAcc + "\n")
         dumpFile.flush()
-    elif msg.payload == 'ping':
+    elif (payload == 'ping'):
         logFile.write("I'm Alive\n")
         logFile.flush()
-    elif msg.payload == 'exit':
+    elif (payload == 'exit'):
         logFile.write("EXIT command received - I die\n")
         logFile.flush()
         exit(0)
-    elif msg.payload == 'reset':
+    elif (payload == 'reset'):
         logFile.write("Resetting dump file\n")
         logFile.flush()
-        notifications = 0
+        notifications   = 0
         notificationAcc = ""
         dumpFile.close()
         dumpFile = open("/tmp/mqttTestClient.dump", "w")
         dumpFile.flush()
     else:
         logFile.write("Got a notification:\n")
-        logFile.write(msg.payload + "\n\n")
+        logFile.flush()
+
         if pretty:
             logFile.write("pretty-printing\n")
             logFile.flush()
-            json_obj = loads(msg.payload)
-            logFile.write("pretty-printing\n")
-            logFile.flush()
-            out = dumps(json_obj, indent=2, sort_keys=False)
-            logFile.write("pretty-printing\n")
-            logFile.flush()
+            try:
+                logFile.write("before loads\n")
+                logFile.flush()
+                json_obj = json.loads(msg.payload)
+                logFile.write("after loads\n")
+                logFile.flush()
+                out = json.dumps(json_obj, indent=2, sort_keys=True)
+                logFile.write("after dumps\n")
+                logFile.flush()
+            except ValueError as e:
+                out = str(e)
+            except:
+                out = payload;
         else:
-            out = msg.payload
+            out = payload
 
         logFile.write("Pretty payload:\n")
         logFile.write(out + "\n\n")

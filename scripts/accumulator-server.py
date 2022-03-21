@@ -161,7 +161,7 @@ if isfile(pidFile):
     oPid = int(oldPid)
     print("PID file %s already exists, killing the process %s" % (pidFile, oldPid))
 
-    try: 
+    try:
         oldStderr = stderr
         stderr = open("/dev/null", "w")
         kill(oPid, SIGTERM)
@@ -207,8 +207,12 @@ def qno_response():
     return Response(status=200)
 
 
+
+# -----------------------------------------------------------------------------
+#
 # This response has been designed to test the #2360 case, but is general enough to be
 # used in other future cases
+#
 @app.route("/badresponse/queryContext", methods=['POST'])
 def bad_response():
     r = Response(status=404)
@@ -216,6 +220,58 @@ def bad_response():
     return r
 
 
+# -----------------------------------------------------------------------------
+#
+# Courtesy of Telefonica
+# sort_headers was "robbed" from the repository of Orion
+#
+def sort_headers(headers):
+    """
+    Sort headers in a predefined order. It seems that from the Python2 version of this
+    script (which used Flask==1.0.2) and the Python3 version (which uses Flask==2.0.2)
+    the order of the headers has changed. We sort to avoid change a lot of .test
+    expectations with no gain.
+
+    :param headers: the headers list to sort
+    """
+
+    sorted = []
+    headers_order = [
+        'Fiware-Servicepath',
+        'Content-Length',
+        'Authorization',
+        'X-Auth-Token',
+        'User-Agent',
+        'Ngsiv2-Attrsformat',
+        'Host',
+        'Accept',
+        'Fiware-Service',
+        'Ngsild-Tenant',
+        'Ngsild-Scope',
+        'Content-Type',
+        'Fiware-Correlator',
+        'Link',
+    ]
+
+    # headers is a generator object, not exactly a list (i.e. it doesn't have remove method)
+    headers_list = list(headers)
+
+    for h in headers_order:
+        if h in headers_list:
+            sorted.append(h)
+            headers_list.remove(h)
+
+    # Remaining headers are added at the end of sorted array in the same order
+    for h in headers_list:
+        sorted.append(h)
+
+    return sorted
+
+
+# -----------------------------------------------------------------------------
+#
+# record_request -
+#
 def record_request(req):
     """
     Common function used by several route methods to save request content
@@ -262,19 +318,22 @@ def record_request(req):
     else:
         s += '?' + params + '\n'
 
-    # Store headers
-    for h in req.headers.keys():
+    # Store headers (according to pre-defined order)
+    for h in sort_headers(req.headers.keys()):
         s += h + ': ' + req.headers[h] + '\n'
 
     # Store payload
     if (req.data is not None) and (len(req.data) != 0):
         s += '\n'
         if pretty:
-            raw = loads(req.data)
-            s += dumps(raw, indent=4, sort_keys=True)
-            s += '\n'
+            try:
+                raw = json.loads(req.data, object_pairs_hook=dict_raise_on_duplicates)
+                s += json.dumps(raw, indent=4, sort_keys=True)
+                s += '\n'
+            except ValueError as e:
+                s += str(e)
         else:
-            s += req.data
+            s += req.data.decode("utf-8")
 
     # Separator
     s += '=======================================\n'

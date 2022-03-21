@@ -171,8 +171,8 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
@@ -181,88 +181,88 @@ Content-Type: application/json; charset=utf-8
                 "pp_array": {
                     "type": "Property",
                     "value": [
-                        1, 
-                        2, 
+                        1,
+                        2,
                         3
                     ]
-                }, 
+                },
                 "pp_bool": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": true
-                }, 
+                },
                 "pp_float": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": 1.123
-                }, 
+                },
                 "pp_int": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": 1
-                }, 
+                },
                 "pp_object": {
                     "type": "Property",
                     "value": {
                         "a": true
                     }
-                }, 
+                },
                 "pp_relationship": {
-                    "object": "urn:ngsi-ld:Entity:E2", 
+                    "object": "urn:ngsi-ld:Entity:E2",
                     "type": "Relationship"
-                }, 
+                },
                 "pp_string": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": "STRING"
-                }, 
-                "type": "Property", 
+                },
+                "type": "Property",
                 "value": [
-                    1, 
+                    1,
                     2
                 ]
-            }, 
+            },
             "R1": {
-                "object": "urn:ngsi-ld:Entity:E2", 
+                "object": "urn:ngsi-ld:Entity:E2",
                 "pp_array": {
                     "type": "Property",
                     "value": [
-                        1, 
-                        2, 
+                        1,
+                        2,
                         3
                     ]
-                }, 
+                },
                 "pp_bool": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": true
-                }, 
+                },
                 "pp_float": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": 1.123
-                }, 
+                },
                 "pp_int": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": 1
-                }, 
+                },
                 "pp_object": {
                     "type": "Property",
                     "value": {
                         "a": true
                     }
-                }, 
+                },
                 "pp_relationship": {
-                    "object": "urn:ngsi-ld:Entity:E2", 
+                    "object": "urn:ngsi-ld:Entity:E2",
                     "type": "Relationship"
-                }, 
+                },
                 "pp_string": {
-                    "type": "Property", 
+                    "type": "Property",
                     "value": "STRING"
-                }, 
+                },
                 "type": "Relationship"
-            }, 
-            "id": "urn:ngsi-ld:Entity:E1", 
+            },
+            "id": "urn:ngsi-ld:Entity:E1",
             "type": "T"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:Subscription:S1", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:S1",
     "type": "Notification"
 }
 =======================================

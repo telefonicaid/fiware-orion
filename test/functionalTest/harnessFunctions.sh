@@ -794,7 +794,7 @@ function accumulatorStart()
   echo scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr >> /tmp/accumulatorStart
   scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
-  cd -
+  cd - > /dev/null 2>&1
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1
   typeset -i time
@@ -830,7 +830,9 @@ function mqttTestClientStart()
   rm -f /tmp/mqttTestClient.dump
   date > /tmp/mqttSend.log
 
-  $REPO_HOME/scripts/mqttTestClient.py $*   &
+  cd $REPO_HOME
+  ./scripts/mqttTestClient.py $*   &
+  cd - > /dev/null 2>&1
   sleep 0.2
   logMsg Started MQTT notification client
 }
@@ -844,7 +846,9 @@ function mqttTestClientStart()
 function mqttTestClientStop()
 {
   topic=$1
-  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload exit
+  cd $REPO_HOME
+  ./scripts/mqttSend.py --topic "$topic" --payload exit
+  cd - > /dev/null 2>&1
 }
 
 
@@ -857,7 +861,9 @@ function mqttTestClientDump()
 {
   sleep 0.2
   topic=$1
-  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload dump
+  cd $REPO_HOME
+  ./scripts/mqttSend.py --topic "$topic" --payload dump
+  cd - > /dev/null 2>&1
   cat /tmp/mqttTestClient.dump
 }
 
@@ -871,7 +877,9 @@ function mqttTestClientReset()
 {
   sleep 0.2
   topic=$1
-  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload reset
+  cd $REPO_HOME
+  ./scripts/mqttSend.py --topic "$topic" --payload reset
+  cd - > /dev/null 2>&1
 }
 
 

@@ -344,18 +344,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-PUT http://127.0.0.1:9997/notify?a1=true&type=T1&id=E1
+PUT http://127.0.0.1:9997/notify?a1=true&id=E1&type=T1
 Fiware-Servicepath: /
-Entity-Id: E1
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-A1: true
-Entity-Type: T1
 Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+A1: true
+Entity-Id: E1
+Entity-Type: T1
 
 {
     "A1": "true",
@@ -363,18 +363,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "A3": ""
 }
 =======================================
-PUT http://127.0.0.1:9997/notify?a2=null&type=T2&id=E1
+PUT http://127.0.0.1:9997/notify?a2=null&id=E1&type=T2
 Fiware-Servicepath: /
-Entity-Id: E1
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-A2: null
-Entity-Type: T2
 Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+A2: null
+Entity-Id: E1
+Entity-Type: T2
 
 {
     "A1": "",
@@ -383,18 +383,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 #SORT_START
-PUT http://127.0.0.1:9997/notify?a3=3&type=T3&id=E1
+PUT http://127.0.0.1:9997/notify?a3=3&id=E1&type=T3
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: custom
-Entity-Id: E1
 Content-Length: 33
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Accept: application/json
 Host: 127.0.0.1:REGEX(\d+)
-A3: 3
-Entity-Type: T3
 Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+A3: 3
+Entity-Id: E1
+Entity-Type: T3
 #SORT_END
 
 {

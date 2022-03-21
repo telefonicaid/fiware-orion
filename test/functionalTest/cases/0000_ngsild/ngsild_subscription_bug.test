@@ -115,21 +115,21 @@ User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(.*)
 Accept: application/json
-Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Ngsild-Tenant: openiot
 Content-Type: application/json; charset=utf-8
+Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
-            "airflow": 127, 
-            "id": "urn:ngsi-ld:Blower:bd01", 
+            "airflow": 127,
+            "id": "urn:ngsi-ld:Blower:bd01",
             "type": "BlowerDevice"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================

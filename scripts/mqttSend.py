@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env .venv/bin/python
 # -*- coding: latin-1 -*-
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #

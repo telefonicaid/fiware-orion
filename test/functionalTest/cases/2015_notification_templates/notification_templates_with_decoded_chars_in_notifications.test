@@ -116,17 +116,17 @@ Date: REGEX(.*)
 
 03. Dump accumulator to ensure the broker correctly decodes the encoded chars in the custom payload
 ===================================================================================================
-POST http://127.0.0.1:9997/notify?qs2=a1&qs1=1
+POST http://127.0.0.1:9997/notify?qs1=1&qs2=a1
 Fiware-Servicepath: /
 Content-Length: 33
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Hs1: 1
-Hs2: a1
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:9997
 Accept: application/json
 Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Hs1: 1
+Hs2: a1
 
 A string with double-quotes: "a1"=======================================
 

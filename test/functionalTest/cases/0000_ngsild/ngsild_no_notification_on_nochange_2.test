@@ -187,50 +187,50 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
             "array": {
-                "type": "Property", 
+                "type": "Property",
                 "value": [
-                    1, 
-                    2, 
+                    1,
+                    2,
                     {
-                        "a": 1, 
+                        "a": 1,
                         "b": 2
                     }
                 ]
-            }, 
+            },
             "bool": {
-                "type": "Property", 
+                "type": "Property",
                 "value": true
-            }, 
+            },
             "hobject": {
-                "type": "Property", 
+                "type": "Property",
                 "value": {
                     "E": [
-                        1, 
-                        2, 
+                        1,
+                        2,
                         3
-                    ], 
-                    "a": 1, 
-                    "b": 2, 
-                    "c": 3, 
+                    ],
+                    "a": 1,
+                    "b": 2,
+                    "c": 3,
                     "d": "4"
                 }
-            }, 
-            "id": "urn:ngsi-ld:entities:E1", 
+            },
+            "id": "urn:ngsi-ld:entities:E1",
             "number": {
-                "type": "Property", 
+                "type": "Property",
                 "value": 1
-            }, 
+            },
             "string": {
-                "type": "Property", 
+                "type": "Property",
                 "value": "Mercedes"
-            }, 
+            },
             "type": "T"
         }
     ],
