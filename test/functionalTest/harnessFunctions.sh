@@ -735,6 +735,8 @@ function accumulatorStart()
   # in a fixed order in the .test, i.e.: --pretty-print, --https, --key, --cert
 
   echo accumulatorStart $* > /tmp/accumulatorStart
+  pwd >>  /tmp/accumulatorStart
+  echo REPO_HOME: $REPO_HOME >> /tmp/accumulatorStart
   if [ "$1" = "--pretty-print" ]
   then
     pretty="$1"
@@ -788,10 +790,11 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  echo $REPO_HOME/scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr >> /tmp/accumulatorStart
-  $REPO_HOME/scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  cd $REPO_HOME
+  echo scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr >> /tmp/accumulatorStart
+  scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
-
+  cd -
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1
   typeset -i time
@@ -1383,7 +1386,7 @@ function orionCurl()
         # We need to apply pretty-print on _response. Otherwise positional processing used in .test
         # (e.g. to get SUB_ID typically grep and awk are used) will break
         #
-        _response=$(echo $_response | python -mjson.tool)
+        _response=$(echo $_response | python -m json.tool --sort-keys)
         echo "$_response"
       else
         logMsg Unknown payloadCheckFormat
