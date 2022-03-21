@@ -928,6 +928,22 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
   }
 
+  // covered
+  if (notification.HasMember("covered"))
+  {
+    Opt<bool> coveredOpt = getBoolOpt(notification, "covered");
+    if (!coveredOpt.ok())
+    {
+      return badInput(ciP, coveredOpt.error);
+    }
+    else if (coveredOpt.given)
+    {
+      bool coveredBool = coveredOpt.value;
+      subsP->coveredProvided = true;
+      subsP->notification.covered = coveredBool;
+    }
+  }
+
   // metadata
   if (notification.HasMember("metadata"))
   {

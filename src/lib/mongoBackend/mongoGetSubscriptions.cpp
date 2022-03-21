@@ -176,6 +176,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   nP->maxFailsLimit     = r.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(r, CSUB_MAXFAILSLIMIT)    : -1;
   nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(r, CSUB_ONLYCHANGED)                 : false;
+  nP->covered           = r.hasField(CSUB_COVERED)?          getBoolFieldF(r, CSUB_COVERED)                     : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
   nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(r, CSUB_LASTFAILUREASON)           : "";
@@ -210,6 +211,11 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
     {
       subP->notification.lastSuccess     = cSubP->lastSuccess;
       subP->notification.lastSuccessCode = cSubP->lastSuccessCode;
+    }
+
+    if (cSubP->covered > subP->notification.covered)
+    {
+       subP->notification.covered = cSubP->covered;
     }
   }
   cacheSemGive(__FUNCTION__, "get notification info");

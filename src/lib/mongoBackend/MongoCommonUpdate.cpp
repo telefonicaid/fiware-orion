@@ -1125,7 +1125,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->mqttInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
-                                                           cSubP->tenant);
+                                                           cSubP->tenant,
+                                                           cSubP->covered);
     if (cSubP->onlyChanged)
     {
       subP->blacklist = false;
@@ -1544,6 +1545,7 @@ static bool addTriggeredSubscriptions_noCache
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1567,7 +1569,7 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
-          aList, "", "");
+          aList, "", "", covered);
 
       if (!onlyChanged)
       {
@@ -1725,7 +1727,8 @@ static bool processOnChangeConditionForUpdateContext
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
-  bool                             blacklist = false
+  bool                             blacklist = false,
+  bool                             covered = false
 )
 {
   NotifyContextRequest   ncr;
@@ -1765,6 +1768,16 @@ static bool processOnChangeConditionForUpdateContext
       }
     }
   }
+  if (covered)
+  {
+    for (unsigned int ix = 0; ix < attrL.size(); ix++)
+    {
+      std::string attrName = attrL[ix];
+      ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+      caP->valueType = orion::ValueTypeNull;
+      cer.entity.attributeVector.push_back(caP);
+    }
+  }
 
   /* Early exit without sending notification if attribute list is empty */
   if (cer.entity.attributeVector.size() == 0)
@@ -1795,6 +1808,7 @@ static bool processOnChangeConditionForUpdateContext
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
+                                          covered,
                                           metadataV);
   return true;
 }
@@ -1940,7 +1954,8 @@ static unsigned int processSubscriptions
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
                                                                 notification,
-                                                                tSubP->blacklist);
+                                                                tSubP->blacklist,
+                                                                tSubP->covered);
 
     if (notificationSent)
     {
