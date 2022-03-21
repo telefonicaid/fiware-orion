@@ -1,1 +1,2 @@
 - Fix: Covered notifications in subscritpions (#3693)
+- Reference distribution changed RHEL/CentOS 8 to Debian 11

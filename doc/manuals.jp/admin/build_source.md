@@ -1,16 +1,16 @@
 # ソースからのビルド
 
-Orion Context Broker のリファレンス配布は CentOS 8.x です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。CentOS を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は CentOS 8.x 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
+Orion Context Broker のリファレンス配布は Debian 11 です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。Debian を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は Debian 11 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
 
-## CentOS 8.x (正式サポート)
+## Debian 11 (正式サポート)
 
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
-* boost: 1.66
+* boost: 1.74
 * libmicrohttpd: 0.9.70 (ソースから)
-* libcurl: 7.61.1
-* openssl: 1.1.1g
-* libuuid: 2.32.1
+* libcurl: 7.74.0
+* openssl: 1.1.1k
+* libuuid: 2.36.1
 * libmosquitto: 2.0.12 (ソースから)
 * Mongo C driver: 1.17.4 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
@@ -21,11 +21,11 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * 必要なビルドツール (コンパイラなど) をインストールします
 
-        sudo yum install make cmake gcc-c++
+        sudo apt-get install make cmake g++
 
 * 必要なライブラリをインストールします (次の手順で説明する、ソースから取得する必要があるものを除きます)
 
-        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel cyrus-sasl-devel
+        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev
 
 * ソースから Mongo Driver をインストールします
 
@@ -68,7 +68,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * コードを取得します (または、圧縮されたバージョンや別の URL パターンを使用してダウンロードできます。例えば、`git clone git@github.com:telefonicaid/fiware-orion.git`) :
 
-        sudo yum install git
+        sudo apt-get install git
         git clone https://github.com/telefonicaid/fiware-orion
 
 * ソースをビルドします :
@@ -86,23 +86,23 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
         contextBroker --version
 
-### テスト, カバレッジと RPM
+### テストとカバレッジ
 
 Orion Context Broker には、次の手順に従って実行できる一連のユニット・テスト, valgrind, およびエンドツーエンドのテストが付属しています (オプションですが、強くお勧めします):
 
-* ソースから GoogleTest/Mock をインストールします (これには RPM パッケージがありますが、現在の CMakeLists.txt 構成では機能しません)。以前の URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google は2016年8月下旬にそのパッケージを削除し、機能しなくなりました。
+* ソースから GoogleTest/Mock をインストールします。以前の URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google は2016年8月下旬にそのパッケージを削除し、機能しなくなりました。
 
-        sudo yum install python2
+        sudo apt-get install python2
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on Debian 11
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-aarch64 アーキテクチャの場合、yum を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
+aarch64 アーキテクチャの場合、apt-get を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
 
 * MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 4.4 です (以前のバージョンで動作する可能性がありますが、お勧めしません)。
 
@@ -112,10 +112,10 @@ aarch64 アーキテクチャの場合、yum を使用して libxslt をイン�
 
 * 機能テストと valgrind テストに必要な追加のツールをインストールします:
 
-        sudo yum install curl nc valgrind bc
-        sudo pip2 install virtualenv
+        sudo apt-get install curl nc valgrind bc python3 python3-pip
+        sudo pip3 install virtualenv
 
-* テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
+* テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、他のプログラムと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
@@ -137,26 +137,13 @@ aarch64 アーキテクチャの場合、yum を使用して libxslt をイン�
 
 * lcov ツールをインストールします
 
-        # Download .rpm file from http://downloads.sourceforge.net/ltp/lcov-1.14-1.noarch.rpm
-        sudo yum install lcov-1.14-1.noarch.rpm
+        sudo apt-get install lcov
 
 * まず、unit_test と functional_test の成功パスを実行して、すべてが正常であることを確認します (上記参照)
 
 * カバレッジを実行します
 
         make coverage INSTALL_DIR=~
-
-ソースコードの RPM を生成することができます (オプション) :
-
-* 必要なツールをインストールします
-
-        sudo yum install rpm-build
-
-* RPM を生成します
-
-        make rpm
-
-* 生成された RPM は `~/rpmbuild/RPMS/x86_64` ディレクトリに置かれます
 
 ## Ubuntu 20.04 LTS
 
@@ -255,9 +242,8 @@ aarch64 アーキテクチャの場合、yum を使用して libxslt をイン�
 Orion Context Broker には、次の手順 (オプション) に従って実行することができる、valgrind およびエンド・ツー・エンドのテストの
 機能的なスイートが付属しています :
 
-* ソースから Google Test/Mock をインストールします (このための RPM パッケージがありますが、現在の CMakeLists.txt
-の設定では動作しません)。以前は URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、
-Google では2016年8月下旬にそのパッケージを削除したため、動作しなくなりました
+* ソースから Google Test/Mock をインストールします。以前は URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2
+でしたが、Google では2016年8月下旬にそのパッケージを削除したため、動作しなくなりました
 
         sudo apt install python-is-python2 xsltproc
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
@@ -288,7 +274,7 @@ aarch64 アーキテクチャの場合、`.-configure` を `--build=arm-linux` �
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスに
 インストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることも
-できますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh`
+できますが、他のプログラムと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh`
 ファイル参照) で使用されるいくつかの環境変数を設定し、Ubuntu のデフォルトの Flask の代わりに Flask version 1.0.2 を使用する
 ために、virtualenv 環境を作成する必要があります。この環境でテスト・ハーネスを実行します。
 
