@@ -2,10 +2,10 @@ This directory includes some scripts to help to control context subscriptions co
 the same CLI arguments:
 
 * `-db <database>` (mandatory): to specify the DB to process
-* `--dry-run (optional): it avoids actual modification in the DB, just reporting
+* `--dry-run` (optional): it avoids actual modification in the DB, just reporting
 * `--with-restart <status_file>` (optional): restart Context Broker service if the database was manipulated and,
    consecuently, Context Broker needs to be restarted. It is based on `/etc/init.d/contextBroker` service script,
-   so it will not work if the CB was not installed as RPM. It requires root permissions.
+   so it will not work if the CB was not installed as RPM. It requires root permissions. *(deprecated)*
 * `-v` (optional): enables verbose mode
 
 The scripts are:
