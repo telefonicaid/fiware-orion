@@ -20,8 +20,9 @@ RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x
 RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-4.4.9-1.el8.x86_64.rpm
 RUN yum install -y mongodb-org
 
+RUN yum install -y python3
 RUN yum install -y python2
-RUN ln --force -s /usr/bin/python2.7 /usr/bin/python
+RUN ln --force -s /usr/bin/python3 /usr/bin/python
 
 RUN yum install -y openssl-devel libffi-devel
 
