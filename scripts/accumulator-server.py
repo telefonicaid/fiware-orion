@@ -47,7 +47,7 @@ from os.path import basename, isfile
 from os import unlink, getpid, kill
 from atexit import register
 from signal import SIGTERM, SIGINT, SIGKILL
-from json import loads, dumps
+import json
 
 
 def usage_and_exit(msg):
@@ -327,7 +327,7 @@ def record_request(req):
         s += '\n'
         if pretty:
             try:
-                raw = json.loads(req.data, object_pairs_hook=dict_raise_on_duplicates)
+                raw = json.loads(req.data)
                 s += json.dumps(raw, indent=4, sort_keys=True)
                 s += '\n'
             except ValueError as e:
