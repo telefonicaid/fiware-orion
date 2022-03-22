@@ -1264,14 +1264,22 @@ static void fill_idPtypeNP
   const std::string&  typePatternQ
 )
 {
+  std::string typeCheck;
+
+  // Sometimes (for instance, when we reach this point during a entity deletion operation)
+  // we don't know the type of the entity, in which case the check for type shouldn't be included
+  if (!entityType.empty())
+  {
+    typeCheck = std::string("(this.")+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
+        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
+        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && ";
+  }
+
   bgP->functionIdPtypeNP = std::string("function()") +
          "{" +
             "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
                 "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
+                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " + typeCheck +
                     "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
                     "return true; " +
                 "}" +
@@ -3433,13 +3441,67 @@ static unsigned int updateEntity
   ContextElementResponse* cerP = new ContextElementResponse();
   cerP->entity.fill(entityId, entityType, "false");
 
+  /* Build CER used for notifying (if needed) */
+  StringList               emptyAttrL;
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
+
+  // The hasField() check is needed as the entity could have been created with very old Orion version not
+  // supporting modification/creation dates
+  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
+
+  /* We accumulate the subscriptions in a map. The key of the map is the string representing
+   * subscription id */
+  std::map<std::string, TriggeredSubscription*> subsToNotify;
+
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
   if ((action == ActionTypeDelete) && (eP->attributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
     responseP->contextElementResponseVector.push_back(cerP);
-    return 0;
+
+    /* EntityDelete subscriptions may be triggered */
+    // attrNames is initialized as in addTriggeredSubscriptions() in the create entity logic
+    std::string               err;
+    std::vector<std::string>  attrNames;
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
+    {
+      attrNames.push_back(eP->attributeVector[ix]->name);
+    }
+    if (!addTriggeredSubscriptions(eP->id,
+                                   eP->type,
+                                   attrNames,
+                                   attrNames,
+                                   subsToNotify,
+                                   err,
+                                   tenant,
+                                   servicePathV,
+                                   ngsiv2::SubOp::EntityDelete))
+    {
+      releaseTriggeredSubscriptions(&subsToNotify);
+      cerP->statusCode.fill(SccReceiverInternalError, err);
+      responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
+
+      responseP->contextElementResponseVector.push_back(cerP);
+      return 0;  // Error already in responseP
+    }
+
+    addBuiltins(notifyCerP);
+    unsigned int notifSent = processSubscriptions(subsToNotify,
+                                                  notifyCerP,
+                                                  tenant,
+                                                  xauthToken,
+                                                  fiwareCorrelator,
+                                                  notifStartCounter);
+    releaseTriggeredSubscriptions(&subsToNotify);
+
+    LM_W(("FGM: notifSent: %d", notifSent));
+
+    notifyCerP->release();
+    delete notifyCerP;
+
+    return notifSent;
   }
 
   LM_T(LmtServicePath, ("eP->attributeVector.size: %d", eP->attributeVector.size()));
@@ -3453,10 +3515,6 @@ static unsigned int updateEntity
   orion::BSONObjBuilder    toUnset;
   orion::BSONArrayBuilder  attrNamesAdd;
   orion::BSONArrayBuilder  attrNamesRemove;
-
-  /* We accumulate the subscriptions in a map. The key of the map is the string representing
-   * subscription id */
-  std::map<std::string, TriggeredSubscription*> subsToNotify;
 
   /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
    * we fill an empty locAttr. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
@@ -3538,15 +3596,6 @@ static unsigned int updateEntity
     *attributeNotExistingList += " ]";
   }
 
-  /* Build CER used for notifying (if needed) */
-  StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
-
-  // The hasField() check is needed as the entity could have been created with very old Orion version not
-  // supporting modification/creation dates
-  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
-
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
@@ -3597,7 +3646,7 @@ static unsigned int updateEntity
       delete cerP;
     }
 
-    /* EntityUpdate subscriptions are triggered, even in the case of no actual modification */
+    /* EntityUpdate subscriptions may be triggered, even in the case of no actual modification */
     addBuiltins(notifyCerP);
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
