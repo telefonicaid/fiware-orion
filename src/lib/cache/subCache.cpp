@@ -399,9 +399,16 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 static bool matchOperation(CachedSubscription* cSubP, ngsiv2::SubOp mode)
 {
   // If subOpV size == 0 default mode is update and create
-  if ((cSubP->subOpV.size() == 0) && (mode != ngsiv2::SubOp::EntityUpdate) && (mode != ngsiv2::SubOp::EntityCreate))
+  if (cSubP->subOpV.size() == 0)
   {
-    return false;
+    if ((mode == ngsiv2::SubOp::EntityUpdate) || (mode == ngsiv2::SubOp::EntityCreate))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
   for (unsigned int ix = 0; ix < cSubP->subOpV.size(); ix++)
   {

@@ -1404,20 +1404,24 @@ static void fill_idPtypeP
 */
 static bool matchMode(orion::BSONObj sub, ngsiv2::SubOp mode)
 {
-  // Check mode. If operations field is not there or size == 0 default mode is update and create
-  // Maybe this could be check at MongoDB query stage, but seems be more complex
-  if ((!sub.hasField(CSUB_OPERATIONS)) && (mode != ngsiv2::SubOp::EntityUpdate) && (mode != ngsiv2::SubOp::EntityCreate))
+  std::vector<std::string> operationStrings;
+  if (sub.hasField(CSUB_OPERATIONS))
   {
-    return false;
+    setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
   }
 
-
-  std::vector<std::string> operationStrings;
-  setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
-
-  if ((operationStrings.size() == 0) && (mode != ngsiv2::SubOp::EntityUpdate) && (mode != ngsiv2::SubOp::EntityCreate))
+  // Check mode. If operations field is not there or size == 0 default mode is update and create
+  // Maybe this could be check at MongoDB query stage, but seems be more complex
+  if (operationStrings.size() == 0)
   {
-    return false;
+    if ((mode == ngsiv2::SubOp::EntityUpdate) || (mode == ngsiv2::SubOp::EntityCreate))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
