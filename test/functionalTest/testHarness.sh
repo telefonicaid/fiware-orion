@@ -65,6 +65,8 @@ export -f logMsg
 #
 if [ ! -d .venv ]
 then
+    pver=$(python3 --version)
+    echo "Creating Virtual Environment for $pver for functional tests"
     virtualenv -p python3 .venv
     source .venv/bin/activate
     pip install -r scripts/requirements.txt
