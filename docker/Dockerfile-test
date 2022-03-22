@@ -19,6 +19,7 @@ RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x
 RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-mongos-4.4.9-1.el8.x86_64.rpm
 RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-4.4.9-1.el8.x86_64.rpm
 RUN yum install -y mongodb-org
+RUN yum install -y python-virtualenv
 
 RUN yum install -y python3
 RUN yum install -y python2
