@@ -22,7 +22,7 @@ RUN yum install -y mongodb-org
 
 RUN yum install -y python3
 RUN yum install -y python2
-RUN ln --force -s /usr/bin/python3 /usr/bin/python
+RUN ln --force -s /usr/bin/python2 /usr/bin/python
 
 RUN yum install -y openssl-devel libffi-devel
 
