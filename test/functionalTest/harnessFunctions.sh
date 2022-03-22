@@ -1394,7 +1394,7 @@ function orionCurl()
         # We need to apply pretty-print on _response. Otherwise positional processing used in .test
         # (e.g. to get SUB_ID typically grep and awk are used) will break
         #
-        _response=$(echo $_response | python -m json.tool --sort-keys)
+        _response=$(echo $_response | python3 -m json.tool --sort-keys)
         echo "$_response"
       else
         logMsg Unknown payloadCheckFormat
