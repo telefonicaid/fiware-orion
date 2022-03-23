@@ -31,7 +31,7 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# FIXME PR: entitySatatus not yet working
+# FIXME #1494: entityStatus not yet working
 #
 # 01. Create subscription for entity type T with entityChange
 # 02. Create entity E/T (no notif)

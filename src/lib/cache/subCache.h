@@ -92,33 +92,33 @@ struct EntityInfo
 */
 struct CachedSubscription
 {
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  std::vector<std::string>    metadata;
-  std::vector<std::string>    notifyConditionV;
-  std::vector<ngsiv2::SubAltType> subAltTypeV;
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
-  int64_t                     failsCounter;
-  int64_t                     maxFailsLimit;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
-  std::string                 status;
-  double                      statusLastChange;
-  int64_t                     count;
-  RenderFormat                renderFormat;
-  SubscriptionExpression      expression;
-  bool                        blacklist;
-  bool                        onlyChanged;
-  ngsiv2::HttpInfo            httpInfo;
-  ngsiv2::MqttInfo            mqttInfo;
-  int64_t                     lastFailure;  // timestamp of last notification failure
-  int64_t                     lastSuccess;  // timestamp of last successful notification
-  std::string                 lastFailureReason;
-  int64_t                     lastSuccessCode;
-  struct CachedSubscription*  next;
+  std::vector<EntityInfo*>         entityIdInfos;
+  std::vector<std::string>         attributes;
+  std::vector<std::string>         metadata;
+  std::vector<std::string>         notifyConditionV;
+  std::vector<ngsiv2::SubAltType>  subAltTypeV;
+  char*                            tenant;
+  char*                            servicePath;
+  char*                            subscriptionId;
+  int64_t                          failsCounter;
+  int64_t                          maxFailsLimit;
+  int64_t                          throttling;
+  int64_t                          expirationTime;
+  int64_t                          lastNotificationTime;
+  std::string                      status;
+  double                           statusLastChange;
+  int64_t                          count;
+  RenderFormat                     renderFormat;
+  SubscriptionExpression           expression;
+  bool                             blacklist;
+  bool                             onlyChanged;
+  ngsiv2::HttpInfo                 httpInfo;
+  ngsiv2::MqttInfo                 mqttInfo;
+  int64_t                          lastFailure;  // timestamp of last notification failure
+  int64_t                          lastSuccess;  // timestamp of last successful notification
+  std::string                      lastFailureReason;
+  int64_t                          lastSuccessCode;
+  struct CachedSubscription*       next;
 };
 
 

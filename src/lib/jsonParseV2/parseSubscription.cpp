@@ -1054,7 +1054,7 @@ static std::string parseNotifyConditionVector
       ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
       if (altType == ngsiv2::SubAltType::Unknown)
       {
-        return badInput(ciP, "unknown subscription operation: " + altTypeStrings[ix]);
+        return badInput(ciP, "unknown subscription alterationType: " + altTypeStrings[ix]);
       }
       else
       {

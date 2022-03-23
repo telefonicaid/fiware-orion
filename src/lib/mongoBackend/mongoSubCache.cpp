@@ -253,7 +253,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
       ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
       if (altType == ngsiv2::SubAltType::Unknown)
       {
-        LM_E(("Runtime Error (unknown subscription operation found in database)"));
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
       }
       else
       {

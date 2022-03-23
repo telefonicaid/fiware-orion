@@ -1429,7 +1429,7 @@ static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
     ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
     if (altType == ngsiv2::SubAltType::Unknown)
     {
-      LM_E(("Runtime Error (unknown subscription operation found in database)"));
+      LM_E(("Runtime Error (unknown alterationType found in database)"));
     }
     else
     {
@@ -1890,7 +1890,7 @@ static unsigned int processSubscriptions
   unsigned int                                   notifStartCounter
 )
 {
-  // Nedeed in some calls to underlying logic, although not currently used
+  // Needed in some calls to underlying logic, although not currently used
   std::string err;
 
   unsigned int notifSent = 0;

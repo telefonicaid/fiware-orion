@@ -88,7 +88,7 @@ std::string subAltType2string(ngsiv2::SubAltType altType)
   }
   else
   {
-    LM_E(("Runtime Error (unknown sub operation)"));
+    LM_E(("Runtime Error (unknown alteration type)"));
     return "Unknown";
   }
 }

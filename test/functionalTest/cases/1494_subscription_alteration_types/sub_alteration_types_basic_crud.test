@@ -178,13 +178,13 @@ echo
 01. Create subscription with invalid alterationTypes, see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 80
+Content-Length: 85
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "unknown subscription operation: entityFoo",
+    "description": "unknown subscription alterationType: entityFoo",
     "error": "BadRequest"
 }
 
