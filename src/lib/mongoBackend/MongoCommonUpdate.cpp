@@ -1410,11 +1410,11 @@ static bool matchMode(orion::BSONObj sub, ngsiv2::SubOp mode)
     setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
   }
 
-  // Check mode. If operations field is not there or size == 0 default mode is update and create
+  // Check mode. If operations field is not there or size == 0 default mode is update with change and create
   // Maybe this could be check at MongoDB query stage, but seems be more complex
   if (operationStrings.size() == 0)
   {
-    if ((mode == ngsiv2::SubOp::EntityUpdate) || (mode == ngsiv2::SubOp::EntityCreate))
+    if ((mode == ngsiv2::SubOp::EntityChange) || (mode == ngsiv2::SubOp::EntityCreate))
     {
       return true;
     }
