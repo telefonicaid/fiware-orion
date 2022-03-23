@@ -199,6 +199,7 @@ SET (ORION_LIBS
     orionld_mongoCppLegacy
     orionld_socketService
     orionld_troe
+    orionld_notifications
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
@@ -344,6 +345,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
+  ADD_SUBDIRECTORY(src/lib/orionld/notifications)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/orionld/troe)

@@ -42,9 +42,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "common/string.h"                                       // FT
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "rest/restReply.h"                                      // restReply
@@ -908,7 +906,6 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if (orionldState.verb != OPTIONS)
   {
-    LM_TMP(("orionldState.verb: %d", orionldState.verb));
     char* detail;
     if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
     {

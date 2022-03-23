@@ -1,0 +1,327 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity using Real PATCH - add two sub-attributes to a Property with none
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+#
+# 01. Create an entity E1 with an attribute P1, matching S1 and S2
+# 02. Create an entity E2 - matching S2 only
+# 03. Create S1 - a matching subscription, only for E1
+# 04. Create S2 - a subscription matching all entities of type T
+# 05. Create S3 - a subscription matching all entities of type T2
+# 06. Create S4 - a subscription matching all entities of type T AND Attrs P1-P3
+# 07. Create S5 - a subscription matching all entities of type T AND Attr P2
+# 16. PATCH E1, deleting P1
+# 17. Dump+Reset accumulator - see two notifications
+# 18. PATCH E2, deleting P1
+# 19. Dump+Reset accumulator - see one notifications
+#
+
+echo "01. Create an entity E1 with an attribute P1, matching S1 and S2"
+echo "================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E2 - matching S2 only"
+echo "=========================================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create S1 - a matching subscription, only for E1"
+echo "===================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create S2 - a subscription matching all entities of type T"
+echo "=============================================================="
+payload='{
+  "id": "urn:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create S3 - a subscription matching all entities of type T2"
+echo "==============================================================="
+payload='{
+  "id": "urn:S3",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T2"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create S4 - a subscription matching all entities of type T AND Attrs P1-P3"
+echo "=============================================================================="
+payload='{
+  "id": "urn:S4",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["P1", "P2", "P3" ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create S5 - a subscription matching all entities of type T AND Attr P2"
+echo "=========================================================================="
+payload='{
+  "id": "urn:S5",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["P2" ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "16. PATCH E1, deleting P1"
+echo "========================="
+payload='{
+  "P1": {"@type": "@json", "@value": null }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "17. Dump+Reset accumulator - see two notifications"
+echo "=================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "18. PATCH E2, deleting P1"
+echo "========================="
+payload='{
+  "P1": {"@type": "@json", "@value": null }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E2 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "19. Dump+Reset accumulator - see one notifications"
+echo "=================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "20. PATCH E2, adding P2"
+echo "========================="
+payload='{
+  "P2": 20
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E2 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "21. Dump+Reset accumulator - see one notifications"
+echo "=================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with an attribute P1, matching S1 and S2
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. Create an entity E2 - matching S2 only
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E2
+Date: REGEX(.*)
+
+
+
+03. Create S1 - a matching subscription, only for E1
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+Date: REGEX(.*)
+
+
+
+04. Create S2 - a subscription matching all entities of type T
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S2
+Date: REGEX(.*)
+
+
+
+05. Create S3 - a subscription matching all entities of type T2
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S3
+Date: REGEX(.*)
+
+
+
+06. Create S4 - a subscription matching all entities of type T AND Attrs P1-P3
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S4
+Date: REGEX(.*)
+
+
+
+07. Create S5 - a subscription matching all entities of type T AND Attr P2
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S5
+Date: REGEX(.*)
+
+
+
+16. PATCH E1, deleting P1
+=========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+17. Dump+Reset accumulator - see two notifications
+==================================================
+
+
+18. PATCH E2, deleting P1
+=========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+19. Dump+Reset accumulator - see one notifications
+==================================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

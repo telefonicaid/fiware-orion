@@ -277,7 +277,9 @@ static void setSubscriptionId(Subscription* s, const BSONObj* rP)
 */
 static void setName(Subscription* s, const BSONObj* rP)
 {
+  LM_TMP(("KZ: In setName"));
   s->name = getStringFieldF(rP, CSUB_NAME);
+  LM_TMP(("KZ: From setName"));
 }
 
 

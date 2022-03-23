@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,11 +21,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    OrionldProblemDetails.cpp
-    OrionldHeader.cpp
-    OrionldAttributeType.cpp
-    OrionldGeoJsonType.cpp
-    OrionldAlteration.cpp
+    orionldAlterationsTreat.cpp
+    subCacheAlterationMatch.cpp
 )
 
 # Include directories
@@ -35,4 +32,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_types STATIC ${SOURCES})
+ADD_LIBRARY(orionld_notifications STATIC ${SOURCES})

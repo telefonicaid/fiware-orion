@@ -65,10 +65,10 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/notifications/orionldAlterationsTreat.h"       // orionldAlterationsTreat
 #include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
-#include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
 
 #include "rest/HttpHeaders.h"                                    // HTTP_* defines
 #include "rest/Verb.h"
@@ -395,12 +395,14 @@ static void requestCompleted
   const char*      spath    = ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
 
-  if (orionldState.notify == true)
+  if (orionldState.alterations != NULL)
   {
     PERFORMANCE(notifStart);
-    orionldNotify();
+    orionldAlterationsTreat(orionldState.alterations);
     PERFORMANCE(notifEnd);
   }
+  else
+    LM_TMP(("KZ: No alterations"));
 
   if ((orionldState.in.payload != NULL) && (orionldState.in.payload != static_buffer))
   {

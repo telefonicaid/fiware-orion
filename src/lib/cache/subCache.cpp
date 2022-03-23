@@ -158,6 +158,7 @@ bool EntityInfo::match
   }
   else
   {
+    LM_TMP(("KZ No match due to Entity ID"));
     matchedId = false;
   }
 
@@ -172,6 +173,7 @@ bool EntityInfo::match
     }
     else if ((type != "")  && (entityType != "") && (entityType != type))
     {
+      LM_TMP(("KZ No match due to Entity Type"));
       matchedType = false;
     }
     else
@@ -231,6 +233,17 @@ typedef struct SubCache
 static SubCache  subCache            = { NULL, NULL, 0, 0, 0, 0 };
 bool             subCacheActive      = false;
 bool             subCacheMultitenant = false;
+
+
+
+/* ****************************************************************************
+*
+* subCacheHeadGet -
+*/
+CachedSubscription* subCacheHeadGet(void)
+{
+  return subCache.head;
+}
 
 
 
@@ -412,18 +425,21 @@ static bool subMatch
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
         // No match due to tenant I
+        LM_TMP(("KZ: No match due to tenant I"));
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
         // No match due to tenant II
+        LM_TMP(("KZ: No match due to tenant II"));
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
       // No match due to tenant III
+      LM_TMP(("KZ: No match due to tenant III"));
       return false;
     }
   }
@@ -431,6 +447,7 @@ static bool subMatch
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
     // No match due to servicePath
+    LM_TMP(("KZ: No match due to servicePath"));
     return false;
   }
 
@@ -444,6 +461,7 @@ static bool subMatch
   if (!attributeMatch(cSubP, attrV))
   {
     // No match due to attributes
+    LM_TMP(("KZ: No match due to attributes"));
     return false;
   }
 
@@ -453,6 +471,7 @@ static bool subMatch
 
     if (eiP->match(entityId, entityType))
     {
+      LM_TMP(("KZ: MATCH"));
       return true;
     }
   }
@@ -467,7 +486,7 @@ static bool subMatch
 *
 * subCacheMatch -
 */
-void subCacheMatch
+int subCacheMatch
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -477,7 +496,8 @@ void subCacheMatch
   std::vector<CachedSubscription*>*  subVecP
 )
 {
-  CachedSubscription* cSubP = subCache.head;
+  CachedSubscription* cSubP   = subCache.head;
+  int                 matches = 0;
 
   while (cSubP != NULL)
   {
@@ -487,11 +507,14 @@ void subCacheMatch
 
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
+      ++matches;
       subVecP->push_back(cSubP);
     }
 
     cSubP = cSubP->next;
   }
+
+  return matches;
 }
 
 
@@ -500,7 +523,7 @@ void subCacheMatch
 *
 * subCacheMatch -
 */
-void subCacheMatch
+int subCacheMatch
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -510,17 +533,22 @@ void subCacheMatch
   std::vector<CachedSubscription*>*  subVecP
 )
 {
-  CachedSubscription* cSubP = subCache.head;
+  CachedSubscription* cSubP   = subCache.head;
+  int                 matches = 0;
 
   while (cSubP != NULL)
   {
+    LM_TMP(("KZ: Checking subscription %s", cSubP->subscriptionId));
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
+      ++matches;
     }
 
     cSubP = cSubP->next;
   }
+
+  return matches;
 }
 
 
@@ -603,7 +631,7 @@ void subCacheDestroy(void)
 *
 * tenantMatch -
 */
-static bool tenantMatch(const char* tenant1, const char* tenant2)
+bool tenantMatch(const char* tenant1, const char* tenant2)
 {
   //
   // Removing complications with NULL, giving NULL tenants the value of an empty string;
@@ -611,17 +639,7 @@ static bool tenantMatch(const char* tenant1, const char* tenant2)
   tenant1 = (tenant1 == NULL)? "" : tenant1;
   tenant2 = (tenant2 == NULL)? "" : tenant2;
 
-  if (strlen(tenant1) != strlen(tenant2))
-  {
-    return false;
-  }
-
-  if (strcmp(tenant1, tenant2) == 0)
-  {
-    return true;
-  }
-
-  return false;
+  return (strcmp(tenant1, tenant2) == 0);
 }
 
 
@@ -828,6 +846,15 @@ void subCacheItemInsert
     cSubP->entityIdInfos.push_back(eP);
   }
 
+  //
+  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
+  //
+  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
+
+  for (int ix = 0; ix < triggerArraySize; ++ix)
+  {
+    cSubP->triggers[ix] = true;
+  }
 
   //
   // Insert the subscription in the cache

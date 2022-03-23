@@ -351,7 +351,8 @@ bool kjValuesDiffer(KjNode* leftAttr, KjNode* rightAttr)
 do                                                          \
 {                                                           \
   aeP->alteredAttributeV[ix].alterationType = altType;      \
-  aeP->alteredAttributeV[ix].attrName       = attrName;     \
+  aeP->alteredAttributeV[ix].attrName       = attrP->name;  \
+  aeP->alteredAttributeV[ix].attrNameEq     = attrNameEq;   \
   ++ix;                                                     \
 } while (0)
 
@@ -398,8 +399,8 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
   int ix = 0;
   for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);  // Must copy to change dot for eq
-    dotForEq(attrName);
+    char* attrNameEq = kaStrdup(&orionldState.kalloc, attrP->name);  // Must copy to change dot for eq for ...
+    dotForEq(attrNameEq);
 
     if (attrP->type == KjNull)
     {
@@ -407,7 +408,7 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
       continue;
     }
 
-    KjNode* dbAttrP = kjLookup(dbAttrsP, attrName);
+    KjNode* dbAttrP = kjLookup(dbAttrsP, attrNameEq);
 
     if (dbAttrP == NULL)
     {
@@ -426,6 +427,8 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
       ALTERATION(AttributeModifiedAtChanged);  // Need to check all metadata - could also be AttributeMetadataChanged
     }
   }
+
+  aeP->next = NULL;
 
   return aeP;
 }
@@ -479,6 +482,7 @@ void orionldAlterationsPresent(OrionldAlteration* altP)
   for (int ix = 0; ix < altP->alteredAttributes; ix++)
   {
     LM_K(("Entity Altered:    Attribute:  %s", altP->alteredAttributeV[ix].attrName));
+    LM_K(("Entity Altered:    Attribute:  %s", altP->alteredAttributeV[ix].attrNameEq));
     LM_K(("Entity Altered:    Alteration: %s", orionldAlterationType(altP->alteredAttributeV[ix].alterationType)));
   }
 }

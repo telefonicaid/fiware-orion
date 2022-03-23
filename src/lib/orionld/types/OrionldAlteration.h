@@ -25,6 +25,18 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                           // KjNode
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// CachedSubscription - can't include subCache.h as subCache.h includes this header ...
+//
+struct CachedSubscription;
 
 
 
@@ -34,32 +46,67 @@
 //
 typedef enum OrionldAlterationType
 {
-  EntityCreated,
+  EntityCreated = 1,
   EntityDeleted,
   EntityModified,  // Any of the Attribute alterations imply EntityModified
   AttributeAdded,
   AttributeDeleted,
   AttributeValueChanged,
   AttributeMetadataChanged,
-  AttributeModifiedAtChanged
+  AttributeModifiedAtChanged,
+  OrionldAlterationTypes = AttributeModifiedAtChanged
 } OrionldAlterationType;
 
 
 
+// -----------------------------------------------------------------------------
+//
+// OrionldAttributeAlteration -
+//
 typedef struct OrionldAttributeAlteration
 {
   OrionldAlterationType  alterationType;
   char*                  attrName;
+  char*                  attrNameEq;
 } OrionldAttributeAlteration;
 
 
 
+// -----------------------------------------------------------------------------
+//
+// OrionldAlteration -
+//
 typedef struct OrionldAlteration
 {
   char*                        entityId;
   char*                        entityType;
+  KjNode*                      entityP;
   int                          alteredAttributes;
   OrionldAttributeAlteration*  alteredAttributeV;
+  struct OrionldAlteration*    next;
 } OrionldAlteration;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldAlterationMatch
+//
+typedef struct OrionldAlterationMatch
+{
+  OrionldAlteration*              altP;
+  OrionldAttributeAlteration*     altAttrP;
+  CachedSubscription*             subP;
+  struct OrionldAlterationMatch*  next;
+} OrionldAlterationMatch;
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldAlterationType -
+//
+extern const char* orionldAlterationType(OrionldAlterationType altType);
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDALTERATION_H_

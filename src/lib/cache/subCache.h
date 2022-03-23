@@ -35,6 +35,7 @@
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
+#include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
@@ -60,7 +61,7 @@ typedef enum SubCacheState
 * The struct fields:
 * -------------------------------------------------------------------------------
 * o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
-* o entityType           string containing the type of the EntityId
+* o entityType           string containing the type of the Entity
 *
 */
 struct EntityInfo
@@ -99,15 +100,14 @@ struct CachedSubscription
   std::vector<std::string>    notifyConditionV;
   char*                       tenant;
   char*                       servicePath;
+  bool                        triggers[OrionldAlterationTypes];
   char*                       subscriptionId;
   double                      throttling;
   double                      expirationTime;
   double                      lastNotificationTime;
   std::string                 status;
-#ifdef ORIONLD
   std::string                 name;
   std::string                 ldContext;
-#endif
   int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
@@ -126,6 +126,14 @@ struct CachedSubscription
 */
 extern bool                    subCacheActive;
 extern volatile SubCacheState  subCacheState;
+
+
+
+/* ****************************************************************************
+*
+* subCacheHeadGet - 
+*/
+extern CachedSubscription* subCacheHeadGet(void);
 
 
 
@@ -268,7 +276,7 @@ extern void subCacheSync(void);
 *
 * subCacheMatch - 
 */
-extern void subCacheMatch
+extern int subCacheMatch
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -284,7 +292,7 @@ extern void subCacheMatch
 *
 * subCacheMatch - 
 */
-extern void subCacheMatch
+extern int subCacheMatch
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -339,5 +347,13 @@ extern void subCacheItemNotificationErrorStatus
   const std::string&  subscriptionId,
   int                 errors
 );
+
+
+
+/* ****************************************************************************
+*
+* tenantMatch -
+*/
+extern bool tenantMatch(const char* tenant1, const char* tenant2);
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_
