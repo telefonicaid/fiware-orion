@@ -1,0 +1,5 @@
+# python3.8 scripts, use virtualenv -ppython3.8 .env
+# and activate the virtual environment
+Flask==1.1.2
+pyOpenSSL==20.0.1
+paho-mqtt==1.5.1

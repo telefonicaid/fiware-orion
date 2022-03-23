@@ -177,22 +177,22 @@ Notifications: 1
   "body": {
     "data": [
       {
-        "type": "AirQualityObserved", 
-        "id": "urn:ngsi-ld:Test:Mqtt", 
+        "id": "urn:ngsi-ld:Test:Mqtt",
         "temperature": {
-          "type": "Property", 
+          "type": "Property",
           "value": 21
-        }
+        },
+        "type": "AirQualityObserved"
       }
-    ], 
-    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification", 
-    "type": "Notification", 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)"
-  }, 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification",
+    "type": "Notification"
+  },
   "metadata": {
-    "Link": "REGEX(.*)",
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "Link": "REGEX(.*)"
   }
 }
 =======================================

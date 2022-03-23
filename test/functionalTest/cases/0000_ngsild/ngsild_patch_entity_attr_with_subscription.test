@@ -253,27 +253,27 @@ User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
             "A1": {
-                "type": "Property", 
+                "type": "Property",
                 "value": "A1 Step 3"
-            }, 
+            },
             "A2": {
-                "type": "Property", 
+                "type": "Property",
                 "value": "A2 Step 1"
-            }, 
-            "id": "urn:ngsi-ld:entity:E1", 
+            },
+            "id": "urn:ngsi-ld:entity:E1",
             "type": "T"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:subscriptions:S1", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
     "type": "Notification"
 }
 =======================================

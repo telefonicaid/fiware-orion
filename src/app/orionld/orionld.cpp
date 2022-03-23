@@ -932,7 +932,6 @@ int main(int argC, char* argV[])
     daemonize();
   }
 
-
   IpVersion ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
@@ -948,7 +947,25 @@ int main(int argC, char* argV[])
   //
   orionldTenantInit();
 
+  //
+  // The database for Temporal Representation of Entities must be initialized before mongodb
+  // as callbacks to create tenants (== postgres databases) and their tables are called from the
+  // initialization routines of mongodb - if postgres is not initialized, this will fail.
+  //
+  if (troe)
+  {
+    // Close stderr, as postgres driver prints garbage to it!
+    // close(2);
+
+    if (troeInit() == false)
+      LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
+  }
+
+
+  // Initialize Mongo Legacy C++ driver
   mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+
+  // Initialize orion libs
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
@@ -998,20 +1015,6 @@ int main(int argC, char* argV[])
   //
   contextDownloadListInit();
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
-
-  //
-  // The database for Temporal Representation of Entities must be initialized before mongodb
-  // as callbacks to create tenants (== postgres databases) and their tables are called from the
-  // initialization routines of mongodb - if postgres is not initialized, this will fail.
-  //
-  if (troe)
-  {
-    // Close stderr, as postgres driver prints garbage to it!
-    // close(2);
-
-    if (troeInit() == false)
-      LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
-  }
 
   dbInit(dbHost, dbName);
 

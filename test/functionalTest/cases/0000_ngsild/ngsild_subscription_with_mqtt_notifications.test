@@ -274,24 +274,24 @@ Notifications: 1
   "body": {
     "data": [
       {
-        "type": "AirQualityObserved", 
-        "id": "urn:ngsi-ld:Test:Mqtt1", 
+        "id": "urn:ngsi-ld:Test:Mqtt1",
         "temperature": {
-          "type": "Property", 
+          "type": "Property",
           "value": 21
-        }
+        },
+        "type": "AirQualityObserved"
       }
-    ], 
-    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification", 
-    "type": "Notification", 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)"
-  }, 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification",
+    "type": "Notification"
+  },
   "metadata": {
-    "H2": "456", 
-    "Link": "REGEX(.*)", 
-    "H1": "123", 
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "H1": "123",
+    "H2": "456",
+    "Link": "REGEX(.*)"
   }
 }
 =======================================
@@ -357,24 +357,24 @@ Notifications: 1
   "body": {
     "data": [
       {
-        "type": "AirQualityObserved2", 
-        "id": "urn:ngsi-ld:Test:Mqtt2", 
+        "id": "urn:ngsi-ld:Test:Mqtt2",
         "temperature": {
-          "type": "Property", 
+          "type": "Property",
           "value": 21
-        }
+        },
+        "type": "AirQualityObserved2"
       }
-    ], 
-    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification", 
-    "type": "Notification", 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)"
-  }, 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification",
+    "type": "Notification"
+  },
   "metadata": {
-    "H2": "456", 
-    "Link": "REGEX(.*)", 
-    "H1": "123", 
     "Content-Type": "application/json",
+    "H1": "123",
+    "H2": "456",
+    "Link": "REGEX(.*)",
     "X-Auth-Token": "x-auth-token-is-not-verified"
   }
 }

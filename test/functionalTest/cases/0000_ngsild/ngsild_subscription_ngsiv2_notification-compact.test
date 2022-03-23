@@ -401,21 +401,21 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
             "P": {
-                "metadata": {}, 
-                "type": "Property", 
+                "metadata": {},
+                "type": "Property",
                 "value": 2
-            }, 
-            "id": "urn:ngsi-ld:entities:E1", 
+            },
+            "id": "urn:ngsi-ld:entities:E1",
             "type": "T1"
         }
-    ], 
+    ],
     "subscriptionId": "http://a.b.c/subs/sub01"
 }
 =======================================
@@ -455,21 +455,21 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
             "P1": {
-                "metadata": {}, 
-                "type": "Property", 
+                "metadata": {},
+                "type": "Property",
                 "value": 5
-            }, 
-            "id": "urn:ngsi-ld:entities:E2", 
+            },
+            "id": "urn:ngsi-ld:entities:E2",
             "type": "T2"
         }
-    ], 
+    ],
     "subscriptionId": "http://a.b.c/subs/sub02"
 }
 =======================================
@@ -509,21 +509,21 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
             "P3": {
-                "metadata": {}, 
-                "type": "Property", 
+                "metadata": {},
+                "type": "Property",
                 "value": 10
-            }, 
-            "id": "urn:ngsi-ld:entities:E3", 
+            },
+            "id": "urn:ngsi-ld:entities:E3",
             "type": "T3"
         }
-    ], 
+    ],
     "subscriptionId": "http://a.b.c/subs/sub03"
 }
 =======================================
@@ -563,28 +563,28 @@ User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
-            "id": "urn:ngsi-ld:entities:E4", 
+            "id": "urn:ngsi-ld:entities:E4",
             "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
+                "metadata": {},
+                "type": "GeoProperty",
                 "value": {
                     "coordinates": [
-                        1, 
-                        2, 
+                        1,
+                        2,
                         3
-                    ], 
+                    ],
                     "type": "Point"
                 }
-            }, 
+            },
             "type": "T4"
         }
-    ], 
+    ],
     "subscriptionId": "http://a.b.c/subs/sub04"
 }
 =======================================
@@ -643,45 +643,45 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
-            "id": "urn:ngsi-ld:entities:E4", 
+            "id": "urn:ngsi-ld:entities:E4",
             "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
+                "metadata": {},
+                "type": "GeoProperty",
                 "value": {
                     "coordinates": [
-                        1, 
-                        2, 
+                        1,
+                        2,
                         3
-                    ], 
+                    ],
                     "type": "Point"
                 }
-            }, 
+            },
             "observationSpace": {
                 "metadata": {
                     "r1": {
-                        "type": "Relationship", 
+                        "type": "Relationship",
                         "value": "urn:r:r1"
                     }
-                }, 
-                "type": "GeoProperty", 
+                },
+                "type": "GeoProperty",
                 "value": {
                     "coordinates": [
-                        1, 
-                        3, 
+                        1,
+                        3,
                         1
-                    ], 
+                    ],
                     "type": "Point"
                 }
-            }, 
+            },
             "type": "T4"
         }
-    ], 
+    ],
     "subscriptionId": "http://a.b.c/subs/sub04"
 }
 =======================================
@@ -703,62 +703,62 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
-            "id": "urn:ngsi-ld:entities:E4", 
+            "id": "urn:ngsi-ld:entities:E4",
             "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
+                "metadata": {},
+                "type": "GeoProperty",
                 "value": {
                     "coordinates": [
-                        1, 
-                        2, 
+                        1,
+                        2,
                         3
-                    ], 
+                    ],
                     "type": "Point"
                 }
-            }, 
+            },
             "observationSpace": {
                 "metadata": {
                     "r1": {
-                        "type": "Relationship", 
+                        "type": "Relationship",
                         "value": "urn:r:r1"
                     }
-                }, 
-                "type": "GeoProperty", 
+                },
+                "type": "GeoProperty",
                 "value": {
                     "coordinates": [
-                        1, 
-                        3, 
+                        1,
+                        3,
                         1
-                    ], 
+                    ],
                     "type": "Point"
                 }
-            }, 
+            },
             "operationSpace": {
                 "metadata": {
                     "r2": {
-                        "type": "Relationship", 
+                        "type": "Relationship",
                         "value": "urn:r:r2"
                     }
-                }, 
-                "type": "GeoProperty", 
+                },
+                "type": "GeoProperty",
                 "value": {
                     "coordinates": [
-                        2, 
-                        4, 
+                        2,
+                        4,
                         2
-                    ], 
+                    ],
                     "type": "Point"
                 }
-            }, 
+            },
             "type": "T4"
         }
-    ], 
+    ],
     "subscriptionId": "http://a.b.c/subs/sub04"
 }
 =======================================

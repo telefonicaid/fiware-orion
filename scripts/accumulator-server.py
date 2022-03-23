@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env .venv/bin/python
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -21,6 +21,7 @@
 # iot_support at tid dot es
 
 from __future__ import division   # need for seconds calculation (could be removed with Python 2.7)
+
 __author__ = 'fermin'
 
 # This program stores everything it receives by HTTP in a given URL (pased as argument),
@@ -41,12 +42,13 @@ from getopt import getopt, GetoptError
 from datetime import datetime
 from math import trunc
 from time import sleep
-import sys
-import os
-import atexit
-import string
-import signal
+from sys import exit, argv, stderr
+from os.path import basename, isfile
+from os import unlink, getpid, kill
+from atexit import register
+from signal import SIGTERM, SIGINT, SIGKILL
 import json
+
 
 def usage_and_exit(msg):
     """
@@ -56,11 +58,10 @@ def usage_and_exit(msg):
     """
 
     if msg != '':
-        print msg
-        print
+        print("{}\n".format(msg))
 
     usage()
-    sys.exit(1)
+    exit(1)
 
 
 def usage():
@@ -68,43 +69,46 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print "  --host <host>: host to use database to use (default is '0.0.0.0')"
-    print "  --port <port>: port to use (default is 1028)"
-    print "  --url <server url>: server URL to use (default is /accumulate)"
-    print "  --pretty-print: pretty print mode"
-    print "  --https: start in https"
-    print "  --key: key file (only used if https is enabled)"
-    print "  --cert: cert file (only used if https is enabled)"
-    print "  -v: verbose mode"
-    print "  -u: print this usage message"
+    print('Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u\n'
+          % basename(__file__))
+
+    print('Parameters:')
+    print("  --host <host>: host to use database to use (default is '0.0.0.0')")
+    print("  --port <port>: port to use (default is 1028)")
+    print("  --url <server url>: server URL to use (default is /accumulate)")
+    print("  --pretty-print: pretty print mode")
+    print("  --https: start in https")
+    print("  --key: key file (only used if https is enabled)")
+    print("  --cert: cert file (only used if https is enabled)")
+    print("  -v: verbose mode")
+    print("  -u: print this usage message")
 
 
 # This function is registered to be called upon termination
 def all_done():
-    os.unlink(pidfile)
+    unlink(pidFile)
+
 
 # Default arguments
-port       = 1028
-host       = '0.0.0.0'
+port = 1028
+host = '0.0.0.0'
 server_url = '/accumulate'
-verbose    = 0
-pretty     = False
-https      = False
-key_file   = None
-cert_file  = None
+verbose = 0
+pretty = False
+https = False
+key_file = None
+cert_file = None
 
+opts = []
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
+    opts, args = getopt(argv[1:], 'vu', ['host=', 'port=', 'url=', 'pretty-print', 'https', 'key=', 'cert='])
 except GetoptError:
     usage_and_exit('wrong parameter')
 
 for opt, arg in opts:
     if opt == '-u':
         usage()
-        sys.exit(0)
+        exit(0)
     elif opt == '--host':
         host = arg
     elif opt == '--url':
@@ -125,26 +129,26 @@ for opt, arg in opts:
     elif opt == '--cert':
         cert_file = arg
     else:
-        usage_and_exit()
+        usage_and_exit(msg='')
 
 if https:
     if key_file is None or cert_file is None:
-        print "if --https is used then you have to provide --key and --cert"
-        sys.exit(1)
+        print("if --https is used then you have to provide --key and --cert")
+        exit(1)
 
 if verbose:
-    print "verbose mode is on"
-    print "port: " + str(port)
-    print "host: " + str(host)
-    print "server_url: " + str(server_url)
-    print "pretty: " + str(pretty)
-    print "https: " + str(https)
+    print("verbose mode is on")
+    print("port: " + str(port))
+    print("host: " + str(host))
+    print("server_url: " + str(server_url))
+    print("pretty: " + str(pretty))
+    print("https: " + str(https))
     if https:
-        print "key file: " + key_file
-        print "cert file: " + cert_file
+        print("key file: " + key_file)
+        print("cert file: " + cert_file)
 
-pid     = str(os.getpid())
-pidfile = "/tmp/accumulator." + str(port) + ".pid"
+pid = str(getpid())
+pidFile = "/tmp/accumulator." + str(port) + ".pid"
 
 #
 # If an accumulator process is already running, it is killed.
@@ -152,55 +156,63 @@ pidfile = "/tmp/accumulator." + str(port) + ".pid"
 # The exception handling is needed as this process dies in case
 # a kill is issued on a non-running process ...
 #
-if os.path.isfile(pidfile):
-    oldpid = file(pidfile, 'r').read()
-    opid   = string.atoi(oldpid)
-    print "PID file %s already exists, killing the process %s" % (pidfile, oldpid)
+if isfile(pidFile):
+    oldPid = open(pidFile, 'r').read()
+    oPid = int(oldPid)
+    print("PID file %s already exists, killing the process %s" % (pidFile, oldPid))
 
-    try: 
-        oldstderr = sys.stderr
-        sys.stderr = open("/dev/null", "w")
-        os.kill(opid, signal.SIGTERM);
+    try:
+        oldStderr = stderr
+        stderr = open("/dev/null", "w")
+        kill(oPid, SIGTERM)
         sleep(0.1)
-        os.kill(opid, signal.SIGINT);
+        kill(oPid, SIGINT)
         sleep(0.1)
-        os.kill(opid, signal.SIGKILL);
-        sys.stderr = oldstderr
-    except:
-        print "Process %d killed" % opid
+        kill(oPid, SIGKILL)
+        stderr = oldStderr  # !!!
+    except OSError:
+        print("Process %d killed" % oPid)
 
 
 #
-# Creating the pidfile of the currently running process
+# Creating the pidFile of the currently running process
 #
-file(pidfile, 'w').write(pid)
+open(pidFile, 'w').write(pid)
 
 #
 # Making the function all_done being executed on exit of this process.
-# all_done removes the pidfile
+# all_done removes the pidFile
 #
-atexit.register(all_done)
+register(all_done)
 
 
 app = Flask(__name__)
 
+
 @app.route("/noresponse", methods=['POST'])
-def noresponse():
+def no_response():
     sleep(10)
     return Response(status=200)
+
 
 @app.route("/noresponse/updateContext", methods=['POST'])
-def unoresponse():
+def uno_response():
     sleep(10)
     return Response(status=200)
+
 
 @app.route("/noresponse/queryContext", methods=['POST'])
-def qnoresponse():
+def qno_response():
     sleep(10)
     return Response(status=200)
 
+
+
+# -----------------------------------------------------------------------------
+#
 # This response has been designed to test the #2360 case, but is general enough to be
 # used in other future cases
+#
 @app.route("/badresponse/queryContext", methods=['POST'])
 def bad_response():
     r = Response(status=404)
@@ -208,11 +220,63 @@ def bad_response():
     return r
 
 
-def record_request(request):
+# -----------------------------------------------------------------------------
+#
+# Courtesy of Telefonica
+# sort_headers was "robbed" from the repository of Orion
+#
+def sort_headers(headers):
     """
-    Common function used by serveral route methods to save request content
+    Sort headers in a predefined order. It seems that from the Python2 version of this
+    script (which used Flask==1.0.2) and the Python3 version (which uses Flask==2.0.2)
+    the order of the headers has changed. We sort to avoid change a lot of .test
+    expectations with no gain.
 
-    :param request: the request to save
+    :param headers: the headers list to sort
+    """
+
+    sorted = []
+    headers_order = [
+        'Fiware-Servicepath',
+        'Content-Length',
+        'Authorization',
+        'X-Auth-Token',
+        'User-Agent',
+        'Ngsiv2-Attrsformat',
+        'Host',
+        'Accept',
+        'Fiware-Service',
+        'Ngsild-Tenant',
+        'Ngsild-Scope',
+        'Content-Type',
+        'Fiware-Correlator',
+        'Link',
+    ]
+
+    # headers is a generator object, not exactly a list (i.e. it doesn't have remove method)
+    headers_list = list(headers)
+
+    for h in headers_order:
+        if h in headers_list:
+            sorted.append(h)
+            headers_list.remove(h)
+
+    # Remaining headers are added at the end of sorted array in the same order
+    for h in headers_list:
+        sorted.append(h)
+
+    return sorted
+
+
+# -----------------------------------------------------------------------------
+#
+# record_request -
+#
+def record_request(req):
+    """
+    Common function used by several route methods to save request content
+
+    :param req: the request to save
     """
 
     global ac, t0, times
@@ -220,7 +284,7 @@ def record_request(request):
 
     # First request? Then, set reference datetime. Otherwise, add the
     # timedelta to the list
-    if (t0 == ''):
+    if t0 == '':
         t0 = datetime.now()
         times.append(0)
     else:
@@ -239,34 +303,37 @@ def record_request(request):
     #
     #  request.url = request.scheme + '://' + request.host + request.path
     #
-    s += request.method + ' ' + request.scheme + '://' + request.host + request.path
+    s += req.method + ' ' + req.scheme + '://' + req.host + req.path
 
     # Check for query params
     params = ''
-    for k in request.args:
-        if (params == ''):
-            params = k + '=' + request.args[k]
+    for k in req.args:
+        if params == '':
+            params = k + '=' + req.args[k]
         else:
-            params += '&' + k + '=' + request.args[k]
+            params += '&' + k + '=' + req.args[k]
 
-    if (params == ''):
+    if params == '':
         s += '\n'
     else:
         s += '?' + params + '\n'
 
-    # Store headers
-    for h in request.headers.keys():
-        s += h + ': ' + request.headers[h] + '\n'
+    # Store headers (according to pre-defined order)
+    for h in sort_headers(req.headers.keys()):
+        s += h + ': ' + req.headers[h] + '\n'
 
     # Store payload
-    if ((request.data is not None) and (len(request.data) != 0)):
+    if (req.data is not None) and (len(req.data) != 0):
         s += '\n'
-        if pretty == True:
-            raw = json.loads(request.data)
-            s += json.dumps(raw, indent=4, sort_keys=True)
-            s += '\n'
+        if pretty:
+            try:
+                raw = json.loads(req.data)
+                s += json.dumps(raw, indent=4, sort_keys=True)
+                s += '\n'
+            except ValueError as e:
+                s += str(e)
         else:
-            s += request.data
+            s += req.data.decode("utf-8")
 
     # Separator
     s += '=======================================\n'
@@ -275,20 +342,20 @@ def record_request(request):
     ac += s
 
     if verbose:
-        print s
+        print(s)
 
 
-def send_continue(request):
+def send_continue(req):
     """
     Inspect request header in order to look if we have to continue or not
 
-    :param request: the request to look
+    :param req: the request to look
     :return: true if we  have to continue, false otherwise
     """
 
-    for h in request.headers.keys():
-        if ((h == 'Expect') and (request.headers[h] == '100-continue')):
-            send_continue = True
+    for h in req.headers.keys():
+        if (h == 'Expect') and (req.headers[h] == '100-continue'):
+            return True  # send_continue = True
 
     return False
 
@@ -318,7 +385,33 @@ def record_2871():
     else:
         # Ad hoc response related with issue #2871, see https://github.com/telefonicaid/fiware-orion/issues/2871
         r = Response(status=200)
-        r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],"id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
+
+        # r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],
+        #            "id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
+
+        r.data = {
+                    "contextResponses": [
+                        {
+                            "contextElement": {
+                                "attributes": [
+                                    {
+                                        "name": "turn",
+                                        "type": "string",
+                                        "value": ""
+                                    }
+                                ],
+                                "id": "entity1",
+                                "isPattern": False,
+                                "type": "device"
+                            },
+                            "statusCode": {
+                                "code": 200,
+                                "reasonPhrase": "OK"
+                            }
+                        }
+                    ]
+        }
+
         return r
 
 
@@ -328,8 +421,8 @@ def dump():
 
 
 @app.route('/times', methods=['GET'])
-def times():
-    return ', '.join(map(str,times)) + '\n'
+def get_times():
+    return ', '.join(map(str, times)) + '\n'
 
 
 @app.route('/number', methods=['GET'])
@@ -347,26 +440,29 @@ def reset():
 
 
 @app.route('/pid', methods=['GET'])
-def getPid():
-    return str(os.getpid())
+def get_pid():
+    return str(getpid())
+
 
 # This is the accumulation string
 ac = ''
 t0 = ''
 times = []
 
+
 if __name__ == '__main__':
-    # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
-    # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
+    # Note that using debug=True breaks the procedure to write the PID into a file. In particular
+    # makes the call to os.path.isfile(pidFile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
-    if (https):
-      # According to http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
-      # original way of using context is deprecated. New way is simpler. However, we are still testing this... some environments
-      # fail in some configurations (the current one is an attempt to make this to work at jenkins)
-      context = SSL.Context(SSL.SSLv23_METHOD)
-      context.use_privatekey_file(key_file)
-      context.use_certificate_file(cert_file)
-      #context = (cert_file, key_file)
-      app.run(host=host, port=port, debug=False, ssl_context=context)
+    if https:
+        # According to http://stackoverflow.com
+        # /questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266, the
+        # original way of using context is deprecated. New way is simpler. However, we are still testing this...
+        # some environments fail in some configurations (the current one is an attempt to make this to work at jenkins)
+        context = SSL.Context(SSL.SSLv23_METHOD)
+        context.use_privatekey_file(key_file)
+        context.use_certificate_file(cert_file)
+        # context = (cert_file, key_file)
+        app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
-      app.run(host=host, port=port)
+        app.run(host=host, port=port)

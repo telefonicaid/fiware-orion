@@ -55,7 +55,7 @@ payload='{
     "address": {
         "type": "Property",
         "value": {
-            "streetAddress": "Bornholmer Straße 65",
+            "streetAddress": "Bornholmer Strasse 65",
             "addressRegion": "Berlin",
             "addressLocality": "Prenzlauer Berg",
             "postalCode": "10439"
@@ -225,7 +225,7 @@ Date: REGEX(.*)
                 "addressLocality": "Prenzlauer Berg",
                 "addressRegion": "Berlin",
                 "postalCode": "10439",
-                "streetAddress": "Bornholmer Stra\u00dfe 65"
+                "streetAddress": "Bornholmer Strasse 65"
             }
         },
         "category": {
@@ -342,7 +342,7 @@ Date: REGEX(.*)
                 "addressLocality": "Prenzlauer Berg",
                 "addressRegion": "Berlin",
                 "postalCode": "10439",
-                "streetAddress": "Bornholmer Stra\u00dfe 65"
+                "streetAddress": "Bornholmer Strasse 65"
             }
         },
         "category": {

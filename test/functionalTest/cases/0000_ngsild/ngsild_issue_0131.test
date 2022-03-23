@@ -171,7 +171,7 @@ Date: REGEX(.*)
   "https://schema.org/address": {
     "type": "Property",
     "value": {
-      "streetAddress": "Bornholmer Straße 65",
+      "streetAddress": "Bornholmer StraREGEX(.*)e 65",
       "addressRegion": "Berlin",
       "addressLocality": "Prenzlauer Berg",
       "postalCode": "10439"
@@ -213,7 +213,7 @@ Date: REGEX(.*)
   "address": {
     "type": "Property",
     "value": {
-      "streetAddress": "Bornholmer Straße 65",
+      "streetAddress": "Bornholmer StraREGEX(.*)e 65",
       "addressRegion": "Berlin",
       "addressLocality": "Prenzlauer Berg",
       "postalCode": "10439"

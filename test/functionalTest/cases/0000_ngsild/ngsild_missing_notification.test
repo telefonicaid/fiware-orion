@@ -187,28 +187,28 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Ngsild-Tenant: openiot
 Content-Type: application/json; charset=utf-8
+Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
-            "id": "urn:ngsi-ld:Device:temperature002", 
+            "id": "urn:ngsi-ld:Device:temperature002",
             "temperature": {
-                "type": "Property", 
-                "unitCode": "CEL", 
+                "type": "Property",
+                "unitCode": "CEL",
                 "value": {
-                    "@type": "Intangible", 
+                    "@type": "Intangible",
                     "@value": null
                 }
-            }, 
+            },
             "type": "TemperatureSensor"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================
@@ -230,26 +230,26 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Ngsild-Tenant: openiot
 Content-Type: application/json; charset=utf-8
+Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "data": [
         {
-            "id": "urn:ngsi-ld:Device:temperature002", 
+            "id": "urn:ngsi-ld:Device:temperature002",
             "temperature": {
-                "observedAt": "2022-01-17T11:18:02.000Z", 
-                "type": "Property", 
-                "unitCode": "CEL", 
+                "observedAt": "2022-01-17T11:18:02.000Z",
+                "type": "Property",
+                "unitCode": "CEL",
                 "value": 10
-            }, 
+            },
             "type": "TemperatureSensor"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================

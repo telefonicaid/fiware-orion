@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env .venv/bin/python
 # -*- coding: latin-1 -*-
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -42,26 +42,15 @@
 # orionld at fiware dot org
 
 
-
-# -----------------------------------------------------------------------------
-#
-# To install paho:
-#   pip install paho-mqtt
-#   
-#
-
-
-
 # -----------------------------------------------------------------------------
 #
 # Imports
 #
 import paho.mqtt.client as mqtt
 from getopt import getopt, GetoptError
-import sys
-import os
+from os.path import basename
+from sys import argv
 import json
-
 
 
 # -----------------------------------------------------------------------------
@@ -81,7 +70,6 @@ dumpFile = open("/tmp/mqttTestClient.dump", "w")
 dumpFile.flush()
 
 
-
 # -----------------------------------------------------------------------------
 #
 # usage -
@@ -91,71 +79,68 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s --mqttBrokerIp <broker ip> --mqttBrokerPort <portNo> --pretty-print --mqttTopic <topic> -v -u' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print "  --mqttBrokerIp <MQTT Broker IP-address>: (default is 'localhost')"
-    print "  --mqttBrokerPort <port number>: MQTT broker port (default is 1883)"
-    print "  --mqttTopic <topic>: MQTT topic to subscribe to (default is 'notification')"
-    print "  --pretty-print: pretty print mode"
-    print "  -v: verbose mode"
-    print "  -u: print this usage message"
-
+    print('Usage: %s --mqttBrokerIp <broker ip> --mqttBrokerPort <portNo> --pretty-print --mqttTopic <topic> -v -u'
+          % basename(__file__))
+    print('')
+    print('Parameters:')
+    print("  --mqttBrokerIp <MQTT Broker IP-address>: (default is 'localhost')")
+    print("  --mqttBrokerPort <port number>: MQTT broker port (default is 1883)")
+    print("  --mqttTopic <topic>: MQTT topic to subscribe to (default is 'notification')")
+    print("  --pretty-print: pretty print mode")
+    print("  -v: verbose mode")
+    print("  -u: print this usage message")
 
 
 # -----------------------------------------------------------------------------
 #
 # Command Line Arguments
 #
-pretty          = False
-verbose         = 0
-mqttBrokerIp    = "localhost"
-mqttBrokerPort  = 1883
-mqttTopic       = "notification"
-qos             = 0
+pretty = False
+verbose = 0
+mqttBrokerIp = "localhost"
+mqttBrokerPort = 1883
+mqttTopic = "notification"
+qos = 0
 
 logFile.write("Parsing Command Line Arguments\n")
 logFile.flush()
 
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', [ 'mqttBrokerIp=', 'mqttBrokerPort=', 'mqttTopic=', 'pretty-print' ])
+    opts, args = getopt(argv[1:], 'vu', ['mqttBrokerIp=', 'mqttBrokerPort=', 'mqttTopic=', 'pretty-print'])
+
+    for opt, arg in opts:
+        if opt == '-u':
+            usage()
+            exit(0)
+        elif opt == '-v':
+            verbose = 1
+        elif opt == '--pretty-print':
+            pretty = True
+        elif opt == '--mqttBrokerIp':
+            mqttBrokerIp = arg
+        elif opt == '--mqttBrokerPort':
+            try:
+                mqttBrokerPort = int(arg)
+            except ValueError:
+                print('the "--mqttBrokerPort" value must be an integer')
+                exit(1)
+        elif opt == '--mqttTopic':
+            mqttTopic = arg
+        else:
+            print("no such command-line argument: " + opt)
+            exit(1)
 except GetoptError:
-    print 'Invalid command-line argument\n'
+    print('Invalid command-line argument\n')
     usage()
-    sys.exit(1)
-
-
-for opt, arg in opts:
-    if opt == '-u':
-        usage()
-        sys.exit(0)
-    elif opt == '-v':
-        verbose = 1
-    elif opt == '--pretty-print':
-        pretty = True
-    elif opt == '--mqttBrokerIp':
-        mqttBrokerIp = arg
-    elif opt == '--mqttBrokerPort':
-        try:
-            mqttBrokerPort = int(arg)
-        except ValueError:
-            print 'the "--mqttBrokerPort" value must be an integer'
-            sys.exit(1)
-    elif opt == '--mqttTopic':
-        mqttTopic = arg
-    else:
-        print "no such command-line argument: " + opt
-        sys.exit(1)
-
+    exit(1)
 
 
 # -----------------------------------------------------------------------------
 #
 #
 #
-notifications   = 0
+notifications = 0
 notificationAcc = ""
-
 
 
 # -----------------------------------------------------------------------------
@@ -164,9 +149,8 @@ notificationAcc = ""
 #
 def on_connect(client, userdata, flags, rc):
     global notifications, notificationAcc
-    notifications   = 0;
+    notifications = 0
     notificationAcc = ""
-
 
 
 # -----------------------------------------------------------------------------
@@ -177,23 +161,26 @@ def on_message(client, userdata, msg):
     global notifications, notificationAcc
     global logFile, dumpFile
 
-    logFile.write("Topic:   " + msg.topic + "\n" + "Payload: " + str(msg.payload) + "\n")
+    payload = msg.payload.decode("utf-8")
+
+    logFile.write("-----------------------------------------------------------------------------------------\n")
+    logFile.write("Topic:   " + msg.topic + "\n" + "Payload: " + payload + "\n")
     logFile.flush()
 
-    if (msg.payload == 'dump'):
-        logFile.write("Dumping received notifications to dump-file\n");
+    if (payload == 'dump'):
+        logFile.write("Dumping received notifications to dump-file\n")
         logFile.flush()
         dumpFile.write("Notifications: " + str(notifications) + "\n")
         dumpFile.write(notificationAcc + "\n")
         dumpFile.flush()
-    elif (msg.payload == 'ping'):
+    elif (payload == 'ping'):
         logFile.write("I'm Alive\n")
         logFile.flush()
-    elif (msg.payload == 'exit'):
+    elif (payload == 'exit'):
         logFile.write("EXIT command received - I die\n")
         logFile.flush()
-        sys.exit(0)
-    elif (msg.payload == 'reset'):
+        exit(0)
+    elif (payload == 'reset'):
         logFile.write("Resetting dump file\n")
         logFile.flush()
         notifications   = 0
@@ -203,18 +190,26 @@ def on_message(client, userdata, msg):
         dumpFile.flush()
     else:
         logFile.write("Got a notification:\n")
-        logFile.write(msg.payload + "\n\n")
-        if pretty == True:
+        logFile.flush()
+
+        if pretty:
             logFile.write("pretty-printing\n")
             logFile.flush()
-            jsonObj = json.loads(msg.payload)
-            logFile.write("pretty-printing\n")
-            logFile.flush()
-            out     = json.dumps(jsonObj, indent=2, sort_keys=False)
-            logFile.write("pretty-printing\n")
-            logFile.flush()
+            try:
+                logFile.write("before loads\n")
+                logFile.flush()
+                json_obj = json.loads(msg.payload)
+                logFile.write("after loads\n")
+                logFile.flush()
+                out = json.dumps(json_obj, indent=2, sort_keys=True)
+                logFile.write("after dumps\n")
+                logFile.flush()
+            except ValueError as e:
+                out = str(e)
+            except:
+                out = payload;
         else:
-            out = msg.payload
+            out = payload
 
         logFile.write("Pretty payload:\n")
         logFile.write(out + "\n\n")
@@ -224,7 +219,7 @@ def on_message(client, userdata, msg):
         notificationAcc += "=======================================\n"
 
 
-client            = mqtt.Client()
+client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 

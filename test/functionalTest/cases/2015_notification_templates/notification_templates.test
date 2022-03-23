@@ -422,13 +422,13 @@ Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A3": "13",
     "step": "03"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?a1=a1&step=04&a2=a2&type=Thing&a3=13&id=E1
+POST http://127.0.0.1:9997/notify?a1=a1&a2=a2&a3=13&id=E1&step=04&type=Thing
 Fiware-Servicepath: /
 Content-Length: 285
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -514,7 +514,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-DELETE http://127.0.0.1:9997/notify?a1=a1&step=06&a2=a2&type=Thing&a3=13&id=E1
+DELETE http://127.0.0.1:9997/notify?a1=a1&a2=a2&a3=13&id=E1&step=06&type=Thing
 Fiware-Servicepath: /
 Ngsiv2-Attrsformat: custom
 Entity-Id: E1
@@ -531,12 +531,12 @@ Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A3": "13"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?a1=a1&step=07&a2=a2&type=Thing&id=E1
+POST http://127.0.0.1:9997/notify?a1=a1&a2=a2&id=E1&step=07&type=Thing
 Fiware-Servicepath: /
 Entity-Id: E1
 Content-Length: 36
@@ -552,8 +552,8 @@ Content-Type: user-specified
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A4": ""
 }
 =======================================
