@@ -33,8 +33,8 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create subscription with Q-filter for temperature>20
-# 03. Create an entity with temperature = 23 - should provoke a notification
-# 04. Dump accumulator and see one notification
+# 02. Create an entity with temperature = 23 - should provoke a notification
+# 03. Dump accumulator and see one notification
 #
 
 
@@ -66,7 +66,7 @@ echo
 echo
 
 
-echo "03. Create an entity with temperature = 23 - should provoke a notification"
+echo "02. Create an entity with temperature = 23 - should provoke a notification"
 echo "=========================================================================="
 payload='{
   "id": "urn:ngsi-ld:Test:12",
@@ -82,7 +82,7 @@ echo
 echo
 
 
-echo "04. Dump accumulator and see one notification"
+echo "03. Dump accumulator and see one notification"
 echo "============================================="
 accumulatorDump
 echo
@@ -99,7 +99,7 @@ Date: REGEX(.*)
 
 
 
-03. Create an entity with temperature = 23 - should provoke a notification
+02. Create an entity with temperature = 23 - should provoke a notification
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 
 
 
-04. Dump accumulator and see one notification
+03. Dump accumulator and see one notification
 =============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
@@ -117,20 +117,20 @@ User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(.*)
 Accept: application/json
-Link: REGEX(.*)
 Content-Type: application/json; charset=utf-8
+Link: REGEX(.*)
 
 {
     "data": [
         {
-            "id": "urn:ngsi-ld:Test:12", 
-            "temperature": 21, 
+            "id": "urn:ngsi-ld:Test:12",
+            "temperature": 21,
             "type": "AirQualityObserved"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:Subscription:test12", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:test12",
     "type": "Notification"
 }
 =======================================

@@ -5,12 +5,13 @@ Orion-LD is an NGSI-LD publish/subscribe broker (a.k.a. a context broker).
 
 For now, Orion-LD only runs under Linux.
 No effort has been made so far to make Orion-LD run under any other platform.
-The obvious choice would be MacOS, and if anybody volunteers to investigate on this, it would be a very welcome contribution.
+The obvious choice would be MacOS, and if anybody volunteers to investigate on this, it would be a very welcome 
+contribution.
 
 ## Supported Linux Distributions
 Orion-LD NGSI-LD Context Broker reference distribution is Ubuntu 18.04.
-While Orion-LD works just fine also in CentOS, Debian, etc, or, other versions of Ubuntu, including 20.04,
-the inly officially supported distribution is Ubuntu 18.04.
+While Orion-LD works just fine also in CentOS, Debian, etc., or, other versions of Ubuntu, including 20.04,
+the only officially supported distribution is Ubuntu 18.04.
 
 ## Installation
 For installation of Orion-LD, alpha version 0.x, you can:
@@ -88,8 +89,9 @@ Now let's create an entity:
 ```bash
   curl localhost:1026/ngsi-ld/v1/entities -d '{ "id": "urn:entities:E1", "type": "T", "P1": { "type": "Property", "value": 12 }}' -H 'Content-Type: application/json' --dump-header /tmp/httpHeaders.out
 ```
-*curl* only prints the payload data of the response on the screen, and as an Entity Creation _has no payload data_, you will see nothing (unless there is a nerror).
-You can check that the curl command worked by issuing the following command (right after the curl command):
+*curl* only prints the payload data of the response on the screen, and as an Entity Creation _has no payload data_, 
+you will see nothing (unless there is an error). You can check that the curl command worked by issuing the following 
+command (right after the curl command):
 
 ```bash
 echo $?
@@ -98,7 +100,8 @@ echo $?
 *$?* is an environment variable that stores the return code of the last executed shell command.
 Zero means OK, anything else means an error.
 
-There is no payload data in the response, but, can see the HTTP headers of the response, as the option `--dump-header /tmp/httpHeaders.out` was used:
+There is no payload data in the response, but, can see the HTTP headers of the response, as the option 
+`--dump-header /tmp/httpHeaders.out` was used:
 
 ```bash
 cat /tmp/httpHeaders.out
@@ -114,7 +117,8 @@ Location: /ngsi-ld/v1/entities/urn:entities:E2
 Date: Tue, 19 Nov 2019 18:56:01 GMT
 ```
 
-As may be extrapolated, there is no payload data in the response - only HTTP headers. That's why `--dump-header /tmp/httpHeaders.out` was added in the curl request andf the second command shows the context of the file.
+As may be extrapolated, there is no payload data in the response - only HTTP headers. That's why 
+`--dump-header /tmp/httpHeaders.out` was added in the curl request and the second command shows the context of the file.
 An entity has been created and we can see it in mongo, like this:
 
 ```sql
@@ -216,7 +220,8 @@ Date: Wed, 20 Nov 2019 11:49:04 GMT
 
 *https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld* - that's the Core Context!
 
-If you instead ask the broker to return the context inside the payload data (which is done by setting the *Accept* header to *application/ld+json*):
+If you instead ask the broker to return the context inside the payload data (which is done by setting the *Accept* 
+header to *application/ld+json*):
 
 ```bash
 curl 'localhost:1026/ngsi-ld/v1/entities?type=T&prettyPrint=yes&space=2' -H "Accept: application/ld+json"
@@ -251,7 +256,8 @@ please follow the instructions in your respective Installation Guide for Functio
 * [Debian 10](installation-guide-functional-tests-debian10.md)
 
 
-And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).
+And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff),
+how to do it is described [here](installation-guide-for-unit-tests.md).
 
 ## Kubernetes
 

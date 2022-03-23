@@ -735,6 +735,8 @@ function accumulatorStart()
   # in a fixed order in the .test, i.e.: --pretty-print, --https, --key, --cert
 
   echo accumulatorStart $* > /tmp/accumulatorStart
+  pwd >>  /tmp/accumulatorStart
+  echo REPO_HOME: $REPO_HOME >> /tmp/accumulatorStart
   if [ "$1" = "--pretty-print" ]
   then
     pretty="$1"
@@ -788,10 +790,11 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  echo $REPO_HOME/scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr >> /tmp/accumulatorStart
-  $REPO_HOME/scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  cd $REPO_HOME
+  echo scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr >> /tmp/accumulatorStart
+  scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
-
+  cd - > /dev/null 2>&1
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1
   typeset -i time
@@ -827,7 +830,9 @@ function mqttTestClientStart()
   rm -f /tmp/mqttTestClient.dump
   date > /tmp/mqttSend.log
 
-  $REPO_HOME/scripts/mqttTestClient.py $*   &
+  cd $REPO_HOME
+  ./scripts/mqttTestClient.py $*   &
+  cd - > /dev/null 2>&1
   sleep 0.2
   logMsg Started MQTT notification client
 }
@@ -841,7 +846,9 @@ function mqttTestClientStart()
 function mqttTestClientStop()
 {
   topic=$1
-  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload exit
+  cd $REPO_HOME
+  ./scripts/mqttSend.py --topic "$topic" --payload exit
+  cd - > /dev/null 2>&1
 }
 
 
@@ -854,7 +861,9 @@ function mqttTestClientDump()
 {
   sleep 0.2
   topic=$1
-  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload dump
+  cd $REPO_HOME
+  ./scripts/mqttSend.py --topic "$topic" --payload dump
+  cd - > /dev/null 2>&1
   cat /tmp/mqttTestClient.dump
 }
 
@@ -868,7 +877,9 @@ function mqttTestClientReset()
 {
   sleep 0.2
   topic=$1
-  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload reset
+  cd $REPO_HOME
+  ./scripts/mqttSend.py --topic "$topic" --payload reset
+  cd - > /dev/null 2>&1
 }
 
 
@@ -1383,7 +1394,7 @@ function orionCurl()
         # We need to apply pretty-print on _response. Otherwise positional processing used in .test
         # (e.g. to get SUB_ID typically grep and awk are used) will break
         #
-        _response=$(echo $_response | python -mjson.tool)
+        _response=$(echo $_response | python3 -m json.tool --sort-keys)
         echo "$_response"
       else
         logMsg Unknown payloadCheckFormat
