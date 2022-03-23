@@ -98,7 +98,7 @@ static void insertInCache
                      sub.notification.attributes,
                      sub.notification.metadata,
                      sub.subject.condition.attributes,
-                     sub.subject.condition.operations,
+                     sub.subject.condition.altTypes,
                      subId.c_str(),
                      sub.expires,
                      sub.notification.maxFailsLimit,

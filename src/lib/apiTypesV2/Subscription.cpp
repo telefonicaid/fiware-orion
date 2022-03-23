@@ -36,29 +36,29 @@
 
 /* ****************************************************************************
 *
-* parseSubscriptionOperation -
+* parseAlterationType -
 */
-ngsiv2::SubOp parseSubscriptionOperation(const std::string& op)
+ngsiv2::SubAltType parseAlterationType(const std::string& altType)
 {
-  if (op == "entityChange")
+  if (altType == "entityChange")
   {
-    return ngsiv2::SubOp::EntityChange;
+    return ngsiv2::SubAltType::EntityChange;
   }
-  else if (op == "entityUpdate")
+  else if (altType == "entityUpdate")
   {
-    return ngsiv2::SubOp::EntityUpdate;
+    return ngsiv2::SubAltType::EntityUpdate;
   }
-  else if (op == "entityCreate")
+  else if (altType == "entityCreate")
   {
-    return ngsiv2::SubOp::EntityCreate;
+    return ngsiv2::SubAltType::EntityCreate;
   }
-  else if (op == "entityDelete")
+  else if (altType == "entityDelete")
   {
-    return ngsiv2::SubOp::EntityDelete;
+    return ngsiv2::SubAltType::EntityDelete;
   }
   else
   {
-    return ngsiv2::SubOp::Unknown;
+    return ngsiv2::SubAltType::Unknown;
   }
 }
 
@@ -66,23 +66,23 @@ ngsiv2::SubOp parseSubscriptionOperation(const std::string& op)
 
 /* ****************************************************************************
 *
-* operation2string -
+* subAltType2string -
 */
-std::string subOperation2string(ngsiv2::SubOp op)
+std::string subAltType2string(ngsiv2::SubAltType altType)
 {
-  if (op == ngsiv2::SubOp::EntityChange)
+  if (altType == ngsiv2::SubAltType::EntityChange)
   {
     return "entityChange";
   }
-  else if (op == ngsiv2::SubOp::EntityUpdate)
+  else if (altType == ngsiv2::SubAltType::EntityUpdate)
   {
     return "entityUpdate";
   }
-  else if (op == ngsiv2::SubOp::EntityCreate)
+  else if (altType == ngsiv2::SubAltType::EntityCreate)
   {
     return "entityCreate";
   }
-  else if (op == ngsiv2::SubOp::EntityDelete)
+  else if (altType == ngsiv2::SubAltType::EntityDelete)
   {
     return "entityDelete";
   }
@@ -303,14 +303,14 @@ std::string Condition::toJson()
 
   JsonVectorHelper jhv;
 
-  for (unsigned int ix = 0 ; ix < this->operations.size(); ix++)
+  for (unsigned int ix = 0 ; ix < this->altTypes.size(); ix++)
   {
-    jhv.addString(subOperation2string(this->operations[ix]));
+    jhv.addString(subAltType2string(this->altTypes[ix]));
   }
 
   std::string operationsString = jhv.str();
 
-  if (operationsString != "[]")         jh.addRaw("operations", operationsString);
+  if (operationsString != "[]")         jh.addRaw("alterationTypes", operationsString);
 
   return jh.str();
 }

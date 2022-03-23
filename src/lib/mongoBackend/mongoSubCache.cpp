@@ -241,23 +241,23 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   //
-  // 09. Fill in cSubP->subOp from subOpV
+  // 09. Fill in cSubP->subAltTypeV from alteration types
   //
-  if (sub.hasField(CSUB_OPERATIONS))
+  if (sub.hasField(CSUB_ALTTYPES))
   {
-    std::vector<std::string> operationStrings;
-    setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
 
-    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
     {
-      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
-      if (op == ngsiv2::SubOp::Unknown)
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
       {
         LM_E(("Runtime Error (unknown subscription operation found in database)"));
       }
       else
       {
-        cSubP->subOpV.push_back(op);
+        cSubP->subAltTypeV.push_back(altType);
       }
     }
   }
@@ -458,23 +458,23 @@ int mongoSubCacheItemInsert
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   //
-  // 09. Fill in cSubP->subOp from subOpV
+  // 09. Fill in cSubP->subAltTypeV from alterationTypes
   //
-  if (sub.hasField(CSUB_OPERATIONS))
+  if (sub.hasField(CSUB_ALTTYPES))
   {
-    std::vector<std::string> operationStrings;
-    setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
 
-    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
     {
-      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
-      if (op == ngsiv2::SubOp::Unknown)
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
       {
-        LM_E(("Runtime Error (unknown subscription operation found in database)"));
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
       }
       else
       {
-        cSubP->subOpV.push_back(op);
+        cSubP->subAltTypeV.push_back(altType);
       }
     }
   }

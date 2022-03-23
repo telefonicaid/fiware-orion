@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Basic CRUD operations for subscriptions operations field
+Basic CRUD for subscriptions alterationTypes field
 
 --SHELL-INIT--
 dbInit CB
@@ -30,20 +30,20 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create subscription with invalid operations, see error
-# 02. Create subscription with operations entityDelete and entityCreate
-# 03a. Get subscription and see operations entityDelete and entityCreate
-# 03b. Get subscription (as a list) and see operations entityDelete and entityCreate
-# 04. Update subscription with operations entityChange
-# 05a. Get subscription and see operations entityChange
-# 05b. Get subscription (as a list) and see operations entityChange
-# 06. Update subscription without operations
-# 07a. Get subscription and not see operations
-# 07b. Get subscription (as a list) and not see operations
+# 01. Create subscription with invalid alterationTypes, see error
+# 02. Create subscription with alterationTypes entityDelete and entityCreate
+# 03a. Get subscription and see alterationTypes entityDelete and entityCreate
+# 03b. Get subscription (as a list) and see alterationTypes entityDelete and entityCreate
+# 04. Update subscription with alterationTypes entityChange
+# 05a. Get subscription and see alterationTypes entityChange
+# 05b. Get subscription (as a list) and see alterationTypes entityChange
+# 06. Update subscription without alterationTypes
+# 07a. Get subscription and not see alterationTypes
+# 07b. Get subscription (as a list) and not see alterationTypes
 #
 
-echo "01. Create subscription with invalid operations, see error"
-echo "=========================================================="
+echo "01. Create subscription with invalid alterationTypes, see error"
+echo "==============================================================="
 payload='{
   "subject": {
     "entities": [
@@ -53,7 +53,7 @@ payload='{
       }
     ],
     "condition": {
-      "operations": [ "entityFoo" ]
+      "alterationTypes": [ "entityFoo" ]
     }
   },
   "notification": {
@@ -67,8 +67,8 @@ echo
 echo
 
 
-echo "02. Create subscription with operations entityDelete and entityCreate"
-echo "====================================================================="
+echo "02. Create subscription with alterationTypes entityDelete and entityCreate"
+echo "=========================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -78,7 +78,7 @@ payload='{
       }
     ],
     "condition": {
-      "operations": [ "entityDelete", "entityCreate" ]
+      "alterationTypes": [ "entityDelete", "entityCreate" ]
     }
   },
   "notification": {
@@ -95,22 +95,22 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "03a. Get subscription and see operations entityDelete and entityCreate"
-echo "======================================================================"
+echo "03a. Get subscription and see alterationTypes entityDelete and entityCreate"
+echo "==========================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "03b. Get subscription (as a list) and see operations entityDelete and entityCreate"
-echo "=================================================================================="
+echo "03b. Get subscription (as a list) and see alterationTypes entityDelete and entityCreate"
+echo "======================================================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "04. Update subscription with operations entityChange"
-echo "===================================================="
+echo "04. Update subscription with alterationTypes entityChange"
+echo "========================================================="
 payload='{
   "subject": {
     "entities": [
@@ -120,7 +120,7 @@ payload='{
       }
     ],
     "condition": {
-      "operations": [ "entityChange" ]
+      "alterationTypes": [ "entityChange" ]
     }
   }
 }'
@@ -129,22 +129,22 @@ echo
 echo
 
 
-echo "05a. Get subscription and see operations entityChange"
-echo "====================================================="
+echo "05a. Get subscription and see alterationTypes entityChange"
+echo "=========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "05b. Get subscription (as a list) and see operations entityChange"
-echo "================================================================="
+echo "05b. Get subscription (as a list) and see alterationTypes entityChange"
+echo "======================================================================"
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "06. Update subscription without operations"
-echo "=========================================="
+echo "06. Update subscription without alterationTypes"
+echo "==============================================="
 payload='{
   "subject": {
     "entities": [
@@ -160,23 +160,23 @@ echo
 echo
 
 
-echo "07a. Get subscription and not see operations"
-echo "==========================================="
+echo "07a. Get subscription and not see alterationTypes"
+echo "================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "07b. Get subscription (as a list) and not see operations"
-echo "========================================================"
+echo "07b. Get subscription (as a list) and not see alterationTypes"
+echo "============================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
 --REGEXPECT--
-01. Create subscription with invalid operations, see error
-==========================================================
+01. Create subscription with invalid alterationTypes, see error
+===============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 80
 Content-Type: application/json
@@ -189,8 +189,8 @@ Date: REGEX(.*)
 }
 
 
-02. Create subscription with operations entityDelete and entityCreate
-=====================================================================
+02. Create subscription with alterationTypes entityDelete and entityCreate
+==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -199,10 +199,10 @@ Date: REGEX(.*)
 
 
 
-03a. Get subscription and see operations entityDelete and entityCreate
-======================================================================
+03a. Get subscription and see alterationTypes entityDelete and entityCreate
+===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 307
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,11 +220,11 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": [],
-            "operations": [
+            "alterationTypes": [
                 "entityDelete",
                 "entityCreate"
-            ]
+            ],
+            "attrs": []
         },
         "entities": [
             {
@@ -236,10 +236,10 @@ Date: REGEX(.*)
 }
 
 
-03b. Get subscription (as a list) and see operations entityDelete and entityCreate
-==================================================================================
+03b. Get subscription (as a list) and see alterationTypes entityDelete and entityCreate
+=======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 304
+Content-Length: 309
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -258,11 +258,11 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": [],
-                "operations": [
+                "alterationTypes": [
                     "entityDelete",
                     "entityCreate"
-                ]
+                ],
+                "attrs": []
             },
             "entities": [
                 {
@@ -275,18 +275,18 @@ Date: REGEX(.*)
 ]
 
 
-04. Update subscription with operations entityChange
-====================================================
+04. Update subscription with alterationTypes entityChange
+=========================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05a. Get subscription and see operations entityChange
-=====================================================
+05a. Get subscription and see alterationTypes entityChange
+==========================================================
 HTTP/1.1 200 OK
-Content-Length: 287
+Content-Length: 292
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -304,10 +304,10 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": [],
-            "operations": [
+            "alterationTypes": [
                 "entityChange"
-            ]
+            ],
+            "attrs": []
         },
         "entities": [
             {
@@ -319,10 +319,10 @@ Date: REGEX(.*)
 }
 
 
-05b. Get subscription (as a list) and see operations entityChange
-=================================================================
+05b. Get subscription (as a list) and see alterationTypes entityChange
+======================================================================
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 294
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -341,10 +341,10 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": [],
-                "operations": [
+                "alterationTypes": [
                     "entityChange"
-                ]
+                ],
+                "attrs": []
             },
             "entities": [
                 {
@@ -357,16 +357,16 @@ Date: REGEX(.*)
 ]
 
 
-06. Update subscription without operations
-==========================================
+06. Update subscription without alterationTypes
+===============================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-07a. Get subscription and not see operations
-===========================================
+07a. Get subscription and not see alterationTypes
+=================================================
 HTTP/1.1 200 OK
 Content-Length: 257
 Content-Type: application/json
@@ -398,8 +398,8 @@ Date: REGEX(.*)
 }
 
 
-07b. Get subscription (as a list) and not see operations
-========================================================
+07b. Get subscription (as a list) and not see alterationTypes
+=============================================================
 HTTP/1.1 200 OK
 Content-Length: 259
 Content-Type: application/json

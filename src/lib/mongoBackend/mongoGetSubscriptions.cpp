@@ -121,21 +121,21 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
   setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
   // Operations
-  if (r.hasField(CSUB_OPERATIONS))
+  if (r.hasField(CSUB_ALTTYPES))
   {
-    std::vector<std::string> operationStrings;
-    setStringVectorF(r, CSUB_OPERATIONS, &operationStrings);
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(r, CSUB_ALTTYPES, &altTypeStrings);
 
-    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
     {
-      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
-      if (op == ngsiv2::SubOp::Unknown)
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
       {
-        LM_E(("Runtime Error (unknown subscription operation found in database)"));
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
       }
       else
       {
-        s->subject.condition.operations.push_back(op);
+        s->subject.condition.altTypes.push_back(altType);
       }
     }
   }

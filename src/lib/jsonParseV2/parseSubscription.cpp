@@ -1034,13 +1034,13 @@ static std::string parseNotifyConditionVector
   }
 
   // Operations
-  if (condition.HasMember("operations"))
+  if (condition.HasMember("alterationTypes"))
   {
     std::string errorString;
-    std::vector<std::string> operationStrings;
-    bool        b = parseStringVector(&operationStrings,
-                                      condition["operations"],
-                                      "operations",
+    std::vector<std::string> altTypeStrings;
+    bool        b = parseStringVector(&altTypeStrings,
+                                      condition["alterationTypes"],
+                                      "alterationTypes",
                                       true,
                                       true,
                                       &errorString);
@@ -1049,16 +1049,16 @@ static std::string parseNotifyConditionVector
       return badInput(ciP, errorString);
     }
 
-    for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
     {
-      ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
-      if (op == ngsiv2::SubOp::Unknown)
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
       {
-        return badInput(ciP, "unknown subscription operation: " + operationStrings[ix]);
+        return badInput(ciP, "unknown subscription operation: " + altTypeStrings[ix]);
       }
       else
       {
-        subsP->subject.condition.operations.push_back(op);
+        subsP->subject.condition.altTypes.push_back(altType);
       }
     }
   }

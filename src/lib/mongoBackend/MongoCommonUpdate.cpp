@@ -1062,14 +1062,14 @@ static bool addTriggeredSubscriptions_withCache
   std::string&                                   err,
   std::string                                    tenant,
   const std::vector<std::string>&                servicePathV,
-  ngsiv2::SubOp                                  mode
+  ngsiv2::SubAltType                             targetAltType
 )
 {
   std::string                       servicePath = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, mode, &subVec);
+  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, targetAltType, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   double now = getCurrentTime();
@@ -1399,22 +1399,22 @@ static void fill_idPtypeP
 
 /* ****************************************************************************
 *
-* matchMode
+* matchAltType
 *
 */
-static bool matchMode(orion::BSONObj sub, ngsiv2::SubOp mode)
+static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
 {
-  std::vector<std::string> operationStrings;
-  if (sub.hasField(CSUB_OPERATIONS))
+  std::vector<std::string> altTypeStrings;
+  if (sub.hasField(CSUB_ALTTYPES))
   {
-    setStringVectorF(sub, CSUB_OPERATIONS, &operationStrings);
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
   }
 
-  // Check mode. If operations field is not there or size == 0 default mode is update with change and create
-  // Maybe this could be check at MongoDB query stage, but seems be more complex
-  if (operationStrings.size() == 0)
+  // Check targetAltType. If operations field is not there or size == 0 default alterationTypes are update with
+  // change and create. Maybe this could be check at MongoDB query stage, but seems be more complex
+  if (altTypeStrings.size() == 0)
   {
-    if ((mode == ngsiv2::SubOp::EntityChange) || (mode == ngsiv2::SubOp::EntityCreate))
+    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
     {
       return true;
     }
@@ -1424,24 +1424,24 @@ static bool matchMode(orion::BSONObj sub, ngsiv2::SubOp mode)
     }
   }
 
-  for (unsigned int ix = 0; ix < operationStrings.size(); ix++)
+  for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
   {
-    ngsiv2::SubOp op = parseSubscriptionOperation(operationStrings[ix]);
-    if (op == ngsiv2::SubOp::Unknown)
+    ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+    if (altType == ngsiv2::SubAltType::Unknown)
     {
       LM_E(("Runtime Error (unknown subscription operation found in database)"));
     }
     else
     {
-      // EntityUpdate is special, it is a "sub-mode" of EntityChange
-      if (mode == ngsiv2::SubOp::EntityChange)
+      // EntityUpdate is special, it is a "sub-type" of EntityChange
+      if (targetAltType == ngsiv2::SubAltType::EntityChange)
       {
-        if ((op == ngsiv2::SubOp::EntityUpdate) || (op == ngsiv2::SubOp::EntityChange))
+        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
         {
           return true;
         }
       }
-      else if (op == mode)
+      else if (altType == targetAltType)
       {
         return true;
       }
@@ -1467,7 +1467,7 @@ static bool addTriggeredSubscriptions_noCache
   std::string&                                   err,
   const std::string&                             tenant,
   const std::vector<std::string>&                servicePathV,
-  ngsiv2::SubOp                                  mode
+  ngsiv2::SubAltType                             targetAltType
 )
 {
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
@@ -1583,8 +1583,8 @@ static bool addTriggeredSubscriptions_noCache
 
     if (subs.count(subIdStr) == 0)
     {
-      // Check mode
-      if (!matchMode(sub, mode))
+      // Check alteration type
+      if (!matchAltType(sub, targetAltType))
       {
         continue;
       }
@@ -1758,18 +1758,18 @@ static bool addTriggeredSubscriptions
   std::string&                                   err,
   std::string                                    tenant,
   const std::vector<std::string>&                servicePathV,
-  ngsiv2::SubOp                                  mode
+  ngsiv2::SubAltType                             targetAltType
 )
 {
   extern bool noCache;
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, mode);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, targetAltType);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, mode);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, targetAltType);
   }
 }
 
@@ -2622,7 +2622,7 @@ static bool processContextAttributeVector
   bool                      entityModified  = false;
   std::vector<std::string>  modifiedAttrs;
   std::vector<std::string>  attributes;
-  ngsiv2::SubOp             mode = ngsiv2::SubOp::EntityUpdate;
+  ngsiv2::SubAltType        targetAltType = ngsiv2::SubAltType::EntityUpdate;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2731,11 +2731,11 @@ static bool processContextAttributeVector
     }
     attributes.push_back(ca->name);
 
-    /* If actual update then mode changes from EntityUpdate (the value used to initialize the variable)
-     * to EntityChange */
+    /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
+     * the variable) to EntityChange */
     if (actualUpdate)
     {
-      mode = ngsiv2::SubOp::EntityChange;
+      targetAltType = ngsiv2::SubAltType::EntityChange;
     }
   }
 
@@ -2746,7 +2746,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV, mode))
+  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV, targetAltType))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3482,7 +3482,7 @@ static unsigned int updateEntity
                                    err,
                                    tenant,
                                    servicePathV,
-                                   ngsiv2::SubOp::EntityDelete))
+                                   ngsiv2::SubAltType::EntityDelete))
     {
       releaseTriggeredSubscriptions(&subsToNotify);
       cerP->statusCode.fill(SccReceiverInternalError, err);
@@ -4334,7 +4334,7 @@ unsigned int processContextElement
                                        err,
                                        tenant,
                                        servicePathV,
-                                       ngsiv2::SubOp::EntityCreate))
+                                       ngsiv2::SubAltType::EntityCreate))
         {
           releaseTriggeredSubscriptions(&subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);

@@ -96,7 +96,7 @@ struct CachedSubscription
   std::vector<std::string>    attributes;
   std::vector<std::string>    metadata;
   std::vector<std::string>    notifyConditionV;
-  std::vector<ngsiv2::SubOp>  subOpV;
+  std::vector<ngsiv2::SubAltType> subAltTypeV;
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
@@ -197,7 +197,7 @@ extern void subCacheItemInsert
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
-  const std::vector<ngsiv2::SubOp>&  subOp,
+  const std::vector<ngsiv2::SubAltType>&  altType,
   const char*                        subscriptionId,
   int64_t                            expiration,
   int64_t                            maxFailsLimit,
@@ -273,7 +273,7 @@ extern void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
-  ngsiv2::SubOp                      mode,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );
 
@@ -290,7 +290,7 @@ extern void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attrV,
-  ngsiv2::SubOp                      mode,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );
 

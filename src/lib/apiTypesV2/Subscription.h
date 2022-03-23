@@ -53,16 +53,16 @@ typedef enum NotificationType
 
 /* ****************************************************************************
 *
-* SubOp -
+* SubAltType -
 */
-typedef enum SubOp
+typedef enum SubAltType
 {
   EntityChange,
   EntityUpdate,
   EntityCreate,
   EntityDelete,
   Unknown
-} SubOp;
+} SubAltType;
 
 
 
@@ -118,7 +118,7 @@ struct Condition
 {
   std::vector<std::string>  attributes;
   SubscriptionExpression    expression;
-  std::vector<SubOp>        operations;
+  std::vector<SubAltType>   altTypes;
   std::string               toJson();
 };
 
@@ -164,17 +164,17 @@ struct Subscription
 
 /* ****************************************************************************
 *
-* parseSubscriptionOperation -
+* parseAlterationType -
 */
-extern ngsiv2::SubOp parseSubscriptionOperation(const std::string& op);
+extern ngsiv2::SubAltType parseAlterationType(const std::string& altType);
 
 
 
 /* ****************************************************************************
 *
-* operation2string -
+* subAltType2string -
 */
-extern std::string subOperation2string(ngsiv2::SubOp op);
+extern std::string subAltType2string(ngsiv2::SubAltType altType);
 
 
 
