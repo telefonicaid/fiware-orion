@@ -385,33 +385,30 @@ def record_2871():
     else:
         # Ad hoc response related with issue #2871, see https://github.com/telefonicaid/fiware-orion/issues/2871
         r = Response(status=200)
-
-        # r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],
-        #            "id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
-
-        r.data = {
-                    "contextResponses": [
-                        {
-                            "contextElement": {
-                                "attributes": [
-                                    {
-                                        "name": "turn",
-                                        "type": "string",
-                                        "value": ""
-                                    }
-                                ],
-                                "id": "entity1",
-                                "isPattern": False,
-                                "type": "device"
-                            },
-                            "statusCode": {
-                                "code": 200,
-                                "reasonPhrase": "OK"
-                            }
-                        }
-                    ]
-        }
-
+        r.data = '''
+            {
+              "contextResponses": [
+                {
+                  "contextElement": {
+                    "attributes": [
+                      {
+                        "name": "turn",
+                        "type": "string",
+                        "value": ""
+                      }
+                    ],
+                    "id": "entity1",
+                    "isPattern": false,
+                    "type": "device"
+                  },
+                  "statusCode": {
+                    "code": 200,
+                    "reasonPhrase": "OK"
+                  }
+                }
+              ]
+            }
+        '''
         return r
 
 
