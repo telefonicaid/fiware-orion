@@ -122,7 +122,6 @@ static void getAttributeTypes
     }
 
     docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     BSONObj                attrs;
     std::set<std::string>  attrsSet;
@@ -500,8 +499,6 @@ HttpStatusCode mongoEntityTypes
   }
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
 
   if (result.hasField("cursor"))
@@ -540,46 +537,39 @@ HttpStatusCode mongoEntityTypes
 
     entityType->count = countEntities(servicePathV, entityType->type);
 
-    if (!attrsArray[0].isNull())
+    for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
     {
-      for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
+      /* This is where NULL-elements in the resulting attrs vector are pruned */
+      if (attrsArray[jx].isNull())
+        continue;
+
+      /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
+       * This could be inefficient, especially if the number of attributes is large */
+      if (!noAttrDetail)
       {
-        /* This is where NULL-elements in the resulting attrs vector are pruned */
-        if (attrsArray[jx].isNull())
+        std::vector<std::string> attrTypes;
+
+        getAttributeTypes(orionldState.tenantP, servicePathV, entityType->type, attrsArray[jx].str(), &attrTypes);
+
+        for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
         {
-          continue;
+          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
+
+          entityType->contextAttributeVector.push_back(ca);
+
+          // For backward compability, NGSIv1 only accepts one element
+          if (apiVersion == V1)
+            break;
         }
-
-        /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
-         * This could be inefficient, especially if the number of attributes is large */
-        if (!noAttrDetail)
-        {
-          std::vector<std::string> attrTypes;
-
-          getAttributeTypes(orionldState.tenantP, servicePathV, entityType->type, attrsArray[jx].str(), &attrTypes);
-
-          for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
-          {
-            ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
-
-            entityType->contextAttributeVector.push_back(ca);
-
-            // For backward compability, NGSIv1 only accepts one element
-            if (apiVersion == V1)
-            {
-              break;
-            }
-          }
-        }
-        else
-        {
-          //
-          // NOTE: here we add a ContextAttribute with empty type, as a marker for
-          //       this special condition of 'No Attribute Detail'
-          //
-          ContextAttribute* caP = new ContextAttribute(attrsArray[jx].str(), "", "");
-          entityType->contextAttributeVector.push_back(caP);
-        }
+      }
+      else
+      {
+        //
+        // NOTE: here we add a ContextAttribute with empty type, as a marker for
+        //       this special condition of 'No Attribute Detail'
+        //
+        ContextAttribute* caP = new ContextAttribute(attrsArray[jx].str(), "", "");
+        entityType->contextAttributeVector.push_back(caP);
       }
     }
 
