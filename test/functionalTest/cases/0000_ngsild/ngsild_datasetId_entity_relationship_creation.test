@@ -172,7 +172,7 @@ Date: REGEX(.*)
             "addressLocality": "Prenzlauer Berg",
             "addressRegion": "Berlin",
             "postalCode": "10439",
-            "streetAddress": "Bornholmer Stra\u00dfe 65"
+            "streetAddress": "Bornholmer StraREGEX(.*)e 65"
         },
         "verified": {
             "type": "Property",
@@ -247,7 +247,7 @@ Date: REGEX(.*)
         "addressLocality": "Prenzlauer Berg",
         "addressRegion": "Berlin",
         "postalCode": "10439",
-        "streetAddress": "Bornholmer Stra\u00dfe 65"
+        "streetAddress": "Bornholmer StraREGEX(.*)e 65"
     },
     "category": "commercial",
     "furniture": [
@@ -289,7 +289,7 @@ Date: REGEX(.*)
                 "addressLocality": "Prenzlauer Berg",
                 "addressRegion": "Berlin",
                 "postalCode": "10439",
-                "streetAddress": "Bornholmer Stra\u00dfe 65"
+                "streetAddress": "Bornholmer StraREGEX(.*)e 65"
             },
             "verified": {
                 "type": "Property",
@@ -342,7 +342,7 @@ Date: REGEX(.*)
             "addressLocality": "Prenzlauer Berg",
             "addressRegion": "Berlin",
             "postalCode": "10439",
-            "streetAddress": "Bornholmer Stra\u00dfe 65"
+            "streetAddress": "Bornholmer StraREGEX(.*)e 65"
         },
         "category": "commercial",
         "furniture": "urn:ngsi-ld:Shelf:001",

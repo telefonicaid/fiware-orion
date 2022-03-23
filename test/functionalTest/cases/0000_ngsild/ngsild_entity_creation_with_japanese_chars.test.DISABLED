@@ -47,7 +47,7 @@ payload='{
     "住所": {
         "type": "Property",
         "value": {
-            "streetAddress": "Eisenacher Straße 98",
+            "streetAddress": "Eisenacher Strasse 98",
             "addressRegion": "Berlin",
             "addressLocality": "Marzahn",
             "postalCode": "12685"
@@ -105,7 +105,7 @@ Date: REGEX(.*)
             "addressLocality": "Marzahn",
             "addressRegion": "Berlin",
             "postalCode": "12685",
-            "streetAddress": "Eisenacher Stra\u00dfe 98"
+            "streetAddress": "Eisenacher Strasse 98"
         }
     },
     "\u540d\u524d": {
