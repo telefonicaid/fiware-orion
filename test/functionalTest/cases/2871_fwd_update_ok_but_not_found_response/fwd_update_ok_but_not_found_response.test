@@ -63,7 +63,8 @@ doc='{
          "attrs":[
             {
                "name":"turn",
-               "type":"string"
+               "type":"string",
+               "isDomain":"false"
             }
          ],
          "providingApplication":"http://localhost:9997/bug2871"
@@ -132,13 +133,6 @@ doc='{
         "lastCorrelator": "c8bcef8a-6e5c-11e8-a06c-0242ac11000b"
 }'
 mongoCmd ${CB_DB_NAME} "db.entities.insert($doc)"
-echo
-echo
-
-
-echo "00. See entity in DB"
-echo "===================="
-mongoCmd2 ${CB_DB_NAME} "db.entities.findOne()"
 echo
 echo
 

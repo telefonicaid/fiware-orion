@@ -65,8 +65,8 @@ echo
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
-CRE_DATE=$(echo "$_response" | python -m json.tool --sort-keys | grep dateCreated  | awk -F '"' '{print $4}')
-MOD_DATE=$(echo "$_response" | python -m json.tool --sort-keys | grep dateModified | awk -F '"' '{print $4}')
+CRE_DATE=$(echo "$_response" | python3 -m json.tool --sort-keys | grep dateCreated  | awk -F '"' '{print $4}')
+MOD_DATE=$(echo "$_response" | python3 -m json.tool --sort-keys | grep dateModified | awk -F '"' '{print $4}')
 echo
 echo
 
@@ -124,8 +124,8 @@ echo
 echo "05b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
-CRE_DATE=$(echo "$_response" | python -m json.tool --sort-keys | grep dateCreated  | awk -F '"' '{print $4}')
-MOD_DATE=$(echo "$_response" | python -m json.tool --sort-keys | grep dateModified | awk -F '"' '{print $4}')
+CRE_DATE=$(echo "$_response" | python3 -m json.tool --sort-keys | grep dateCreated  | awk -F '"' '{print $4}')
+MOD_DATE=$(echo "$_response" | python3 -m json.tool --sort-keys | grep dateModified | awk -F '"' '{print $4}')
 echo
 echo
 

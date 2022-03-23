@@ -56,10 +56,10 @@ echo
 echo "02. GET E1/A1, see dateCreated == dateModified"
 echo "=============================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
-dateCreated=$(echo "$_response"  | python -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
+dateCreated=$(echo "$_response"  | python3 -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
 echo "=============================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
-dateModified=$(echo "$_response" | python -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
+dateModified=$(echo "$_response" | python3 -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
 
 if [ "$dateCreated" != "$dateModified" ]
 then
@@ -98,10 +98,10 @@ echo
 echo "04. GET E1/A1, check dateModified and dateCreated"
 echo "================================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
-dateCreated=$(echo "$_response"  | python -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
+dateCreated=$(echo "$_response"  | python3 -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
 echo "================================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
-dateModified=$(echo "$_response" | python -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
+dateModified=$(echo "$_response" | python3 -m json.tool --sort-keys | grep value | awk -F '"' '{print $4}')
 
 if [[ "$dateCreated" != "$T_0"* ]]
 then
