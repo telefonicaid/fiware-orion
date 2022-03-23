@@ -40,6 +40,11 @@ brokerStart CB 0-255
 # 06. Update subscription without alterationTypes
 # 07a. Get subscription and not see alterationTypes
 # 07b. Get subscription (as a list) and not see alterationTypes
+# 08. Update subscription with with entityDelete and entityUpdate
+# 09a. Get subscription and see alterationTypes entityDelete and entityUpdate
+# 09b. Get subscription (as a list) and see alterationTypes entityDelete and entityUpdate
+# 10. Update subscription without 1 invalid alterationTypes (see error)
+# 11. Update subscription with 1 valid element and 1 invalid element the alterationTypes (see error)
 #
 
 echo "01. Create subscription with invalid alterationTypes, see error"
@@ -170,6 +175,80 @@ echo
 echo "07b. Get subscription (as a list) and not see alterationTypes"
 echo "============================================================="
 orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "08. Update subscription with with entityDelete and entityUpdate"
+echo "==============================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "alterationTypes": [ "entityDelete", "entityUpdate" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09a. Get subscription and see alterationTypes entityDelete and entityUpdate"
+echo "==========================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09b. Get subscription (as a list) and see alterationTypes entityDelete and entityUpdate"
+echo "======================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "10. Update subscription without 1 invalid alterationTypes (see error)"
+echo "====================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "alterationTypes": [ "entityFoo" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "11. Update subscription with 1 valid element and 1 invalid element the alterationTypes (see error)"
+echo "=================================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "alterationTypes": [ "entityDelete", "entityFoo" ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
 echo
 echo
 
@@ -431,6 +510,118 @@ Date: REGEX(.*)
         }
     }
 ]
+
+
+08. Update subscription with with entityDelete and entityUpdate
+===============================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09a. Get subscription and see alterationTypes entityDelete and entityUpdate
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 307
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "http": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "alterationTypes": [
+                "entityDelete",
+                "entityUpdate"
+            ],
+            "attrs": []
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09b. Get subscription (as a list) and see alterationTypes entityDelete and entityUpdate
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 309
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "http": {
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "alterationTypes": [
+                    "entityDelete",
+                    "entityUpdate"
+                ],
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+10. Update subscription without 1 invalid alterationTypes (see error)
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "unknown subscription alterationType: entityFoo",
+    "error": "BadRequest"
+}
+
+
+11. Update subscription with 1 valid element and 1 invalid element the alterationTypes (see error)
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "unknown subscription alterationType: entityFoo",
+    "error": "BadRequest"
+}
 
 
 --TEARDOWN--
