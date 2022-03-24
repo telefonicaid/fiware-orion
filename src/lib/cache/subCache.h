@@ -92,33 +92,34 @@ struct EntityInfo
 */
 struct CachedSubscription
 {
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  std::vector<std::string>    metadata;
-  std::vector<std::string>    notifyConditionV;
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
-  int64_t                     failsCounter;
-  int64_t                     maxFailsLimit;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
-  std::string                 status;
-  double                      statusLastChange;
-  int64_t                     count;
-  RenderFormat                renderFormat;
-  SubscriptionExpression      expression;
-  bool                        blacklist;
-  bool                        onlyChanged;
-  bool                        covered;
-  ngsiv2::HttpInfo            httpInfo;
-  ngsiv2::MqttInfo            mqttInfo;
-  int64_t                     lastFailure;  // timestamp of last notification failure
-  int64_t                     lastSuccess;  // timestamp of last successful notification
-  std::string                 lastFailureReason;
-  int64_t                     lastSuccessCode;
-  struct CachedSubscription*  next;
+  std::vector<EntityInfo*>         entityIdInfos;
+  std::vector<std::string>         attributes;
+  std::vector<std::string>         metadata;
+  std::vector<std::string>         notifyConditionV;
+  std::vector<ngsiv2::SubAltType>  subAltTypeV;
+  char*                            tenant;
+  char*                            servicePath;
+  char*                            subscriptionId;
+  int64_t                          failsCounter;
+  int64_t                          maxFailsLimit;
+  int64_t                          throttling;
+  int64_t                          expirationTime;
+  int64_t                          lastNotificationTime;
+  std::string                      status;
+  double                           statusLastChange;
+  int64_t                          count;
+  RenderFormat                     renderFormat;
+  SubscriptionExpression           expression;
+  bool                             blacklist;
+  bool                             onlyChanged;
+  bool                             covered;
+  ngsiv2::HttpInfo                 httpInfo;
+  ngsiv2::MqttInfo                 mqttInfo;
+  int64_t                          lastFailure;  // timestamp of last notification failure
+  int64_t                          lastSuccess;  // timestamp of last successful notification
+  std::string                      lastFailureReason;
+  int64_t                          lastSuccessCode;
+  struct CachedSubscription*       next;
 };
 
 
@@ -197,6 +198,7 @@ extern void subCacheItemInsert
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
+  const std::vector<ngsiv2::SubAltType>&  altType,
   const char*                        subscriptionId,
   int64_t                            expiration,
   int64_t                            maxFailsLimit,
@@ -273,6 +275,7 @@ extern void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );
 
@@ -289,6 +292,7 @@ extern void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attrV,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );
 

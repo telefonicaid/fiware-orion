@@ -205,6 +205,14 @@ extern void setCovered(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b
 
 /* ****************************************************************************
 *
+* setOperations -
+*/
+extern void setOperations(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
 * setMetadata -
 */
 extern void setMetadata(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);

@@ -1,2 +1,3 @@
+- Add: conditions.alterationTypes subscription fuctionality (#1494)
 - Fix: covered notifications in subscriptions (#3693)
 - Reference distribution changed RHEL/CentOS 8 to Debian 11
