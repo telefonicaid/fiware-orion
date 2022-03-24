@@ -665,10 +665,7 @@ static bool mergeAttrInfo
   }
 
   /* Was it an actual update? */
-  //anjali
   bool actualUpdate;
-  //enum actualUpdate {value, onlyMetadata, None };
-  //actualUpdate ac = None; 
   if (caP->compoundValueP == NULL)
   {
     /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
@@ -679,190 +676,40 @@ static bool mergeAttrInfo
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-  //    orion::BSONObj sub;
-  //    bool notifyOnMetadataChange  = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
-//naveen code modification ends.
 
-//started new code
-//
-/*if((attrValueChanges(attr, caP, forcedUpdate, apiVersion)) && equalMetadata(md, mdNew))
-{ 
-   actualUpdate = value;            
-//   actualUpdate = true;
-}
-else
-{
-   actualUpdate = onlyMetadata;
- //  actualUpdate = true;
-}*/
+    extern bool onlyMetadata;
 
-
-/*else
-{
-  if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) 
-  actualUpdate = true;
-  else
-  {
-   if (mdNew.nFields() != mdSize)
-   {
-    actualUpdate = onlyMetadata;
-    actualUpdate = true;
-   }
-   else
-   {    
-    if((!equalMetadata(md, mdNew)))
+    if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
     {
-     actualUpdate = onlyMetadata;
-     actualUpdate = true;
+      onlyMetadata = false;                     
     }
+
     else
     {
-     actualUpdate = false;
-     actualUpdate = None;
-    }
-  }
-}*/
-/*else
-{
-  if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) 
-  {
-    actualUpdate = true;
-  }
-  else 
-  {
-    if (mdNew.nFields() != mdSize)
-    {                                       
-       actualUpdate = true;
-    }
-    else
-    {
-      if((!equalMetadata(md, mdNew)))
+      if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type))
       {
-        actualUpdate = true;
+        onlyMetadata = false;
       }
-      else 
+      else
       {
-     /   actualUpdate = true;
-     // }
-  //  }
- // }
-//actualUpdate = false;
-}*/
-
-
-//new code using switch
-
-/*enum actualUpdate {None, onlyMetadata, value};
-actualUpdate ap = None;
-
-switch (ap)
-{
-  case None : 
-  if((attrValueChanges(attr, caP, forcedUpdate, apiVersion)))
-  {
-    return true;
-  }
-  break;
-
-  case onlyMetadata :
-  if((!equalMetadata(md, mdNew)))
-  {
-    return true;
-  }
-  break;
-  
-  case value :
-  if((attrValueChanges(attr, caP, forcedUpdate, apiVersion)))
-  {
-    return true;
-  }
-  break;
-}*/
-
-// anjali new code
-/*if (ac == value)
-{
-     attrValueChanges(attr, caP, forcedUpdate, apiVersion);
-     !caP->type.empty() && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type);
-}
-else if (ac == onlyMetadata)
-{
-    //(mdNew.nFields() != mdSize)
-    //(!equalMetadata(md, mdNew))
-    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew);
-}*/
-extern bool meta;
-if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
-{              meta = false;
-                         
-}
-if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type))
-{
-   meta = false;
-
-}
-if (mdNew.nFields() != mdSize)
-{
-   meta = true;
-}
-else
-{
-   if(!equalMetadata(md, mdNew))
-   {
-      meta = true;
-   }
-}
-
-
-/*if (meta)
-{
-  actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                    ((!caP->type.empty()) &&
-                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)));
-}
-else
-{
-  actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                    ((!caP->type.empty()) &&
-                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) ||
-                    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
-}*/
-/*if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
-{
-     ac = value;
-     LM_E(("anjali 22 ac = value %d)", update));
-}
-else
-{
-if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) 
-{
-   update = value;
-   LM_E(("anjali 22 ac = valueTypeMeta %d)", update));
-}
-else 
-{
-    if (mdNew.nFields() != mdSize)
-    {
-        update = onlyMetadata;
-        LM_E(("anjali123 ac = metadata %d)", update));
-    }
-    else
-    {
-        if(!equalMetadata(md, mdNew))
+        if (mdNew.nFields() != mdSize)
         {
-            update = onlyMetadata;
-            LM_E(("anjali123 ac = metadata %d)", update));
+          onlyMetadata = true;
         }
         else
         {
-           update = None;
-           LM_E(("anjali22 ac = none %d)", update));
+          if(!equalMetadata(md, mdNew))
+          {
+            onlyMetadata = true;
+          }
+          else
+          {
+            onlyMetadata = false;
+          }
         }
+      }
     }
-}
-}
-}*/
-}
+  }
   else
   {
     // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
@@ -1724,10 +1571,10 @@ static bool addTriggeredSubscriptions_noCache
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
-      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true; 
 
       httpInfo.fill(sub);
       mqttInfo.fill(sub);
@@ -1944,13 +1791,13 @@ static bool processOnChangeConditionForUpdateContext
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
            * cer.entity destructor does release() on the attrs vector */
           cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-          //LM_T(LmtMongo, ("anjali Subscription notifyOnMetadataChange: %s", notifyOnMetadataChange ? "true" : "false"));
         }
       }
     }
   }
 
-  if (notifyOnMetadataChange == false && meta == true)
+  /* Avoid sending notification if notifyOnMetadataChange == false and metadata changes */
+  if (notifyOnMetadataChange == false && onlyMetadata == true)
   {
     ncr.contextElementResponseVector.release();
     return false;

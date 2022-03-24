@@ -800,11 +800,11 @@ void subCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
+  cSubP->notifyOnMetadataChange = notifyOnMetadataChange;
   cSubP->httpInfo              = httpInfo;
   cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;
-  cSubP->notifyOnMetadataChange = notifyOnMetadataChange;
   cSubP->metadata              = metadata;
 
 

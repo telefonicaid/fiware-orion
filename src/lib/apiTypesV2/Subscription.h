@@ -61,9 +61,9 @@ struct Notification
   std::vector<std::string> metadata;
   bool                     blacklist;
   bool                     onlyChanged;
+  bool                     notifyOnMetadataChange;
   long long                timesSent;
   long long                failsCounter;
-  bool                     notifyOnMetadataChange;
   long long                maxFailsLimit;
   long long                lastNotification;
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
@@ -80,9 +80,9 @@ struct Notification
     attributes(),
     blacklist(false),
     onlyChanged(false),
+    notifyOnMetadataChange(true),
     timesSent(0),
     failsCounter(0),
-    notifyOnMetadataChange(true),
     maxFailsLimit(-1),
     lastNotification(-1),
     httpInfo(),

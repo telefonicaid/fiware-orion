@@ -175,7 +175,7 @@ std::vector<int>          serviceQueueSizeV;
 std::vector<int>          serviceNumThreadV;
 
 bool            noCache;
-bool            meta;
+bool            onlyMetadata;
 unsigned int    connectionMemory;
 unsigned int    maxConnections;
 unsigned int    reqPoolSize;

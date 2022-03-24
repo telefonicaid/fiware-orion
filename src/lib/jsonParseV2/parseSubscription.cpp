@@ -944,7 +944,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
   }
 
-  // notifyOnMetadataChange
+  // notifyOnMetadataChange field
   if (notification.HasMember("notifyOnMetadataChange"))
   {
     Opt<bool> notifyOnMetadataChangeOpt = getBoolOpt(notification, "notifyOnMetadataChange");

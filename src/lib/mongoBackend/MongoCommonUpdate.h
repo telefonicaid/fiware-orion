@@ -58,15 +58,4 @@ extern unsigned int processContextElement
   Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
 );
 
-/* ****************************************************************************
- * *
- * * PaFrom - from where did the argument come?
- * */
-typedef enum actualUpdate
-{
- None,
- onlyMetadata, 
- value
-} actualUpdate;
-
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
