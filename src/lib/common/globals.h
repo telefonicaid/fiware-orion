@@ -225,6 +225,7 @@ extern unsigned           cprForwardLimit;
 extern char               notificationMode[];
 extern char               notifFlowControl[];
 extern bool               noCache;
+extern bool               meta;
 extern bool               simulatedNotification;
 
 extern bool               semWaitStatistics;

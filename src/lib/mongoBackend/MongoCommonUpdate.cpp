@@ -666,9 +666,9 @@ static bool mergeAttrInfo
 
   /* Was it an actual update? */
   //anjali
-  //bool actualUpdate;
-  enum actualUpdate {value, onlyMetadata, None };
-  actualUpdate ac = None; 
+  bool actualUpdate;
+  //enum actualUpdate {value, onlyMetadata, None };
+  //actualUpdate ac = None; 
   if (caP->compoundValueP == NULL)
   {
     /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
@@ -780,7 +780,7 @@ switch (ap)
 }*/
 
 // anjali new code
-if (ac == value)
+/*if (ac == value)
 {
      attrValueChanges(attr, caP, forcedUpdate, apiVersion);
      !caP->type.empty() && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type);
@@ -790,8 +790,43 @@ else if (ac == onlyMetadata)
     //(mdNew.nFields() != mdSize)
     //(!equalMetadata(md, mdNew))
     mdNew.nFields() != mdSize || !equalMetadata(md, mdNew);
+}*/
+extern bool meta;
+if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
+{              meta = false;
+                         
+}
+if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type))
+{
+   meta = false;
+
+}
+if (mdNew.nFields() != mdSize)
+{
+   meta = true;
+}
+else
+{
+   if(!equalMetadata(md, mdNew))
+   {
+      meta = true;
+   }
 }
 
+
+/*if (meta)
+{
+  actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
+                    ((!caP->type.empty()) &&
+                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)));
+}
+else
+{
+  actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
+                    ((!caP->type.empty()) &&
+                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type)) ||
+                    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+}*/
 /*if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
 {
      ac = value;
@@ -834,11 +869,11 @@ else
     // has really changed its value (many levels have to be traversed). Until we can develop the
     // matching logic, we consider actualUpdate always true.
     //
-    ac = value;
+    actualUpdate = true;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
-  if (ac != None)
+  if (actualUpdate)
   {
     toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
   }
@@ -851,7 +886,7 @@ else
       toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
-  return ac;
+  return actualUpdate;
 }
 
 
@@ -1914,22 +1949,13 @@ static bool processOnChangeConditionForUpdateContext
       }
     }
   }
-  // anjali
-  // tifyOnMetadataChange
-  //actualUpdate ac;
-  /*if (onlyMetadata && notifyOnMetadataChange == false)
+
+  if (notifyOnMetadataChange == false && meta == true)
   {
-    LM_E(("anjali22 ac = valueTypeMeta %d)", onlyMetadata));
+    ncr.contextElementResponseVector.release();
     return false;
-  }*/
-  /*else if (onlyMetadata  && notifyOnMetadataChange == true)
-  {
-    return true;
   }
-  else
-  {
-    return true;
-  }*/
+
   /* Early exit without sending notification if attribute list is empty */
   if (cer.entity.attributeVector.size() == 0)
   {
@@ -2015,14 +2041,6 @@ static unsigned int processSubscriptions
         continue;
       }
     }
-    if ((tSubP->notifyOnMetadataChange == false) && (value))
-    {
-        LM_T(LmtMongo, ("zzz blocked due , current time is: %s", value));
-        LM_T(LmtSubCache, ("zzz '%s' due to throttling, current time is: %l", tSubP->notifyOnMetadataChange, value));
-
-     //   continue;
-    }
-
 
     /* Check 2: String Filters */
     if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
