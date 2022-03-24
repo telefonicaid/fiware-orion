@@ -1,0 +1,162 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 1064 - expanded attribute names in updates
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity Entity:001 with an attribute 'boat' (expanded with smart data models context)
+# 02. Update the attribute 'boat' of Entity:001, using its expanded name
+# 03. GET the entity and see the update
+# 04. Add the attribute from the issue (#1064)
+# 05. GET the entity and see the update
+#
+
+echo "01. Create an entity Entity:001 with an attribute 'boat' (expanded with smart data models context)"
+echo "=================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Entity:001",
+  "type": "Device",
+  "boat": {
+    "type": "Property",
+    "value": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Link: <https://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "02. Update the attribute 'boat' of Entity:001, using its expanded name"
+echo "======================================================================"
+payload='{
+  "https://uri.fiware.org/ns/data-models#boat": {
+    "type": "Property",
+    "value": false
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entity:001/attrs --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity and see the update"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entity:001 -H "Link: <https://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "04. Add the attribute from the issue (#1064)"
+echo "============================================"
+payload='{
+  "https://nproject.io/day#is": {
+    "type": "Property",
+    "value": false
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entity:001/attrs --payload "$payload"
+echo
+echo
+
+
+echo "05. GET the entity and see the update"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entity:001 -H "Link: <https://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity Entity:001 with an attribute 'boat' (expanded with smart data models context)
+==================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity:001
+Date: REGEX(.*)
+
+
+
+02. Update the attribute 'boat' of Entity:001, using its expanded name
+======================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET the entity and see the update
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "boat": {
+        "type": "Property",
+        "value": false
+    },
+    "id": "urn:ngsi-ld:Entity:001",
+    "type": "Device"
+}
+
+
+04. Add the attribute from the issue (#1064)
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET the entity and see the update
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "boat": {
+        "type": "Property",
+        "value": false
+    },
+    "https://nproject.io/day#is": {
+        "type": "Property",
+        "value": false
+    },
+    "id": "urn:ngsi-ld:Entity:001",
+    "type": "Device"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

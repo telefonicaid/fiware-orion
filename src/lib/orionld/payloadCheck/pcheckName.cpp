@@ -55,13 +55,13 @@ bool pcheckName(char* name, char** detailsPP)
     //   ''',
     //   '\b',
     //   '\t',
-    //   '\n',
-    //   '#', and
+    //   '\n', and
     //   ' '
     //
     if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
-        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#') || (*name == ' '))
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == ' '))
     {
+      LM_W(("Invalid character: 0x%x", *name & 0xFF));
       *detailsPP = (char*) "invalid character in name";
       return false;
     }
@@ -97,13 +97,13 @@ bool pCheckName(char* name)
     //   ''',
     //   '\b',
     //   '\t',
-    //   '\n',
-    //   '#', and
+    //   '\n', and
     //   ' '
     //
     if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
-        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#') || (*name == ' '))
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == ' '))
     {
+      LM_W(("Invalid character: 0x%x", *name & 0xFF));
       orionldError(OrionldBadRequestData, "Invalid attribute name", "invalid character", 400);
       return false;
     }

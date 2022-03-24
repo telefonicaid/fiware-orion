@@ -16,3 +16,4 @@
 * Issue #280   Implemented support for the OPTIONS method for all NGSI-LD API endpoints
 * Issue #1045  Fixed bug related to TRoE and creation of entity without attributes
 * Issue #280   TRoE support for PATCH /entities/{entityId} - quite untested
+* Issue #1064  Can't forbid '#' in attribute names as it often expands with a hash and we support already expanded attribute names in the payload body
