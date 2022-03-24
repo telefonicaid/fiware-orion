@@ -1264,22 +1264,14 @@ static void fill_idPtypeNP
   const std::string&  typePatternQ
 )
 {
-  std::string typeCheck;
-
-  // Sometimes (for instance, when we reach this point during a entity deletion operation)
-  // we don't know the type of the entity, in which case the check for type shouldn't be included
-  if (!entityType.empty())
-  {
-    typeCheck = std::string("(this.")+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && ";
-  }
-
   bgP->functionIdPtypeNP = std::string("function()") +
          "{" +
             "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
                 "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " + typeCheck +
+                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
+                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
+                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
+                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
                     "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
                     "return true; " +
                 "}" +
@@ -3474,8 +3466,11 @@ static unsigned int updateEntity
     {
       attrNames.push_back(eP->attributeVector[ix]->name);
     }
-    if (!addTriggeredSubscriptions(eP->id,
-                                   eP->type,
+
+    // Note we cannot usse eP->type for the type, as it may be blank in the request
+    // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
+    if (!addTriggeredSubscriptions(notifyCerP->entity.id,
+                                   notifyCerP->entity.type,
                                    attrNames,
                                    attrNames,
                                    subsToNotify,
