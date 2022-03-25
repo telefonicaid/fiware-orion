@@ -256,7 +256,8 @@ time=... | lvl=SUMMARY | ... Bad input active alarms: 5, raised: (total: 12, new
 <a name="log-rotation"></a>
 ## ログ・ローテーション
 
-Logrotate は、contextBroker とともに RPM としてインストールされます。システムは、ログ・ファイルのサイズが 100MB を超える場合 (デフォルトでは30分毎にチェックされています)、1日1回以上回転するように設定されています :
+ログ・ローテーションの推奨事項は、ログ・ファイルのサイズが 100MB を超える場合に1日1回以上ローテーションすることです
+(デフォルトでは非常に30分チェックされています)。`rpm/SOURCES/` ディレクトリにいくつかのサンプルファイルがあります:
 
 -   毎日のローテーションの場合 : `/etc/logrotate.d/logrotate-contextBroker-daily` : 毎日のログローテーションを有効にする
 -   サイズベースのローテーションの場合 :

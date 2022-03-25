@@ -97,6 +97,10 @@ broker を再起動するには、*root* として実行するか、`sudo` コ�
 インストールと競合する場合は、[virtualenv](https://virtualenv.pypa.io/en/latest/) を使用することを
 お勧めします。
 
+アキュムレータ (Docker に基づく代替を含む) のインストールに関する詳細は、この
+[ドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/test/functionalTest/README.md#how-to-install-accumulator-serverpy)
+で確認できます。
+
 [トップ](#top)
 
 <a name="issuing-commands-to-the-broker"></a>

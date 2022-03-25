@@ -53,6 +53,21 @@ typedef enum NotificationType
 
 /* ****************************************************************************
 *
+* SubAltType -
+*/
+typedef enum SubAltType
+{
+  EntityChange,
+  EntityUpdate,
+  EntityCreate,
+  EntityDelete,
+  Unknown
+} SubAltType;
+
+
+
+/* ****************************************************************************
+*
 * Notification -
 */
 struct Notification
@@ -105,6 +120,7 @@ struct Condition
 {
   std::vector<std::string>  attributes;
   SubscriptionExpression    expression;
+  std::vector<SubAltType>   altTypes;
   std::string               toJson();
 };
 
@@ -146,5 +162,23 @@ struct Subscription
 };
 
 }  // end namespace
+
+
+
+/* ****************************************************************************
+*
+* parseAlterationType -
+*/
+extern ngsiv2::SubAltType parseAlterationType(const std::string& altType);
+
+
+
+/* ****************************************************************************
+*
+* subAltType2string -
+*/
+extern std::string subAltType2string(ngsiv2::SubAltType altType);
+
+
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTION_H_

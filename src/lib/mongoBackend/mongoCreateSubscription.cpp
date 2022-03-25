@@ -98,6 +98,7 @@ static void insertInCache
                      sub.notification.attributes,
                      sub.notification.metadata,
                      sub.subject.condition.attributes,
+                     sub.subject.condition.altTypes,
                      subId.c_str(),
                      sub.expires,
                      sub.notification.maxFailsLimit,
@@ -178,6 +179,7 @@ std::string mongoCreateSubscription
   setConds(sub, &b);
 
   setExpression(sub, &b);
+  setOperations(sub, &b);
   setFormat(sub, &b);
 
   orion::BSONObj doc = b.obj();

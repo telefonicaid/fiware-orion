@@ -166,7 +166,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else  // MqttNotification
     {
-      // Verb/methodd is irrelevant in this case
+      // Verb/method is irrelevant in this case
       method = verbName(NOVERB);
     }
 
@@ -278,6 +278,11 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
           // To avoid empty header name
           continue;
         }
+
+        // Decode header value
+        char* pvalue = curl_unescape(value.c_str(), value.length());
+        value        = std::string(pvalue);
+        curl_free(pvalue);
 
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         headers[key] = value;

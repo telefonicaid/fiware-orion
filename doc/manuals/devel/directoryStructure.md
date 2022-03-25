@@ -18,13 +18,12 @@ scripts used for testing and release making are found under `scripts/`.
   * **unittest**: contains unit tests
   * **functionalTest**: contains functional end-to-end tests based on the "test harness" engine
   * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python frameworks
-* **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with the Orion binary itself,
-  scripts used by the test frameworks, etc.)
+* **scripts**: contains utility scripts (e.g. scripts used by the test frameworks, etc.)
 * **doc**: contains documentation, with the following subdirectories:
   * **apiary**: for apiary-based documentation
   * **manuals**: for markdown based documentation
-* **rpm**: contains files for RPM building
-* **etc**: scripts that are installed under etc/ (typically, included in RPM package)
+* **rpm**: contains files for RPM building *(deprecated)*
+* **etc**: scripts that are installed under etc/ (typically, included in RPM package) *(deprecated)*
 * **docker**: contains the docker files
 * **ci**: contains files required by Orion's CI process
 * **archive**: contains older files that is no longer in use but that we don't feel comfortable removing just yet
