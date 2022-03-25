@@ -622,6 +622,7 @@ static bool mergeAttrInfo
     // or can be simplified
     md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     std::set<std::string>  mdsSet;
+
     md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
@@ -680,14 +681,14 @@ static bool mergeAttrInfo
 
     extern bool onlyMetadata;
 
-    if(attrValueChanges(attr, caP, forcedUpdate, apiVersion))
+    if (attrValueChanges(attr, caP, forcedUpdate, apiVersion))
     {
-      onlyMetadata = false;                     
+      onlyMetadata = false;
     }
 
     else
     {
-      if((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type))
+      if ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type))
       {
         onlyMetadata = false;
       }
@@ -699,7 +700,7 @@ static bool mergeAttrInfo
         }
         else
         {
-          if(!equalMetadata(md, mdNew))
+          if (!equalMetadata(md, mdNew))
           {
             onlyMetadata = true;
           }
@@ -2140,7 +2141,9 @@ static unsigned int processSubscriptions
       }
     }
   }
+
   releaseTriggeredSubscriptions(&subs);
+
   return notifSent;
 }
 

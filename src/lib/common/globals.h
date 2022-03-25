@@ -167,7 +167,6 @@ typedef enum ApiVersion
 
 
 
-
 /* ****************************************************************************
 *
 * PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
