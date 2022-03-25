@@ -19,6 +19,7 @@
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
@@ -420,6 +421,17 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 [トップ](#top)
 
+<a name="subscriptions-based-in-alteration-type"></a>
+## 変更タイプ (alteration type) に基づくサブスクリプション
+
+NGSIv2 の仕様に従ってサブスクリプションの `conditions` フィールドで許可されるサブフィールドとは別に、
+Orionは `alterationTypes` フィールドをサポートして、サブスクリプションがトリガーされる変更
+(エンティティの作成、エンティティの変更など) を指定します。
+
+詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
+
+[トップ](#top)
+
 <a name="custom-notifications-without-payload"></a>
 ## ペイロードなしのカスタム通知
 
@@ -577,6 +589,10 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+同じ効果については、`entityChange` [変更タイプ](subscriptions_alttype.md) (alteration type)
+も確認してください。ただし、更新リクエストに `forcedUpdate` オプションが含まれているかどうかに
+関係なく、サブスクリプションに適用されます。
 
 [Top](#top)
 

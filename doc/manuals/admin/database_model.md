@@ -333,6 +333,7 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     Not present if the subscription has never provoked a successful notification.
 -   **maxFailsLimit**: An optional field used to specify the maximum limit of connection attempts, so when that number of failing notifications is reached, then the subscription passes automatically to inactive state.
 -   **failsCounter**: the number of consecutive failing notifications associated to the subscription. This is increased by one each time a notification attempt fails. It is reset to 0 if a notification attempt successes.
+-   **altTypes**: array with a list of alteration types associated to the subscription. If the field is not included, a default is assumed (check [this document](../user/subscriptions_alttype.md)).
 
 Example document:
 

@@ -1,2 +1,3 @@
 - Fix: allow limit=0 in all paginated operations in the NGSIv2 API (entities, entity types, subscriptions and registrations) (#1492)
+- Add: conditions.alterationTypes subscription fuctionality (#1494)
 - Reference distribution changed RHEL/CentOS 8 to Debian 11
