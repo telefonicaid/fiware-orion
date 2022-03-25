@@ -18,7 +18,8 @@
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
-* [Oneshot Subscription](#oneshot-subscriptions)
+* [Oneshot subscriptions](#oneshot-subscriptions)
+* [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
@@ -80,7 +81,7 @@ context. More detail in [specific documentation](update_operators.md).
 
 The metadata update semantics used by Orion Context Broker (and the
 related `overrideMetadata` option are detailed in
-[this section of the documentation](metadata.md)[#updating-metadata].
+[this section of the documentation](metadata.md#updating-metadata).
 
 Moreover, from NGSIv2 specification section "Partial Representations":
 
@@ -449,6 +450,14 @@ Apart from the `status` values defined for subscription in the NGSIv2 specificat
 
 [Top](#top)
 
+## Subscriptions based in alteration type
+
+Apart from the sub-fields allowed in subscriptions `conditions` field according to NGSIv2 specifiction,
+Orion supports the `alterationTypes` field to specify under which alterations (entity creation, entity
+modification, etc.) the subscription is triggered.
+
+Please find details in [this specific documentation](subscriptions_alttype.md)
+
 ## Custom notifications without payload
 
 If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
@@ -597,6 +606,9 @@ The following requests can use the forcedUpdate URI param option:
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+Check also the `entityChange` [alteration type](subscriptions_alttype.md) for the same effect,
+but applyed to the subscription, not matter if the update request included the `forcedUpdate` option or not.
 
 [Top](#top)
 

@@ -2,6 +2,7 @@
 
 * [禁止されている文字](#forbidden-characters)
 * [属性値の更新演算子](#update-operators-for-attribute-values)
+* [メタデータ更新セマンティクス](#metadata-update-semantics)
 * [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
@@ -18,6 +19,7 @@
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
@@ -71,6 +73,28 @@ POST /v2/entities/E/attrs/A
 この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
 アプリケーションの競合状態を回避するために役立ちます。
 詳細は[このドキュメント](update_operators.md)を参照してください。
+
+[トップ](#top)
+
+<a name="metadata-update-semantics"></a>
+## メタデータ更新セマンティクス
+
+Orion Context Broker (および関連する `overrideMetadata` オプション)
+で使用されるメタデータ更新セマンティクスについては、
+[ドキュメントのこのセクション](metadata.md#updating-metadata)
+で詳しく説明しています。
+
+さらに、NGSIv2 仕様セクション "Partial Representations" (部分表現) から:
+
+> 属性 `metadata` はリクエストで省略できます。つまり、属性に関連付けられた
+> メタデータ要素はありません。
+`overrideMetadata` が使用されているかどうかに応じて、この文には2つの解釈があります:
+
+* `overrideMetadata` が使用されていない場合 (デフォルトの動作)、"...属性に
+  関連付けられたメタデータ要素がないことを意味します。**更新する必要があります**"
+  と解釈されます
+* `overrideMetadata` が使用されている場合、"...属性に関連付けられたメタデータ要素が
+  ないことを意味します。**属性の更新の結果として**" と解釈されます
 
 [トップ](#top)
 
@@ -397,6 +421,17 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 [トップ](#top)
 
+<a name="subscriptions-based-in-alteration-type"></a>
+## 変更タイプ (alteration type) に基づくサブスクリプション
+
+NGSIv2 の仕様に従ってサブスクリプションの `conditions` フィールドで許可されるサブフィールドとは別に、
+Orionは `alterationTypes` フィールドをサポートして、サブスクリプションがトリガーされる変更
+(エンティティの作成、エンティティの変更など) を指定します。
+
+詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
+
+[トップ](#top)
+
 <a name="custom-notifications-without-payload"></a>
 ## ペイロードなしのカスタム通知
 
@@ -554,6 +589,10 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+同じ効果については、`entityChange` [変更タイプ](subscriptions_alttype.md) (alteration type)
+も確認してください。ただし、更新リクエストに `forcedUpdate` オプションが含まれているかどうかに
+関係なく、サブスクリプションに適用されます。
 
 [Top](#top)
 

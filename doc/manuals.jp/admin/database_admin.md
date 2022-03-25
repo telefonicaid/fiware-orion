@@ -128,7 +128,7 @@ Orion Context Broker には、`/usr/share/contextBroker` ディレクトリ内�
 
 NGSI は、レジストレーションとサブスクリプション (コンテキストとコンテキスト・アベイラビリティの両方のサブスクリプション) の有効期限を指定します。期限切れのレジストレーション/サブスクリプションはサブスクリプション更新リクエストを使用して "再アクティブ化" することができて、期間を変更するため、Orion Context Broker は期限切れのドキュメントを削除しません (無視されます)。
 
-ただし、有効期限が切れたレジストレーション/サブスクリプションはデータベース内の領域を消費するため、時々 "パージ" することができます。その作業を手助けするために、garbage- collector.py スクリプトが Orion Context Broker (RPM のインストール後に /usr/share/contextBroker/garbage-collector.py にあります) と一緒に提供されています。
+ただし、有効期限が切れたレジストレーション/サブスクリプションはデータベース内の領域を消費するため、時々 "パージ" することができます。その作業を手助けするために、[garbage-collector.py script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/managedb/garbage-collector.py) が Orion Context Broker と一緒に提供されています。
 
 
 garbage-collector.py は、registrations, csubs コレクション内の期限切れのドキュメントを探し、次のフィールドでそれらを "マーク (marking)" します :

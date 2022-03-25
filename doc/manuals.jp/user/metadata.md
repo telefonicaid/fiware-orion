@@ -4,7 +4,6 @@ Orion が特別な注意を払うメタデータ要素 (たとえば、`dateCrea
 
 Orion によって解釈される特別なメタデータに使用されるいくつかの予約された名前を除いて、カスタム・メタデータに任意の名前を使用できます :
 
--   [ID](#metadata-id-for-attributes) (廃止されましたが、それでも禁止されたキーワードとして "ブロック" されています)
 -   "location" は現在 [非推奨](../deprecated.md)ですが、引き続きサポートされています
 -   NGSIv2 仕様の "組み込みメタデータ" のセクションで定義されているもの
 
@@ -63,3 +62,97 @@ curl localhost:1026/v2/entities/Room1 -s -S \
 現時点では、NGSIv2 では一度導入された個々のメタデータ要素を削除することはできません。ただし、`metadataset` を使用して属性を `{}` に更新するすべてのメタデータを削除できます。
 
 [サブスクリプション](walkthrough_apiv2.md#subscriptions)の観点から見ると、属性値自体は変更されていなくても、特定の属性のメタデータの変更は変更とみなされます。
+
+<a name="updating-metadata"></a>
+## メタデータの更新
+
+属性が更新されると、次のルールが適用されます:
+
+* *以前に存在しなかった*属性更新リクエストに含まれるメタデータが属性に追加されます
+* *既存の*属性更新リクエストに含まれるメタデータが属性で更新されます
+* リクエストに含まれていない既存のメタデータは、属性に変更されません (つまり、
+  以前の値を保持します)
+
+たとえば、メタデータ `unit` と `avg` を持つ属性 `temperature` を考えてみましょう。これらの値は、
+現時点では次のとおりです:
+
+* `unit`: `"celsius"`
+* `avg`: `25.4`
+
+Context Broker はこのようなリクエストを受け取ります:
+
+```
+PUT /v2/entities/E/attrs/temperature
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+更新を処理した後、属性 `temperature` のメタデータは次のようになります:
+
+* `unit`: `"celsius"` (既存であり、リクエストで触れていない)
+* `avg`: `25.6` (既存だが、リクエストで触れた)
+* `accuracy`: `98.7` (リクエストによって追加されたメタデータ)
+
+このデフォルトの動作におけるメタデータの "stikyness" の背後にある理論的根拠は、
+[Orion リポジトリのこの Issue](https://github.com/telefonicaid/fiware-orion/issues/4033)
+でより詳細に説明されています。
+
+### `overrideMetadata` オプション
+
+`overrideMetadata` オプションを使用して、デフォルトの動作をオーバーライドできます。
+その場合、リクエストのメタデータは、属性に存在していた以前のメタデータを置き換えます。
+たとえば、以前と同じ初期状況ですが、リクエストに `overrideMetadata` オプションを追加します:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+更新を処理した後、属性 `temperature` のメタデータは次のようになります:
+
+* `avg`: `25.6` (既存だが、リクエストで触れた)
+* `accuracy`: `98.7` (リクエストによって追加されたメタデータ)
+
+`unit` メタデータが削除されていることに注意してください。
+
+`overrideMetadata` オプションは、リクエストの `metadata` フィールドを省略して
+(同等に、`"metadata":{}` を使用して) 特定の属性のメタデータをクリーンアップ
+するためにも使用できます。例えば:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number"
+}
+```
+
+`overrideMetadata` オプションは、属性値の更新操作
+(例えば、`PUT /v2/entities/E/attrs/temperature/value`) では無視されることに
+注意してください。その場合、操作のセマンティクスは、値のみが更新されることを
+明示します (`type` および `metadata` 属性フィールドは変更されません)。

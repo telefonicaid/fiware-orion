@@ -1061,14 +1061,15 @@ static bool addTriggeredSubscriptions_withCache
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
   std::string                                    tenant,
-  const std::vector<std::string>&                servicePathV
+  const std::vector<std::string>&                servicePathV,
+  ngsiv2::SubAltType                             targetAltType
 )
 {
   std::string                       servicePath = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
+  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, targetAltType, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   double now = getCurrentTime();
@@ -1390,6 +1391,61 @@ static void fill_idPtypeP
 
 /* ****************************************************************************
 *
+* matchAltType
+*
+*/
+static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
+{
+  std::vector<std::string> altTypeStrings;
+  if (sub.hasField(CSUB_ALTTYPES))
+  {
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
+  }
+
+  // Check targetAltType. If operations field is not there or size == 0 default alterationTypes are update with
+  // change and create. Maybe this could be check at MongoDB query stage, but seems be more complex
+  if (altTypeStrings.size() == 0)
+  {
+    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+  {
+    ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+    if (altType == ngsiv2::SubAltType::Unknown)
+    {
+      LM_E(("Runtime Error (unknown alterationType found in database)"));
+    }
+    else
+    {
+      // EntityUpdate is special, it is a "sub-type" of EntityChange
+      if (targetAltType == ngsiv2::SubAltType::EntityChange)
+      {
+        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+        {
+          return true;
+        }
+      }
+      else if (altType == targetAltType)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * addTriggeredSubscriptions_noCache
 *
 */
@@ -1402,7 +1458,8 @@ static bool addTriggeredSubscriptions_noCache
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
   const std::string&                             tenant,
-  const std::vector<std::string>&                servicePathV
+  const std::vector<std::string>&                servicePathV,
+  ngsiv2::SubAltType                             targetAltType
 )
 {
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
@@ -1518,6 +1575,12 @@ static bool addTriggeredSubscriptions_noCache
 
     if (subs.count(subIdStr) == 0)
     {
+      // Check alteration type
+      if (!matchAltType(sub, targetAltType))
+      {
+        continue;
+      }
+
       /* Except in the case of ONANYCHANGE subscriptions (the ones with empty condValues), we check if
        * condValues include some of the modifiedAttributes. In previous versions we defered this to DB
        * as an additional element in the csubs query (in both pattern and no-pattern "$or branches"), eg:
@@ -1686,18 +1749,19 @@ static bool addTriggeredSubscriptions
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
   std::string                                    tenant,
-  const std::vector<std::string>&                servicePathV
+  const std::vector<std::string>&                servicePathV,
+  ngsiv2::SubAltType                             targetAltType
 )
 {
   extern bool noCache;
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, targetAltType);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, targetAltType);
   }
 }
 
@@ -1812,14 +1876,14 @@ static unsigned int processSubscriptions
 (
   std::map<std::string, TriggeredSubscription*>& subs,
   ContextElementResponse*                        notifyCerP,
-  std::string*                                   err,
   const std::string&                             tenant,
   const std::string&                             xauthToken,
   const std::string&                             fiwareCorrelator,
   unsigned int                                   notifStartCounter
 )
 {
-  *err = "";
+  // Needed in some calls to underlying logic, although not currently used
+  std::string err;
 
   unsigned int notifSent = 0;
 
@@ -1989,7 +2053,7 @@ static unsigned int processSubscriptions
         bobUpdate.append("$set", bobSet.obj());
         bobUpdate.append("$inc", bobInc.obj());
 
-        orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
+        orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);
       }
 
 
@@ -2013,7 +2077,7 @@ static unsigned int processSubscriptions
             bobUpdate.append("$set", bobSet.obj());
 
             // update the status to inactive as status is oneshot (in both DB and csubs cache)
-            orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
+            orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, &err);
             cSubP->status = STATUS_INACTIVE;
             cSubP->statusLastChange = getCurrentTime();
 
@@ -2549,6 +2613,7 @@ static bool processContextAttributeVector
   bool                      entityModified  = false;
   std::vector<std::string>  modifiedAttrs;
   std::vector<std::string>  attributes;
+  ngsiv2::SubAltType        targetAltType = ngsiv2::SubAltType::EntityUpdate;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2655,6 +2720,13 @@ static bool processContextAttributeVector
       modifiedAttrs.push_back(ca->name);
     }
     attributes.push_back(ca->name);
+
+    /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
+     * the variable) to EntityChange */
+    if (actualUpdate)
+    {
+      targetAltType = ngsiv2::SubAltType::EntityChange;
+    }
   }
 
   /* Add triggered subscriptions */
@@ -2664,7 +2736,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV, targetAltType))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3364,13 +3436,70 @@ static unsigned int updateEntity
   ContextElementResponse* cerP = new ContextElementResponse();
   cerP->entity.fill(entityId, entityType, "false");
 
+  /* Build CER used for notifying (if needed) */
+  StringList               emptyAttrL;
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
+
+  // The hasField() check is needed as the entity could have been created with very old Orion version not
+  // supporting modification/creation dates
+  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
+
+  /* We accumulate the subscriptions in a map. The key of the map is the string representing
+   * subscription id */
+  std::map<std::string, TriggeredSubscription*> subsToNotify;
+
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
   if ((action == ActionTypeDelete) && (eP->attributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
     responseP->contextElementResponseVector.push_back(cerP);
-    return 0;
+
+    /* EntityDelete subscriptions may be triggered */
+    // attrNames is initialized as in addTriggeredSubscriptions() in the create entity logic
+    std::string               err;
+    std::vector<std::string>  attrNames;
+    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
+    {
+      attrNames.push_back(eP->attributeVector[ix]->name);
+    }
+
+    // Note we cannot usse eP->type for the type, as it may be blank in the request
+    // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
+    if (!addTriggeredSubscriptions(notifyCerP->entity.id,
+                                   notifyCerP->entity.type,
+                                   attrNames,
+                                   attrNames,
+                                   subsToNotify,
+                                   err,
+                                   tenant,
+                                   servicePathV,
+                                   ngsiv2::SubAltType::EntityDelete))
+    {
+      releaseTriggeredSubscriptions(&subsToNotify);
+      cerP->statusCode.fill(SccReceiverInternalError, err);
+      responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
+
+      responseP->contextElementResponseVector.push_back(cerP);
+      return 0;  // Error already in responseP
+    }
+
+    addBuiltins(notifyCerP);
+    unsigned int notifSent = processSubscriptions(subsToNotify,
+                                                  notifyCerP,
+                                                  tenant,
+                                                  xauthToken,
+                                                  fiwareCorrelator,
+                                                  notifStartCounter);
+    releaseTriggeredSubscriptions(&subsToNotify);
+
+    LM_W(("FGM: notifSent: %d", notifSent));
+
+    notifyCerP->release();
+    delete notifyCerP;
+
+    return notifSent;
   }
 
   LM_T(LmtServicePath, ("eP->attributeVector.size: %d", eP->attributeVector.size()));
@@ -3384,10 +3513,6 @@ static unsigned int updateEntity
   orion::BSONObjBuilder    toUnset;
   orion::BSONArrayBuilder  attrNamesAdd;
   orion::BSONArrayBuilder  attrNamesRemove;
-
-  /* We accumulate the subscriptions in a map. The key of the map is the string representing
-   * subscription id */
-  std::map<std::string, TriggeredSubscription*> subsToNotify;
 
   /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
    * we fill an empty locAttr. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
@@ -3469,15 +3594,6 @@ static unsigned int updateEntity
     *attributeNotExistingList += " ]";
   }
 
-  /* Build CER used for notifying (if needed) */
-  StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
-
-  // The hasField() check is needed as the entity could have been created with very old Orion version not
-  // supporting modification/creation dates
-  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
-
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
@@ -3528,12 +3644,20 @@ static unsigned int updateEntity
       delete cerP;
     }
 
+    /* EntityUpdate subscriptions may be triggered, even in the case of no actual modification */
+    addBuiltins(notifyCerP);
+    unsigned int notifSent = processSubscriptions(subsToNotify,
+                                                  notifyCerP,
+                                                  tenant,
+                                                  xauthToken,
+                                                  fiwareCorrelator,
+                                                  notifStartCounter);
     releaseTriggeredSubscriptions(&subsToNotify);
 
     notifyCerP->release();
     delete notifyCerP;
 
-    return 0;
+    return notifSent;
   }
 
   /* Compose the final update on database */
@@ -3770,7 +3894,6 @@ static unsigned int updateEntity
   addBuiltins(notifyCerP);
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
-                                                &err,
                                                 tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
@@ -4163,7 +4286,6 @@ unsigned int processContextElement
     }
     else   /* APPEND or APPEND_STRICT */
     {
-      std::string  errReason;
       std::string  errDetail;
       double       now = getCurrentTime();
 
@@ -4204,7 +4326,8 @@ unsigned int processContextElement
                                        subsToNotify,
                                        err,
                                        tenant,
-                                       servicePathV))
+                                       servicePathV,
+                                       ngsiv2::SubAltType::EntityCreate))
         {
           releaseTriggeredSubscriptions(&subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
@@ -4242,7 +4365,6 @@ unsigned int processContextElement
         addBuiltins(notifyCerP);
         notifSent = processSubscriptions(subsToNotify,
                                          notifyCerP,
-                                         &errReason,
                                          tenant,
                                          xauthToken,
                                          fiwareCorrelator,

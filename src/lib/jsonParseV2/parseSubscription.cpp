@@ -1022,6 +1022,7 @@ static std::string parseNotifyConditionVector
     }
   }
 
+  // Expression
   if (condition.HasMember("expression"))
   {
     std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
@@ -1029,6 +1030,36 @@ static std::string parseNotifyConditionVector
     if (r != "OK")
     {
       return badInput(ciP, r);
+    }
+  }
+
+  // Operations
+  if (condition.HasMember("alterationTypes"))
+  {
+    std::string errorString;
+    std::vector<std::string> altTypeStrings;
+    bool        b = parseStringVector(&altTypeStrings,
+                                      condition["alterationTypes"],
+                                      "alterationTypes",
+                                      true,
+                                      true,
+                                      &errorString);
+    if (b == false)
+    {
+      return badInput(ciP, errorString);
+    }
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        return badInput(ciP, "unknown subscription alterationType: " + altTypeStrings[ix]);
+      }
+      else
+      {
+        subsP->subject.condition.altTypes.push_back(altType);
+      }
     }
   }
 

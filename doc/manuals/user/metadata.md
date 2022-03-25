@@ -112,7 +112,7 @@ PUT /v2/entities/E/attrs/temperature
 
 After processing the update, the metadata at the attribute `temperature` would be:
 
-* `unit`: `"celsius"` (exixting and not touched by the request)
+* `unit`: `"celsius"` (existing and not touched by the request)
 * `avg`: `25.6` (existing but touched by the request)
 * `accuracy`: `98.7` (metadata added by the request)
 
@@ -164,6 +164,6 @@ PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
 ```
 
 Note `overrideMetadata` option is ignored in the update attribute value operation
-(e.b. `PUT /v2/entities/E/attrs/temperature/value`) as in that case the operation
+(e.g. `PUT /v2/entities/E/attrs/temperature/value`) as in that case the operation
 semantics makes explicit that only the value is going to be updated
 (leaving `type` and `metadata` attribute fields untouched).

@@ -42,7 +42,7 @@ accumulatorStart --pretty-print
 # 09. With subscription in place, create entity E3 inside area A (notif)
 # 10. Update subscription using a micro-area centered at E4
 # 11. With subscription in place, create entity E4 outside area A (notif)
-# 12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)
+# 12. Dump acumulator (6 notifs: E1, E2, E1, E1, E3, E4)
 #
 # Area (100 km max distance to Madrid):
 #
@@ -290,7 +290,7 @@ echo
 echo
 
 
-echo "12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)"
+echo "12. Dump acumulator (6 notifs: E1, E2, E1, E1, E3, E4)"
 echo "======================================================"
 accumulatorDump
 echo
@@ -396,7 +396,7 @@ Date: REGEX(.*)
 
 
 
-12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)
+12. Dump acumulator (6 notifs: E1, E2, E1, E1, E3, E4)
 ======================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
