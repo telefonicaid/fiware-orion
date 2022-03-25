@@ -44,7 +44,7 @@
 
 /* ****************************************************************************
 *
-* SubCacheState - 
+* SubCacheState -
 */
 typedef enum SubCacheState
 {
@@ -56,7 +56,7 @@ typedef enum SubCacheState
 
 /* ****************************************************************************
 *
-* EntityInfo - 
+* EntityInfo -
 *
 * The struct fields:
 * -------------------------------------------------------------------------------
@@ -90,10 +90,18 @@ struct EntityInfo
 
 /* ****************************************************************************
 *
-* CachedSubscription - 
+* CachedSubscription -
 */
 struct CachedSubscription
 {
+  char*                       subscriptionId;
+
+  char*                       url;       // Copy of httpInfo.url (parsed and destroyed) - allocated and must be freed
+  char*                       protocol;  // pointing to 'protocol' part of 'url'
+  char*                       ip;        // pointing to 'ip' part of 'url'
+  unsigned short              port;      // port, as parsed from 'url'
+  char*                       rest;      // pointing to 'rest' part of 'url'
+
   std::vector<EntityInfo*>    entityIdInfos;
   std::vector<std::string>    attributes;
   std::vector<std::string>    metadata;
@@ -101,7 +109,6 @@ struct CachedSubscription
   char*                       tenant;
   char*                       servicePath;
   bool                        triggers[OrionldAlterationTypes];
-  char*                       subscriptionId;
   double                      throttling;
   double                      expirationTime;
   double                      lastNotificationTime;
@@ -122,7 +129,7 @@ struct CachedSubscription
 
 /* ****************************************************************************
 *
-* subCacheActive - 
+* subCacheActive -
 */
 extern bool                    subCacheActive;
 extern volatile SubCacheState  subCacheState;
@@ -131,7 +138,7 @@ extern volatile SubCacheState  subCacheState;
 
 /* ****************************************************************************
 *
-* subCacheHeadGet - 
+* subCacheHeadGet -
 */
 extern CachedSubscription* subCacheHeadGet(void);
 
@@ -139,7 +146,7 @@ extern CachedSubscription* subCacheHeadGet(void);
 
 /* ****************************************************************************
 *
-* subCacheInit - 
+* subCacheInit -
 */
 extern void subCacheInit(bool multitenant = false);
 
@@ -147,7 +154,7 @@ extern void subCacheInit(bool multitenant = false);
 
 /* ****************************************************************************
 *
-* subCacheStart - 
+* subCacheStart -
 */
 extern void subCacheStart(void);
 
@@ -155,7 +162,7 @@ extern void subCacheStart(void);
 
 /* ****************************************************************************
 *
-* subCacheDestroy - 
+* subCacheDestroy -
 */
 extern void subCacheDestroy(void);
 
@@ -174,7 +181,7 @@ void subCacheDisable(void);
 
 /* ****************************************************************************
 *
-* subCacheItemDestroy - 
+* subCacheItemDestroy -
 */
 extern void subCacheItemDestroy(CachedSubscription* cSubP);
 
@@ -182,7 +189,7 @@ extern void subCacheItemDestroy(CachedSubscription* cSubP);
 
 /* ****************************************************************************
 *
-* subCacheItems - 
+* subCacheItems -
 */
 extern int subCacheItems(void);
 
@@ -234,7 +241,7 @@ extern void subCacheItemInsert
 
 /* ****************************************************************************
 *
-* subCacheItemInsert - 
+* subCacheItemInsert -
 */
 extern void subCacheItemInsert(CachedSubscription* cSubP);
 
@@ -242,7 +249,7 @@ extern void subCacheItemInsert(CachedSubscription* cSubP);
 
 /* ****************************************************************************
 *
-* subCacheItemLookup - 
+* subCacheItemLookup -
 */
 extern CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscriptionId);
 
@@ -250,7 +257,7 @@ extern CachedSubscription* subCacheItemLookup(const char* tenant, const char* su
 
 /* ****************************************************************************
 *
-* subCacheItemRemove - 
+* subCacheItemRemove -
 */
 extern int subCacheItemRemove(CachedSubscription* cSubP);
 
@@ -258,7 +265,7 @@ extern int subCacheItemRemove(CachedSubscription* cSubP);
 
 /* ****************************************************************************
 *
-* subCacheRefresh - 
+* subCacheRefresh -
 */
 extern void subCacheRefresh(void);
 
@@ -266,7 +273,7 @@ extern void subCacheRefresh(void);
 
 /* ****************************************************************************
 *
-* subCacheSync - 
+* subCacheSync -
 */
 extern void subCacheSync(void);
 
@@ -274,7 +281,7 @@ extern void subCacheSync(void);
 
 /* ****************************************************************************
 *
-* subCacheMatch - 
+* subCacheMatch -
 */
 extern int subCacheMatch
 (
@@ -290,7 +297,7 @@ extern int subCacheMatch
 
 /* ****************************************************************************
 *
-* subCacheMatch - 
+* subCacheMatch -
 */
 extern int subCacheMatch
 (
@@ -306,7 +313,7 @@ extern int subCacheMatch
 
 /* ****************************************************************************
 *
-* subCacheStatisticsGet - 
+* subCacheStatisticsGet -
 */
 extern void subCacheStatisticsGet
 (
@@ -323,7 +330,7 @@ extern void subCacheStatisticsGet
 
 /* ****************************************************************************
 *
-* subCacheUpdateStatisticsIncrement - 
+* subCacheUpdateStatisticsIncrement -
 */
 extern void subCacheUpdateStatisticsIncrement(void);
 
@@ -331,7 +338,7 @@ extern void subCacheUpdateStatisticsIncrement(void);
 
 /* ****************************************************************************
 *
-* subCacheStatisticsReset - 
+* subCacheStatisticsReset -
 */
 extern void subCacheStatisticsReset(const char* by);
 
@@ -339,7 +346,7 @@ extern void subCacheStatisticsReset(const char* by);
 
 /* ****************************************************************************
 *
-* subCacheItemNotificationErrorStatus - 
+* subCacheItemNotificationErrorStatus -
 */
 extern void subCacheItemNotificationErrorStatus
 (

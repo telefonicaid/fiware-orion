@@ -23,6 +23,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     orionldAlterationsTreat.cpp
     subCacheAlterationMatch.cpp
+    notificationSend.cpp
 )
 
 # Include directories

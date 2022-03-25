@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                     // orionldState
 #include "orionld/types/OrionldAlteration.h"                 // OrionldAlteration, orionldAlterationType
 #include "orionld/notifications/subCacheAlterationMatch.h"   // subCacheAlterationMatch
+#include "orionld/notifications/notificationSend.h"          // notificationSend
 #include "orionld/notifications/orionldAlterationsTreat.h"   // Own interface
 
 
@@ -77,8 +78,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    ngsiv2::HttpInfo* hiP = &matchP->subP->httpInfo;
-
-    LM_TMP(("KZ: Got a %s Notification for sub %s: %s %s", orionldAlterationType(matchP->altAttrP->alterationType), matchP->subP->subscriptionId, verbName(hiP->verb), hiP->url.c_str()));
+    // FIXME: Need to lookup all matches for one and the same subscription
+    notificationSend(matchP);
   }
 }

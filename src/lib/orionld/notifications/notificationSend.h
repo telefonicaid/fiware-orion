@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
+#define SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
 
 /*
 *
@@ -25,17 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "orionld/types/OrionldAlteration.h"                      // OrionldAlterationMatch, OrionldAlteration
 
 
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
+// notificationSend -
 //
-extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
+extern void notificationSend(OrionldAlterationMatch* altP);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_

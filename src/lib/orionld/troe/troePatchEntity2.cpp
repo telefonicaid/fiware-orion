@@ -44,7 +44,7 @@ extern "C"
 //
 // pathComponentsSplit -
 //
-static int pathComponentsSplit(char* path, char** compV)
+int pathComponentsSplit(char* path, char** compV)
 {
   int compIx = 1;
 
@@ -173,6 +173,7 @@ int pathComponentsFix(char** compV, int components, bool* skipP)
 
   return newIx;
 }
+
 
 
 char* pathArrayJoin(char* out, char** compV, int components)

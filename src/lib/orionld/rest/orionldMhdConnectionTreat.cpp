@@ -1250,9 +1250,6 @@ MHD_Result orionldMhdConnectionTreat(void)
         LM_E(("Internal Error (something went wrong during TRoE processing)"));
       else
       {
-        numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
-
-
         //
         // Special case - Entity creation with no attribute
         // As both the entity id and the entity type have been removed from the payload body, the payload body is now empty.

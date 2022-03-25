@@ -80,7 +80,9 @@ typedef struct OrionldAlteration
 {
   char*                        entityId;
   char*                        entityType;
-  KjNode*                      entityP;
+  KjNode*                      entityP;              // New entity, after the update
+  KjNode*                      patchTree;            // Patch Info, to merge with 'dbEntityP' to create 'entityP'
+  KjNode*                      dbEntityP;            // Entity in DB before the modification
   int                          alteredAttributes;
   OrionldAttributeAlteration*  alteredAttributeV;
   struct OrionldAlteration*    next;
@@ -99,7 +101,6 @@ typedef struct OrionldAlterationMatch
   CachedSubscription*             subP;
   struct OrionldAlterationMatch*  next;
 } OrionldAlterationMatch;
-
 
 
 

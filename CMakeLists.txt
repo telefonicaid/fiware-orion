@@ -191,6 +191,7 @@ SET (ORION_LIBS
     orionld_common
     orionld_context
     orionld_contextCache
+    orionld_notifications
     orionld_db
     orionld_mongoc
     orionld_mongoCppLegacy
@@ -199,7 +200,6 @@ SET (ORION_LIBS
     orionld_mongoCppLegacy
     orionld_socketService
     orionld_troe
-    orionld_notifications
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify

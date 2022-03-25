@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_
+#define SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_
 
 /*
 *
@@ -34,8 +34,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
+// dbModelToApiEntity - produce an NGSI-LD API Entity from its DB format
 //
-extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
+extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, const char* entityId);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_

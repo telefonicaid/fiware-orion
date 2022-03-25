@@ -104,7 +104,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     while (nIx < watchAttrs)
     {
-      LM_TMP(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
+      // LM_TMP(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
       if (strcmp(aaP->attrName, subP->notifyConditionV[nIx].c_str()) == 0)
         break;
       ++nIx;

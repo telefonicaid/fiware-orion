@@ -43,7 +43,12 @@ extern "C"
 //
 bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
 {
-  if ((strcmp(typeP->name, "@type") == 0) && (typeP->type == KjString))
+  char* type = typeP->name;
+
+  if (*type == '@')
+    ++type;
+
+  if ((strcmp(type, "type") == 0) && (typeP->type == KjString))
   {
     if (strcmp(typeP->value.s, "@json") == 0)
     {

@@ -46,7 +46,6 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -347,6 +346,10 @@ bool kjValuesDiffer(KjNode* leftAttr, KjNode* rightAttr)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// ALTERATION -
+//
 #define ALTERATION(altType)                                 \
 do                                                          \
 {                                                           \
@@ -358,6 +361,10 @@ do                                                          \
 
 
 
+// -----------------------------------------------------------------------------
+//
+// orionldAlterationType -
+//
 const char* orionldAlterationType(OrionldAlterationType altType)
 {
   switch (altType)
@@ -384,7 +391,7 @@ const char* orionldAlterationType(OrionldAlterationType altType)
 OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* attrsP, KjNode* dbAttrsP)
 {
   OrionldAlteration* aeP   = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
-  int               attrs = 0;
+  int                attrs = 0;
 
   for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -419,13 +426,9 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
     bool valuesDiffer = kjValuesDiffer(attrP, dbAttrP);
 
     if (valuesDiffer)
-    {
       ALTERATION(AttributeValueChanged);
-    }
     else
-    {
       ALTERATION(AttributeModifiedAtChanged);  // Need to check all metadata - could also be AttributeMetadataChanged
-    }
   }
 
   aeP->next = NULL;
@@ -473,6 +476,12 @@ static bool dbEntityFields(KjNode* dbEntityP, const char* entityId, char** entit
   return true;
 }
 
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldAlterationsPresent -
+//
 void orionldAlterationsPresent(OrionldAlteration* altP)
 {
   LM_K(("Entity Altered:  Entity Id:   %s", altP->entityId));
@@ -544,6 +553,7 @@ bool orionldPatchEntity2(void)
 
   orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP);
   orionldAlterationsPresent(orionldState.alterations);
+  orionldState.alterations->dbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
 
   //
   // For TRoE we need a tree with all those attributes that have been patched (part of incoming tree)
@@ -563,7 +573,7 @@ bool orionldPatchEntity2(void)
       {
         KjNode* troeAttrP = kjClone(orionldState.kjsonP, dbAttrP);
 
-        dbModelToApiAttribute(troeAttrP);
+        dbModelToApiAttribute(troeAttrP, orionldState.uriParamOptions.sysAttrs);
         kjChildAdd(troeTree, troeAttrP);
       }
       eqForDot(patchedAttrP->name);
@@ -573,7 +583,7 @@ bool orionldPatchEntity2(void)
   }
 
   //
-  // FIXME: If I destroy the tree, how do I handle forwarding later ... ?
+  // FIXME: If I destroy the tree, how do I handle notifications/forwarding later ... ?
   //        I extract the part that is to be forwarded from the tree before I destroy
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
@@ -606,6 +616,9 @@ bool orionldPatchEntity2(void)
   kjChildAdd(dbAttrsObject, dbAttrsP);
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
+
+  orionldState.alterations->patchTree = patchTree;
+  orionldState.alterations->entityP   = NULL;
 
   bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
   if (b == false)

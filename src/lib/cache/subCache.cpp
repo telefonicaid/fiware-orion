@@ -559,6 +559,8 @@ int subCacheMatch
 */
 void subCacheItemDestroy(CachedSubscription* cSubP)
 {
+  free(cSubP->url);
+
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
@@ -722,6 +724,84 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// urlParse - extract protocol, ip, port and URL-PATH from a 'reference' string
+//
+// FIXME
+//   This function is generic and should be moved to its own module in orionld/common
+//   However, I think I have a function doing exactly this already ...
+//
+static bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP)
+{
+  char*            protocolEnd;
+  char*            colon;
+  char*            ip;
+  char*            rest;
+
+  // Check for custom url, e.g. "${abc}" - only if NGSIv2
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    if (strncmp(url, "${", 2) == 0)
+    {
+      int len = strlen(url);
+
+      if (url[len - 1] == '}')
+      {
+        *protocolP = NULL;
+        *ipP       = NULL;
+        *portP     = 0;
+        *restP     = NULL;
+        return true;
+      }
+    }
+  }
+
+
+  //
+  // URL: <protocol> "://" <ip> [:<port] [path]
+  //
+  protocolEnd = strstr(url, "://");
+  if (protocolEnd != NULL)
+  {
+    *protocolEnd = 0;
+    *protocolP   = url;
+    ip           = &protocolEnd[3];
+  }
+  else
+    ip = url;
+
+  colon = strchr(ip, ':');
+  if (colon != NULL)
+  {
+    *colon = 0;
+    *portP = atoi(&colon[1]);
+    rest   = &colon[1];
+  }
+  else
+  {
+    *portP = 80;  // What should be the default port?
+    *ipP   = ip;
+    *restP = NULL;
+    return true;
+  }
+
+  *ipP   = ip;
+
+  rest = strchr(rest, '/');
+  if (rest != NULL)
+  {
+    *rest  = 0;
+    *restP = &rest[1];
+  }
+  else
+    *restP = NULL;
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * subCacheItemInsert - create a new sub, fill it in, and add it to cache
@@ -804,6 +884,12 @@ void subCacheItemInsert
   cSubP->notifyConditionV       = conditionAttrs;
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
+
+  //
+  // IP, port and rest
+  //
+  cSubP->url = strdup(httpInfo.url.c_str());
+  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
 
   //
   // String filters

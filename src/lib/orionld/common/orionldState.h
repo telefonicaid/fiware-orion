@@ -99,6 +99,7 @@ struct OrionLdRestService;
 //
 typedef struct OrionldUriParamOptions
 {
+  bool sysAttrs;
   bool noOverwrite;
   bool update;
   bool replace;
@@ -112,7 +113,6 @@ typedef struct OrionldUriParamOptions
   bool append;         // Only NGSIv2
   bool noAttrDetail;   // Only NGSIv2
   bool upsert;         // Only NGSIv2
-  bool sysAttrs;
 } OrionldUriParamOptions;
 
 
@@ -185,6 +185,11 @@ typedef struct OrionldNotificationInfo
 } OrionldNotificationInfo;
 
 
+
+// -----------------------------------------------------------------------------
+//
+// OrionldPhase -
+//
 typedef enum OrionldPhase
 {
   OrionldPhaseStartup = 1,
