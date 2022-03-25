@@ -288,6 +288,7 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
 
     orion::BSONObj md1Item = getObjectFieldF(md1, currentMd);
     orion::BSONObj md2Item = getObjectFieldF(md2, currentMd);
+
     if (!equalMetadataValues(md1Item, md2Item))
     {
       return false;
@@ -621,7 +622,6 @@ static bool mergeAttrInfo
     // or can be simplified
     md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     std::set<std::string>  mdsSet;
- 
     md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
@@ -666,6 +666,7 @@ static bool mergeAttrInfo
 
   /* Was it an actual update? */
   bool actualUpdate;
+
   if (caP->compoundValueP == NULL)
   {
     /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
@@ -726,13 +727,14 @@ static bool mergeAttrInfo
   }
   else
   {
-   /* The hasField() check is needed to preserve compatibility with entities that were created
+    /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
       toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
+
   return actualUpdate;
 }
 
@@ -783,7 +785,7 @@ static bool contextAttributeCustomMetadataToBson
 
 /* ****************************************************************************
 *
-*updateAttribute -
+* updateAttribute -
 *
 * Returns true if an attribute was found, false otherwise. If true,
 * the "actualUpdate" argument (passed by reference) is set to true in the case that the
@@ -813,7 +815,7 @@ static bool updateAttribute
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
-  bool*             actualUpdate,
+  bool*                     actualUpdate,
   bool                      isReplace,
   const bool&               forcedUpdate,
   const bool&               overrideMetadata,
@@ -2044,6 +2046,7 @@ static unsigned int processSubscriptions
                                                                 notification,
                                                                 tSubP->blacklist,
                                                                 tSubP->notifyOnMetadataChange);
+
     if (notificationSent)
     {
       notifSent++;
@@ -2664,7 +2667,7 @@ static bool processContextAttributeVector
     /* No matter if success or fail, we have to include the attribute in the response */
     ContextAttribute*  ca = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
- //   setResponseMetadata(targetAttr, ca);
+    setResponseMetadata(targetAttr, ca);
     cerP->entity.attributeVector.push_back(ca);
 
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and

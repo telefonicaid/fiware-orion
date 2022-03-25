@@ -199,15 +199,17 @@ extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilde
 
 /* ****************************************************************************
 *
-<<<<<<< HEAD
 * setNotifyOnMetadataChange -
 */
 extern void setNotifyOnMetadataChange(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
-=======
+
+
+
+/* ****************************************************************************
+*
 * setOperations -
 */
 extern void setOperations(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
->>>>>>> upstream/master
 
 
 

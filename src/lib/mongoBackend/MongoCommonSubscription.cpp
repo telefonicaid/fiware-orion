@@ -521,7 +521,6 @@ void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
-<<<<<<< HEAD
 * setNotifyOnMetadataChange -
 */
 void setNotifyOnMetadataChange(const Subscription& sub, orion::BSONObjBuilder* b)
@@ -530,7 +529,12 @@ void setNotifyOnMetadataChange(const Subscription& sub, orion::BSONObjBuilder* b
 
   b->append(CSUB_NOTIFYONMETADATACHANGE, bl);
   LM_T(LmtMongo, ("Subscription notifyOnMetadataChange: %s", bl ? "true" : "false"));
-=======
+}
+
+
+
+/* ****************************************************************************
+*
 * setOperations -
 */
 void setOperations(const Subscription& sub, orion::BSONObjBuilder* b)
@@ -546,7 +550,6 @@ void setOperations(const Subscription& sub, orion::BSONObjBuilder* b)
 
   b->append(CSUB_ALTTYPES, operationsArr);
   LM_T(LmtMongo, ("Subscription operations: %s", operationsArr.toString().c_str()));
->>>>>>> upstream/master
 }
 
 
