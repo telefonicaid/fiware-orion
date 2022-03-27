@@ -872,16 +872,21 @@ void subCacheItemInsert
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;
 #ifdef ORIONLD
-  OrionldProblemDetails  pd;
 
   cSubP->name                    = name;
   cSubP->expression.geoproperty  = geoproperty;
-  cSubP->ldContext               = ldContext;
-  cSubP->contextP                = orionldContextFromUrl((char*) cSubP->ldContext.c_str(), NULL, &pd);
-  if (cSubP->contextP == NULL)
+  if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    LM_E(("Internal Error (%s: %s)", pd.title, pd.status));
-    cSubP->contextP = orionldState.contextP;
+    OrionldProblemDetails  pd;
+
+    cSubP->ldContext               = ldContext;
+    cSubP->contextP                = orionldContextFromUrl((char*) cSubP->ldContext.c_str(), NULL, &pd);
+
+    if (cSubP->contextP == NULL)
+    {
+      LM_E(("Internal Error (%s: %s)", pd.title, pd.status));
+      cSubP->contextP = orionldState.contextP;
+    }
   }
 #endif
   cSubP->expression.q           = q;
