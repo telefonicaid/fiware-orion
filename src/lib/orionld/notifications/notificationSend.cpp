@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -133,7 +134,6 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 
 
 
-extern void patchApply(KjNode* patchBase, KjNode* patchP);
 // -----------------------------------------------------------------------------
 //
 // notificationSend -
@@ -158,7 +158,7 @@ int notificationSend(OrionldAlterationMatch* mAltP)
 
   for (KjNode* patchP = mAltP->altP->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
   {
-    patchApply(apiEntityP, patchP);
+    orionldPatchApply(apiEntityP, patchP);
   }
 
   if (mAltP->subP->attributes.size() > 0)

@@ -148,7 +148,17 @@ static void mongocKjTreeToUpdateBson
 //
 // patchApply -
 //
-bool patchApply(KjNode* patchTree, bson_t* setP, bson_t* unsetP, int* unsetsP, bson_t* pullP, int* pullsP, bson_t* pushP, int* pushesP)
+static bool patchApply
+(
+  KjNode*  patchTree,
+  bson_t*  setP,
+  bson_t*  unsetP,
+  int*     unsetsP,
+  bson_t*  pullP,
+  int*     pullsP,
+  bson_t*  pushP,
+  int*     pushesP
+)
 {
   for (KjNode* patchObject = patchTree->value.firstChildP; patchObject != NULL; patchObject = patchObject->next)
   {
