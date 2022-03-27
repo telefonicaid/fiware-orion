@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove, kjString
+#include "kjson/kjClone.h"                                       // kjClone
 #include "kjson/kjRender.h"                                      // kjFastRender (TEMP)
 }
 
@@ -57,13 +58,24 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
     return NULL;
   }
 
-  KjNode* dbIdNodeP    = kjLookup(dbIdObjectP, "id");
-  KjNode* dbTypeNodeP  = kjLookup(dbIdObjectP, "type");
+  KjNode* dbIdNodeP = kjLookup(dbIdObjectP, "id");
+  if (dbIdNodeP != NULL)
+  {
+    KjNode* idNodeP = kjClone(orionldState.kjsonP, dbIdNodeP);
+    kjChildAdd(apiEntityP, idNodeP);
+  }
+  else
+    LM_E(("Database Error (entity '%s' without id inside _id)", entityId));
 
-  kjChildRemove(dbIdObjectP, dbIdNodeP);
-  kjChildRemove(dbIdObjectP, dbTypeNodeP);
+  KjNode* dbTypeNodeP = kjLookup(dbIdObjectP, "type");
+  if (dbTypeNodeP != NULL)
+  {
+    KjNode* typeNodeP = kjClone(orionldState.kjsonP, dbTypeNodeP);
+    kjChildAdd(apiEntityP, typeNodeP);
+  }
+  else
+    LM_E(("Database Error (entity '%s' without type inside _id)", entityId));
 
-  kjChildAdd(apiEntityP, dbIdNodeP);
   kjChildAdd(apiEntityP, dbTypeNodeP);
 
   if (sysAttrs)
@@ -89,17 +101,16 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
 
   if (dbAttrsP)
   {
-    // <DEBUG>
-    char buf[2048];
-    kjFastRender(dbAttrsP, buf);
-    LM_TMP(("KZ: dbAttrsP: %s", buf));
-    // <DEBUG>
+    KjNode*  dbAttrP = dbAttrsP->value.firstChildP;
+    KjNode*  next;
 
-    for (KjNode* dbAttrP = dbAttrsP->value.firstChildP; dbAttrP != NULL; dbAttrP = dbAttrP->next)
+    while (dbAttrP != NULL)
     {
+      next = dbAttrP->next;
       kjChildRemove(dbAttrP, dbAttrsP);
       dbModelToApiAttribute(dbAttrP, sysAttrs);
       kjChildAdd(apiEntityP, dbAttrP);  // No longer a DB attr - has been transformed to API representation
+      dbAttrP = next;
     }
   }
 

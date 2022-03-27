@@ -39,7 +39,9 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
-#include "orionld/common/orionldState.h"        // orionldState
+#include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "cache/subCache.h"
 
 using std::map;
@@ -851,7 +853,6 @@ void subCacheItemInsert
   //
   // Add the subscription to the subscription cache.
   //
-
   CachedSubscription* cSubP = new CachedSubscription();
 
 
@@ -871,9 +872,17 @@ void subCacheItemInsert
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;
 #ifdef ORIONLD
+  OrionldProblemDetails  pd;
+
   cSubP->name                    = name;
-  cSubP->ldContext               = ldContext;
   cSubP->expression.geoproperty  = geoproperty;
+  cSubP->ldContext               = ldContext;
+  cSubP->contextP                = orionldContextFromUrl((char*) cSubP->ldContext.c_str(), NULL, &pd);
+  if (cSubP->contextP == NULL)
+  {
+    LM_E(("Internal Error (%s: %s)", pd.title, pd.status));
+    cSubP->contextP = orionldState.contextP;
+  }
 #endif
   cSubP->expression.q           = q;
   cSubP->expression.geometry    = geometry;

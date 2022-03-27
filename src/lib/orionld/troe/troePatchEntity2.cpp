@@ -234,6 +234,11 @@ void patchApply(KjNode* patchBase, KjNode* patchP)
     }
   }
 
+  if (parentP == NULL)  // New attribute?  Add to patchBase (entity)
+  {
+    treeNode->name = pathNode->value.s;
+    kjChildAdd(patchBase, treeNode);
+  }
   if (nodeP == NULL)  // Did not exist in the "patch base" - add to parentP
   {
     if (onlyLastMissing == true)
@@ -243,7 +248,11 @@ void patchApply(KjNode* patchBase, KjNode* patchP)
       kjChildAdd(parentP, treeNode);
     }
     else
-      LM_E(("Did not find the immediate parent (parent: '%s')", (parentP != NULL)? parentP->name : "no parent"));
+    {
+      // Must be a new attribute ...
+      treeNode->name = pathNode->value.s;
+      kjChildAdd(patchBase, treeNode);
+    }
 
     return;
   }

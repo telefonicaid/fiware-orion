@@ -33,6 +33,6 @@
 //
 // notificationSend -
 //
-extern void notificationSend(OrionldAlterationMatch* altP);
+extern int notificationSend(OrionldAlterationMatch* altP);
 
 #endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_

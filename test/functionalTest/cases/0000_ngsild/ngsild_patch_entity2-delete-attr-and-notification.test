@@ -39,9 +39,11 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 06. Create S4 - a subscription matching all entities of type T AND Attrs P1-P3
 # 07. Create S5 - a subscription matching all entities of type T AND Attr P2
 # 16. PATCH E1, deleting P1
-# 17. Dump+Reset accumulator - see two notifications
+# 17. Dump+Reset accumulator - see three notifications: S1, S2, and S4
 # 18. PATCH E2, deleting P1
-# 19. Dump+Reset accumulator - see one notifications
+# 19. Dump+Reset accumulator - see two notifications: S2 and S4
+# 20. PATCH E2, adding P2
+# 21. Dump+Reset accumulator - see three notifications: S2, S4, and S5
 #
 
 echo "01. Create an entity E1 with an attribute P1, matching S1 and S2"
@@ -191,8 +193,8 @@ echo
 echo
 
 
-echo "17. Dump+Reset accumulator - see two notifications"
-echo "=================================================="
+echo "17. Dump+Reset accumulator - see three notifications: S1, S2, and S4"
+echo "===================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -209,8 +211,8 @@ echo
 echo
 
 
-echo "19. Dump+Reset accumulator - see one notifications"
-echo "=================================================="
+echo "19. Dump+Reset accumulator - see two notifications: S2 and S4"
+echo "============================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -218,7 +220,7 @@ echo
 
 
 echo "20. PATCH E2, adding P2"
-echo "========================="
+echo "======================="
 payload='{
   "P2": 20
 }'
@@ -227,8 +229,8 @@ echo
 echo
 
 
-echo "21. Dump+Reset accumulator - see one notifications"
-echo "=================================================="
+echo "21. Dump+Reset accumulator - see three notifications: S2, S4, and S5"
+echo "===================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -306,8 +308,73 @@ Date: REGEX(.*)
 
 
 
-17. Dump+Reset accumulator - see two notifications
-==================================================
+17. Dump+Reset accumulator - see three notifications: S1, S2, and S4
+====================================================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 278
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S4",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 313
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 313
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
 
 
 18. PATCH E2, deleting P1
@@ -317,8 +384,122 @@ Date: REGEX(.*)
 
 
 
-19. Dump+Reset accumulator - see one notifications
-==================================================
+19. Dump+Reset accumulator - see two notifications: S2 and S4
+=============================================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 278
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S4",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 313
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S2",
+    "type": "Notification"
+}
+=======================================
+
+
+20. PATCH E2, adding P2
+=======================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+21. Dump+Reset accumulator - see three notifications: S2, S4, and S5
+====================================================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 314
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "P2": {
+                "type": "Property",
+                "value": 20
+            },
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S5",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 278
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S4",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 278
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "data": [
+        {
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S2",
+    "type": "Notification"
+}
+=======================================
 
 
 --TEARDOWN--

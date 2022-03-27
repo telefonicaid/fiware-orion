@@ -41,6 +41,54 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// NotificationPending -
+//
+typedef struct NotificationPending
+{
+  CachedSubscription*          subP;
+  int                          fd;
+  struct NotificationPending*  next;
+} NotificationPending;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationResponseTreat -
+//
+void notificationResponseTreat(NotificationPending* npP)
+{
+  char headers[2048];
+  int  nb = read(npP->fd, headers, sizeof(headers) - 1);
+
+  if (nb == -1)
+  {
+    LM_E(("Internal Error (unable to read response for notification)"));
+    // Mark error for subscription npP->subP
+    return;
+  }
+
+  char* endOfFirstLine = strchr(headers, '\r');
+
+  if (endOfFirstLine == NULL)
+  {
+    // Mark error for subscription npP->subP
+    LM_E(("Internal Error (unable to find end of first line from notification endpoint: %s)", strerror(errno)));
+    return;
+  }
+
+  LM_TMP(("First line: '%s'", headers));
+
+  //
+  // FIXME: Read the rest of the message, using select
+  //        And, set the lastSuccess, lastFailure etc in the subscription
+  //
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldAlterationsTreat -
 //
 // As a first "draft", just find subs in the sub-cache and send notifications, one by one
@@ -73,12 +121,127 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   if (matchList == NULL)
     LM_RVE(("KZ: No matching subscriptions"));
 
-  LM_TMP(("KZ: %d Matching subscriptions for alteration", matches));
-  LM_TMP(("KZ: %llu Matching subs", matches));
 
+  //
+  // The matches are ordered, grouped by subscriptionId
+  // So, before notificationSend is called, the first "group" is removed from the matchList
+  // to create a new list and that new list is sent to notificationSend
+  //
+  NotificationPending* notificationList = NULL;
+
+  // <DEBUG>
+  int ix = 1;
+  LM_TMP(("XX: %d Matching subscriptions:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    // FIXME: Need to lookup all matches for one and the same subscription
-    notificationSend(matchP);
+    LM_TMP(("XX:   %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+  }
+  // </DEBUG>
+
+  while (matchList != NULL)
+  {
+    // Get the group
+    OrionldAlterationMatch* groupList = matchList;
+    OrionldAlterationMatch* prev      = matchList;
+
+    for (OrionldAlterationMatch* matchP = groupList->next; matchP != NULL; matchP = matchP->next)
+    {
+      LM_TMP(("Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
+      if (matchP->subP != groupList->subP)
+      {
+        matchList  = matchP;  // matchList pointing to the first non-matching
+        prev->next = NULL;    // Ending the 'groupList'
+        LM_TMP(("Breaking match loop for sub '%s' - next is %p", groupList->subP->subscriptionId, matchList));
+        break;
+      }
+
+      prev = matchP;
+      if (matchP->next == NULL)
+        matchList = NULL;
+    }
+
+    // <DEBUG>
+    int groupMembers = 0;
+    LM_TMP(("XX: Alterations matching sub '%s':", groupList->subP->subscriptionId));
+    for (OrionldAlterationMatch* matchP = groupList; matchP != NULL; matchP = matchP->next)
+    {
+      ++groupMembers;
+      LM_TMP(("XX  - %s", orionldAlterationType(matchP->altAttrP->alterationType)));
+    }
+    LM_TMP(("XX: Calling notificationSend for group of sub %s of %d matches", groupList->subP->subscriptionId, groupMembers));
+    // </DEBUG>
+
+    int fd = notificationSend(groupList);
+    if (fd != -1)
+    {
+      NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
+
+      npP->subP = groupList->subP;
+      npP->fd   = fd;
+
+      npP->next = notificationList;
+      notificationList = npP;
+    }
+
+    if (groupList == matchList)
+      break;
+    LM_TMP(("Still here ..."));
+  }
+
+  LM_TMP(("Await responses"));
+  // Await responses
+  int             fds;
+  fd_set          rFds;
+  int             fdMax      = 0;
+  int             startTime  = time(NULL);
+  struct timeval  tv         = { 1, 0 };
+
+  while (1)
+  {
+    //
+    // Set File Descriptors for the select
+    //
+    FD_ZERO(&rFds);
+
+    NotificationPending* npP = notificationList;
+    while (npP != NULL)
+    {
+      if (npP->fd != -1)
+      {
+        FD_SET(npP->fd, &rFds);
+        fdMax = MAX(fdMax, npP->fd);
+      }
+    }
+
+    fds = select(1, &rFds, NULL, NULL, &tv);
+    if (fds == -1)
+    {
+      if (errno != EINTR)
+        LM_X(1, ("select error: %s\n", strerror(errno)));
+    }
+    else
+    {
+      while (fds > 0)
+      {
+        LM_TMP(("Awaiting responses to the notifications"));
+        npP = notificationList;
+        while (npP != NULL)
+        {
+          if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
+          {
+            notificationResponseTreat(npP);
+            close(npP->fd);  // OR: close socket inside responseTreat?
+            npP->fd = -1;
+            --fds;
+            break;
+          }
+
+          npP = npP->next;
+        }
+        if (time(NULL) > startTime + 10)
+          break;
+      }
+      LM_TMP(("Done awaiting responses to notifications - mark all subs at timedout if npP->fd != -1"));
+    }
   }
 }

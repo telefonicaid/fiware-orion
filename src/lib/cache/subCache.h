@@ -36,6 +36,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
@@ -115,6 +116,7 @@ struct CachedSubscription
   std::string                 status;
   std::string                 name;
   std::string                 ldContext;
+  OrionldContext*             contextP;
   int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;

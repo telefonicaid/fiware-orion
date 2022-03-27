@@ -90,6 +90,34 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
 
 // -----------------------------------------------------------------------------
 //
+// matchListInsert -
+//
+static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList, OrionldAlterationMatch* itemP)
+{
+  OrionldAlterationMatch* matchP = matchList;
+
+  while (matchP != NULL)
+  {
+    if (matchP->subP == itemP->subP)
+    {
+      itemP->next = matchP->next;
+      matchP->next = itemP;
+
+      return matchList;
+    }
+
+    matchP = matchP->next;
+  }
+
+  // First alteration-match of a subscription - prepending it to the matchList
+  itemP->next = matchList;
+  return itemP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributeMatch -
 //
 static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, int* matchesP)
@@ -131,9 +159,14 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     amP->altP     = altP;
     amP->altAttrP = aaP;
     amP->subP     = subP;
-    amP->next     = matchList;
 
-    matchList = amP;
+    if (matchList == NULL)
+    {
+      matchList = amP;
+      amP->next = NULL;
+    }
+    else
+      matchList = matchListInsert(matchList, amP);  // Items in matchList are grouped by their subP
   }
 
   if (matches == 0)

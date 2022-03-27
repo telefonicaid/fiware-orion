@@ -117,6 +117,29 @@ Date: REGEX(.*)
 
 04. Dump accumulator - see one notification
 ===========================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 240
+User-Agent: orionld
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
 
 
 --TEARDOWN--
