@@ -330,7 +330,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 313
+Content-Length: 278
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -338,10 +338,6 @@ Content-Type: application/ld+json
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
-            "P1": {
-                "type": "Property",
-                "value": 1
-            },
             "id": "urn:E1",
             "type": "T"
         }
@@ -353,7 +349,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 313
+Content-Length: 278
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -361,10 +357,6 @@ Content-Type: application/ld+json
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
-            "P1": {
-                "type": "Property",
-                "value": 1
-            },
             "id": "urn:E1",
             "type": "T"
         }
@@ -406,7 +398,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 313
+Content-Length: 278
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -414,10 +406,6 @@ Content-Type: application/ld+json
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
-            "P1": {
-                "type": "Property",
-                "value": 1
-            },
             "id": "urn:E2",
             "type": "T"
         }
@@ -463,7 +451,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 314
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -471,6 +459,10 @@ Content-Type: application/ld+json
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
+            "P2": {
+                "type": "Property",
+                "value": 20
+            },
             "id": "urn:E2",
             "type": "T"
         }
@@ -482,7 +474,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 314
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -490,6 +482,10 @@ Content-Type: application/ld+json
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
+            "P2": {
+                "type": "Property",
+                "value": 20
+            },
             "id": "urn:E2",
             "type": "T"
         }

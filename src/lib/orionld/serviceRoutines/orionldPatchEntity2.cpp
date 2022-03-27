@@ -617,8 +617,8 @@ bool orionldPatchEntity2(void)
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
 
-  orionldState.alterations->patchTree = patchTree;
-  orionldState.alterations->entityP   = NULL;
+  orionldState.alterations->patchTree     = patchTree;
+  orionldState.alterations->patchedEntity = NULL;
 
   bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
   if (b == false)

@@ -27,15 +27,17 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "logMsg/logMsg.h"                                   // LM_*
+#include "logMsg/logMsg.h"                                       // LM_*
 
-#include "cache/subCache.h"                                  // CachedSubscription, subCacheMatch
+#include "cache/subCache.h"                                      // CachedSubscription, subCacheMatch
 
-#include "orionld/common/orionldState.h"                     // orionldState
-#include "orionld/types/OrionldAlteration.h"                 // OrionldAlteration, orionldAlterationType
-#include "orionld/notifications/subCacheAlterationMatch.h"   // subCacheAlterationMatch
-#include "orionld/notifications/notificationSend.h"          // notificationSend
-#include "orionld/notifications/orionldAlterationsTreat.h"   // Own interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
+#include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
+#include "orionld/db/dbModelToApiEntity.h"                       // dbModelToApiEntity
+#include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
+#include "orionld/notifications/notificationSend.h"              // notificationSend
+#include "orionld/notifications/orionldAlterationsTreat.h"       // Own interface
 
 
 
@@ -111,7 +113,14 @@ void notificationResponseTreat(NotificationPending* npP)
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-  LM_TMP(("KZ: Alterations present"));
+  // <DEBUG>
+  int alterations = 0;
+  for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
+  {
+    ++alterations;
+  }
+  LM_TMP(("KZ: %d Alterations present", alterations));
+  // </DEBUG>
 
   OrionldAlterationMatch* matchList;
   int                     matches;
@@ -138,6 +147,20 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   }
   // </DEBUG>
 
+
+  //
+  // Applying the PATCH
+  //
+  altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
+  for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+  {
+    orionldPatchApply(altList->patchedEntity, patchP);
+  }
+
+
+  //
+  // Sorting matches into groups and sending notifications
+  //
   while (matchList != NULL)
   {
     // Get the group
@@ -188,8 +211,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     LM_TMP(("Still here ..."));
   }
 
-  LM_TMP(("Await responses"));
-  // Await responses
+
+
+  //
+  // Awaiting responses and updating subscriptions accordingly (in sub cache)
+  //
   int             fds;
   fd_set          rFds;
   int             fdMax      = 0;

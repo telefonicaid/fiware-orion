@@ -148,7 +148,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
       continue;
     }
 
-    LM_TMP(("KZ: Alteration made it all the way:"));
+    LM_TMP(("KZ: Alteration made it all the way for sub %s:", subP->subscriptionId));
     LM_TMP(("KZ:   - Alteration Type:  %s", orionldAlterationType(aaP->alterationType)));
     LM_TMP(("KZ:   - Attribute:        %s", aaP->attrName));
 

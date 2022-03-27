@@ -28,11 +28,12 @@
 
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
 #include "kjson/kjRenderSize.h"                                  // kjFastRenderSize
 #include "kjson/kjRender.h"                                      // kjFastRender
 #include "kjson/kjBuilder.h"                                     // kjObject, kjArray, kjString, kjChildAdd, ...
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "logMsg/logMsg.h"
@@ -43,12 +44,10 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/db/dbModelToApiEntity.h"                       // dbModelToApiEntity
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -136,6 +135,58 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 
 // -----------------------------------------------------------------------------
 //
+// attributeFilter -
+//
+static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP)
+{
+  LM_TMP(("Filter out attrs according to mAltP->subP->attributes"));
+
+  KjNode* filteredEntityP = kjObject(orionldState.kjsonP, NULL);
+  KjNode* attrP           = apiEntityP->value.firstChildP;
+  KjNode* next;
+
+  while (attrP != NULL)
+  {
+    next = attrP->next;
+
+    bool clone = false;
+    if      (strcmp(attrP->name, "id")   == 0) clone = true;
+    else if (strcmp(attrP->name, "type") == 0) clone = true;
+    else
+    {
+      char dotName[512];
+      strncpy(dotName, attrP->name, sizeof(dotName));
+      eqForDot(dotName);
+
+      for (int ix = 0; ix < (int) mAltP->subP->attributes.size(); ix++)
+      {
+        const char* attrName = mAltP->subP->attributes[ix].c_str();
+
+        LM_TMP(("XY: Comparing '%s' and '%s'", dotName, attrName));
+        if (strcmp(dotName, attrName) == 0)
+        {
+          clone = true;
+          break;
+        }
+      }
+    }
+
+    if (clone)
+    {
+      KjNode* nodeP = kjClone(orionldState.kjsonP, attrP);
+      kjChildAdd(filteredEntityP, nodeP);
+    }
+
+    attrP = next;
+  }
+
+  return filteredEntityP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // notificationSend -
 //
 // writev is used for the notifications.
@@ -152,19 +203,12 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 //
 int notificationSend(OrionldAlterationMatch* mAltP)
 {
+  KjNode* apiEntityP = mAltP->altP->patchedEntity;
+
   LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
 
-  KjNode* apiEntityP = dbModelToApiEntity(mAltP->altP->dbEntityP, false, mAltP->altP->entityId);  // No sysAttrs options for subscriptions?
-
-  for (KjNode* patchP = mAltP->altP->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
-  {
-    orionldPatchApply(apiEntityP, patchP);
-  }
-
   if (mAltP->subP->attributes.size() > 0)
-  {
-    LM_TMP(("Filter out attrs according to mAltP->subP->attributes"));
-  }
+    apiEntityP = attributeFilter(apiEntityP, mAltP);
 
   KjNode*            notificationP    = notificationTree(mAltP->subP, apiEntityP);
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
