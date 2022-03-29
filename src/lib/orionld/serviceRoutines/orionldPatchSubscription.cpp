@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
@@ -40,7 +43,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/common/urlParse.h"                           // urlParse 
+#include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
