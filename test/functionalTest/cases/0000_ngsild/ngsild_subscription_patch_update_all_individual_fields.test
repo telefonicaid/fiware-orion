@@ -72,6 +72,15 @@ accumulatorStart --pretty-print
 # 34. PATCH all patchable fields
 # 35. GET subscription and see all the fields
 # 36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
+# 37. PATCH 'receiverInfo' adding A=1
+# 38. GET subscription and see A=1 in receiverInfo
+# 39. PATCH 'receiverInfo' modifying A=2
+# 40. GET subscription and see A=2 in receiverInfo
+# 41. PATCH 'notifierInfo' adding A=1
+# 42. GET subscription and see A=1 in notifierInfo
+# 43. PATCH 'notifierInfo' modifying A=2
+# 44. GET subscription and see A=2 in notifierInfo
+# 45. GET subscription from sub-cache - see the exact same as in 44
 #
 
 echo "01. Create a subscription with all fields (except timeInterval)"
@@ -444,6 +453,58 @@ echo
 echo "36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition"
 echo "===================================================================================================="
 mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "37. PATCH 'receiverInfo' adding A=1"
+echo "==================================="
+payload='{
+  "notification": {
+    "endpoint": {
+      "receiverInfo": [ { "key": "A", "value": "1" } ]
+    }  
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "38. GET subscription and see A=1 in receiverInfo"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "39. PATCH 'receiverInfo' modifying A=2"
+echo "======================================"
+
+
+echo "40. GET subscription and see A=2 in receiverInfo"
+echo "================================================"
+
+
+echo "41. PATCH 'notifierInfo' adding A=1"
+echo "==================================="
+
+
+echo "42. GET subscription and see A=1 in notifierInfo"
+echo "================================================"
+
+
+echo "43. PATCH 'notifierInfo' modifying A=2"
+echo "======================================"
+
+
+echo "44. GET subscription and see A=2 in notifierInfo"
+echo "================================================"
+
+
+echo "45. GET subscription from sub-cache - see the exact same as in 44"
+echo "================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?from=cache&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 
@@ -1912,6 +1973,101 @@ MongoDB server version: REGEX(.)
 	}
 }
 bye
+
+
+37. PATCH 'receiverInfo' adding A=1
+===================================
+
+
+38. GET subscription and see A=1 in receiverInfo
+================================================
+HTTP/1.1 200 OK
+Content-Length: 851
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "Name 34",
+  "description": "Description 34",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E34",
+      "type": "T34"
+    },
+    {
+      "id": "urn:ngsi-ld:E34-2",
+      "type": "T34-2"
+    }
+  ],
+  "watchedAttributes": [
+    "P34"
+  ],
+  "q": "P34>34",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      34,
+      34
+    ],
+    "georel": "near;maxDistance==34",
+    "geoproperty": "geo34"
+  },
+  "csf": "34",
+  "status": "active",
+  "isActive": true,
+  "notification": {
+    "attributes": [
+      "P34",
+      "R34",
+      "A34"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:3434/notify",
+      "accept": "application/ld+json",
+      "receiverInfo": [
+        {
+          "key": "A",
+          "value": "1"
+        }
+      ]
+    },
+    "status": "ok"
+  },
+  "expires": "2028-12-31T10:34:34.000Z",
+  "throttling": 34
+}
+
+
+39. PATCH 'receiverInfo' modifying A=2
+======================================
+
+
+40. GET subscription and see A=2 in receiverInfo
+================================================
+
+
+41. PATCH 'notifierInfo' adding A=1
+===================================
+
+
+42. GET subscription and see A=1 in notifierInfo
+================================================
+
+
+43. PATCH 'notifierInfo' modifying A=2
+======================================
+
+
+44. GET subscription and see A=2 in notifierInfo
+================================================
+
+
+45. GET subscription from sub-cache - see the exact same as in 44
+=================================================================
 
 
 --TEARDOWN--
