@@ -732,7 +732,7 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 //   This function is generic and should be moved to its own module in orionld/common
 //   However, I think I have a function doing exactly this already ...
 //
-static bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP)
+bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP)
 {
   char*            protocolEnd;
   char*            colon;
