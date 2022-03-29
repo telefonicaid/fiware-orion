@@ -136,7 +136,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 355
+Content-Length: 403
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -151,14 +151,17 @@ Date: REGEX(.*)
     ],
     "expires": "2028-12-31T10:00:00.000Z",
     "id": "http://a.b.c/subs/sub01",
+    "isActive": true,
     "name": "Sub 01",
     "notification": {
         "endpoint": {
             "accept": "application/geo+json",
             "uri": "http://127.0.0.1:9997/notify"
         },
-        "format": "normalized"
+        "format": "normalized",
+        "status": "ok"
     },
+    "status": "active",
     "type": "Subscription"
 }
 

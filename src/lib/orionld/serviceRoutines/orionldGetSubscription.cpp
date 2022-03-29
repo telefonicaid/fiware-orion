@@ -26,8 +26,10 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/numberToDate.h"                         // numberToDate
+#include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscription.h"      // Own Interface
 
@@ -39,24 +41,26 @@
 //
 bool orionldGetSubscription(void)
 {
+  char*                 subscriptionId = orionldState.wildcard[0];
   ngsiv2::Subscription  subscription;
-  char*                 details;
+  char*                 details = (char*) "subscription not found";
+  CachedSubscription*   cSubP   = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
 
   subscription.descriptionProvided = false;
   subscription.expires             = -1;  // 0?
   subscription.throttling          = -1;  // 0?
   subscription.timeInterval        = -1;  // 0?
 
-  if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenantP, &orionldState.httpStatusCode, &details) != true)
+  if ((cSubP == NULL) || (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false))
   {
     LM_E(("mongoGetLdSubscription error: %s", details));
-    orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
+    orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
     return false;
   }
 
   // Transform to KjNode tree
   orionldState.httpStatusCode = SccOk;
-  orionldState.responseTree   = kjTreeFromSubscription(&subscription);
+  orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP);
 
   return true;
 }

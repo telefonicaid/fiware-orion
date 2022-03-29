@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
@@ -58,25 +59,25 @@ typedef struct NotificationPending
 //
 // notificationResponseTreat -
 //
-void notificationResponseTreat(NotificationPending* npP)
+static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 {
   char headers[2048];
   int  nb = read(npP->fd, headers, sizeof(headers) - 1);
 
   if (nb == -1)
   {
+    subscriptionFailure(npP->subP, "Unable to read from notification endpoint", timestamp);
     LM_E(("Internal Error (unable to read response for notification)"));
-    // Mark error for subscription npP->subP
-    return;
+    return -1;
   }
 
   char* endOfFirstLine = strchr(headers, '\r');
 
   if (endOfFirstLine == NULL)
   {
-    // Mark error for subscription npP->subP
+    subscriptionFailure(npP->subP, "Invalid response from notification endpoint", timestamp);
     LM_E(("Internal Error (unable to find end of first line from notification endpoint: %s)", strerror(errno)));
-    return;
+    return -1;
   }
 
   LM_TMP(("First line: '%s'", headers));
@@ -85,6 +86,8 @@ void notificationResponseTreat(NotificationPending* npP)
   // FIXME: Read the rest of the message, using select
   //        And, set the lastSuccess, lastFailure etc in the subscription
   //
+
+  return 0;
 }
 
 
@@ -119,7 +122,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   {
     ++alterations;
   }
-  LM_TMP(("KZ: %d Alterations present", alterations));
+  LM_TMP(("%d Alterations present", alterations));
   // </DEBUG>
 
   OrionldAlterationMatch* matchList;
@@ -128,7 +131,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   matchList = subCacheAlterationMatch(altList, &matches);
 
   if (matchList == NULL)
-    LM_RVE(("KZ: No matching subscriptions"));
+    LM_RVE(("No matching subscriptions"));
 
 
   //
@@ -157,6 +160,14 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     orionldPatchApply(altList->patchedEntity, patchP);
   }
 
+
+  //
+  // Timestamp for sending of notification - for stats in subscriptions
+  //
+  struct timespec  notificationTime;
+  double           notificationTimeAsFloat;
+  kTimeGet(&notificationTime);
+  notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
 
   //
   // Sorting matches into groups and sending notifications
@@ -194,14 +205,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     LM_TMP(("XX: Calling notificationSend for group of sub %s of %d matches", groupList->subP->subscriptionId, groupMembers));
     // </DEBUG>
 
-    int fd = notificationSend(groupList);
+    int fd = notificationSend(groupList, notificationTimeAsFloat);
     if (fd != -1)
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
       npP->subP = groupList->subP;
       npP->fd   = fd;
-
       npP->next = notificationList;
       notificationList = npP;
     }
@@ -212,7 +222,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   }
 
 
-
   //
   // Awaiting responses and updating subscriptions accordingly (in sub cache)
   //
@@ -221,15 +230,18 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int             fdMax      = 0;
   int             startTime  = time(NULL);
   struct timeval  tv         = { 1, 0 };
+  bool            timeout    = false;
 
-  while (1)
+  LM_TMP(("Awaiting responses and updating cached subscriptions accordingly"));
+  while (timeout == false)
   {
     //
     // Set File Descriptors for the select
     //
-    FD_ZERO(&rFds);
-
     NotificationPending* npP = notificationList;
+
+    fdMax = 0;
+    FD_ZERO(&rFds);
     while (npP != NULL)
     {
       if (npP->fd != -1)
@@ -237,37 +249,61 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         FD_SET(npP->fd, &rFds);
         fdMax = MAX(fdMax, npP->fd);
       }
+      npP = npP->next;
     }
 
-    fds = select(1, &rFds, NULL, NULL, &tv);
+    if (fdMax == 0)
+      break;
+
+    LM_TMP(("Awaiting responses to the notifications"));
+    fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
     if (fds == -1)
     {
       if (errno != EINTR)
         LM_X(1, ("select error: %s\n", strerror(errno)));
     }
-    else
-    {
-      while (fds > 0)
-      {
-        LM_TMP(("Awaiting responses to the notifications"));
-        npP = notificationList;
-        while (npP != NULL)
-        {
-          if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
-          {
-            notificationResponseTreat(npP);
-            close(npP->fd);  // OR: close socket inside responseTreat?
-            npP->fd = -1;
-            --fds;
-            break;
-          }
 
-          npP = npP->next;
-        }
-        if (time(NULL) > startTime + 10)
+    while (fds > 0)
+    {
+      LM_TMP(("Got %d notification response(s)", fds));
+      npP = notificationList;
+      while (npP != NULL)
+      {
+        if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
+        {
+          LM_TMP(("Got a notification response on fd %d", npP->fd));
+          if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
+            subscriptionSuccess(npP->subP, notificationTimeAsFloat);
+
+          close(npP->fd);  // OR: close socket inside responseTreat?
+          npP->fd = -1;
+          --fds;
           break;
+        }
+
+        npP = npP->next;
       }
-      LM_TMP(("Done awaiting responses to notifications - mark all subs at timedout if npP->fd != -1"));
+
+      if (time(NULL) > startTime + 4)
+      {
+        timeout = true;
+        break;
+      }
     }
+  }
+
+  LM_TMP(("Mark all subs for unanswered notifications as timed out if npP->fd != -1"));
+  NotificationPending* npP = notificationList;
+  while (npP != NULL)
+  {
+    if (npP->fd != -1)
+    {
+      // No response
+      subscriptionFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
+      close(npP->fd);
+      npP->fd = -1;
+    }
+
+    npP = npP->next;
   }
 }

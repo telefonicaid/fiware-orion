@@ -222,7 +222,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 336
+Content-Length: 384
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -237,6 +237,7 @@ Date: REGEX(.*)
         }
     ],
     "id": "urn:ngsi-ld:Subscription:mqttNotification",
+    "isActive": true,
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -252,8 +253,10 @@ Date: REGEX(.*)
             ],
             "uri": "mqtt://localhost:1883/entities"
         },
-        "format": "normalized"
+        "format": "normalized",
+        "status": "ok"
     },
+    "status": "active",
     "type": "Subscription"
 }
 
@@ -305,7 +308,7 @@ Notifications: 1
 07. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 374
+Content-Length: 422
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -320,6 +323,7 @@ Date: REGEX(.*)
         }
     ],
     "id": "urn:ngsi-ld:Subscription:mqttNotification",
+    "isActive": true,
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -335,8 +339,10 @@ Date: REGEX(.*)
             ],
             "uri": "mqtt://localhost:1883/entities"
         },
-        "format": "normalized"
+        "format": "normalized",
+        "status": "ok"
     },
+    "status": "active",
     "type": "Subscription"
 }
 

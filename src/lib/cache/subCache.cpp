@@ -472,10 +472,7 @@ static bool subMatch
     EntityInfo* eiP = cSubP->entityIdInfos[ix];
 
     if (eiP->match(entityId, entityType))
-    {
-      LM_TMP(("KZ: MATCH"));
       return true;
-    }
   }
 
   // No match due to EntityInfo
@@ -540,7 +537,6 @@ int subCacheMatch
 
   while (cSubP != NULL)
   {
-    LM_TMP(("KZ: Checking subscription %s", cSubP->subscriptionId));
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
@@ -656,7 +652,9 @@ bool tenantMatch(const char* tenant1, const char* tenant2)
 *           just a single linked link for the subscriptions.
 *           The hash could be adding each char in 'tenant' and 'subscriptionId' to a 8-bit
 *           integer and then we'd have a vector of 256 linked lists.
-*           Another way of implementing this would be to use a std::vector or std::map.
+*
+*           However, for matching against chang3ed entities, which is 99% of the usage of the cache,
+*           nothing would be gained so ... let's not do this.
 */
 CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscriptionId)
 {
@@ -871,10 +869,24 @@ void subCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;
-#ifdef ORIONLD
+
+  if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
+  {
+    cSubP->status   = "expired";
+    cSubP->isActive = false;
+  }
+  else if (cSubP->status == "")
+    cSubP->status = "active";
+
+  if (cSubP->status == "active")
+    cSubP->isActive = true;
+  else
+    cSubP->isActive = false;
+
 
   cSubP->name                    = name;
   cSubP->expression.geoproperty  = geoproperty;
+
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
     OrionldProblemDetails  pd;
@@ -888,7 +900,15 @@ void subCacheItemInsert
       cSubP->contextP = orionldState.contextP;
     }
   }
-#endif
+
+  // Counters and stats
+  cSubP->lastNotificationTime  = 0;  // Or, does this come from DB ?
+  cSubP->lastSuccess           = 0;  // Or, does this come from DB ?
+  cSubP->lastFailure           = 0;  // Or, does this come from DB ?
+  cSubP->consecutiveErrors     = 0;
+  cSubP->lastErrorReason[0]    = 0;
+
+
   cSubP->expression.q           = q;
   cSubP->expression.geometry    = geometry;
   cSubP->expression.coords      = coords;
@@ -1391,4 +1411,45 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     subP->lastFailure  = orionldState.requestTime;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
+}
+
+
+
+/* ****************************************************************************
+*
+* subscriptionFailure -
+*/
+void subscriptionFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
+{
+  subP->lastNotificationTime  = timestamp;
+  subP->lastFailure           = timestamp;
+  subP->consecutiveErrors    += 1;
+  subP->count                += 1;
+
+  strncpy(subP->lastErrorReason, errorReason, sizeof(subP->lastErrorReason) - 1);
+
+  // Force the subscription into "paused" due to too many consecutive errors
+  if (subP->consecutiveErrors >= 3)
+  {
+    subP->isActive = false;
+    subP->status   = "paused";
+  }
+
+  // Write to DB ... ?
+}
+
+
+
+/* ****************************************************************************
+*
+* subscriptionSuccess -
+*/
+void subscriptionSuccess(CachedSubscription* subP, double timestamp)
+{
+  subP->lastSuccess           = timestamp;
+  subP->lastNotificationTime  = timestamp;
+  subP->consecutiveErrors     = 0;
+  subP->count                += 1;
+
+  // Write to DB ... ?
 }

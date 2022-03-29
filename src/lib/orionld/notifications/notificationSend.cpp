@@ -201,7 +201,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //   size_t iov_len;     /* Number of bytes to transfer */
 // };
 //
-int notificationSend(OrionldAlterationMatch* mAltP)
+int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 {
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
 
@@ -251,29 +251,33 @@ int notificationSend(OrionldAlterationMatch* mAltP)
   else  // Add Link header
   {
     // Replace ioVec[4] - make sure to end it in double newline/linefeed
-    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n\r\n", mAltP->subP->ldContext.c_str());
+    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n\r\n",
+             mAltP->subP->ldContext.c_str());
+
     ioVec[4].iov_base = linkHeader;
     ioVec[4].iov_len  = strlen(linkHeader);
   }
 
   // <DEBUG>
-  LM_TMP(("KZ: Notification:"));
+  LM_TMP(("Notification:"));
   for (int ix = 0; ix < ioVecLen; ix++)
   {
-    LM_TMP(("KZ:   %s", (char*) ioVec[ix].iov_base));
+    LM_TMP(("   %s", (char*) ioVec[ix].iov_base));
   }
   // </DEBUG>
 
 
   // Connect
+  LM_TMP(("KZ: Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
   int fd = orionldServerConnect(mAltP->subP->ip, mAltP->subP->port);
 
   if (fd == -1)
   {
-    LM_E(("Internal Error (unable to connent to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
+    LM_E(("KZ: Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
+    subscriptionFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
     return -1;
   }
-  LM_TMP(("Connected to %s:%d", mAltP->subP->ip, mAltP->subP->port));
+  LM_TMP(("KZ: Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
 
   // Send
   int nb;
@@ -281,7 +285,8 @@ int notificationSend(OrionldAlterationMatch* mAltP)
   {
     close(fd);
 
-    LM_E(("Internal Error (unable to send to server for notification for subscription '%s'): %s", mAltP->subP->subscriptionId, strerror(errno)));
+    LM_E(("Internal Error (unable to send to server for notification for subscription '%s' (fd: %d): %s", mAltP->subP->subscriptionId, fd, strerror(errno)));
+    subscriptionFailure(mAltP->subP, "Unable to write to notification endpoint", timestamp);
     return -1;
   }
 

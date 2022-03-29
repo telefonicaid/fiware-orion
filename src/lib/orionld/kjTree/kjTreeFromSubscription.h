@@ -25,7 +25,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "apiTypesV2/Subscription.h"                           // Subscription
+#include "apiTypesV2/Subscription.h"                             // Subscription
+#include "cache/subCache.h"                                      // CachedSubscription
 
 
 
@@ -33,6 +34,6 @@
 //
 // kjTreeFromSubscription -
 //
-extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP);
+extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription*  cSubP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_

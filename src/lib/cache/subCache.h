@@ -96,6 +96,7 @@ struct EntityInfo
 struct CachedSubscription
 {
   char*                       subscriptionId;
+  std::string                 name;
 
   char*                       url;       // Copy of httpInfo.url (parsed and destroyed) - allocated and must be freed
   char*                       protocol;  // pointing to 'protocol' part of 'url'
@@ -112,18 +113,22 @@ struct CachedSubscription
   bool                        triggers[OrionldAlterationTypes];
   double                      throttling;
   double                      expirationTime;
-  double                      lastNotificationTime;
-  std::string                 status;
-  std::string                 name;
   std::string                 ldContext;
   OrionldContext*             contextP;
-  int64_t                     count;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
-  double                      lastFailure;  // timestamp of last notification failure
-  double                      lastSuccess;  // timestamp of last successful notification
+
+  bool                        isActive;
+  std::string                 status;
+  int64_t                     count;
+  double                      lastNotificationTime;  // timestamp of last notification attempt
+  double                      lastFailure;           // timestamp of last notification failure
+  double                      lastSuccess;           // timestamp of last successful notification
+  int                         consecutiveErrors;     // Not in DB
+  char                        lastErrorReason[128];
+
   struct CachedSubscription*  next;
 };
 
@@ -364,5 +369,21 @@ extern void subCacheItemNotificationErrorStatus
 * tenantMatch -
 */
 extern bool tenantMatch(const char* tenant1, const char* tenant2);
+
+
+
+/* ****************************************************************************
+*
+* subscriptionFailure -
+*/
+extern void subscriptionFailure(CachedSubscription* subP, const char* errorReason, double timestamp);
+
+
+
+/* ****************************************************************************
+*
+* subscriptionSuccess -
+*/
+extern void subscriptionSuccess(CachedSubscription* subP, double timestamp);
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

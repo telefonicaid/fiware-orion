@@ -35,6 +35,7 @@ extern "C"
 
 #include "common/string.h"                                     // toString
 #include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
 
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -64,9 +65,13 @@ bool orionldGetSubscriptions(void)
 
   for (unsigned int ix = 0; ix < subVec.size(); ix++)
   {
-    KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix]);
+    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subVec[ix].id.c_str());
 
-    kjChildAdd(orionldState.responseTree, subscriptionNodeP);
+    if (cSubP != NULL)
+    {
+      KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix], cSubP);
+      kjChildAdd(orionldState.responseTree, subscriptionNodeP);
+    }
   }
 
   return true;

@@ -197,7 +197,7 @@ bye
 03. GET the subscription - see its initial state
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 551
+Content-Length: 613
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -217,6 +217,8 @@ Date: REGEX(.*)
   ],
   "q": "P2>10",
   "csf": "not implemented",
+  "status": "active",
+  "isActive": true,
   "notification": {
     "attributes": [
       "P1",
@@ -227,7 +229,8 @@ Date: REGEX(.*)
     "endpoint": {
       "uri": "http://localhost:9997/notify",
       "accept": "application/ld+json"
-    }
+    },
+    "status": "ok"
   },
   "expires": "2028-12-31T11:12:13.140Z",
   "throttling": 5
@@ -245,7 +248,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 716
+Content-Length: 778
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -268,6 +271,8 @@ Date: REGEX(.*)
   ],
   "q": "P2>10",
   "csf": "not implemented",
+  "status": "active",
+  "isActive": true,
   "notification": {
     "attributes": [
       "P1",
@@ -278,7 +283,8 @@ Date: REGEX(.*)
     "endpoint": {
       "uri": "http://localhost:9997/notify",
       "accept": "application/ld+json"
-    }
+    },
+    "status": "ok"
   },
   "expires": "2028-12-31T11:12:13.140Z",
   "throttling": 5

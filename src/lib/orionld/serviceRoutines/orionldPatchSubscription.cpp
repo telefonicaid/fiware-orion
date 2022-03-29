@@ -31,6 +31,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
@@ -88,7 +89,7 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
+static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription* cSubP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
   KjNode* next;
@@ -117,6 +118,20 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, 
     {
       if ((fragmentP != qP) && (fragmentP != expressionP))
         kjChildAddOrReplace(dbSubscriptionP, fragmentP->name, fragmentP);
+
+      if (strcmp(fragmentP->name, "status") == 0)
+      {
+        if (strcmp(fragmentP->value.s, "active") == 0)
+        {
+          cSubP->isActive = true;
+          cSubP->status   = "active";
+        }
+        else
+        {
+          cSubP->isActive = false;
+          cSubP->status	  = "paused";
+        }
+      }
     }
 
     fragmentP = next;
@@ -549,7 +564,8 @@ bool orionldPatchSubscription(void)
   // modified.
   // ngsildSubscriptionPatch() performs that modification
   //
-  if (ngsildSubscriptionPatch(dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
+  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+  if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
     return false;
 
   // Update modifiedAt

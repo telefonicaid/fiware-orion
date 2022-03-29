@@ -294,7 +294,7 @@ bye
 03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 419
+Content-Length: 467
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -309,6 +309,7 @@ Date: REGEX(.*)
     ],
     "expires": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
+    "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "name": "Test subscription 01",
     "notification": {
@@ -316,8 +317,10 @@ Date: REGEX(.*)
             "accept": "application/json",
             "uri": "REGEX(.*)"
         },
-        "format": "normalized"
+        "format": "normalized",
+        "status": "ok"
     },
+    "status": "active",
     "throttling": 1.459,
     "type": "Subscription"
 }
@@ -373,7 +376,7 @@ Date: REGEX(.*)
 07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 520
+Content-Length: 568
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -388,6 +391,7 @@ Date: REGEX(.*)
     ],
     "expires": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
+    "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "name": "Test subscription 01",
     "notification": {
@@ -398,8 +402,10 @@ Date: REGEX(.*)
         "format": "normalized",
         "lastNotification": "REGEX(.*\.\d\d\dZ)",
         "lastSuccess": "REGEX(.*\.\d\d\dZ)",
+        "status": "ok",
         "timesSent": 2
     },
+    "status": "active",
     "throttling": 1.459,
     "type": "Subscription"
 }
@@ -418,7 +424,7 @@ Date: REGEX(.*)
 09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
+Content-Length: 581
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -433,6 +439,7 @@ Date: REGEX(.*)
     ],
     "expires": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
+    "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "name": "New Name for Test subscription 01",
     "notification": {
@@ -443,8 +450,10 @@ Date: REGEX(.*)
         "format": "normalized",
         "lastNotification": "REGEX(.*\.\d\d\dZ)",
         "lastSuccess": "REGEX(.*\.\d\d\dZ)",
+        "status": "ok",
         "timesSent": 2
     },
+    "status": "active",
     "throttling": 1.459,
     "type": "Subscription"
 }
@@ -468,7 +477,7 @@ Date: REGEX(.*)
 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 574
+Content-Length: 622
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -483,6 +492,7 @@ Date: REGEX(.*)
     ],
     "expires": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
+    "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "name": "New Name for Test subscription 01",
     "notification": {
@@ -494,8 +504,10 @@ Date: REGEX(.*)
         "lastFailure": "REGEX(.*\.\d\d\dZ)",
         "lastNotification": "REGEX(.*\.\d\d\dZ)",
         "lastSuccess": "REGEX(.*\.\d\d\dZ)",
+        "status": "ok",
         "timesSent": 3
     },
+    "status": "active",
     "throttling": 1.459,
     "type": "Subscription"
 }

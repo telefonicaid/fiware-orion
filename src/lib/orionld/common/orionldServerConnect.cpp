@@ -68,6 +68,7 @@ int orionldServerConnect(char* ip, uint16_t portNo)
   {
     close(fd);
     LM_E(("Unable to connect to host/port: %s:%d", ip, portNo));
+    return -1;
   }
 
   return fd;

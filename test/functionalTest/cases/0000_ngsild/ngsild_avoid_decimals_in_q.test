@@ -138,7 +138,7 @@ bye
 03. GET the subscription and see the Q String Filter P2>10
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 485
+Content-Length: 547
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -158,12 +158,15 @@ Date: REGEX(.*)
     "P2"
   ],
   "q": "P2>10",
+  "status": "active",
+  "isActive": true,
   "notification": {
     "format": "normalized",
     "endpoint": {
       "uri": "http://valid.url/url",
       "accept": "application/ld+json"
-    }
+    },
+    "status": "ok"
   },
   "expires": "2028-12-31T10:11:12.123Z"
 }

@@ -198,6 +198,32 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
         continue;
       }
 
+      if (subP->isActive == false)
+      {
+        LM_TMP(("KZ: Sub '%s' - no match due to isActive == false", subP->subscriptionId));
+        continue;
+      }
+
+      if (strcmp(subP->status.c_str(), "active") != 0)
+      {
+        LM_TMP(("KZ: Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
+        continue;
+      }
+
+      if (subP->expirationTime < orionldState.requestTime)
+      {
+        LM_TMP(("KZ: Sub '%s' - no match due to expiration", subP->subscriptionId));
+        subP->status   = "expired";
+        subP->isActive = false;
+        continue;
+      }
+
+      if ((subP->throttling > 0) && ((orionldState.requestTime - subP->lastNotificationTime) < subP->throttling))
+      {
+        LM_TMP(("KZ: Sub '%s' - no match due to throttling", subP->subscriptionId));
+        continue;
+      }
+
       int eItems = subP->entityIdInfos.size();
       if (eItems > 0)
       {

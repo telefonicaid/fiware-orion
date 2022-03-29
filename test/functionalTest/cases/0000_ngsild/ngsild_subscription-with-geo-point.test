@@ -87,7 +87,7 @@ Date: REGEX(.*)
 02. GET the subscription to see the geo-data intact
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 375
+Content-Length: 423
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -107,6 +107,7 @@ Date: REGEX(.*)
         "georel": "near;maxDistance==2000"
     },
     "id": "urn:ngsi-ld:Subscription:mySubscription123",
+    "isActive": true,
     "notification": {
         "attributes": [
             "speed"
@@ -115,9 +116,11 @@ Date: REGEX(.*)
             "accept": "application/json",
             "uri": "http://my.endpoint.org/notify"
         },
-        "format": "keyValues"
+        "format": "keyValues",
+        "status": "ok"
     },
     "q": "speed>50",
+    "status": "active",
     "type": "Subscription",
     "watchedAttributes": [
         "speed"
