@@ -584,6 +584,14 @@ bool orionldPatchSubscription(void)
   //
   dbSubscriptionReplace(subscriptionId, dbSubscriptionP);
 
+  //
+  // To make sure all modifications enter the subscription cache - call subCacheRefresh
+  // FIXME: This is a huge overkill, we only need to refresh the patched subscription
+  //
+  // Except, that didn't work - need to either fix it or invent some other way
+  //
+  // subCacheRefresh();
+
   // All OK? 204 No Content
   orionldState.httpStatusCode = 204;
 
