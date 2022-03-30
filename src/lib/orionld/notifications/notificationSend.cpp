@@ -155,7 +155,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
     else
     {
       char dotName[512];
-      strncpy(dotName, attrP->name, sizeof(dotName));
+      strncpy(dotName, attrP->name, sizeof(dotName) - 1);
       eqForDot(dotName);
 
       for (int ix = 0; ix < (int) mAltP->subP->attributes.size(); ix++)
