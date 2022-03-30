@@ -69,7 +69,6 @@ bool troePatchEntity(void)
 
   if (orionldState.patchTree != NULL)
   {
-    LM_TMP(("KZ: ------- To Be Marked as Deleted ----------------"));
     for (KjNode* patchP = orionldState.patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
       KjNode* pathNode = kjLookup(patchP, "PATH");
@@ -82,7 +81,6 @@ bool troePatchEntity(void)
 
         if (dotP == NULL)
         {
-          LM_TMP(("KZ: DELETE ATTRIBUTE %s", attrName));
           char instanceId[80];
           uuidGenerate(instanceId, sizeof(instanceId), true);
           pgAttributeAppend(&attributesBuffer, instanceId, attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL, NULL);
@@ -101,14 +99,12 @@ bool troePatchEntity(void)
                 (strcmp(subAttrName, "observedAt") != 0) &&
                 (strcmp(subAttrName, "datasetId")  != 0))
             {
-              LM_TMP(("KZ: DELETE SUB-ATTRIBUTE %s", subAttrName));
               pgSubAttributeAppend(&subAttributesBuffer, "urn:delete", subAttrName, entityId, "urn:attr-instance:unknown", NULL, "String", NULL, NULL, NULL, NULL);
             }
           }
         }
       }
     }
-    LM_TMP(("KZ: ------------------------------------------------"));
   }
 
   char* sqlV[2];

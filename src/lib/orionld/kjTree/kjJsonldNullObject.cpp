@@ -43,7 +43,12 @@ extern "C"
 //
 bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
 {
-  if ((strcmp(typeP->name, "@type") == 0) && (typeP->type == KjString))
+  char* type = typeP->name;
+
+  if (*type == '@')
+    ++type;
+
+  if ((strcmp(type, "type") == 0) && (typeP->type == KjString))
   {
     if (strcmp(typeP->value.s, "@json") == 0)
     {
@@ -63,7 +68,6 @@ bool kjJsonldNullObject(KjNode* attrP, KjNode* typeP)
 
         if (items == 2)  // All good - it's a JSON-LD NULL object
         {
-          LM_TMP(("XXXXXXXXXXXXXXXXXXXXXXXXXX JSON-LD NULL object for '%s' has been modified to a normal JSON null", attrP->name));
           attrP->type    = KjNull;
           attrP->value.i = 0;
 

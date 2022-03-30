@@ -39,7 +39,9 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
-#include "orionld/common/orionldState.h"        // orionldState
+#include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
+#include "orionld/common/orionldState.h"             // orionldState
+
 #include "cache/subCache.h"
 
 using std::map;
@@ -158,6 +160,7 @@ bool EntityInfo::match
   }
   else
   {
+    LM_TMP(("KZ No match due to Entity ID"));
     matchedId = false;
   }
 
@@ -172,6 +175,7 @@ bool EntityInfo::match
     }
     else if ((type != "")  && (entityType != "") && (entityType != type))
     {
+      LM_TMP(("KZ No match due to Entity Type"));
       matchedType = false;
     }
     else
@@ -231,6 +235,17 @@ typedef struct SubCache
 static SubCache  subCache            = { NULL, NULL, 0, 0, 0, 0 };
 bool             subCacheActive      = false;
 bool             subCacheMultitenant = false;
+
+
+
+/* ****************************************************************************
+*
+* subCacheHeadGet -
+*/
+CachedSubscription* subCacheHeadGet(void)
+{
+  return subCache.head;
+}
 
 
 
@@ -412,18 +427,21 @@ static bool subMatch
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
         // No match due to tenant I
+        LM_TMP(("KZ: No match due to tenant I"));
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
         // No match due to tenant II
+        LM_TMP(("KZ: No match due to tenant II"));
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
       // No match due to tenant III
+      LM_TMP(("KZ: No match due to tenant III"));
       return false;
     }
   }
@@ -431,6 +449,7 @@ static bool subMatch
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
     // No match due to servicePath
+    LM_TMP(("KZ: No match due to servicePath"));
     return false;
   }
 
@@ -444,6 +463,7 @@ static bool subMatch
   if (!attributeMatch(cSubP, attrV))
   {
     // No match due to attributes
+    LM_TMP(("KZ: No match due to attributes"));
     return false;
   }
 
@@ -452,9 +472,7 @@ static bool subMatch
     EntityInfo* eiP = cSubP->entityIdInfos[ix];
 
     if (eiP->match(entityId, entityType))
-    {
       return true;
-    }
   }
 
   // No match due to EntityInfo
@@ -467,7 +485,7 @@ static bool subMatch
 *
 * subCacheMatch -
 */
-void subCacheMatch
+int subCacheMatch
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -477,7 +495,8 @@ void subCacheMatch
   std::vector<CachedSubscription*>*  subVecP
 )
 {
-  CachedSubscription* cSubP = subCache.head;
+  CachedSubscription* cSubP   = subCache.head;
+  int                 matches = 0;
 
   while (cSubP != NULL)
   {
@@ -487,11 +506,14 @@ void subCacheMatch
 
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
+      ++matches;
       subVecP->push_back(cSubP);
     }
 
     cSubP = cSubP->next;
   }
+
+  return matches;
 }
 
 
@@ -500,7 +522,7 @@ void subCacheMatch
 *
 * subCacheMatch -
 */
-void subCacheMatch
+int subCacheMatch
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -510,17 +532,21 @@ void subCacheMatch
   std::vector<CachedSubscription*>*  subVecP
 )
 {
-  CachedSubscription* cSubP = subCache.head;
+  CachedSubscription* cSubP   = subCache.head;
+  int                 matches = 0;
 
   while (cSubP != NULL)
   {
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
+      ++matches;
     }
 
     cSubP = cSubP->next;
   }
+
+  return matches;
 }
 
 
@@ -531,6 +557,8 @@ void subCacheMatch
 */
 void subCacheItemDestroy(CachedSubscription* cSubP)
 {
+  free(cSubP->url);
+
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
@@ -603,7 +631,7 @@ void subCacheDestroy(void)
 *
 * tenantMatch -
 */
-static bool tenantMatch(const char* tenant1, const char* tenant2)
+bool tenantMatch(const char* tenant1, const char* tenant2)
 {
   //
   // Removing complications with NULL, giving NULL tenants the value of an empty string;
@@ -611,17 +639,7 @@ static bool tenantMatch(const char* tenant1, const char* tenant2)
   tenant1 = (tenant1 == NULL)? "" : tenant1;
   tenant2 = (tenant2 == NULL)? "" : tenant2;
 
-  if (strlen(tenant1) != strlen(tenant2))
-  {
-    return false;
-  }
-
-  if (strcmp(tenant1, tenant2) == 0)
-  {
-    return true;
-  }
-
-  return false;
+  return (strcmp(tenant1, tenant2) == 0);
 }
 
 
@@ -634,7 +652,9 @@ static bool tenantMatch(const char* tenant1, const char* tenant2)
 *           just a single linked link for the subscriptions.
 *           The hash could be adding each char in 'tenant' and 'subscriptionId' to a 8-bit
 *           integer and then we'd have a vector of 256 linked lists.
-*           Another way of implementing this would be to use a std::vector or std::map.
+*
+*           However, for matching against chang3ed entities, which is 99% of the usage of the cache,
+*           nothing would be gained so ... let's not do this.
 */
 CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscriptionId)
 {
@@ -704,6 +724,84 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// urlParse - extract protocol, ip, port and URL-PATH from a 'reference' string
+//
+// FIXME
+//   This function is generic and should be moved to its own module in orionld/common
+//   However, I think I have a function doing exactly this already ...
+//
+bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP)
+{
+  char*            protocolEnd;
+  char*            colon;
+  char*            ip;
+  char*            rest;
+
+  // Check for custom url, e.g. "${abc}" - only if NGSIv2
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    if (strncmp(url, "${", 2) == 0)
+    {
+      int len = strlen(url);
+
+      if (url[len - 1] == '}')
+      {
+        *protocolP = NULL;
+        *ipP       = NULL;
+        *portP     = 0;
+        *restP     = NULL;
+        return true;
+      }
+    }
+  }
+
+
+  //
+  // URL: <protocol> "://" <ip> [:<port] [path]
+  //
+  protocolEnd = strstr(url, "://");
+  if (protocolEnd != NULL)
+  {
+    *protocolEnd = 0;
+    *protocolP   = url;
+    ip           = &protocolEnd[3];
+  }
+  else
+    ip = url;
+
+  colon = strchr(ip, ':');
+  if (colon != NULL)
+  {
+    *colon = 0;
+    *portP = atoi(&colon[1]);
+    rest   = &colon[1];
+  }
+  else
+  {
+    *portP = 80;  // What should be the default port?
+    *ipP   = ip;
+    *restP = NULL;
+    return true;
+  }
+
+  *ipP   = ip;
+
+  rest = strchr(rest, '/');
+  if (rest != NULL)
+  {
+    *rest  = 0;
+    *restP = &rest[1];
+  }
+  else
+    *restP = NULL;
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * subCacheItemInsert - create a new sub, fill it in, and add it to cache
@@ -753,7 +851,6 @@ void subCacheItemInsert
   //
   // Add the subscription to the subscription cache.
   //
-
   CachedSubscription* cSubP = new CachedSubscription();
 
 
@@ -772,11 +869,46 @@ void subCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
   cSubP->status                = status;
-#ifdef ORIONLD
+
+  if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
+  {
+    cSubP->status   = "expired";
+    cSubP->isActive = false;
+  }
+  else if (cSubP->status == "")
+    cSubP->status = "active";
+
+  if (cSubP->status == "active")
+    cSubP->isActive = true;
+  else
+    cSubP->isActive = false;
+
+
   cSubP->name                    = name;
-  cSubP->ldContext               = ldContext;
   cSubP->expression.geoproperty  = geoproperty;
-#endif
+
+  if (orionldState.apiVersion == NGSI_LD_V1)
+  {
+    OrionldProblemDetails  pd;
+
+    cSubP->ldContext               = ldContext;
+    cSubP->contextP                = orionldContextFromUrl((char*) cSubP->ldContext.c_str(), NULL, &pd);
+
+    if (cSubP->contextP == NULL)
+    {
+      LM_E(("Internal Error (%s: %s)", pd.title, pd.status));
+      cSubP->contextP = orionldState.contextP;
+    }
+  }
+
+  // Counters and stats
+  cSubP->lastNotificationTime  = 0;  // Or, does this come from DB ?
+  cSubP->lastSuccess           = 0;  // Or, does this come from DB ?
+  cSubP->lastFailure           = 0;  // Or, does this come from DB ?
+  cSubP->consecutiveErrors     = 0;
+  cSubP->lastErrorReason[0]    = 0;
+
+
   cSubP->expression.q           = q;
   cSubP->expression.geometry    = geometry;
   cSubP->expression.coords      = coords;
@@ -786,6 +918,12 @@ void subCacheItemInsert
   cSubP->notifyConditionV       = conditionAttrs;
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
+
+  //
+  // IP, port and rest
+  //
+  cSubP->url = strdup(httpInfo.url.c_str());
+  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
 
   //
   // String filters
@@ -828,6 +966,15 @@ void subCacheItemInsert
     cSubP->entityIdInfos.push_back(eP);
   }
 
+  //
+  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
+  //
+  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
+
+  for (int ix = 0; ix < triggerArraySize; ++ix)
+  {
+    cSubP->triggers[ix] = true;
+  }
 
   //
   // Insert the subscription in the cache
@@ -1264,4 +1411,45 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     subP->lastFailure  = orionldState.requestTime;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
+}
+
+
+
+/* ****************************************************************************
+*
+* subscriptionFailure -
+*/
+void subscriptionFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
+{
+  subP->lastNotificationTime  = timestamp;
+  subP->lastFailure           = timestamp;
+  subP->consecutiveErrors    += 1;
+  subP->count                += 1;
+
+  strncpy(subP->lastErrorReason, errorReason, sizeof(subP->lastErrorReason) - 1);
+
+  // Force the subscription into "paused" due to too many consecutive errors
+  if (subP->consecutiveErrors >= 3)
+  {
+    subP->isActive = false;
+    subP->status   = "paused";
+  }
+
+  // Write to DB ... ?
+}
+
+
+
+/* ****************************************************************************
+*
+* subscriptionSuccess -
+*/
+void subscriptionSuccess(CachedSubscription* subP, double timestamp)
+{
+  subP->lastSuccess           = timestamp;
+  subP->lastNotificationTime  = timestamp;
+  subP->consecutiveErrors     = 0;
+  subP->count                += 1;
+
+  // Write to DB ... ?
 }

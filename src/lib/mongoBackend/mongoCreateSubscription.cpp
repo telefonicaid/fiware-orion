@@ -196,9 +196,10 @@ std::string mongoCreateSubscription
 
 #ifdef ORIONLD
   double now = orionldState.requestTime;
-  setName(sub, &b);
-  setContext(sub, &b);
-  setCsf(sub, &b);
+  if (sub.name      != "")  setName(sub, &b);
+  if (sub.ldContext != "")  setContext(sub, &b);
+  if (sub.csf       != "")  setCsf(sub, &b);
+
   setTimestamp("createdAt",  now, &b);
   setTimestamp("modifiedAt", now, &b);
 

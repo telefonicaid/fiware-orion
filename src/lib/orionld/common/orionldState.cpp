@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL_V*
 #include "orionld/troe/troe.h"                                   // TroeMode
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // Own interface
@@ -137,6 +138,9 @@ void orionldStateInit(MHD_Connection* connection)
   kTimeGet(&orionldState.timestamp);
   orionldState.mhdConnection           = connection;
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+
+  numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
+
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;

@@ -275,9 +275,10 @@ static void setSubscriptionId(Subscription* s, const BSONObj* rP)
 *
 * setName -
 */
-static void setName(Subscription* s, const BSONObj* rP)
+static void setName(Subscription* subP, const BSONObj* rP)
 {
-  s->name = getStringFieldF(rP, CSUB_NAME);
+  if (rP->hasField(CSUB_NAME))
+    subP->name = getStringFieldF(rP, CSUB_NAME);
 }
 
 
@@ -286,9 +287,10 @@ static void setName(Subscription* s, const BSONObj* rP)
 *
 * setContext -
 */
-static void setContext(Subscription* s, const BSONObj* rP)
+static void setContext(Subscription* subP, const BSONObj* rP)
 {
-  s->ldContext = getStringFieldF(rP, CSUB_LDCONTEXT);
+  if (rP->hasField(CSUB_LDCONTEXT))
+    subP->ldContext = getStringFieldF(rP, CSUB_LDCONTEXT);
 }
 
 
@@ -297,9 +299,10 @@ static void setContext(Subscription* s, const BSONObj* rP)
 *
 * setCsf -
 */
-static void setCsf(Subscription* s, const BSONObj* rP)
+static void setCsf(Subscription* subP, const BSONObj* rP)
 {
-  s->csf = getStringFieldF(rP, "csf");
+  if (rP->hasField("csf"))
+    subP->csf = getStringFieldF(rP, "csf");
 }
 
 
@@ -310,7 +313,7 @@ static void setCsf(Subscription* s, const BSONObj* rP)
 */
 static void setMimeType(Subscription* s, const BSONObj* rP)
 {
-  if (rP->hasField(CSUB_NAME))
+  if (rP->hasField(CSUB_MIMETYPE))
   {
     const char* mimeTypeString = getStringFieldF(rP, CSUB_MIMETYPE);
 

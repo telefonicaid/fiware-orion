@@ -59,7 +59,7 @@ bool mongoCppLegacySubscriptionReplace(const char* subscriptionId, KjNode* dbSub
   // semTake()
   mongo::DBClientBase*  connectionP = getMongoConnection();
   mongo::Query          query(filter.obj());
-
+  bool                  r = true;
   try
   {
     connectionP->update(orionldState.tenantP->subscriptions, query, payloadAsBsonObj, false, false);
@@ -67,10 +67,11 @@ bool mongoCppLegacySubscriptionReplace(const char* subscriptionId, KjNode* dbSub
   catch (const std::exception &e)
   {
     LM_E(("Mongo Exception: %s", e.what()));
+    r = false;
   }
 
   releaseMongoConnection(connectionP);
   // semGive()
 
-  return false;
+  return r;
 }

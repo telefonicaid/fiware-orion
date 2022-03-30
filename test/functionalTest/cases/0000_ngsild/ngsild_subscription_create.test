@@ -478,7 +478,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 888
+Content-Length: 908
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -513,8 +513,8 @@ Date: REGEX(.*)
     "geoproperty": "not supported"
   },
   "csf": "not implemented",
-  "isActive": false,
   "status": "paused",
+  "isActive": false,
   "notification": {
     "attributes": [
       "P1",
@@ -525,7 +525,8 @@ Date: REGEX(.*)
     "endpoint": {
       "uri": "http://valid.url/url",
       "accept": "application/ld+json"
-    }
+    },
+    "status": "ok"
   },
   "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5
@@ -536,7 +537,7 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 977
+Content-Length: 997
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -570,8 +571,8 @@ Date: REGEX(.*)
     "geoproperty": "not supported"
   },
   "csf": "not implemented",
-  "isActive": false,
   "status": "paused",
+  "isActive": false,
   "notification": {
     "attributes": [
       "P1",
@@ -582,7 +583,8 @@ Date: REGEX(.*)
     "endpoint": {
       "uri": "http://valid.url/url",
       "accept": "application/ld+json"
-    }
+    },
+    "status": "ok"
   },
   "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
@@ -654,7 +656,7 @@ Date: REGEX(.*)
 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 444
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -669,6 +671,7 @@ Date: REGEX(.*)
         }
     ],
     "id": "http://a.b.c/subs/sub09",
+    "isActive": true,
     "modifiedAt": REGEX(.*),
     "name": "Test subscription 09",
     "notification": {
@@ -679,8 +682,10 @@ Date: REGEX(.*)
             "accept": "application/ld+json",
             "uri": "http://valid.url/url"
         },
-        "format": "keyValues"
+        "format": "keyValues",
+        "status": "ok"
     },
+    "status": "active",
     "type": "Subscription"
 }
 

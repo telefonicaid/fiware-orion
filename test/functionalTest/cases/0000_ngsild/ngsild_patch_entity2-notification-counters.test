@@ -1,0 +1,294 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New notifications and subscription counters
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+#
+# 01. Create an entity E1 with an attribute P1
+# 02. Create an entity E2 with an attribute P1
+# 03. Create S1 - a subscription matching E1 pointing to accumulator
+# 04. Create S2 - a subscription matching E2 pointing nowhere
+# 05. PATCH E1, updating P1 - 10 times
+# 06. PATCH E2, updating P1 - 4 times
+# 07. GET S1 - see lastSuccess==now, lastFailure==never, errors==0, timesSent==10, status==active
+# 08. GET S2 - see lastSuccess==never, lastFailure==now, timesSent==4, status==paused
+#
+
+echo "01. Create an entity E1 with an attribute P1"
+echo "============================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E2 with an attribute P1"
+echo "============================================"
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create S1 - a subscription matching E1 pointing to accumulator"
+echo "=================================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create S2 - a subscription matching E2 pointing nowhere"
+echo "==========================================================="
+payload='{
+  "id": "urn:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E2",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.9.9.9:1234/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. PATCH E1, updating P1 - 10 times"
+echo "===================================="
+typeset -i loopNo
+loopNo=1
+
+while [ $loopNo -le 10 ]
+do
+  loopNo=$loopNo+1
+
+  payload='{
+    "P1": '$loopNo'
+  }'
+  orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+done | grep 204
+echo
+echo
+
+
+echo "06. PATCH E2, updating P1 - 4 times"
+echo "==================================="
+typeset -i loopNo
+loopNo=1
+
+while [ $loopNo -le 4 ]
+do
+  loopNo=$loopNo+1
+
+  payload='{
+    "P1": '$loopNo'
+  }'
+  orionCurl --url /ngsi-ld/v1/entities/urn:E2 -X PATCH --payload "$payload"
+done | grep 204
+echo
+echo
+
+
+echo "07. GET S1 - see lastSuccess==now, lastFailure==never, errors==0, timesSent==10, status==active"
+echo "==============================================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+echo "08. GET S2 - see lastSuccess==never, lastFailure==now, timesSent==4, status==paused"
+echo "==================================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with an attribute P1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. Create an entity E2 with an attribute P1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E2
+Date: REGEX(.*)
+
+
+
+03. Create S1 - a subscription matching E1 pointing to accumulator
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+Date: REGEX(.*)
+
+
+
+04. Create S2 - a subscription matching E2 pointing nowhere
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S2
+Date: REGEX(.*)
+
+
+
+05. PATCH E1, updating P1 - 10 times
+====================================
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+
+
+06. PATCH E2, updating P1 - 4 times
+===================================
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+HTTP/1.1 204 No Content
+
+
+07. GET S1 - see lastSuccess==now, lastFailure==never, errors==0, timesSent==10, status==active
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 344
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 10
+    },
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+08. GET S2 - see lastSuccess==never, lastFailure==now, timesSent==4, status==paused
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 433
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S2",
+    "isActive": false,
+    "notification": {
+        "consecutiveErrors": 3,
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.9.9.9:1234/notify"
+        },
+        "format": "normalized",
+        "lastErrorReason": "Unable to connect to notification endpoint",
+        "lastFailure": "202REGEX(.*)",
+        "lastNotification": "202REGEX(.*)",
+        "status": "failed",
+        "timesSent": 3
+    },
+    "status": "paused",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

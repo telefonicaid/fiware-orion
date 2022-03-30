@@ -44,19 +44,31 @@ extern "C"
 //
 // dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
 //
-void dbModelToApiAttribute(KjNode* attrP)
+void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
 {
   //
   // Remove unwanted parts of the attribute from DB
   //
-  const char* unwanted[] = { "mdNames", "creDate", "modDate" };
+  const char* unwanted[]   = { "mdNames", "creDate",   "modDate" };
+  const char* ngsildName[] = { NULL,      "createdAt", "modifiedAt" };
 
   for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {
     KjNode* nodeP = kjLookup(attrP, unwanted[ix]);
 
     if (nodeP != NULL)
-      kjChildRemove(attrP, nodeP);
+    {
+      if ((sysAttrs == true) && (ix > 0))
+      {
+        char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+        numberToDate(attrP->value.f, dateTimeBuf, 32);
+        attrP->name       = (char*) ngsildName[ix];
+        attrP->value.s    = dateTimeBuf;
+        attrP->type       = KjString;
+      }
+      else
+        kjChildRemove(attrP, nodeP);
+    }
   }
 
   KjNode* observedAtP = kjLookup(attrP, "observedAt");
@@ -68,7 +80,6 @@ void dbModelToApiAttribute(KjNode* attrP)
     numberToDate(observedAtP->value.firstChildP->value.f, dateTimeBuf, 32);
     observedAtP->type      = KjString;
     observedAtP->value.s   = dateTimeBuf;
-    observedAtP->lastChild = NULL;
   }
 
   if (unitCodeP != NULL)

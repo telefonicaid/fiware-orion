@@ -45,7 +45,6 @@ SET (SOURCES
     orionldGetContexts.cpp
     orionldGetVersion.cpp
     orionldNotImplemented.cpp
-    orionldNotify.cpp
     orionldPostBatchCreate.cpp
     orionldPostBatchUpsert.cpp
     orionldPostBatchUpdate.cpp

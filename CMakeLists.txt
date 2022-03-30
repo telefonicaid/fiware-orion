@@ -191,6 +191,7 @@ SET (ORION_LIBS
     orionld_common
     orionld_context
     orionld_contextCache
+    orionld_notifications
     orionld_db
     orionld_mongoc
     orionld_mongoCppLegacy
@@ -344,6 +345,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
+  ADD_SUBDIRECTORY(src/lib/orionld/notifications)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/orionld/troe)

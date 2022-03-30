@@ -30,6 +30,7 @@ SET (SOURCES
     dbModelFromApiEntity.cpp
     dbModelFromApiAttribute.cpp
     dbModelFromApiSubAttribute.cpp
+    dbModelToApiEntity.cpp
     dbModelToApiAttribute.cpp
     dbModelToApiSubAttribute.cpp
 )

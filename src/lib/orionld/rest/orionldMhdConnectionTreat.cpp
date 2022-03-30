@@ -42,9 +42,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "common/string.h"                                       // FT
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "rest/restReply.h"                                      // restReply
@@ -893,6 +891,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.httpStatusCode != 200)
     goto respond;
 
+  // if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT) && (orionldState.verb != OPTIONS))
   if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT))
   {
     LM_W(("Bad Input (payload body - of %d bytes - for a %s request", orionldState.in.contentLength, verbName(orionldState.verb)));
@@ -903,14 +902,18 @@ MHD_Result orionldMhdConnectionTreat(void)
 
   //
   // Any URI param given but not supported?
+  // No validity check if OPTIONS verb is used
   //
-  char* detail;
-  if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
+  if (orionldState.verb != OPTIONS)
   {
-    LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
-    orionldState.httpStatusCode = 400;
-    goto respond;
+    char* detail;
+    if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
+    {
+      LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
+      orionldState.httpStatusCode = 400;
+      goto respond;
+    }
   }
 
   //
@@ -1247,9 +1250,6 @@ MHD_Result orionldMhdConnectionTreat(void)
         LM_E(("Internal Error (something went wrong during TRoE processing)"));
       else
       {
-        numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
-
-
         //
         // Special case - Entity creation with no attribute
         // As both the entity id and the entity type have been removed from the payload body, the payload body is now empty.

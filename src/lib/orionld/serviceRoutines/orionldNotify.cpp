@@ -46,6 +46,7 @@ extern "C"
 
 
 
+
 // -----------------------------------------------------------------------------
 //
 // ipPortAndRest - extract ip, port and URL-PATH from a 'reference' string
@@ -287,7 +288,7 @@ void orionldNotify(void)
     if (niP->fd == -1)
     {
       niP->connected = false;
-      LM_E(("Internal Error (unable to connent to server for notification for subscription '%s': %s)", niP->subscriptionId, strerror(errno)));
+      LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", niP->subscriptionId, strerror(errno)));
       continue;
     }
 

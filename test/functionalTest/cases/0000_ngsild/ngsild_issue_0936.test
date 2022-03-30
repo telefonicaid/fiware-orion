@@ -87,7 +87,7 @@ Date: REGEX(.*)
 02. Query subscriptions, make sure the sub from step 01 has an identifier
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 412
+Content-Length: 460
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -103,6 +103,7 @@ Date: REGEX(.*)
         ],
         "expires": "2040-01-01T14:00:00.000Z",
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
         "notification": {
             "attributes": [
                 "Water level"
@@ -111,8 +112,10 @@ Date: REGEX(.*)
                 "accept": "application/json",
                 "uri": "http://my.endpoint.org/notify"
             },
-            "format": "keyValues"
+            "format": "keyValues",
+            "status": "ok"
         },
+        "status": "active",
         "type": "Subscription",
         "watchedAttributes": [
             "Water level"

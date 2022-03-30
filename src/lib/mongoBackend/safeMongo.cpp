@@ -72,8 +72,7 @@ bool getObjectField(BSONObj* outObjectP, const BSONObj* bP, const char* field, c
   }
   else
   {
-    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field, bP->toString().c_str(), caller, line));
+    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)", field, bP->toString().c_str(), caller, line));
     return false;
   }
 
@@ -138,11 +137,8 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
   }
   else
   {
-    LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field,
-          bP->toString().c_str(),
-          caller,
-          line));
+    // Sometines this is an error, far from always ...
+    LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s:%d)", field, bP->toString().c_str(), caller, line));
     return "";
   }
 

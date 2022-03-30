@@ -1,0 +1,216 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications for PATCH /entities/{entityId} 01 - Attribute Added, Deleted, and Modified
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes A2 and A3
+# 02. Create a subscription on Entity E1 for all attributes
+# 03. PATCH E1 adding an attribute A1
+# 04. Dump+Reset accumulator - see one notification
+# 05. PATCH E1 modifying the value of attribute A1
+# 06. Dump+Reset accumulator - see one notification
+# 07. PATCH E1 with exact same attribute A1
+# 08. Dump+Reset accumulator - see one notification
+# 09. PATCH E1 deleting attribute A1
+# 10. Dump+Reset accumulator - see one notification
+# 11. PATCH E1 with exact same value of attribute A1, but changing some sub-attr
+# 12. Dump+Reset accumulator - see one notification
+#
+
+echo "01. Create an entity E1 with attributes A2 and A3"
+echo "================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "A2": 2,
+  "A3": 3
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription on Entity E1 for all attributes"
+echo "========================================================="
+payload='{
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T",
+      "id": "urn:E1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }   
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. PATCH E1 adding an attribute A1"
+echo "==================================="
+payload='{
+  "A1": {
+    "value": 3,
+    "observedAt": "2022-03-10T20:36:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+
+echo "04. Dump+Reset accumulator - see one notification"
+echo "================================================="
+echo
+echo
+
+echo "05. PATCH E1 modifying the value of attribute A1"
+echo "================================================"
+payload='{
+  "A1": 5
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. Dump+Reset accumulator - see one notification"
+echo "================================================="
+echo
+echo
+
+
+echo "07. PATCH E1 with exact same attribute A1"
+echo "========================================="
+payload='{
+  "A1": 5
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. Dump+Reset accumulator - see one notification"
+echo "================================================="
+echo
+echo
+
+
+echo "09. PATCH E1 deleting attribute A1"
+echo "=================================="
+payload='{
+  "A1": { "@type": "@json", "@value": null }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "10. Dump+Reset accumulator - see one notification"
+echo "================================================="
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attributes A2 and A3
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. Create a subscription on Entity E1 for all attributes
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+03. PATCH E1 adding an attribute A1
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Dump+Reset accumulator - see one notification
+=================================================
+
+
+05. PATCH E1 modifying the value of attribute A1
+================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Dump+Reset accumulator - see one notification
+=================================================
+
+
+07. PATCH E1 with exact same attribute A1
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. Dump+Reset accumulator - see one notification
+=================================================
+
+
+09. PATCH E1 deleting attribute A1
+==================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. Dump+Reset accumulator - see one notification
+=================================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

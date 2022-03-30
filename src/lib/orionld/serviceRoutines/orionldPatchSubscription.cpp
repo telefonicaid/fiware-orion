@@ -22,20 +22,34 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
+#include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
+#include "common/globals.h"                                    // parse8601Time
+
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/common/urlParse.h"                           // urlParse
+#include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
+#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
 #include "orionld/db/dbConfiguration.h"                        // dbSubscriptionGet
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/kjTree/kjChildAddOrReplace.h"                // kjChildAddOrReplace
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"  // Own Interface
 
@@ -88,7 +102,7 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
+static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription* cSubP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
   KjNode* next;
@@ -105,8 +119,7 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, 
       {
         if (okToRemove(fragmentP->name) == false)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name);
-          orionldState.httpStatusCode = 400;
+          orionldError(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name, 500);
           return false;
         }
 
@@ -117,6 +130,20 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree, 
     {
       if ((fragmentP != qP) && (fragmentP != expressionP))
         kjChildAddOrReplace(dbSubscriptionP, fragmentP->name, fragmentP);
+
+      if (strcmp(fragmentP->name, "status") == 0)
+      {
+        if (strcmp(fragmentP->value.s, "active") == 0)
+        {
+          cSubP->isActive = true;
+          cSubP->status   = "active";
+        }
+        else
+        {
+          cSubP->isActive = false;
+          cSubP->status   = "paused";
+        }
+      }
     }
 
     fragmentP = next;
@@ -437,6 +464,274 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// subCacheItemUpdateEntities -
+//
+static bool subCacheItemUpdateEntities(CachedSubscription* cSubP, KjNode* entityArray)
+{
+  cSubP->entityIdInfos.empty();
+  for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    KjNode*      idP          = kjLookup(entityP, "id");
+    KjNode*      idPatternP   = kjLookup(entityP, "idPattern");
+    KjNode*      typeP        = kjLookup(entityP, "type");
+    EntityInfo*  entityInfoP;
+
+    if ((idP == NULL) && (idPatternP == NULL))
+      entityInfoP = new EntityInfo(".*", std::string(typeP->value.s), "true", false);
+    else if (idP != NULL)
+      entityInfoP = new EntityInfo(std::string(idP->value.s), std::string(typeP->value.s), "false", false);
+    else
+      entityInfoP = new EntityInfo(std::string(idPatternP->value.s), std::string(typeP->value.s), "true", false);
+
+    cSubP->entityIdInfos.push_back(entityInfoP);
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheItemUpdateWatchedAttributes -
+//
+static bool subCacheItemUpdateWatchedAttributes(CachedSubscription* cSubP, KjNode* itemP)
+{
+  cSubP->notifyConditionV.empty();
+
+  int  attrs = 0;
+  for (KjNode* attrNodeP = itemP->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  {
+    char* longName = orionldAttributeExpand(orionldState.contextP, attrNodeP->value.s, true, NULL);
+
+    cSubP->notifyConditionV.push_back(longName);
+    ++attrs;
+  }
+
+  if ((int) cSubP->notifyConditionV.size() != attrs)
+    LM_RE(false, ("Expected %d items in watchedAttributes list - there are %d !!!", attrs, cSubP->notifyConditionV.size()));
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheItemUpdateGeoQ -
+//
+static bool subCacheItemUpdateGeoQ(CachedSubscription* cSubP, KjNode* itemP)
+{
+  KjNode* geometryP     = kjLookup(itemP, "geometry");
+  KjNode* coordinatesP  = kjLookup(itemP, "coordinates");
+  KjNode* georelP       = kjLookup(itemP, "georel");
+  KjNode* geopropertyP  = kjLookup(itemP, "geoproperty");
+
+  if (geometryP    != NULL) cSubP->expression.geometry    = geometryP->value.s;
+  if (georelP      != NULL) cSubP->expression.georel      = georelP->value.s;
+  if (geopropertyP != NULL) cSubP->expression.geoproperty = geopropertyP->value.s;
+
+  if (coordinatesP != NULL)
+  {
+    int   coordsSize = kjFastRenderSize(coordinatesP) + 100;
+    char* coords     = kaAlloc(&orionldState.kalloc, coordsSize);
+
+    kjFastRender(coordinatesP, coords);
+    cSubP->expression.coords = coords;
+  }
+
+  return true;
+}
+
+
+extern bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP);
+// -----------------------------------------------------------------------------
+//
+// subCacheItemUpdateNotificationEndpoint -
+//
+static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, KjNode* endpointP)
+{
+  KjNode* uriP           = kjLookup(endpointP, "uri");
+  KjNode* acceptP        = kjLookup(endpointP, "accept");
+#if 0
+  KjNode* receiverInfoP  = kjLookup(endpointP, "receiverInfo");
+  KjNode* notifierInfoP  = kjLookup(endpointP, "notifierInfo");
+#endif
+
+  if (uriP != NULL)
+  {
+    char*           url;
+    char*           protocol;
+    char*           ip;
+    unsigned short  port;
+    char*           rest;
+
+    url = strdup(uriP->value.s);
+    LM_TMP(("KZ: uri: '%s'", uriP->value.s));
+    if (urlParse(cSubP->url, &protocol, &ip, &port, &rest) == true)
+    {
+      free(cSubP->url);
+      cSubP->url      = url;
+      cSubP->protocol = protocol;
+      cSubP->ip       = ip;
+      cSubP->port     = port;
+      cSubP->rest     = rest;
+    }
+    else
+      LM_W(("Invalid url '%s'", uriP->value.s));
+  }
+
+  if (acceptP != NULL)
+  {
+    uint32_t acceptMask;
+    cSubP->httpInfo.mimeType = mimeTypeFromString(acceptP->value.s, NULL, true, false, &acceptMask);
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheItemUpdateNotification -
+//
+static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* itemP)
+{
+  KjNode* attributesP = kjLookup(itemP, "attributes");
+  KjNode* formatP     = kjLookup(itemP, "format");
+  KjNode* endpointP   = kjLookup(itemP, "endpoint");
+
+  if (attributesP != NULL)  // Those present in the notification
+  {
+    cSubP->attributes.empty();
+    for (KjNode* attrNodeP = attributesP->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+    {
+      char* longName = orionldAttributeExpand(orionldState.contextP, attrNodeP->value.s, true, NULL);
+      cSubP->attributes.push_back(longName);
+    }
+  }
+
+  if (formatP != NULL)
+    cSubP->renderFormat = stringToRenderFormat(formatP->value.s);
+
+  if (endpointP != NULL)
+    return subCacheItemUpdateNotificationEndpoint(cSubP, endpointP);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheItemUpdate -
+//
+static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionId, KjNode* subscriptionTree)
+{
+  CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subscriptionId);
+  bool                r     = true;
+
+  if (cSubP == NULL)
+    LM_RE(false, ("Internal Error (can't find the subscription '%s' in the subscription cache)", subscriptionId));
+
+  cacheSemTake(__FUNCTION__, "Updating a cached subscription");
+  subCacheState = ScsSynchronizing;
+
+  for (KjNode* itemP = subscriptionTree->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    LM_TMP(("Updating '%s' for the cached subscription '%s'", itemP->name, subscriptionId));
+    if ((strcmp(itemP->name, "subscriptionName") == 0) || (strcmp(itemP->name, "name") == 0))
+    {
+      cSubP->name = itemP->value.s;
+    }
+    else if (strcmp(itemP->name, "description") == 0)
+    {
+      // The description is only stored in the database ...
+      //
+      // cSubP->description = itemP->value.s;
+    }
+    else if (strcmp(itemP->name, "entities") == 0)
+    {
+      subCacheItemUpdateEntities(cSubP, itemP);
+    }
+    else if (strcmp(itemP->name, "watchedAttributes") == 0)
+    {
+      subCacheItemUpdateWatchedAttributes(cSubP, itemP);
+    }
+    else if (strcmp(itemP->name, "timeInterval") == 0)
+    {
+      LM_W(("Not Implemented (Orion-LD doesn't implement periodical notifications"));
+    }
+    else if (strcmp(itemP->name, "q") == 0)
+    {
+      cSubP->expression.q = itemP->value.s;
+    }
+    else if (strcmp(itemP->name, "geoQ") == 0)
+    {
+      subCacheItemUpdateGeoQ(cSubP, itemP);
+    }
+    else if (strcmp(itemP->name, "csf") == 0)
+    {
+      //
+      // csf is not implemented (only used for Subscriptions on Context Source Registrations)
+      //
+      // cSubP->csf = itemP->value.s;
+    }
+    else if (strcmp(itemP->name, "isActive") == 0)
+    {
+      if (itemP->value.b == true)
+      {
+        cSubP->isActive = true;
+        cSubP->status   = "active";
+      }
+      else
+      {
+        cSubP->isActive = false;
+        cSubP->status   = "paused";
+      }
+    }
+    else if (strcmp(itemP->name, "notification") == 0)
+    {
+      subCacheItemUpdateNotification(cSubP, itemP);
+    }
+    else if (strcmp(itemP->name, "expiresAt") == 0)
+    {
+      cSubP->expirationTime = parse8601Time(itemP->value.s);
+    }
+    else if (strcmp(itemP->name, "throttling") == 0)
+    {
+      if (itemP->type == KjInt)
+        cSubP->throttling = (double) itemP->value.i;
+      else if (itemP->type == KjFloat)
+        cSubP->throttling = itemP->value.f;
+      else
+        LM_W(("Invalid type for 'throttling'"));
+    }
+    else if (strcmp(itemP->name, "scopeQ") == 0)
+    {
+      LM_W(("Not Implemented (Orion-LD doesn't support Multi-Type (yet)"));
+    }
+    else if (strcmp(itemP->name, "lang") == 0)
+    {
+      LM_W(("Not Implemented (Orion-LD doesn't support LanguageProperty just yet"));
+    }
+    else
+    {
+      orionldError(OrionldBadRequestData, "Invalid field for subscription patch", itemP->name, 400);
+      r = false;
+    }
+  }
+
+  subCacheState = ScsIdle;
+  cacheSemGive(__FUNCTION__, "Updated a cached subscription");
+  return r;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPatchSubscription -
@@ -464,8 +759,7 @@ bool orionldPatchSubscription(void)
 
   if (pcheckUri(subscriptionId, true, &detail) == false)
   {
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);  // FIXME: Include 'detail' and name (subscriptionId)
+    orionldError(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId, 400);
     return false;
   }
 
@@ -484,8 +778,7 @@ bool orionldPatchSubscription(void)
 
   if (dbSubscriptionP == NULL)
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", subscriptionId);
-    orionldState.httpStatusCode = 404;
+    orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
     return false;
   }
 
@@ -497,16 +790,14 @@ bool orionldPatchSubscription(void)
   //
   if (timeIntervalNodeP != NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented");
-    orionldState.httpStatusCode = 501;
+    orionldError(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented", 501);
     return false;
   }
 
   if ((watchedAttributesNodeP != NULL) && (timeIntervalNodeP != NULL))
   {
     LM_W(("Bad Input (Both 'watchedAttributes' and 'timeInterval' given in Subscription Payload Data)"));
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Both 'watchedAttributes' and 'timeInterval' given");
+    orionldError(OrionldBadRequestData, "Invalid Subscription Payload Data", "Both 'watchedAttributes' and 'timeInterval' given", 400);
     return false;
   }
   else if (watchedAttributesNodeP != NULL)
@@ -515,9 +806,10 @@ bool orionldPatchSubscription(void)
 
     if ((dbTimeIntervalNodeP != NULL) && (dbTimeIntervalNodeP->value.i != -1))
     {
-      LM_W(("Bad Input (Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'");
+      orionldError(OrionldBadRequestData,
+                   "Invalid Subscription Payload Data",
+                   "Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'",
+                   400);
       return false;
     }
   }
@@ -528,8 +820,7 @@ bool orionldPatchSubscription(void)
     if ((dbConditionsNodeP != NULL) && (dbConditionsNodeP->value.firstChildP != NULL))
     {
       LM_W(("Bad Input (Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes')"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'");
+      orionldError(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'", 400);
       return false;
     }
   }
@@ -541,6 +832,7 @@ bool orionldPatchSubscription(void)
   // FIXME: This is BAD ... shouldn't change the type of these fields
   //
   fixDbSubscription(dbSubscriptionP);
+  KjNode* patchBody = kjClone(orionldState.kjsonP, orionldState.requestTree);
   ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
 
   //
@@ -549,7 +841,8 @@ bool orionldPatchSubscription(void)
   // modified.
   // ngsildSubscriptionPatch() performs that modification
   //
-  if (ngsildSubscriptionPatch(dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
+  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+  if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
     return false;
 
   // Update modifiedAt
@@ -566,7 +859,15 @@ bool orionldPatchSubscription(void)
   //
   // Overwrite the current Subscription in the database
   //
-  dbSubscriptionReplace(subscriptionId, dbSubscriptionP);
+  if (dbSubscriptionReplace(subscriptionId, dbSubscriptionP) == false)
+  {
+    orionldError(OrionldInternalError, "Database Error", "patching a subscription", 500);
+    return false;
+  }
+
+  // Modify the subscription in the subscription cache
+  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody) == false)
+    LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
 
   // All OK? 204 No Content
   orionldState.httpStatusCode = 204;

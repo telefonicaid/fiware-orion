@@ -96,30 +96,30 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "QA_Provision_NoType", 
-                "isPattern": "false", 
+                "id": "QA_Provision_NoType",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "asdf", 
-                        "type": "asdf", 
+                        "name": "asdf",
+                        "type": "asdf",
                         "value": ""
                     }
-                ], 
-                "id": "id2", 
-                "isPattern": "false", 
+                ],
+                "id": "id2",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -139,30 +139,30 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "QA_Provision_NoType", 
-                "isPattern": "false", 
+                "id": "QA_Provision_NoType",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "asdf", 
-                        "type": "asdf", 
+                        "name": "asdf",
+                        "type": "asdf",
                         "value": "asdf"
                     }
-                ], 
-                "id": "id2", 
-                "isPattern": "false", 
+                ],
+                "id": "id2",
+                "isPattern": "false",
                 "type": ""
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }

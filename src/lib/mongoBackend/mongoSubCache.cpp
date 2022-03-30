@@ -28,6 +28,11 @@
 
 #include "mongo/client/dbclient.h"
 
+extern "C"
+{
+#include "kbase/kTime.h"                                         // kTimeGet
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -177,6 +182,24 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
+
+  //
+  // Checking status/isActive
+  //
+  if (cSubP->status == "active")
+    cSubP->isActive = true;
+
+  struct timespec now;
+  double          rightNow;
+
+  kTimeGet(&now);
+  rightNow = now.tv_sec + ((double) now.tv_nsec) / 1000000000;
+
+  if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < rightNow))
+  {
+    cSubP->status   = "expired";
+    cSubP->isActive = false;
+  }
 
   //
   // 04.2 httpInfo
