@@ -30,6 +30,7 @@
 #include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
 #include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"       // orionldPatchEntity2
+#include "orionld/serviceRoutines/orionldPutEntity.h"          // orionldPutEntity
 #include "orionld/serviceRoutines/orionldOptions.h"            // Own interface
 
 
@@ -50,7 +51,6 @@ static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, b
   //
   for (uint16_t verbNo = 0; verbNo <= OPTIONS; verbNo++)  // 0:GET, 1:PUT, 2:POST, 3:DELETE, 4:PATCH, 5:HEAD, 6:OPTIONS
   {
-    if (verbNo == PUT)  continue;
     if (verbNo == HEAD) continue;
 
     OrionLdRestService* serviceP;
@@ -58,6 +58,9 @@ static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, b
     {
       // PATCH Entity2 is only active if broker is started with -experimental
       if ((serviceP->serviceRoutine == orionldPatchEntity2) && (experimental == false))
+        continue;
+      // PUT Entity is only active if broker is started with -experimental
+      if ((serviceP->serviceRoutine == orionldPutEntity) && (experimental == false))
         continue;
 
       bitmask |= (1 << verbNo);
@@ -76,6 +79,7 @@ static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, b
   if (bitmask > 0)
   {
     if (bitmask & (1 << GET))      strcat(verbList, ",GET");
+    if (bitmask & (1 << PUT))      strcat(verbList, ",PUT");
     if (bitmask & (1 << POST))     strcat(verbList, ",POST");
     if (bitmask & (1 << DELETE))   strcat(verbList, ",DELETE");
     if (bitmask & (1 << PATCH))    strcat(verbList, ",PATCH");

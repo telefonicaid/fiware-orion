@@ -26,6 +26,7 @@ SET (SOURCES
     mongocConnectionRelease.cpp
     mongocEntityLookup.cpp
     mongocEntityUpdate.cpp
+    mongocEntityReplace.cpp
     mongocKjTreeFromBson.cpp
     mongocKjTreeToBson.cpp
     mongocContextCacheGet.cpp

@@ -380,6 +380,7 @@ Date: REGEX(.*)
 
 19. Dump+Reset accumulator - see two notifications: S2 and S4
 =============================================================
+#SORT_START
 POST http://127.0.0.1:9997/notify
 Content-Length: 278
 User-Agent: orionld
@@ -417,6 +418,7 @@ Content-Type: application/ld+json
     "subscriptionId": "urn:S2",
     "type": "Notification"
 }
+#SORT_END
 =======================================
 
 
@@ -429,6 +431,7 @@ Date: REGEX(.*)
 
 21. Dump+Reset accumulator - see three notifications: S2, S4, and S5
 ====================================================================
+#SORT_START
 POST http://127.0.0.1:9997/notify
 Content-Length: 314
 User-Agent: orionld
@@ -497,6 +500,7 @@ Content-Type: application/ld+json
     "subscriptionId": "urn:S2",
     "type": "Notification"
 }
+#SORT_END
 =======================================
 
 
