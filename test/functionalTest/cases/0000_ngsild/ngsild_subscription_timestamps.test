@@ -69,7 +69,7 @@ payload='{
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
     }
   },
-  "expires": "2028-12-31T11:12:13.456",
+  "expiresAt": "2028-12-31T11:12:13.456",
   "throttling": 1.459
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
@@ -294,7 +294,7 @@ bye
 03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 467
+Content-Length: 469
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -307,7 +307,7 @@ Date: REGEX(.*)
             "type": "T"
         }
     ],
-    "expires": "2028-12-31T11:12:13.456Z",
+    "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
@@ -376,7 +376,7 @@ Date: REGEX(.*)
 07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 568
+Content-Length: 570
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -389,7 +389,7 @@ Date: REGEX(.*)
             "type": "T"
         }
     ],
-    "expires": "2028-12-31T11:12:13.456Z",
+    "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
@@ -424,7 +424,7 @@ Date: REGEX(.*)
 09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 581
+Content-Length: 583
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -437,7 +437,7 @@ Date: REGEX(.*)
             "type": "T"
         }
     ],
-    "expires": "2028-12-31T11:12:13.456Z",
+    "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
@@ -477,7 +477,7 @@ Date: REGEX(.*)
 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 622
+Content-Length: 624
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -490,7 +490,7 @@ Date: REGEX(.*)
             "type": "T"
         }
     ],
-    "expires": "2028-12-31T11:12:13.456Z",
+    "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",

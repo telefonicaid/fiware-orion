@@ -57,7 +57,7 @@ payload='{
       "accept": "application/geo+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
+  "expiresAt": "2028-12-31T10:00:00",
   "throttling": 0
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
@@ -136,7 +136,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 403
+Content-Length: 405
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -149,7 +149,7 @@ Date: REGEX(.*)
             "type": "T"
         }
     ],
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "id": "http://a.b.c/subs/sub01",
     "isActive": true,
     "name": "Sub 01",

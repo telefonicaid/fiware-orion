@@ -26,6 +26,7 @@ SET (SOURCES
     OrionldAttributeType.cpp
     OrionldGeoJsonType.cpp
     OrionldAlteration.cpp
+    KeyValue.cpp
 )
 
 # Include directories

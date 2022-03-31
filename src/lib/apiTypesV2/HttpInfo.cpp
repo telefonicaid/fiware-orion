@@ -130,15 +130,28 @@ void HttpInfo::fill(const BSONObj* boP)
   this->url    = boP->hasField(CSUB_REFERENCE)? getStringFieldF(boP,  CSUB_REFERENCE) : "";
   this->custom = boP->hasField(CSUB_CUSTOM)?    getBoolFieldF(boP,    CSUB_CUSTOM)    : false;
 
-  bool mqtt = (strncmp(url.c_str(), "mqtt", 4) == 0);
-
-#ifdef ORIONLD
+  bool  mqtt           = (strncmp(url.c_str(), "mqtt", 4) == 0);
   char* mimeTypeString = (char*) getStringFieldF(boP, CSUB_MIMETYPE);
 
   if (mimeTypeString[0] == 0)
     mimeTypeString = (char*) "application/json";  // Default value
 
   this->mimeType = longStringToMimeType(mimeTypeString);
+
+  if (boP->hasField("headers"))  // This is 'receiverInfo' from the NGSI-LD API
+  {
+    mongo::BSONObj headersObj;
+
+    getObjectFieldF(&headersObj, boP, "headers");  // If it fails, 'headersObj' is empty and the for-loop will not be entered
+
+    for (BSONObj::iterator iter = headersObj.begin(); iter.more();)
+    {
+      mongo::BSONElement be  = iter.next();
+      const char*        key = be.fieldName();
+
+      headers[key] = be.String();
+    }
+  }
 
   if (boP->hasField("notifierInfo"))
   {
@@ -152,7 +165,7 @@ void HttpInfo::fill(const BSONObj* boP)
 
       const char*  key   = be.fieldName();
       const char*  value = be.String().c_str();
-      KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));  // FIXME: what about initial cache fill?
+      KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
 
       strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
       strncpy(kvP->value, value, sizeof(kvP->value) - 1);
@@ -160,7 +173,6 @@ void HttpInfo::fill(const BSONObj* boP)
       notifierInfo.push_back(kvP);
     }
   }
-#endif
 
   if (this->custom)
   {

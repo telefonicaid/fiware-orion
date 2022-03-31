@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKRECEIVERINFO_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKRECEIVERINFO_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -34,8 +34,8 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// pcheckEndpoint -
+// pcheckReceiverInfo -
 //
-extern bool pcheckEndpoint(KjNode* endpointP, bool patch);
+extern bool pcheckReceiverInfo(KjNode* receiverInfoP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKRECEIVERINFO_H_

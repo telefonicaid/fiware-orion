@@ -83,7 +83,14 @@ static bool kjTreeToReceiverInfo(KjNode* receiverInfoP, ngsiv2::HttpInfo* httpIn
         return false;
     }
 
-    httpInfoP->headers[key] = value;
+    if ((*key == 0) || (*value == 0))
+    {
+      LM_W(("Bad Input (Incomplete Endpoint::receiverInfo key-value pair - one of them is empty)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::receiverInfo key-value pair - one of them is empty");
+      return false;
+    }
+
+    httpInfoP->headers[key] = value;  // Adding the key-value to the list of headers for outgoing notifications
   }
 
   return true;

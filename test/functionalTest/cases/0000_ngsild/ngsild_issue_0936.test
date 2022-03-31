@@ -60,7 +60,7 @@ payload='{
       "accept": "application/json"
     }
   },
-  "expires": "2040-01-01T14:00:00.00Z"
+  "expiresAt": "2040-01-01T14:00:00.00Z"
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions -X POST --payload "$payload" -H "Content-Type: application/json"
 echo
@@ -87,7 +87,7 @@ Date: REGEX(.*)
 02. Query subscriptions, make sure the sub from step 01 has an identifier
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 460
+Content-Length: 462
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -101,7 +101,7 @@ Date: REGEX(.*)
                 "type": "Device"
             }
         ],
-        "expires": "2040-01-01T14:00:00.000Z",
+        "expiresAt": "2040-01-01T14:00:00.000Z",
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
         "notification": {

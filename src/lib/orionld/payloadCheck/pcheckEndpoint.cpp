@@ -32,18 +32,21 @@ extern "C"
 
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/payloadCheck/pcheckReceiverInfo.h"            // pcheckReceiverInfo
+#include "orionld/payloadCheck/pcheckNotifierInfo.h"            // pcheckNotifierInfo
 #include "orionld/payloadCheck/pcheckEndpoint.h"                // Own interface
-
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckEndpoint -
 //
-bool pcheckEndpoint(KjNode* endpointP)
+bool pcheckEndpoint(KjNode* endpointP, bool patch)
 {
-  KjNode* uriP    = NULL;
-  KjNode* acceptP = NULL;
+  KjNode* uriP           = NULL;
+  KjNode* acceptP        = NULL;
+  KjNode* receiverInfoP  = NULL;
+  KjNode* notifierInfoP  = NULL;
 
   for (KjNode* epItemP = endpointP->value.firstChildP; epItemP != NULL; epItemP = epItemP->next)
   {
@@ -65,6 +68,22 @@ bool pcheckEndpoint(KjNode* endpointP)
         return false;
       }
     }
+    else if (strcmp(epItemP->name, "receiverInfo") == 0)
+    {
+      DUPLICATE_CHECK(receiverInfoP, "receiverInfo", epItemP);
+      ARRAY_CHECK(receiverInfoP, "receiverInfo");
+      EMPTY_ARRAY_CHECK(receiverInfoP, "receiverInfo");
+      if (pcheckReceiverInfo(receiverInfoP) == false)
+        return false;
+    }
+    else if (strcmp(epItemP->name, "notifierInfo") == 0)
+    {
+      DUPLICATE_CHECK(notifierInfoP, "notifierInfo", epItemP);
+      ARRAY_CHECK(notifierInfoP, "notifierInfo");
+      EMPTY_ARRAY_CHECK(notifierInfoP, "notifierInfo");
+      if (pcheckNotifierInfo(notifierInfoP) == false)
+        return false;
+    }
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for 'endpoint'", epItemP->name);
@@ -73,7 +92,7 @@ bool pcheckEndpoint(KjNode* endpointP)
     }
   }
 
-  if (uriP == NULL)
+  if ((patch == false) && (uriP == NULL))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing in 'endpoint'", "uri");
     orionldState.httpStatusCode = SccBadRequest;

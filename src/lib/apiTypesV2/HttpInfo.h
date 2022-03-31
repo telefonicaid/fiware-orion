@@ -32,21 +32,8 @@
 #include "mongo/client/dbclient.h"
 #include "rest/Verb.h"
 
-#ifdef ORIONLD
 #include "common/MimeType.h"              // MimeType
-#endif
-
-
-
-/* ****************************************************************************
-*
-* KeyValue - FIXME: move!
-*/
-typedef struct KeyValue
-{
-  char key[64];
-  char value[64];
-} KeyValue;
+#include "orionld/types/KeyValue.h"       // KeyValue
 
 
 
@@ -86,6 +73,7 @@ struct HttpInfo
   MimeType                            mimeType;
   MqttInfo                            mqtt;
   std::vector<KeyValue*>              notifierInfo;
+  std::vector<KeyValue*>              receiverInfo;
 #endif
   HttpInfo();
   explicit HttpInfo(const std::string& _url);

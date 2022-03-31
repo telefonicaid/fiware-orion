@@ -1,0 +1,327 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creations and Patch with receiverInfo
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 with a receiverInfo with A=1 and B=2
+# 02. GET S1 and see the receiverInfo
+# 03. See S1 in mongo
+# 04. PATCH S1, setting A to 11 and B to 22
+# 05. GET S1 and see the new values of MQTT-Version and MQTT-QoS
+# 06. See S1 in mongo
+#
+
+echo "01. Create a subscription S1 with a receiverInfo with A=1 and B=2"
+echo "================================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["temperature"],
+  "notification": {
+    "endpoint": {
+      "uri": "http://nowhere:1000/xxx",
+      "receiverInfo": [
+        {
+          "key": "A",
+          "value": "1"
+        },
+        {
+          "key": "B",
+          "value": "2"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. GET S1 and see the receiverInfo"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+echo "03. See S1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "04. PATCH S1, setting A to 11 and B to 22"
+echo "========================================="
+payload='{
+  "notification": {
+    "endpoint": {
+      "receiverInfo": [
+        {
+          "key": "A",
+          "value": "11"
+        },
+        {
+          "key": "B",
+          "value": "22"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. GET S1 and see the new values of MQTT-Version and MQTT-QoS"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+echo "06. See S1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 with a receiverInfo with A=1 and B=2
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+Date: REGEX(.*)
+
+
+
+02. GET S1 and see the receiverInfo
+===================================
+HTTP/1.1 200 OK
+Content-Length: 338
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "receiverInfo": [
+                {
+                    "key": "A",
+                    "value": "1"
+                },
+                {
+                    "key": "B",
+                    "value": "2"
+                }
+            ],
+            "uri": "http://nowhere:1000/xxx"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "status": "active",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "temperature"
+    ]
+}
+
+
+03. See S1 in mongo
+===================
+MongoDB shell REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:S1",
+	"expiration" : REGEX(.*),
+	"reference" : "http://nowhere:1000/xxx",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"headers" : {
+		"A" : "1",
+		"B" : "2"
+	},
+	"throttling" : 0,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+04. PATCH S1, setting A to 11 and B to 22
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET S1 and see the new values of MQTT-Version and MQTT-QoS
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 340
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "receiverInfo": [
+                {
+                    "key": "A",
+                    "value": "11"
+                },
+                {
+                    "key": "B",
+                    "value": "22"
+                }
+            ],
+            "uri": "http://nowhere:1000/xxx"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "status": "active",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "temperature"
+    ]
+}
+
+
+06. See S1 in mongo
+===================
+MongoDB shell REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:S1",
+	"expiration" : REGEX(.*),
+	"reference" : "http://nowhere:1000/xxx",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"headers" : {
+		"A" : "11",
+		"B" : "22"
+	},
+	"throttling" : 0,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -43,7 +43,7 @@ extern "C"
 //
 // pcheckNotification -
 //
-bool pcheckNotification(KjNode* notificationP)
+bool pcheckNotification(KjNode* notificationP, bool patch)
 {
   KjNode* attributesP = NULL;
   KjNode* formatP     = NULL;
@@ -83,7 +83,7 @@ bool pcheckNotification(KjNode* notificationP)
       DUPLICATE_CHECK(endpointP, "endpoint", nItemP);
       OBJECT_CHECK(endpointP, "endpoint");
       EMPTY_OBJECT_CHECK(endpointP, "endpoint");
-      if (pcheckEndpoint(endpointP) == false)
+      if (pcheckEndpoint(endpointP, patch) == false)
         return false;
     }
     else if (strcmp(nItemP->name, "status") == 0)

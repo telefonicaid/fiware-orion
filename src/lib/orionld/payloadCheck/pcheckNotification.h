@@ -36,6 +36,6 @@ extern "C"
 //
 // pcheckNotification -
 //
-extern bool pcheckNotification(KjNode* notificationP);
+extern bool pcheckNotification(KjNode* notificationP, bool patch);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_

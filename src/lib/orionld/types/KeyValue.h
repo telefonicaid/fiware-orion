@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_KEYVALUE_H_
+#define SRC_LIB_ORIONLD_TYPES_KEYVALUE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +25,34 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <vector>                                       // std::vector
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pcheckEndpoint -
+// KeyValue -
 //
-extern bool pcheckEndpoint(KjNode* endpointP, bool patch);
+typedef struct KeyValue
+{
+  char key[64];
+  char value[64];
+} KeyValue;
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// keyValueLookup -
+//
+extern KeyValue* keyValueLookup(const std::vector<KeyValue*>& array, const char* keyName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// keyValueAdd -
+//
+extern KeyValue* keyValueAdd(std::vector<KeyValue*>* array, const char* key, const char* value);
+
+#endif  // SRC_LIB_ORIONLD_TYPES_KEYVALUE_H_

@@ -364,6 +364,24 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
 
   // notification::endpoint::receiverInfo
+  if (subscriptionP->notification.httpInfo.receiverInfo.size() > 0)
+  {
+    KjNode* niArray = kjArray(orionldState.kjsonP, "receiverInfo");
+
+    for (unsigned int ix = 0; ix < subscriptionP->notification.httpInfo.receiverInfo.size(); ix++)
+    {
+      KjNode* kvObject = kjObject(orionldState.kjsonP, NULL);
+      KjNode* keyP     = kjString(orionldState.kjsonP, "key",   subscriptionP->notification.httpInfo.receiverInfo[ix]->key);
+      KjNode* valueP   = kjString(orionldState.kjsonP, "value", subscriptionP->notification.httpInfo.receiverInfo[ix]->value);
+
+      kjChildAdd(kvObject, keyP);
+      kjChildAdd(kvObject, valueP);
+      kjChildAdd(niArray,  kvObject);
+    }
+    kjChildAdd(endpointP, niArray);
+  }
+
+
   if (subscriptionP->notification.httpInfo.headers.size() > 0)
   {
     KjNode*           riArray   = kjArray(orionldState.kjsonP, "receiverInfo");
@@ -457,7 +475,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
       orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", NULL);
       return NULL;
     }
-    nodeP = kjString(orionldState.kjsonP, "expires", date);
+    nodeP = kjString(orionldState.kjsonP, "expiresAt", date);  // expiresAt is v1.3? of the spec ... it was called expires before
     kjChildAdd(topP, nodeP);
   }
 
