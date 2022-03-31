@@ -57,6 +57,8 @@ SET (SOURCES
      pCheckGeoPropertyType.cpp
      pCheckGeoPropertyValue.cpp
      pCheckAttributeType.cpp
+     pcheckReceiverInfo.cpp
+     pcheckNotifierInfo.cpp
 )
 
 # Include directories

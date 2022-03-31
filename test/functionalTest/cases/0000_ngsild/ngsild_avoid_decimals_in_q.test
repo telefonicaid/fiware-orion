@@ -44,7 +44,7 @@ payload='{
   "type": "Subscription",
   "name": "Test subscription 01",
   "description": "Description of Test subscription 01",
-  "expires": "2028-12-31T10:11:12.123",
+  "expiresAt": "2028-12-31T10:11:12.123",
   "entities": [
     {
       "id": "urn:ngsi-ld:E01",
@@ -138,7 +138,7 @@ bye
 03. GET the subscription and see the Q String Filter P2>10
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 547
+Content-Length: 549
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -168,7 +168,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:11:12.123Z"
+  "expiresAt": "2028-12-31T10:11:12.123Z"
 }
 
 

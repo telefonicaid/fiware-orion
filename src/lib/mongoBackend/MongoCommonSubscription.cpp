@@ -145,15 +145,8 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
   b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
   b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
 
-#ifdef ORIONLD
   b->append("mimeType", mimeTypeToLongString(sub.notification.httpInfo.mimeType));
-  LM_T(LmtMongo, ("Subscription mimeType: %d", sub.notification.httpInfo.mimeType));
-#endif
 
-  LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-  LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
-
-#ifdef ORIONLD
   if ((sub.notification.httpInfo.headers.size() > 0) && (disableCusNotif == false))
   {
     BSONObjBuilder headersBuilder;
@@ -164,7 +157,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
     }
     BSONObj headersObj = headersBuilder.obj();
 
-    b->append(CSUB_HEADERS, headersObj);
+    b->append(CSUB_HEADERS, headersObj);  // CSUB_HEADERS == "headers"
   }
 
   if (sub.notification.httpInfo.notifierInfo.size() > 0)
@@ -180,12 +173,9 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 
     b->append("notifierInfo", bo.obj());
   }
-#endif
 
   if (sub.notification.httpInfo.custom)
-  {
     setCustomHttpInfo(sub.notification.httpInfo, b);
-  }
 }
 
 

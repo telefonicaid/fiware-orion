@@ -66,7 +66,7 @@ payload='{
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T11:12:13.14",
+  "expiresAt": "2028-12-31T11:12:13.14",
   "throttling": 5
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
@@ -197,7 +197,7 @@ bye
 03. GET the subscription - see its initial state
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 613
+Content-Length: 615
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -232,7 +232,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T11:12:13.140Z",
+  "expiresAt": "2028-12-31T11:12:13.140Z",
   "throttling": 5
 }
 
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 778
+Content-Length: 780
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -286,7 +286,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T11:12:13.140Z",
+  "expiresAt": "2028-12-31T11:12:13.140Z",
   "throttling": 5
 }
 

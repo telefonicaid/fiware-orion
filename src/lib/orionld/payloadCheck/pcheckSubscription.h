@@ -43,7 +43,8 @@ extern bool pcheckSubscription
   KjNode**         watchedAttributesPP,
   KjNode**         timeIntervalPP,
   KjNode**         qPP,
-  KjNode**         geoqPP
+  KjNode**         geoqPP,
+  bool             patch
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_

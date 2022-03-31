@@ -36,7 +36,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
 #include "common/globals.h"                                    // parse8601Time
@@ -45,6 +44,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
+#include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
@@ -197,17 +197,42 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
 
 // -----------------------------------------------------------------------------
 //
+// ngsildKeyValuesToDatabaseModel -
+//
+KjNode* ngsildKeyValuesToDatabaseModel(KjNode* kvObjectArray, const char* name)
+{
+  KjNode* kvs = kjObject(orionldState.kjsonP, name);
+
+  for (KjNode* kv = kvObjectArray->value.firstChildP; kv != NULL; kv = kv->next)
+  {
+    KjNode* key   = kjLookup(kv, "key");
+    KjNode* value = kjLookup(kv, "value");
+
+    // Steal 'value' from 'kv'
+    kjChildRemove(kv, value);
+
+    value->name = key->value.s;
+    kjChildAdd(kvs, value);
+  }
+
+  return kvs;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // ngsildSubscriptionToAPIv1Datamodel -
 //
 // For the PATCH (step 5) the difference of the APIv1 database model and the NGSI-LD payload data for a Subscription:
 //
 // PAYLOAD of an NGSI-LD Subscription
 // {
-//   "id": "urn:ngsi-ld:subscriptions:01",     => "id" => "_id"
-//   "type": "Subscription",                   => Not in DB and not needed
-//   "name": "Test subscription S01",          => NEW and added to the datamodel
-//   "description": "XXX",                     => NEW and added to the datamodel
-//   "entities": [                             => SAME, but remember, "isTypePattern" : false (default value)
+//   "id": "urn:ngsi-ld:subscriptions:01",         => "id" => "_id"
+//   "type": "Subscription",                       => Not in DB and not needed
+//   "subscriptionName": "Test subscription S01",  => NEW and added to the datamodel ("name" is accepteb as well, and used for the DB - old name of the field)
+//   "description": "XXX",                         => NEW and added to the datamodel
+//   "entities": [                                 => SAME, but remember, "isTypePattern" : false (default value)
 //     {
 //       "id": "urn:ngsi-ld:E01",
 //       "type": "T1"
@@ -231,7 +256,7 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
 //       "accept": "application/ld+json"      => "endpoint.accept" => "mimeType"
 //     }
 //   },
-//   "expires": "2028-12-31T10:00:00",        => "expires" => "expiration"
+//   "expiresAt": "2028-12-31T10:00:00",      => "expiresAt" => "expiration"
 //   "throttling": 5                          => SAME
 // }
 //
@@ -345,7 +370,7 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
     }
     else if (strcmp(fragmentP->name, "notification") == 0)
       notificationP = fragmentP;
-    else if (strcmp(fragmentP->name, "expires") == 0)
+    else if ((strcmp(fragmentP->name, "expires") == 0) || (strcmp(fragmentP->name, "expiresAt") == 0))
     {
       fragmentP->name    = (char*) "expiration";
       fragmentP->type    = KjFloat;
@@ -389,8 +414,10 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
       }
       else if (strcmp(nItemP->name, "endpoint") == 0)
       {
-        KjNode* uriP    = kjLookup(nItemP, "uri");
-        KjNode* acceptP = kjLookup(nItemP, "accept");
+        KjNode* uriP           = kjLookup(nItemP, "uri");
+        KjNode* acceptP        = kjLookup(nItemP, "accept");
+        KjNode* receiverInfoP  = kjLookup(nItemP, "receiverInfo");
+        KjNode* notifierInfoP  = kjLookup(nItemP, "notifierInfo");
 
         kjChildRemove(notificationP, nItemP);
         if (uriP != NULL)
@@ -403,6 +430,36 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
         {
           acceptP->name = (char*) "mimeType";
           kjChildAdd(patchTree, acceptP);
+        }
+
+        if (receiverInfoP != NULL)
+        {
+          //
+          // receiverInfo is an array of objects in the API:
+          //   "receiverInfo": [ { "key": "k1", "value": "v1" }, { }, ... ]
+          //
+          // In the database, it is instead stored as an object (it's much shorter) and under a different name.
+          //   "headers": { "k1": "v1", ... }
+          //
+          // This is amended here
+          //
+          KjNode* headers = ngsildKeyValuesToDatabaseModel(receiverInfoP, "headers");
+          kjChildAdd(patchTree, headers);
+        }
+
+        if (notifierInfoP != NULL)
+        {
+          //
+          // notifierInfo is an array of objects in the API:
+          //   "notifierInfo": [ { "key": "k1", "value": "v1" }, { }, ... ]
+          //
+          // In the database, it is instead stored as an object (it's much shorter):
+          //   "notifierInfo": { "k1": "v1", ... }
+          //
+          // This is amended here
+          //
+          KjNode* kvs = ngsildKeyValuesToDatabaseModel(notifierInfoP, "notifierInfo");
+          kjChildAdd(patchTree, kvs);
         }
       }
 
@@ -555,10 +612,8 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
 {
   KjNode* uriP           = kjLookup(endpointP, "uri");
   KjNode* acceptP        = kjLookup(endpointP, "accept");
-#if 0
   KjNode* receiverInfoP  = kjLookup(endpointP, "receiverInfo");
   KjNode* notifierInfoP  = kjLookup(endpointP, "notifierInfo");
-#endif
 
   if (uriP != NULL)
   {
@@ -569,7 +624,6 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
     char*           rest;
 
     url = strdup(uriP->value.s);
-    LM_TMP(("KZ: uri: '%s'", uriP->value.s));
     if (urlParse(cSubP->url, &protocol, &ip, &port, &rest) == true)
     {
       free(cSubP->url);
@@ -587,6 +641,41 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
   {
     uint32_t acceptMask;
     cSubP->httpInfo.mimeType = mimeTypeFromString(acceptP->value.s, NULL, true, false, &acceptMask);
+  }
+
+  if (receiverInfoP != NULL)
+  {
+    //
+    // for each key-value pair in "receiverInfo" -
+    // - look it up in cSubP->httpInfo.receiverInfo
+    // - replace the value if there, add if not there
+    //
+    for (KjNode* riP = receiverInfoP->value.firstChildP; riP != NULL; riP = riP->next)
+    {
+      KjNode*   keyP   = kjLookup(riP, "key");
+      KjNode*   valueP = kjLookup(riP, "value");
+      KeyValue* kvP    = keyValueLookup(cSubP->httpInfo.receiverInfo, keyP->value.s);
+
+      if (kvP != NULL)
+        strncpy(kvP->value, valueP->value.s, sizeof(kvP->value) - 1);
+      else
+        keyValueAdd(&cSubP->httpInfo.receiverInfo, keyP->value.s, valueP->value.s);
+    }
+  }
+
+  if (notifierInfoP != NULL)
+  {
+    //
+    // notifierInfo is storeed in cSubP->httpInfo.headers
+    // - just set it (in the std::map)
+    //
+    for (KjNode* riP = notifierInfoP->value.firstChildP; riP != NULL; riP = riP->next)
+    {
+      KjNode*   keyP   = kjLookup(riP, "key");
+      KjNode*   valueP = kjLookup(riP, "value");
+
+      cSubP->httpInfo.headers[keyP->value.s] = valueP->value.s;
+    }
   }
 
   return true;
@@ -642,9 +731,10 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
 
   for (KjNode* itemP = subscriptionTree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
-    LM_TMP(("Updating '%s' for the cached subscription '%s'", itemP->name, subscriptionId));
     if ((strcmp(itemP->name, "subscriptionName") == 0) || (strcmp(itemP->name, "name") == 0))
     {
+      // If v1.1-1.3? give error if "subscriptionName" ?
+      // If > v1.3?   give error if "name"             ?
       cSubP->name = itemP->value.s;
     }
     else if (strcmp(itemP->name, "description") == 0)
@@ -697,8 +787,9 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
     {
       subCacheItemUpdateNotification(cSubP, itemP);
     }
-    else if (strcmp(itemP->name, "expiresAt") == 0)
+    else if ((strcmp(itemP->name, "expires") == 0) || (strcmp(itemP->name, "expiresAt") == 0))
     {
+      // Give error for expires/expiresAt and version of NGSI-LD ?
       cSubP->expirationTime = parse8601Time(itemP->value.s);
     }
     else if (strcmp(itemP->name, "throttling") == 0)
@@ -768,7 +859,7 @@ bool orionldPatchSubscription(void)
   KjNode* qP                     = NULL;
   KjNode* geoqP                  = NULL;
 
-  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP) == false)
+  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP, true) == false)
   {
     LM_E(("pcheckSubscription FAILED"));
     return false;
@@ -833,19 +924,23 @@ bool orionldPatchSubscription(void)
   //
   fixDbSubscription(dbSubscriptionP);
   KjNode* patchBody = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
   ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
 
   //
   // After calling ngsildSubscriptionToAPIv1Datamodel, the incoming payload data has beed structured just as the
   // API v1 database model and the original tree (obtained calling dbSubscriptionGet()) can easily be
   // modified.
-  // ngsildSubscriptionPatch() performs that modification
+  // ngsildSubscriptionPatch() performs that modification.
   //
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
-  if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
-    return false;
 
+  if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
+    LM_RE(false, ("KZ: ngsildSubscriptionPatch failed!"));
+
+  //
   // Update modifiedAt
+  //
   KjNode* modifiedAtP = kjLookup(dbSubscriptionP, "modifiedAt");
 
   if (modifiedAtP != NULL)
@@ -855,6 +950,7 @@ bool orionldPatchSubscription(void)
     modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
     kjChildAdd(dbSubscriptionP, modifiedAtP);
   }
+
 
   //
   // Overwrite the current Subscription in the database

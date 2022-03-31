@@ -298,11 +298,11 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       OBJECT_CHECK(operationSpaceP, "Registration::operationSpace");
       kjTreeToGeoLocation(kNodeP, &regP->operationSpace);
     }
-    else if (SCOMPARE8(kNodeP->name, 'e', 'x', 'p', 'i', 'r', 'e', 's', 0))
+    else if ((strcmp(kNodeP->name, "expires") == 0) || (strcmp(kNodeP->name, "expiresAt") == 0))
     {
-      DUPLICATE_CHECK(expiresP, "Registration::expires", kNodeP);
-      STRING_CHECK(kNodeP, "Registration::expires");
-      DATETIME_CHECK(expiresP->value.s, regP->expires, "Registration::expires");
+      DUPLICATE_CHECK(expiresP, "Registration::expiresAt", kNodeP);
+      STRING_CHECK(kNodeP, "Registration::expiresAt");
+      DATETIME_CHECK(expiresP->value.s, regP->expires, "Registration::expiresAt");
     }
     else if (SCOMPARE9(kNodeP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
     {

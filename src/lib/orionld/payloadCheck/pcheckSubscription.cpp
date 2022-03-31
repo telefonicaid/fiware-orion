@@ -53,7 +53,8 @@ bool pcheckSubscription
   KjNode**         watchedAttributesPP,
   KjNode**         timeIntervalPP,
   KjNode**         qPP,
-  KjNode**         geoqPP
+  KjNode**         geoqPP,
+  bool             patch
 )
 {
   KjNode* idP                     = NULL;
@@ -178,12 +179,12 @@ bool pcheckSubscription
       OBJECT_CHECK(nodeP, "notification");
       EMPTY_OBJECT_CHECK(nodeP, "notification");
     }
-    else if (strcmp(nodeP->name, "expires") == 0)
+    else if ((strcmp(nodeP->name, "expiresAt") == 0) || (strcmp(nodeP->name, "expires") == 0))
     {
-      DUPLICATE_CHECK(expiresP, "expires", nodeP);
-      STRING_CHECK(nodeP, "expires");
-      EMPTY_STRING_CHECK(nodeP, "expires");
-      DATETIME_CHECK(expiresP->value.s, dateTime, "expires");
+      DUPLICATE_CHECK(expiresP, nodeP->name, nodeP);
+      STRING_CHECK(nodeP, nodeP->name);
+      EMPTY_STRING_CHECK(nodeP, nodeP->name);
+      DATETIME_CHECK(expiresP->value.s, dateTime, nodeP->name);
     }
     else if (strcmp(nodeP->name, "throttling") == 0)
     {
@@ -212,7 +213,7 @@ bool pcheckSubscription
     }
   }
 
-  if ((notificationP != NULL) && (pcheckNotification(notificationP) == false))
+  if ((notificationP != NULL) && (pcheckNotification(notificationP, patch) == false))
       return false;
 
   return true;

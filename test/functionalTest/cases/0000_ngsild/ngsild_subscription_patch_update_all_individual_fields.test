@@ -64,14 +64,24 @@ accumulatorStart --pretty-print
 # 26. PATCH 'notification'
 # 27. MONGO: see the expanded attributes in 'notification'
 # 28. GET subscription and see the new 'notification'
-# 29. PATCH 'expires'
-# 30. GET subscription and see the new 'expires'
+# 29. PATCH 'expiresAt'
+# 30. GET subscription and see the new 'expiresAt'
 # 31. PATCH 'throttling'
 # 32. GET subscription and see the new 'throttling'
 # 33. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
 # 34. PATCH all patchable fields
 # 35. GET subscription and see all the fields
 # 36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
+# 37. PATCH 'receiverInfo' adding A=1
+# 38. MONGO: check receiverInfo in the DB
+# 39. GET subscription and see A=1 in receiverInfo
+# 40. PATCH 'receiverInfo' modifying A=2
+# 41. GET subscription and see A=2 in receiverInfo
+# 42. PATCH 'notifierInfo' adding A=1
+# 43. GET subscription and see A=1 in notifierInfo
+# 44. PATCH 'notifierInfo' modifying A=2
+# 45. GET subscription and see A=2 in notifierInfo
+# 46. GET subscription from sub-cache - see the exact same as in 44
 #
 
 echo "01. Create a subscription with all fields (except timeInterval)"
@@ -105,7 +115,7 @@ payload='{
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
+  "expiresAt": "2028-12-31T10:00:00",
   "throttling": 5
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
@@ -352,18 +362,18 @@ echo
 echo
 
 
-echo "29. PATCH 'expires'"
-echo "==================="
+echo "29. PATCH 'expiresAt'"
+echo "====================="
 payload='{
-  "expires": "2026-04-01T12:34:56"
+  "expiresAt": "2026-04-01T12:34:56"
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
 echo
 echo
 
 
-echo "30. GET subscription and see the new 'expires'"
-echo "=============================================="
+echo "30. GET subscription and see the new 'expiresAt'"
+echo "================================================"
 orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
@@ -426,7 +436,7 @@ payload='{
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:34:34",
+  "expiresAt": "2028-12-31T10:34:34",
   "throttling": 34
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
@@ -444,6 +454,86 @@ echo
 echo "36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition"
 echo "===================================================================================================="
 mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "37. PATCH 'receiverInfo' adding A=1"
+echo "==================================="
+payload='{
+  "notification": {
+    "endpoint": {
+      "receiverInfo": [ { "key": "A", "value": "1" } ]
+    }  
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "38. MONGO: check receiverInfo in the DB"
+echo "======================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "39. GET subscription and see A=1 in receiverInfo"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "40. PATCH 'receiverInfo' modifying A=2"
+echo "======================================"
+payload='{
+  "notification": {
+    "endpoint": {
+      "receiverInfo": [ { "key": "A", "value": "2" } ]
+    }  
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "41. GET subscription and see A=2 in receiverInfo"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "42. PATCH 'notifierInfo' adding A=1"
+echo "==================================="
+echo
+echo
+
+
+echo "43. GET subscription and see A=1 in notifierInfo"
+echo "================================================"
+echo
+echo
+
+
+echo "44. PATCH 'notifierInfo' modifying A=2"
+echo "======================================"
+echo
+echo
+
+
+echo "45. GET subscription and see A=2 in notifierInfo"
+echo "================================================"
+echo
+echo
+
+
+echo "46. GET subscription from sub-cache - see the exact same as in 44"
+echo "================================================================="
+#orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?from=cache&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 
@@ -512,7 +602,7 @@ bye
 03. GET subscription from the broker
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 824
+Content-Length: 826
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -557,7 +647,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -573,7 +663,7 @@ Date: REGEX(.*)
 05. GET subscription and see the new 'name'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 811
+Content-Length: 813
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -618,7 +708,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -634,7 +724,7 @@ Date: REGEX(.*)
 07. GET subscription and see the new 'description'
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 790
+Content-Length: 792
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -679,7 +769,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -752,7 +842,7 @@ bye
 10. GET subscription and see the new 'entities'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 791
+Content-Length: 793
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -799,7 +889,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -872,7 +962,7 @@ bye
 13. GET subscription and see the new 'watchedAttributes'
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 791
+Content-Length: 793
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -919,7 +1009,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -1006,7 +1096,7 @@ bye
 17. GET subscription and see the new 'q'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 800
+Content-Length: 802
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1053,7 +1143,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -1125,7 +1215,7 @@ bye
 20. GET subscription and see the new 'geoQ'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1076
+Content-Length: 1078
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1194,7 +1284,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -1210,7 +1300,7 @@ Date: REGEX(.*)
 22. GET subscription and see the new 'csf'
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 1091
+Content-Length: 1093
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1279,7 +1369,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -1351,7 +1441,7 @@ bye
 25. GET subscription and see the new 'isActive'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 1092
+Content-Length: 1094
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1420,7 +1510,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -1492,7 +1582,7 @@ bye
 28. GET subscription and see the new 'notification'
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 1091
+Content-Length: 1093
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1561,23 +1651,23 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
 
 
-29. PATCH 'expires'
-===================
+29. PATCH 'expiresAt'
+=====================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-30. GET subscription and see the new 'expires'
-==============================================
+30. GET subscription and see the new 'expiresAt'
+================================================
 HTTP/1.1 200 OK
-Content-Length: 1091
+Content-Length: 1093
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1646,7 +1736,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2026-04-01T12:34:56.000Z",
+  "expiresAt": "2026-04-01T12:34:56.000Z",
   "throttling": 5
 }
 
@@ -1662,7 +1752,7 @@ Date: REGEX(.*)
 32. GET subscription and see the new 'throttling'
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 1092
+Content-Length: 1094
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1731,7 +1821,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2026-04-01T12:34:56.000Z",
+  "expiresAt": "2026-04-01T12:34:56.000Z",
   "throttling": 12
 }
 
@@ -1803,7 +1893,7 @@ Date: REGEX(.*)
 35. GET subscription and see all the fields
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 851
+Content-Length: 853
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1852,7 +1942,7 @@ Date: REGEX(.*)
     },
     "status": "ok"
   },
-  "expires": "2028-12-31T10:34:34.000Z",
+  "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34
 }
 
@@ -1912,6 +2002,227 @@ MongoDB server version: REGEX(.)
 	}
 }
 bye
+
+
+37. PATCH 'receiverInfo' adding A=1
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+38. MONGO: check receiverInfo in the DB
+=======================================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861871674,
+	"reference" : "http://localhost:3434/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 34,
+	"servicePath" : "/",
+	"description" : "Description 34",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E34",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T34",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "urn:ngsi-ld:E34-2",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T34-2",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P34",
+		"https://uri.etsi.org/ngsi-ld/default-context/R34",
+		"https://uri.etsi.org/ngsi-ld/default-context/A34"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Name 34",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "34",
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P34"
+	],
+	"format" : "keyValues",
+	"expression" : {
+		"geometry" : "Point",
+		"coords" : "34.000000,34.000000",
+		"georel" : "near;maxDistance==34",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo34",
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/P34>34"
+	},
+	"headers" : {
+		"A" : "1"
+	}
+}
+bye
+
+
+39. GET subscription and see A=1 in receiverInfo
+================================================
+HTTP/1.1 200 OK
+Content-Length: 951
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "Name 34",
+  "description": "Description 34",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E34",
+      "type": "T34"
+    },
+    {
+      "id": "urn:ngsi-ld:E34-2",
+      "type": "T34-2"
+    }
+  ],
+  "watchedAttributes": [
+    "P34"
+  ],
+  "q": "P34>34",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      34,
+      34
+    ],
+    "georel": "near;maxDistance==34",
+    "geoproperty": "geo34"
+  },
+  "csf": "34",
+  "status": "active",
+  "isActive": true,
+  "notification": {
+    "attributes": [
+      "P34",
+      "R34",
+      "A34"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:3434/notify",
+      "accept": "application/ld+json",
+      "receiverInfo": [
+        {
+          "key": "A",
+          "value": "1"
+        }
+      ]
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:34:34.000Z",
+  "throttling": 34
+}
+
+
+
+40. PATCH 'receiverInfo' modifying A=2
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+41. GET subscription and see A=2 in receiverInfo
+================================================
+HTTP/1.1 200 OK
+Content-Length: 951
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "Name 34",
+  "description": "Description 34",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E34",
+      "type": "T34"
+    },
+    {
+      "id": "urn:ngsi-ld:E34-2",
+      "type": "T34-2"
+    }
+  ],
+  "watchedAttributes": [
+    "P34"
+  ],
+  "q": "P34>34",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      34,
+      34
+    ],
+    "georel": "near;maxDistance==34",
+    "geoproperty": "geo34"
+  },
+  "csf": "34",
+  "status": "active",
+  "isActive": true,
+  "notification": {
+    "attributes": [
+      "P34",
+      "R34",
+      "A34"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:3434/notify",
+      "accept": "application/ld+json",
+      "receiverInfo": [
+        {
+          "key": "A",
+          "value": "2"
+        }
+      ]
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:34:34.000Z",
+  "throttling": 34
+}
+
+
+
+42. PATCH 'notifierInfo' adding A=1
+===================================
+
+
+43. GET subscription and see A=1 in notifierInfo
+================================================
+
+
+44. PATCH 'notifierInfo' modifying A=2
+======================================
+
+
+45. GET subscription and see A=2 in notifierInfo
+================================================
+
+
+46. GET subscription from sub-cache - see the exact same as in 44
+=================================================================
 
 
 --TEARDOWN--

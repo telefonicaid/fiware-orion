@@ -281,11 +281,11 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToNotification
       }
     }
-    else if (SCOMPARE8(kNodeP->name, 'e', 'x', 'p', 'i', 'r', 'e', 's', 0))
+    else if ((strcmp(kNodeP->name, "expires") == 0) || (strcmp(kNodeP->name, "expiresAt") == 0))
     {
-      DUPLICATE_CHECK(expiresP, "Subscription::expires", kNodeP->value.s);
-      STRING_CHECK(kNodeP, "Subscription::expires");
-      DATETIME_CHECK(expiresP, subP->expires, "Subscription::expires");
+      DUPLICATE_CHECK(expiresP, "Subscription::expiresAt", kNodeP->value.s);
+      STRING_CHECK(kNodeP, "Subscription::expiresAt");
+      DATETIME_CHECK(expiresP, subP->expires, "Subscription::expiresAt");
     }
     else if (SCOMPARE11(kNodeP->name, 't', 'h', 'r', 'o', 't', 't', 'l', 'i', 'n', 'g', 0))
     {

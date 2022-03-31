@@ -137,7 +137,7 @@ const char* getStringField(const BSONObj* bP, const char* field, const char* cal
   }
   else
   {
-    // Sometines this is an error, far from always ...
+    // Sometimes this is an error, far from always - I should add a parameter 'bool mandatory' to not send non-errors as errors to log file
     LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s:%d)", field, bP->toString().c_str(), caller, line));
     return "";
   }
