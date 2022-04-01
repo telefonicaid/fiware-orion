@@ -1,0 +1,531 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling for PUT Entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Attempt to PUT an entity that does not exist
+# 02. Create an entity E1 with at least one attribute
+# 03. Attempt to PUT E1 with an Array - see error
+# 04. Attempt to PUT E1 with an empty object - see error
+# 05. Attempt to PUT E1 without an entity type - see error
+# 06. PUT E1 with just an entity type - that should work
+# 07. GET E1 and see only id and type - no attrs
+# 08. Attempt to PUT E1 with a different entity id inside payload body - see error
+# 09. Attempt to PUT E1 with an entity id inside payload body that is not a string - see error
+# 10. Attempt to PUT E1 with an entity type that is not a string
+# 11. Attempt to PUT E1 with duplicated entity type - see error
+# 12. Attempt to PUT E1 with duplicated entity id - see error
+# 13. Attempt to PUT E1 with both id and @id - both matching the entity id in the URL PATH - see error
+# 14. Attempt to PUT E1 with both type and @type - see error
+# 15. Attempt to PUT E1 with an entity type that contains a forbidden character - see error
+# 16. Attempt to PUT E1 with an attribute as an object with datasetId - see 501 (for now at least)
+# 17. Attempt to PUT E1 with an attribute as an array with datasetId - see 501 (for now at least)
+# 18. Attempt to PUT E1 with a duplicated attribute A1 - see error
+#
+
+echo "01. Attempt to PUT an entity that does not exist"
+echo "================================================"
+payload='{
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E1 with at least one attribute"
+echo "==================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "R1": {
+    "object": "urn:ngsi-ld:Building:R1"
+  },
+  "R2": {
+    "object": "urn:ngsi-ld:Building:R1"
+  },
+  "P1": 1,
+  "P2": 2
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to PUT E1 with an Array - see error"
+echo "==============================================="
+payload='[{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": 1,
+    "unitCode": "cm",
+    "observedAt": "2022-03-31T17:23:00.056Z",
+    "pp1": 23,
+    "rr1": { "object": "urn:ngsi-ld:Building:R2" }
+  },
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}]'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to PUT E1 with an empty object - see error"
+echo "======================================================"
+payload='{}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to PUT E1 without an entity type - see error"
+echo "========================================================"
+payload='{
+  "id": "urn:E1",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "06. PUT E1 with just an entity type - that should work"
+echo "======================================================"
+payload='{
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "07. GET E1 and see only id and type - no attrs"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "08. Attempt to PUT E1 with a different entity id inside payload body - see error"
+echo "================================================================================"
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "09. Attempt to PUT E1 with an entity id inside payload body that is not a string - see error"
+echo "============================================================================================"
+payload='{
+  "id": 9,
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "10. Attempt to PUT E1 with an entity type that is not a string"
+echo "=============================================================="
+payload='{
+  "type": 9,
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "11. Attempt to PUT E1 with duplicated entity type - see error"
+echo "============================================================="
+payload='{
+  "type": "T",
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "12. Attempt to PUT E1 with duplicated entity id - see error"
+echo "==========================================================="
+payload='{
+  "id": "urn:E1",
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "13. Attempt to PUT E1 with both id and @id - both matching the entity id in the URL PATH - see error"
+echo "===================================================================================================="
+payload='{
+  "id": "urn:E1",
+  "@id": "urn:E1",
+  "type": "T",
+  "A1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "14. Attempt to PUT E1 with both type and @type - see error"
+echo "=========================================================="
+payload='{
+  "id": "urn:E1",
+  "@type": "T",
+  "type": "T",
+  "A1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "15. Attempt to PUT E1 with an entity type that contains a forbidden character - see error"
+echo "========================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T 8"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "16. Attempt to PUT E1 with an attribute as an object with datasetId - see 501 (for now at least)"
+echo "================================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "A1": {
+    "value": 1,
+    "datasetId": "urn:dataset:1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "17. Attempt to PUT E1 with an attribute as an array with datasetId - see 501 (for now at least)"
+echo "==============================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "A1": [
+    {
+      "value": 1,
+      "datasetId": "urn:dataset:1"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "18. Attempt to PUT E1 with a duplicated attribute A1 - see error"
+echo "================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "A1": 1,
+  "A1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Attempt to PUT an entity that does not exist
+================================================
+HTTP/1.1 404 Not Found
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity does not exist",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+02. Create an entity E1 with at least one attribute
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+03. Attempt to PUT E1 with an Array - see error
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid JSON type for Entity - not a JSON Object",
+    "title": "Invalid payload body",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+04. Attempt to PUT E1 with an empty object - see error
+======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Empty Object",
+    "title": "Invalid Payload Body",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+}
+
+
+05. Attempt to PUT E1 without an entity type - see error
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'type' field is mandatory",
+    "title": "Entity type is missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. PUT E1 with just an entity type - that should work
+======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET E1 and see only id and type - no attrs
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 26
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+08. Attempt to PUT E1 with a different entity id inside payload body - see error
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E2",
+    "title": "Non-matching entity id in payload body",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to PUT E1 with an entity id inside payload body that is not a string - see error
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Invalid JSON type",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Attempt to PUT E1 with an entity type that is not a string
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Int",
+    "title": "Entity type must be a String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Attempt to PUT E1 with duplicated entity type - see error
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Duplicated field in an entity",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. Attempt to PUT E1 with duplicated entity id - see error
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Duplicated field in an entity",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. Attempt to PUT E1 with both id and @id - both matching the entity id in the URL PATH - see error
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Both /id/ and /@id/ field in an entity",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. Attempt to PUT E1 with both type and @type - see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 172
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/T",
+    "title": "Both /type/ and /@type/ field in an entity",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. Attempt to PUT E1 with an entity type that contains a forbidden character - see error
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity Type",
+    "title": "Invalid URI/Shortname - whitespace present",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. Attempt to PUT E1 with an attribute as an object with datasetId - see 501 (for now at least)
+================================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "datasetId",
+    "title": "Not Implemented (for this request type)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+17. Attempt to PUT E1 with an attribute as an array with datasetId - see 501 (for now at least)
+===============================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "datasetId",
+    "title": "Not Implemented (for this request type)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+18. Attempt to PUT E1 with a duplicated attribute A1 - see error
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "A1",
+    "title": "Duplicated field in an entity",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
