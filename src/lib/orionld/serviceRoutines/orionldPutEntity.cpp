@@ -67,7 +67,7 @@ static bool entityIdCheck(KjNode* idP, const char* entityIdFromUrl)
     }
   }
 
-  if (pCheckUri(entityIdFromUrl, "id", true) == false)
+  if (pCheckUri(entityIdFromUrl, "id", true) == false)  // This can never happen!
     return false;
 
   return true;

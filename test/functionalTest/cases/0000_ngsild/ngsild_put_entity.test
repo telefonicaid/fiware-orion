@@ -35,6 +35,9 @@ brokerStart CB 0 IPv4 -experimental
 # 03. Replace E1 using PUT
 # 04. GET E1, see the new entity
 # 05. See E1 in mongo
+# 06. Replace E1 using PUT and an @context in payload body
+# 07. GET E1 without @context - see longnames
+# 08. GET E1 with @context - see shortnames
 #
 
 echo "01. Attempt to PUT an entity that does not exist"
@@ -97,6 +100,37 @@ echo
 echo "05. See E1 in mongo"
 echo "==================="
 mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. Replace E1 using PUT and an @context in payload body"
+echo "========================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "Vehicle": {
+    "value": 1,
+    "Road": 23
+  },
+  "Museum": { "object": "urn:ngsi-ld:Building:R2" },
+  "@context": [ "http://smartdatamodels.org/context.jsonld" ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "07. GET E1 without @context - see longnames"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "08. GET E1 with @context - see shortnames"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -H 'Link: <http://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -224,6 +258,65 @@ MongoDB server version: REGEX(.*)
 	"modDate" : REGEX(.*)
 }
 bye
+
+
+06. Replace E1 using PUT and an @context in payload body
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET E1 without @context - see longnames
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 286
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "https://uri.fiware.org/ns/data-models#Museum": {
+        "object": "urn:ngsi-ld:Building:R2",
+        "type": "Relationship"
+    },
+    "https://uri.fiware.org/ns/data-models#Vehicle": {
+        "https://uri.fiware.org/ns/data-models#Road": {
+            "type": "Property",
+            "value": 23
+        },
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+08. GET E1 with @context - see shortnames
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Link: <http://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "Museum": {
+        "object": "urn:ngsi-ld:Building:R2",
+        "type": "Relationship"
+    },
+    "Vehicle": {
+        "Road": {
+            "type": "Property",
+            "value": 23
+        },
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
 
 
 --TEARDOWN--
