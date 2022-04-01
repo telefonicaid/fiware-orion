@@ -271,12 +271,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_COORDINATES;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTY;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
   }
   else if (serviceP->serviceRoutine == orionldGetEntity)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
   }
   else if (serviceP->serviceRoutine == orionldDeleteEntity)
   {

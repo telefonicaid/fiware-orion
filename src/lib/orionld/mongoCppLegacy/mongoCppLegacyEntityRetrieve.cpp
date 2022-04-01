@@ -104,7 +104,7 @@ static bool timestampToString(KjNode* nodeP)
 //
 // 1. Remove 'createdAt' and 'modifiedAt' is options=sysAttrs is not set
 //
-static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool sysAttrs, bool keyValues)
+static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool sysAttrs, bool keyValues, const char* lang)
 {
   if (keyValues == true)
   {
@@ -136,10 +136,28 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
       valueP = kjString(orionldState.kjsonP, "value", "Internal Error - attribute value lost");
     }
 
-    // Inherit the value field
-    attrP->type      = valueP->type;
-    attrP->value     = valueP->value;
-    attrP->lastChild = valueP->lastChild;
+    if ((lang == NULL) || (strcmp(typeP->value.s, "LanguageProperty") != 0))
+    {
+      // Inherit the value field
+      attrP->type      = valueP->type;
+      attrP->value     = valueP->value;
+      attrP->lastChild = valueP->lastChild;
+    }
+    else
+    {
+      // Special case - URI param lang is set and it's a LanguageProperty
+      KjNode* langValueNodeP = kjLookup(valueP, lang);
+
+      if (langValueNodeP == NULL)
+        langValueNodeP = kjLookup(valueP, "en");   // Pick English as default if the desired language is not found
+      if (langValueNodeP == NULL)
+        langValueNodeP = valueP->value.firstChildP;  // If English is also not found, just take the first one
+
+      char* value = (langValueNodeP != NULL)? langValueNodeP->value.s : (char*) "empty languageMap ...";
+
+      attrP->type      = KjString;
+      attrP->value.s   = value;
+    }
   }
   else if (sysAttrs == false)
   {
@@ -211,7 +229,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 //
 // 4. All metadata in 'md' must be placed one level higher
 //
-static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysAttrs)
+static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysAttrs, const char* lang)
 {
   //
   // 1. Change "value" to "object" for all attributes that are "Relationship"
@@ -241,6 +259,50 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
     }
 
     objectP->name = (char*) "object";
+  }
+  else if (strcmp(typeP->value.s, "LanguageProperty") == 0)
+  {
+    KjNode* languageMapP = kjLookup(attrP, "value");
+
+    if (languageMapP == NULL)
+    {
+      LM_E(("Database Error (field 'value' not found for attribute '%s' of entity '%s')", attrP->name, entityId));
+      return false;
+    }
+
+    // If the language is asked for, then the LanguageProperty is converted into a normal property ...
+    if (lang != NULL)
+    {
+      KjNode* langValueNodeP   = kjLookup(languageMapP, lang);
+      char*   stringValue      = NULL;
+
+      if (langValueNodeP == NULL)
+      {
+        langValueNodeP = kjLookup(languageMapP, "en");         // Pick English as default if the desired language is not found
+        if (langValueNodeP == NULL)
+          langValueNodeP = languageMapP->value.firstChildP;    // If English is also not found, just take the first one
+      }
+
+      char* langName = (char*) "none";
+      if (langValueNodeP != NULL)
+      {
+        stringValue = langValueNodeP->value.s;
+        langName    = langValueNodeP->name;
+      }
+      else
+        stringValue = (char*) "empty languageMap ...";
+
+      // Convert the LanguageProperty into a normal Property
+      typeP->value.s        = (char*) "Property";
+      languageMapP->type    = KjString;
+      languageMapP->value.s = stringValue;
+
+      // Picked Language as sub-attr
+      KjNode* langNameNodeP = kjString(orionldState.kjsonP, "lang", langName);
+      kjChildAdd(attrP, langNameNodeP);
+    }
+    else
+      languageMapP->name = (char*) "languageMap";
   }
 
   //
@@ -380,7 +442,8 @@ KjNode* mongoCppLegacyEntityRetrieve
   bool         concise,
   const char*  datasetId,
   const char*  geoPropertyName,
-  KjNode**     geoPropertyP
+  KjNode**     geoPropertyP,
+  const char*  lang
 )
 {
   KjNode* attrTree  = NULL;
@@ -473,7 +536,7 @@ KjNode* mongoCppLegacyEntityRetrieve
     {
       for (KjNode* attrP = dbAttrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
-        datamodelAttributeFix(attrP, entityId, sysAttrs);
+        datamodelAttributeFix(attrP, entityId, sysAttrs, lang);
       }
     }
 
@@ -557,7 +620,7 @@ KjNode* mongoCppLegacyEntityRetrieve
       if (attrP != NULL)
       {
         if (keyValues == false)
-          datamodelAttributeFix(attrP, entityId, sysAttrs);
+          datamodelAttributeFix(attrP, entityId, sysAttrs, lang);
       }
 
       if ((datasetP != NULL) && (attrP != NULL))
@@ -647,7 +710,7 @@ KjNode* mongoCppLegacyEntityRetrieve
 
     if (attrP->type == KjObject)
     {
-      if (presentationAttributeFix(attrP, entityId, sysAttrs, keyValues) == false)
+      if (presentationAttributeFix(attrP, entityId, sysAttrs, keyValues, lang) == false)
       {
         LM_E(("Internal Error (presentationAttributeFix failed)"));
         return NULL;
@@ -658,7 +721,7 @@ KjNode* mongoCppLegacyEntityRetrieve
       int instances = 0;
       for (KjNode* aP = attrP->value.firstChildP; aP != NULL; aP = aP->next)
       {
-        if (presentationAttributeFix(aP, entityId, sysAttrs, keyValues) == false)
+        if (presentationAttributeFix(aP, entityId, sysAttrs, keyValues, lang) == false)
         {
           LM_E(("presentationAttributeFix failed"));
           return NULL;

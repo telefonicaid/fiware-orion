@@ -147,6 +147,7 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_URIPARAM_GEOPROPERTIES        (1 << 31)
 #define ORIONLD_URIPARAM_LANGUAGEPROPERTIES   (1UL << 32)
 #define ORIONLD_URIPARAM_OBSERVEDAT           (1UL << 33)
+#define ORIONLD_URIPARAM_LANG                 (1UL << 34)
 
 
 

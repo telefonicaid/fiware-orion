@@ -755,6 +755,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.mask       |= ORIONLD_URIPARAM_OBSERVEDAT;
     }
   }
+  else if (strcmp(key, "lang") == 0)
+  {
+    orionldState.uriParams.lang        = (char*) value;
+    orionldState.uriParams.mask       |= ORIONLD_URIPARAM_LANG;
+  }
   else if (strcmp(key, "reload") == 0)
   {
     orionldState.uriParams.reload = true;
