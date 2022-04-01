@@ -13,6 +13,8 @@
 * Issue #1033  Fixed a bug about Concise GeoJSON returning an Invalid Geometry
 * Issue #1034  Fixed a bug about Array Reduction and Concise Attribute Format
 * Issue #280   Implemented the new PATCH /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
+* Issue #280   URI parameter options=simplified as an alias to options=keyValues
+* Issue #280   Support for URI parameter 'observedAt' for PATCH /entities/{entityId} in combination with options=keyValues - update existing observedAt sub-attributes
 * Issue #280   Implemented support for the OPTIONS method for all NGSI-LD API endpoints
 * Issue #1045  Fixed bug related to TRoE and creation of entity without attributes
 * Issue #280   TRoE support for PATCH /entities/{entityId} - quite untested

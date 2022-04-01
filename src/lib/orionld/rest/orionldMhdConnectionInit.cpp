@@ -36,6 +36,7 @@ extern "C"
 #include "common/wsStrip.h"                                      // wsStrip
 #include "common/MimeType.h"                                     // MimeType
 #include "common/string.h"                                       // toLowercase
+#include "common/globals.h"                                      // parse8601Time
 #include "alarmMgr/alarmMgr.h"                                   // alarmMgr
 #include "rest/Verb.h"                                           // Verb
 #include "rest/OrionError.h"                                     // OrionError
@@ -189,6 +190,7 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
       else if (strcmp(optionStart, "noOverwrite")   == 0)  orionldState.uriParamOptions.noOverwrite   = true;
       else if (strcmp(optionStart, "keyValues")     == 0)  orionldState.uriParamOptions.keyValues     = true;
+      else if (strcmp(optionStart, "simplified")    == 0)  orionldState.uriParamOptions.keyValues     = true;
       else if (strcmp(optionStart, "concise")       == 0)  orionldState.uriParamOptions.concise       = true;
       else if (strcmp(optionStart, "normalized")    == 0)  orionldState.uriParamOptions.normalized    = true;
       else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
@@ -737,6 +739,21 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.url   = (char*) value;
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_URL;
+  }
+  else if (strcmp(key, "observedAt") == 0)
+  {
+    orionldState.uriParams.observedAtAsDouble = parse8601Time((char*) value);
+
+    if (orionldState.uriParams.observedAtAsDouble == -1)
+    {
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /observedAt/ (not a valid ISO8601 timestamp)", value, 400);
+      return MHD_YES;
+    }
+    else
+    {
+      orionldState.uriParams.observedAt  = (char*) value;
+      orionldState.uriParams.mask       |= ORIONLD_URIPARAM_OBSERVEDAT;
+    }
   }
   else if (strcmp(key, "reload") == 0)
   {

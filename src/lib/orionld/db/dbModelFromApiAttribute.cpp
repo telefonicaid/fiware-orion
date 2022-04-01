@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/db/dbModelFromApiSubAttribute.h"               // dbModelFromApiSubAttribute
 #include "orionld/db/dbModelFromApiAttribute.h"                  // Own interface
@@ -81,6 +82,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     return true;
   }
 
+
   // Move everything into "md", leaving attrP EMPTY
   mdP = kjObject(orionldState.kjsonP, "md");
   mdP->value.firstChildP   = attrP->value.firstChildP;
@@ -117,14 +119,8 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     if (attrP->type == KjNull)
     {
       // Apparently it's OK to try to delete an attribute that does not exist
-#if 1
       *ignoreP = true;
       return true;  // Just ignore it
-#else
-      LM_W(("Attempt to DELETE an attribute that doesn't exist (%s)", attrEqName));
-      orionldError(OrionldResourceNotFound, "Cannot delete an attribute that does not exist", attrEqName, 404);
-      return false;
-#endif
     }
 
     kjTimestampAdd(attrP, "creDate");
@@ -165,6 +161,20 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     {
       mdAddedP   = kjArrayAdd(attrP, ".added");
       mdRemovedP = kjArrayAdd(attrP, ".removed");
+    }
+
+    //
+    // Very Special case: If key-values is set, and an uri param 'observedAt' is present, and we're doing a patchEntity2, then:
+    // modify the observedAt sub-attr accordingly
+    //
+    if ((orionldState.uriParamOptions.keyValues == true) && (orionldState.uriParams.observedAt != NULL) && (dbMdP != NULL))
+    {
+      KjNode* observedAtP = kjLookup(dbMdP, "observedAt");
+      if (observedAtP != NULL)
+      {
+        KjNode* mdObservedAt = kjFloat(orionldState.kjsonP, "observedAt", orionldState.uriParams.observedAtAsDouble);
+        kjChildAdd(mdP, mdObservedAt);
+      }
     }
   }
 
