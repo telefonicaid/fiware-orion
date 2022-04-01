@@ -37,11 +37,13 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // pcheckGeoPropertyValue
+#include "orionld/payloadCheck/pcheckLanguagePropertyValue.h"    // pcheckLanguagePropertyValue
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // Own interface
@@ -232,21 +234,23 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName)
   {
     for (KjNode* kNodeP = nodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
     {
-      if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
+      if (strcmp(kNodeP->name, "type") == 0)
       {
         DUPLICATE_CHECK(typeNodeP, "metadata type", kNodeP);
         STRING_CHECK(kNodeP, "metadata type");
 
-        if (SCOMPARE9(kNodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+        if (strcmp(kNodeP->value.s, "Property") == 0)
           isProperty = true;
-        else if (SCOMPARE12(kNodeP->value.s, 'G', 'e', 'o', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+        else if (strcmp(kNodeP->value.s, "GeoProperty") == 0)
           isProperty = true;
-        else if (SCOMPARE13(kNodeP->value.s, 'R', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 0))
+        else if (strcmp(kNodeP->value.s, "Relationship") == 0)
           isRelationship = true;
+        else if (strcmp(kNodeP->value.s, "LanguageProperty") == 0)
+          isProperty = true;
         else
         {
           LM_E(("Invalid type for metadata '%s': '%s'", kNodeP->name, kNodeP->value.s));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid type for attribute", kNodeP->value.s);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid type for sub-attribute", kNodeP->value.s);
           return false;
         }
 
@@ -438,18 +442,20 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   // For performance issues, all predefined names should have their char-sum precalculated
   // Advantage: just a simple integer comparison before we do the complete string-comparisom
   //
-  KjNode*  typeP                  = NULL;  // For ALL:            Mandatory
-  KjNode*  valueP                 = NULL;  // For 'Property':     Mandatory
-  KjNode*  objectP                = NULL;  // For 'Relationship:  Mandatory
-  KjNode*  unitCodeP              = NULL;  // For 'Property':     Optional
-  KjNode*  observedAtP            = NULL;  // For ALL:            Optional
-  KjNode*  locationP              = NULL;  // For 'GeoProperty':  Optional
-  KjNode*  observationSpaceP      = NULL;  // For 'GeoProperty':  Optional
-  KjNode*  operationSpaceP        = NULL;  // For 'GeoProperty':  Optional
+  KjNode*  typeP                  = NULL;  // For ALL:               Mandatory
+  KjNode*  valueP                 = NULL;  // For 'Property':        Mandatory
+  KjNode*  objectP                = NULL;  // For 'Relationship:     Mandatory
+  KjNode*  languageMapP           = NULL;  // For 'LanguageProperty: Mandatory
+  KjNode*  unitCodeP              = NULL;  // For 'Property':        Optional
+  KjNode*  observedAtP            = NULL;  // For ALL:               Optional
+  KjNode*  locationP              = NULL;
+  KjNode*  observationSpaceP      = NULL;
+  KjNode*  operationSpaceP        = NULL;
   KjNode*  creDateP               = NULL;
   KjNode*  modDateP               = NULL;
   bool     isProperty             = false;
   bool     isGeoProperty          = false;
+  bool     isLanguageProperty     = false;
   bool     isTemporalProperty     = false;
   bool     isRelationship         = false;
   KjNode*  nodeP                  = kNodeP->value.firstChildP;
@@ -482,15 +488,24 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         return false;
       }
 
-      if (SCOMPARE9(nodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
-      {
+      if (strcmp(nodeP->value.s, "Property") == 0)
         isProperty = true;
-      }
-      else if (SCOMPARE13(nodeP->value.s, 'R', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 0))
-      {
+      else if (strcmp(nodeP->value.s, "Relationship") == 0)
         isRelationship = true;
+      else if (strcmp(nodeP->value.s, "LanguageProperty") == 0)
+      {
+        if (experimental == true)
+        {
+          isProperty         = true;
+          isLanguageProperty = true;
+        }
+        else
+        {
+          orionldError(OrionldBadRequestData, "Invalid Attribute Type", "LanguageProperty", 501);
+          return false;
+        }
       }
-      else if (SCOMPARE12(nodeP->value.s, 'G', 'e', 'o', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+      else if (strcmp(nodeP->value.s, "GeoProperty") == 0)
       {
         isProperty    = true;
         isGeoProperty = true;
@@ -514,12 +529,14 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
         orionldState.geoAttrV[orionldState.geoAttrs++] = kNodeP;
       }
-      else if (SCOMPARE17(nodeP->value.s, 'T', 'e', 'm', 'p', 'o', 'r', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+#if 0
+      else if (strcmp(nodeP->value.s, "TemporalProperty") == 0)
       {
+        // Not even in t he NGSI-LD API spec yet ...
         isProperty         = true;
         isTemporalProperty = true;
-        // FIXME: Give error - users can't create TemporalProperties (unless it's "observedAt")
       }
+#endif
       else
       {
         *detailP = (char*) "Invalid type for attribute";
@@ -552,7 +569,12 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     else if (SCOMPARE7(nodeP->name, 'o', 'b', 'j', 'e', 'c', 't', 0))
     {
       DUPLICATE_CHECK(objectP, "object", nodeP);
-      // FIXME: "object" for Property Attribute should be added as metadata
+    }
+    else if (strcmp(nodeP->name, "languageMap") == 0)
+    {
+      DUPLICATE_CHECK(languageMapP, "languageMap", nodeP);
+      OBJECT_CHECK(languageMapP, "languageMap");
+      valueP = languageMapP;
     }
     else if (SCOMPARE11(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
     {
@@ -678,6 +700,12 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         orionldErrorResponseCreate(OrionldBadRequestData, "Attribute with type GeoProperty found, but the associated value field is missing", attributeName);
         *detailP = (char*) "value missing for GeoProperty";
       }
+      else if (isLanguageProperty == true)
+      {
+        LM_E(("value missing for LanguageProperty '%s'", kNodeP->name));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Attribute with type LanguageProperty found, but the associated value field is missing", attributeName);
+        *detailP = (char*) "value missing for LanguageProperty";
+      }
       else if (isTemporalProperty == true)
       {
         LM_E(("value missing for TemporalProperty '%s'", kNodeP->name));
@@ -715,6 +743,20 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         orionldState.httpStatusCode = 400;
         return false;
       }
+      caP->valueType       = orion::ValueTypeObject;
+      caP->compoundValueP  = kjTreeToCompoundValue(valueP, NULL, 0);
+    }
+    else if (isLanguageProperty == true)
+    {
+      if (pcheckLanguagePropertyValue(valueP, attributeName) == false)
+      {
+        LM_E(("pcheckLanguageProperty error for %s", attributeName));
+        // pcheckLanguageProperty fills in error response
+        *detailP = (char*) "pcheckLanguageProperty failed";
+        orionldState.httpStatusCode = 400;
+        return false;
+      }
+
       caP->valueType       = orion::ValueTypeObject;
       caP->compoundValueP  = kjTreeToCompoundValue(valueP, NULL, 0);
     }

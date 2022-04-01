@@ -21,3 +21,5 @@
 * Issue #1064  Can't forbid '#' in attribute names as it often expands with a hash and we support already expanded attribute names in the payload body
 * Issue #280   Fixed 'notifierInfo' and 'receiverInfo' for subscriptions
 * Issue #280   Notifications for PATCH /entities/{entityId} - quite untested
+* Issue #280   Implemented the new PUT /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
+* Issue #280   Highly Experimental implementation of LanguageProperty attributes - works only for POST /entities and GET /entities/{entityId}

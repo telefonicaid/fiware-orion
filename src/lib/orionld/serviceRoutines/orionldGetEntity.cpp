@@ -472,7 +472,8 @@ bool orionldGetEntity(void)
                                                orionldState.uriParamOptions.concise,
                                                orionldState.uriParams.datasetId,
                                                geometryProperty,
-                                               &orionldState.geoPropertyNode);
+                                               &orionldState.geoPropertyNode,
+                                               orionldState.uriParams.lang);
 #endif
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))

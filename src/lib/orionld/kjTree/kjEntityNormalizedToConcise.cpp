@@ -70,6 +70,10 @@ void kjEntityNormalizedToConcise(KjNode* outputP)
     if ((typeP != NULL) && (strcmp(typeP->value.s, "Relationship") == 0))
       kjChildRemove(attrP, typeP);
 
+    // If LanguageProperty, remove typeP - leave "languageMap"
+    if ((typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty") == 0))
+      kjChildRemove(attrP, typeP);
+
     // Same same for Sub-Attributes
     kjEntityNormalizedToConcise(attrP);
   }

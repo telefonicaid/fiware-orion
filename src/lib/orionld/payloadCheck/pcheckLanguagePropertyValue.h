@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYRETRIEVE_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYRETRIEVE_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKLANGUAGEPROPERTYVALUE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKLANGUAGEPROPERTYVALUE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -34,26 +34,8 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityRetrieve -
+// pcheckLanguagePropertyValue -
 //
-// PARAMERTERS
-//   entityId        ID of the entity to be retrieved
-//   attrs           array of attribute names, terminated by a NULL pointer
-//   attrMandatory   If true - the entity is found only if any of the attributes in 'attrs'
-//                   is present in the entity
-//
-extern KjNode* mongoCppLegacyEntityRetrieve
-(
-  const char*  entityId,
-  char**       attrs,
-  bool         attrMandatory,
-  bool         sysAttrs,
-  bool         keyValues,
-  bool         concise,
-  const char*  datasetId,
-  const char*  geoPropertyName,
-  KjNode**     geoPropertyP,
-  const char*  lang
-);
+extern bool pcheckLanguagePropertyValue(KjNode* valueP, const char* attrName);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYRETRIEVE_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKLANGUAGEPROPERTYVALUE_H_

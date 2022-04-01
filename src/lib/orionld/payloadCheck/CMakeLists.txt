@@ -59,6 +59,7 @@ SET (SOURCES
      pCheckAttributeType.cpp
      pcheckReceiverInfo.cpp
      pcheckNotifierInfo.cpp
+     pcheckLanguagePropertyValue.cpp
 )
 
 # Include directories

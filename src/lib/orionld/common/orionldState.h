@@ -165,6 +165,8 @@ typedef struct OrionldUriParams
   char*     geoproperties;
   char*     languageproperties;
   char*     observedAt;
+  char*     lang;
+
   double    observedAtAsDouble;
   uint64_t  mask;
 } OrionldUriParams;

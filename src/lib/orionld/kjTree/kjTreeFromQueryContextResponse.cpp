@@ -248,7 +248,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
       ContextAttribute* aP                   = ceP->contextAttributeVector[aIx];
       const char*       attrLongName         = aP->name.c_str();
       char*             attrName;              // Attribute Short Name
-      char*             valueFieldName;
       bool              valueMayBeCompacted  = false;
 
       attrName = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, &valueMayBeCompacted, NULL);
@@ -337,7 +336,10 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
         }
 
         // value
-        valueFieldName = (char*) ((aP->type == "Relationship")? "object" : "value");
+        char* valueFieldName = (char*) "value";
+        if      (aP->type == "Relationship")      valueFieldName = (char*) "object";
+        else if (aP->type == "LanguageProperty")  valueFieldName = (char*) "languageMap";
+
 
         switch (aP->valueType)
         {
@@ -432,7 +434,10 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
 
           if (mdP->type != "")
           {
-            const char*  valueFieldName = (mdP->type == "Relationship")? "object" : "value";
+            char* valueFieldName = (char*) "value";
+            if      (mdP->type == "Relationship")      valueFieldName = (char*) "object";
+            else if (mdP->type == "LanguageProperty")  valueFieldName = (char*) "languageMap";
+
             KjNode*      typeP;
             KjNode*      valueP = NULL;
 

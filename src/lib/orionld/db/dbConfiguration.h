@@ -72,7 +72,8 @@ typedef KjNode* (*DbEntityRetrieveFunction)(const char*  entityId,
                                             bool         concise,
                                             const char*  datasetId,
                                             const char*  geoProperty,
-                                            KjNode**     geoPropertyP);
+                                            KjNode**     geoPropertyP,
+                                            const char*  lang);
 
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
 typedef KjNode* (*DbEntityLookupManyFunction)(KjNode* requestTree);
