@@ -37,7 +37,7 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// pCheckEntityType - move to payloadCheck/pCheckEntityType.[cpp|h]
+// pCheckEntityType -
 //
 bool pCheckEntityType(KjNode* typeNodeP, bool mandatory, char** entityTypeP)
 {
@@ -61,6 +61,8 @@ bool pCheckEntityType(KjNode* typeNodeP, bool mandatory, char** entityTypeP)
   if (pCheckUri(typeNodeP->value.s, "Entity Type", false) == false)
     return false;
 
-  *entityTypeP = typeNodeP->value.s;
+  if (entityTypeP != NULL)
+    *entityTypeP = typeNodeP->value.s;
+
   return true;
 }

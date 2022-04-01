@@ -59,5 +59,5 @@ void orionldError
 
   orionldState.httpStatusCode = status;
 
-  LM_E(("%s: %s (status code: %d)", title, detail, status));
+  LM_E(("***** ERROR %s: %s (status code: %d)", title, detail, status));
 }

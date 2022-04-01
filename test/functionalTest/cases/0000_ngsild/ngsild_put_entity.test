@@ -1,0 +1,324 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity using PUT
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Attempt to PUT an entity that does not exist
+# 02. Create an entity E1 with a Relationship R1
+# 03. Replace E1 using PUT
+# 04. GET E1, see the new entity
+# 05. See E1 in mongo
+# 06. Replace E1 using PUT and an @context in payload body
+# 07. GET E1 without @context - see longnames
+# 08. GET E1 with @context - see shortnames
+#
+
+echo "01. Attempt to PUT an entity that does not exist"
+echo "================================================"
+payload='{
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E1"
+echo "======================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "R1": {
+    "object": "urn:ngsi-ld:Building:R1"
+  },
+  "R2": {
+    "object": "urn:ngsi-ld:Building:R1"
+  },
+  "P1": 1,
+  "P2": 2
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Replace E1 using PUT"
+echo "========================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": 1,
+    "unitCode": "cm",
+    "observedAt": "2022-03-31T17:23:00.056Z",
+    "pp1": 23,
+    "rr1": { "object": "urn:ngsi-ld:Building:R2" }
+  },
+  "R1": { "object": "urn:ngsi-ld:Building:R2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "04. GET E1, see the new entity"
+echo "=============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "05. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. Replace E1 using PUT and an @context in payload body"
+echo "========================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "Vehicle": {
+    "value": 1,
+    "Road": 23
+  },
+  "Museum": { "object": "urn:ngsi-ld:Building:R2" },
+  "@context": [ "http://smartdatamodels.org/context.jsonld" ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "07. GET E1 without @context - see longnames"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "08. GET E1 with @context - see shortnames"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -H 'Link: <http://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to PUT an entity that does not exist
+================================================
+HTTP/1.1 404 Not Found
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity does not exist",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+02. Create an entity E1
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+03. Replace E1 using PUT
+========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. GET E1, see the new entity
+==============================
+HTTP/1.1 200 OK
+Content-Length: 283
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "observedAt": "2022-03-31T17:23:00.056Z",
+        "pp1": {
+            "type": "Property",
+            "value": 23
+        },
+        "rr1": {
+            "object": "urn:ngsi-ld:Building:R2",
+            "type": "Relationship"
+        },
+        "type": "Property",
+        "unitCode": "cm",
+        "value": 1
+    },
+    "R1": {
+        "object": "urn:ngsi-ld:Building:R2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+05. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"value" : 1,
+			"type" : "Property",
+			"mdNames" : [
+				"unitCode",
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/pp1",
+				"https://uri.etsi.org/ngsi-ld/default-context/rr1"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "cm"
+				},
+				"observedAt" : {
+					"value" : 1648747380.056
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/pp1" : {
+					"type" : "Property",
+					"value" : 23,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/rr1" : {
+					"object" : "urn:ngsi-ld:Building:R2",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			},
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
+			"value" : "urn:ngsi-ld:Building:R2",
+			"type" : "Relationship",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*)
+}
+bye
+
+
+06. Replace E1 using PUT and an @context in payload body
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET E1 without @context - see longnames
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 286
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "https://uri.fiware.org/ns/data-models#Museum": {
+        "object": "urn:ngsi-ld:Building:R2",
+        "type": "Relationship"
+    },
+    "https://uri.fiware.org/ns/data-models#Vehicle": {
+        "https://uri.fiware.org/ns/data-models#Road": {
+            "type": "Property",
+            "value": 23
+        },
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+08. GET E1 with @context - see shortnames
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Link: <http://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "Museum": {
+        "object": "urn:ngsi-ld:Building:R2",
+        "type": "Relationship"
+    },
+    "Vehicle": {
+        "Road": {
+            "type": "Property",
+            "value": 23
+        },
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
