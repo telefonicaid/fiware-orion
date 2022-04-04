@@ -95,7 +95,7 @@ struct Notification
     attributes(),
     blacklist(false),
     onlyChanged(false),
-    notifyOnMetadataChange(true),
+    notifyOnMetadataChange(false),
     timesSent(0),
     failsCounter(0),
     maxFailsLimit(-1),

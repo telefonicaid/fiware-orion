@@ -13,6 +13,7 @@
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
+* [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
 * [`ignoreType` metadata](#ignoretype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -358,6 +359,25 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
+
+[Top](#top)
+
+## `alterationType` attribute
+
+Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Orion implements the `alterationType` attribute.
+
+This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
+is ignored) and can take the following values:
+
+* `entityCreate` if the update that triggers the notification is a entity creation operation
+* `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+* `entityChange` if the update that triggers the notification was an update with an actual change
+* `entityDelete` if the update that triggers the notification was a entity delete operation
+
+The type of this attribute is `Text`
+
+This builtin attribute is related with the [subscriptions based in alteration type](subscriptions_alttype.md) feature.
 
 [Top](#top)
 

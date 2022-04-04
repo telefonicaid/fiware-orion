@@ -13,6 +13,7 @@
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
+* [`alterationType` 属性](#alterationtype-attribute)
 * [`actionType` メタデータ](#actiontype-metadata)
 * [`ignoreType` メタデータ](#ignoretype-metadata)
 * [`noAttrDetail` オプション](#noattrdetail-option)
@@ -335,6 +336,26 @@ Orion が NGSIv2 サブスクリプション・ペイロードで実装する特
 * **throttling**: オプション (整数でなければなりません)
 * **expires**: オプション (日付または空の文字列 "" でなければなりません)
 * **status**: オプション (有効なステータス・キーワードである必要があります)
+
+[トップ](#top)
+
+<a name="alterationtype-attribute"></a>
+## `alterationType` 属性
+
+NGSIv2 仕様の "組み込み属性" (Builtin Attributes) セクションで説明されている属性から、Orion は
+`alterationType` 属性を実装します。
+
+この属性は通知でのみ使用でき (`GET /v2/entities?attrs=alterationType` などのクエリでは無視されます)、
+次の値をとることができます:
+
+* `entityCreate` 通知をトリガーする更新がエンティティ作成操作の場合
+* `entityUpdate` 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
+* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合
+* `entityDelete` 通知をトリガーする更新がエンティティ削除操作であった場合
+
+この属性のタイプは `Text` です。
+
+この組み込み属性は、[変更タイプに基づくサブスクリプション](subscriptions_alttype.md) 機能に関連しています。
 
 [トップ](#top)
 

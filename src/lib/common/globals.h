@@ -94,6 +94,7 @@
 #define DATE_CREATED    "dateCreated"
 #define DATE_MODIFIED   "dateModified"
 #define DATE_EXPIRES    "dateExpires"
+#define ALTERATION_TYPE "alterationType"
 #define ALL_ATTRS       "*"
 
 

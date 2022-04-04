@@ -32,18 +32,18 @@ accumulatorStart --pretty-print
 
 #
 # 01. POST /v2/entities, to create Room1 with attribute and metadata.
-# 02. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=false.
+# 02. POST /v2/subscriptions, to create subscription for Room1 with notifyOnMetadataChange=false.
 # 03. PATCH /v2/entities/Room1/attrs, to update the value of metadata.
 # 04. Dump the accumulator, see no notification when metadata changes.
 # 05. PATCH /v2/entities/Room1/attrs, to update the value of attribute.
 # 06. Dump the accumulator, see the notification when value of attribute changes.
 # 07. POST /v2/entities, to create Room2 with attribute and metadata.
-# 08. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=true.
+# 08. POST /v2/subscriptions, to create subscription for Room2 with notifyOnMetadataChange=true.
 # 09. PATCH /v2/entities/Room2/attrs, to update the value of metadata.
 # 10. Dump the accumulator, see the notification when metadata changes.
 # 11. PATCH /v2/entities/Room2/attrs, to update the value of attribute.
 # 12. Dump the accumulator, see the notification when value of attribute changes.
-# 13. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=foo and see error.
+# 13. POST /v2/subscriptions, to create subscription for Room3 with notifyOnMetadataChange=foo and see error.
 #
 
 
@@ -69,8 +69,8 @@ echo
 
 
 
-echo '02. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=false.'
-echo '====================================================================================='
+echo '02. POST /v2/subscriptions, to create subscription for Room1 with notifyOnMetadataChange=false.'
+echo '==============================================================================================='
 payload='{
   "description": "A subscription to get info about Room1",
   "subject": {
@@ -161,8 +161,8 @@ echo
 
 
 
-echo '07. POST /v2/entities, to create Room1 with temperature and pressure.'
-echo '====================================================================='
+echo '07. POST /v2/entities, to create Room2 with attribute and metadata.'
+echo '==================================================================='
 payload='{
   "id": "Room2",
   "type": "Room",
@@ -183,10 +183,10 @@ echo
 
 
 
-echo '08. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=true.'
-echo '===================================================================================='
+echo '08. POST /v2/subscriptions, to create subscription for Room2 with notifyOnMetadataChange=true.'
+echo '=============================================================================================='
 payload='{
-  "description": "A subscription to get info about Room1",
+  "description": "A subscription to get info about Room2",
   "subject": {
     "entities": [
       {
@@ -275,14 +275,14 @@ echo
 
 
 
-echo '13. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=foo and see error.'
-echo '================================================================================================='
+echo '13. POST /v2/subscriptions, to create subscription for Room3 with notifyOnMetadataChange=foo and see error.'
+echo '==========================================================================================================='
 payload='{
-  "description": "A subscription to get info about Room1",
+  "description": "A subscription to get info about Room3",
   "subject": {
     "entities": [
       {
-        "id": "Room1",
+        "id": "Room3",
         "type": "Room"
       }
     ],
@@ -319,8 +319,8 @@ Date: REGEX(.*)
 
 
 
-02. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=false.
-=====================================================================================
+02. POST /v2/subscriptions, to create subscription for Room1 with notifyOnMetadataChange=false.
+===============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -383,8 +383,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 
 
-07. POST /v2/entities, to create Room1 with temperature and pressure.
-=====================================================================
+07. POST /v2/entities, to create Room2 with attribute and metadata.
+===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/Room2?type=Room
@@ -393,8 +393,8 @@ Date: REGEX(.*)
 
 
 
-08. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=true.
-====================================================================================
+08. POST /v2/subscriptions, to create subscription for Room2 with notifyOnMetadataChange=true.
+==============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -487,8 +487,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 
 
-13. POST /v2/subscriptions, to create subscription with notifyOnMetadataChange=foo and see error.
-=================================================================================================
+13. POST /v2/subscriptions, to create subscription for Room3 with notifyOnMetadataChange=foo and see error.
+===========================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json

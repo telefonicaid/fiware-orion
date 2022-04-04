@@ -1,3 +1,4 @@
 - Fix: avoid triggering notification if metadata changes but not the attribute value itself (#3727)
 - Add: conditions.alterationTypes subscription fuctionality (#1494)
+- Add: alterationType built-in atrribute in notifications (#1494)
 - Reference distribution changed RHEL/CentOS 8 to Debian 11

@@ -35,3 +35,6 @@ update takes place. The elements in the `alterationTypes` array are interpreted 
 
 Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
 is `["entityCreate", "entityChange"]`.
+
+The particular alteration type can be got in notifications using the
+[`alterationType` builtin attribute](ngsiv2_implementation_nodes.md#alterationtype-attribute).

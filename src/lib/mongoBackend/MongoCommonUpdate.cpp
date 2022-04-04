@@ -3529,7 +3529,7 @@ static unsigned int updateEntity
       return 0;  // Error already in responseP
     }
 
-    addBuiltins(notifyCerP);
+    addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityDelete));
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
                                                   tenant,
@@ -3689,7 +3689,7 @@ static unsigned int updateEntity
     }
 
     /* EntityUpdate subscriptions may be triggered, even in the case of no actual modification */
-    addBuiltins(notifyCerP);
+    addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityUpdate));
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
                                                   tenant,
@@ -3935,7 +3935,7 @@ static unsigned int updateEntity
    * previous addTriggeredSubscriptions() invocations. Before that, we add
    * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
    * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-  addBuiltins(notifyCerP);
+  addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChange));
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
                                                 tenant,
@@ -4406,7 +4406,7 @@ unsigned int processContextElement
          * previous addTriggeredSubscriptions() invocations. Before that, we add
          * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
          * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-        addBuiltins(notifyCerP);
+        addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityCreate));
         notifSent = processSubscriptions(subsToNotify,
                                          notifyCerP,
                                          tenant,
