@@ -192,6 +192,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Clean up space, from https://github.com/actions/virtual-environments/issues/709#issuecomment-612569242
+        run: |
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "Removing large packages"
+	  sudo apt-get remove -y '^ghc-8.*'
+	  sudo apt-get remove -y '^dotnet-.*'
+	  sudo apt-get remove -y '^llvm-.*'
+	  sudo apt-get remove -y 'php.*'
+	  sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
+	  sudo apt-get autoremove -y
+	  sudo apt-get clean
+
       - name: Build Image
         id: build-image
         uses: redhat-actions/buildah-build@v2
