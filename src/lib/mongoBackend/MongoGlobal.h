@@ -417,6 +417,6 @@ extern void cprLookupByAttribute
 * addBuiltins -
 *
 */
-extern void addBuiltins(ContextElementResponse* cerP);
+extern void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

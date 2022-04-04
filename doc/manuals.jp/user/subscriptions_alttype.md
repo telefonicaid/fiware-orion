@@ -35,3 +35,6 @@
 
 デフォルトの `alterationTypes` (つまり、サブスクリプションが明示的に指定していないもの) は
 `["entityCreate", "entityChange"]` です。
+
+特定の変更タイプは、[`alterationType` 組み込み属性](ngsiv2_implementation_nodes.md#alterationtype-attribute)
+を使用して通知で取得できます。
