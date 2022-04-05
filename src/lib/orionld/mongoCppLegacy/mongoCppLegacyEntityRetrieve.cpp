@@ -34,13 +34,12 @@ extern "C"
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjLookup.h"                                         // kjLookup
 #include "kjson/kjBuilder.h"                                        // kjObject, ...
-#include "kjson/kjRender.h"                                        // TmP
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                            // orionldState
 
 #include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/numberToDate.h"                            // numberToDate

@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 #include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -102,6 +103,28 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 
 // -----------------------------------------------------------------------------
 //
+// langStringExtract -
+//
+static char* langStringExtract(KjNode* languageMapP, const char* lang)
+{
+  KjNode* langItemP   = kjLookup(languageMapP, lang);  // Find the desired language item (key == lang) inside the languageMap
+
+  if (langItemP == NULL)
+    langItemP  = kjLookup(languageMapP, "en");    // English is the default if 'lang' is not present
+
+  if (langItemP == NULL)
+    langItemP = languageMapP->value.firstChildP;  // If English also not present, just pick the first one
+
+  if (langItemP == NULL)
+    return (char*) "empty languageMap";  // If there is no item at all inside the language map, use "empty languageMap"
+
+  return langItemP->value.s;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromQueryContextResponse -
 //
 // PARAMETERS
@@ -115,7 +138,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 // The context for the entity is found in the context-cache.
 // If not present, it is retreived from the "@context" attribute of the entity and put in the cache
 //
-KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise, const char* lang, QueryContextResponse* responseP)
 {
   char* details  = NULL;
   bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
@@ -261,46 +284,65 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
 
       if (keyValues)
       {
-        // If keyValues, then just the value of the attribute is to be rendered (built)
-        switch (aP->valueType)
+        if ((aP->type == "LanguageProperty") && (lang != NULL) && (aP->valueType == orion::ValueTypeObject))
         {
-        case orion::ValueTypeNull:      aTop = kjNull(orionldState.kjsonP, attrName);                              break;
-        case orion::ValueTypeNumber:    aTop = kjFloat(orionldState.kjsonP, attrName,   aP->numberValue);          break;
-        case orion::ValueTypeBoolean:   aTop = kjBoolean(orionldState.kjsonP, attrName, aP->boolValue);            break;
-        case orion::ValueTypeString:
-          if (valueMayBeCompacted == true)
+          KjNode* langValueP = NULL;
+          char*   details    = NULL;
+
+          langValueP = kjTreeFromCompoundValue(aP->compoundValueP, langValueP, valueMayBeCompacted, &details);
+          if (langValueP == NULL)
           {
-            char* compactedValue = orionldContextItemAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL, NULL);
-            aTop = kjString(orionldState.kjsonP, attrName, (compactedValue != NULL)? compactedValue : aP->stringValue.c_str());
+            LM_E(("kjTreeFromCompoundValue: %s", details));
+            orionldError(OrionldInternalError, "Unable to create tree node from a compound value", details, 500);
+            return NULL;
           }
-          else
-            aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());
-          break;
 
-        case orion::ValueTypeVector:
-        case orion::ValueTypeObject:
-          aTop = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, attrName) : kjObject(orionldState.kjsonP, attrName);
-
-          if (aTop != NULL)
+          char* langString = langStringExtract(langValueP, lang);
+          aTop = kjString(orionldState.kjsonP, attrName, langString);
+        }
+        else
+        {
+          // If keyValues, then just the value of the attribute is to be rendered (built)
+          switch (aP->valueType)
           {
-            if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, valueMayBeCompacted, &details) == NULL)
+          case orion::ValueTypeNull:      aTop = kjNull(orionldState.kjsonP, attrName);                              break;
+          case orion::ValueTypeNumber:    aTop = kjFloat(orionldState.kjsonP, attrName,   aP->numberValue);          break;
+          case orion::ValueTypeBoolean:   aTop = kjBoolean(orionldState.kjsonP, attrName, aP->boolValue);            break;
+          case orion::ValueTypeString:
+            if (valueMayBeCompacted == true)
             {
-              LM_E(("kjTreeFromCompoundValue: %s", details));
-              orionldError(OrionldInternalError, "Unable to create tree node from a compound value", details, 500);
-              return NULL;
+              char* compactedValue = orionldContextItemAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL, NULL);
+              aTop = kjString(orionldState.kjsonP, attrName, (compactedValue != NULL)? compactedValue : aP->stringValue.c_str());
             }
-          }
-          break;
+            else
+              aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());
+            break;
 
-        case orion::ValueTypeNotGiven:
-          orionldError(OrionldInternalError, "Invalid internal JSON type for Context Atribute", NULL, 500);
-          break;
+          case orion::ValueTypeVector:
+          case orion::ValueTypeObject:
+            aTop = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, attrName) : kjObject(orionldState.kjsonP, attrName);
+
+            if (aTop != NULL)
+            {
+              if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, valueMayBeCompacted, &details) == NULL)
+              {
+                LM_E(("kjTreeFromCompoundValue: %s", details));
+                orionldError(OrionldInternalError, "Unable to create tree node from a compound value", details, 500);
+                return NULL;
+              }
+            }
+            break;
+
+          case orion::ValueTypeNotGiven:
+            orionldError(OrionldInternalError, "Invalid internal JSON type for Context Atribute", NULL, 500);
+            break;
+          }
         }
 
         if (aTop == NULL)
         {
-          LM_E(("kjTreeFromCompoundValue: %s", details));
-          orionldError(OrionldInternalError, "Unable to create tree node for a compound value", "out of memory", 500);
+          LM_E(("Internal Error (Out of memory)"));
+          orionldError(OrionldInternalError, "Unable to create tree node", "out of memory", 500);
           return NULL;
         }
 
@@ -335,6 +377,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
 
         // value
         char* valueFieldName = (char*) "value";
+
         if      (aP->type == "Relationship")      valueFieldName = (char*) "object";
         else if (aP->type == "LanguageProperty")  valueFieldName = (char*) "languageMap";
 

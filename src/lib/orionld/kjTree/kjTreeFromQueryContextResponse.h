@@ -33,6 +33,6 @@
 //
 // kjTreeFromQueryContextResponse -
 //
-extern KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise, QueryContextResponse* responseP);
+extern KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise, const char* lang, QueryContextResponse* responseP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMQUERYCONTEXTRESPONSE_H_
