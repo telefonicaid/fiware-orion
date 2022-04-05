@@ -42,7 +42,6 @@ extern "C"
 #include "rest/OrionError.h"                                     // OrionError
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
@@ -52,7 +51,6 @@ extern "C"
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
-#include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
 
@@ -205,8 +203,7 @@ static void optionsParse(const char* options)
       else
       {
         LM_W(("Invalid 'options' value: %s", optionStart));
-        orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI param /options/", optionStart);
+        orionldError(OrionldBadRequestData, "Invalid value for URI param /options/", optionStart, 400);
         return;
       }
 
@@ -389,8 +386,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
     if (orionldState.scopes == -1)
     {
       LM_W(("Bad Input (too many scopes)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for HTTP header /NGSILD-Scope/", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Bad value for HTTP header /NGSILD-Scope/", value, 400);
     }
   }
   else if (strcmp(key, "Accept") == 0)
@@ -402,8 +398,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
       const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
 
       LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Accept mime-type", details);
-      orionldState.httpStatusCode = SccNotAcceptable;
+      orionldError(OrionldBadRequestData, "Invalid Accept mime-type", details, 406);
     }
   }
   else if (strcasecmp(key, "Ngsiv2-AttrsFormat") == 0) orionldState.attrsFormat         = (char*) value;
@@ -437,9 +432,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
     else
     {
       // Tenant used when tenant is not supported by the broker - silently ignored for NGSIv2/v2, error for NGSI-LD
-      LM_E(("tenant in use but tenant support is not enabled for the broker"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
+      orionldError(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker", 400);
     }
   }
 
@@ -457,9 +450,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   // NULL/empty URI param value
   if ((value == NULL) || (*value == 0))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty right-hand-side for a URI parameter", key);
-    orionldState.httpStatusCode = 400;
-
+    orionldError(OrionldBadRequestData, "Empty right-hand-side for a URI parameter", key, 400);
     return MHD_YES;
   }
 
@@ -483,10 +474,9 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       char        details[256];
 
       snprintf(details, sizeof(details), "invalid character in URI param '%s'", key);
-      orionldErrorResponseCreate(OrionldBadRequestData, "invalid character in a URI parameter", key);
+      orionldError(OrionldBadRequestData, "invalid character in a URI parameter", key, 400);
 
       alarmMgr.badInput(clientIp, details);
-      orionldState.httpStatusCode  = 400;
 
       LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key, value));
       return MHD_YES;
@@ -522,17 +512,13 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     if (value[0] == '-')
     {
-      LM_W(("Bad Input (negative value for /offset/ URI param)"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /offset/", value);
+      orionldError(OrionldBadRequestData, "Bad value for URI parameter /offset/", value, 400);
       return MHD_YES;
     }
 
     if (strspn(value, "0123456789") != strlen(value))
     {
-      LM_W(("Bad Input (invalid character in /offset/ URI param)"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0");
+      orionldError(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0", 400);
       return MHD_YES;
     }
 
@@ -543,26 +529,20 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     if (value[0] == '-')
     {
-      LM_W(("Bad Input (negative value for /limit/ URI param)"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/", value);
+      orionldError(OrionldBadRequestData, "Bad value for URI parameter /limit/", value, 400);
       return MHD_YES;
     }
 
     if (strspn(value, "0123456789") != strlen(value))
     {
-      LM_W(("Bad Input (invalid character in /limit/ URI param)"));
-      orionldState.httpStatusCode = 400;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
+      orionldError(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", 400);
       return MHD_YES;
     }
 
     orionldState.uriParams.limit = atoi(value);
     if (orionldState.uriParams.limit > 1000)
     {
-      LM_W(("Bad Input (too big value for /limit/ URI param: %d - max allowed is 1000)", orionldState.uriParams.limit));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/ (valid range: 0-1000)", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Bad value for URI parameter /limit/ (valid range: 0-1000)", value, 400);
       return MHD_YES;
     }
 
@@ -609,9 +589,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.count = true;
     else if (strcmp(value, "false") != 0)
     {
-      LM_W(("Bad Input (invalid value for URI parameter 'count': %s)", value));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /count/", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Bad value for URI parameter /count/", value, 400);
       return MHD_YES;
     }
 
@@ -632,8 +610,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     if (pcheckUri((char*) value, true, &detail) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", value);  // FIXME: Include 'detail' and name (datasetId)
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Not a URI", value, 400);  // FIXME: Include 'detail' and name (datasetId)
       return MHD_YES;
     }
 
@@ -648,8 +625,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.deleteAll = false;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /deleteAll/", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /deleteAll/", value, 400);
       return MHD_YES;
     }
 
@@ -688,8 +664,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.details = true;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /details/", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /details/", value, 400);
       return MHD_YES;
     }
 
@@ -703,8 +678,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.prettyPrint = false;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /prettyPrint/", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /prettyPrint/", value, 400);
       return MHD_YES;
     }
 
@@ -728,8 +702,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.uriParams.location = false;
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter /location/", value);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /location/", value, 400);
       return MHD_YES;
     }
 
@@ -832,9 +805,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else
   {
-    LM_W(("Bad Input (unknown URI parameter: '%s' (value: '%s'))", key, value));
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Unknown URI parameter", key);
+    orionldError(OrionldBadRequestData, "Unknown URI parameter", key, 400);
     return MHD_YES;
   }
 
@@ -860,10 +831,7 @@ static OrionLdRestService* serviceLookup(void)
     if (orionldBadVerb() == true)
       orionldState.httpStatusCode = 405;  // SccBadVerb
     else
-    {
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath);
-      orionldState.httpStatusCode = 404;
-    }
+      orionldError(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath, 404);
   }
 
   return serviceP;
@@ -875,23 +843,21 @@ static OrionLdRestService* serviceLookup(void)
 //
 // tenantCheck -
 //
-static bool tenantCheck(char* tenantName, char* title, int titleLen, char* detail, int detailLen)
+static bool tenantCheck(char* tenantName)
 {
-  int   len    = 0;
+  int len = 0;
 
   while (tenantName[len] != 0)
   {
     if (len > SERVICE_NAME_MAX_LEN)
     {
-      snprintf(title, titleLen, "Invalid Tenant");
-      snprintf(detail, detailLen, "a tenant name can be max %d characters long", SERVICE_NAME_MAX_LEN);
+      orionldError(OrionldBadRequestData, "Invalid Tenant", "a tenant name can be max 50 characters long", 400);
       return false;
     }
 
     if ((!isalnum(tenantName[len])) && (tenantName[len] != '_'))
     {
-      snprintf(title, titleLen, "Invalid Tenant");
-      snprintf(detail, detailLen, "bad character in tenant name - only underscore and alphanumeric characters are allowed");
+      orionldError(OrionldBadRequestData, "Invalid Tenant", "bad character in tenant name - only underscore and alphanumeric characters are allowed", 400);
       return false;
     }
 
@@ -961,8 +927,7 @@ MHD_Result orionldMhdConnectionInit
     // Now check for a second '/'
     if (orionldState.urlPath[urlLen - 1] == '/')
     {
-      orionldState.responsePayload = (char*) doubleSlashPayload;  // FIXME: use orionldErrorResponseCreate - after setting prettyPrint
-      orionldState.httpStatusCode  = 400;
+      orionldError(OrionldBadRequestData, "Invalid URL PATH", "Double Slash", 400);
       return MHD_YES;
     }
   }
@@ -973,8 +938,7 @@ MHD_Result orionldMhdConnectionInit
 
   if (orionldState.verb == NOVERB)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);  // FIXME: do this after setting prettyPrint
-    orionldState.httpStatusCode   = 400;
+    orionldError(OrionldBadRequestData, "not a valid verb", method, 400);  // FIXME: do this after setting prettyPri, 400nt
     return MHD_YES;
   }
 
@@ -1013,26 +977,17 @@ MHD_Result orionldMhdConnectionInit
       (orionldState.verb != PUT)     &&
       (orionldState.verb != OPTIONS))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldBadRequestData, "Verb not supported by NGSI-LD", method, 400);
   }
 
   //
   // Check validity of URI parameters
   //
   if ((orionldState.uriParams.limit == 0) && (orionldState.uriParams.count == false))
-  {
-    LM_E(("Invalid value for URI parameter /limit/: 0"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1, if /count/ is not set");
-    orionldState.httpStatusCode = 400;
-  }
+    orionldError(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1, if /count/ is not set", 400);
 
   if (orionldState.uriParams.limit > 1000)
-  {
-    LM_E(("Invalid value for URI parameter /limit/: %d", orionldState.uriParams.limit));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
-    orionldState.httpStatusCode = 400;
-  }
+    orionldError(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000", 400);
 
   //
   // Get HTTP Headers
@@ -1047,32 +1002,19 @@ MHD_Result orionldMhdConnectionInit
 
   if (orionldState.tenantP == NULL)
     orionldState.tenantP = &tenant0;
-  else
-  {
-    char title[80];
-    char detail[256];
-
-    if (tenantCheck(orionldState.tenantName, title, sizeof(title), detail, sizeof(detail)) == false)
-    {
-      LM_E(("Invalid value for tenant: '%s'", orionldState.tenantName));
-      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
-      orionldState.httpStatusCode = 400;
-      return MHD_YES;
-    }
-  }
+  else if (tenantCheck(orionldState.tenantName) == false)  // tenantCheck calls orionldError
+    return MHD_YES;
 
   if ((orionldState.in.contentType == JSONLD) && (orionldState.linkHttpHeaderPresent == true))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
-    orionldState.httpStatusCode  = 400;
+    orionldError(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed", 400);
     return MHD_YES;
   }
 
   // Check payload too big
   if (orionldState.in.contentLength > 2000000)
   {
-    orionldState.responsePayload = (char*) payloadTooLargePayload;
-    orionldState.httpStatusCode  = 400;
+    orionldError(OrionldBadRequestData, "Invalid Payload", "Payload too large", 400);
     return MHD_YES;
   }
 
@@ -1090,10 +1032,7 @@ MHD_Result orionldMhdConnectionInit
     if ((orionldState.in.contentType != JSON) && (orionldState.in.contentType != JSONLD))
     {
       LM_W(("Bad Input (invalid Content-Type: '%s')", orionldState.in.contentTypeString));
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "unsupported format of payload",
-                                 "only application/json and application/ld+json are supported");
-      orionldState.httpStatusCode = 415;  // Unsupported Media Type
+      orionldError(OrionldBadRequestData, "unsupported format of payload", "only application/json and application/ld+json are supported", 415);
       return MHD_YES;
     }
   }

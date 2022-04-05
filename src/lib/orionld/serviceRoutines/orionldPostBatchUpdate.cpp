@@ -47,10 +47,10 @@ extern "C"
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection()
 
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECK
-#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
@@ -198,10 +198,9 @@ bool orionldPostBatchUpdate(void)
     }
 
     // If @context inpayload body, it needs to be respected
-    KjNode*                contextNodeP  = kjLookup(entityP, "@context");
-    OrionldProblemDetails  pd;
+    KjNode* contextNodeP  = kjLookup(entityP, "@context");
     if (contextNodeP != NULL)
-      orionldState.contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
+      orionldState.contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
 
     // Checking the entity and turning it Normalized
     if (pCheckEntity(entityP, true, NULL) == false)  // NULL ... I could give the DB Entity, just it's a REPLACE - not needed
@@ -340,9 +339,7 @@ bool orionldPostBatchUpdate(void)
 
   if (orionldState.httpStatusCode != SccOk)
   {
-    LM_E(("mongoUpdateContext flagged an error"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
-    orionldState.httpStatusCode = SccReceiverInternalError;
+    orionldError(OrionldBadRequestData, "Internal Error", "Database Error", 500);
     return false;
   }
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error

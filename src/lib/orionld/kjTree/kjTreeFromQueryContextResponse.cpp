@@ -37,11 +37,11 @@ extern "C"
 #include "common/string.h"                                     // FT
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
-#include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
@@ -78,8 +78,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
   // createdAt
   if (numberToDate(creDate, date, sizeof(date)) == false)
   {
-    LM_E(("Error creating a stringified date for 'createdAt'"));
-    orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified createdAt date", NULL);
+    orionldError(OrionldInternalError, "Unable to create a stringified createdAt date", NULL, 500);
     return false;
   }
 
@@ -89,8 +88,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
   // modifiedAt
   if (numberToDate(modDate, date, sizeof(date)) == false)
   {
-    LM_E(("Error creating a stringified date for 'modifiedAt'"));
-    orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified modifiedAt date", NULL);
+    orionldError(OrionldInternalError, "Unable to create a stringified modifiedAt date", NULL, 500);
     return false;
   }
 
@@ -146,10 +144,10 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
     LM_E(("Error %d from mongoBackend", responseP->errorCode.code));
     OrionldResponseErrorType errorType = httpStatusCodeToOrionldErrorType(responseP->errorCode.code);
 
-    orionldErrorResponseCreate(errorType, responseP->errorCode.reasonPhrase.c_str(), responseP->errorCode.details.c_str());
+    orionldError(errorType, responseP->errorCode.reasonPhrase.c_str(), responseP->errorCode.details.c_str(), 400);
 
     if (responseP->errorCode.code == SccContextElementNotFound)
-      orionldState.httpStatusCode = responseP->errorCode.code;
+      orionldState.httpStatusCode = 404;
 
     return orionldState.responseTree;
   }
@@ -169,7 +167,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
   }
   else if ((hits > 1) && (oneHit == true))  // More than one hit - not possible!
   {
-    orionldErrorResponseCreate(OrionldInternalError, "More than one hit", orionldState.wildcard[0]);
+    orionldError(OrionldInternalError, "More than one hit", orionldState.wildcard[0], 500);
     return NULL;
   }
 
@@ -218,7 +216,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
       if (nodeP == NULL)
       {
         LM_E(("out of memory"));
-        orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node", "out of memory");
+        orionldError(OrionldInternalError, "Unable to create tree node", "out of memory", 500);
         return NULL;
       }
 
@@ -288,21 +286,21 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
             if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, valueMayBeCompacted, &details) == NULL)
             {
               LM_E(("kjTreeFromCompoundValue: %s", details));
-              orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node from a compound value", details);
+              orionldError(OrionldInternalError, "Unable to create tree node from a compound value", details, 500);
               return NULL;
             }
           }
           break;
 
         case orion::ValueTypeNotGiven:
-          orionldErrorResponseCreate(OrionldInternalError, "Invalid internal JSON type for Context Atribute", NULL);
+          orionldError(OrionldInternalError, "Invalid internal JSON type for Context Atribute", NULL, 500);
           break;
         }
 
         if (aTop == NULL)
         {
           LM_E(("kjTreeFromCompoundValue: %s", details));
-          orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node for a compound value", "out of memory");
+          orionldError(OrionldInternalError, "Unable to create tree node for a compound value", "out of memory", 500);
           return NULL;
         }
 
@@ -317,7 +315,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
         if (aTop == NULL)
         {
           LM_E(("Error creating a KjNode Object"));
-          orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node", "out of memory");
+          orionldError(OrionldInternalError, "Unable to create tree node", "out of memory", 500);
           return NULL;
         }
 
@@ -328,7 +326,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
           if (nodeP == NULL)
           {
             LM_E(("Error creating a KjNode String"));
-            orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node", "out of memory");
+            orionldError(OrionldInternalError, "Unable to create tree node", "out of memory", 500);
             return NULL;
           }
 
@@ -351,7 +349,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
             if (numberToDate(aP->numberValue, date, sizeof(date)) == false)
             {
               LM_E(("Error creating a stringified date"));
-              orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified observedAt date", NULL);
+              orionldError(OrionldInternalError, "Unable to create a stringified observedAt date", NULL, 500);
               return NULL;
             }
 
@@ -385,14 +383,14 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
           if (nodeP == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
-            orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node for compound value", "out of memory");
+            orionldError(OrionldInternalError, "Unable to create tree node for compound value", "out of memory", 500);
             return NULL;
           }
 
           if (kjTreeFromCompoundValue(aP->compoundValueP, nodeP, valueMayBeCompacted, &details) == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
-            orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node from compound value", details);
+            orionldError(OrionldInternalError, "Unable to create tree node from compound value", details, 500);
             return NULL;
           }
           break;
@@ -467,7 +465,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
                 if (numberToDate(mdP->numberValue, date, sizeof(date)) == false)
                 {
                   LM_E(("Error creating a stringified date"));
-                  orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified observedAt date", NULL);
+                  orionldError(OrionldInternalError, "Unable to create a stringified observedAt date", NULL, 500);
                   return NULL;
                 }
 
@@ -514,7 +512,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
                 if (numberToDate(mdP->numberValue, date, sizeof(date)) == false)
                 {
                   LM_E(("Error creating a stringified date"));
-                  orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified date", NULL);
+                  orionldError(OrionldInternalError, "Unable to create a stringified date", NULL, 500);
                   return NULL;
                 }
 

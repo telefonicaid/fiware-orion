@@ -49,7 +49,6 @@ extern "C"
 #include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/performance.h"                        // PERFORMANCE
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
@@ -181,21 +180,17 @@ bool orionldGetEntities(void)
 
   if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
   {
-    LM_W(("Bad Input (too broad query - need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter"));
+    orionldError(OrionldBadRequestData,
+                 "Too broad query",
+                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
+                 400);
 
-    orionldErrorResponseCreate(OrionldBadRequestData,
-                               "Too broad query",
-                               "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter");
-
-    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   if ((idPattern != NULL) && (id != NULL))
   {
-    LM_W(("Bad Input (both 'idPattern' and 'id' used)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible parameters", "id, idPattern");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Incompatible parameters", "id, idPattern", 400);
     return false;
   }
 
@@ -208,9 +203,7 @@ bool orionldGetEntities(void)
   {
     if ((geometry == NULL) || (georel == NULL) || (coordinates == NULL))
     {
-      LM_W(("Bad Input (incomplete geometry - three URI parameters must be present)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Incomplete geometry", "geometry, georel, and coordinates must all be present");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Incomplete geometry", "geometry, georel, and coordinates must all be present", 400);
       return false;
     }
   }
@@ -228,9 +221,7 @@ bool orionldGetEntities(void)
         (strncmp(georel, "equals", 6)      != 0) &&
         (strncmp(georel, "disjoint", 8)    != 0))
     {
-      LM_W(("Bad Input (invalid value for georel)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for georel", georel);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid value for georel", georel, 400);
       return false;
     }
 
@@ -243,8 +234,7 @@ bool orionldGetEntities(void)
       if ((strncmp(georelExtra, "minDistance==", 11) != 0) && (strncmp(georelExtra, "maxDistance==", 11) != 0))
       {
         LM_W(("Bad Input (invalid value for georel parameter: %s)", georelExtra));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for georel parameter", georel);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid value for georel parameter", georel, 400);
         return false;
       }
     }
@@ -260,8 +250,7 @@ bool orionldGetEntities(void)
         (strcmp(geometry, "MultiLineString") != 0))
     {
       LM_W(("Bad Input (invalid value for URI parameter 'geometry'"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /geometry/", geometry);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid value for URI parameter /geometry/", geometry, 400);
       return false;
     }
 
@@ -286,8 +275,7 @@ bool orionldGetEntities(void)
       delete scopeP;
 
       LM_E(("Geo: Scope::fill failed"));
-      orionldErrorResponseCreate(OrionldInternalError, "Invalid Geometry", errorString);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldInternalError, "Invalid Geometry", errorString, 400);
       return false;
     }
 
@@ -315,7 +303,7 @@ bool orionldGetEntities(void)
   if ((orionldState.in.idList.items > 1) && (orionldState.in.typeList.items > 1))
   {
     LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted");
+    orionldError(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted", 400);
     return false;
   }
   else if (orionldState.in.idList.items > 1)  // A list of Entity IDs, a single Entity TYPE
@@ -359,7 +347,7 @@ bool orionldGetEntities(void)
     if ((lexList = qLex(q, &title, &detail)) == NULL)
     {
       LM_W(("Bad Input (qLex: %s: %s)", title, detail));
-      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
+      orionldError(OrionldBadRequestData, title, detail, 400);
       mongoRequest.release();
       return false;
     }
@@ -367,7 +355,7 @@ bool orionldGetEntities(void)
     if ((qTree = qParse(lexList, &title, &detail)) == NULL)
     {
       LM_W(("Bad Input (qParse: %s: %s)", title, detail));
-      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
+      orionldError(OrionldBadRequestData, title, detail, 400);
       mongoRequest.release();
       return false;
     }
@@ -383,7 +371,7 @@ bool orionldGetEntities(void)
     if (qTreeToBsonObj(qTree, &objBuilder, &title, &detail) == false)
     {
       LM_W(("Bad Input (qTreeToBsonObj: %s: %s)", title, detail));
-      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
+      orionldError(OrionldBadRequestData, title, detail, 400);
       mongoRequest.release();
       return false;
     }

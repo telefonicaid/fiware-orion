@@ -31,11 +31,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/qLex.h"                                 // qLex
 #include "orionld/common/qParse.h"                               // qParse
@@ -95,16 +95,12 @@ bool pcheckQuery(KjNode* tree, KjNode** entitiesPP, KjNode** attrsPP, QNode** qT
       //
       // Temporal Queries are recognized but not allowed
       //
-      orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", "Temporal Query as part of POST Query");
-      orionldState.httpStatusCode = 501;
-
+      orionldError(OrionldBadRequestData, "Not Implemented", "Temporal Query as part of POST Query", 501);
       return false;
     }
     else  // Not Recognized - Error
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for query", kNodeP->name);
-      orionldState.httpStatusCode = 400;
-
+      orionldError(OrionldBadRequestData, "Invalid field for query", kNodeP->name, 400);
       return false;
     }
   }

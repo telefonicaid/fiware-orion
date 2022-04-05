@@ -40,12 +40,12 @@ extern "C"
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
-#include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
-#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/payloadCheck/pcheckEntity.h"                   // Own interface
 
@@ -59,7 +59,7 @@ static bool checkEntityIdFieldExists(void)
 {
   if (orionldState.payloadIdNode == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory");
+    orionldError(OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory", 400);
     return false;
   }
 
@@ -73,7 +73,7 @@ static bool checkEntityIdFieldExists(void)
     strcpy(titleExpanded, entityStartTitle);
     strcat(titleExpanded, idEntityFromPayload);
 
-    orionldErrorResponseCreate(OrionldBadRequestData, titleExpanded, "The 'type' field is mandatory");
+    orionldError(OrionldBadRequestData, titleExpanded, "The 'type' field is mandatory", 400);
     return false;
   }
 
@@ -171,7 +171,7 @@ bool pcheckEntity
       {
         if (pcheckName(kNodeP->name, &detailsP) == false)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", kNodeP->name);
+          orionldError(OrionldBadRequestData, "Invalid Property/Relationship name", kNodeP->name, 400);
           return false;
         }
       }

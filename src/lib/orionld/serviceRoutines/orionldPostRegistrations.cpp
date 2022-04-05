@@ -35,7 +35,7 @@
 #include "mongoBackend/mongoRegistrationCreate.h"              // mongoRegistrationCreate
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
@@ -65,7 +65,7 @@ bool orionldPostRegistrations(void)
     // mongoLdRegistrationGet takes the req semaphore
     if (mongoLdRegistrationGet(NULL, regId, orionldState.tenantP, &statusCode, &details) == true)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId);
+      orionldError(OrionldBadRequestData, "Registration already exists", regId, 409);
       return false;
     }
   }
@@ -84,7 +84,7 @@ bool orionldPostRegistrations(void)
   if (kjTreeToRegistration(&reg, &regIdP) == false)
   {
     LM_E(("kjTreeToRegistration FAILED"));
-    // orionldErrorResponseCreate is invoked by kjTreeToRegistration
+    // orionldError is invoked by kjTreeToRegistration
     return false;
   }
 

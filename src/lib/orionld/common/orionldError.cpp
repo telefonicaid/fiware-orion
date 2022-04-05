@@ -22,6 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                  // kaStrdup
+}
+
 #include "logMsg/logMsg.h"                                    // LM_*
 
 #include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
@@ -50,12 +55,10 @@ void orionldError
   int                       status
 )
 {
-  OrionldProblemDetails*    pdP = &orionldState.pd;
-
-  pdP->type   = errorType;
-  pdP->title  = (char*) title;
-  pdP->detail = (char*) detail;
-  pdP->status = status;
+  orionldState.pd.type   = errorType;
+  orionldState.pd.title  = (title != NULL)? kaStrdup(&orionldState.kalloc, title) : NULL;
+  orionldState.pd.detail = (detail != NULL)? kaStrdup(&orionldState.kalloc, detail) : NULL;
+  orionldState.pd.status = status;
 
   orionldState.httpStatusCode = status;
 

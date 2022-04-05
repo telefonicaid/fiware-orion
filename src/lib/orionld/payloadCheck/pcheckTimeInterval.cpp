@@ -24,16 +24,15 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
-#include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/payloadCheck/pcheckTimeInterval.h"            // Own interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
+#include "orionld/payloadCheck/pcheckTimeInterval.h"             // Own interface
 
 
 
@@ -64,37 +63,32 @@ bool pcheckTimeInterval(KjNode* timeIntervalNodeP, const char* fieldName)
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for TimeInterval", tiItemP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid field for TimeInterval", tiItemP->name, 400);
       return false;
     }
   }
 
   if ((startP == NULL) && (endP == NULL))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", fieldName);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Empty Object", fieldName, 400);
     return false;
   }
 
   if (startP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "start");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Missing mandatory field", "start", 400);
     return false;
   }
 
   if (endP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "end");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Missing mandatory field", "end", 400);
     return false;
   }
 
   if (start > end)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Inconsistent TimeInterval", "TimeInterval ends before it starts");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Inconsistent TimeInterval", "TimeInterval ends before it starts", 400);
     return false;
   }
 

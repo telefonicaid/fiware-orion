@@ -27,9 +27,9 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                        // orionldError
+#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"         // pcheckEntityInfoArray
 #include "orionld/payloadCheck/pcheckInformationItem.h"         // Own interface
@@ -90,8 +90,7 @@ bool pcheckInformationItem(KjNode* informationP)
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for information[X]", infoItemP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid field for information[X]", infoItemP->name, 400);
       return false;
     }
   }

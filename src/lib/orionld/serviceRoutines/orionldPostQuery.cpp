@@ -22,28 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strlen
-#include <string>                                                // std::string
-#include <vector>                                                // std::vector
+#include <string.h>                                            // strlen
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjChildAdd, kjObject, kjArray, ...
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjObject, kjArray, ...
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/QNode.h"                                // QNode
-#include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/payloadCheck/pcheckQuery.h"                    // pcheckQuery
-#include "orionld/db/dbConfiguration.h"                          // dbEntitiesQuery
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/serviceRoutines/orionldPostQuery.h"            // Own Interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/common/QNode.h"                              // QNode
+#include "orionld/common/eqForDot.h"                           // eqForDot
+#include "orionld/payloadCheck/pcheckQuery.h"                  // pcheckQuery
+#include "orionld/db/dbConfiguration.h"                        // dbEntitiesQuery
+#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
+#include "orionld/serviceRoutines/orionldPostQuery.h"          // Own Interface
 
 
 
@@ -298,9 +297,7 @@ bool orionldPostQuery(void)
 {
   if (orionldState.requestTree->type != KjObject)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", "The payload data for POST Query must be a JSON Object");
-    orionldState.httpStatusCode = 400;
-
+    orionldError(OrionldBadRequestData, "Bad Request", "The payload data for POST Query must be a JSON Object", 400);
     return false;
   }
 

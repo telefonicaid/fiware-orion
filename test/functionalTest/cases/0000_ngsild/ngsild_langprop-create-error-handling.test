@@ -1,0 +1,306 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation with a language property
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Attempt to create an entity with a LanguageProperty without a languageMap
+# 02. Attempt to create an entity with a LanguageProperty with a languageMap that is not an object
+# 03. Attempt to create an entity with a LanguageProperty with a languageMap item that is not a string
+# 04. Attempt to create an entity with a LanguageProperty with a value
+# 05. Attempt to create an entity with a LanguageProperty with an object
+# 06. Attempt to create an entity with a LanguageProperty with a unitCode
+# 07. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty key
+# 08. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty value
+#
+
+echo "01. Attempt to create an entity with a LanguageProperty without a languageMap"
+echo "============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "type": "LanguageProperty",
+    "lang": {
+      "en": "el",
+      "es": "ele",
+      "sv": 12
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create an entity with a LanguageProperty with a languageMap that is not an object"
+echo "================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "type": "LanguageProperty",
+    "languageMap": "en=el, es=ele"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create an entity with a LanguageProperty with a languageMap item that is not a string"
+echo "===================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "languageMap": {
+      "en": "el",
+      "es": "ele",
+      "sv": 12
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create an entity with a LanguageProperty with a value"
+echo "===================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "el",
+      "es": "ele",
+      "sv": "ell"
+    },
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to create an entity with a LanguageProperty with an object"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "type": "LanguageProperty",
+    "object": "urn:E1",
+    "languageMap": {
+      "en": "el",
+      "es": "ele",
+      "sv": "ell"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create an entity with a LanguageProperty with a unitCode"
+echo "======================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "unitCode": "cm",
+    "languageMap": {
+      "en": "el",
+      "es": "ele",
+      "sv": "ell"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty key"
+echo "====================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "languageMap": {
+      "": "el",
+      "es": "ele",
+      "sv": "ell"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "08. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty value"
+echo "======================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "languageMap": {
+      "en": "",
+      "es": "ele",
+      "sv": "ell"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an entity with a LanguageProperty without a languageMap
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 195
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "Missing /languageMap/ field for LanguageProperty at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an entity with a LanguageProperty with a languageMap that is not an object
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 199
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "the languageMap of a LanguageProperty attribute must be a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create an entity with a LanguageProperty with a languageMap item that is not a string
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 201
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "items of the value of a LanguageProperty attribute must be JSON Strings",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create an entity with a LanguageProperty with a value
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 175
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "Forbidden field for a LanguageProperty: value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create an entity with a LanguageProperty with an object
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 176
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "Forbidden field for a LanguageProperty: object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create an entity with a LanguageProperty with a unitCode
+=======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "valid for Property attributes only",
+    "title": "Invalid member /unitCode/",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty key
+=====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 205
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "an item of the value (languageMap) of a LanguageProperty is an empty string",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty value
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 205
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "an item of the value (languageMap) of a LanguageProperty is an empty string",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -32,9 +32,10 @@ extern "C"
 
 #include "apiTypesV2/Subscription.h"                           // Subscription
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // kjTreeToEndpoint
 #include "orionld/kjTree/kjTreeToNotification.h"               // Own interface
@@ -125,9 +126,7 @@ static bool formatExtract(char* format, ngsiv2::Subscription* subP)
   else if (strcmp(format, "x-ngsiv2-keyValues-compacted")  == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES_COMPACT;
   else
   {
-    LM_E(("Invalid value for Notification::format: '%s'", format));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Notification::format", format);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid value for Notification::format", format, 400);
     return false;
   }
 
@@ -172,8 +171,7 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
       if ((subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
       {
         LM_W(("Non-supported notification format: %s", itemP->value.s));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Non-supported notification format", itemP->value.s);
-        orionldState.httpStatusCode = 501;
+        orionldError(OrionldBadRequestData, "Non-supported notification format", itemP->value.s, 501);
         return false;
       }
     }
@@ -209,22 +207,20 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown Notification field", itemP->name);
+      orionldError(OrionldBadRequestData, "Unknown Notification field", itemP->name, 400);
       return false;
     }
   }
 
   if (endpointP == NULL)
   {
-    LM_W(("Bad Input (notification::endpoint is missing)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint");
+    orionldError(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint", 400);
     return false;
   }
 
   if (pcheckSubscriptionAcceptAndFormat(subP->attrsFormat, subP->notification.httpInfo.mimeType) == false)
   {
-    LM_W(("Bad Input (Non-compatible 'format' (%s) and 'accept' (%s) fields)", renderFormatToString(subP->attrsFormat), mimeTypeToLongString(subP->notification.httpInfo.mimeType)));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Non-compatible 'format' and 'accept' fields");
+    orionldError(OrionldBadRequestData, "Bad Input", "Non-compatible 'format' and 'accept' fields", 400);
     return false;
   }
 

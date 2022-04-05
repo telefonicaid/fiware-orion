@@ -49,11 +49,10 @@ extern "C"
 #include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection()
 
-#include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECK
-#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityIdCheck.h"                      // entityIdCheck
@@ -63,6 +62,7 @@ extern "C"
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
 #include "orionld/common/duplicatedInstances.h"                // duplicatedInstances
 #include "orionld/types/OrionldProblemDetails.h"               // OrionldProblemDetails
+#include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -194,8 +194,7 @@ bool orionldPostBatchUpsert(void)
   //
   if ((orionldState.uriParamOptions.update == true) && (orionldState.uriParamOptions.replace == true))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "URI Param Error", "options: both /update/ and /replace/ present");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "URI Param Error", "options: both /update/ and /replace/ present", 400);
     return false;
   }
 
@@ -230,14 +229,13 @@ bool orionldPostBatchUpsert(void)
     KjNode*                atidNodeP    = kjLookup(entityP, "@id");       // To populate removeArray
     KjNode*                contextNodeP = kjLookup(entityP, "@context");
     OrionldContext*        contextP     = NULL;
-    OrionldProblemDetails  pd;
 
     // Error if both - taken care of by pCheckEntity ... I hope!
     if (idNodeP == NULL)
       idNodeP = atidNodeP;
 
     if (contextNodeP != NULL)
-      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
 
     if (contextP != NULL)
       orionldState.contextP = contextP;

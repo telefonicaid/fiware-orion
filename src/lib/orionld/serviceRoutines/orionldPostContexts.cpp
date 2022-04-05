@@ -34,9 +34,10 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist
@@ -70,13 +71,11 @@ bool orionldPostContexts(void)
 
   url = orionldContextUrlGenerate(&id);
 
-  OrionldProblemDetails  pd;
-  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.requestTree, &pd);
+  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.requestTree);
 
   if (contextP == NULL)
   {
-    LM_W(("Unable to create context (%s: %s)", pd.title, pd.detail));
-    orionldErrorResponseCreate(&pd);
+    LM_W(("Unable to create context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
     return false;
   }
 

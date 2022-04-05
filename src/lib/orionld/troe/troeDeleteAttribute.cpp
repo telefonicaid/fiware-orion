@@ -30,10 +30,8 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ENTITY_INSERT_START

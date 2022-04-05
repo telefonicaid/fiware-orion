@@ -30,10 +30,11 @@ extern "C"
 }
 
 #include "common/globals.h"                                    // parse8601Time
+
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/types/OrionldTimeInterval.h"                 // OrionldTimeInterval
 
 
@@ -61,8 +62,7 @@ bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP)
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected field in TimeInterval", intervalItemP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Unexpected field in TimeInterval", intervalItemP->name, 400);
       return false;
     }
   }
@@ -70,22 +70,19 @@ bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP)
   if ((startP == NULL) || (endP == NULL))
   {
     const char* missing = (startP == NULL)? "TimeInterval::start" : "TimeInterval::end";
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in TimeInterval", missing);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Missing field in TimeInterval", missing, 400);
     return false;
   }
 
   if ((intervalP->start = parse8601Time(startP->value.s)) == -1)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s, 400);
     return false;
   }
 
   if ((intervalP->end = parse8601Time(endP->value.s)) == -1)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s, 400);
     return false;
   }
 

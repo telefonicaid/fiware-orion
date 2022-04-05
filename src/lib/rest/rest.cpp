@@ -60,7 +60,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState, multitenancy, ...
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
@@ -164,15 +164,11 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       OrionError error(SccBadRequest, errorString);
       orionldState.httpStatusCode = error.code;
       ciP->answer                 = error.smartRender(orionldState.apiVersion);
-
-      orionldErrorResponseCreate(OrionldBadRequestData, "Empty right-hand-side for URI param", ckey);
     }
     else if (orionldState.apiVersion == ADMIN_API)
     {
       orionldState.httpStatusCode = SccBadRequest;
       ciP->answer                 = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
-
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error in URI param", errorString.c_str());
     }
 
     return MHD_YES;
@@ -203,9 +199,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
         OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
         orionldState.httpStatusCode = error.code;
         ciP->answer                 = error.smartRender(orionldState.apiVersion);
-
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0");
-
         return MHD_YES;
       }
 
@@ -226,9 +219,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
         ciP->answer                 = error.smartRender(orionldState.apiVersion);
 
         LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
-        orionldState.httpStatusCode = SccBadRequest;
-
         return MHD_YES;
       }
 
@@ -242,10 +232,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       orionldState.httpStatusCode = error.code;
       ciP->answer                 = error.smartRender(orionldState.apiVersion);
 
-        LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
-        orionldState.httpStatusCode = SccBadRequest;
-
+      LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
       return MHD_YES;
     }
     else if (limit == 0)
@@ -268,9 +255,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       orionldState.httpStatusCode = error.code;
       ciP->answer                 = error.smartRender(orionldState.apiVersion);
-
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for /details/ - accepted: /on/, /ON/, /off/, /OFF/. Default is /off/", val);
-
       return MHD_YES;
     }
   }
@@ -301,8 +285,6 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
-
-    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in a URI param", key.c_str());
 
     alarmMgr.badInput(clientIp, details);
     orionldState.httpStatusCode = error.code;
@@ -360,11 +342,7 @@ static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
     {
       // Tenant used when tenant is not supported by the broker - silently ignored for NGSIv2/v2, error for NGSI-LD
       if (orionldState.apiVersion == NGSI_LD_V1)
-      {
-        LM_E(("tenant in use but tenant support is not enabled for the broker"));
-        orionldState.httpStatusCode = 400;
-        orionldErrorResponseCreate(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker");
-      }
+        orionldError(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker", 400);
     }
   }
   else
@@ -401,8 +379,6 @@ static void requestCompleted
     orionldAlterationsTreat(orionldState.alterations);
     PERFORMANCE(notifEnd);
   }
-  else
-    LM_TMP(("KZ: No alterations"));
 
   if ((orionldState.in.payload != NULL) && (orionldState.in.payload != static_buffer))
   {

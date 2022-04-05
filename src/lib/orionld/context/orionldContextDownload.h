@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
-
 
 
 // -----------------------------------------------------------------------------
 //
 // orionldContextDownload -
 //
-extern char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP);
+extern char* orionldContextDownload(const char* url);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTDOWNLOAD_H_

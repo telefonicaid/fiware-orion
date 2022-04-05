@@ -50,7 +50,7 @@ bool orionldGetEntityAttribute(void)
 
   if (orionldState.responseTree == NULL)
   {
-    // dbEntityAttributesGet calls orionldErrorResponseCreate
+    // dbEntityAttributesGet calls orionldError
     LM_E(("dbEntityAttributesGet: %s: %s", pd.title, pd.detail));
     return false;
   }

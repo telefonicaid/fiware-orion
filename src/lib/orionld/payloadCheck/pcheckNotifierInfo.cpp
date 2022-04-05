@@ -31,6 +31,7 @@ extern "C"
 
 #include "orionld/common/CHECK.h"                               // OBJECT_CHECK, DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/payloadCheck/pcheckNotifierInfo.h"            // Own interface
 
 
@@ -62,23 +63,20 @@ bool pcheckNotifierInfo(KjNode* niP)
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for 'endpoint::notifierInfo'", nodeP->name);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid field for 'endpoint::notifierInfo'", nodeP->name, 400);
         return false;
       }
     }
 
     if (keyP == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing in endpoint::notifierInfo array item", "key");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Mandatory field missing in endpoint::notifierInfo array item", "key", 400);
       return false;
     }
 
     if (valueP == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing in endpoint::notifierInfo array item", "value");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Mandatory field missing in endpoint::notifierInfo array item", "value", 400);
       return false;
     }
   }

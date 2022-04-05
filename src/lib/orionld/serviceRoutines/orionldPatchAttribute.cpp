@@ -40,15 +40,15 @@ extern "C"
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
-#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -69,9 +69,7 @@ extern "C"
 //
 #define DB_ERROR(r, title, detail)                                    \
 do {                                                                  \
-  LM_E(("Database Error: %s: %s", title, detail));                    \
-  orionldState.httpStatusCode = 500;                                  \
-  orionldErrorResponseCreate(OrionldInternalError, title, detail);    \
+  orionldError(OrionldInternalError, title, detail, 500);             \
   return r;                                                           \
 } while (0)
 
@@ -96,9 +94,7 @@ bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, cha
   KjNode* datasetNodeP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
   if (datasetNodeP == NULL)
   {
-    LM_W(("Bad Input (dataset '%s' not found for attr '%s' in entity '%s')", datasetId, attrNameExpandedEq, entityId));
-    orionldState.httpStatusCode = 404;
-    orionldErrorResponseCreate(OrionldResourceNotFound, "attribute dataset not found", datasetId);
+    orionldError(OrionldResourceNotFound, "attribute dataset not found", datasetId, 404);
     return false;
   }
 
@@ -430,13 +426,11 @@ static bool orionldForwardPatchAttribute
     //
     if (regContextNodeP != NULL)
     {
-      OrionldProblemDetails pd;
-
       if (regContextNodeP->type == KjString)
         regContextP = orionldContextCacheLookup(regContextNodeP->value.s);
 
       if (regContextP == NULL)
-        regContextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, regContextNodeP, &pd);
+        regContextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, regContextNodeP);
     }
 
     if (regContextP == NULL)
@@ -783,11 +777,7 @@ bool orionldPatchAttribute(void)
     attributeType = orionldAttributeType(attrTypeInDb);
 
   if (pCheckAttribute(inAttribute, true, attributeType, true, contextItemP) == false)
-  {
-    orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
     return false;
-  }
 
 
 
@@ -805,6 +795,9 @@ bool orionldPatchAttribute(void)
 
     if (regArray != NULL)
     {
+      // Need to null out a possible "Not Found"
+      orionldState.pd.status = 200;
+
       //
       // There can be only ONE matching registration - the second matching should not have been allowed
       //
@@ -823,6 +816,9 @@ bool orionldPatchAttribute(void)
   KjNode* datasetIdP = kjLookup(inAttribute, "datasetId");
   if (datasetIdP != NULL)
   {
+    // Need to null out a possible "Not Found"
+    orionldState.pd.status = 200;
+
     PCHECK_STRING(datasetIdP, 0, NULL, "datasetId", 400);
     if (pCheckUri(datasetIdP->value.s, "datasetId", true) == false)
       return false;
@@ -875,7 +871,7 @@ bool orionldPatchAttribute(void)
     delete caP;
 
     LM_E(("kjAttributeToNgsiContextAttribute failed: %s", detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Unable to convert merged attribute to a struct for mongoBackend");
+    orionldError(OrionldBadRequestData, "Internal Error", "Unable to convert merged attribute to a struct for mongoBackend", 500);
     return false;
   }
 
@@ -919,9 +915,7 @@ bool orionldPatchAttribute(void)
     orionldState.httpStatusCode = 204;
   else
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
-    orionldState.httpStatusCode = 500;
+    orionldError(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", 500);
     ucr.release();
     return false;
   }

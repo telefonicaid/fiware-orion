@@ -32,9 +32,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldState.h"                         // orionldState, contextDownloadAttempts, ...
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/context/orionldContextDownload.h"              // Own interface
@@ -45,7 +44,7 @@ extern "C"
 //
 // orionldContextDownload -
 //
-char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP)
+char* orionldContextDownload(const char* url)
 {
   char        protocol[16];
   char        ip[256];
@@ -55,20 +54,20 @@ char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP)
 
   if ((url == NULL || *url == 0))
   {
-    pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Invalid @context";
-    pdP->detail = (char*) ((url == NULL)? "Null @context" : "Empty @context");
-    pdP->status = 400;
+    orionldState.pd.type   = OrionldBadRequestData;
+    orionldState.pd.title  = (char*) "Invalid @context";
+    orionldState.pd.detail = (char*) ((url == NULL)? "Null @context" : "Empty @context");
+    orionldState.pd.status = 400;
 
     return NULL;
   }
 
-  if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, &pdP->detail) == false)
+  if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, &orionldState.pd.detail) == false)
   {
-    // pdP->detail set by urlParse
-    pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Invalid @context";
-    pdP->status = 400;
+    // orionldState.pd.detail set by urlParse
+    orionldState.pd.type   = OrionldBadRequestData;
+    orionldState.pd.title  = (char*) "Invalid @context";
+    orionldState.pd.status = 400;
 
     return NULL;
   }
@@ -101,7 +100,7 @@ char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP)
                                urlPath,
                                contextDownloadTimeout,
                                NULL,
-                               &pdP->detail,
+                               &orionldState.pd.detail,
                                &tryAgain,
                                &downloadFailed,
                                "Accept: application/ld+json",
@@ -113,17 +112,17 @@ char* orionldContextDownload(const char* url, OrionldProblemDetails* pdP)
     if (reqOk == true)
       break;
 
-    LM_E(("orionldRequestSend failed (try number %d out of %d. Timeout is: %dms): %s", tries + 1, contextDownloadAttempts, contextDownloadTimeout, pdP->detail));
+    LM_E(("orionldRequestSend failed (try number %d out of %d. Timeout is: %dms): %s", tries + 1, contextDownloadAttempts, contextDownloadTimeout, orionldState.pd.detail));
     if (tryAgain == false)
       break;
   }
 
   if (reqOk == false)  // && (downloadFailed == true)? - could get better error handling with 'downloadFailed'
   {
-    pdP->type   = OrionldLdContextNotAvailable;
-    pdP->title  = (char*) "Unable to download context";
-    pdP->detail = (char*) url;
-    pdP->status = 503;
+    orionldState.pd.type   = OrionldLdContextNotAvailable;
+    orionldState.pd.title  = (char*) "Unable to download context";
+    orionldState.pd.detail = (char*) url;
+    orionldState.pd.status = 503;
 
     return NULL;
   }

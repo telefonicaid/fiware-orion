@@ -33,10 +33,10 @@ extern "C"
 
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/mqtt/mqttCheck.h"                            // mqttCheck
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // Own interface
@@ -70,23 +70,20 @@ static bool kjTreeToReceiverInfo(KjNode* receiverInfoP, ngsiv2::HttpInfo* httpIn
       }
       else
       {
-        LM_E(("Bad Input (Invalid Endpoint::receiverInfo field: '%s')", nodeP->name));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::receiverInfo field", nodeP->name);
+        orionldError(OrionldBadRequestData, "Invalid Endpoint::receiverInfo field", nodeP->name, 400);
         return false;
       }
     }
 
     if ((key == NULL) || (value == NULL))
     {
-        LM_E(("Bad Input (Incomplete Endpoint::receiverInfo key-value pair)"));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::receiverInfo key-value pair");
+        orionldError(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::receiverInfo key-value pair", 400);
         return false;
     }
 
     if ((*key == 0) || (*value == 0))
     {
-      LM_W(("Bad Input (Incomplete Endpoint::receiverInfo key-value pair - one of them is empty)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::receiverInfo key-value pair - one of them is empty");
+      orionldError(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::receiverInfo key-value pair - one of them is empty", 400);
       return false;
     }
 
@@ -125,23 +122,20 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
       }
       else
       {
-        LM_E(("Bad Input (Invalid Endpoint::notifierInfo field: '%s')", nodeP->name));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::notifierInfo field", nodeP->name);
+        orionldError(OrionldBadRequestData, "Invalid Endpoint::notifierInfo field", nodeP->name, 400);
         return false;
       }
     }
 
     if ((key == NULL) || (value == NULL))
     {
-      LM_W(("Bad Input (Incomplete Endpoint::notifierInfo key-value pair - one of them is missing)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::notifierInfo key-value pair - one of them is missing");
+      orionldError(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::notifierInfo key-value pair - one of them is missing", 400);
       return false;
     }
 
     if ((*key == 0) || (*value == 0))
     {
-      LM_W(("Bad Input (Incomplete Endpoint::notifierInfo key-value pair - one of them is empty)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::notifierInfo key-value pair - one of them is empty");
+      orionldError(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::notifierInfo key-value pair - one of them is empty", 400);
       return false;
     }
 
@@ -158,8 +152,7 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
     {
       if ((strcmp(value, "mqtt3.1.1") != 0) && (strcmp(value, "mqtt5.0") != 0))
       {
-        LM_W(("Bad Input (Invalid value for MQTT-Version in Endpoint::notifierInfo key-value pair - '%s')", value));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Invalid value for MQTT-Version Endpoint::notifierInfo key-value pair");
+        orionldError(OrionldBadRequestData, "Bad Input", "Invalid value for MQTT-Version Endpoint::notifierInfo key-value pair", 400);
         return false;
       }
 
@@ -172,15 +165,13 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
       else if ((value[0] == '2') && (value[1] == 0))   httpInfoP->mqtt.qos = 2;
       else
       {
-        LM_W(("Bad Input (Invalid value for MQTT-QoS in Endpoint::notifierInfo key-value pair - '%s')", value));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Invalid value for MQTT-QoS Endpoint::notifierInfo key-value pair");
+        orionldError(OrionldBadRequestData, "Bad Input", "Invalid value for MQTT-QoS Endpoint::notifierInfo key-value pair", 400);
         return false;
       }
     }
     else
     {
-      LM_W(("Bad Input (Invalid key in Endpoint::notifierInfo)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Invalid key in Endpoint::notifierInfo");
+      orionldError(OrionldBadRequestData, "Bad Input", "Invalid key in Endpoint::notifierInfo", 400);
       return false;
     }
   }
@@ -216,15 +207,13 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
       {
         if (mqttCheck(uriP, &detail) == false)
         {
-          LM_W(("Bad Input (endpoint is not a valid MQTT endpoint)"));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid MQTT endpoint");
+          orionldError(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid MQTT endpoint", 400);
           return false;
         }
       }
       else if (pcheckUri(uriP, true, &detail) == false)
       {
-        LM_W(("Bad Input (endpoint is not a valid URI)"));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid URI");
+        orionldError(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid URI", 400);
         return false;
       }
 
@@ -238,7 +227,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
 
       if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType);
+        orionldError(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, 400);
         return false;
       }
 
@@ -252,7 +241,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
         httpInfoP->mimeType = GEOJSON;
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s);
+        orionldError(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, 400);
         return false;
       }
     }
@@ -274,14 +263,14 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name);
+      orionldError(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name, 400);
       return false;
     }
   }
 
   if (uriP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint::uri");
+    orionldError(OrionldBadRequestData, "Mandatory field missing", "Subscription::notification::endpoint::uri", 400);
     return false;
   }
 

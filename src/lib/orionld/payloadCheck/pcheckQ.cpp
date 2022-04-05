@@ -24,18 +24,17 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                       // KjNode
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/logMsg.h"                                      // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/QNode.h"                                // QNode
-#include "orionld/common/qLex.h"                                 // qLex
-#include "orionld/common/qParse.h"                               // qParse
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/payloadCheck/pcheckQ.h"                        // Own interface
+#include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/common/orionldError.h"                        // orionldError
+#include "orionld/common/QNode.h"                               // QNode
+#include "orionld/common/qLex.h"                                // qLex
+#include "orionld/common/qParse.h"                              // qParse
+#include "orionld/payloadCheck/pcheckQ.h"                       // Own interface
 
 
 
@@ -96,17 +95,13 @@ QNode* pcheckQ(char* qString)
 
   if ((lexList = qLex(qString, &title, &detail)) == NULL)
   {
-    LM_W(("Bad Input (qLex: %s: %s)", title, detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldBadRequestData, title, detail, 400);
     return NULL;
   }
 
   if ((qTree = qParse(lexList, &title, &detail)) == NULL)
   {
-    LM_W(("Bad Input (qParse: %s: %s)", title, detail));
-    orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldBadRequestData, title, detail, 400);
     return NULL;
   }
 

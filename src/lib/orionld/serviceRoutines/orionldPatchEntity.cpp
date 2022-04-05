@@ -38,14 +38,14 @@ extern "C"
 
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
@@ -87,8 +87,7 @@ bool orionldPatchEntity(void)
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity does not exist", entityId);
+    orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
   }
 
@@ -97,8 +96,7 @@ bool orionldPatchEntity(void)
 
   if (idNodeP == NULL)
   {
-    orionldState.httpStatusCode = 500;
-    orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'_id' field of entity from DB not found");
+    orionldError(OrionldInternalError, "Corrupt Database", "'_id' field of entity from DB not found", 500);
     return false;
   }
 
@@ -107,8 +105,7 @@ bool orionldPatchEntity(void)
 
   if (entityTypeNodeP == NULL)
   {
-    orionldState.httpStatusCode = 500;
-    orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'_id::type' field of entity from DB not found");
+    orionldError(OrionldInternalError, "Corrupt Database", "'_id::type' field of entity from DB not found", 500);
     return false;
   }
 
@@ -116,8 +113,7 @@ bool orionldPatchEntity(void)
   KjNode* inDbAttrNamesP = kjLookup(dbEntityP, "attrNames");
   if (inDbAttrNamesP == NULL)
   {
-    orionldState.httpStatusCode = 500;
-    orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found");
+    orionldError(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found", 500);
     return false;
   }
 
@@ -125,8 +121,7 @@ bool orionldPatchEntity(void)
   KjNode* inDbAttrsP = kjLookup(dbEntityP, "attrs");
   if (inDbAttrsP == NULL)
   {
-    orionldState.httpStatusCode = 500;
-    orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
+    orionldError(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found", 500);
     return false;
   }
 

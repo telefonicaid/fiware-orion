@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
 

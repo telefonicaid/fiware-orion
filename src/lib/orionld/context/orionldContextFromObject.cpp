@@ -105,8 +105,7 @@ OrionldContext* orionldContextFromObject
   char*                   url,
   OrionldContextOrigin    origin,
   char*                   id,
-  KjNode*                 contextObjectP,
-  OrionldProblemDetails*  pdP
+  KjNode*                 contextObjectP
 )
 {
   OrionldContext*  contextP;
@@ -133,7 +132,7 @@ OrionldContext* orionldContextFromObject
     ok = false;
   }
 
-  if ((ok == true) && (orionldContextHashTablesFill(contextP, contextObjectP, pdP) == false))
+  if ((ok == true) && (orionldContextHashTablesFill(contextP, contextObjectP, &orionldState.pd) == false))
   {
     // orionldContextHashTablesFill fills in pdP
     LM_E(("orionldContextHashTablesFill failed"));

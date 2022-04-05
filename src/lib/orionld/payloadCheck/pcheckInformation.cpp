@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
 #include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/payloadCheck/pcheckInformationItem.h"         // pcheckInformationItem
 #include "orionld/payloadCheck/pcheckInformation.h"             // Own interface
@@ -46,8 +46,7 @@ bool pcheckInformation(KjNode* informationArrayP)
 {
   if (informationArrayP->value.firstChildP == NULL)  // Empty Array
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Empty Array", "information", 400);
     return false;
   }
 

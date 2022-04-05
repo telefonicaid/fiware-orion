@@ -26,7 +26,7 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"   // Own Interface
@@ -43,25 +43,19 @@ bool orionldDeleteRegistration(void)
 
   if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
   {
-    LM_E(("uriCheck: %s", detail));
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0]);  // FIXME: Include 'detail' and name (registrationId)
+    orionldError(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0], 400);
     return false;
   }
 
   if (dbRegistrationExists(orionldState.wildcard[0]) == false)
   {
-    LM_E(("dbRegistrationExists says that the registration '%s' doesn't exist", orionldState.wildcard[0]));
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0]);
+    orionldError(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0], 404);
     return false;
   }
 
   if (dbRegistrationDelete(orionldState.wildcard[0]) == false)
   {
-    LM_E(("dbRegistrationDelete failed - not found?"));
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0]);
+    orionldError(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0], 404);
     return false;
   }
 

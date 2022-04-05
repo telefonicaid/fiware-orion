@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState, kalloc, coreContextUrl
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
@@ -76,7 +76,7 @@ bool willBeSimplified(KjNode* contextTreeP, int* itemsInArrayP)
 //
 // orionldContextFromTree -
 //
-OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP)
 {
   int itemsInArray;
 
@@ -86,7 +86,7 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
     if ((contextTreeP == NULL) || (contextTreeP->value.firstChildP == NULL))
     {
       // Nothing left in  the array - only Core Context was there but has been removed?
-      pdP->status = 200;
+      orionldState.pd.status = 200;
 
       return orionldCoreContextP;
     }
@@ -125,11 +125,7 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
         cachedContextP = orionldContextCacheLookup(ctxItemP->value.s);
       else if ((ctxItemP->type != KjObject) && (ctxItemP->type != KjArray))
       {
-        LM_E(("invalid type of @context array item: %s", kjValueType(ctxItemP->type)));
-        pdP->type   = OrionldBadRequestData;
-        pdP->title  = (char*) "Invalid @context - invalid type for @context array item";
-        pdP->detail = (char*) kjValueType(ctxItemP->type);
-        pdP->status = 400;
+        orionldError(OrionldBadRequestData, "Invalid @context - invalid type for @context array item", kjValueType(ctxItemP->type), 400);
 
         if (contextP->url != NULL)  // Only contexts with a URL are "kj-cloned"
           kjFree(contextP->tree);
@@ -147,9 +143,11 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
         else if (origin == OrionldContextUserCreated)
           url = orionldContextUrlGenerate(&id);
 
-        contextP->context.array.vector[ix] = orionldContextFromTree(url, origin, id, ctxItemP, pdP);
+        contextP->context.array.vector[ix] = orionldContextFromTree(url, origin, id, ctxItemP);
         if (contextP->context.array.vector[ix] != NULL)
           contextP->context.array.vector[ix]->parent = contextP->id;
+        else
+          LM_RE(NULL, ("unable to download context '%s'", url));
       }
       else
         contextP->context.array.vector[ix] = cachedContextP;
@@ -178,7 +176,7 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
 
         contextP->context.array.items     = 1;
         contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, 1 * sizeof(OrionldContext*));
-        contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, NULL, pdP);
+        contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, NULL);
       }
 
       if (contextP != NULL)
@@ -189,9 +187,8 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
     else
     {
       OrionldContext* contextP;
-      contextP = orionldContextFromUrl(contextTreeP->value.s, NULL, pdP);
-
-      if (contextP)
+      contextP = orionldContextFromUrl(contextTreeP->value.s, NULL);
+      if (contextP != NULL)
       {
         if (contextP->origin != OrionldContextDownloaded)
           contextP->origin = origin;
@@ -202,7 +199,7 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
   }
   else if (contextTreeP->type == KjObject)
   {
-    OrionldContext* contextP = orionldContextFromObject(url, origin, id, contextTreeP, pdP);
+    OrionldContext* contextP = orionldContextFromObject(url, origin, id, contextTreeP);
 
     if (contextP)
       contextP->origin = origin;
@@ -213,11 +210,6 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
   //
   // None of the above. Error
   //
-  pdP->type   = OrionldBadRequestData;
-  pdP->title  = (char*) "Invalid type for item in @context array";
-  pdP->detail = (char*) kjValueType(contextTreeP->type);
-  pdP->status = 400;
-
-  LM_E(("%s: %s", pdP->title, pdP->detail));
+  orionldError(OrionldBadRequestData, "Invalid type for item in @context array", kjValueType(contextTreeP->type), 400);
   return NULL;
 }

@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckAttrs.h"                    // Own interface
 
@@ -47,16 +47,12 @@ bool pcheckAttrs(KjNode* tree)
   {
     if (attrP->type != KjString)
     {
-      LM_W(("Bad Input (Query 'attrs' array field is not a string: '%s')", kjValueType(attrP->type)));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid JSON Content", "Query 'attrs' array field is not a string");
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Invalid JSON Content", "Query 'attrs' array field is not a string", 400);
       return false;
     }
     else if (attrP->value.s[0] == 0)
     {
-      LM_W(("Bad Input (Query 'attrs' array field is an empty string)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid JSON Content", "Query 'attrs' array field is an empty string");
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Invalid JSON Content", "Query 'attrs' array field is an empty string", 400);
       return false;
     }
 

@@ -35,14 +35,15 @@
 #include "rest/OrionError.h"                                     // OrionError
 #include "apiTypesV2/Registration.h"                             // ngsiv2::Registration
 #include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, ...
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
 #include "mongoBackend/safeMongo.h"                              // moreSafe
 #include "mongoBackend/connectionOperations.h"                   // collectionRangedQuery
 #include "mongoBackend/mongoRegistrationAux.h"                   // mongoSetXxx
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"         // mongoSetLdRelationshipV, mongoSetLdPropertyV, ...
 #include "orionld/mongoBackend/mongoLdRegistrationsGet.h"        // Own interface
 
@@ -83,7 +84,7 @@ static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char
   if (idPattern[0] == 0)
   {
     *detailsP = "URI Param /idPattern/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "idPattern");
+    orionldError(OrionldBadRequestData, "No value for URI Parameter", "idPattern", 400);
     return false;
   }
 

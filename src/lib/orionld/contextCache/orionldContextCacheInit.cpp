@@ -34,7 +34,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/common/orionldState.h"                         // dbHost, coreContextUrl
 #include "orionld/mongoc/mongocInit.h"                           // mongocInit
 #include "orionld/mongoc/mongocContextCacheGet.h"                // mongocContextCacheGet
@@ -68,11 +67,10 @@ void dbContextToCache(KjNode* dbContextP, KjNode* atContextP, bool keyValues, bo
   char*                 url          = urlNodeP->value.s;
   double                createdAt    = createdAtNodeP->value.f;
   OrionldContextOrigin  origin       = orionldOriginFromString(originNodeP->value.s);
-  OrionldProblemDetails pd;
-  OrionldContext*       contextP     = orionldContextFromTree(url, origin, id, atContextP, &pd);
+  OrionldContext*       contextP     = orionldContextFromTree(url, origin, id, atContextP);
 
   if (contextP == NULL)
-    LM_RVE(("Internal Error (unable to create context '%s' from DB - %s: %s)", url, pd.title, pd.detail));
+    LM_RVE(("Internal Error (unable to create context '%s' from DB - %s: %s)", url, orionldState.pd.title, orionldState.pd.detail));
 
   contextP->createdAt   = createdAt;
   contextP->usedAt      = 0;
@@ -159,10 +157,9 @@ void orionldContextCacheInit(void)
   // 1.5. Still no core context?
   if (orionldCoreContextP == NULL)
   {
-    OrionldProblemDetails pd;
-    orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL, &pd);
+    orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL);
     if (orionldCoreContextP == NULL)
-      LM_X(1, ("Unable to download the core context (%s: %s)", pd.title, pd.detail));
+      LM_X(1, ("Unable to download the core context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
   }
 
 

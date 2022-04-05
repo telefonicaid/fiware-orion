@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
@@ -50,17 +50,14 @@ bool orionldGetContext(void)
 
   if (contextP == NULL)
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", orionldState.wildcard[0]);
-    orionldState.httpStatusCode = 404;
+    orionldError(OrionldResourceNotFound, "Context Not Found", orionldState.wildcard[0], 404);
     return false;
   }
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
   if (orionldState.responseTree == NULL)
   {
-    LM_E(("Internal Error (out of memory)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "kjObject failed", "out of memory?");
-    orionldState.httpStatusCode = SccReceiverInternalError;
+    orionldError(OrionldBadRequestData, "kjObject failed", "out of memory?", 500);
     return false;
   }
 

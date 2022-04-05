@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/qTreeToBsonObj.h"                       // qTreeToBsonObj
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
@@ -501,7 +501,7 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
 
   if ((qP != NULL) && (qFilter(&queryBuilder, qP, &title, &detail) == false))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
+    orionldError(OrionldBadRequestData, title, detail, 400);
     return NULL;
   }
 

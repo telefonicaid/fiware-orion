@@ -33,10 +33,11 @@ extern "C"
 }
 
 #include "apiTypesV2/EntID.h"                                    // EntID
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECKx(U)
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // Own interface
@@ -60,7 +61,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
   {
     if (entityP->type != KjObject)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL);
+      orionldError(OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL, 400);
       return false;
     }
 
@@ -88,20 +89,20 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown EntityInfo field", itemP->name);
+        orionldError(OrionldBadRequestData, "Unknown EntityInfo field", itemP->name, 400);
         return false;
       }
     }
 
     if ((idP == NULL) && (idPatternP == NULL) && (typeP == NULL))
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Empty EntityInfo object", NULL);
+      orionldError(OrionldBadRequestData, "Empty EntityInfo object", NULL, 400);
       return false;
     }
 
     if ((idP != NULL) && (idPatternP != NULL))
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL);
+      orionldError(OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL, 400);
       return false;
     }
 
@@ -112,15 +113,14 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
 
       if (pcheckUri(idP, true, &detail) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include 'detail' and name (id)
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid Entity ID", detail, 400);  // FIXME: Include 'detail' and name (id)
         return false;
       }
     }
 
     if (typeP == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in EntityInfo object", "type");
+      orionldError(OrionldBadRequestData, "Missing field in EntityInfo object", "type", 400);
       return false;
     }
 
@@ -129,7 +129,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
     if (idP)        entityInfo.id        = idP;
     if (idPatternP) entityInfo.idPattern = idPatternP;
 
-    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);  // Expansion for Regs+Subs
+    entityInfo.type = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);  // Expansion for Regs+Subs
     entitiesP->push_back(entityInfo);
   }
 

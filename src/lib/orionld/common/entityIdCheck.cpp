@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Trace levels for logging
 
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
 #include "orionld/common/entityIdCheck.h"                        // Own interface

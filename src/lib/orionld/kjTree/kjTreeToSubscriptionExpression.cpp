@@ -31,10 +31,10 @@ extern "C"
 
 #include "apiTypesV2/SubscriptionExpression.h"                 // SubscriptionExpression
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // Own interface
 
 
@@ -63,7 +63,7 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
       DUPLICATE_CHECK(coordinatesNodeP, "GeoQuery::coordinates", itemP);
       if ((itemP->type != KjString) && (itemP->type != KjArray))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates");
+        orionldError(OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates", 400);
         return false;
       }
     }
@@ -79,26 +79,26 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown GeoQuery field", itemP->name);
+      orionldError(OrionldBadRequestData, "Unknown GeoQuery field", itemP->name, 400);
       return false;
     }
   }
 
   if (geometryP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::geometry missing in Subscription", NULL);
+    orionldError(OrionldBadRequestData, "GeoQuery::geometry missing in Subscription", NULL, 400);
     return false;
   }
 
   if (coordinatesNodeP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::coordinates missing in Subscription", NULL);
+    orionldError(OrionldBadRequestData, "GeoQuery::coordinates missing in Subscription", NULL, 400);
     return false;
   }
 
   if (georelP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::georel missing in Subscription", NULL);
+    orionldError(OrionldBadRequestData, "GeoQuery::georel missing in Subscription", NULL, 400);
     return false;
   }
 

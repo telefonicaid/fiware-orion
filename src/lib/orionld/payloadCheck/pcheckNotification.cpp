@@ -28,11 +28,10 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                        // orionldError
+#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckEndpoint.h"                // pcheckEndpoint
 #include "orionld/payloadCheck/pcheckNotification.h"            // Own interface
@@ -73,8 +72,7 @@ bool pcheckNotification(KjNode* notificationP, bool patch)
       EMPTY_STRING_CHECK(formatP, "format");
       if ((strcmp(formatP->value.s, "keyValues") != 0) && (strcmp(formatP->value.s, "normalized") != 0))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of 'format' (must be either 'keyValues' or 'normalized'", formatP->value.s);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid value of 'format' (must be either 'keyValues' or 'normalized'", formatP->value.s, 400);
         return false;
       }
     }
@@ -88,22 +86,19 @@ bool pcheckNotification(KjNode* notificationP, bool patch)
     }
     else if (strcmp(nItemP->name, "status") == 0)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for notification", "'status' is read-only");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid field for notification", "'status' is read-only", 400);
       return false;
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for notification", nItemP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid field for notification", nItemP->name, 400);
       return false;
     }
   }
 
   if (endpointP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "endpoint");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Mandatory field missing", "endpoint", 400);
     return false;
   }
 

@@ -35,14 +35,14 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "cache/subCache.h"                                      // CachedSubscription
 #include "apiTypesV2/Subscription.h"                             // Subscription
 #include "apiTypesV2/HttpInfo.h"                                 // HttpInfo
-#include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
+
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/qAliasCompact.h"                        // qAliasCompact
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
@@ -249,8 +249,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
       if (coordValueP == NULL)
       {
-        LM_E(("error parsing coordinates: '%s'", coordinateString));
-        orionldErrorResponseCreate(OrionldInternalError, "Unable to parse coordinates string", coordinateString);
+        orionldError(OrionldInternalError, "Unable to parse coordinates string", coordinateString, 500);
         return NULL;
       }
 
@@ -471,8 +470,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
     if (numberToDate(subscriptionP->expires, date, sizeof(date)) == false)
     {
-      LM_E(("Error creating a stringified date for 'expires'"));
-      orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", NULL);
+      orionldError(OrionldInternalError, "Unable to create a stringified expires date", NULL, 500);
       return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "expiresAt", date);  // expiresAt is v1.3? of the spec ... it was called expires before

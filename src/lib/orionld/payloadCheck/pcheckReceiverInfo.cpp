@@ -31,6 +31,7 @@ extern "C"
 
 #include "orionld/common/CHECK.h"                               // OBJECT_CHECK, DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/payloadCheck/pcheckReceiverInfo.h"            // Own interface
 
 
@@ -62,23 +63,20 @@ bool pcheckReceiverInfo(KjNode* riP)
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for 'endpoint::receiverInfo'", nodeP->name);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid field for 'endpoint::receiverInfo'", nodeP->name, 400);
         return false;
       }
     }
 
     if (keyP == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing in endpoint::receiverInfo array item", "key");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Mandatory field missing in endpoint::receiverInfo array item", "key", 400);
       return false;
     }
 
     if (valueP == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing in endpoint::receiverInfo array item", "value");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Mandatory field missing in endpoint::receiverInfo array item", "value", 400);
       return false;
     }
   }

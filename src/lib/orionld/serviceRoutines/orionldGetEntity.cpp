@@ -43,9 +43,9 @@ extern "C"
 
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
-#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/performance.h"                          // PERFORMANCE
@@ -389,8 +389,7 @@ bool orionldGetEntity(void)
   //
   if (pcheckUri(eId, true, &detail) == false)
   {
-    LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (entityId)
+    orionldError(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", 400);
     return false;
   }
 
@@ -422,7 +421,7 @@ bool orionldGetEntity(void)
     // If no registration found, retuirn 404 Not Found
     //
     LM_E(("ToDo: Implement this special case of entity not found in local BUT in registration"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", NULL);
+    orionldError(OrionldBadRequestData, "Bad Request", NULL, 400);
     return false;
   }
 
@@ -478,15 +477,13 @@ bool orionldGetEntity(void)
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
-    if (attrsMandatory == true)
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Combination Entity/Attributes Not Found", eId);
-    else
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", eId);
-    orionldState.httpStatusCode = SccContextElementNotFound;  // 404
-
+    const char* title = (attrsMandatory == true)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
+    orionldError(OrionldResourceNotFound, title, eId, 404);
     return false;
   }
 
+  // Need to null out a possible "Not Found"
+  orionldState.pd.status = 200;
 
   //
   // GET /ngsi-ld/v1/entities/{entityId} returns a single Entity, not an Array.

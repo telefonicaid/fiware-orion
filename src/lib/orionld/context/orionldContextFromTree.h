@@ -31,7 +31,6 @@ extern "C"
 }
 
 #include "orionld/context/OrionldContext.h"                      // OrionldContext, OrionldContextOrigin
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
 
@@ -39,6 +38,6 @@ extern "C"
 //
 // orionldContextFromTree -
 //
-extern OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP, OrionldProblemDetails* pdP);
+extern OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMTREE_H_
