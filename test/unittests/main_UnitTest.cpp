@@ -66,6 +66,7 @@ int           fwdPort               = -1;
 int           subCacheInterval      = 10;
 unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
+bool          onlyMetadata          = true;
 bool          insecureNotif         = false;
 bool          ngsiv1Autocast        = false;
 char          fwdHost[64];
