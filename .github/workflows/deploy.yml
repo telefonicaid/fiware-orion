@@ -184,30 +184,30 @@ jobs:
           password: ${{ secrets.QUAY_PASSWORD }}
 
 
-#  deploy-debug-quay:
-#
-#    runs-on: ubuntu-18.04
-#    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Build Image
-#        id: build-image
-#        uses: redhat-actions/buildah-build@v2
-#        with:
-#          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
-#          tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
-#          oci: true
-#          dockerfiles: |
-#            ./docker/Dockerfile-debug
-#
-#      - name: Push To quay.io
-#        id: push-debug-to-quay
-#        uses: redhat-actions/push-to-registry@v2
-#        with:
-#          image: ${{ steps.build-image.outputs.image }}
-#          tags: ${{ steps.build-image.outputs.tags }}
-#          registry: quay.io
-#          username: ${{ secrets.QUAY_USERNAME }}
-#          password: ${{ secrets.QUAY_PASSWORD }}
+  deploy-debug-quay:
+
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
+          oci: true
+          dockerfiles: |
+            ./docker/Dockerfile-debug
+
+      - name: Push To quay.io
+        id: push-debug-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
