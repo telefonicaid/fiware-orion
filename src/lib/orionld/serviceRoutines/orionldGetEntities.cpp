@@ -149,11 +149,9 @@ void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
     // Now add the language chosen, if any
     if (langItemP != NULL)
     {
-      // LM_TMP(("KZ: langItemP at %p: %s: %s", langItemP, langItemP->name, langChosen));
       KjNode* langItemP = kjString(orionldState.kjsonP, "lang", langChosen);
       kjChildAdd(attrP, langItemP);
     }
-    // LM_TMP(("KZ: stringValue: %s", stringValue));
   }
 }
 
@@ -572,14 +570,10 @@ bool orionldGetEntities(void)
   if ((keyValues == false) && (lang != NULL))  // If key-values, the lang thing has already been taken care of by kjTreeFromQueryContextResponse
   {
     // A language has been selected: lang, if we have an LanguageProperty in the response, the response tree needs to be modified
-    // LM_TMP(("Before lang loop"));
     for (KjNode* apiEntityP = orionldState.responseTree->value.firstChildP; apiEntityP != NULL; apiEntityP = apiEntityP->next)
     {
-      // LM_TMP(("Calling apiEntityLanguageProps"));
       apiEntityLanguageProps(apiEntityP, lang);
-      // LM_TMP(("After apiEntityLanguageProps"));
     }
-    // LM_TMP(("After lang loop"));
   }
 
   if (orionldState.responseTree->value.firstChildP == NULL)
@@ -590,14 +584,9 @@ bool orionldGetEntities(void)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, *countP);
 
   if (orionldState.uriParamOptions.concise == true)
-  {
-    // LM_TMP(("Calling kjEntityNormalizedToConcise"));
     kjEntityNormalizedToConcise(orionldState.responseTree);
-    // LM_TMP(("After kjEntityNormalizedToConcise"));
-  }
 
   mongoRequest.release();
 
-  // LM_TMP(("Service Routine DONE"));
   return true;
 }
