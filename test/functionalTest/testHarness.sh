@@ -265,15 +265,17 @@ function exitFunction()
           echo
 
           cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-          if [ "$ORIONLD_SUPPRESS_LOG_FILE_OUTPUT" != "YES" ] && [ -s /tmp/orionld.err-warn.log ]
-          then
+          echo "------------ Last 30 Lines: ---------------------" >> /tmp/orionld.err-warn.log
+          tail -30 /tmp/orionld.log >> /tmp/orionld.err-warn.log
+          # if [ "$ORIONLD_SUPPRESS_LOG_FILE_OUTPUT" != "YES" ]
+          # then
               echo "Errors and warnings from the orionld log file"
               echo "-------------------------------------------------"
               cat /tmp/orionld.err-warn.log
               echo "-------------------------------------------------"
               echo
               echo
-          fi
+          # fi
 
           if [ -s /tmp/accumulator_9997_stderr ]
           then
@@ -939,7 +941,7 @@ function partExecute()
       logMsg "$what $dirname/$filename: exitCode=$exitCode"
       if [ $__tryNo == $MAX_TRIES ]
       then
-        exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff
+        exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff 
       else
         echo -n "(ERROR 9 - .out and .regexpect differ) "
       fi
