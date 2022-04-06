@@ -36,7 +36,7 @@ extern "C"
 #include "common/globals.h"                                     // parse8601Time
 
 #include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
@@ -51,13 +51,11 @@ extern "C"
 //
 // CORRUPTED_DB
 //
-#define CORRUPTED_DB(detail)                                                                      \
-do                                                                                                \
-{                                                                                                 \
-  LM_E(("Internal Error (database corruption: %s)", detail));                                     \
-  orionldErrorResponseCreate(OrionldBadRequestData, "Database seems to be corrupted", detail);    \
-  orionldState.httpStatusCode = SccReceiverInternalError;                                         \
-  return false;                                                                                   \
+#define CORRUPTED_DB(detail)                                                          \
+do                                                                                    \
+{                                                                                     \
+  orionldError(OrionldBadRequestData, "Database seems to be corrupted", detail, 500); \
+  return false;                                                                       \
 } while (0)
 
 
@@ -547,8 +545,7 @@ bool orionldPatchRegistration(void)
 
   if (pcheckUri(registrationId, true, &detail) == false)
   {
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);  // FIXME: Include 'detail' and name (registrationId)
+    orionldError(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId, 400);
     return false;
   }
 
@@ -562,8 +559,7 @@ bool orionldPatchRegistration(void)
 
   if (dbRegistrationP == NULL)
   {
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Registration not found", registrationId);
+    orionldError(OrionldResourceNotFound, "Registration not found", registrationId, 404);
     return false;
   }
 
@@ -581,8 +577,7 @@ bool orionldPatchRegistration(void)
     //
     if (propertyTree->value.firstChildP != NULL)
     {
-      orionldState.httpStatusCode = SccBadRequest;
-      orionldErrorResponseCreate(OrionldBadRequestData, "non-existing registration property", propertyTree->value.firstChildP->name);
+      orionldError(OrionldBadRequestData, "non-existing registration property", propertyTree->value.firstChildP->name, 400);
       return false;
     }
   }
@@ -605,8 +600,7 @@ bool orionldPatchRegistration(void)
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)
     {
-      orionldState.httpStatusCode = SccBadRequest;
-      orionldErrorResponseCreate(OrionldBadRequestData, "non-existing registration property", propertyP->name);
+      orionldError(OrionldBadRequestData, "non-existing registration property", propertyP->name, 400);
       return false;
     }
 

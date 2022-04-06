@@ -43,7 +43,7 @@ extern "C"
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
@@ -102,7 +102,7 @@ bool orionldPostSubscriptions(void)
   if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
   {
     LM_E(("kjTreeToSubscription FAILED"));
-    // orionldErrorResponseCreate is invoked by kjTreeToSubscription
+    // orionldError is invoked by kjTreeToSubscription
     return false;
   }
 
@@ -123,9 +123,7 @@ bool orionldPostSubscriptions(void)
 
       if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
       {
-        LM_W(("Bad Input (invalid MQTT endpoint)"));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid MQTT endpoint", detail);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
         return false;
       }
 
@@ -173,9 +171,7 @@ bool orionldPostSubscriptions(void)
       //
       if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
       {
-        LM_E(("Internal Error (unable to connect to MQTT server)"));
-        orionldErrorResponseCreate(OrionldInternalError, "Unable to connect to MQTT server", "xxx");
-        orionldState.httpStatusCode = SccReceiverInternalError;
+        orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
         return false;
       }
     }
@@ -194,8 +190,7 @@ bool orionldPostSubscriptions(void)
     // mongoGetLdSubscription takes the req semaphore
     if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenantP, &orionldState.httpStatusCode, &details) == true)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "A subscription with that ID already exists", subIdP);
-      orionldState.httpStatusCode = SccConflict;
+      orionldError(OrionldBadRequestData, "A subscription with that ID already exists", subIdP, 409);
       return false;
     }
   }

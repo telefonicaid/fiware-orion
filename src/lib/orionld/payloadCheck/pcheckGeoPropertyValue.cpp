@@ -29,10 +29,11 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECKx()
+#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/payloadCheck/pcheckGeoType.h"                  // pcheckGeoType
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"          // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // Own interface
@@ -43,7 +44,7 @@ extern "C"
 //
 // pcheckGeoPropertyValue -
 //
-bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP)
+bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP, const char* attrName)
 {
   KjNode*             typeNodeP         = NULL;
   KjNode*             coordinatesNodeP  = NULL;
@@ -52,8 +53,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
 
   if (geoPropertyP->type != KjObject)
   {
-    LM_W(("Bad Input (the value of a geo-location attribute must be a JSON Object: '%s')", geoPropertyP->name));
-    orionldErrorResponseCreate(OrionldBadRequestData, "the value of a geo-location attribute must be a JSON Object", kjValueType(geoPropertyP->type));
+    orionldError(OrionldBadRequestData, "the value of a geo-location attribute must be a JSON Object", kjValueType(geoPropertyP->type), 400);
     return false;
   }
 
@@ -69,8 +69,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
 
       if (pcheckGeoType(typeNodeP->value.s, &geoType, &detail) == false)
       {
-        LM_W(("Bad Input (invalid type for geoJson: '%s')", typeNodeP->value.s));
-        orionldErrorResponseCreate(OrionldBadRequestData, detail, typeNodeP->value.s);
+        orionldError(OrionldBadRequestData, detail, typeNodeP->value.s, 400);
         return false;
       }
       geoTypeString = typeNodeP->value.s;
@@ -83,37 +82,32 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
     }
     else
     {
-      LM_W(("Bad Input (unexpected item in geo-location: '%s')", geoPropertyP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "unexpected item in geo-location", geoPropertyP->name);
+      orionldError(OrionldBadRequestData, "unexpected item in geo-location", attrName, 400);
       return false;
     }
   }
 
   if ((typeNodeP == NULL) && (coordinatesNodeP == NULL))
   {
-    LM_W(("Bad Input (empty value in geo-location '%s')", geoPropertyP->name));
-    orionldErrorResponseCreate(OrionldBadRequestData,
-                               "The value of an attribute of type GeoProperty must be valid GeoJson",
-                               "Mandatory 'coordinates' and 'type' fields missing for a GeoJSON Property");
+    orionldError(OrionldBadRequestData,
+                 "The value of an attribute of type GeoProperty must be valid GeoJson",
+                 "Mandatory 'coordinates' and 'type' fields missing for a GeoJSON Property",
+                 400);
     return false;
   }
 
   if (typeNodeP == NULL)
   {
-    LM_W(("Bad Input ('type' missing in geo-location '%s')", geoPropertyP->name));
-    orionldErrorResponseCreate(OrionldBadRequestData,
-                               "Mandatory 'type' field missing for GeoJSON Property",
-                               geoPropertyP->name);
-
+    orionldError(OrionldBadRequestData, "Mandatory 'type' field missing for GeoJSON Property", attrName, 400);
     return false;
   }
 
   if (coordinatesNodeP == NULL)
   {
-    LM_W(("Bad Input ('coordinates' missing in geo-location '%s')", geoPropertyP->name));
-    orionldErrorResponseCreate(OrionldBadRequestData,
-                               "The value of an attribute of type GeoProperty must be valid GeoJson",
-                               "Mandatory 'coordinates' field missing for a GeoJSON Property");
+    orionldError(OrionldBadRequestData,
+                 "The value of an attribute of type GeoProperty must be valid GeoJson - 'coordinates' field missing",
+                 attrName,
+                 400);
     return false;
   }
 

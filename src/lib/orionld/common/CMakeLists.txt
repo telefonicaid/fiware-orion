@@ -22,7 +22,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     orionldRequestSend.cpp
-    orionldErrorResponse.cpp
     urlParse.cpp
     linkCheck.cpp
     httpStatusCodeToOrionldErrorType.cpp

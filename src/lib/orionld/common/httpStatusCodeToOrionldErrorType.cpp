@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType
+#include "orionld/types/OrionldResponseErrorType.h"            // OrionldResponseErrorType
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // Own interface
 
 

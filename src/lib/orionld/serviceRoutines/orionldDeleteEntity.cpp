@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbEntityDelete, dbEntityLookup
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
@@ -48,22 +48,19 @@ bool orionldDeleteEntity(void)
   // Make sure the Entity ID is a valid URI
   if (pcheckUri(entityId, true, &detail) == false)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include value (entityId) and name ("entityId")
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid Entity ID", detail, 400);  // FIXME: Include value (entityId) and name ("entityId")
     return false;
   }
 
   if (dbEntityLookup(entityId) == NULL)
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity not found", entityId);
-    orionldState.httpStatusCode = 404;  // Not Found
+    orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
     return false;
   }
 
   if (dbEntityDelete(entityId) == false)
   {
-    LM_E(("dbEntityDelete failed"));
-    orionldState.httpStatusCode = SccBadRequest;  // 400
+    orionldError(OrionldInternalError, "Database Error", "dbEntityDelete failed", 500);
     return false;
   }
 

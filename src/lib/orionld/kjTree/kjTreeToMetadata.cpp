@@ -34,8 +34,9 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
+
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // Own interface
@@ -81,8 +82,7 @@ bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* attributeName,
   if (nodeP->type != KjObject)
   {
     *detailP = (char*) "sub-attribute must be a JSON object";
-    LM_E(("sub-attribute '%s' of '%s' is not a JSON object", nodeP->name, caP->name.c_str()));
-    orionldErrorResponseCreate(OrionldBadRequestData, *detailP, nodeP->name);
+    orionldError(OrionldBadRequestData, *detailP, nodeP->name, 400);
     return false;
   }
 
@@ -93,16 +93,14 @@ bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* attributeName,
 
   if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
   {
-    LM_E(("Duplicated attribute property '%s' for attribute '%s'", nodeP->name, caP->name.c_str()));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated attribute property", nodeP->name);
+    orionldError(OrionldBadRequestData, "Duplicated attribute property", nodeP->name, 400);
     *detailP = (char*) "Duplicated attribute property";
     return false;
   }
 
   if (metadataAdd(caP, nodeP, attributeName) == false)
   {
-    // metadataAdd calls orionldErrorResponseCreate
-    LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
+    // metadataAdd calls orionldError
     *detailP = (char*) "Error adding sub-attribute to attribute";
     return false;
   }

@@ -24,10 +24,10 @@
 */
 #include "logMsg/logMsg.h"
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
-#include "orionld/serviceRoutines/orionldPostTemporalQuery.h"    // Own Interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/serviceRoutines/orionldPostTemporalQuery.h"  // Own Interface
 
 
 
@@ -37,9 +37,7 @@
 //
 bool orionldPostTemporalQuery(void)
 {
-  orionldState.httpStatusCode = 501;
+  orionldError(OrionldOperationNotSupported, "Not Implemented in Orion-LD, please use Mintaka for this operation", orionldState.serviceP->url, 501);
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
-
-  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented in Orion-LD, please use Mintaka for this operation", orionldState.serviceP->url);
   return false;
 }

@@ -472,12 +472,12 @@ Date: REGEX(.*)
 03. Attempt to create an Entity with a GeoProperty that contains no 'type' field - see failure
 ==============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 140
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "value",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/G1",
     "title": "Mandatory 'type' field missing for GeoJSON Property",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -528,13 +528,13 @@ Date: REGEX(.*)
 07. Attempt to create an Entity with a GeoProperty that contains no 'coordinates' field - see failure
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 211
+Content-Length: 228
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Mandatory 'coordinates' field missing for a GeoJSON Property",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/G1",
+    "title": "The value of an attribute of type GeoProperty must be valid GeoJson - 'coordinates' field missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/payloadCheck/pcheckReceiverInfo.h"            // pcheckReceiverInfo
 #include "orionld/payloadCheck/pcheckNotifierInfo.h"            // pcheckNotifierInfo
 #include "orionld/payloadCheck/pcheckEndpoint.h"                // Own interface
@@ -63,8 +64,7 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch)
       EMPTY_STRING_CHECK(acceptP, "endpoint::accept");
       if ((strcmp(acceptP->value.s, "application/json") != 0) && (strcmp(acceptP->value.s, "application/ld+json") != 0))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported Mime-type in 'accept'", epItemP->value.s);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Unsupported Mime-type in 'accept'", epItemP->value.s, 400);
         return false;
       }
     }
@@ -86,16 +86,14 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch)
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for 'endpoint'", epItemP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid field for 'endpoint'", epItemP->name, 400);
       return false;
     }
   }
 
   if ((patch == false) && (uriP == NULL))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing in 'endpoint'", "uri");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Mandatory field missing in 'endpoint'", "uri", 400);
     return false;
   }
 

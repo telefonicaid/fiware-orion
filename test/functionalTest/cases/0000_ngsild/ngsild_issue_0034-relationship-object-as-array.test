@@ -31,7 +31,7 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. POST /ngsi-ld/v1/entities with a relationship that has an object that is an array of URIs
+# 01. POST /ngsi-ld/v1/entities with One Property and One Relationship
 # 02. Check contents in database
 # 03. GET entity
 #

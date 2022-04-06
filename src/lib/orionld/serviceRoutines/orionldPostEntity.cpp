@@ -47,11 +47,11 @@ extern "C"
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
@@ -97,8 +97,7 @@ bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, co
 
       if (iDatasetP == NULL)
       {
-        LM_E(("Internal Error (no datasetId in attribute instance of @datasets for attribute '%s')", attrObjP->name));
-        orionldErrorResponseCreate(OrionldInternalError, "No datasetId in attribute instance of @datasets for attribute", attrObjP->name);
+        orionldError(OrionldInternalError, "No datasetId in attribute instance of @datasets for attribute", attrObjP->name, 500);
         return false;
       }
 
@@ -385,7 +384,7 @@ bool orionldPostEntity(void)
       if (defaultInstances > 1)
       {
         LM_E(("Bad Input (more than one instance without datasetId)"));
-        orionldErrorResponseCreate(OrionldBadRequestData, "more than one instance without datasetId for an attribute", attrP->name);
+        orionldError(OrionldBadRequestData, "more than one instance without datasetId for an attribute", attrP->name, 400);
         return false;
       }
       else if (defaultInstances == 1)
@@ -449,8 +448,7 @@ bool orionldPostEntity(void)
   {
     if (dbEntityFieldReplace(entityId, "@datasets", datasetsP) == false)
     {
-      LM_E(("DID: dbEntityUpdate failed"));
-      orionldErrorResponseCreate(OrionldInternalError, "Error updating @datasets for entity", entityId);
+      orionldError(OrionldInternalError, "Error updating @datasets for entity", entityId, 500);
       return false;
     }
   }

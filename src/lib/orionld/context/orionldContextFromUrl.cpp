@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
@@ -168,7 +168,7 @@ void contextDownloadListRelease(void)
 //
 // contextCacheWait -
 //
-static OrionldContext* contextCacheWait(char* url, OrionldProblemDetails* pdP)
+static OrionldContext* contextCacheWait(char* url)
 {
   int             sleepTime = 0;
   OrionldContext* contextP;
@@ -182,11 +182,8 @@ static OrionldContext* contextCacheWait(char* url, OrionldProblemDetails* pdP)
     sleepTime += 20000;
   }
 
-  // The wait timed out
-  pdP->status     = 400;  // Assuming the URL is invalid, this a "400 Bad Request"
-  pdP->title      = (char*) "Timeout awaiting other thread to download a context";
-  pdP->detail     = (char*) url;
-
+  // The wait timed out - assuming the URL is invalid, this a "400 Bad Request"
+  orionldError(OrionldInternalError, "Timeout during download of an @context", url, 504);
   return NULL;
 }
 
@@ -196,7 +193,7 @@ static OrionldContext* contextCacheWait(char* url, OrionldProblemDetails* pdP)
 //
 // orionldContextFromUrl -
 //
-OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails* pdP)
+OrionldContext* orionldContextFromUrl(char* url, char* id)
 {
   OrionldContext* contextP = orionldContextCacheLookup(url);
 
@@ -242,22 +239,18 @@ OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails
     sem_post(&contextDownloadListSem);
 
     if (urlDownloading == true)  // If somebody has taken the semaphore before me and is downloading the context - I'll have to wait
-      return contextCacheWait(url, pdP);  // CASE 2 - another thread has downloaded the context
+      return contextCacheWait(url);  // CASE 2 - another thread has downloaded the context
 
     // CASE 1 - the context will be downloaded
   }
   else
-    return contextCacheWait(url, pdP);  // CASE 3 - another thread has downloaded the context
+    return contextCacheWait(url);  // CASE 3 - another thread has downloaded the context
 
-  char* buffer = orionldContextDownload(url, pdP);
+  char* buffer = orionldContextDownload(url);  // orionldContextDownload fills in ProblemDetails
   if (buffer == NULL)
-  {
-    // orionldContextDownload fills in pdP
-    LM_W(("Bad Input? (%s: %s). URL: %s", pdP->title, pdP->detail, url));
     return NULL;
-  }
 
-  contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer, pdP);
+  contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer);
   if (contextP == NULL)
   {
     //
@@ -267,7 +260,7 @@ OrionldContext* orionldContextFromUrl(char* url, char* id, OrionldProblemDetails
     // insists on trying to use the context (without fixing it), the broker will download it over and over again.
     // Still, I believe this is the best solution.
     //
-    LM_E(("Context Error (%s: %s)", pdP->title, pdP->detail));
+    LM_E(("Context Error (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
     contextDownloadListRemove(url);
     return NULL;  // Parse Error?
   }

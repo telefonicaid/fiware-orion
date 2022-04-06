@@ -28,11 +28,8 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
-#include "orionld/common/orionldState.h"                         // orionldState
 
 
 // -----------------------------------------------------------------------------

@@ -31,7 +31,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/db/dbEntityAttributesGet.h"                    // dbEntityAttributesGet
 #include "orionld/serviceRoutines/orionldGetEntityAttributes.h"  // Own Interface
@@ -49,7 +48,7 @@ bool orionldGetEntityAttributes(void)
   orionldState.responseTree = dbEntityAttributesGet(&pd, NULL, orionldState.uriParams.details);
   if (orionldState.responseTree == NULL)
   {
-    // dbEntityAttributesGet calls orionldErrorResponseCreate
+    // dbEntityAttributesGet calls orionldError
     LM_E(("dbEntityAttributesGet: %s: %s", pd.title, pd.detail));
     return false;
   }

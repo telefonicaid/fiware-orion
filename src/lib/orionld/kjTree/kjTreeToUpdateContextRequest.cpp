@@ -36,7 +36,7 @@ extern "C"
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
@@ -134,7 +134,7 @@ static bool kjTreeToContextElementAttributes
       // kjTreeToContextAttribute treats the attribute, including expanding the attribute name and values, if applicable
       if (kjTreeToContextAttribute(contextP, itemP, caP, &attrTypeNodeP, detailP) == false)
       {
-        // kjTreeToContextAttribute calls orionldErrorResponseCreate
+        // kjTreeToContextAttribute calls orionldError
         LM_E(("kjTreeToContextAttribute failed for attribute '%s': %s", itemP->name, *detailP));
         *titleP = (char*) "Error treating attribute";
         delete caP;
@@ -198,13 +198,11 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
         continue;
       }
 
-      OrionldProblemDetails pd;
-      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
-
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
       if (contextP == NULL)
       {
-        LM_E(("orionldContextFromTree reports error: %s: %s", pd.title, pd.detail));
-        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, pd.title, pd.detail, pd.status, false);
+        LM_E(("orionldContextFromTree reports error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status, false);
         entityP = next;
         continue;
       }

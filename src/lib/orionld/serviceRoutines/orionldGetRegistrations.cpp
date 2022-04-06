@@ -39,7 +39,7 @@ extern "C"
 #include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 
 #include "orionld/common/orionldState.h"                      // orionldState
-#include "orionld/common/orionldErrorResponse.h"              // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/types/OrionldHeader.h"                      // orionldHeaderAdd
 #include "orionld/mongoBackend/mongoLdRegistrationsGet.h"     // mongoLdRegistrationsGet
 #include "orionld/kjTree/kjTreeFromRegistration.h"            // kjTreeFromRegistration
@@ -77,8 +77,7 @@ bool orionldGetRegistrations(void)
 
   if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenantP, &count, &oe))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str());
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Bad Request", oe.details.c_str(), 400);
     return false;
   }
 

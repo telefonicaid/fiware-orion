@@ -26,23 +26,21 @@
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjObject, kjArray
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjObject, kjArray
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/string.h"                                     // toString
-#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
-#include "mongoBackend/mongoGetSubscriptions.h"                // mongoListSubscriptions
+#include "common/string.h"                                       // toString
+#include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
+#include "mongoBackend/mongoGetSubscriptions.h"                  // mongoListSubscriptions
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-#include "orionld/kjTree/kjTreeFromSubscription.h"             // kjTreeFromSubscription
-#include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // Own Interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
+#include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
 
 
 

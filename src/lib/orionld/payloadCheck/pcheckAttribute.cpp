@@ -32,7 +32,7 @@ extern "C"
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/CHECK.h"                                // X_CHECK
 #include "orionld/payloadCheck/pcheckAttribute.h"                // Own interface
 
@@ -65,8 +65,7 @@ bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailP)
       if (typeP->type != KjString)
       {
         *detailP = (char*) "Attribute type must be a string";
-        orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type must be a string", aP->name);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Attribute type must be a string", aP->name, 400);
         return false;
       }
 
@@ -75,8 +74,7 @@ bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailP)
     else if (typeMandatory == true)
     {
       *detailP = (char*) "attribute type missing";
-      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type missing", aP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Attribute type missing", aP->name, 400);
       return false;
     }
   }
@@ -98,8 +96,7 @@ bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailP)
       if ((type != NULL) && (strcmp(type, "Relationship") == 0))
       {
         *detailP = (char*) "Relationships cannot have a 'value' member";
-        orionldErrorResponseCreate(OrionldBadRequestData, "Relationships cannot have a 'value' member", aP->name);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Relationships cannot have a 'value' member", aP->name, 400);
         return false;
       }
     }
@@ -109,8 +106,7 @@ bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailP)
       if ((type != NULL) && (strcmp(type, "Relationship") != 0))
       {
         *detailP = (char*) "Only Relationships can have an 'object' member";
-        orionldErrorResponseCreate(OrionldBadRequestData, "Only Relationships can have an 'object' member", aP->name);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Only Relationships can have an 'object' member", aP->name, 400);
         return false;
       }
 
@@ -133,7 +129,7 @@ bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailP)
     }
     else  // Seems to be a sub-attribute
     {
-      if (pcheckSubAttribute(memberP, detailP) == false)  // pcheckSubAttribute calls orionldErrorResponseCreate
+      if (pcheckSubAttribute(memberP, detailP) == false)  // pcheckSubAttribute calls orionldError
         return false;
     }
   }

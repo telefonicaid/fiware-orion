@@ -152,7 +152,6 @@ static KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, con
       saP      = subAttrP;   // saP is used inside this loop
       subAttrP = saP->next;  // this is just the "loop incrementor
 
-      LM_TMP(("Treating a sub-attr '%s' of attr '%s'", saP->name, newAttrP->name));
       if (strcmp(saP->name, "type")        == 0) continue;
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) { saP->name = (char*) "value"; continue; }

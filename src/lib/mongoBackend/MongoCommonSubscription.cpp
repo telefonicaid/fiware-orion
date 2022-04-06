@@ -521,7 +521,6 @@ std::string setSubscriptionId(const ngsiv2::Subscription& sub, mongo::BSONObjBui
 */
 void setName(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 {
-  LM_TMP(("KZ: name: ", sub.name));
   if (sub.name != "")
   {
     bobP->append(CSUB_NAME, sub.name);

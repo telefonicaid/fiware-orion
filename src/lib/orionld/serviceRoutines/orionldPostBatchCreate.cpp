@@ -22,55 +22,54 @@
 *
 * Author: Gabriel Quaresma and Ken Zangelin
 */
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
 
 extern "C"
 {
-#include "kbase/kMacros.h"                                     // K_FT
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
-#include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjClone.h"                                     // kjClone
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kbase/kMacros.h"                                       // K_FT
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                    // parse8601Time
-#include "orionTypes/OrionValueType.h"                         // orion::ValueType
-#include "orionTypes/UpdateActionType.h"                       // ActionType
-#include "parse/CompoundValueNode.h"                           // CompoundValueNode
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
-#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
-#include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
-#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "mongoBackend/MongoGlobal.h"                          // getMongoConnection()
+#include "common/globals.h"                                      // parse8601Time
+#include "orionTypes/OrionValueType.h"                           // orion::ValueType
+#include "orionTypes/UpdateActionType.h"                         // ActionType
+#include "parse/CompoundValueNode.h"                             // CompoundValueNode
+#include "ngsi/ContextAttribute.h"                               // ContextAttribute
+#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
+#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
+#include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection()
 
-#include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/CHECK.h"                              // ARRAY_CHECK
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/entityErrorPush.h"                    // entityErrorPush
-#include "orionld/common/entityIdCheck.h"                      // entityIdCheck
-#include "orionld/common/entityTypeCheck.h"                    // entityTypeCheck
-#include "orionld/common/entityIdAndTypeGet.h"                 // entityIdAndTypeGet
-#include "orionld/common/entityLookupById.h"                   // entityLookupById
-#include "orionld/common/removeArrayEntityLookup.h"            // removeArrayEntityLookup
-#include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
-#include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
-#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
-#include "orionld/context/orionldContextItemExpand.h"          // orionldUriExpand
-#include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
-#include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
-#include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
-#include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
-#include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
-#include "orionld/serviceRoutines/orionldPostBatchCreate.h"    // Own Interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/CHECK.h"                                // ARRAY_CHECK
+#include "orionld/common/entityErrorPush.h"                      // entityErrorPush
+#include "orionld/common/entityIdCheck.h"                        // entityIdCheck
+#include "orionld/common/entityTypeCheck.h"                      // entityTypeCheck
+#include "orionld/common/entityIdAndTypeGet.h"                   // entityIdAndTypeGet
+#include "orionld/common/entityLookupById.h"                     // entityLookupById
+#include "orionld/common/removeArrayEntityLookup.h"              // removeArrayEntityLookup
+#include "orionld/common/typeCheckForNonExistingEntities.h"      // typeCheckForNonExistingEntities
+#include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
+#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/context/orionldContextItemExpand.h"            // orionldUriExpand
+#include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
+#include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
+#include "orionld/kjTree/kjEntityArrayErrorPurge.h"              // kjEntityArrayErrorPurge
+#include "orionld/serviceRoutines/orionldPostBatchCreate.h"      // Own Interface
 
 
 
@@ -264,10 +263,9 @@ bool orionldPostBatchCreate(void)
 
     KjNode*                contextNodeP = kjLookup(entityP, "@context");
     OrionldContext*        contextP     = NULL;
-    OrionldProblemDetails  pd;
 
     if (contextNodeP != NULL)
-      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP, &pd);
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
 
     if (contextP != NULL)
       orionldState.contextP = contextP;
@@ -358,9 +356,7 @@ bool orionldPostBatchCreate(void)
 
     if (orionldState.httpStatusCode != 200)
     {
-      LM_E(("mongoUpdateContext flagged an error"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
-      orionldState.httpStatusCode = SccReceiverInternalError;
+      orionldError(OrionldBadRequestData, "Internal Error", "Database Error", 500);
       return false;
     }
   }

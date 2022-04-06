@@ -70,8 +70,6 @@ bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId)
     bson_error_t* errP = &orionldState.mongoc.error;
     LM_E(("mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
   }
-  else
-    LM_TMP(("mongoc_collection_replace_one is OK"));
 
   mongocConnectionRelease();
 

@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/db/dbEntityTypesGet.h"                         // dbEntityTypesGet
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"       // Own Interface
@@ -49,9 +49,7 @@ bool orionldGetEntityTypes(void)
   orionldState.responseTree = dbEntityTypesGet(&pd, orionldState.uriParams.details);
   if (orionldState.responseTree == NULL)
   {
-    LM_E(("dbEntityTypesGet: %s: %s", pd.title, pd.detail));
-    orionldErrorResponseCreate(OrionldResourceNotFound, pd.title, pd.detail);
-    orionldState.httpStatusCode = (HttpStatusCode) pd.status;
+    orionldError(OrionldResourceNotFound, pd.title, pd.detail, pd.status);
     return false;
   }
 

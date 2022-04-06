@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 
 
 

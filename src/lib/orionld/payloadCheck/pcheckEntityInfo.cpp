@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/payloadCheck/pcheckEntityInfo.h"              // Own interface
@@ -84,8 +84,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for entities[X]", entityItemP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid field for entities[X]", entityItemP->name, 400);
       return false;
     }
   }
@@ -93,8 +92,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
   // Only if Fully NGSI-LD compliant
   if ((typeMandatory == true) && (typeP == NULL))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "entities[X]::type");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Missing mandatory field", "entities[X]::type", 400);
     return false;
   }
 

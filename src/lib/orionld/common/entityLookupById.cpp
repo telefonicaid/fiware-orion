@@ -29,8 +29,8 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 
 
 

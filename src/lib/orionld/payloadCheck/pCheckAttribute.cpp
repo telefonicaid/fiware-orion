@@ -810,8 +810,11 @@ static bool pCheckAttributeObject
     {
       if (attributeType == Relationship)
       {
-        if ((objectCheck(fieldP) == false) && (stringArrayCheck(fieldP) == false))  // Until datasetId is fully implemented - string array allowed for Relationship
+        // Until datasetId is fully implemented - string array allowed for Relationship
+        if ((objectCheck(fieldP) == false) && (stringArrayCheck(fieldP) == false))
           return false;
+        // All OK - clear part errors
+        orionldState.pd.status = 200;
       }
       else
       {

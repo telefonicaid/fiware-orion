@@ -47,11 +47,11 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "rest/restReply.h"                                      // restReply
 
+#include "orionld/types/OrionldResponseErrorType.h"              // orionldResponseErrorType
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/CHECK.h"                                // CHECK
@@ -80,8 +80,53 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
-#include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// errorTree -
+//
+KjNode* errorTree
+(
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               detail
+)
+{
+  orionldState.pd.title  = (char*) title;
+  orionldState.pd.detail = (char*) detail;
+
+  if ((title  != NULL) && (detail != NULL))
+  {
+    snprintf(orionldState.pd.titleAndDetailBuffer, sizeof(orionldState.pd.titleAndDetailBuffer), "%s: %s", title, detail);
+    orionldState.pd.titleAndDetail = orionldState.pd.titleAndDetailBuffer;
+  }
+  else if (title != NULL)
+    orionldState.pd.titleAndDetail = (char*) title;
+  else if (detail != NULL)
+    orionldState.pd.titleAndDetail = (char*) detail;
+  else
+    orionldState.pd.titleAndDetail = (char*) "no error info available";
+
+  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    orionldResponseErrorType(errorType));
+  KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
+  KjNode* detailP;
+
+  if ((detail != NULL) && (detail[0] != 0))
+    detailP = kjString(orionldState.kjsonP, "detail", detail);
+  else
+    detailP = kjString(orionldState.kjsonP, "detail", "no detail");
+
+  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+
+  kjChildAdd(orionldState.responseTree, typeP);
+  kjChildAdd(orionldState.responseTree, titleP);
+  kjChildAdd(orionldState.responseTree, detailP);
+
+  return orionldState.responseTree;
+}
 
 
 
@@ -152,9 +197,7 @@ static bool contentTypeCheck(void)
   {
     LM_E(("Bad Input (%s: %s)", errorTitle, errorDetails));
 
-    orionldErrorResponseCreate(OrionldBadRequestData, errorTitle, errorDetails);
-    orionldState.httpStatusCode = 400;
-
+    orionldError(OrionldBadRequestData, errorTitle, errorDetails, 400);
     return false;
   }
 
@@ -172,16 +215,14 @@ static bool payloadEmptyCheck(void)
   // No payload?
   if (orionldState.in.payload == NULL)
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldInvalidRequest, "payload missing", NULL, 400);
     return false;
   }
 
   // Empty payload?
   if (orionldState.in.payload[0] == 0)
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldInvalidRequest, "payload missing", NULL, 400);
     return false;
   }
 
@@ -226,8 +267,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if (orionldState.requestTree == NULL)
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString, 400);
     return false;
   }
 
@@ -236,8 +276,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object", 400);
     return false;
   }
 
@@ -246,8 +285,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload Body", "Empty Object");
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldInvalidRequest, "Invalid Payload Body", "Empty Object", 400);
     return false;
   }
 
@@ -256,8 +294,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload Body", "Empty Array");
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldInvalidRequest, "Invalid Payload Body", "Empty Array", 400);
     return false;
   }
 
@@ -288,8 +325,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
         if (orionldState.payloadContextNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
-          orionldState.httpStatusCode = 400;
+          orionldError(OrionldBadRequestData, "Duplicated field", "@context", 400);
           return false;
         }
         orionldState.payloadContextNode = attrNodeP;
@@ -302,8 +338,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
         if (orionldState.payloadIdNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:id'"));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Entity:id");
-          orionldState.httpStatusCode = 400;
+          orionldError(OrionldBadRequestData, "Duplicated field", "Entity:id", 400);
           return false;
         }
 
@@ -319,8 +354,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
         if (orionldState.payloadTypeNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:type'"));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Entity:type");
-          orionldState.httpStatusCode = 400;
+          orionldError(OrionldBadRequestData, "Duplicated field", "Entity:type", 400);
           return false;
         }
 
@@ -354,8 +388,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
           if (orionldState.payloadContextNode != NULL)
           {
             LM_W(("Bad Input (duplicated attribute: '@context'"));
-            orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
-            orionldState.httpStatusCode = 400;
+            orionldError(OrionldBadRequestData, "Duplicated field", "@context", 400);
             return false;
           }
 
@@ -371,28 +404,16 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 
   if (orionldState.payloadContextNode != NULL)
   {
+    KjNode* cNodeP = orionldState.payloadContextNode;
     // A @context in the payload must be a JSON String, Array, or an Object
-    if ((orionldState.payloadContextNode->type != KjString) && (orionldState.payloadContextNode->type != KjArray) && (orionldState.payloadContextNode->type != KjObject))
+    if ((cNodeP->type != KjString) && (cNodeP->type != KjArray) && (cNodeP->type != KjObject))
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context");
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context", 400);
       return false;
     }
   }
 
   return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldErrorResponseFromProblemDetails
-//
-void orionldErrorResponseFromProblemDetails(OrionldProblemDetails* pdP)
-{
-  orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
-  orionldState.httpStatusCode = pdP->status;
 }
 
 
@@ -407,8 +428,7 @@ static bool linkHeaderCheck(void)
 
   if (orionldState.link[0] != '<')
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "invalid Link HTTP header", "link doesn't start with '<'");
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldBadRequestData, "invalid Link HTTP header", "link doesn't start with '<'", 400);
     return false;
   }
 
@@ -416,9 +436,7 @@ static bool linkHeaderCheck(void)
 
   if (linkCheck(orionldState.link, &details) == false)
   {
-    LM_E(("linkCheck: %s", details));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Link HTTP Header", details);
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldBadRequestData, "Invalid Link HTTP Header", details, 400);
     return false;
   }
 
@@ -428,17 +446,11 @@ static bool linkHeaderCheck(void)
   // As it will be inserted in the Context Cache, that must survive requests, it must be
   // allocated in the global allocation buffer 'kalloc', not the thread-local 'orionldState.kalloc'.
   //
-  char*                  url = kaStrdup(&kalloc, orionldState.link);
-  OrionldProblemDetails  pd;
+  char* url = kaStrdup(&kalloc, orionldState.link);
 
-  orionldState.contextP = orionldContextFromUrl(url, NULL, &pd);
+  orionldState.contextP = orionldContextFromUrl(url, NULL);
   if (orionldState.contextP == NULL)
-  {
-    LM_W(("Bad Input? (%s: %s)", pd.title, pd.detail));
-    orionldErrorResponseFromProblemDetails(&pd);
-    orionldState.httpStatusCode = (HttpStatusCode) pd.status;
     return false;
-  }
 
   orionldState.link = orionldState.contextP->url;
 
@@ -464,9 +476,7 @@ static void contextToPayload(void)
 
   if (orionldState.payloadContextNode == NULL)
   {
-    LM_E(("Out of memory"));
-    orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
-    orionldState.httpStatusCode = 500;  // If ever able to send the response ...
+    orionldError(OrionldInternalError, "Out of memory", NULL, 500);
     return;
   }
 
@@ -506,8 +516,7 @@ static void contextToPayload(void)
 
       if (contextNode == NULL)
       {
-        orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
-        orionldState.httpStatusCode = 500;  // If ever able to send the response ...
+        orionldError(OrionldInternalError, "Out of memory", NULL, 500);
         return;
       }
 
@@ -567,6 +576,11 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 }
 
 
+
+// -----------------------------------------------------------------------------
+//
+// commaCount -
+//
 static int commaCount(char* s)
 {
   int commas = 0;
@@ -891,12 +905,9 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.httpStatusCode != 200)
     goto respond;
 
-  // if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT) && (orionldState.verb != OPTIONS))
   if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT))
   {
-    LM_W(("Bad Input (payload body - of %d bytes - for a %s request", orionldState.in.contentLength, verbName(orionldState.verb)));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb));
-    orionldState.httpStatusCode = 400;
+    orionldError(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb), 400);
     goto respond;
   }
 
@@ -906,12 +917,10 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if (orionldState.verb != OPTIONS)
   {
-    char* detail;
+    char* detail = (char*) "no detail";
     if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
     {
-      LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Unsupported URI parameter", detail, 400);
       goto respond;
     }
   }
@@ -939,9 +948,7 @@ MHD_Result orionldMhdConnectionTreat(void)
         //
         if (dbTenantExists(orionldState.tenantName) == false)
         {
-          LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenantName));
-          orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName);
-          orionldState.httpStatusCode = 404;
+          orionldError(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName, 404);
           goto respond;
         }
         else
@@ -1016,27 +1023,15 @@ MHD_Result orionldMhdConnectionTreat(void)
       if (((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CREATE_CONTEXT) != 0) && (orionldState.payloadContextNode->type != KjString))
         url = orionldContextUrlGenerate(&id);
 
-      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, id, orionldState.payloadContextNode, &pd);
-      if (orionldState.contextP == NULL)
-      {
-        LM_W(("Bad Input (invalid context - %s: %s)", pd.title, pd.detail));
-        orionldErrorResponseFromProblemDetails(&pd);
-        orionldState.httpStatusCode = (HttpStatusCode) pd.status;
-
+      orionldState.contextP = orionldContextFromTree(url, OrionldContextFromInline, id, orionldState.payloadContextNode);
+      if ((orionldState.contextP == NULL) || (orionldState.pd.status >= 400))
         goto respond;
-      }
 
       if (pd.status == 200)  // got an array with only Core Context
         orionldState.contextP = orionldCoreContextP;
 
       if (pd.status >= 400)
-      {
-        LM_W(("Bad Input? (%s: %s (type == %d, status = %d))", pd.title, pd.detail, pd.type, pd.status));
-        orionldErrorResponseFromProblemDetails(&pd);
-        orionldState.httpStatusCode = (HttpStatusCode) pd.status;
-
         goto respond;
-      }
     }
   }
 
@@ -1088,16 +1083,16 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   // The only exception is 405 that has no payload - the info comes in the "Accepted" HTTP header.
   //
-  if ((orionldState.httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (orionldState.httpStatusCode != 405))
+  if ((orionldState.pd.status >= 400) && (orionldState.responseTree == NULL) && (orionldState.pd.status != 405))
   {
     if (orionldState.pd.status != 0)  // Perhaps the error is in orionldState.pd ?
     {
-      orionldErrorResponseCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
+      errorTree(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
       orionldState.httpStatusCode = orionldState.pd.status;
     }
     else
     {
-      orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
+      errorTree(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
       orionldState.httpStatusCode = 500;
     }
   }

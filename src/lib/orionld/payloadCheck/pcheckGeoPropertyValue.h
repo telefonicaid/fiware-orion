@@ -36,6 +36,6 @@ extern "C"
 //
 // pcheckGeoPropertyValue -
 //
-extern bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP);
+extern bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP, const char* attrName);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_

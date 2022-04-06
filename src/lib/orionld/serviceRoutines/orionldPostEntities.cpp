@@ -55,7 +55,6 @@ extern "C"
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, NoAttributeType
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
@@ -245,7 +244,7 @@ bool orionldPostEntities(void)
 
       if (kNodeP == NULL)
       {
-        if (orionldState.pd.status != 0)  // Error in datasetInstances
+        if ((orionldState.pd.status != 0) && (orionldState.pd.status != 200))  // Error in datasetInstances
         {
           mongoRequest.release();
           return false;
@@ -303,7 +302,7 @@ bool orionldPostEntities(void)
     eqForDot(kNodeP->name);
     if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
-      // kjTreeToContextAttribute calls orionldErrorResponseCreate
+      // kjTreeToContextAttribute calls orionldError
       LM_E(("kjTreeToContextAttribute failed: %s", detail));
       caP->release();
       delete caP;
@@ -347,14 +346,13 @@ bool orionldPostEntities(void)
 
   if (orionldState.httpStatusCode != 200)
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
+    orionldError(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", orionldState.httpStatusCode);
     return false;
   }
   else if ((mongoResponse.oe.code != 200) && (mongoResponse.oe.code != 0))
   {
     LM_E(("mongoUpdateContext: mongo responds with error %d: '%s'", mongoResponse.oe.code, mongoResponse.oe.details));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
+    orionldError(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", 400);  // 400 ... really?
     return false;
   }
 

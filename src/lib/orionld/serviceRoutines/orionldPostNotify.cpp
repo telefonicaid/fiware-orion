@@ -35,7 +35,7 @@ extern "C"
 #include "common/globals.h"                                    // parse8601Time
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // orionldPostBatchUpsert
 #include "orionld/serviceRoutines/orionldPostNotify.h"         // Own interface
 
@@ -51,17 +51,13 @@ bool orionldPostNotify(void)
 
   if (dataArray == NULL)
   {
-    LM_W(("Invalid Notification (the 'data' member is missing)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Notification", "The 'data' member is missing");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid Notification", "The 'data' member is missing", 400);
     return false;
   }
 
   if (dataArray->type != KjArray)
   {
-    LM_W(("Invalid Notification (the 'data' member is present but it is not a GSON Array - it is a JSON %s)", kjValueType(dataArray->type)));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Notification", "The 'data' member is present but it is not an array");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid Notification", "The 'data' member is present but it is not an array", 400);
     return false;
   }
 

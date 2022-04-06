@@ -48,4 +48,12 @@ typedef enum OrionldResponseErrorType
   OrionldNonExistingTenant
 } OrionldResponseErrorType;
 
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldResponseErrorType -
+//
+extern const char* orionldResponseErrorType(OrionldResponseErrorType type);
+
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_

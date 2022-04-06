@@ -35,7 +35,6 @@ extern "C"
 
 #include "orionld/common/CHECK.h"                              // STRING_CHECK()
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToStringList.h"                 // Own interface
 

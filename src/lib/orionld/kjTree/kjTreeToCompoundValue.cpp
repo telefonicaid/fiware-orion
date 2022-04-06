@@ -33,8 +33,7 @@ extern "C"
 #include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldBadRequestData, ...
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // Own interface
 
 
@@ -94,9 +93,7 @@ static bool compoundValueNodeValueSet(orion::CompoundValueNode* cNodeP, KjNode* 
   }
   else
   {
-    LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name.c_str()));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Internal error", "Invalid type from kjson", 400);
     return false;
   }
 
@@ -116,11 +113,8 @@ orion::CompoundValueNode* kjTreeToCompoundValue(KjNode* kNodeP, KjNode* parentP,
   if ((parentP != NULL) && (parentP->type == KjObject))
     cNodeP->name = kNodeP->name;
 
-  if (compoundValueNodeValueSet(cNodeP, kNodeP, &level) == false)
-  {
-    // compoundValueNodeValueSet calls orionldErrorResponseCreate
+  if (compoundValueNodeValueSet(cNodeP, kNodeP, &level) == false)  // compoundValueNodeValueSet calls orionldError
     return NULL;
-  }
 
   return cNodeP;
 }

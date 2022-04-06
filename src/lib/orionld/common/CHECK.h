@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 
 
@@ -43,9 +43,7 @@ do                                                                              
 {                                                                                                                \
   if (pointer != NULL)                                                                                           \
   {                                                                                                              \
-    LM_E(("Duplicated attribute: '%s'", fieldName));                                                             \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName);                            \
-    orionldState.httpStatusCode = SccBadRequest;                                                                 \
+    orionldError(OrionldBadRequestData, "Duplicated field", fieldName, 400);                                     \
     return false;                                                                                                \
   }                                                                                                              \
   pointer = value;                                                                                               \
@@ -62,8 +60,7 @@ do                                                                              
 {                                                                                                                \
   if (alreadyPresent == true)                                                                                    \
   {                                                                                                              \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName);                            \
-    orionldState.httpStatusCode = SccBadRequest;                                                                 \
+    orionldError(OrionldBadRequestData, "Duplicated field", fieldName, 400);                                     \
     return false;                                                                                                \
   }                                                                                                              \
   valueHolder    = value;                                                                                        \
@@ -81,8 +78,7 @@ do                                                                              
 {                                                                                                            \
   if (nodeP->type != KjObject)                                                                               \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Object", what);                            \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Object", what, 400);                                     \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -98,8 +94,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->value.firstChildP == NULL)                                                                     \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", what);                                 \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Empty Object", what, 400);                                          \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -115,8 +110,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->type != KjArray)                                                                               \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array", fieldName);                        \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Array", fieldName, 400);                                 \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -132,8 +126,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->value.firstChildP == NULL)                                                                     \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", what);                                  \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Empty Array", what, 400);                                           \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -149,9 +142,7 @@ do                                                                              
 {                                                                                                            \
   if ((nodeP->type != KjArray) && (nodeP->type != KjObject))                                                 \
   {                                                                                                          \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                 \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor an Object", what);               \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Array nor an Object", what, 400);                        \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -167,8 +158,7 @@ do                                                                              
 {                                                                                                            \
   if (nodeP->type != KjObject)                                                                               \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name);       \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name, 400);                \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -184,8 +174,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->type != KjString)                                                                              \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", fieldName);                       \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON String", fieldName, 400);                                \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -201,8 +190,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->value.s[0] == 0)                                                                               \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty String", what);                                 \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Empty String", what, 400);                                          \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -218,8 +206,7 @@ do                                                                              
 {                                                                                                            \
   if (nodeP->type != KjInt)                                                                                  \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Integer", fieldName);                      \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Integer", fieldName, 400);                               \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -235,8 +222,7 @@ do                                                                              
 {                                                                                                            \
   if ((nodeP->type != KjInt) && (nodeP->type != KjFloat))                                                    \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Number", fieldName);                       \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Number", fieldName, 400);                                \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -252,8 +238,7 @@ do                                                                              
 {                                                                                                                  \
   if (((nodeP->type == KjInt) && (nodeP->value.i < 0)) || ((nodeP->type == KjFloat) && (nodeP->value.f < 0)))      \
   {                                                                                                                \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Negative Number not allowed in this position", fieldName);  \
-    orionldState.httpStatusCode = SccBadRequest;                                                                   \
+    orionldError(OrionldBadRequestData, "Negative Number not allowed in this position", fieldName, 400);           \
     return false;                                                                                                  \
   }                                                                                                                \
 } while (0)
@@ -269,8 +254,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->type != KjBoolean)                                                                             \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Boolean", fieldName);                      \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Boolean", fieldName, 400);                               \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -286,8 +270,7 @@ do                                                                              
 {                                                                                                            \
   if ((dateTimeValue = parse8601Time(stringValue)) == -1)                                                    \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid DateTime value", fieldName);                  \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Invalid DateTime value", fieldName, 400);                           \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -303,9 +286,7 @@ do                                                                              
 {                                                                                                            \
   if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                                 \
   {                                                                                                          \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                 \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor String", what);                  \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Array nor String", what, 400);                           \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -321,9 +302,7 @@ do                                                                              
 {                                                                                                            \
   if ((nodeP->type != KjArray) && (nodeP->type != KjString) && (nodeP->type != KjObject))                    \
   {                                                                                                          \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                 \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what);     \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what, 400);              \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -340,8 +319,7 @@ do                                                                              
   char* detail;                                                                                              \
   if (pcheckUri(uri, strict, &detail) == false)                                                              \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", fieldName);                               \
-    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    orionldError(OrionldBadRequestData, "Not a URI", fieldName, 400);                                        \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
@@ -357,8 +335,7 @@ do                                                                              
 {                                                                                               \
   if (orionldState.requestTree == NULL)                                                         \
   {                                                                                             \
-    orionldState.httpStatusCode = SccBadRequest;                                                \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is missing", NULL);              \
+    orionldError(OrionldBadRequestData, "Payload is missing", NULL, 400);                       \
     return false;                                                                               \
   }                                                                                             \
 } while (0)
@@ -374,9 +351,8 @@ do                                                                              
 {                                                                                               \
   if (orionldState.requestTree->type != KjObject)                                               \
   {                                                                                             \
-    orionldState.httpStatusCode = SccBadRequest;                                                \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload not a JSON object",              \
-                               kjValueType(orionldState.requestTree->type));                    \
+    orionldError(OrionldBadRequestData, "Payload not a JSON object",                            \
+                 kjValueType(orionldState.requestTree->type), 400);                             \
     return false;                                                                               \
   }                                                                                             \
 } while (0)
@@ -392,8 +368,7 @@ do                                                                              
 {                                                                                               \
   if (orionldState.requestTree->value.firstChildP == NULL)                                      \
   {                                                                                             \
-    orionldState.httpStatusCode = SccBadRequest;                                                \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is an empty JSON object", NULL); \
+    orionldError(OrionldBadRequestData, "Payload is an empty JSON object", NULL, 400);          \
     return false;                                                                               \
   }                                                                                             \
 } while (0)

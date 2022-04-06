@@ -22,10 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/serviceRoutines/orionldNotImplemented.h"     // Own Interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
+#include "orionld/serviceRoutines/orionldNotImplemented.h"       // Own Interface
 
 
 
@@ -35,9 +35,7 @@
 //
 bool orionldNotImplemented(void)
 {
-  orionldState.httpStatusCode = 501;
+  orionldError(OrionldOperationNotSupported, "Not Implemented", orionldState.serviceP->url, 501);
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
-
-  orionldErrorResponseCreate(OrionldOperationNotSupported, "Not Implemented", orionldState.serviceP->url);
   return false;
 }

@@ -37,10 +37,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                        // LM_*
 #include "logMsg/traceLevels.h"                                   // Lmt*
 
-#include "orionld/types/OrionldProblemDetails.h"                  // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldState.h"                          // orionldState
+#include "orionld/common/orionldError.h"                          // orionldError
+#include "orionld/types/OrionldProblemDetails.h"                  // OrionldProblemDetails
 #include "orionld/common/uuidGenerate.h"                          // uuidGenerate
-#include "orionld/common/orionldErrorResponse.h"                  // orionldErrorResponseCreate
 #include "orionld/common/eqForDot.h"                              // eqForDot
 #include "orionld/common/dotForEq.h"                              // dotForEq
 #include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
@@ -463,8 +463,7 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char
     }
     else
     {
-      orionldProblemDetailsFill(pdP, OrionldResourceNotFound, "Attribute Not Found", attributeName, 404);
-      orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+      orionldError(OrionldResourceNotFound, "Attribute Not Found", attributeName, 404);
       return orionldState.responseTree;
     }
   }
@@ -525,8 +524,7 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char
   {
     if (attrV->value.firstChildP == NULL)
     {
-      orionldProblemDetailsFill(pdP, OrionldResourceNotFound, "Attribute Not Found", attributeName, 404);
-      orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+      orionldError(OrionldResourceNotFound, "Attribute Not Found", attributeName, 404);
       return orionldState.responseTree;
     }
 

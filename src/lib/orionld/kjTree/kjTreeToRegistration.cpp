@@ -34,10 +34,10 @@ extern "C"
 #include "apiTypesV2/Registration.h"                           // Registration
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
@@ -70,13 +70,12 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
 
   if (items == 0)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty 'information' in Registration", NULL);
+    orionldError(OrionldBadRequestData, "Empty 'information' in Registration", NULL, 400);
     return false;
   }
   else if (items > 1)
   {
-    orionldErrorResponseCreate(OrionldOperationNotSupported, "More than one item in Registration::information vector", "Not Implemented");
-    orionldState.httpStatusCode = SccNotImplemented;
+    orionldError(OrionldOperationNotSupported, "More than one item in Registration::information vector", "Not Implemented", 501);
     return false;
   }
 
@@ -97,22 +96,19 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         DUPLICATE_CHECK(entitiesP, "Registration::information::entities", infoNodeP);
         if (infoNodeP->value.firstChildP == NULL)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information::entities");
+          orionldError(OrionldBadRequestData, "Empty Array", "information::entities", 400);
           return false;
         }
 
         if (kjTreeToEntIdVector(infoNodeP, &regP->dataProvided.entities) == false)
-        {
-          LM_E(("kjTreeToEntIdVector failed"));
-          return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
-        }
+          return false;  // orionldError is invoked by kjTreeToEntIdVector
       }
       else if (SCOMPARE11(infoNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
       {
         DUPLICATE_CHECK(propertiesP, "Registration::information::properties", infoNodeP);
         if (infoNodeP->value.firstChildP == NULL)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information::properties");
+          orionldError(OrionldBadRequestData, "Empty Array", "information::properties", 400);
           return false;
         }
 
@@ -130,7 +126,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
 
         if (infoNodeP->value.firstChildP == NULL)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information::relationships");
+          orionldError(OrionldBadRequestData, "Empty Array", "information::relationships", 400);
           return false;
         }
 
@@ -144,18 +140,14 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData,
-                                   "Unknown field inside Registration::information",
-                                   infoNodeP->name);
+        orionldError(OrionldBadRequestData, "Unknown field inside Registration::information", infoNodeP->name, 400);
         return false;
       }
     }
 
     if ((entitiesP == NULL) && (propertiesP == NULL) && (relationshipsP == NULL))
     {
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "Empty Registration::information item",
-                                 NULL);
+      orionldError(OrionldBadRequestData, "Empty Registration::information item", NULL, 400);
       return false;
     }
   }
@@ -197,9 +189,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   char* detail;
   if (pcheckUri(uri, true, &detail) == false)
   {
-    LM_W(("Bad Input (Registration::id is not a URI)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str());  // FIXME: Include 'detail' and name (registration::id)
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), 400);
     return false;
   }
 
@@ -219,18 +209,17 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Registration::type)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Registration::type");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Mandatory field missing", "Registration::type", 400);
     return false;
   }
 
   if (strcmp(orionldState.payloadTypeNode->value.s, "ContextSourceRegistration") != 0)
   {
     LM_W(("Bad Input (Registration type must have the value /Registration/)"));
-    orionldErrorResponseCreate(OrionldBadRequestData,
-                               "Registration::type must have a value of /ContextSourceRegistration/",
-                               orionldState.payloadTypeNode->value.s);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData,
+                 "Registration::type must have a value of /ContextSourceRegistration/",
+                 orionldState.payloadTypeNode->value.s,
+                 400);
     return false;
   }
 

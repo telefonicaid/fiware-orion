@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/db/dbConfiguration.h"                          // dbEntityTypeGet
@@ -142,8 +142,7 @@ bool orionldGetEntityType(void)
   else if (entities == 0)
   {
     LM_E(("dbEntityTypeGet: no entities found"));
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Type Not Found", typeExpanded);
-    orionldState.httpStatusCode = 404;
+    orionldError(OrionldResourceNotFound, "Entity Type Not Found", typeExpanded, 404);
     return false;
   }
 

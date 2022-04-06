@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/entityErrorPush.h"                      // Own interface
 
@@ -84,7 +84,7 @@ void entityErrorPush
   KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
   KjNode* eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);
   KjNode* problemDetailsP = kjObject(orionldState.kjsonP,  "error");
-  KjNode* typeP           = kjString(orionldState.kjsonP,  "type",     orionldErrorTypeToString(type));
+  KjNode* typeP           = kjString(orionldState.kjsonP,  "type",     orionldResponseErrorType(type));
   KjNode* titleP          = kjString(orionldState.kjsonP,  "title",    title);
   KjNode* statusP         = kjInteger(orionldState.kjsonP, "status",   status);
 

@@ -26,7 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
 #include "orionld/kjTree/kjTreeFromRegistration.h"             // kjTreeFromRegistration
 #include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
@@ -44,8 +44,7 @@ bool orionldGetRegistration(void)
 
   if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenantP, &orionldState.httpStatusCode, &details) != true)
   {
-    LM_E(("mongoLdRegistrationGet error: %s", details));
-    orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
+    orionldError(OrionldResourceNotFound, details, orionldState.wildcard[0], 404);
     return false;
   }
 

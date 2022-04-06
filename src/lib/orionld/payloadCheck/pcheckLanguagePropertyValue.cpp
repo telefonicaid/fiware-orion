@@ -29,7 +29,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/pcheckLanguagePropertyValue.h"    // Own interface
 
 
@@ -42,8 +42,7 @@ bool pcheckLanguagePropertyValue(KjNode* valueP, const char* attrName)
 {
   if (valueP->type != KjObject)
   {
-    LM_W(("Bad Input (the value of a LanguageProperty attribute must be a JSON Object: '%s')", attrName));
-    orionldErrorResponseCreate(OrionldBadRequestData, "the value of a LanguageProperty attribute must be a JSON Object", kjValueType(valueP->type));
+    orionldError(OrionldBadRequestData, "the languageMap of a LanguageProperty attribute must be a JSON Object", attrName, 400);
     return false;
   }
 
@@ -51,15 +50,13 @@ bool pcheckLanguagePropertyValue(KjNode* valueP, const char* attrName)
   {
     if (itemP->type != KjString)
     {
-      LM_W(("Bad Input (an item of the LanguageProperty '%s' attribute value is not a JSON String: '%s')", attrName, itemP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "items of the value of a LanguageProperty attribute must be JSON Strings", kjValueType(itemP->type));
+      orionldError(OrionldBadRequestData, "items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
       return false;
     }
 
     if ((itemP->name[0] == 0) || (itemP->value.s[0] == 0))
     {
-      LM_W(("Bad Input (an item of the LanguageProperty '%s' attribute value is an empty string)", attrName));
-      orionldErrorResponseCreate(OrionldBadRequestData, "an item of a value of a LanguageProperty is an empty string", kjValueType(valueP->type));
+      orionldError(OrionldBadRequestData, "an item of the value (languageMap) of a LanguageProperty is an empty string", attrName, 400);
       return false;
     }
   }

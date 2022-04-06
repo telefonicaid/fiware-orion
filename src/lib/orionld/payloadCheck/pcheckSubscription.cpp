@@ -28,11 +28,10 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
 #include "orionld/common/qAliasCompact.h"                        // qAliasCompact
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
@@ -76,8 +75,7 @@ bool pcheckSubscription
 
   if (subNodeP->type != KjObject)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription", "The payload data for updating a subscription must be a JSON Object");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid Subscription", "The payload data for updating a subscription must be a JSON Object", 400);
     return false;
   }
 
@@ -87,8 +85,7 @@ bool pcheckSubscription
     {
       if (idCanBePresent == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "The Subscription ID cannot be modified", "id");
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "The Subscription ID cannot be modified", "id", 400);
         return false;
       }
 
@@ -103,8 +100,7 @@ bool pcheckSubscription
 
       if (strcmp(nodeP->value.s, "Subscription") != 0)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription Type", nodeP->value.s);
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldError(OrionldBadRequestData, "Invalid value for Subscription Type", nodeP->value.s, 400);
         return false;
       }
     }
@@ -200,15 +196,12 @@ bool pcheckSubscription
     }
     else if (strcmp(nodeP->name, "status") == 0)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Attempt to modify Read-Only attribute", "status");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Attempt to modify Read-Only attribute", "status", 400);
       return false;
     }
     else
     {
-      LM_E(("Unknown field in Subscription fragment: '%s'", nodeP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown field in Subscription fragment", nodeP->name);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Unknown field in Subscription fragment", nodeP->name, 400);
       return false;
     }
   }

@@ -48,7 +48,6 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
-#include "orionld/rest/temporaryErrorPayloads.h"                     // Temporary Error Payloads
 #include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
 #include "orionld/serviceRoutines/orionldPostEntity.h"               // orionldPostEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"              // orionldGetEntities

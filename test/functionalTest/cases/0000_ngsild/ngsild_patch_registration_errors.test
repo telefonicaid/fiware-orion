@@ -2298,13 +2298,13 @@ Date: REGEX(.*)
 71. Attempt to PATCH the registration with a 'location' that contains no 'coordinates' field - see failure
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 211
+Content-Length: 189
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Mandatory 'coordinates' field missing for a GeoJSON Property",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "detail": "location",
+    "title": "The value of an attribute of type GeoProperty must be valid GeoJson - 'coordinates' field missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

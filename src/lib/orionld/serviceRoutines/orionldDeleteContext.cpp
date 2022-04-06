@@ -29,10 +29,9 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
@@ -53,9 +52,7 @@ bool orionldDeleteContext(void)
 
   if (oldContextP == NULL)
   {
-    LM_W(("Bad Input (context '%s' not found)", id));
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", id);
-    orionldState.httpStatusCode = 404;
+    orionldError(OrionldResourceNotFound, "Context Not Found", id, 404);
     return false;
   }
 
@@ -64,9 +61,7 @@ bool orionldDeleteContext(void)
   {
     if (oldContextP->origin != OrionldContextDownloaded)
     {
-      LM_W(("Bad Input (only cached contexts are subject for reload)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Wrong type of context", "only cached contexts are subject for reload");
-      orionldState.httpStatusCode = 400;
+      orionldError(OrionldBadRequestData, "Wrong type of context", "only cached contexts are subject for reload", 400);
       return false;
     }
 
@@ -86,9 +81,7 @@ bool orionldDeleteContext(void)
 
     if (done == false)
     {
-      LM_E(("Context Cache Error (context to be reloaded not found in cache)"));  // orionldContextCacheLookup found it though ... ???
-      orionldErrorResponseCreate(OrionldInternalError, "Context Cache Error", "context to be reloaded not found in cache");
-      orionldState.httpStatusCode = 500;
+      orionldError(OrionldInternalError, "Context Cache Error", "context to be reloaded not found in cache", 500);
       return false;
     }
 
@@ -96,18 +89,13 @@ bool orionldDeleteContext(void)
     // Download, parse and insert the new context
     // If anything goes wrong, the old context is put back into the cache
     //
-    OrionldProblemDetails pd;
-    OrionldContext*       contextP = orionldContextFromUrl(oldContextP->url, oldContextP->id, &pd);
-
+    OrionldContext* contextP = orionldContextFromUrl(oldContextP->url, oldContextP->id);
     if (contextP == NULL)
     {
-      LM_W(("orionldContextFromUrl(%s): %s: %s", oldContextP->url, pd.title, pd.detail));
-      orionldErrorResponseCreate(pd.type, pd.title, pd.detail);
-      orionldState.httpStatusCode = pd.status;
-
       orionldContextCacheInsert(oldContextP);
       return false;
     }
+
     contextP->createdAt      = oldContextP->createdAt;
     contextP->usedAt         = orionldState.requestTime;
 
@@ -119,7 +107,7 @@ bool orionldDeleteContext(void)
     if (orionldContextCacheDelete(id) == false)
     {
       orionldState.httpStatusCode = 404;
-      orionldErrorResponseCreate(OrionldResourceNotFound, "Context Not Found", id);
+      orionldError(OrionldResourceNotFound, "Context Not Found", id, 400);
       return false;
     }
   }

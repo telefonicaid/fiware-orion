@@ -35,9 +35,9 @@ extern "C"
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/db/dbConfiguration.h"                        // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
@@ -67,8 +67,7 @@ bool orionldPostBatchDelete(void)
   if (orionldState.requestTree->type != KjArray)
   {
     LM_W(("Bad Input (Payload must be a JSON Array)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Must be a JSON Array");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldError(OrionldBadRequestData, "Invalid payload", "Must be a JSON Array", 400);
     return false;
   }
 
@@ -82,16 +81,14 @@ bool orionldPostBatchDelete(void)
     if (idNodeP->type != KjString)
     {
       LM_W(("Bad Input (Invalid payload - Array items must be JSON Strings)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be JSON Strings");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid payload", "Array items must be JSON Strings", 400);
       return false;
     }
 
     if (pcheckUri(idNodeP->value.s, true, &detail) == false)
     {
       LM_W(("Bad Input (Invalid payload - Array items must be valid URIs)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs");  // FIXME: Include 'detail' and name ("id") and its value (idNodeP->value.s)
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldError(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs", 400);
       return false;
     }
   }
@@ -175,7 +172,7 @@ bool orionldPostBatchDelete(void)
   {
     LM_E(("Database Error (dbEntitiesDelete returned error)"));
     orionldState.httpStatusCode = 500;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntitiesDelete");
+    orionldError(OrionldBadRequestData, "Database Error", "dbEntitiesDelete", 400);
 
     return false;
   }

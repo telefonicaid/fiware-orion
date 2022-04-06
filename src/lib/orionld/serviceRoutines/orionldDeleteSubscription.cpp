@@ -29,7 +29,7 @@
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup, ...
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
@@ -46,25 +46,19 @@ bool orionldDeleteSubscription(void)
 
   if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
   {
-    LM_E(("uriCheck: %s", detail));
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Identifier", orionldState.wildcard[0]);  // FIXME: Include 'detail' and name (subscriptionId)
+    orionldError(OrionldBadRequestData, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);
     return false;
   }
 
   if (dbSubscriptionGet(orionldState.wildcard[0]) == NULL)
   {
-    LM_E(("dbSubscriptionGet says that the subscription '%s' doesn't exist", orionldState.wildcard[0]));
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0]);
+    orionldError(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0], 404);
     return false;
   }
 
   if (dbSubscriptionDelete(orionldState.wildcard[0]) == false)
   {
-    LM_E(("dbSubscriptionDelete failed - not found?"));
-    orionldState.httpStatusCode = 404;  // Not Found
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0]);
+    orionldError(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0], 404);
     return false;
   }
 
