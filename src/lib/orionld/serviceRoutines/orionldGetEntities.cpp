@@ -595,7 +595,7 @@ bool orionldGetEntities(void)
     kjEntityNormalizedToConcise(orionldState.responseTree);
     LM_TMP(("After kjEntityNormalizedToConcise"));
   }
-  
+
   mongoRequest.release();
 
   LM_TMP(("Service Routine DONE"));
