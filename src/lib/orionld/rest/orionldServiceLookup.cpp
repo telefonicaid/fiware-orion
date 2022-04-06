@@ -107,9 +107,7 @@ OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV)
         if (serviceP->charsBeforeFirstWildcardSum == cSumV[sLen - 1])
         {
           if (strcmp(&serviceP->url[ORION_LD_SERVICE_PREFIX_LEN], &orionldState.urlPath[ORION_LD_SERVICE_PREFIX_LEN]) == 0)
-          {
             return serviceP;
-          }
         }
       }
     }

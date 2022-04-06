@@ -169,7 +169,6 @@ static OrionLdRestServiceSimplified deleteServiceV[] =
   { "/ngsi-ld/v1/subscriptions/*",               orionldDeleteSubscription },
   { "/ngsi-ld/v1/csourceRegistrations/*",        orionldDeleteRegistration },
   { "/ngsi-ld/v1/jsonldContexts/*",              orionldDeleteContext      },
-  { "/ngsi-ld/v1/temporal/entities/*/attrs/*/*", orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*/attrs/*",   orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",           orionldNotImplemented     }
 };
@@ -202,6 +201,8 @@ static OrionLdRestServiceSimplified optionsServiceV[] =
   { "/ngsi-ld/v1/csourceRegistrations",            orionldOptions },
   { "/ngsi-ld/v1/jsonldContexts/*",                orionldOptions },
   { "/ngsi-ld/v1/jsonldContexts",                  orionldOptions },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs/*",     orionldOptions },
+  { "/ngsi-ld/v1/temporal/entities/*/attrs",       orionldOptions },
   { "/ngsi-ld/v1/temporal/entities/*",             orionldOptions },
   { "/ngsi-ld/v1/temporal/entities",               orionldOptions },
   { "/ngsi-ld/v1/temporal/entityOperations/query", orionldOptions }
