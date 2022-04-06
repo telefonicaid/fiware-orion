@@ -41,7 +41,7 @@
 //
 // FIXME: orionldBadVerb does the exact same thing. This functions should have its own module.
 //
-static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, bool* mergePatchP)
+static char* orionldAllowedVerbs(char* verbList, int len, char* serviceUrlPath, bool* patchAllowedP, bool* mergePatchP)
 {
   uint16_t  bitmask = 0;
 
@@ -54,8 +54,13 @@ static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, b
     if (verbNo == HEAD) continue;
 
     OrionLdRestService* serviceP;
+
     if ((serviceP = orionldServiceLookup(&orionldRestServiceV[verbNo])) != NULL)
     {
+      // If not the exact same URL Path - not a match
+      if (strcmp(serviceP->url, serviceUrlPath) != 0)
+        continue;
+
       // PATCH Entity2 is only active if broker is started with -experimental
       if ((serviceP->serviceRoutine == orionldPatchEntity2) && (experimental == false))
         continue;
@@ -64,7 +69,6 @@ static char* orionldAllowedVerbs(char* verbList, int len, bool* patchAllowedP, b
         continue;
 
       bitmask |= (1 << verbNo);
-
       if (verbNo == PATCH)
       {
         *patchAllowedP = true;
@@ -104,7 +108,7 @@ bool orionldOptions(void)
   bool  patchAllowed = false;
   bool  mergePatch   = false;
 
-  verbList = orionldAllowedVerbs(verbListV, sizeof(verbListV), &patchAllowed, &mergePatch);
+  verbList = orionldAllowedVerbs(verbListV, sizeof(verbListV), orionldState.serviceP->url, &patchAllowed, &mergePatch);
 
   if (patchAllowed == true)
   {

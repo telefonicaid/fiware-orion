@@ -52,8 +52,8 @@ brokerStart CB
 # 19. OPTIONS request for /jsonldContexts/{contextId}
 # 20. OPTIONS request for /temporal/entities
 # 21. OPTIONS request for /temporal/entities/{entityId}
-# 22. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
-# 23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}/{instanceId}
+# 22. OPTIONS request for /temporal/entities/{entityId}/attrs
+# 23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
 # 24. OPTIONS request for /temporal/entityOperations/query
 #
 
@@ -204,16 +204,16 @@ echo
 echo
 
 
-echo "22. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}"
+echo "22. OPTIONS request for /temporal/entities/{entityId}/attrs"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/temporal/entities/urn:E1/attrs -X OPTIONS
+echo
+echo
+
+
+echo "23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}"
 echo "======================================================================"
 orionCurl --url /ngsi-ld/v1/temporal/entities/urn:E1/attrs/P1 -X OPTIONS
-echo
-echo
-
-
-echo "23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}/{instanceId}"
-echo "==================================================================================="
-orionCurl --url /ngsi-ld/v1/temporal/entities/urn:E1/attrs/P1/urn:instance:a -X OPTIONS
 echo
 echo
 
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Allow: GET,POST,DELETE,PATCH,OPTIONS
+Allow: POST,PATCH,OPTIONS
 Accept-Patch: application/json, application/ld+json
 Date: REGEX(.*)
 
@@ -258,7 +258,7 @@ Date: REGEX(.*)
 =============================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Allow: GET,DELETE,PATCH,OPTIONS
+Allow: DELETE,PATCH,OPTIONS
 Accept-Patch: application/json, application/ld+json
 Date: REGEX(.*)
 
@@ -419,22 +419,20 @@ Date: REGEX(.*)
 
 
 
-22. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
-======================================================================
+22. OPTIONS request for /temporal/entities/{entityId}/attrs
+===========================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Allow: GET,DELETE,PATCH,OPTIONS
-Accept-Patch: application/json, application/ld+json
+Allow: POST,OPTIONS
 Date: REGEX(.*)
 
 
 
-23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}/{instanceId}
-===================================================================================
+23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
+======================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Allow: GET,DELETE,PATCH,OPTIONS
-Accept-Patch: application/json, application/ld+json
+Allow: DELETE,OPTIONS
 Date: REGEX(.*)
 
 
