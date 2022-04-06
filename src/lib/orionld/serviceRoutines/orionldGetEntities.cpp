@@ -52,7 +52,6 @@ extern "C"
 #include "orionld/common/performance.h"                        // PERFORMANCE
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
@@ -84,6 +83,76 @@ static bool geoPropertyInAttrs(char** attrsV, int attrsCount, const char* geoPro
   }
 
   return false;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// apiEntityLanguageProps -
+//
+void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
+{
+  // Loop over attributes, if "languageMap" is present . pick the language and convert to Property
+  for (KjNode* attrP = apiEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (attrP->type != KjObject)  // type, id, ...  but also an attribute with datasetId ...
+      continue;
+    KjNode* languageMapP = kjLookup(attrP, "languageMap");
+
+    if (languageMapP == NULL)
+      continue;
+
+    // Find the language item inside the languageMap
+    KjNode* langItemP   = kjLookup(languageMapP, lang);
+    char*   stringValue = NULL;
+    char*   langChosen  = (char*) lang;
+
+    if (langItemP == NULL)
+    {
+      langItemP  = kjLookup(languageMapP, "en");    // English is the default if 'lang' is not present
+      if (langItemP != NULL) langChosen = (char*) "en";
+    }
+
+    if (langItemP == NULL)
+    {
+      langItemP = languageMapP->value.firstChildP;  // If English also not present, just pick the first one
+      if (langItemP != NULL) langChosen = langItemP->name;
+    }
+
+    if (langItemP == NULL)
+    {
+      stringValue = (char*) "empty languageMap";  // If there is no item at all inside the language map, use "empty languageMap"
+      langChosen  = (char*) "none";
+    }
+    else
+      stringValue = langItemP->value.s;
+
+
+    // Lookup the type node and change it to "Property"
+    KjNode* typeP = kjLookup(attrP, "type");
+    if (typeP != NULL)
+      typeP->value.s = (char*) "Property";
+
+    // Change name of "languageMap" to "value"
+    languageMapP->name = (char*) "value";
+
+    // Change JSON type to "String" - it was an object
+    languageMapP->type = KjString;
+
+    // Give it its new value
+    languageMapP->value.s = stringValue;
+    LM_TMP(("KZ: stringValue: %s", stringValue));
+    // NULL out the lastChild
+    languageMapP->lastChild = NULL;
+
+    // Now add the language chosen, if any
+    if (langItemP != NULL)
+    {
+      KjNode* langItemP = kjString(orionldState.kjsonP, "lang", langChosen);
+      kjChildAdd(attrP, langItemP);
+    }
+  }
 }
 
 
@@ -129,6 +198,7 @@ bool orionldGetEntities(void)
   char*                 geometry       = orionldState.uriParams.geometry;
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
+  char*                 lang           = orionldState.uriParams.lang;
   bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   bool                  concise        = orionldState.uriParamOptions.concise;
   char*                 idString       = (id   != NULL)? id      : idPattern;
@@ -408,7 +478,7 @@ bool orionldGetEntities(void)
   //
   orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
-  orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, concise, &mongoResponse);
+  orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, concise, lang, &mongoResponse);
 
   //
   // Work-around for Accept: application/geo+json
@@ -492,6 +562,17 @@ bool orionldGetEntities(void)
             kjChildAdd(orionldState.geoPropertyNodes, entityP);
         }
       }
+    }
+  }
+
+  // Can "Accept: GEOJSON" and ?lang=x be combined?
+
+  if ((keyValues == false) && (lang != NULL))  // If key-values, the lang thing has already been taken care of by kjTreeFromQueryContextResponse
+  {
+    // A language has been selected: lang, if we have an LanguageProperty in the response, the response tree needs to be modified
+    for (KjNode* apiEntityP = orionldState.responseTree->value.firstChildP; apiEntityP != NULL; apiEntityP = apiEntityP->next)
+    {
+      apiEntityLanguageProps(apiEntityP, lang);
     }
   }
 

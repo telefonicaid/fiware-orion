@@ -1,0 +1,458 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Language Property and Entities Query - Simple
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities with a language property L
+# 02. See the entity in the database
+# 03. GET entities in Normalized form
+# 04. GET entities in Concise form
+# 05. GET entities in Simplified form
+# 06. GET entities in Normalized form with URL parameter lang=en
+# 07. GET entities in Concise form with URL parameter lang=en
+# 08. GET entities in Simplified form with URL parameter lang=en
+# 09. GET entities in Normalized form with URL parameter lang=ex - get en
+# 10. GET entities in Simplified form with URL parameter lang=sv
+# 11. GET entities with q=L[es]==ele - see E1
+# 12. GET entities with q=L[es]==elk - see nothing
+#
+
+echo "01. POST /ngsi-ld/v1/entities with a language property L"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "el",
+      "es": "ele",
+      "sv": "ell"
+    },
+    "observedAt": "2022-04-01T18:07:00.987Z",
+    "Sub-P": 1,
+    "Sub-R": { "object": "urn:E2" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in the database"
+echo "=================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET entities in Normalized form"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "04. GET entities in Concise form"
+echo "================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise'
+echo
+echo
+
+
+echo "05. GET entities in Simplified form"
+echo "==================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified'
+echo
+echo
+
+
+echo "06. GET entities in Normalized form with URL parameter lang=en"
+echo "=============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&lang=en'
+echo
+echo
+
+
+echo "07. GET entities in Concise form with URL parameter lang=en"
+echo "==========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise&lang=en'
+echo
+echo
+
+
+echo "08. GET entities in Simplified form with URL parameter lang=en"
+echo "=============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified&lang=en'
+echo
+echo
+
+
+echo "09. GET entities in Normalized form with URL parameter lang=ex - get en"
+echo "======================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&lang=ex'
+echo
+echo
+
+
+echo "10. GET entities in Simplified form with URL parameter lang=sv"
+echo "=============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified&lang=sv'
+echo
+echo
+
+
+echo "11. GET entities with q=L[es]==ele - see E1"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=L\[es\]==\"ele\"'
+echo
+echo
+
+
+echo "12. GET entities with q=L[es]==elk - see nothing"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/entities?q=L\[es\]==\"elk\"'
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities with a language property L
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in the database
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
+			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"en" : "el",
+				"es" : "ele",
+				"sv" : "ell"
+			},
+			"md" : {
+				"observedAt" : {
+					"value" : 1648836420.987
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Sub-P" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Property",
+					"value" : 1
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Sub-R" : {
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*),
+					"type" : "Relationship",
+					"value" : "urn:E2"
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/Sub-P",
+				"https://uri.etsi.org/ngsi-ld/default-context/Sub-R"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET entities in Normalized form
+===================================
+HTTP/1.1 200 OK
+Content-Length: 246
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "Sub-P": {
+                "type": "Property",
+                "value": 1
+            },
+            "Sub-R": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "languageMap": {
+                "en": "el",
+                "es": "ele",
+                "sv": "ell"
+            },
+            "observedAt": "2022-04-01T18:07:00.987Z",
+            "type": "LanguageProperty"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+04. GET entities in Concise form
+================================
+HTTP/1.1 200 OK
+Content-Length: 170
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "Sub-P": 1,
+            "Sub-R": {
+                "object": "urn:E2"
+            },
+            "languageMap": {
+                "en": "el",
+                "es": "ele",
+                "sv": "ell"
+            },
+            "observedAt": "2022-04-01T18:07:00.987Z"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+05. GET entities in Simplified form
+===================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "en": "el",
+            "es": "ele",
+            "sv": "ell"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+06. GET entities in Normalized form with URL parameter lang=en
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 215
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "Sub-P": {
+                "type": "Property",
+                "value": 1
+            },
+            "Sub-R": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "lang": "en",
+            "observedAt": "2022-04-01T18:07:00.987Z",
+            "type": "Property",
+            "value": "el"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+07. GET entities in Concise form with URL parameter lang=en
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 147
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "Sub-P": 1,
+            "Sub-R": {
+                "object": "urn:E2"
+            },
+            "lang": "en",
+            "observedAt": "2022-04-01T18:07:00.987Z",
+            "value": "el"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+08. GET entities in Simplified form with URL parameter lang=en
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 47
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": "el",
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+09. GET entities in Normalized form with URL parameter lang=ex - get en
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 215
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "Sub-P": {
+                "type": "Property",
+                "value": 1
+            },
+            "Sub-R": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "lang": "en",
+            "observedAt": "2022-04-01T18:07:00.987Z",
+            "type": "Property",
+            "value": "el"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+10. GET entities in Simplified form with URL parameter lang=sv
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 48
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": "ell",
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+11. GET entities with q=L[es]==ele - see E1
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 246
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "L": {
+            "Sub-P": {
+                "type": "Property",
+                "value": 1
+            },
+            "Sub-R": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "languageMap": {
+                "en": "el",
+                "es": "ele",
+                "sv": "ell"
+            },
+            "observedAt": "2022-04-01T18:07:00.987Z",
+            "type": "LanguageProperty"
+        },
+        "id": "urn:ngsi-ld:T:E1",
+        "type": "T"
+    }
+]
+
+
+12. GET entities with q=L[es]==elk - see nothing
+================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

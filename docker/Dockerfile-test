@@ -48,6 +48,7 @@ WORKDIR ${PATH_TO_SRC}
 
 RUN yum install -y netcat
 RUN yum install -y bc
+RUN yum install -y diffutils
 RUN yum -y install hostname
 
 COPY . ${PATH_TO_SRC}
