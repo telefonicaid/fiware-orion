@@ -405,7 +405,7 @@ bool orionldPostEntity(void)
           LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
           attributeNotUpdated(notUpdatedP, shortName, "Error converting attribute", detail);
           caP->release();
-          free(caP);
+          delete caP;
           continue;
         }
 
