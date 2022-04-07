@@ -30,7 +30,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "cache/subCache.h"                                      // CachedSubscription, subCacheMatch
+#include "cache/subCache.h"                                      // CachedSubscription, subCacheMatch, subscriptionFailure, subscriptionSuccess
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
@@ -61,8 +61,8 @@ typedef struct NotificationPending
 //
 static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 {
-  char headers[2048];
-  int  nb = read(npP->fd, headers, sizeof(headers) - 1);
+  char buf[2048];  // should be enough for the HTTP headers ...
+  int  nb = read(npP->fd, buf, sizeof(buf) - 1);
 
   if (nb == -1)
   {
@@ -71,7 +71,9 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
     return -1;
   }
 
-  char* endOfFirstLine = strchr(headers, '\r');
+  LM_TMP(("NFY: Read %d bytes of notification: %s", nb, buf));
+
+  char* endOfFirstLine = strchr(buf, '\r');
 
   if (endOfFirstLine == NULL)
   {
@@ -80,12 +82,19 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
     return -1;
   }
 
-  LM_TMP(("First line: '%s'", headers));
+  *endOfFirstLine = 0;
+  LM_TMP(("NFY: First line: '%s'", buf));
+  LM_TMP(("NFY: Rest: '%s'", &endOfFirstLine[1]));
 
   //
-  // FIXME: Read the rest of the message, using select
-  //        And, set the lastSuccess, lastFailure etc in the subscription
+  // Reading the rest of the message, using select
   //
+  while ((nb = read(npP->fd, buf, sizeof(buf) - 1)) > 0)
+  {
+    buf[nb] = 0;
+    LM_TMP(("NFY: Read a chunk of %d bytes: %s", nb, buf));
+  }
+
 
   return 0;
 }
@@ -152,14 +161,19 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
 
   //
-  // Applying the PATCH
+  // Applying the PATCH, if any
   //
-  altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
-  for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+  if (altList->dbEntityP != NULL)
   {
-    orionldPatchApply(altList->patchedEntity, patchP);
+    LM_TMP(("XX: Calling dbModelToApiEntity"));
+    altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
+    LM_TMP(("XX: After dbModelToApiEntity"));
+    for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+    {
+      orionldPatchApply(altList->patchedEntity, patchP);
+    }
   }
-
+  LM_TMP(("XX: Here"));
 
   //
   // Timestamp for sending of notification - for stats in subscriptions
@@ -177,10 +191,10 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     // Get the group
     OrionldAlterationMatch* groupList = matchList;
     OrionldAlterationMatch* prev      = matchList;
-
+    LM_TMP(("XX: groupList at %p (next at %p)", groupList, groupList->next));
     for (OrionldAlterationMatch* matchP = groupList->next; matchP != NULL; matchP = matchP->next)
     {
-      LM_TMP(("Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
+      LM_TMP(("XX: Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
       if (matchP->subP != groupList->subP)
       {
         matchList  = matchP;  // matchList pointing to the first non-matching
@@ -200,7 +214,8 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     for (OrionldAlterationMatch* matchP = groupList; matchP != NULL; matchP = matchP->next)
     {
       ++groupMembers;
-      LM_TMP(("XX  - %s", orionldAlterationType(matchP->altAttrP->alterationType)));
+      if (matchP->altAttrP)
+        LM_TMP(("XX  - %s", orionldAlterationType(matchP->altAttrP->alterationType)));
     }
     LM_TMP(("XX: Calling notificationSend for group of sub %s of %d matches", groupList->subP->subscriptionId, groupMembers));
     // </DEBUG>
@@ -271,7 +286,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       {
         if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
         {
-          LM_TMP(("Got a notification response on fd %d", npP->fd));
+          LM_TMP(("Detected a notification response on fd %d", npP->fd));
           if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
             subscriptionSuccess(npP->subP, notificationTimeAsFloat);
 
