@@ -359,7 +359,6 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 
 
 
-// #define USE_MONGO_BACKEND 0
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntity -
@@ -396,42 +395,6 @@ bool orionldGetEntity(void)
   if (forwarding)
     regArray = dbRegistrationLookup(eId, NULL, NULL);
 
-#ifdef USE_MONGO_BACKEND
-  bool                      keyValues = orionldState.uriParamOptions.keyValues;
-  EntityId                  entityId(eId, "", "false", false);
-  QueryContextRequest       request;
-  QueryContextResponse      response;
-  std::vector<std::string>  servicePathV;
-
-  request.entityIdVector.push_back(&entityId);
-
-  orionldState.httpStatusCode = mongoQueryContext(&request,
-                                                  &response,
-                                                  orionldState.tenantP,
-                                                  servicePathV,
-                                                  NULL,
-                                                  orionldState.apiVersion);
-
-  if (response.errorCode.code == SccBadRequest)
-  {
-    //
-    // Not found in local, or some error
-    // Get Entity::Type and Entity::ID from the registration (if found)
-    // Add the forwardTree to the entity and return it
-    // If no registration found, retuirn 404 Not Found
-    //
-    LM_E(("ToDo: Implement this special case of entity not found in local BUT in registration"));
-    orionldError(OrionldBadRequestData, "Bad Request", NULL, 400);
-    return false;
-  }
-
-  // It's OK to not find the Entity in local - we still may find it in a Context Provider
-  if ((response.errorCode.code == SccOk) || (response.errorCode.code == 0))
-  {
-    // Create response by converting "QueryContextResponse response" into a KJson tree
-    orionldState.responseTree = kjTreeFromQueryContextResponse(true, keyValues, &response);
-  }
-#else
   bool attrsMandatory = false;
 
   //
@@ -473,7 +436,6 @@ bool orionldGetEntity(void)
                                                geometryProperty,
                                                &orionldState.geoPropertyNode,
                                                orionldState.uriParams.lang);
-#endif
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {

@@ -1,0 +1,207 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications for PUT /entities/{entityId}
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes A2 and A3
+# 02. Create a subscription on Entity E1 for all attributes
+# 03. PUT E1 with an attribute A2
+# 04. Dump+Reset accumulator - see one notification
+# 05. PUT E1 with an attribute A1, and with an @context in payload body
+# 06. Dump+Reset accumulator - see one notification
+#
+
+echo "01. Create an entity E1 with attributes A2 and A3"
+echo "================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "A2": 2,
+  "A3": 3
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription on Entity E1 for all attributes"
+echo "========================================================="
+payload='{
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T",
+      "id": "urn:E1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }   
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. PUT E1 with an attribute A2"
+echo "==============================="
+payload='{
+  "type": "T",
+  "A2": 3
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PUT
+echo
+echo
+
+
+
+echo "04. Dump+Reset accumulator - see one notification"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. PUT E1 with an attribute A1, and with an @context in payload body"
+echo "====================================================================="
+payload='{
+  "@context": [ "http://smartdatamodels.org/context.jsonld" ],
+  "type": "T",
+  "A1": 3
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PUT --in jsonld
+echo
+echo
+
+
+echo "06. Dump+Reset accumulator - see one notification"
+echo "================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attributes A2 and A3
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+02. Create a subscription on Entity E1 for all attributes
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+03. PUT E1 with an attribute A2
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Dump+Reset accumulator - see one notification
+=================================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 272
+User-Agent: orionld
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "data": [
+        {
+            "A2": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+05. PUT E1 with an attribute A1, and with an @context in payload body
+=====================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Dump+Reset accumulator - see one notification
+=================================================
+POST http://127.0.0.1:9997/notify
+Content-Length: 272
+User-Agent: orionld
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
