@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/mongoc/mongocRegistrationLookup.h"             // mongocRegistrationLookup
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
@@ -394,7 +395,7 @@ bool orionldGetEntity(void)
   }
 
   if (forwarding)
-    regArray = dbRegistrationLookup(eId, NULL, NULL);
+    regArray = mongocRegistrationLookup(eId, NULL, NULL);
 
 #ifdef USE_MONGO_BACKEND
   bool                      keyValues = orionldState.uriParamOptions.keyValues;

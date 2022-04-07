@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjArray, kjChildAdd
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -35,49 +36,71 @@ extern "C"
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
-#include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
+#include "orionld/mongoc/mongocRegistrationLookup.h"             // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntityLookup -
+// mongocRegistrationLookup -
 //
-KjNode* mongocEntityLookup(const char* entityId)
+KjNode* mongocRegistrationLookup(const char* entityId, const char* attribute, int* noOfRegsP)
 {
-  bson_t            mongoFilter;
-  const bson_t*     mongoDocP;
-  mongoc_cursor_t*  mongoCursorP;
-  bson_error_t      mongoError;
-  char*             title;
-  char*             details;
-  KjNode*           entityNodeP = NULL;
+  if (noOfRegsP != NULL)
+    *noOfRegsP = 0;
 
   //
-  // Create the filter for the query
+  // Populate filter - on Entity ID and Attribute Name
   //
+  bson_t mongoFilter;
   bson_init(&mongoFilter);
-  bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
+
+  bson_append_utf8(&mongoFilter, "contextRegistration.entities.id", 31, entityId, -1);
+
+  if (attribute != NULL)
+  {
+    // { $or: [ { "contextRegistration.attrs": { $size: 0 }}, { "contextRegistration.attrs.name": 'attribute' } ]  }  ???
+  }
 
   mongocConnectionGet();
 
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  if (orionldState.mongoc.registrationsP == NULL)
+    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
 
   //
   // Run the query
   //
-  // semTake(&mongoEntitiesSem);
-  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, NULL, NULL)) == NULL)
+  // semTake(&mongoRegistrationsSem);
+  //
+  mongoc_cursor_t*  mongoCursorP;
+  bson_error_t      mongoError;
+
+  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.registrationsP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
     return NULL;
   }
 
+  // mongocConnectionRelease(); - done at the end of the request
+
+  KjNode*        kjRegArray        = NULL;
+  KjNode*        registrationNodeP = NULL;
+  const bson_t*  mongoDocP;
+
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &details);
-    break;  // Just using the first one - should be no more than one!
+    char* title;
+    char* detail;
+
+    registrationNodeP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
+    if (registrationNodeP == NULL)
+      LM_E(("%s: %s", title, detail));
+    else
+    {
+      if (kjRegArray == NULL)
+        kjRegArray = kjArray(orionldState.kjsonP, NULL);
+      kjChildAdd(kjRegArray, registrationNodeP);
+    }
   }
 
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
@@ -87,8 +110,8 @@ KjNode* mongocEntityLookup(const char* entityId)
   }
 
   mongoc_cursor_destroy(mongoCursorP);
-  // semGive(&mongoEntitiesSem);
+  // semGive(&mongoRegistrationsSem);
   bson_destroy(&mongoFilter);
-
-  return entityNodeP;
+  
+  return kjRegArray;
 }

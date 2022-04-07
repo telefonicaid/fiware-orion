@@ -38,7 +38,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
-#include "orionld/mongoc/mongocConnectionRelease.h"              // mongocConnectionRelease
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocEntityUpdate.h"                   // Own interface
 
@@ -301,7 +300,8 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   //
   // char* s = bson_as_canonical_extended_json(&reply, NULL);
 
-  mongocConnectionRelease();
+  // mongocConnectionRelease(); - done at the end of the request
+
   bson_destroy(&request);
   bson_destroy(&set);
   bson_destroy(&reply);

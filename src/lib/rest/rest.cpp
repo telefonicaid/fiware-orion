@@ -58,6 +58,7 @@ extern "C"
 #include "parse/forbiddenChars.h"
 #include "serviceRoutinesV2/getEntityAttributeValue.h"           // getEntityAttributeValue
 
+#include "orionld/mongoc/mongocConnectionRelease.h"              // Own interface
 #include "orionld/common/orionldState.h"                         // orionldState, multitenancy, ...
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -372,6 +373,9 @@ static void requestCompleted
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   const char*      spath    = ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
+
+  // Release the connection to mongo, if there is any
+  mongocConnectionRelease();
 
   if (orionldState.alterations != NULL)
   {

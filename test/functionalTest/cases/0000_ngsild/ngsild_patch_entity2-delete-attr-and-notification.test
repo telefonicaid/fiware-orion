@@ -312,7 +312,7 @@ Date: REGEX(.*)
 ====================================================================
 #SORT_START
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 267
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -331,7 +331,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 267
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -350,7 +350,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 267
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -382,7 +382,7 @@ Date: REGEX(.*)
 =============================================================
 #SORT_START
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 267
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -401,7 +401,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 278
+Content-Length: 267
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -433,7 +433,7 @@ Date: REGEX(.*)
 ====================================================================
 #SORT_START
 POST http://127.0.0.1:9997/notify
-Content-Length: 314
+Content-Length: 303
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -456,7 +456,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 314
+Content-Length: 303
 User-Agent: orionld
 Content-Type: application/ld+json
 
@@ -479,7 +479,7 @@ Content-Type: application/ld+json
 }
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 314
+Content-Length: 303
 User-Agent: orionld
 Content-Type: application/ld+json
 
