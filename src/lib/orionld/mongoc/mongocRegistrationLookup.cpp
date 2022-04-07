@@ -112,6 +112,6 @@ KjNode* mongocRegistrationLookup(const char* entityId, const char* attribute, in
   mongoc_cursor_destroy(mongoCursorP);
   // semGive(&mongoRegistrationsSem);
   bson_destroy(&mongoFilter);
-  
+
   return kjRegArray;
 }

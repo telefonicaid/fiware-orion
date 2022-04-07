@@ -43,6 +43,6 @@ done
 # kjson
 #
 cd ${ROOT_FOLDER}/kjson
-git checkout release/0.8.1
+git checkout release/0.8.2
 make
 make install

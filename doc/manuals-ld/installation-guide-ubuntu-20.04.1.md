@@ -50,7 +50,7 @@ Some libraries are built from source code and those sources must be downloaded a
 * kbase:              0.8
 * klog:               0.8
 * kalloc:             0.8
-* kjson:              0.8.1
+* kjson:              0.8.2
 * khash:              0.8
 * gtest:              1.5 (needed for unit testing only)
 * gmock:              1.5 (needed for unit testing only)
@@ -196,7 +196,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.8.1
+git checkout release/0.8.2
 make install
 ```
 
