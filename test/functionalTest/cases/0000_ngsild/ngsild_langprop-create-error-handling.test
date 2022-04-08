@@ -212,7 +212,7 @@ Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "the languageMap of a LanguageProperty attribute must be a JSON Object",
+    "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -226,7 +226,7 @@ Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "items of the value of a LanguageProperty attribute must be JSON Strings",
+    "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -276,13 +276,13 @@ Date: REGEX(.*)
 07. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty key
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 205
+Content-Length: 206
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "an item of the value (languageMap) of a LanguageProperty is an empty string",
+    "title": "An item of the value (languageMap) of a LanguageProperty has an empty string",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -290,13 +290,13 @@ Date: REGEX(.*)
 08. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty value
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 205
+Content-Length: 206
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "an item of the value (languageMap) of a LanguageProperty is an empty string",
+    "title": "An item of the value (languageMap) of a LanguageProperty has an empty string",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

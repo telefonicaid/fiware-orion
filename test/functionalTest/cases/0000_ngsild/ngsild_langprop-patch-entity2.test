@@ -1,0 +1,259 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Patch of a language property
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities with a language property L
+# 02. See the entity in the database
+# 03. PATCH the entity, changing L:es to 'Castellano'
+# 04. See the entity in the database - make sure L:es is 'Castellano'
+# 05. GET entity in Normalized form
+# 06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
+# 07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
+#
+
+echo "01. POST /ngsi-ld/v1/entities with a language property L"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L": {
+    "languageMap": {
+      "en": "English",
+      "es": "Spanish",
+      "sv": "Swedish"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in the database"
+echo "=================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. PATCH the entity, changing L:es to 'Castellano'"
+echo "==================================================="
+payload='{
+  "L": {
+    "languageMap": {
+      "es": "Castellano"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. See the entity in the database - make sure L:es is 'Castellano'"
+echo "==================================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. GET entity in Normalized form"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo "06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error"
+echo "============================================================================================="
+payload='{
+  "L": {
+    "languageMap": 13
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error"
+echo "================================================================================================"
+payload='{
+  "L": {
+    "languageMap": {
+      "es": 14
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities with a language property L
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in the database
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
+			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"en" : "English",
+				"es" : "Spanish",
+				"sv" : "Swedish"
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. PATCH the entity, changing L:es to 'Castellano'
+===================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. See the entity in the database - make sure L:es is 'Castellano'
+===================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
+			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"en" : "English",
+				"es" : "Castellano",
+				"sv" : "Swedish"
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. GET entity in Normalized form
+=================================
+HTTP/1.1 200 OK
+Content-Length: 132
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "L": {
+        "languageMap": {
+            "en": "English",
+            "es": "Castellano",
+            "sv": "Swedish"
+        },
+        "type": "LanguageProperty"
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T"
+}
+
+
+06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 199
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 201
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
