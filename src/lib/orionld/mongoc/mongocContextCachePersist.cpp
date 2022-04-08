@@ -34,7 +34,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocContextsSem
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
-#include "orionld/mongoc/mongocConnectionRelease.h"              // mongocConnectionRelease
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocContextCachePersist.h"            // Own interface
 
@@ -67,5 +66,5 @@ void mongocContextCachePersist(KjNode* contextObject)
 
   bson_destroy(&bson);
 
-  mongocConnectionRelease();
+  // mongocConnectionRelease(); - done at the end of the request
 }

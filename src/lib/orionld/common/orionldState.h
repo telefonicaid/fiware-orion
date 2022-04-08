@@ -278,6 +278,8 @@ typedef struct OrionldMongoC
   mongoc_client_t*      client;
   mongoc_collection_t*  contextsP;
   mongoc_collection_t*  entitiesP;
+  mongoc_collection_t*  subscriptionsP;
+  mongoc_collection_t*  registrationsP;
   bson_error_t          error;
 } OrionldMongoC;
 

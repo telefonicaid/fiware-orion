@@ -92,7 +92,7 @@ Date: REGEX(.*)
 03. GET the entity with options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 89
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -100,7 +100,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
   "type": "T",
-  "P1": "Internal Error - attribute value lost"
+  "P1": "too big string"
 }
 
 

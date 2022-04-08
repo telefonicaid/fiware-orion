@@ -32,6 +32,8 @@ SET (SOURCES
     mongocContextCacheGet.cpp
     mongocContextCachePersist.cpp
     mongocContextCacheDelete.cpp
+    mongocRegistrationLookup.cpp
+    mongocEntityRetrieve.cpp
 )
 
 # Include directories

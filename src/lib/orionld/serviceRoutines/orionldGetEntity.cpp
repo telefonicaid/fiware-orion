@@ -39,9 +39,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -50,9 +47,10 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/mongoc/mongocRegistrationLookup.h"             // mongocRegistrationLookup
+#include "orionld/mongoc/mongocEntityRetrieve.h"                 // mongocEntityRetrieve
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
@@ -393,13 +391,13 @@ bool orionldGetEntity(void)
   }
 
   if (forwarding)
-    regArray = dbRegistrationLookup(eId, NULL, NULL);
+    regArray = mongocRegistrationLookup(eId, NULL, NULL);
 
   bool attrsMandatory = false;
 
   //
-  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for dbEntityRetrieve
-  // Slightly modified as dbEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
+  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for mongocEntityRetrieve
+  // Slightly modified as mongocEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
   //
   char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrsList.items + 1));
 
@@ -426,16 +424,16 @@ bool orionldGetEntity(void)
       geometryProperty = (char*) "location";
   }
 
-  orionldState.responseTree = dbEntityRetrieve(eId,
-                                               eqAttrV,
-                                               attrsMandatory,
-                                               orionldState.uriParamOptions.sysAttrs,
-                                               orionldState.uriParamOptions.keyValues,
-                                               orionldState.uriParamOptions.concise,
-                                               orionldState.uriParams.datasetId,
-                                               geometryProperty,
-                                               &orionldState.geoPropertyNode,
-                                               orionldState.uriParams.lang);
+  orionldState.responseTree = mongocEntityRetrieve(eId,
+                                                   eqAttrV,
+                                                   attrsMandatory,
+                                                   orionldState.uriParamOptions.sysAttrs,
+                                                   orionldState.uriParamOptions.keyValues,
+                                                   orionldState.uriParamOptions.concise,
+                                                   orionldState.uriParams.datasetId,
+                                                   geometryProperty,
+                                                   &orionldState.geoPropertyNode,
+                                                   orionldState.uriParams.lang);
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
