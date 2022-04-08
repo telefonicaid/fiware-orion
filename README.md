@@ -63,9 +63,6 @@ If you are not sharing your data across systems and have no need for linked data
 version of **NGSI** (**NGSI-v2**) is more than sufficient.
 If so, please use the original unforked [Orion](https://github.com/telefonicaid/fiware-orion) instead.
 
-This component is currently a beta release but already passing most of the
-[NGSI-LD test suite](https://github.com/FIWARE/NGSI-LD_TestSuite)
-
 Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples). See
 also the
 [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json)
@@ -81,4 +78,9 @@ Documentation:
 -   [The Broker as Context Server](doc/manuals-ld/contextServer.md)
 -   [State of the Implementation](doc/manuals-ld/implementationState.md)
 
-A Test Suite for **NGSI-LD** can be found [here](https://github.com/fiware/NGSI-LD_Tests).
+A Test Suite for NGSI-LD compliant brokers can be found [here](https://github.com/fiware/NGSI-LD_Tests).
+This test suite is kind of deprecated in favor of the [ETSI NGSI-LD API Conformance Test Suite](https://forge.etsi.org/rep/cim/ngsi-ld-test-suite).
+However, the ETSI test suite still needs quite some work to be usable.
+A TTF (Testing Task force) is applied for (ETSI fundings) and hopefully the test suite will be improved upon during this year of 2022.
+
+Orion-LD passes about 95% of the test cases of the older deprecated test suite, while ETSI's test suite isn't usable at the moment.
