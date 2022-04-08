@@ -109,10 +109,10 @@ To test it, Orion-LD must be started with the CLI parameter `-experimental`.
 
 #### Done in new implementation
   * Uses the new mongoc driver
+  * LanguageProperty attributes are supported
 
 #### Missing in new implementation
   * TRoE is implemented just not tested
-  * LanguageProperty
   * Multi-attributes
   * Notifications
   * Forwarding
