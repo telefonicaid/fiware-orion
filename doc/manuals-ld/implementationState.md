@@ -1,5 +1,7 @@
 # State of the Implementation
 
+
+
 ## 1. Features that may or not be implemented by the Service Routines (API endpoints)
 All Services:
 * Use of the **new C driver "mongoc"** vs the _deprecated MongoDB Lecacy C++ driver_
@@ -15,6 +17,8 @@ Entity-updating services:
 
 Features that are implemented by all services, like _Concise Representation_, etc, are not mentioned in this document.
 This document is a guide to what is missing, not what has been implemented.
+
+
 
 ## 2. Stuff that differ from the NGSI-LD API
 ### Relationships
@@ -39,6 +43,8 @@ So, until the Multi-Attribute concept is fully supported, Orion-LD accepts Array
 _I implemented it that way by mistake as I thought it made a lot of sense to have a Relationship as an array of URIs.
 Then I got users (a European project) using the feature and it was too late to remove it._
 
+
+
 ## 3. Other critical stuff that need to be implemented
 * Memory management for containers
 * Safe connection to MongoDB Server (-dbSSL and -dbAuthDb CLI arguments that Orion now implements)
@@ -48,6 +54,8 @@ Then I got users (a European project) using the feature and it was too late to r
   the **worst possible way**
 * Registration Cache
 * Perhaps even an Entity Cache?
+
+
 
 ## 4. Extra Stuff that Orion-LD supports but that may never enter the NGSI-LD API
 ### Cross Notifications
@@ -70,7 +78,10 @@ Then I got users (a European project) using the feature and it was too late to r
 ### GET /ngsi-ld/ex/v1/dbIndexes
   Retrieve a list of the current database indices - used for debugging purposes.
 
+
+
 ## 5. Implementation state of Services (API Endpoints)
+
 
 ### POST /ngsi-ld/v1/entities
 Creation of an entity.  
@@ -86,22 +97,58 @@ then a `409 Conflict` is returned.
   * Notifications are supported but, that's part of mongoBackend and needs a rewrite
   * Forwarding - the old NGSIv2 style forwarding has been disabled
 
+
 ### GET /ngsi-ld/v1/entities
 #### Done
   * LanguageProperty attributes are supported
 
 #### Missing
   * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
-  * Multi-attributes are supported
+  * Multi-attributes
   * Forwarding - the old NGSIv2 style forwarding has been disabled
 
 ###
 
 
---------------------------------------------------------------
 ### GET /ngsi-ld/v1/entities/*
+#### Done
+  * Uses the new mongoc driver
+  * LanguageProperty attributes are supported
+  * Multi-attributes are supported
+
+#### Missing
+  * Forwarding
+
+
 ### PATCH /ngsi-ld/v1/entities/*
+This service is experimental and is only in place when Orion-LD is started with the `-experimental` CLI option.
+
+#### Done
+  * Uses the new mongoc driver
+  * LanguageProperty attributes are supported
+  * TRoE is almost fully working - we need to add an opMode in the sub-attrs table to indicate "Removal of Sub-Attribute"
+
+## Missing
+  * Multi-attributes
+  * New "native NGSI-LD" Notifications are supported but some parts are missing: { "q", "geoQ" }. It is also very green.
+  * Forwarding
+
+
 ### PUT /ngsi-ld/v1/entities/*
+This service is experimental and is only in place when Orion-LD is started with the `-experimental` CLI option.
+
+#### Done
+  * Uses the new mongoc driver
+
+## Missing
+  * Multi-attributes
+  * New "native NGSI-LD" Notifications are supported but some parts are missing: { "q", "geoQ" }. It is also very green.
+  * Forwarding
+  * LanguageProperty attributes
+  * TRoE
+
+------ TBI --------------------------------------------------------
+
 ### DELETE /ngsi-ld/v1/entities/*
 
 ### POST /ngsi-ld/v1/entities/*/attrs
