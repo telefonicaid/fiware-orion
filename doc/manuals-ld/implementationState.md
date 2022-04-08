@@ -1,22 +1,22 @@
 # State of the Implementation
 
-## Features that may or not be implemented by the Service Routines (API endpoints)
+## 1. Features that may or not be implemented by the Service Routines (API endpoints)
 All Services:
-* Use of the *new C driver "mongoc"* vs the _deprecated MongoDB Lecacy C++ driver_
+* Use of the **new C driver "mongoc"** vs the _deprecated MongoDB Lecacy C++ driver_
 
 Entity Services:
-* Support of *LanguageProperty*
-* *Forwarding*, as of NGSI-LD API spec 1.6 (due summer 2022)
-* Support for *Multi-Attributes* (datasetId)
+* Support of **LanguageProperty**
+* **Forwarding**, as of NGSI-LD API spec 1.6 (due summer 2022)
+* Support for **Multi-Attributes** (datasetId)
 
 Entity-updating services:
-* Notifications - *native NGSI-LD* vs _old mongoBackend_
-* *TRoE* - Temporal Representation of Entities
+* **Notifications** - _native NGSI-LD_ vs _old mongoBackend_
+* **TRoE** - Temporal Representation of Entities
 
 Features that are implemented by all services, like _Concise Representation_, etc, are not mentioned in this document.
 This document is a guide to what is missing, not what has been implemented.
 
-## Stuff that differ from the NGSI-LD API
+## 2. Stuff that differ from the NGSI-LD API
 ### Relationships
 According to the NGSI-LD API, a Relationship must be a String that is a valid URI.
 However, there is a demand to have an Array of URIs, e.g.:
@@ -32,24 +32,24 @@ However, there is a demand to have an Array of URIs, e.g.:
   }
 ```
 While it is true that the same effect can be achived (well, not really the same) using the Multi-Attribute concept (datasetId),
-that *is not* what our users are asking for. It's merely a "workaround" for them to have the array of relationships.
+that **is not** what our users are asking for. It's merely a _workaround_ for them to get what they need, which is an array of relationships.
 Orion-LD doesn't really implement Multi-Attribute and it's going to take quite some time for that feature to be supported (if ever).
-So, until the Multi-Attribute concept is fully supported, Orion-LD accepts Array as "object" for a Relationship Attribute.
+So, until the Multi-Attribute concept is fully supported, Orion-LD accepts Array as `object` for a Relationship Attribute.
 
-_I implemented it that way by mistake as I thought it made a lot of sense to have a Relationshiup as an array of URIs.
+_I implemented it that way by mistake as I thought it made a lot of sense to have a Relationship as an array of URIs.
 Then I got users (a European project) using the feature and it was too late to remove it._
 
-## Other critical stuff that need to be implemented
+## 3. Other critical stuff that need to be implemented
 * Memory management for containers
 * Safe connection to MongoDB Server (-dbSSL and -dbAuthDb CLI arguments that Orion now implements)
-* Subscription matching for Notification directly on DB (the matching are done on the Subscription Cache)
+* Subscription matching for Notification directly on DB (the matching is done on the Subscription Cache)
 * Complete rewrite of the Subscription Cache and especially how brokers on the same DB communicate.
-  Right now, the communication is done via the database and that is ... well, the wasiest possible way, but also
-  the *worst possible way*
+  Right now, the communication is done via the database and that is ... well, the _easiest possible way_, but also
+  the **worst possible way**
 * Registration Cache
 * Perhaps even an Entity Cache?
 
-## Extra Stuff that Orion-LD supports but that may never enter the NGSI-LD API
+## 4. Extra Stuff that Orion-LD supports but that may never enter the NGSI-LD API
 ### Cross Notifications
 ### POST /ngsi-ld/ex/v1/notify
   The ability to receive notifications from an NGSI-LD Broker and treat the notification as a BATCH Upsert.
@@ -62,17 +62,20 @@ Then I got users (a European project) using the feature and it was too late to r
   The old NGSI /version is of course supported as well: `GET /version`
 
 ### GET /ngsi-ld/ex/v1/ping
+  Just to have the broker respond with the same - used for debugging purposes.
+
 ### GET /ngsi-ld/ex/v1/tenants
-  Retrieve a list of the current tenants - used for debugging purposes
+  Retrieve a list of the current tenants - used for debugging purposes.
 
 ### GET /ngsi-ld/ex/v1/dbIndexes
-  Retrieve a list of the current database indices - used for debugging purposes
+  Retrieve a list of the current database indices - used for debugging purposes.
 
-## Implementation state of Services (API Endpoints)
+## 5. Implementation state of Services (API Endpoints)
 
 ### POST /ngsi-ld/v1/entities
-Creation of an entity. If the entity in question already exists (depending on the "id" field in the payload body), then a `409 Conflict`
-is returned.
+Creation of an entity.  
+If the entity in question already exists (depending on the "id" field in the payload body),
+then a `409 Conflict` is returned.
 #### Done
   * TRoE is fully working
   * LanguageProperty attributes are supported
