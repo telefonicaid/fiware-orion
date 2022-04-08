@@ -76,8 +76,6 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
   else
     LM_E(("Database Error (entity '%s' without type inside _id)", entityId));
 
-  kjChildAdd(apiEntityP, dbTypeNodeP);
-
   if (sysAttrs)
   {
     const char* fieldName[]  = { "creDate",   "modDate"    };

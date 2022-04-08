@@ -52,7 +52,7 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
 #if 0
   // FIXME: Real implementation - avoiding the extra step going via JSON
 #else
-  if ((json = bson_as_json(bsonP, NULL)) == NULL)
+  if ((json = bson_as_relaxed_extended_json(bsonP, NULL)) == NULL)
   {
     *titleP   = (char*) "Internal Error";
     *detailsP = (char*) "Error creating JSON from BSON";

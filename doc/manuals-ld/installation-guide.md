@@ -71,7 +71,7 @@ kz@ubuntu:~$ curl localhost:1026/ngsi-ld/ex/v1/version
   "branch": "develop",
   "kbase version": "0.8",
   "kalloc version": "0.8",
-  "kjson version": "0.8",
+  "kjson version": "0.8.2",
   "boost version": "1_65_1",
   "microhttpd version": "0.9.48-0",
   "openssl version": "OpenSSL 1.0.2n  7 Dec 2017",

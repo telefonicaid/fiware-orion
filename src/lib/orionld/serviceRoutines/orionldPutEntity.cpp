@@ -297,6 +297,28 @@ bool orionldPutEntity(void)
     return false;
   }
 
+  orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+  orionldState.alterations->entityId          = entityId;
+  orionldState.alterations->entityType        = typeNodeP->value.s;
+  orionldState.alterations->patchTree         = NULL;
+  orionldState.alterations->dbEntityP         = NULL;
+  orionldState.alterations->patchedEntity     = orionldState.requestTree;  // entity id, createdAt, modifiedAt ...
+  orionldState.alterations->alteredAttributes = 0;
+  orionldState.alterations->alteredAttributeV = NULL;
+  orionldState.alterations->next              = NULL;
+
+  //
+  // Is the entity id inside orionldState.requestTree?
+  // If not, it must be added for the notification
+  //
+  idNodeP = kjLookup(orionldState.requestTree, "id");
+  if (idNodeP == NULL)
+  {
+    idNodeP = kjString(orionldState.kjsonP, "id", entityId);
+    kjChildAdd(orionldState.requestTree, idNodeP);
+  }
+
   orionldState.httpStatusCode = 204;
+
   return true;
 }

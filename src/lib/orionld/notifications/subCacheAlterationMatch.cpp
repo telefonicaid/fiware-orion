@@ -59,7 +59,7 @@ static bool entityIdMatch(CachedSubscription* subP, const char* entityId, int eI
     }
   }
 
-  LM_TMP(("KZ: Sub '%s': no match due to Entity ID", subP->subscriptionId));
+  LM_TMP(("NFY: Sub '%s': no match due to Entity ID", subP->subscriptionId));
   return false;
 }
 
@@ -82,7 +82,7 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
       return true;
   }
 
-  LM_TMP(("KZ: Sub '%s': no match due to Entity Type", subP->subscriptionId));
+  LM_TMP(("NFY: Sub '%s': no match due to Entity Type", subP->subscriptionId));
   return false;
 }
 
@@ -118,11 +118,54 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 
 // -----------------------------------------------------------------------------
 //
+// matchToMatchList -
+//
+static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, OrionldAttributeAlteration* aaP)
+{
+  LM_TMP(("NFY: Alteration made it all the way for sub %s:", subP->subscriptionId));
+  if (aaP != NULL)
+  {
+    LM_TMP(("NFY:   - Alteration Type:  %s", orionldAlterationType(aaP->alterationType)));
+    LM_TMP(("NFY:   - Attribute:        %s", aaP->attrName));
+  }
+
+  OrionldAlterationMatch* amP = (OrionldAlterationMatch*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlterationMatch));
+  amP->altP     = altP;
+  amP->altAttrP = aaP;
+  amP->subP     = subP;
+
+  if (matchList == NULL)
+  {
+    matchList = amP;
+    amP->next = NULL;
+  }
+  else
+    matchList = matchListInsert(matchList, amP);  // Items in matchList are grouped by their subP
+
+  return matchList;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributeMatch -
 //
 static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, int* matchesP)
 {
   int matches = 0;
+
+  if (altP->alteredAttributes == 0)  // E.g. complete replace of an entity - treating it as EntityModified (for now)
+  {
+    // Is the Alteration type ON for this subscription?
+    if (subP->triggers[EntityModified] == true)
+    {
+      matchList = matchToMatchList(matchList, subP, altP, NULL);
+      ++matches;
+    }
+    else
+      LM_TMP(("NFY: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
+  }
 
   for (int aaIx = 0; aaIx < altP->alteredAttributes; aaIx++)
   {
@@ -132,7 +175,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     while (nIx < watchAttrs)
     {
-      // LM_TMP(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
+      // LM_TMP(("NFY: Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
       if (strcmp(aaP->attrName, subP->notifyConditionV[nIx].c_str()) == 0)
         break;
       ++nIx;
@@ -144,33 +187,16 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[aaP->alterationType] == false)
     {
-      // LM_TMP(("KZ: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
+      LM_TMP(("NFY: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
       continue;
     }
 
-    LM_TMP(("KZ: Alteration made it all the way for sub %s:", subP->subscriptionId));
-    LM_TMP(("KZ:   - Alteration Type:  %s", orionldAlterationType(aaP->alterationType)));
-    LM_TMP(("KZ:   - Attribute:        %s", aaP->attrName));
-
-    // OK, let's add it to matchList!
+    matchList = matchToMatchList(matchList, subP, altP, aaP);
     ++matches;
-
-    OrionldAlterationMatch* amP = (OrionldAlterationMatch*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlterationMatch));
-    amP->altP     = altP;
-    amP->altAttrP = aaP;
-    amP->subP     = subP;
-
-    if (matchList == NULL)
-    {
-      matchList = amP;
-      amP->next = NULL;
-    }
-    else
-      matchList = matchListInsert(matchList, amP);  // Items in matchList are grouped by their subP
   }
 
   if (matches == 0)
-    LM_TMP(("KZ: Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
+    LM_TMP(("NFY: Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
 
   *matchesP += matches;
 
@@ -194,25 +220,25 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
     {
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
       {
-        LM_TMP(("KZ: Sub '%s' - no match due to tenant", subP->subscriptionId));
+        LM_TMP(("NFY: Sub '%s' - no match due to tenant", subP->subscriptionId));
         continue;
       }
 
       if (subP->isActive == false)
       {
-        LM_TMP(("KZ: Sub '%s' - no match due to isActive == false", subP->subscriptionId));
+        LM_TMP(("NFY: Sub '%s' - no match due to isActive == false", subP->subscriptionId));
         continue;
       }
 
       if (strcmp(subP->status.c_str(), "active") != 0)
       {
-        LM_TMP(("KZ: Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
+        LM_TMP(("NFY: Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
         continue;
       }
 
       if (subP->expirationTime < orionldState.requestTime)
       {
-        LM_TMP(("KZ: Sub '%s' - no match due to expiration", subP->subscriptionId));
+        LM_TMP(("NFY: Sub '%s' - no match due to expiration", subP->subscriptionId));
         subP->status   = "expired";
         subP->isActive = false;
         continue;
@@ -220,7 +246,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       if ((subP->throttling > 0) && ((orionldState.requestTime - subP->lastNotificationTime) < subP->throttling))
       {
-        LM_TMP(("KZ: Sub '%s' - no match due to throttling", subP->subscriptionId));
+        LM_TMP(("NFY: Sub '%s' - no match due to throttling", subP->subscriptionId));
         continue;
       }
 

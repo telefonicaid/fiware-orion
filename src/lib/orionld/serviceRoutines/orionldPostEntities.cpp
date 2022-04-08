@@ -178,7 +178,7 @@ bool orionldPostEntities(void)
   //
   if (mongoEntityExists(entityId, orionldState.tenantP) == true)
   {
-    orionldError(OrionldAlreadyExists, "Entity already exists", entityId, SccConflict);
+    orionldError(OrionldAlreadyExists, "Entity already exists", entityId, 409);
     return false;
   }
 

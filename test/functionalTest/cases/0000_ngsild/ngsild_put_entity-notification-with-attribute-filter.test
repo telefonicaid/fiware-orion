@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update an entity using Real PATCH - subscription with attribute filter
+Update an entity using PUT Entity - subscription with attribute filter
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -33,7 +33,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 #
 # 01. Create an entity E1 with attributes P1-P5
 # 02. Create S1 - a matching subscription, with attribute filter on P1, P3, and P5
-# 03. PATCH E1, updating P1-P5
+# 03. PUT E1 with attributes P1-P5
 # 04. Dump accumulator - see only P1, P3, and P5
 #
 
@@ -77,16 +77,18 @@ echo
 echo
 
 
-echo "03. PATCH E1, updating P1-P5"
-echo "============================"
+echo "03. PUT E1 with attributes P1-P5"
+echo "================================"
 payload='{
+  "id": "urn:E1",
+  "type": "T",
   "P1": 31,
   "P2": 32,
   "P3": 33,
   "P4": 34,
   "P5": 35
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PUT --payload "$payload"
 echo
 echo
 
@@ -117,8 +119,8 @@ Date: REGEX(.*)
 
 
 
-03. PATCH E1, updating P1-P5
-============================
+03. PUT E1 with attributes P1-P5
+================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

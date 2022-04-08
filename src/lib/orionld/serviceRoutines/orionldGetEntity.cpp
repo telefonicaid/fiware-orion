@@ -39,9 +39,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -50,9 +47,10 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/mongoc/mongocRegistrationLookup.h"             // mongocRegistrationLookup
+#include "orionld/mongoc/mongocEntityRetrieve.h"                 // mongocEntityRetrieve
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
@@ -359,7 +357,6 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 
 
 
-// #define USE_MONGO_BACKEND 0
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntity -
@@ -394,49 +391,13 @@ bool orionldGetEntity(void)
   }
 
   if (forwarding)
-    regArray = dbRegistrationLookup(eId, NULL, NULL);
+    regArray = mongocRegistrationLookup(eId, NULL, NULL);
 
-#ifdef USE_MONGO_BACKEND
-  bool                      keyValues = orionldState.uriParamOptions.keyValues;
-  EntityId                  entityId(eId, "", "false", false);
-  QueryContextRequest       request;
-  QueryContextResponse      response;
-  std::vector<std::string>  servicePathV;
-
-  request.entityIdVector.push_back(&entityId);
-
-  orionldState.httpStatusCode = mongoQueryContext(&request,
-                                                  &response,
-                                                  orionldState.tenantP,
-                                                  servicePathV,
-                                                  NULL,
-                                                  orionldState.apiVersion);
-
-  if (response.errorCode.code == SccBadRequest)
-  {
-    //
-    // Not found in local, or some error
-    // Get Entity::Type and Entity::ID from the registration (if found)
-    // Add the forwardTree to the entity and return it
-    // If no registration found, retuirn 404 Not Found
-    //
-    LM_E(("ToDo: Implement this special case of entity not found in local BUT in registration"));
-    orionldError(OrionldBadRequestData, "Bad Request", NULL, 400);
-    return false;
-  }
-
-  // It's OK to not find the Entity in local - we still may find it in a Context Provider
-  if ((response.errorCode.code == SccOk) || (response.errorCode.code == 0))
-  {
-    // Create response by converting "QueryContextResponse response" into a KJson tree
-    orionldState.responseTree = kjTreeFromQueryContextResponse(true, keyValues, &response);
-  }
-#else
   bool attrsMandatory = false;
 
   //
-  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for dbEntityRetrieve
-  // Slightly modified as dbEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
+  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for mongocEntityRetrieve
+  // Slightly modified as mongocEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
   //
   char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrsList.items + 1));
 
@@ -463,17 +424,16 @@ bool orionldGetEntity(void)
       geometryProperty = (char*) "location";
   }
 
-  orionldState.responseTree = dbEntityRetrieve(eId,
-                                               eqAttrV,
-                                               attrsMandatory,
-                                               orionldState.uriParamOptions.sysAttrs,
-                                               orionldState.uriParamOptions.keyValues,
-                                               orionldState.uriParamOptions.concise,
-                                               orionldState.uriParams.datasetId,
-                                               geometryProperty,
-                                               &orionldState.geoPropertyNode,
-                                               orionldState.uriParams.lang);
-#endif
+  orionldState.responseTree = mongocEntityRetrieve(eId,
+                                                   eqAttrV,
+                                                   attrsMandatory,
+                                                   orionldState.uriParamOptions.sysAttrs,
+                                                   orionldState.uriParamOptions.keyValues,
+                                                   orionldState.uriParamOptions.concise,
+                                                   orionldState.uriParams.datasetId,
+                                                   geometryProperty,
+                                                   &orionldState.geoPropertyNode,
+                                                   orionldState.uriParams.lang);
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {

@@ -34,7 +34,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
-#include "orionld/mongoc/mongocConnectionRelease.h"              // mongocConnectionRelease
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocEntityReplace.h"                  // Own interface
 
@@ -71,7 +70,7 @@ bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId)
     LM_E(("mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
   }
 
-  mongocConnectionRelease();
+  // mongocConnectionRelease(); - done at the end of the request
 
   bson_destroy(&selector);
   bson_destroy(&replacement);
