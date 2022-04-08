@@ -427,13 +427,20 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
 //
 // A languageMap must be an object with all strings inside
 //
-bool languageMapCheck(KjNode* fieldP)
+bool languageMapCheck(KjNode* fieldP, const char* attrName)
 {
-  PCHECK_OBJECT(fieldP, 0, NULL, "A languageMap must be a JSON Object", 400);
+  PCHECK_OBJECT(fieldP, 0, "The languageMap of a LanguageProperty attribute must be a JSON Object", attrName, 400);
 
   for (KjNode* langItemP = fieldP->value.firstChildP; langItemP != NULL; langItemP = langItemP->next)
   {
-    PCHECK_STRING(langItemP, 0, NULL, "All languageMap items must be of the type JSON String", 400);
+    PCHECK_STRING(langItemP, 0, "Items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
+
+    // Check the key-value pair for either key or value EMPTY
+    if ((langItemP->name[0] == 0) || (langItemP->value.s[0] == 0))
+    {
+      orionldError(OrionldBadRequestData, "An item of the value (languageMap) of a LanguageProperty has an empty string", attrName, 400);
+      return false;
+    }
   }
 
   return true;
@@ -837,7 +844,7 @@ static bool pCheckAttributeObject
     }
     else if ((attributeType == LanguageProperty) && (strcmp(fieldP->name, "languageMap") == 0))
     {
-      if (languageMapCheck(fieldP) == false)
+      if (languageMapCheck(fieldP, attrP->name) == false)
         return false;
     }
     else if (strcmp(fieldP->name, "observedAt") == 0)

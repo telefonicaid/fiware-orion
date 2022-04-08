@@ -42,7 +42,7 @@ bool pcheckLanguagePropertyValue(KjNode* valueP, const char* attrName)
 {
   if (valueP->type != KjObject)
   {
-    orionldError(OrionldBadRequestData, "the languageMap of a LanguageProperty attribute must be a JSON Object", attrName, 400);
+    orionldError(OrionldBadRequestData, "The languageMap of a LanguageProperty attribute must be a JSON Object", attrName, 400);
     return false;
   }
 
@@ -50,13 +50,13 @@ bool pcheckLanguagePropertyValue(KjNode* valueP, const char* attrName)
   {
     if (itemP->type != KjString)
     {
-      orionldError(OrionldBadRequestData, "items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
+      orionldError(OrionldBadRequestData, "Items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
       return false;
     }
 
     if ((itemP->name[0] == 0) || (itemP->value.s[0] == 0))
     {
-      orionldError(OrionldBadRequestData, "an item of the value (languageMap) of a LanguageProperty is an empty string", attrName, 400);
+      orionldError(OrionldBadRequestData, "An item of the value (languageMap) of a LanguageProperty is an empty string", attrName, 400);
       return false;
     }
   }
