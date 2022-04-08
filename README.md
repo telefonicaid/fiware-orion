@@ -26,7 +26,7 @@ Note that the **NGSI-LD** [specification](https://www.etsi.org/deliver/etsi_gs/C
 is a living, changing document (version 1.5 as of June 2021), with features being continuously added at a pace such that it is not
 possible to align a context broker to the cutting edge specification for **NGSI-LD** implementation.
 
-> The latest release of Orion-LD is ([1.0.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.0.1) of January 2022)
+> The latest release of Orion-LD is [1.0.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.0.1) from January 2022
 
 This project is part of [FIWARE](https://www.fiware.org/). For more information check the FIWARE Catalogue entry for
 [Core Context](https://github.com/Fiware/catalogue/tree/master/core).
