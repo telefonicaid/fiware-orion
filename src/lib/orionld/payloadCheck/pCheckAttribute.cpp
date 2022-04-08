@@ -420,11 +420,24 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
-// FIXME - IMPLEMENT
+// languageMapCheck -
 //
-bool languageMapCheck(KjNode* fieldP) { return true; }
+// A languageMap must be an object with all strings inside
+//
+bool languageMapCheck(KjNode* fieldP)
+{
+  PCHECK_OBJECT(fieldP, 0, NULL, "A languageMap must be a JSON Object", 400);
+
+  for (KjNode* langItemP = fieldP->value.firstChildP; langItemP != NULL; langItemP = langItemP->next)
+  {
+    PCHECK_STRING(langItemP, 0, NULL, "All languageMap items must be of the type JSON String", 400);
+  }
+
+  return true;
+}
 
 
 
