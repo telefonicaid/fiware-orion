@@ -45,11 +45,11 @@ If you (at your own risk) want to evaluate the bleeding edge development changes
 `docker run fiware/orion-ld:latest` or even better: use
 [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
 
-If you instead want to use a more stable image, the latest beta release (as of June 2021) is
-[0.8.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/0.8.0)
+If you instead want to use a more stable image, the latest release (as of Jan 2022) is
+[1.0.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.0.1)
 
 ```console
-docker run fiware/orion-ld:0.8.0
+docker run fiware/orion-ld:1.0.1
 ```
 
 Please check [dockerhub](https://hub.docker.com/r/fiware/orion-ld/tags) for newer releases.
