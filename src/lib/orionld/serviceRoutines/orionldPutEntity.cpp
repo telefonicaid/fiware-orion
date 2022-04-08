@@ -213,7 +213,7 @@ static KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, con
   }
 
   //
-  // "lastCorrelator" ... not used in çNGSI-LD, but, for NGSIv2 backwards compatibility, it should be present in DB
+  // "lastCorrelator" ... not used in NGSI-LD, but, for NGSIv2 backwards compatibility, it should be present in DB
   //
   KjNode* lastCorrelatorP = kjString(orionldState.kjsonP,  "lastCorrelator", "");
   kjChildAdd(dbEntityP, lastCorrelatorP);

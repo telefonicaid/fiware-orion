@@ -35,20 +35,19 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
-#include "orionld/mongoc/mongocEntityReplace.h"                  // Own interface
+#include "orionld/mongoc/mongocEntityInsert.h"                   // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntityReplace -
+// mongocEntityInsert -
 //
-// For now, only PUT /entities/{entityId} uses this function
+// For now, only POST /entities uses this function
 //
-bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId)
+bool mongocEntityInsert(KjNode* dbEntityP, const char* entityId)
 {
-  bson_t selector;
-  bson_t replacement;
+  bson_t document;
   bson_t reply;
 
   mongocConnectionGet();  // mongocConnectionGet(MONGO_ENTITIES) - do the mongoc_client_get_collection also
@@ -56,24 +55,21 @@ bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId)
   if (orionldState.mongoc.entitiesP == NULL)
     orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
 
-  bson_init(&selector);
-  bson_init(&replacement);
+  bson_init(&document);
   bson_init(&reply);
 
-  bson_append_utf8(&selector, "_id.id", 6, entityId, -1);
-  mongocKjTreeToBson(dbEntityP, &replacement);
+  mongocKjTreeToBson(dbEntityP, &document);
 
-  bool b = mongoc_collection_replace_one(orionldState.mongoc.entitiesP, &selector, &replacement, NULL, &reply, &orionldState.mongoc.error);
+  bool b = mongoc_collection_insert_one(orionldState.mongoc.entitiesP, &document, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;
-    LM_E(("mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
+    LM_E(("mongoc error inserting entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
   }
 
   // mongocConnectionRelease(); - done at the end of the request
 
-  bson_destroy(&selector);
-  bson_destroy(&replacement);
+  bson_destroy(&document);
   bson_destroy(&reply);
 
   return b;

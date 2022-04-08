@@ -68,14 +68,24 @@ extern "C"
 //
 //   * Sub-Attribute Level (dbModelSubAttribute)
 //
-bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP)
+//
+// The order of the items of an entity in the database (NGSIv1 database model) is:
+//
+//   * _id
+//   * attrNames
+//   * attrs (if present)
+//   * creDate
+//   * modDate
+//   * lastCorrelator
+//
+bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP, bool creation)
 {
   KjNode*      nodeP;
   const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "creDate", "modDate" };
 
   //
-  // Remove any non-attribute nodes
-  // PATCH-able toplevel fields (type? scope?) would need to be removed and saved. Later reintroduced into entityP
+  // Remove any non-attribute nodes from the incoming tree (entityP)
+  // PATCH-able toplevel fields (type? scope?) would need to be removed and saved. Later reintroduce into entityP
   //
   for (unsigned int ix = 0; ix < sizeof(mustGo) / sizeof(mustGo[0]); ix++)
   {
@@ -93,9 +103,26 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   attrsP->value.firstChildP = entityP->value.firstChildP;
   attrsP->lastChild         = entityP->lastChild;
 
-  // Make "attrs" the only child (thus far) of entityP
-  entityP->value.firstChildP  = attrsP;
-  entityP->lastChild          = attrsP;
+  // Empty entityP
+  entityP->value.firstChildP = NULL;
+  entityP->lastChild         = NULL;
+
+
+  //
+  // Add to entityP:
+  // - First "attrNames" (.added)
+  // - Then "attrs"
+  //
+  KjNode* attrAddedV = kjArrayAdd(entityP, ".added");
+  kjChildAdd(entityP, attrsP);
+
+  // Not really necessary?   - RHS == null already tells the next layer ... ?
+  KjNode* attrRemovedV = kjArrayAdd(entityP, ".removed");
+
+  if (creation == true)
+    kjTimestampAdd(entityP, "creDate");
+  kjTimestampAdd(entityP, "modDate");
+
 
   // Rename "attrNames" to ".names" and add it to the entity
   if (dbAttrNamesP == NULL)
@@ -106,13 +133,8 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   else
     dbAttrNamesP->name = (char*) ".names";
 
-  // Now we can add "attrNames"
+  // Add "attrNames" to the entity
   kjChildAdd(entityP, dbAttrNamesP);
-
-  // Adding members necessary for the DB Model
-  kjTimestampAdd(entityP, "modDate");
-  KjNode* attrAddedV   = kjArrayAdd(entityP, ".added");
-  KjNode* attrRemovedV = kjArrayAdd(entityP, ".removed");  // Not really necessary ... the RHS == null already tells the next layer
 
   //
   // Loop over the "attrs" member of entityP and call dbModelFromApiAttribute for every attribute
@@ -133,6 +155,21 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     }
 
     attrP = next;
+  }
+
+  if (creation == true)
+  {
+    attrAddedV->name = (char*) "attrNames";
+    kjChildRemove(entityP, attrRemovedV);
+    kjChildRemove(entityP, dbAttrNamesP);
+
+    //
+    // "lastCorrelator" ... not used in NGSI-LD, but, for NGSIv2 backwards compatibility, it should be present in DB
+    //
+    KjNode* lastCorrelatorP = kjString(orionldState.kjsonP,  "lastCorrelator", "");
+    kjChildAdd(entityP, lastCorrelatorP);
+
+    // _id ...
   }
 
   return true;

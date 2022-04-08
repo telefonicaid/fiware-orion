@@ -207,44 +207,44 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/B1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : false,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
 			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "urn:E1",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		}
 	},
@@ -285,47 +285,47 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 2,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"P3" : "is",
 				"a" : "compound"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/B1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : true,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
 			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "urn:E2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/F1" : {
@@ -418,52 +418,52 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 2,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"P3" : "is",
 				"a" : "compound"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : [
 				"P4",
 				"is",
 				"an",
 				"Array"
 			],
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/B1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : true,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
 			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "urn:E2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/F1" : {
@@ -573,38 +573,38 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "2",
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"P3" : "is",
 				"a" : "compound"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : [
 				"P4",
 				"is",
 				"an",
 				"Array"
 			],
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/B1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : true,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/F1" : {

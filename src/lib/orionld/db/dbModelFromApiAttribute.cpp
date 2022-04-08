@@ -111,7 +111,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   KjNode*  mdAddedP     = NULL;
   KjNode*  mdRemovedP   = NULL;
   KjNode*  mdNamesP     = NULL;
-  KjNode*  dbAttrP      = kjLookup(dbAttrsP, attrEqName);
+  KjNode*  dbAttrP      = (dbAttrsP != NULL)? kjLookup(dbAttrsP, attrEqName) : NULL;
   KjNode*  dbMdP        = NULL;
 
   if (dbAttrP == NULL)  // Attribute does not already exist
@@ -192,6 +192,11 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     next = subP->next;
 
     subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
+
+    // Add the name of the sub-attribute to the "mdNames" array
+    KjNode* mdNameP = kjString(orionldState.kjsonP, NULL, subP->name);
+    kjChildAdd(mdNamesP, mdNameP);
+
     if (dbModelFromApiSubAttribute(subP, dbMdP, mdAddedP, mdRemovedP, &ignore) == false)
       return false;
 

@@ -102,9 +102,9 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		}
 	},
@@ -139,9 +139,9 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [
 				"https://uri.etsi.org/ngsi-ld/default-context/P1-1",
 				"https://uri.etsi.org/ngsi-ld/default-context/P1-2"

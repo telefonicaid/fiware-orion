@@ -147,23 +147,23 @@ MongoDB server version: REGEX(.*)4.4.13
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 1,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 2,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 3,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		}
 	},
@@ -200,23 +200,23 @@ MongoDB server version: REGEX(.*)4.4.13
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 31,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 32,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 33,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
 			"mdNames" : [ ]
 		}
 	},
