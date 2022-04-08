@@ -90,5 +90,5 @@ Documentation:
 -   [External Libraries](doc/manuals-ld/external-libraries.md)
 -   [Temporal Representation](doc/manuals-ld/troe.md)
 -   [The Broker as Context Server](doc/manuals-ld/contextServer.md)
-
+-   [State of the Implementation](doc/manuals-ld/implementationState.md)
 A Test Suite for **NGSI-LD** can be found [here](https://github.com/fiware/NGSI-LD_Tests).

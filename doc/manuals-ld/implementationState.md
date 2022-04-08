@@ -1,0 +1,150 @@
+# State of the Implementation
+
+## Features that may or not be implemented by the Service Routines (API endpoints)
+All Services:
+* Use of the *new C driver "mongoc"* vs the _deprecated MongoDB Lecacy C++ driver_
+
+Entity Services:
+* Support of *LanguageProperty*
+* *Forwarding*, as of NGSI-LD API spec 1.6 (due summer 2022)
+* Support for *Multi-Attributes* (datasetId)
+
+Entity-updating services:
+* Notifications - *native NGSI-LD* vs _old mongoBackend_
+* *TRoE* - Temporal Representation of Entities
+
+Features that are implemented by all services, like _Concise Representation_, etc, are not mentioned in this document.
+This document is a guide to what is missing, not what has been implemented.
+
+## Stuff that differ from the NGSI-LD API
+### Relationships
+According to the NGSI-LD API, a Relationship must be a String that is a valid URI.
+However, there is a demand to have an Array of URIs, e.g.:
+```
+  "cousins": {
+    "type": "Relationship",
+    "object": [
+      "urn:ngsi-ld:people:PeterX",
+      "urn:ngsi-ld:people:PietroX",
+      "urn:ngsi-ld:people:PedroX",
+      ...
+    ]
+  }
+```
+While it is true that the same effect can be achived (well, not really the same) using the Multi-Attribute concept (datasetId),
+that *is not* what our users are asking for. It's merely a "workaround" for them to have the array of relationships.
+Orion-LD doesn't really implement Multi-Attribute and it's going to take quite some time for that feature to be supported (if ever).
+So, until the Multi-Attribute concept is fully supported, Orion-LD accepts Array as "object" for a Relationship Attribute.
+
+_I implemented it that way by mistake as I thought it made a lot of sense to have a Relationshiup as an array of URIs.
+Then I got users (a European project) using the feature and it was too late to remove it._
+
+## Other critical stuff that need to be implemented
+* Memory management for containers
+* Safe connection to MongoDB Server (-dbSSL and -dbAuthDb CLI arguments that Orion now implements)
+* Subscription matching for Notification directly on DB (the matching are done on the Subscription Cache)
+* Complete rewrite of the Subscription Cache and especially how brokers on the same DB communicate.
+  Right now, the communication is done via the database and that is ... well, the wasiest possible way, but also
+  the *worst possible way*
+* Registration Cache
+* Perhaps even an Entity Cache?
+
+## Extra Stuff that Orion-LD supports but that may never enter the NGSI-LD API
+### Cross Notifications
+### POST /ngsi-ld/ex/v1/notify
+  The ability to receive notifications from an NGSI-LD Broker and treat the notification as a BATCH Upsert.
+  This feature allows a Broker to subscribe to information from other brokers and keep its own copy of that information.
+  A typical use case is for treatment of the information by other GEs like Cosmos, or Perseo, that need the information in the local
+  database.
+
+### GET /ngsi-ld/ex/v1/version
+  Retrieve version information specific to the NGSI-LD API.
+  The old NGSI /version is of course supported as well: `GET /version`
+
+### GET /ngsi-ld/ex/v1/ping
+### GET /ngsi-ld/ex/v1/tenants
+  Retrieve a list of the current tenants - used for debugging purposes
+
+### GET /ngsi-ld/ex/v1/dbIndexes
+  Retrieve a list of the current database indices - used for debugging purposes
+
+## Implementation state of Services (API Endpoints)
+
+### POST /ngsi-ld/v1/entities
+Creation of an entity. If the entity in question already exists (depending on the "id" field in the payload body), then a `409 Conflict`
+is returned.
+#### Done
+  * TRoE is fully working
+  * LanguageProperty attributes are supported
+  * Multi-attributes are supported
+
+#### Missing
+  * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
+  * Notifications are supported but, that's part of mongoBackend and needs a rewrite
+  * Forwarding - the old NGSIv2 style forwarding has been disabled
+
+### GET /ngsi-ld/v1/entities
+#### Done
+  * LanguageProperty attributes are supported
+
+#### Missing
+  * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
+  * Multi-attributes are supported
+  * Forwarding - the old NGSIv2 style forwarding has been disabled
+
+###
+
+
+--------------------------------------------------------------
+### GET /ngsi-ld/v1/entities/*
+### PATCH /ngsi-ld/v1/entities/*
+### PUT /ngsi-ld/v1/entities/*
+### DELETE /ngsi-ld/v1/entities/*
+
+### POST /ngsi-ld/v1/entities/*/attrs
+### PATCH /ngsi-ld/v1/entities/*/attrs
+
+### PATCH /ngsi-ld/v1/entities/*/attrs/*
+### DELETE /ngsi-ld/v1/entities/*/attrs/*
+
+### POST /ngsi-ld/v1/entityOperations/create
+### POST /ngsi-ld/v1/entityOperations/upsert
+### POST /ngsi-ld/v1/entityOperations/update
+### POST /ngsi-ld/v1/entityOperations/delete
+### POST /ngsi-ld/v1/entityOperations/query
+
+### GET /ngsi-ld/v1/types
+### GET /ngsi-ld/v1/types/*
+
+### GET /ngsi-ld/v1/attributes
+### GET /ngsi-ld/v1/attributes/*
+
+### POST /ngsi-ld/v1/subscriptions
+### GET /ngsi-ld/v1/subscriptions
+
+### GET /ngsi-ld/v1/subscriptions/*
+### PATCH /ngsi-ld/v1/subscriptions/*
+### DELETE /ngsi-ld/v1/subscriptions/*
+
+### POST /ngsi-ld/v1/csourceRegistrations
+### GET /ngsi-ld/v1/csourceRegistrations
+
+### PATCH /ngsi-ld/v1/csourceRegistrations/*
+### GET /ngsi-ld/v1/csourceRegistrations/*
+### DELETE /ngsi-ld/v1/csourceRegistrations/*
+
+### POST /ngsi-ld/v1/jsonldContexts
+### GET /ngsi-ld/v1/jsonldContexts
+
+### GET /ngsi-ld/v1/jsonldContexts/*
+### DELETE /ngsi-ld/v1/jsonldContexts/*
+
+### GET /ngsi-ld/v1/temporal/entities
+### GET /ngsi-ld/v1/temporal/entities/*
+
+### POST   /ngsi-ld/v1/temporal/entityOperations/query
+### POST   /ngsi-ld/v1/temporal/entities
+### DELETE /ngsi-ld/v1/temporal/entities/*
+### POST   /ngsi-ld/v1/temporal/entities/*/attrs
+### DELETE /ngsi-ld/v1/temporal/entities/*/attrs/*
+### PATCH  /ngsi-ld/v1/temporal/entities/*/attrs/*/*
