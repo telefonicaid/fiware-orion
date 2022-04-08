@@ -167,9 +167,14 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 25,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"observedAt",
+				"unitCode",
+				"https://uri.etsi.org/ngsi-ld/default-context/PP"
+			],
 			"md" : {
 				"observedAt" : {
 					"value" : 1646698440.001
@@ -178,17 +183,14 @@ MongoDB server version: REGEX(.*)
 					"value" : "Celsius"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/PP" : {
-					"createdAt" : REGEX(.*),
-					"modifiedAt" : REGEX(.*),
+					"observedAt" : "2022-03-08T00:14:00.002Z",
+					"unitCode" : "Fahrenheit",
+					"value" : 77,
 					"type" : "Property",
-					"value" : 77
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
 				}
-			},
-			"mdNames" : [
-				"observedAt",
-				"unitCode",
-				"https://uri.etsi.org/ngsi-ld/default-context/PP"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -201,7 +203,7 @@ bye
 03. GET E1
 ==========
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 222
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -209,7 +211,9 @@ Date: REGEX(.*)
 {
     "P": {
         "PP": {
+            "observedAt": "2022-03-08T00:14:00.002Z",
             "type": "Property",
+            "unitCode": "Fahrenheit",
             "value": 77
         },
         "observedAt": "2022-03-08T00:14:00.001Z",
@@ -246,9 +250,14 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : 78,
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"observedAt",
+				"unitCode",
+				"https://uri.etsi.org/ngsi-ld/default-context/PP"
+			],
 			"md" : {
 				"observedAt" : {
 					"value" : 1646698500.444
@@ -257,19 +266,14 @@ MongoDB server version: REGEX(.*)
 					"value" : "Fahrenheit"
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/PP" : {
-					"createdAt" : REGEX(.*),
-					"modifiedAt" : REGEX(.*),
-					"type" : "Property",
-					"value" : 26,
 					"observedAt" : "2022-03-08T00:15:00.002Z",
-					"unitCode" : "Celsius"
+					"unitCode" : "Celsius",
+					"value" : 26,
+					"type" : "Property",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
 				}
-			},
-			"mdNames" : [
-				"observedAt",
-				"unitCode",
-				"https://uri.etsi.org/ngsi-ld/default-context/PP"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),

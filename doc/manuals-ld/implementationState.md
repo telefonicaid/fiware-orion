@@ -110,9 +110,9 @@ To test it, Orion-LD must be started with the CLI parameter `-experimental`.
 #### Done in new implementation
   * Uses the new mongoc driver
   * LanguageProperty attributes are supported
+  * TRoE is implemented
 
 #### Missing in new implementation
-  * TRoE is implemented just not tested
   * Multi-attributes
   * Notifications
   * Forwarding
@@ -135,9 +135,10 @@ To test it, Orion-LD must be started with the CLI parameter `-experimental`.
   * Uses the new mongoc driver
   * LanguageProperty attributes are supported
   * Multi-attributes are supported
+  * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
 
 #### Missing
-  * Forwarding
+  * Forwarding 100% according to the version 1.6 of the NGSI-LD API spec
 
 
 ### PATCH /ngsi-ld/v1/entities/*
@@ -167,6 +168,19 @@ This service is experimental and is only in place when Orion-LD is started with 
   * LanguageProperty attributes
   * TRoE
 
+
+### PATCH /ngsi-ld/v1/entities/*/attrs/*
+
+#### Done
+  * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
+  * TRoE
+  * Notifications - using the Legacy driver
+
+## Missing
+  * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
+  * Multi-attributes
+  * LanguageProperty attributes
+
 ------ TBI --------------------------------------------------------
 
 ### DELETE /ngsi-ld/v1/entities/*
@@ -174,7 +188,6 @@ This service is experimental and is only in place when Orion-LD is started with 
 ### POST /ngsi-ld/v1/entities/*/attrs
 ### PATCH /ngsi-ld/v1/entities/*/attrs
 
-### PATCH /ngsi-ld/v1/entities/*/attrs/*
 ### DELETE /ngsi-ld/v1/entities/*/attrs/*
 
 ### POST /ngsi-ld/v1/entityOperations/create
