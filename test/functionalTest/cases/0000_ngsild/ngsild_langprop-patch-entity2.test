@@ -229,13 +229,13 @@ Date: REGEX(.*)
 06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 136
+Content-Length: 199
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "A languageMap must be a JSON Object",
-    "title": "Not a JSON Object",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -243,13 +243,13 @@ Date: REGEX(.*)
 07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 154
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "All languageMap items must be of the type JSON String",
-    "title": "Not a JSON String",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+    "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
