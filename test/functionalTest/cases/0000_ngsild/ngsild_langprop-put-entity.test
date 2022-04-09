@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Patch of a language property
+Entity PUT of a language property
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -33,11 +33,11 @@ brokerStart CB 0-255 IPv4 -experimental
 #
 # 01. POST /ngsi-ld/v1/entities with a language property L
 # 02. See the entity in the database
-# 03. PATCH the entity, changing L:es to 'Castellano'
+# 03. PUT the entity, changing L:es to 'Castellano'
 # 04. See the entity in the database - make sure L:es is 'Castellano'
 # 05. GET entity in Normalized form
-# 06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
-# 07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
+# 06. Attempt to PUT the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
+# 07. Attempt to PUT the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
 #
 
 echo "01. POST /ngsi-ld/v1/entities with a language property L"
@@ -65,16 +65,19 @@ echo
 echo
 
 
-echo "03. PATCH the entity, changing L:es to 'Castellano'"
-echo "==================================================="
+echo "03. PUT the entity, changing L:es to 'Castellano'"
+echo "================================================="
 payload='{
+  "type": "T",
   "L": {
     "languageMap": {
-      "es": "Castellano"
+      "en": "English",
+      "es": "Castellano",
+      "sv": "Swedish"
     }
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PUT --payload "$payload"
 echo
 echo
 
@@ -93,28 +96,34 @@ echo
 echo
 
 
-echo "06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error"
-echo "============================================================================================="
+echo "06. Attempt to PUT the RHS of L:languageMap to a non-object, e.g. the number 13 - see error"
+echo "==========================================================================================="
 payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
   "L": {
     "languageMap": 13
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PUT --payload "$payload"
 echo
 echo
 
 
-echo "07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error"
-echo "================================================================================================"
+echo "07. Attempt to PUT the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error"
+echo "=============================================================================================="
 payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
   "L": {
     "languageMap": {
-      "es": 14
+      "en": "English",
+      "es": 14,
+      "sv": "Swedish"
     }
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PUT --payload "$payload"
 echo
 echo
 
@@ -163,8 +172,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. PATCH the entity, changing L:es to 'Castellano'
-===================================================
+03. PUT the entity, changing L:es to 'Castellano'
+=================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
@@ -186,15 +195,15 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
-			"type" : "LanguageProperty",
 			"value" : {
 				"en" : "English",
 				"es" : "Castellano",
 				"sv" : "Swedish"
 			},
-			"modDate" : REGEX(.*),
+			"type" : "LanguageProperty",
+			"mdNames" : [ ],
 			"creDate" : REGEX(.*),
-			"mdNames" : [ ]
+			"modDate" : REGEX(.*)
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -226,8 +235,8 @@ Date: REGEX(.*)
 }
 
 
-06. Attempt to PATCH the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
-=============================================================================================
+06. Attempt to PUT the RHS of L:languageMap to a non-object, e.g. the number 13 - see error
+===========================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 199
 Content-Type: application/json
@@ -240,8 +249,8 @@ Date: REGEX(.*)
 }
 
 
-07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
-================================================================================================
+07. Attempt to PUT the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
+==============================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 201
 Content-Type: application/json

@@ -60,6 +60,6 @@ extern "C"
 //
 //   * Sub-Attribute Level (dbModelSubAttribute)
 //
-extern bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP);
+extern bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP, bool creation);
 
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELFROMAPIENTITY_H_

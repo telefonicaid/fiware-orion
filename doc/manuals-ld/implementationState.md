@@ -84,18 +84,38 @@ Then I got users (a European project) using the feature and it was too late to r
 
 
 ### POST /ngsi-ld/v1/entities
-Creation of an entity.  
+Creation of an entity.
 If the entity in question already exists (depending on the "id" field in the payload body),
 then a `409 Conflict` is returned.
-#### Done
+
+There are two different implementations of this API endpoint.
+- The old one that uses mongoBackend and thus the deprecated MongoDB Legacy C++ driver
+- A new one that uses the new mongoc driver
+
+The old implementation supports everything but Forwarding (well, apart from using the old Legacy driver ...)
+and is used by default by Orion-LD.  
+The new implementation is just that, brand new (as of April 8 2022).
+To test it, Orion-LD must be started with the CLI parameter `-experimental`.
+
+#### Done in old implementation
   * TRoE is fully working
   * LanguageProperty attributes are supported
   * Multi-attributes are supported
 
-#### Missing
+#### Missing in old implementation
   * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
   * Notifications are supported but, that's part of mongoBackend and needs a rewrite
   * Forwarding - the old NGSIv2 style forwarding has been disabled
+
+#### Done in new implementation
+  * Uses the new mongoc driver
+  * LanguageProperty attributes are supported
+  * TRoE is implemented
+
+#### Missing in new implementation
+  * Multi-attributes
+  * Notifications
+  * Forwarding
 
 
 ### GET /ngsi-ld/v1/entities
@@ -115,13 +135,14 @@ then a `409 Conflict` is returned.
   * Uses the new mongoc driver
   * LanguageProperty attributes are supported
   * Multi-attributes are supported
+  * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
 
 #### Missing
-  * Forwarding
+  * Forwarding 100% according to the version 1.6 of the NGSI-LD API spec
 
 
 ### PATCH /ngsi-ld/v1/entities/*
-This service is experimental and is only in place when Orion-LD is started with the `-experimental` CLI option.
+This service is experimental and is only in place when Orion-LD is started with the `-experimental` CLI parameter.
 
 #### Done
   * Uses the new mongoc driver
@@ -135,7 +156,7 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 
 ### PUT /ngsi-ld/v1/entities/*
-This service is experimental and is only in place when Orion-LD is started with the `-experimental` CLI option.
+This service is experimental and is only in place when Orion-LD is started with the `-experimental` CLI parameter.
 
 #### Done
   * Uses the new mongoc driver
@@ -147,6 +168,19 @@ This service is experimental and is only in place when Orion-LD is started with 
   * LanguageProperty attributes
   * TRoE
 
+
+### PATCH /ngsi-ld/v1/entities/*/attrs/*
+
+#### Done
+  * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
+  * TRoE
+  * Notifications - using the Legacy driver
+
+## Missing
+  * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
+  * Multi-attributes
+  * LanguageProperty attributes
+
 ------ TBI --------------------------------------------------------
 
 ### DELETE /ngsi-ld/v1/entities/*
@@ -154,7 +188,6 @@ This service is experimental and is only in place when Orion-LD is started with 
 ### POST /ngsi-ld/v1/entities/*/attrs
 ### PATCH /ngsi-ld/v1/entities/*/attrs
 
-### PATCH /ngsi-ld/v1/entities/*/attrs/*
 ### DELETE /ngsi-ld/v1/entities/*/attrs/*
 
 ### POST /ngsi-ld/v1/entityOperations/create

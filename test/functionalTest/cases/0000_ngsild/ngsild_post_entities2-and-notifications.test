@@ -1,0 +1,216 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation with a language property and a notification
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription for entity id urn:E1
+# 02. Create an entity urn:E1 with a language property L
+# 03. See entity in DB
+# 04. Dump accumulator, see one notification
+#
+
+echo "01. Create a subscription for entity id urn:E1"
+echo "=============================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:testsubscription",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity urn:E1 with a language property L"
+echo "======================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "L": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "English",
+      "es": "Castellano",
+      "sv": "Svenska"
+    },
+    "observedAt": "2022-04-01T18:07:00.987Z",
+    "Sub-P": 1,
+    "Sub-R": { "object": "urn:E2" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. See entity in DB"
+echo "===================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "04. Dump accumulator, see one notification"
+echo "=========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription for entity id urn:E1
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. Create an entity urn:E1 with a language property L
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:E1
+Date: REGEX(.*)
+
+
+
+03. See entity in DB
+====================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
+			"type" : "LanguageProperty",
+			"value" : {
+				"en" : "English",
+				"es" : "Castellano",
+				"sv" : "Svenska"
+			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/Sub-P",
+				"https://uri.etsi.org/ngsi-ld/default-context/Sub-R"
+			],
+			"md" : {
+				"observedAt" : {
+					"value" : 1648836420.987
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Sub-P" : {
+					"type" : "Property",
+					"value" : 1,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Sub-R" : {
+					"value" : "urn:E2",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+04. Dump accumulator, see one notification
+==========================================
+POST REGEX(.*)
+Content-Length: 453
+User-Agent: orionld
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "data": [
+        {
+            "L": {
+                "Sub-P": {
+                    "type": "Property",
+                    "value": 1
+                },
+                "Sub-R": {
+                    "object": "urn:E2",
+                    "type": "Relationship"
+                },
+                "languageMap": {
+                    "en": "English",
+                    "es": "Castellano",
+                    "sv": "Svenska"
+                },
+                "observedAt": "2022-04-01T18:07:00.987Z",
+                "type": "LanguageProperty"
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:testsubscription",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

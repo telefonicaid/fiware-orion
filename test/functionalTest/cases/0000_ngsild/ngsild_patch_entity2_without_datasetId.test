@@ -400,13 +400,17 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"v1" : "P1:v1-Step01: to-be-changed",
 				"v2" : "P1:v2-Step01: to-stay",
 				"v3" : "P1:v3-Step01: to-be-removed"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"observedAt",
+				"unitCode"
+			],
 			"md" : {
 				"observedAt" : {
 					"value" : 1645724700.001
@@ -414,11 +418,7 @@ MongoDB server version: REGEX(.*)
 				"unitCode" : {
 					"value" : "step1"
 				}
-			},
-			"mdNames" : [
-				"observedAt",
-				"unitCode"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -476,21 +476,21 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"v1" : "P1:v1-Step04: changed",
 				"v2" : "P1:v2-Step01: to-stay",
 				"v4" : "P1:v4-Step04: added"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"unitCode"
+			],
 			"md" : {
 				"unitCode" : {
 					"value" : "step4"
 				}
-			},
-			"mdNames" : [
-				"unitCode"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -547,14 +547,18 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"v1" : "P1:v1-Step04: changed",
 				"v2" : "P1:v2-Step01: to-stay",
 				"v4" : "P1:v4-Step04: added",
 				"v7" : "P1:v7-Step07: added"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			],
 			"md" : {
 				"unitCode" : {
 					"value" : "step7"
@@ -562,11 +566,7 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1646008680.007
 				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -626,14 +626,18 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"v1" : "P1:v1-Step04: changed",
 				"v2" : "P1:v2-Step01: to-stay",
 				"v4" : "P1:v4-Step04: added",
 				"v7" : "P1:v7-Step07: added"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			],
 			"md" : {
 				"unitCode" : {
 					"value" : "step7"
@@ -641,11 +645,7 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1646008680.007
 				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt"
-			]
+			}
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
 			"type" : "Relationship",
@@ -715,14 +715,18 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"v1" : "P1:v1-Step04: changed",
 				"v2" : "P1:v2-Step01: to-stay",
 				"v4" : "P1:v4-Step04: added",
 				"v7" : "P1:v7-Step07: added"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			],
 			"md" : {
 				"unitCode" : {
 					"value" : "step7"
@@ -730,11 +734,7 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1646008680.007
 				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -793,14 +793,19 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"v1" : "P1:v1-Step04: changed",
 				"v2" : "P1:v2-Step01: to-stay",
 				"v4" : "P1:v4-Step04: added",
 				"v7" : "P1:v7-Step07: added"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"unitCode",
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/R1"
+			],
 			"md" : {
 				"unitCode" : {
 					"value" : "step7"
@@ -814,12 +819,7 @@ MongoDB server version: REGEX(.*)
 					"createdAt" : REGEX(.*),
 					"modifiedAt" : REGEX(.*)
 				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt",
-				"https://uri.etsi.org/ngsi-ld/default-context/R1"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),

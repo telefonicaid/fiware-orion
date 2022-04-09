@@ -171,35 +171,35 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
 			"type" : "LanguageProperty",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"en" : "el",
 				"es" : "ele",
 				"sv" : "ell"
 			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/Sub-P",
+				"https://uri.etsi.org/ngsi-ld/default-context/Sub-R"
+			],
 			"md" : {
 				"observedAt" : {
 					"value" : 1648836420.987
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/Sub-P" : {
-					"createdAt" : REGEX(.*),
-					"modifiedAt" : REGEX(.*),
 					"type" : "Property",
-					"value" : 1
+					"value" : 1,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/Sub-R" : {
-					"createdAt" : REGEX(.*),
-					"modifiedAt" : REGEX(.*),
+					"value" : "urn:E2",
 					"type" : "Relationship",
-					"value" : "urn:E2"
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
 				}
-			},
-			"mdNames" : [
-				"observedAt",
-				"https://uri.etsi.org/ngsi-ld/default-context/Sub-P",
-				"https://uri.etsi.org/ngsi-ld/default-context/Sub-R"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),

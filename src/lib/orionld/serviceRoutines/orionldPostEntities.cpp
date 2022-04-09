@@ -38,7 +38,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjRender.h"                                      // kjRender - TMP
+#include "kjson/kjRender.h"                                      // kjFastRender - TMP
 #include "kjson/kjClone.h"                                       // kjClone
 }
 
@@ -51,6 +51,8 @@ extern "C"
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
+#include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, NoAttributeType
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
@@ -66,8 +68,9 @@ extern "C"
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
-#include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
+#include "orionld/db/dbModelFromApiEntity.h"                     // dbModelFromApiEntity
+#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
+#include "orionld/mongoc/mongocEntityInsert.h"                   // mongocEntityInsert
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
 
 
@@ -160,9 +163,9 @@ static KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attribute
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostEntities -
+// orionldPostEntitiesWithMongoBackend -
 //
-bool orionldPostEntities(void)
+bool orionldPostEntitiesWithMongoBackend(void)
 {
   char*    entityId;
   char*    entityType;
@@ -358,6 +361,122 @@ bool orionldPostEntities(void)
 
   orionldState.httpStatusCode = 201;
 
+  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId);
+
+  if (cloneForTroeP != NULL)
+    orionldState.requestTree = cloneForTroeP;
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldPostEntities -
+//
+bool orionldPostEntities(void)
+{
+  if (experimental == false)                       // Some day ...
+    return orionldPostEntitiesWithMongoBackend();  // ... this will be removed!! :)
+
+  char*    entityId;
+  char*    entityType;
+
+  PCHECK_OBJECT(orionldState.requestTree, 0, NULL, "To create an Entity, a JSON OBJECT describing the entity must be provided", 400);
+
+  if (pCheckEntityId(orionldState.payloadIdNode,     true, &entityId)   == false)   return false;
+  if (pCheckEntityType(orionldState.payloadTypeNode, true, &entityType) == false)   return false;
+
+
+  //
+  // If the entity already exists, an error is returned
+  //
+  if (mongocEntityLookup(entityId) != NULL)
+  {
+    orionldError(OrionldAlreadyExists, "Entity already exists", entityId, 409);
+    return false;
+  }
+
+  //
+  // NOTE
+  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   from the payload body, so, the entity type is not expanded by pCheckEntity()
+  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
+  //
+
+  //
+  // Check and fix the incoming payload (entity)
+  //
+  if (pCheckEntity(orionldState.requestTree, false, NULL) == false)
+    return false;
+
+  // dbModelFromApiEntity destroys the tree, need to make a copy for notifications
+  KjNode* apiEntityP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
+  // Entity id and type was removed - they need to go back
+  orionldState.payloadIdNode->next   = orionldState.payloadTypeNode;
+  orionldState.payloadTypeNode->next = apiEntityP->value.firstChildP;
+  apiEntityP->value.firstChildP      = orionldState.payloadIdNode;
+
+
+  //
+  // The current shape of the incoming tree is now fit for TRoE, while it still needs to be adjusted for mongo,
+  // If TRoE is enable we clone it here, for later use in TRoE processing
+  //
+  KjNode* cloneForTroeP = NULL;
+  if (troe)
+    cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // Must I clone this one?
+
+
+  if (dbModelFromApiEntity(orionldState.requestTree, NULL, NULL, true) == false)
+  {
+    orionldError(OrionldInternalError, "Out of memory?", "Need more info here", 500);
+    return false;
+  }
+  KjNode* dbEntityP = orionldState.requestTree;  // More adecuate to talk about DB-Entity from here on
+
+  //
+  // Put Entity ID and TYPE back - inside _id as first members of the tree
+  //
+  KjNode* _idNodeP         = kjObject(orionldState.kjsonP, "_id");
+  KjNode* entityIdNodeP    = kjString(orionldState.kjsonP, "id",          entityId);
+  KjNode* entityTypeNodeP  = kjString(orionldState.kjsonP, "type",        entityType);
+  KjNode* servicePathNodeP = kjString(orionldState.kjsonP, "servicePath", "/");  // NGSIv2 backwards compatibility
+
+  // Insert the three in _idNodeP
+  entityIdNodeP->next          = entityTypeNodeP;
+  entityTypeNodeP->next        = servicePathNodeP;
+  servicePathNodeP->next       = NULL;
+  _idNodeP->value.firstChildP  = entityIdNodeP;
+  _idNodeP->lastChild          = servicePathNodeP;
+
+  // "Chain-in" _idNodeP as 1st member of dbEntityP
+  _idNodeP->next               = dbEntityP->value.firstChildP;
+  dbEntityP->value.firstChildP = _idNodeP;
+
+  // Ready to send it to the database
+  if (mongocEntityInsert(dbEntityP, entityId) == false)
+  {
+    orionldError(OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
+    return false;
+  }
+
+  //
+  // Prepare for notifications
+  //
+  orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+  orionldState.alterations->entityId          = entityId;
+  orionldState.alterations->entityType        = entityType;
+  orionldState.alterations->patchTree         = NULL;
+  orionldState.alterations->dbEntityP         = NULL;
+  orionldState.alterations->patchedEntity     = apiEntityP;  // entity id, createdAt, modifiedAt ...
+  orionldState.alterations->alteredAttributes = 0;
+  orionldState.alterations->alteredAttributeV = NULL;
+  orionldState.alterations->next              = NULL;
+
+  // All good
+  orionldState.httpStatusCode = 201;
   httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId);
 
   if (cloneForTroeP != NULL)

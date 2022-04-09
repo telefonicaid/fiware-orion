@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYREPLACE_H_
-#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYREPLACE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYINSERT_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYINSERT_H_
 
 /*
 *
@@ -35,8 +35,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntityReplace -
+// mongocEntityInsert -
 //
-extern bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId);
+extern bool mongocEntityInsert(KjNode* dbEntityP, const char* entityId);
 
-#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYREPLACE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYINSERT_H_
