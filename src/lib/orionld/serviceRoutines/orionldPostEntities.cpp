@@ -411,13 +411,23 @@ bool orionldPostEntities(void)
   if (pCheckEntity(orionldState.requestTree, false, NULL) == false)
     return false;
 
+  // dbModelFromApiEntity destroys the tree, need to make a copy for notifications
+  KjNode* apiEntityP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
+  // Entity id and type was removed - they need to go back
+  orionldState.payloadIdNode->next   = orionldState.payloadTypeNode;
+  orionldState.payloadTypeNode->next = apiEntityP->value.firstChildP;
+  apiEntityP->value.firstChildP      = orionldState.payloadIdNode;
+
+
   //
   // The current shape of the incoming tree is now fit for TRoE, while it still needs to be adjusted for mongo,
   // If TRoE is enable we clone it here, for later use in TRoE processing
   //
   KjNode* cloneForTroeP = NULL;
   if (troe)
-    cloneForTroeP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+    cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // Must I clone this one?
+
 
   if (dbModelFromApiEntity(orionldState.requestTree, NULL, NULL, true) == false)
   {
@@ -430,12 +440,18 @@ bool orionldPostEntities(void)
   // Put Entity ID and TYPE back - inside _id as first members of the tree
   //
   KjNode* _idNodeP         = kjObject(orionldState.kjsonP, "_id");
+  KjNode* entityIdNodeP    = kjString(orionldState.kjsonP, "id",          entityId);
+  KjNode* entityTypeNodeP  = kjString(orionldState.kjsonP, "type",        entityType);
   KjNode* servicePathNodeP = kjString(orionldState.kjsonP, "servicePath", "/");  // NGSIv2 backwards compatibility
 
-  kjChildAdd(_idNodeP, orionldState.payloadIdNode);
-  kjChildAdd(_idNodeP, orionldState.payloadTypeNode);
-  kjChildAdd(_idNodeP, servicePathNodeP);
+  // Insert the three in _idNodeP
+  entityIdNodeP->next          = entityTypeNodeP;
+  entityTypeNodeP->next        = servicePathNodeP;
+  servicePathNodeP->next       = NULL;
+  _idNodeP->value.firstChildP  = entityIdNodeP;
+  _idNodeP->lastChild          = servicePathNodeP;
 
+  // "Chain-in" _idNodeP as 1st member of dbEntityP
   _idNodeP->next               = dbEntityP->value.firstChildP;
   dbEntityP->value.firstChildP = _idNodeP;
 
@@ -446,6 +462,18 @@ bool orionldPostEntities(void)
     return false;
   }
 
+  //
+  // Prepare for notifications
+  //
+  orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+  orionldState.alterations->entityId          = entityId;
+  orionldState.alterations->entityType        = entityType;
+  orionldState.alterations->patchTree         = NULL;
+  orionldState.alterations->dbEntityP         = NULL;
+  orionldState.alterations->patchedEntity     = apiEntityP;  // entity id, createdAt, modifiedAt ...
+  orionldState.alterations->alteredAttributes = 0;
+  orionldState.alterations->alteredAttributeV = NULL;
+  orionldState.alterations->next              = NULL;
 
   // All good
   orionldState.httpStatusCode = 201;

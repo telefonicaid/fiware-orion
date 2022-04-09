@@ -79,7 +79,8 @@ void entityFix(KjNode* entityP, OrionldContext* contextP)
   // eqForDot + compact attribute names
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    if (strcmp(attrP->name, "id") == 0) continue;
+    if (strcmp(attrP->name, "id") == 0)
+      continue;
 
     // compaction of the value of 'type'
     if (strcmp(attrP->name, "type") == 0)
@@ -90,6 +91,20 @@ void entityFix(KjNode* entityP, OrionldContext* contextP)
 
     eqForDot(attrP->name);
     attrP->name = orionldContextItemAliasLookup(contextP, attrP->name, NULL, NULL);
+
+    // eqForDot + compact sub-attribute names
+    for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
+    {
+      if (strcmp(attrP->name, "value")       == 0) continue;
+      if (strcmp(attrP->name, "object")      == 0) continue;
+      if (strcmp(attrP->name, "languageMap") == 0) continue;
+      if (strcmp(attrP->name, "type")        == 0) continue;
+      if (strcmp(attrP->name, "observedAt")  == 0) continue;
+      if (strcmp(attrP->name, "unitCode")    == 0) continue;
+
+      eqForDot(saP->name);
+      saP->name = orionldContextItemAliasLookup(contextP, saP->name, NULL, NULL);
+    }
   }
 }
 
