@@ -271,6 +271,7 @@ echo
 echo "12. Post Query - GET entities within PG1 - see E05, E06, E08, and E09"
 echo "====================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "within",
@@ -286,6 +287,7 @@ echo
 echo "13. Post Query - GET entities within PG2 - see E03, E05, E08, and E10"
 echo "====================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "within",
@@ -301,6 +303,7 @@ echo
 echo "14. Post Query - GET entities within PG3 - see E01-E08, and E11"
 echo "==============================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "within",
@@ -316,6 +319,7 @@ echo
 echo "15. Post Query - GET entities within PG4 - see all eleven entities"
 echo "=================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "within",

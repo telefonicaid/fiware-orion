@@ -74,6 +74,7 @@ echo
 echo "02. Query entities without and URI parameters - see E00 - E19"
 echo "============================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -88,6 +89,7 @@ echo
 echo "03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Results-Count: 21 as HTTP header in response"
 echo "==============================================================================================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -102,6 +104,7 @@ echo
 echo "04. Query entities with limit=4 - see E00-E03"
 echo "============================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -116,6 +119,7 @@ echo
 echo "05. Query entities with limit=4, offset=12 - see E12-E15"
 echo "========================================================"
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -130,6 +134,7 @@ echo
 echo "06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Results-Count: 21 as HTTP header"
 echo "================================================================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -144,6 +149,7 @@ echo
 echo "07. Query entities with limit=-1, see error"
 echo "==========================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -158,6 +164,7 @@ echo
 echo "08. Query entities with limit=1001 - see error"
 echo "=============================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -172,6 +179,7 @@ echo
 echo "09. Query entities with offset=-1 - see error"
 echo "============================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -186,6 +194,7 @@ echo
 echo "10. Query entities with offset=22 - see empty array"
 echo "==================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"

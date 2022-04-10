@@ -38,6 +38,6 @@ extern "C"
 //
 // pcheckQuery -
 //
-extern bool pcheckQuery(KjNode* tree, KjNode** entitiesPP, KjNode** attrsPP, QNode** qTreePP, KjNode** geoqPP);
+extern bool pcheckQuery(KjNode* tree, KjNode** entitiesPP, KjNode** attrsPP, QNode** qTreePP, KjNode** geoqPP, char** langP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERY_H_

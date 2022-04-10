@@ -47,6 +47,10 @@ brokerStart CB 212-249
 # 14. POST Query with a duplicated 'q' field
 # 15. POST Query with a 'q' string that is empty
 # 16. POST Query with a 'q' string == 'A=='
+# 17. POST Query without 'type': 'Query'
+# 18. POST Query with duplicated 'type': 'Query'
+# 19. POST Query with 'type' that is not a string
+# 20. POST Query with 'type' that is a string but != 'Query'
 #
 
 echo "01. POST Query with a payload body that is not an object"
@@ -68,6 +72,7 @@ echo
 echo "03. POST Query with an unknown field 'noQ'"
 echo "=========================================="
 payload='{
+  "type": "Query",
   "noQ": "17"
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -78,6 +83,7 @@ echo
 echo "04. POST Query with an 'entities' field that is not an array"
 echo "============================================================"
 payload='{
+  "type": "Query",
   "entities": { "a": 12 }
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -88,14 +94,15 @@ echo
 echo "05. POST Query with a duplicated 'entities' field"
 echo "================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
-      "id": "urn:ngsi-ld:entities:E1"
+      "type": "T"
     }
   ],
   "entities": [
     {
-      "id": "urn:ngsi-ld:entities:E2"
+      "type": "T"
     }
   ]
 }'
@@ -107,6 +114,7 @@ echo
 echo "06. POST Query with an 'entities' field that has a non-object as member of the array"
 echo "===================================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     "not an object"
   ]
@@ -119,6 +127,7 @@ echo
 echo "07. POST Query with an 'entities' field that has an empty object as member of the array"
 echo "======================================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
     }
@@ -133,6 +142,7 @@ echo
 echo "08. POST Query with an 'attrs' field that is not an array"
 echo "========================================================="
 payload='{
+  "type": "Query",
   "attrs": false
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -143,6 +153,7 @@ echo
 echo "09. POST Query with a duplicated 'attrs' field"
 echo "=============================================="
 payload='{
+  "type": "Query",
   "attrs": [ "A1" ],
   "attrs": [ "A1" ]
 }'
@@ -154,6 +165,7 @@ echo
 echo "10. POST Query with an 'attrs' array that is empty"
 echo "=================================================="
 payload='{
+  "type": "Query",
   "attrs": [ ]
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -164,6 +176,7 @@ echo
 echo "11. POST Query with an 'attrs' field that has a non-string as member of the array"
 echo "================================================================================="
 payload='{
+  "type": "Query",
   "attrs": [ "A1", 13 ]
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -174,6 +187,7 @@ echo
 echo "12. POST Query with an 'attrs' field that has an empty string as member of the array"
 echo "===================================================================================="
 payload='{
+  "type": "Query",
   "attrs": [ "A1", "" ]
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -184,6 +198,7 @@ echo
 echo "13. POST Query with a 'q' field that is not a string"
 echo "===================================================="
 payload='{
+  "type": "Query",
   "q": true
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -194,6 +209,7 @@ echo
 echo "14. POST Query with a duplicated 'q' field"
 echo "=========================================="
 payload='{
+  "type": "Query",
   "q": "A==12",
   "q": "A==13"
 }'
@@ -205,6 +221,7 @@ echo
 echo "15. POST Query with a 'q' string that is empty"
 echo "=============================================="
 payload='{
+  "type": "Query",
   "q": ""
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
@@ -215,7 +232,52 @@ echo
 echo "16. POST Query with a 'q' string == 'A=='"
 echo "========================================="
 payload='{
+  "type": "Query",
   "q": "A=="
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
+echo
+echo
+
+
+echo "17. POST Query without 'type': 'Query'"
+echo "======================================"
+payload='{
+  "q": "A==5"
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
+echo
+echo
+
+
+echo "18. POST Query with duplicated 'type': 'Query'"
+echo "=============================================="
+payload='{
+  "type": "Query",
+  "type": "Query",
+  "q": "A==5"
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
+echo
+echo
+
+
+echo "19. POST Query with 'type' that is not a string"
+echo "==============================================="
+payload='{
+  "type": 12,
+  "q": "A==5"
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
+echo
+echo
+
+
+echo "20. POST Query with 'type' that is a string but != 'Query'"
+echo "=========================================================="
+payload='{
+  "type": "querie",
+  "q": "A==5"
 }'
 orionCurl --url /ngsi-ld/v1/entityOperations/query -X POST --payload "$payload"
 echo
@@ -296,12 +358,12 @@ Date: REGEX(.*)
 06. POST Query with an 'entities' field that has a non-object as member of the array
 ====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]",
+    "detail": "Query::entities[X]",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -310,12 +372,12 @@ Date: REGEX(.*)
 07. POST Query with an 'entities' field that has an empty object as member of the array
 =======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 107
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]",
+    "detail": "Query::entities[X]",
     "title": "Empty Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -443,6 +505,62 @@ Date: REGEX(.*)
 {
     "detail": "Unfinished statement?",
     "title": "Parse Error in Q-Expression",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+17. POST Query without 'type': 'Query'
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Query::type",
+    "title": "Mandatory field missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+18. POST Query with duplicated 'type': 'Query'
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+19. POST Query with 'type' that is not a string
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+20. POST Query with 'type' that is a string but != 'Query'
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 175
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Must be a JSON String with the value /Query/",
+    "title": "Invalid value for 'type' member of a POST Query",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

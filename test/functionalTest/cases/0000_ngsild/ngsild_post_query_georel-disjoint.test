@@ -210,6 +210,7 @@ echo
 echo "08. Post Query for disjoint using R2 - see ER3, ER4, and EL4"
 echo "============================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "disjoint",
@@ -225,6 +226,7 @@ echo
 echo "09. Post Query for disjoint using	R1 - see ER4, EL1, EL2, and EL4"
 echo "================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "disjoint",

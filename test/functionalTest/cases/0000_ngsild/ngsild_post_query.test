@@ -188,6 +188,7 @@ echo
 echo "05. GET all entities of type T, see E1 and E3"
 echo "============================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -202,6 +203,7 @@ echo
 echo "06. GET all entities of type T2, see E2 and E4"
 echo "=============================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T2"
@@ -216,12 +218,15 @@ echo
 echo "07. GET all entities with entity id E3 or E4, see E3 and E4"
 echo "==========================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
-      "id": "http://a.b.c/entity/E3"
+      "id": "http://a.b.c/entity/E3",
+      "type": "T"
     },
     {
-      "id": "http://a.b.c/entity/E4"
+      "id": "http://a.b.c/entity/E4",
+      "type": "T2"
     }
   ]
 }'
@@ -233,6 +238,7 @@ echo
 echo "08. GET all entities with attrs A3 - see E2, E3, E4"
 echo "==================================================="
 payload='{
+  "type": "Query",
   "attrs": [ "A3" ]
 }'
 orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes' --payload "$payload" --noPayloadCheck
@@ -243,6 +249,7 @@ echo
 echo "09. GET all entities with attrs A2 or A4 - see E1, E3 and E4"
 echo "============================================================"
 payload='{
+  "type": "Query",
   "attrs": [ "A2", "A4" ]
 }'
 orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes' --payload "$payload" --noPayloadCheck
@@ -253,6 +260,7 @@ echo
 echo "10. GET all entities with attrs A7 or A8 - see no entities"
 echo "=========================================================="
 payload='{
+  "type": "Query",
   "attrs": [ "A7", "A8" ]
 }'
 orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes' --payload "$payload" --noPayloadCheck
@@ -263,9 +271,15 @@ echo
 echo "12. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4"
 echo "======================================================================"
 payload='{
+  "type": "Query",
   "entities": [
     {
-      "idPattern": ".*"
+      "idPattern": ".*",
+      "type": "T"
+    },
+    {
+      "idPattern": ".*",
+      "type": "T2"
     }
   ],
   "q": "A3"
@@ -278,6 +292,7 @@ echo
 echo "13. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1"
 echo "=========================================================================="
 payload='{
+  "type": "Query",
   "q": "A1==%22E1:A1%22"
 }'
 orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes' --payload "$payload" --noPayloadCheck
@@ -295,6 +310,7 @@ echo
 echo "21. GET all entities with a 'location' GeoProperty near a Point"
 echo "==============================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Point",
     "georel": "near;maxDistance==100000",
@@ -317,6 +333,7 @@ echo
 echo "23. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST"
 echo "============================================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Point",
     "georel": "near;maxDistance==100000",
@@ -332,6 +349,7 @@ echo
 echo "24. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2"
 echo "==================================================================================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
