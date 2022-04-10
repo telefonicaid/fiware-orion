@@ -36,6 +36,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/kjTree/kjNavigate.h"                           // kjNavigate
 #include "orionld/common/orionldPatchApply.h"                    // Own interface
 
 
@@ -85,32 +86,7 @@ static int pathComponentsSplit(char* path, char** compV)
 
 // -----------------------------------------------------------------------------
 //
-// kjNavigate -
-//
-static KjNode* kjNavigate(KjNode* treeP, char** pathCompV, KjNode** parentPP, bool* onlyLastMissingP)
-{
-  KjNode* hitP = kjLookup(treeP, pathCompV[0]);
-
-  *parentPP = treeP;
-
-  if (hitP == NULL)  // No hit - we're done
-  {
-    *onlyLastMissingP = (pathCompV[1] == NULL)? true : false;
-    return NULL;
-  }
-
-  if (pathCompV[1] == NULL)  // Found it - we're done
-    return hitP;
-
-  return kjNavigate(hitP, &pathCompV[1], parentPP, onlyLastMissingP);  // Recursive call, one level down
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // pathComponentsFix -
-//
 //
 // Some pieces of information for the DB are either redundant info for the database model of Orion or
 // builtin timestamps, that are not of interest for the TRoE database
@@ -118,7 +94,7 @@ static KjNode* kjNavigate(KjNode* treeP, char** pathCompV, KjNode** parentPP, bo
 // Also, all fields that are entity-characteristics, not attribute, are skipped (for now)
 // Once multi-attribute and/or Scope is supported, this will have to change
 //
-int pathComponentsFix(char** compV, int components, bool* skipP)
+static int pathComponentsFix(char** compV, int components, bool* skipP)
 {
   int oldIx = 0;
   int newIx = 0;

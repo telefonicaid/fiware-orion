@@ -45,19 +45,8 @@ extern "C"
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"          // kjEntityNormalizedToConcise
+#include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
 #include "orionld/mongoc/mongocEntityRetrieve.h"                 // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjChildPrepend - FIXME: move to kjson library
-//
-static void kjChildPrepend(KjNode* container, KjNode* child)
-{
-  child->next = container->value.firstChildP;
-  container->value.firstChildP = child;
-}
 
 
 
