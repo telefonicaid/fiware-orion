@@ -56,6 +56,9 @@ SET (SOURCES
     kjTimestampAdd.cpp
     kjArrayAdd.cpp
     kjJsonldNullObject.cpp
+    kjChildPrepend.cpp
+    kjNodeDecouple.cpp
+    kjNavigate.cpp
 )
 
 # Include directories

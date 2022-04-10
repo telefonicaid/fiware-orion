@@ -67,6 +67,7 @@ extern "C"
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"           // kjGeojsonEntitiesTransform
+#include "orionld/kjTree/kjNodeDecouple.h"                       // kjNodeDecouple
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
@@ -231,21 +232,6 @@ static bool payloadEmptyCheck(void)
 
 
 
-// -----------------------------------------------------------------------------
-//
-// kjNodeDecouple -
-//
-static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
-{
-  // kjTreeFirstLevelPresent("Before decoupling", parent);
-
-  if (prev != NULL)
-    prev->next = nodeToDecouple->next;
-  else
-    parent->value.firstChildP = nodeToDecouple->next;
-
-  // kjTreeFirstLevelPresent("After decoupling", parent);
-}
 
 
 
@@ -331,7 +317,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
         orionldState.payloadContextNode = attrNodeP;
 
         attrNodeP = orionldState.payloadContextNode->next;
-        kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
+        kjNodeDecouple(orionldState.requestTree, orionldState.payloadContextNode, prev);
       }
       else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0) || SCOMPARE4(attrNodeP->name, '@', 'i', 'd', 0))
       {
@@ -347,7 +333,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 
         orionldState.payloadIdNode = attrNodeP;
         attrNodeP                  = attrNodeP->next;
-        kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
+        kjNodeDecouple(orionldState.requestTree, orionldState.payloadIdNode, prev);
       }
       else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(attrNodeP->name, '@', 't', 'y', 'p', 'e', 0))
       {
@@ -363,7 +349,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 
         orionldState.payloadTypeNode = attrNodeP;
         attrNodeP                    = attrNodeP->next;
-        kjNodeDecouple(orionldState.payloadTypeNode, prev, orionldState.requestTree);
+        kjNodeDecouple(orionldState.requestTree, orionldState.payloadTypeNode, prev);
       }
       else
       {
@@ -394,7 +380,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 
           orionldState.payloadContextNode = attrNodeP;
 
-          kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
+          kjNodeDecouple(orionldState.requestTree, orionldState.payloadContextNode, prev);
         }
 
         prev = attrNodeP;
