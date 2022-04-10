@@ -1,0 +1,297 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+BATCH Update with LanguageProperty
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. BATCH Create two entities with a language property L
+# 02. BATCH Update the two entities
+# 03. See one of the entities in the database
+# 04. GET both entities
+# 05. Attempt to Batch Update with the RHS of L:languageMap as a non-object, e.g. the number 13 - see error
+# 06. Attempt to Batch Update with the RHS of L:languageMap:es as a non-string, e.g. the number 14 - see error
+#
+
+echo "01. BATCH Create two entities with a language property L"
+echo "========================================================"
+payload='[
+    {
+        "en": {
+            "languageMap": {
+                "en": "English",
+                "es": "Ingles",
+                "sv": "Engelska"
+            },
+            "type": "LanguageProperty"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "es": {
+            "languageMap": {
+                "en": "Spanish",
+                "es": "Castellano",
+                "sv": "Spanska"
+            },
+            "type": "LanguageProperty"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. BATCH Update the two entities"
+echo "================================="
+payload='[
+    {
+        "en": {
+            "languageMap": {
+                "en": "EnglishUpdated",
+                "es": "InglesUpdated",
+                "sv": "EngelskaUpdated"
+            },
+            "type": "LanguageProperty"
+        },
+        "id": "urn:E1"
+    },
+    {
+        "es": {
+            "languageMap": {
+                "en": "SpanishUpdated",
+                "es": "CastellanoUpdated",
+                "sv": "SpanskaUpdated"
+            },
+            "type": "LanguageProperty"
+        },
+        "id": "urn:E2"
+    }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+echo "03. See one of the entities in the database"
+echo "==========================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "04. GET both entities"
+echo "====================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "05. Attempt to Batch Update with the RHS of L:languageMap as a non-object, e.g. the number 13 - see error"
+echo "========================================================================================================="
+payload='[
+    {
+        "id": "urn:E1",
+        "type": "T",
+        "L": {
+            "languageMap": 13,
+            "type": "LanguageProperty"
+        }
+    }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to Batch Update with the RHS of L:languageMap:es as a non-string, e.g. the number 14 - see error"
+echo "============================================================================================================"
+payload='[
+    {
+        "id": "urn:E1",
+        "type": "T",
+        "L": {
+            "languageMap": {
+              "en": "el",
+              "es": 14,
+              "sv": "ell"
+            },
+            "type": "LanguageProperty"
+        }
+    }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. BATCH Create two entities with a language property L
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 19
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:E1",
+    "urn:E2"
+]
+
+
+02. BATCH Update the two entities
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. See one of the entities in the database
+===========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/en"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/en" : {
+			"value" : {
+				"en" : "EnglishUpdated",
+				"es" : "InglesUpdated",
+				"sv" : "EngelskaUpdated"
+			},
+			"type" : "LanguageProperty",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+04. GET both entities
+=====================
+HTTP/1.1 200 OK
+Content-Length: 288
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "en": {
+            "languageMap": {
+                "en": "EnglishUpdated",
+                "es": "InglesUpdated",
+                "sv": "EngelskaUpdated"
+            },
+            "type": "LanguageProperty"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "es": {
+            "languageMap": {
+                "en": "SpanishUpdated",
+                "es": "CastellanoUpdated",
+                "sv": "SpanskaUpdated"
+            },
+            "type": "LanguageProperty"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]
+
+
+05. Attempt to Batch Update with the RHS of L:languageMap as a non-object, e.g. the number 13 - see error
+=========================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 268
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+                "status": 400,
+                "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+06. Attempt to Batch Update with the RHS of L:languageMap:es as a non-string, e.g. the number 14 - see error
+============================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 270
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
+                "status": 400,
+                "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
