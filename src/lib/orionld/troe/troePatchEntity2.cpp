@@ -35,7 +35,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/troe/troePatchEntity.h"                        // troePatchEntity - to reuse the "push to TRoE" of troePatchEntity
 #include "orionld/troe/troePatchEntity2.h"                       // Own interface
 
@@ -50,15 +49,10 @@ bool troePatchEntity2(void)
   KjNode* patchTree = orionldState.requestTree;
   KjNode* patchBase = orionldState.patchBase;
 
-  // kjTreeLog(orionldState.patchBase, "KZ: patchBase");
-  // kjTreeLog(patchTree, "KZ: patchTree");
-
   for (KjNode* patchP = patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
   {
     orionldPatchApply(patchBase, patchP);
   }
-
-  // kjTreeLog(patchBase, "KZ: patched result");
 
   //
   // No need to reimplement what troePatchEntity already implement - push to the TRoE DB

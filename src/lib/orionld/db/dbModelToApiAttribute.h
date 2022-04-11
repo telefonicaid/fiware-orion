@@ -30,6 +30,9 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+
 
 
 // -----------------------------------------------------------------------------
@@ -37,5 +40,13 @@ extern "C"
 // dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
 //
 extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiAttribute2 -
+//
+extern KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIATTRIBUTE_H_

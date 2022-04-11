@@ -41,7 +41,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldPutEntity.h"            // Own Interface
 
 
@@ -247,8 +246,6 @@ bool orionldPutEntity(void)
     return false;
   }
 
-  kjTreeLog(orionldState.requestTree, "Incoming Entity");
-
   char* entityId = orionldState.wildcard[0];
 
   //
@@ -274,7 +271,6 @@ bool orionldPutEntity(void)
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
   }
-  kjTreeLog(oldDbEntityP, "Old DB Entity");
 
   //
   // Check the attributes
@@ -282,7 +278,6 @@ bool orionldPutEntity(void)
   KjNode* dbAttrsP = kjLookup(oldDbEntityP, "attrs");
   if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
     return false;
-  kjTreeLog(orionldState.requestTree, "output from pCheckEntity");
 
   //
   // Create the new DB Entity, based mainly on orionldState.requestTree
@@ -292,10 +287,6 @@ bool orionldPutEntity(void)
 
   if (dbEntityP == NULL)
     return false;
-
-  kjTreeLog(orionldState.requestTree, "Original Request - good for troe/notifications ?");
-  kjTreeLog(dbEntityP, "New Entity ready for DB");
-
 
   if (mongocEntityReplace(dbEntityP, entityId) == false)
   {

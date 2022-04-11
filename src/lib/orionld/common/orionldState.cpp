@@ -174,6 +174,10 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.out.contentType    = JSON;              // Default response Content-Type is "application/json"
   orionldHeaderSetInit(&orionldState.out.headers, 5);  // 5 response headers, to start with
 
+  //
+  // Default format is Normalized
+  //
+  orionldState.out.format         = NGSI_LD_V1_NORMALIZED;
 
   //
   // Default response status code is 200 OK

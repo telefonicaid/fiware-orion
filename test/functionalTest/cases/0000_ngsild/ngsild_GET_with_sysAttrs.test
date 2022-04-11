@@ -34,7 +34,7 @@ brokerStart CB 0-255
 # 01. Create an entity with attribute P1
 # 02. GET the entity with options=sysAttrs, see 'createdAt' and 'modifiedAt' as text strings
 # 03. GET the entity with options=sysAttrs AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings"
-# 04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1
+# 04. GET the entity with options=sysAttrs,keyValues - see error
 #
 
 echo "01. Create an entity with attribute P1"
@@ -68,8 +68,8 @@ echo
 echo
 
 
-echo "04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1"
-echo "====================================================================================================================================================="
+echo "04. GET the entity with options=sysAttrs,keyValues - see error"
+echo "=============================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=sysAttrs,keyValues&attrs=P1' --noPayloadCheck
 echo
 echo
@@ -131,20 +131,17 @@ Date: REGEX(.*)
 
 
 
-04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1
-=====================================================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 161
+04. GET the entity with options=sysAttrs,keyValues - see error
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 210
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
-  "type": "T",
-  "createdAt": "REGEX(.*)",
-  "modifiedAt": "REGEX(.*)",
-  "P1": 1
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Incoherent value for /options/ URI param",
+  "detail": "Can't have system attributes when /simplified/ output format is selected"
 }
 
 

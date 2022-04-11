@@ -52,6 +52,7 @@ SET (SOURCES
     kjSort.cpp
     kjChildCount.cpp
     kjEntityNormalizedToConcise.cpp
+    kjEntityNormalizedToSimplified.cpp
     kjTreeLog.cpp
     kjTimestampAdd.cpp
     kjArrayAdd.cpp

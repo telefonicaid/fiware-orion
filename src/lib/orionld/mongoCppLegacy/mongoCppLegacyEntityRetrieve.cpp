@@ -780,7 +780,7 @@ KjNode* mongoCppLegacyEntityRetrieve
 
   // Finally, if "Concise Output Format", fix the tree accordingly
   if (concise == true)
-    kjEntityNormalizedToConcise(idP);
+    kjEntityNormalizedToConcise(idP, NULL);  // lang=NULL ...
 
   return idP;
 }

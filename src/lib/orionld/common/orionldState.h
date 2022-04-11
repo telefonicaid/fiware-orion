@@ -42,6 +42,7 @@ extern "C"
 
 #include "common/globals.h"                                      // ApiVersion
 #include "common/MimeType.h"                                     // MimeType
+#include "common/RenderFormat.h"                                 // RenderFormat
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
 #include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
@@ -211,6 +212,9 @@ typedef struct OrionldStateOut
   // Outgoing HTTP headers
   OrionldHeaderSet headers;
   MimeType         contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
+
+  // Rendering info
+  RenderFormat    format;
 
   // Errors
   char*     acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
