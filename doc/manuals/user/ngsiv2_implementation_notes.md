@@ -24,6 +24,7 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
+* [Covered subscriptions](#covered-subscriptions)
 * [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
@@ -508,6 +509,53 @@ update modified only A, then A, B and C are notified (in other words, the trigge
 if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
 
 [Top](#top)
+
+## Covered subscriptions
+
+The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
+notification when subscription is triggered. By default Orion only notifies attributes that exist
+in the entity. For instance, if subscription is this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+but the entity only has `temperature` and `humidity` attributes, then `brightness` attribute is not included
+in notifications.
+
+This default behaviour can be changed using the `covered` field set to `true` this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+in which case all attributes are included in the notification, no matter if they exist or not in the
+entity. For these attribute that doen't exist (`brightness` in this example) the `null`
+value (of type `"None"`) is used.
+
+We use the term "covered" in the sense the notification "covers" completely all the attributes
+in the `notification.attrs` field. It can be useful for those notification endpoints that are
+not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
+in every received notification.
+
+[Top](#top)
+
 
 ## `timeout` subscriptions option
 
