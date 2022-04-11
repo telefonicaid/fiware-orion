@@ -1836,10 +1836,14 @@ static bool processOnChangeConditionForUpdateContext
   {
     for (unsigned int ix = 0; ix < attrL.size(); ix++)
     {
+      // Avoiod over-adding attribute checking first that the attribute is not already added
       std::string attrName = attrL[ix];
-      ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
-      caP->valueType = orion::ValueTypeNull;
-      cer.entity.attributeVector.push_back(caP);
+      if (cer.entity.attributeVector.get(attrName) < 0)
+      {
+        ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+        caP->valueType = orion::ValueTypeNull;
+        cer.entity.attributeVector.push_back(caP);
+      }
     }
   }
 
