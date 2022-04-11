@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
@@ -33,6 +34,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/db/dbModelToApiSubAttribute.h"                 // Own interface
 
 
@@ -56,3 +59,52 @@ void dbModelToApiSubAttribute(KjNode* subP)
       kjChildRemove(subP, nodeP);
   }
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
+//
+KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, OrionldProblemDetails* pdP)
+{
+  char*   longName = kaStrdup(&orionldState.kalloc, dbSubAttributeP->name);
+  eqForDot(longName);
+
+  char*   alias    = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+  KjNode* mdP      = kjObject(orionldState.kjsonP, alias);
+  KjNode* nodeP    = dbSubAttributeP->value.firstChildP;
+  KjNode* next;
+
+  while (nodeP != NULL)
+  {
+    next = nodeP->next;
+    if      (strcmp(nodeP->name, "type")       == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "value")      == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "object")     == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "unitCode")   == 0) kjChildAdd(mdP, nodeP);
+    else if (strcmp(nodeP->name, "observedAt") == 0) kjChildAdd(mdP, nodeP);
+    else if (sysAttrs == true)
+    {
+      if (strcmp(nodeP->name, "creDate") == 0)
+      {
+        nodeP->name = (char*) "createdAt";
+        kjChildAdd(mdP, nodeP);
+      }
+      else if (strcmp(nodeP->name, "modDate") == 0)
+      {
+        nodeP->name = (char*) "modifiedAt";
+        kjChildAdd(mdP, nodeP);
+      }
+    }
+    else
+      LM_W(("Skipping sub-sub-attribute '%s'", nodeP->name));
+
+    nodeP = next;
+  }
+
+  return mdP;
+}
+
+
+

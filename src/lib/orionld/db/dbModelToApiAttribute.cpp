@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove, kjString
@@ -35,6 +36,8 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/db/dbModelToApiSubAttribute.h"                 // dbModelToApiSubAttribute
 #include "orionld/db/dbModelToApiAttribute.h"                    // Own interface
 
@@ -120,4 +123,70 @@ void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
     attrP->lastChild->next = mdP->value.firstChildP;
     attrP->lastChild       = mdP->lastChild;
   }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiAttribute2 -
+//
+KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* pdP)
+{
+  char*   longName = kaStrdup(&orionldState.kalloc, dbAttrP->name);
+
+  eqForDot(longName);
+
+  char*   alias = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+  KjNode* attrP = kjObject(orionldState.kjsonP, alias);
+  KjNode* nodeP = dbAttrP->value.firstChildP;
+  KjNode* mdsP  = NULL;
+  KjNode* next;
+
+  while (nodeP != NULL)
+  {
+    next = nodeP->next;
+
+    if (strcmp(nodeP->name, "type") == 0)
+      kjChildAdd(attrP, nodeP);
+    else if (strcmp(nodeP->name, "value") == 0)
+      kjChildAdd(attrP, nodeP);
+    else if (strcmp(nodeP->name, "object") == 0)
+      kjChildAdd(attrP, nodeP);
+    else if (sysAttrs == true)
+    {
+      if (strcmp(nodeP->name, "creDate") == 0)
+      {
+        nodeP->name = (char*) "createdAt";
+        kjChildAdd(attrP, nodeP);
+      }
+      else if (strcmp(nodeP->name, "modDate") == 0)
+      {
+        nodeP->name = (char*) "modifiedAt";
+        kjChildAdd(attrP, nodeP);
+      }
+    }
+    else if (strcmp(nodeP->name, "md") == 0)
+      mdsP = nodeP;
+
+    nodeP = next;
+  }
+
+  if (mdsP != NULL)
+  {
+    for (KjNode* mdP = mdsP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+    {
+      KjNode* subAttributeP;
+
+      if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, pdP)) == NULL)
+      {
+        LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
+        return NULL;
+      }
+
+      kjChildAdd(attrP, subAttributeP);
+    }
+  }
+
+  return attrP;
 }

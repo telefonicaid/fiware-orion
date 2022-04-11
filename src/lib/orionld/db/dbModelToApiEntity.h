@@ -32,10 +32,33 @@ extern "C"
 
 
 
+//
+// FIXME:
+//   Unfortunately we have two different implementations for DB Model To API Entity
+//   These two need to be unified
+//
+
+
+
 // -----------------------------------------------------------------------------
 //
 // dbModelToApiEntity - produce an NGSI-LD API Entity from its DB format
 //
+// USED BY
+//   - orionldAlterationsTreat (for notifications)
+//
 extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, const char* entityId);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiEntity2 - produce an NGSI-LD API Entity from its DB format
+//
+// USED BY
+//   - orionldGetEntities  (GET /entities)
+//   - orionldPostQuery    (POST /entityOperations/query)
+//
+extern KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_

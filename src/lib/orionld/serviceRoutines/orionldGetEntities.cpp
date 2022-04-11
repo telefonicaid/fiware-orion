@@ -54,19 +54,9 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
+#include "orionld/db/dbModelToApiEntity.h"                     // dbModelToApiEntity2
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// FIXME - put dmodelEntity in its own module (perhaps even its own library ...)
-//
-extern KjNode* dmodelEntity(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pdP);
 
 
 
@@ -556,7 +546,7 @@ bool orionldGetEntities(void)
         for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
         {
           OrionldProblemDetails pd;
-          KjNode*               entityP = dmodelEntity(dbEntityP, false, &pd);
+          KjNode*               entityP = dbModelToApiEntity2(dbEntityP, false, &pd);
 
           if (entityP != NULL)
             kjChildAdd(orionldState.geoPropertyNodes, entityP);

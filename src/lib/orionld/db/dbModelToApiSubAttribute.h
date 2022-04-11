@@ -38,4 +38,12 @@ extern "C"
 //
 extern void dbModelToApiSubAttribute(KjNode* saP);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
+//
+KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, OrionldProblemDetails* pdP);
+
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPISUBATTRIBUTE_H_
