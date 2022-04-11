@@ -305,9 +305,10 @@ bool orionldPostQuery(void)
   KjNode*  attrsP    = NULL;
   QNode*   qTree     = NULL;
   KjNode*  geoqP     = NULL;
+  char*    lang      = NULL;
 
   // pcheckQuery makes sure the Payload Data is correct and it expands all fields that should be expanded
-  if (pcheckQuery(orionldState.requestTree, &entitiesP, &attrsP, &qTree, &geoqP) == false)
+  if (pcheckQuery(orionldState.requestTree, &entitiesP, &attrsP, &qTree, &geoqP, &lang) == false)
     return false;
 
   int      count  = 0;

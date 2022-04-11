@@ -81,6 +81,7 @@ echo
 echo "04. Get the count using batch query and the NGSI-LD mechanism (?count=true)"
 echo "==========================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"
@@ -95,6 +96,7 @@ echo
 echo "05. Get the count using batch query and the NGSIv2 mechanism (?options=count)"
 echo "============================================================================="
 payload='{
+  "type": "Query",
   "entities": [
     {
       "type": "T"

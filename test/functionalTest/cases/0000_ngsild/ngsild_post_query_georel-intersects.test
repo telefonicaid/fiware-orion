@@ -141,6 +141,7 @@ echo
 echo "04. Post Query for overlap with Query-Polygon [[ [2,4], [2,8], [4,8], [4,4], [2,4] ]] - see entity ER"
 echo "====================================================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "overlaps",
@@ -156,6 +157,7 @@ echo
 echo "05. Post Query for overlap with Query-LineString [ [2,2], [7,2] ] - see entity EL"
 echo "================================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "LineString",
     "georel": "overlaps",
@@ -171,6 +173,7 @@ echo
 echo "06. Post Query for overlap with Query-Point [8,7] - see entity EP"
 echo "================================================================="
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Point",
     "georel": "overlaps",
@@ -186,6 +189,7 @@ echo
 echo "07. Post Query for overlap with Query-Polygon [[ [2,2], [2,3], [3,3], [3,2], [2,2] ]] - no match"
 echo "================================================================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "overlaps",
@@ -201,6 +205,7 @@ echo
 echo "08. Post Query for overlap with Query-LineString [ [5,2], [6,2] ] - no match"
 echo "============================================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "LineString",
     "georel": "overlaps",
@@ -216,6 +221,7 @@ echo
 echo "09. Post Query for overlap with Query-Point [3,3] - no match"
 echo "============================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Point",
     "georel": "overlaps",
@@ -231,6 +237,7 @@ echo
 echo "10. Post Query for overlap with Query-LineString [ [0.4], [4,4] ] - no match"
 echo "============================================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "LineString",
     "georel": "overlaps",
@@ -246,6 +253,7 @@ echo
 echo "11. Post Query for overlap with Query-Polygon [[ [2,0], [2,2], [4,2], [4,0], [2,0] ]] - no match"
 echo "================================================================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "Polygon",
     "georel": "overlaps",
@@ -261,6 +269,7 @@ echo
 echo "12. Post Query for overlap with Query-LineString [ [7,7], [9,7] ] - no match"
 echo "============================================================================"
 payload='{
+  "type": "Query",
   "geoQ": {
     "geometry": "LineString",
     "georel": "overlaps",
