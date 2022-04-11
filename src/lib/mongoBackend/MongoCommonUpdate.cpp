@@ -1836,7 +1836,7 @@ static bool processOnChangeConditionForUpdateContext
   {
     for (unsigned int ix = 0; ix < attrL.size(); ix++)
     {
-      // Avoiod over-adding attribute checking first that the attribute is not already added
+      // Aviod over-adding attribute, checking first that the attribute is not already added
       std::string attrName = attrL[ix];
       if (cer.entity.attributeVector.get(attrName) < 0)
       {
