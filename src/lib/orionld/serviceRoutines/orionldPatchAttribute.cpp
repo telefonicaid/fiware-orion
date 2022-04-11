@@ -176,12 +176,19 @@ bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, cha
 //
 bool kjAttributeMerge(KjNode* inAttribute, KjNode* dbAttribute, KjNode* dbAttributeType, KjNode* inAttributeType, KjNode* dbCreatedAt)
 {
+  KjNode* inValueP = NULL;
+
+  if ((strcmp(dbAttributeType->value.s, "Property") == 0) || (strcmp(dbAttributeType->value.s, "GeoProperty") == 0))
+    inValueP = kjLookup(inAttribute, "value");
+  else if (strcmp(dbAttributeType->value.s, "Relationship") == 0)
+    inValueP = kjLookup(inAttribute, "object");
+  else if (strcmp(dbAttributeType->value.s, "LanguageProperty") == 0)
+    inValueP = kjLookup(inAttribute, "languageMap");
+
   //
   // If the value isn't present in inAttribute, get it from the database
   //
-  KjNode* valueP = kjLookup(inAttribute, "value");
-
-  if (valueP == NULL)
+  if (inValueP == NULL)
   {
     KjNode* dbValueP = kjLookup(dbAttribute, "value");
     if (dbValueP == NULL)
@@ -548,6 +555,11 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
       caP->valueType   = orion::ValueTypeString;
       caP->stringValue = mdP->value.s;
     }
+    else if (strcmp(mdP->name, "languageMap") == 0)
+    {
+      caP->valueType      = orion::ValueTypeObject;
+      caP->compoundValueP = kjTreeToCompoundValue(mdP, NULL, 0);
+    }
     else if (strcmp(mdP->name, "createdAt") == 0)
       caP->creDate = mdP->value.f;
     else if (strcmp(mdP->name, "modifiedAt") == 0)
@@ -858,7 +870,6 @@ bool orionldPatchAttribute(void)
   // 8. Merge dbAttributeP into inAttribute
   //
   kjAttributeMerge(inAttribute, dbAttributeP, dbAttributeTypeNodeP, inType, dbCreatedAt);
-
 
   //
   // 9.  Convert merged inAttribute into a ContextElement
