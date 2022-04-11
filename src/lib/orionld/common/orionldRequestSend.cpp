@@ -131,8 +131,8 @@ bool orionldRequestSend
   char                 url[256];
 
   //
-  // If we have a payload, we also need a payloadLen and a content-length
-  // If no payload, there should be no payloadLen nor content-length
+  // If we have a payload body, we also need a payloadLen and a content-length
+  // If no payload body, there should be no payloadLen nor content-length
   //
   if      ((payload == NULL) && (payloadLen == 0) && (contentType == NULL))  {}   // OK
   else if ((payload != NULL) && (payloadLen  > 0) && (contentType != NULL))  {}   // OK

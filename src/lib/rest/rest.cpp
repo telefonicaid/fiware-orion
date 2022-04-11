@@ -375,6 +375,10 @@ static void requestCompleted
   struct timespec  reqEndTime;
 
   // Release the connection to mongo, if there is any
+  if (orionldState.mongoc.contextsP)       mongoc_collection_destroy(orionldState.mongoc.contextsP);
+  if (orionldState.mongoc.entitiesP)       mongoc_collection_destroy(orionldState.mongoc.entitiesP);
+  if (orionldState.mongoc.subscriptionsP)  mongoc_collection_destroy(orionldState.mongoc.subscriptionsP);
+  if (orionldState.mongoc.registrationsP)  mongoc_collection_destroy(orionldState.mongoc.registrationsP);
   mongocConnectionRelease();
 
   if (orionldState.alterations != NULL)
