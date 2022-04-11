@@ -35,6 +35,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
@@ -122,7 +124,23 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
 //
 // dbModelToApiEntity2 -
 //
-KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pdP)
+// USED BY
+//   - orionldGetEntities  (GET /entities)
+//   - orionldPostQuery    (POST /entityOperations/query)
+//
+// NOTE
+//   GET /entities calls "kjTreeFromQueryContextResponse()" that takes care of
+//   concise/keyValues and lang
+//
+//   POST /entityOperations/query (POST Query) on the other hand doewsn't use mongoBackend and thus
+//   doesn't have any QueryContextResponse structure.
+//   So, POST Query needs this to be done by "dbModelToApiEntity2()"
+//
+// FIXME:
+//   Add "concise/keyValues" and "lang" treatment to "dbModelToApiEntity2()"
+//   Remove "concise/keyValues" and "lang" treatment from "kjTreeFromQueryContextResponse()"
+//
+KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
   KjNode* _idP            = NULL;
   KjNode* attrsP          = NULL;
@@ -232,7 +250,7 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDeta
     {
       KjNode* attributeP;
 
-      if ((attributeP = dbModelToApiAttribute2(attrP, sysAttrs, pdP)) == NULL)
+      if ((attributeP = dbModelToApiAttribute2(attrP, sysAttrs, renderFormat, lang, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
         return NULL;

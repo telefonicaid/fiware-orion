@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOCONCISE_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOCONCISE_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOSIMPLIFIED_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOSIMPLIFIED_H_
 
 /*
 *
@@ -34,8 +34,8 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// kjEntityNormalizedToConcise -
+// kjEntityNormalizedToSimplified -
 //
-extern void kjEntityNormalizedToConcise(KjNode* treeP, const char* lang);
+extern void kjEntityNormalizedToSimplified(KjNode* treeP, const char* lang);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOCONCISE_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOSIMPLIFIED_H_

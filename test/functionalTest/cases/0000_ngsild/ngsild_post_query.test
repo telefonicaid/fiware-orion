@@ -62,6 +62,10 @@ payload='{
     "type": "Property",
     "value": "E1/A2"
   },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:E2"
+  },
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -409,7 +413,7 @@ Date: REGEX(.*)
 05. GET all entities of type T, see E1 and E3
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 1131
+Content-Length: 1205
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -425,6 +429,10 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": "E1/A2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E2"
     },
     "location": {
       "type": "GeoProperty",
@@ -761,7 +769,7 @@ Date: REGEX(.*)
 09. GET all entities with attrs A2 or A4 - see E1, E3 and E4
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 1662
+Content-Length: 1736
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -777,6 +785,10 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": "E1/A2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E2"
     },
     "location": {
       "type": "GeoProperty",
@@ -998,7 +1010,7 @@ Date: REGEX(.*)
 13. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
+Content-Length: 607
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1014,6 +1026,10 @@ Date: REGEX(.*)
     "A2": {
       "type": "Property",
       "value": "E1/A2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E2"
     },
     "location": {
       "type": "GeoProperty",
@@ -1219,7 +1235,7 @@ Date: REGEX(.*)
 24. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2
 ===================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 336
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1233,6 +1249,10 @@ Date: REGEX(.*)
         "A2": {
             "type": "Property",
             "value": "E1/A2"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
         },
         "geoPoint2": {
             "type": "GeoProperty",

@@ -218,18 +218,19 @@ static void optionsParse(const char* options)
   }
 
   if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.concise && orionldState.uriParamOptions.normalized)
-    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "All three output formats (keyValues, concise, normalized) are set", 400);
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "All three output formats (simplified, concise, and normalized) are set", 400);
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.concise)
-    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /keyValues/ and /concise/ output formats are set", 400);
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /simplified/ and /concise/ output formats are set", 400);
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.normalized)
-    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /keyValues/ and /normalized/ output formats are set", 400);
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /simplified/ and /normalized/ output formats are set", 400);
   else if (orionldState.uriParamOptions.concise && orionldState.uriParamOptions.normalized)
     orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Both /concise/ and /normalized/ output formats are set", 400);
-#if 0
-  // Need a decision in ETSI IOSG CIM for this - currently it's a valid request
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
-    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when keyValues output format is selected", 400);
-#endif
+    orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when /simplified/ output format is selected", 400);
+  else if (orionldState.uriParamOptions.keyValues)
+    orionldState.out.format = NGSI_LD_V1_KEYVALUES;
+  else if (orionldState.uriParamOptions.concise)
+    orionldState.out.format = NGSI_LD_V1_CONCISE;
 }
 
 

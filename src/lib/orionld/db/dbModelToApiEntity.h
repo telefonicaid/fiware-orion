@@ -30,6 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+
 
 
 //
@@ -59,6 +61,6 @@ extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, const char* enti
 //   - orionldGetEntities  (GET /entities)
 //   - orionldPostQuery    (POST /entityOperations/query)
 //
-extern KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pdP);
+extern KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_

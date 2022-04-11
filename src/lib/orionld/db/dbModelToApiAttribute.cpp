@@ -34,9 +34,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/db/dbModelToApiSubAttribute.h"                 // dbModelToApiSubAttribute
 #include "orionld/db/dbModelToApiAttribute.h"                    // Own interface
@@ -131,28 +135,40 @@ void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
 //
 // dbModelToApiAttribute2 -
 //
-KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
   char*   longName = kaStrdup(&orionldState.kalloc, dbAttrP->name);
 
   eqForDot(longName);
 
-  char*   alias = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
-  KjNode* attrP = kjObject(orionldState.kjsonP, alias);
-  KjNode* nodeP = dbAttrP->value.firstChildP;
-  KjNode* mdsP  = NULL;
-  KjNode* next;
+  char*   shortName = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+  KjNode* attrP     = kjObject(orionldState.kjsonP, shortName);
+  KjNode* mdsP      = NULL;
+  KjNode* typeP     = kjLookup(dbAttrP, "type");
 
+  if (typeP == NULL)
+  {
+    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbAttrP->name, 500);
+    return NULL;
+  }
+
+  OrionldAttributeType attrType = orionldAttributeType(typeP->value.s);
+  kjChildRemove(dbAttrP, typeP);
+  kjChildAdd(attrP, typeP);
+
+  KjNode* nodeP = dbAttrP->value.firstChildP;
+  KjNode* next;
   while (nodeP != NULL)
   {
     next = nodeP->next;
 
-    if (strcmp(nodeP->name, "type") == 0)
+    if (strcmp(nodeP->name, "value") == 0)
+    {
+      if      (attrType == Relationship)      nodeP->name = (char*) "object";
+      else if (attrType == LanguageProperty)  nodeP->name = (char*) "languageMap";
+
       kjChildAdd(attrP, nodeP);
-    else if (strcmp(nodeP->name, "value") == 0)
-      kjChildAdd(attrP, nodeP);
-    else if (strcmp(nodeP->name, "object") == 0)
-      kjChildAdd(attrP, nodeP);
+    }
     else if (sysAttrs == true)
     {
       if (strcmp(nodeP->name, "creDate") == 0)
@@ -178,7 +194,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, OrionldProblemDet
     {
       KjNode* subAttributeP;
 
-      if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, pdP)) == NULL)
+      if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, renderFormat, lang, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
         return NULL;

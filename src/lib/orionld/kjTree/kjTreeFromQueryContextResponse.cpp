@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // httpStatusCodeToOrionldErrorType
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/langStringExtract.h"                  // langStringExtract
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
@@ -97,28 +98,6 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
   kjChildAdd(containerP, nodeP);
 
   return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// langStringExtract -
-//
-static char* langStringExtract(KjNode* languageMapP, const char* lang)
-{
-  KjNode* langItemP   = kjLookup(languageMapP, lang);  // Find the desired language item (key == lang) inside the languageMap
-
-  if (langItemP == NULL)
-    langItemP  = kjLookup(languageMapP, "en");    // English is the default if 'lang' is not present
-
-  if (langItemP == NULL)
-    langItemP = languageMapP->value.firstChildP;  // If English also not present, just pick the first one
-
-  if (langItemP == NULL)
-    return (char*) "empty languageMap";  // If there is no item at all inside the language map, use "empty languageMap"
-
-  return langItemP->value.s;
 }
 
 
@@ -297,7 +276,8 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
             return NULL;
           }
 
-          char* langString = langStringExtract(langValueP, lang);
+          char* pickedLanguage;
+          char* langString = langStringExtract(langValueP, lang, &pickedLanguage);
           aTop = kjString(orionldState.kjsonP, attrName, langString);
         }
         else

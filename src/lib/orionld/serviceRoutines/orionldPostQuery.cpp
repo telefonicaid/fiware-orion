@@ -38,10 +38,16 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/QNode.h"                              // QNode
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
+#include "orionld/kjTree/kjEntityNormalizedToSimplified.h"     // kjEntityNormalizedToSimplified
 #include "orionld/db/dbModelToApiEntity.h"                     // dbModelToApiEntity2
 #include "orionld/payloadCheck/pcheckQuery.h"                  // pcheckQuery
 #include "orionld/db/dbConfiguration.h"                        // dbEntitiesQuery
 #include "orionld/serviceRoutines/orionldPostQuery.h"          // Own Interface
+
+
+
+extern void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang);  // From orionldGetEntities.cpp
 
 
 
@@ -98,12 +104,20 @@ bool orionldPostQuery(void)
       KjNode*                entityP;
       OrionldProblemDetails  pd;
 
-      if ((entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, &pd)) == NULL)
+      if ((entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, lang, &pd)) == NULL)
       {
         LM_E(("Database Error (%s: %s)", pd.title, pd.detail));
         orionldState.httpStatusCode = 500;
         return false;
       }
+
+      // FIXME: dbModelToApiEntity2/dbModelToApiAttribute2/dbModelToApiSubAttribute2 should take care of this ...
+      if (orionldState.uriParamOptions.concise == true)
+        kjEntityNormalizedToConcise(entityP, lang);
+      else if (orionldState.uriParamOptions.keyValues == true)
+        kjEntityNormalizedToSimplified(entityP, lang);
+      else if (lang != NULL)
+        apiEntityLanguageProps(entityP, lang);
 
       kjChildAdd(orionldState.responseTree, entityP);
     }

@@ -546,7 +546,7 @@ bool orionldGetEntities(void)
         for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
         {
           OrionldProblemDetails pd;
-          KjNode*               entityP = dbModelToApiEntity2(dbEntityP, false, &pd);
+          KjNode*               entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, &pd);
 
           if (entityP != NULL)
             kjChildAdd(orionldState.geoPropertyNodes, entityP);
@@ -574,7 +574,7 @@ bool orionldGetEntities(void)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, *countP);
 
   if (orionldState.uriParamOptions.concise == true)
-    kjEntityNormalizedToConcise(orionldState.responseTree);
+    kjEntityNormalizedToConcise(orionldState.responseTree, NULL);  // lang already taken care of by apiEntityLanguageProps
 
   mongoRequest.release();
 

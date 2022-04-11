@@ -30,6 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+
 
 
 // -----------------------------------------------------------------------------
@@ -44,6 +46,6 @@ extern void dbModelToApiSubAttribute(KjNode* saP);
 //
 // dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
 //
-KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, OrionldProblemDetails* pdP);
+KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPISUBATTRIBUTE_H_

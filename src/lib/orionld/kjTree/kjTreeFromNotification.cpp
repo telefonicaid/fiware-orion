@@ -158,7 +158,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     // Concise - transform/simplify the normalized format
     //
     if (renderFormat == NGSI_LD_V1_CONCISE)
-      kjEntityNormalizedToConcise(objectP);
+      kjEntityNormalizedToConcise(objectP, NULL);
   }
 
   return rootP;

@@ -59,6 +59,7 @@ SET (SOURCES
     attributeTypeFromUriParam.cpp
     orionldError.cpp
     orionldPatchApply.cpp
+    langStringExtract.cpp
 )
 
 # Include directories

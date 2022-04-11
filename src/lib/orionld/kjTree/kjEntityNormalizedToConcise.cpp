@@ -22,18 +22,22 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                                 // strcmp
-#include <unistd.h>                                                 // NULL
+#include <string.h>                                            // strcmp
+#include <unistd.h>                                            // NULL
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                           // KjNode
-#include "kjson/kjLookup.h"                                         // kjLookup
-#include "kjson/kjBuilder.h"                                        // kjChildRemove, ...
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildRemove, ...
 }
 
-#include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
-#include "orionld/kjTree/kjEntityNormalizedToConcise.h"             // Own interface
+#include "logMsg/logMsg.h"                                     // LM_*
+
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/langStringExtract.h"                  // langStringExtract
+#include "orionld/kjTree/kjChildCount.h"                       // kjChildCount
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // Own interface
 
 
 
@@ -41,24 +45,64 @@ extern "C"
 //
 // kjEntityNormalizedToConcise -
 //
-void kjEntityNormalizedToConcise(KjNode* outputP)
+void kjEntityNormalizedToConcise(KjNode* treeP, const char* lang)
 {
-  for (KjNode* attrP = outputP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  for (KjNode* attrP = treeP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (attrP->type != KjObject)
       continue;
 
+    if ((treeP->name != NULL) && (strcmp(treeP->name, "value") == 0))
+      continue;
+
     KjNode* typeP  = kjLookup(attrP, "type");
-    KjNode* valueP = kjLookup(attrP, "value");
+    KjNode* valueP = NULL;
 
-    if ((typeP != NULL) && (valueP != NULL) && (strcmp(typeP->value.s, "Property") == 0))
+    if (typeP == NULL)
+    {
+      LM_E(("Database Error (no type found for attribute '%s')", attrP->name));
+      continue;
+    }
+
+    bool typeDeduced = false;
+    if ((strcmp(typeP->value.s, "Property") == 0) || (strcmp(typeP->value.s, "GeoProperty") == 0))
+    {
+      valueP = kjLookup(attrP, "value");
+      typeDeduced = true;
+    }
+    else if (strcmp(typeP->value.s, "Relationship") == 0)
+      typeDeduced = true;
+    else if (strcmp(typeP->value.s, "LanguageProperty") == 0)
+    {
+      typeDeduced = true;
+      valueP = kjLookup(attrP, "languageMap");
+
+      if (lang != NULL)
+      {
+        //
+        // type is modified from LanguageProperty to Property, and then removed as we're in Concise, so, no action needed for that
+        // The value (not languageMap anymore is a string, looked up by langStringExtract
+        //
+        char* pickedLanguage;
+        char* langString = langStringExtract(valueP, lang, &pickedLanguage);
+
+        valueP->name    = (char*) "value";
+        valueP->type    = KjString;
+        valueP->value.s = langString;
+
+        // Add 'lang' sub-attr
+        KjNode* langP = kjString(orionldState.kjsonP, "lang", pickedLanguage);
+        kjChildAdd(attrP, langP);
+      }
+      else
+        valueP = NULL;  // To avoid key-values
+    }
+
+    // Remove 'type' - for attributes and sub-attributes only
+    if (typeDeduced == true)
       kjChildRemove(attrP, typeP);
 
-    // Same for GeoProperty
-    if ((typeP != NULL) && (valueP) && (strcmp(typeP->value.s, "GeoProperty") == 0))
-      kjChildRemove(attrP, typeP);
-
-    // If only value - make it keyValues
+    // If only value - make it keyValues - only valid for Property (or LangProperty + lang that made it a Property
     if ((valueP != NULL) && (kjChildCount(attrP) == 1))
     {
       attrP->type      = valueP->type;
@@ -66,15 +110,7 @@ void kjEntityNormalizedToConcise(KjNode* outputP)
       continue;
     }
 
-    // If Relationship, remove typeP - leave "object"
-    if ((typeP != NULL) && (strcmp(typeP->value.s, "Relationship") == 0))
-      kjChildRemove(attrP, typeP);
-
-    // If LanguageProperty, remove typeP - leave "languageMap"
-    if ((typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty") == 0))
-      kjChildRemove(attrP, typeP);
-
     // Same same for Sub-Attributes
-    kjEntityNormalizedToConcise(attrP);
+    kjEntityNormalizedToConcise(attrP, lang);
   }
 }

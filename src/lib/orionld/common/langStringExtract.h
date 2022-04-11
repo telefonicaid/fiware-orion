@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOCONCISE_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOCONCISE_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_LANGSTRINGEXTRACT_H_
+#define SRC_LIB_ORIONLD_COMMON_LANGSTRINGEXTRACT_H_
 
 /*
 *
@@ -27,15 +27,14 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
 
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// kjEntityNormalizedToConcise -
+// langStringExtract -
 //
-extern void kjEntityNormalizedToConcise(KjNode* treeP, const char* lang);
+extern char* langStringExtract(KjNode* languageMapP, const char* lang, char** pickedLanguageP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYNORMALIZEDTOCONCISE_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_LANGSTRINGEXTRACT_H_

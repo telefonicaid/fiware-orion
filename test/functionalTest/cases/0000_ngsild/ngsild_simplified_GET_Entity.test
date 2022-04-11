@@ -288,12 +288,12 @@ Date: REGEX(.*)
 04. Attempt with Concise+KeyValues
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 177
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Both /keyValues/ and /concise/ output formats are set",
+    "detail": "Both /simplified/ and /concise/ output formats are set",
     "title": "Incoherent value for /options/ URI param",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -316,12 +316,12 @@ Date: REGEX(.*)
 06. Attempt with KeyValues+Normalized
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 180
+Content-Length: 181
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Both /keyValues/ and /normalized/ output formats are set",
+    "detail": "Both /simplified/ and /normalized/ output formats are set",
     "title": "Incoherent value for /options/ URI param",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -330,12 +330,12 @@ Date: REGEX(.*)
 07. Attempt with Concise+KeyValues+Normalized
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 189
+Content-Length: 194
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "All three output formats (keyValues, concise, normalized) are set",
+    "detail": "All three output formats (simplified, concise, and normalized) are set",
     "title": "Incoherent value for /options/ URI param",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -343,34 +343,15 @@ Date: REGEX(.*)
 
 08. Attempt with KeyValues+sysAttrs
 ===================================
-HTTP/1.1 200 OK
-Content-Length: 272
+HTTP/1.1 400 Bad Request
+Content-Length: 196
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "Array": [
-        5,
-        6
-    ],
-    "Bool": "true",
-    "Float": 3.14,
-    "Geo": {
-        "coordinates": [
-            1,
-            2
-        ],
-        "type": "Point"
-    },
-    "Int": 1,
-    "Rel": "urn:ngsi-ld:entities:E2",
-    "String": "String",
-    "Sub": 6,
-    "createdAt": "REGEX(.*)",
-    "id": "urn:ngsi-ld:entities:E1",
-    "modifiedAt": "REGEX(.*)",
-    "type": "T"
+    "detail": "Can't have system attributes when /simplified/ output format is selected",
+    "title": "Incoherent value for /options/ URI param",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
