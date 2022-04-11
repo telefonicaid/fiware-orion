@@ -1,0 +1,298 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attributes POST of Language Property
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entities with a language property L1
+# 02. See the entity in the database
+# 03. POST /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
+# 04. See the entity in the database - make sure L1:es is 'Castellano'
+# 05. GET entity in Normalized form
+# 06. Attempt with RHS of L1:languageMap as a non-object, e.g. the number 13 - see error
+# 07. Attempt with RHS of L1:languageMap:es as a non-string, e.g. the number 14 - see error
+#
+
+echo "01. POST /ngsi-ld/v1/entities with a language property L1"
+echo "========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "L1": {
+    "languageMap": {
+      "en": "English",
+      "es": "Spanish",
+      "sv": "Swedish"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in the database"
+echo "=================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. POST /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)"
+echo "==========================================================================="
+payload='{
+  "L1": {
+    "languageMap": {
+      "en": "English",
+      "es": "Castellano",
+      "sv": "Swedish"
+    }
+  },
+  "L2": {
+    "languageMap": {
+      "en": "Language",
+      "es": "Idioma",
+      "sv": "Spraak"
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. See the entity in the database - make sure L1:es is 'Castellano'"
+echo "===================================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. GET entity in Normalized form"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo "06. Attempt with RHS of L1:languageMap to a non-object, e.g. the number 13 - see error"
+echo "======================================================================================"
+payload='{
+  "L1": {
+    "languageMap": 13
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt with RHS of L1:languageMap:es to a non-string, e.g. the number 14 - see error"
+echo "========================================================================================="
+payload='{
+  "L1": {
+    "languageMap": {
+      "es": 14
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entities with a language property L1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in the database
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L1" : {
+			"type" : "LanguageProperty",
+			"value" : {
+				"en" : "English",
+				"es" : "Spanish",
+				"sv" : "Swedish"
+			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. POST /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
+===========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. See the entity in the database - make sure L1:es is 'Castellano'
+====================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1",
+		"https://uri.etsi.org/ngsi-ld/default-context/L2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L1" : {
+			"type" : "LanguageProperty",
+			"value" : {
+				"en" : "English",
+				"es" : "Castellano",
+				"sv" : "Swedish"
+			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/L2" : {
+			"type" : "LanguageProperty",
+			"value" : {
+				"en" : "Language",
+				"es" : "Idioma",
+				"sv" : "Spraak"
+			},
+			"modDate" : REGEX(.*),
+			"creDate" : REGEX(.*),
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. GET entity in Normalized form
+=================================
+HTTP/1.1 200 OK
+Content-Length: 226
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "L1": {
+        "languageMap": {
+            "en": "English",
+            "es": "Castellano",
+            "sv": "Swedish"
+        },
+        "type": "LanguageProperty"
+    },
+    "L2": {
+        "languageMap": {
+            "en": "Language",
+            "es": "Idioma",
+            "sv": "Spraak"
+        },
+        "type": "LanguageProperty"
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T"
+}
+
+
+06. Attempt with RHS of L1:languageMap to a non-object, e.g. the number 13 - see error
+======================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 182
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "L1",
+            "reason": "The languageMap of a LanguageProperty attribute must be a JSON Object: https://uri.etsi.org/ngsi-ld/default-context/L1"
+        }
+    ],
+    "updated": []
+}
+
+
+07. Attempt with RHS of L1:languageMap:es to a non-string, e.g. the number 14 - see error
+=========================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 184
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "L1",
+            "reason": "Items of the value of a LanguageProperty attribute must be JSON Strings: https://uri.etsi.org/ngsi-ld/default-context/L1"
+        }
+    ],
+    "updated": []
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

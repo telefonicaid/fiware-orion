@@ -423,15 +423,15 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
 
 // -----------------------------------------------------------------------------
 //
-// languageMapCheck -
+// pCheckLanguageMap -
 //
 // A languageMap must be an object with all strings inside
 //
-bool languageMapCheck(KjNode* fieldP, const char* attrName)
+bool pCheckLanguageMap(KjNode* languageMapP, const char* attrName)
 {
-  PCHECK_OBJECT(fieldP, 0, "The languageMap of a LanguageProperty attribute must be a JSON Object", attrName, 400);
+  PCHECK_OBJECT(languageMapP, 0, "The languageMap of a LanguageProperty attribute must be a JSON Object", attrName, 400);
 
-  for (KjNode* langItemP = fieldP->value.firstChildP; langItemP != NULL; langItemP = langItemP->next)
+  for (KjNode* langItemP = languageMapP->value.firstChildP; langItemP != NULL; langItemP = langItemP->next)
   {
     PCHECK_STRING(langItemP, 0, "Items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
 
@@ -452,15 +452,15 @@ bool languageMapCheck(KjNode* fieldP, const char* attrName)
 //
 // datasetIdCheck -
 //
-bool datasetIdCheck(KjNode* fieldP)
+bool datasetIdCheck(KjNode* datasetIdP)
 {
-  if (fieldP->type != KjString)
+  if (datasetIdP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", fieldP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", datasetIdP->name, 400);
     return false;
   }
 
-  if (pCheckUri(fieldP->value.s, fieldP->name, true) == false)
+  if (pCheckUri(datasetIdP->value.s, datasetIdP->name, true) == false)
     return false;
 
   return true;
@@ -471,15 +471,15 @@ bool datasetIdCheck(KjNode* fieldP)
 //
 // objectCheck -
 //
-bool objectCheck(KjNode* fieldP)
+bool objectCheck(KjNode* objectP)
 {
-  if (fieldP->type != KjString)
+  if (objectP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", fieldP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", objectP->name, 400);
     return false;
   }
 
-  if (pCheckUri(fieldP->value.s, fieldP->name, true) == false)
+  if (pCheckUri(objectP->value.s, objectP->name, true) == false)
     return false;
 
   return true;
@@ -516,11 +516,11 @@ bool stringArrayCheck(KjNode* arrayP)
 //
 // unitCodeCheck -
 //
-bool unitCodeCheck(KjNode* fieldP)
+bool unitCodeCheck(KjNode* unitCodeP)
 {
-  if (fieldP->type != KjString)
+  if (unitCodeP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", fieldP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", unitCodeP->name, 400);
     return false;
   }
 
@@ -844,7 +844,7 @@ static bool pCheckAttributeObject
     }
     else if ((attributeType == LanguageProperty) && (strcmp(fieldP->name, "languageMap") == 0))
     {
-      if (languageMapCheck(fieldP, attrP->name) == false)
+      if (pCheckLanguageMap(fieldP, attrP->name) == false)
         return false;
     }
     else if (strcmp(fieldP->name, "observedAt") == 0)
