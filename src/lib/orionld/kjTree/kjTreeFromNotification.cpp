@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -44,6 +45,7 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/contextCache/orionldContextCacheLookup.h"    // orionldContextCacheLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
+#include "orionld/kjTree/kjTreeLog.h"        // kjTreeLog
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromNotification.h"             // Own interface
 
@@ -51,9 +53,44 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// langFix -
+//
+static void langFix(KjNode* attrP, const char* lang)
+{
+  KjNode* typeP        = kjLookup(attrP, "type");
+  KjNode* languageMapP = kjLookup(attrP, "value");
+
+  if ((typeP == NULL) || (languageMapP == NULL))
+    LM_RVE(("%s: invalid languageProperty", attrP->name));
+
+  typeP->value.s = (char*) "Property";
+
+  KjNode* valueP = kjLookup(languageMapP, lang);
+  if (valueP == NULL)
+    valueP = kjLookup(languageMapP, "en");
+  if (valueP == NULL)
+    valueP = languageMapP->value.firstChildP;
+
+  languageMapP->type = KjString;
+
+  if (valueP != NULL)
+  {
+    languageMapP->value.s = valueP->value.s;
+
+    KjNode* langP = kjString(orionldState.kjsonP, "lang", valueP->name);
+    kjChildAdd(attrP, langP);
+  }
+  else
+    languageMapP->value.s = (char*) "empty languageMap";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromNotification -
 //
-KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, char** detailsP)
+KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, const char* lang, char** detailsP)
 {
   KjNode*          nodeP;
   char             buf[32];
@@ -147,10 +184,17 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       ContextAttribute*  aP       = ceP->contextAttributeVector[aIx];
       const char*        attrName = aP->name.c_str();
 
-      if (SCOMPARE9(attrName, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+      if (strcmp(attrName, "@context") == 0)
         continue;
 
-      nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
+      LM_TMP(("LANG: Calling kjTreeFromContextAttribute for attribute '%s', type '%s', lang: '%s", aP->name.c_str(), aP->type.c_str(), lang));
+      nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, lang, detailsP);
+      if ((lang != NULL) && (lang[0] != 0) && (aP->type == "LanguageProperty"))
+      {
+        kjTreeLog(nodeP, "LANG: after kjTreeFromContextAttribute");
+        langFix(nodeP, lang);
+        kjTreeLog(nodeP, "LANG: after langFix");
+      }
       kjChildAdd(objectP, nodeP);
     }
 

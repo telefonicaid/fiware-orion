@@ -115,6 +115,7 @@ struct CachedSubscription
   double                      expirationTime;
   std::string                 ldContext;
   OrionldContext*             contextP;
+  std::string                 lang;
   RenderFormat                renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
@@ -229,6 +230,7 @@ extern void subCacheItemInsert
 #ifdef ORIONLD
   const std::string&                 name,
   const std::string&                 ldContext,
+  const std::string&                 lang,
   const char*                        mqttUserName,
   const char*                        mqttPassword,
   const char*                        mqttVersion,

@@ -195,12 +195,19 @@ extern void setMetadata(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* 
 
 
 
-#ifdef ORIONLD
 /* ****************************************************************************
 *
 * setContext -
 */
 extern void setContext(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
+
+
+
+/* ****************************************************************************
+*
+* setLang -
+*/
+extern void setLang(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
 
 
 
@@ -241,7 +248,5 @@ extern void setCsf(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 * setTimeInterval - 
 */
 extern void setTimeInterval(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
-
-#endif
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_

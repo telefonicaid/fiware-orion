@@ -377,7 +377,7 @@ bool orionldPostEntitiesWithMongoBackend(void)
 //
 bool orionldPostEntities(void)
 {
-  if (experimental == false)                       // Some day ...
+  if ((experimental == false) || (orionldState.in.lang != NULL))                      // Some day ...
     return orionldPostEntitiesWithMongoBackend();  // ... this will be removed!! :)
 
   char*    entityId;

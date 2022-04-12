@@ -51,10 +51,9 @@ extern std::string mongoCreateSubscription
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const char*                      xauthToken,
-  const std::string&               fiwareCorrelator
-#ifdef ORIONLD
-  , const std::string&             ldContext = ""
-#endif
+  const std::string&               fiwareCorrelator,
+  const std::string&               ldContext = "",
+  const std::string&               lang      = ""
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCREATESUBSCRIPTION_H_

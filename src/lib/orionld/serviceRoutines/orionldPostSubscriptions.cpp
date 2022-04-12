@@ -207,7 +207,8 @@ bool orionldPostSubscriptions(void)
                                   servicePathV,
                                   orionldState.xAuthToken,
                                   orionldState.correlator,
-                                  sub.ldContext);
+                                  sub.ldContext,
+                                  sub.lang);
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
 
   orionldState.httpStatusCode = SccCreated;

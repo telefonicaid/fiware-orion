@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -39,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeLog.h"            // kjTreeLog
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // Own interface
 
@@ -59,10 +61,30 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// langFixSimplified -
+//
+static void langFixSimplified(KjNode* languageMapP, const char* lang)
+{
+  KjNode* valueP = kjLookup(languageMapP, lang);
+  if (valueP == NULL)
+    valueP = kjLookup(languageMapP, "en");
+  if (valueP == NULL)
+    valueP = languageMapP->value.firstChildP;
+
+  languageMapP->type     = KjString;
+  languageMapP->value.s  = (valueP != NULL)? valueP->value.s : (char*) "empty languageMap";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromContextAttribute -
 //
-KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, char** detailsP)
+KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, const char* lang, char** detailsP)
 {
+  LM_TMP(("LANG: Attribute: '%s', type: '%s', lang: '%s'", caP->name.c_str(), caP->type.c_str(), lang));
+
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
   bool     ngsild    = (renderFormat == NGSI_LD_V1_NORMALIZED)             ||
@@ -120,10 +142,13 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
+      LM_TMP(("LANG: Calling kjTreeFromCompoundValue for '%s' of type '%s' (lang == '%s')", caP->name.c_str(), caP->type.c_str(), lang));
       nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
       if (nodeP == NULL)
         return NULL;
       nodeP->name = attrName;
+      if ((lang != NULL) && (lang[0] != 0) && (strcmp(caP->type.c_str(), "LanguageProperty") == 0))
+        langFixSimplified(nodeP, lang);
       break;
 
     case orion::ValueTypeNotGiven:

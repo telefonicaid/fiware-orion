@@ -285,12 +285,24 @@ static void setName(Subscription* subP, const BSONObj* rP)
 
 /* ****************************************************************************
 *
-* setContext -
+* extractContext -
 */
-static void setContext(Subscription* subP, const BSONObj* rP)
+static void extractContext(Subscription* subP, const BSONObj* rP)
 {
-  if (rP->hasField(CSUB_LDCONTEXT))
-    subP->ldContext = getStringFieldF(rP, CSUB_LDCONTEXT);
+  if (rP->hasField("ldContext"))
+    subP->ldContext = getStringFieldF(rP, "ldContext");
+}
+
+
+
+/* ****************************************************************************
+*
+* extractLang -
+*/
+static void extractLang(Subscription* subP, const BSONObj* rP)
+{
+  if (rP->hasField("lang"))
+    subP->lang = getStringFieldF(rP, "lang");
 }
 
 
@@ -578,7 +590,8 @@ bool mongoGetLdSubscription
     setNotification(subP, &r, tenantP);
     setStatus(subP, r);
     setName(subP, &r);
-    setContext(subP, &r);
+    extractContext(subP, &r);
+    extractLang(subP, &r);
     setCsf(subP, &r);
     setTimeInterval(subP, r);
     mongoSetLdTimestamp(&subP->createdAt, "createdAt", r);
@@ -696,7 +709,8 @@ bool mongoGetLdSubscriptions
     setNotification(&s, &r, tenantP);
     setStatus(&s, r);
     setName(&s, &r);
-    setContext(&s, &r);
+    extractContext(&s, &r);
+    extractLang(&s, &r);
     setCsf(&s, &r);
     setTimeInterval(&s, r);
 
