@@ -49,7 +49,7 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/mongoc/mongocRegistrationLookup.h"             // mongocRegistrationLookup
 #include "orionld/mongoc/mongocEntityRetrieve.h"                 // mongocEntityRetrieve
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
@@ -377,18 +377,13 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 //
 bool orionldGetEntity(void)
 {
-  char*    detail;
   KjNode*  regArray = NULL;
   char*    eId      = orionldState.wildcard[0];
 
   //
   // Make sure the ID (eId) is a valid URI
   //
-  if (pcheckUri(eId, true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", 400);
-    return false;
-  }
+  PCHECK_URI(eId, true, 0, "Invalid Entity ID", "Not a URL nor a URN", 400);
 
   if (forwarding)
     regArray = mongocRegistrationLookup(eId, NULL, NULL);

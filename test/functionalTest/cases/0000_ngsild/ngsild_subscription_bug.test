@@ -139,4 +139,4 @@ Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/js
 brokerStop CB
 accumulatorStop
 dbDrop CB
-dbDrop openiot
+dbDrop CB openiot

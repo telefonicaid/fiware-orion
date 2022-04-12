@@ -30,7 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/db/dbConfiguration.h"                          // dbEntityDelete, dbEntityLookup
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
@@ -43,14 +43,9 @@
 bool orionldDeleteEntity(void)
 {
   char* entityId = orionldState.wildcard[0];
-  char* detail;
 
   // Make sure the Entity ID is a valid URI
-  if (pcheckUri(entityId, true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Entity ID", detail, 400);  // FIXME: Include value (entityId) and name ("entityId")
-    return false;
-  }
+  PCHECK_URI(entityId, true, 0, "Invalid Entity ID", "Must be a valid URI", 400);
 
   if (dbEntityLookup(entityId) == NULL)
   {

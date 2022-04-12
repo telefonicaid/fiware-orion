@@ -159,13 +159,13 @@ echo
 01. Attempt to create an entity with a space as part of the entity id uri - see error
 =====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "id",
-    "title": "Not a URI",
+    "title": "Invalid URI - invalid character",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -173,13 +173,13 @@ Date: REGEX(.*)
 02. Attempt to create an entity with a space as part of the unexpanded entity type - see error
 ==============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "type",
-    "title": "Not a URI",
+    "title": "Invalid URI/Shortname - whitespace present",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -187,13 +187,13 @@ Date: REGEX(.*)
 03. Attempt to create an entity with a space as part of the expanded entity type - see error
 ============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "type",
-    "title": "Not a URI",
+    "title": "Invalid URI - invalid character",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

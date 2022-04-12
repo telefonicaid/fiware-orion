@@ -30,7 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 
 
 
@@ -316,12 +316,8 @@ do                                                                              
 #define URI_CHECK(uri, fieldName, strict)                                                                    \
 do                                                                                                           \
 {                                                                                                            \
-  char* detail;                                                                                              \
-  if (pcheckUri(uri, strict, &detail) == false)                                                              \
-  {                                                                                                          \
-    orionldError(OrionldBadRequestData, "Not a URI", fieldName, 400);                                        \
+  if (pCheckUri(uri, fieldName, strict) == false)                                                            \
     return false;                                                                                            \
-  }                                                                                                          \
 } while (0)
 
 

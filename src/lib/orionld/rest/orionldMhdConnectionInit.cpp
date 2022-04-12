@@ -48,7 +48,7 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
@@ -607,13 +607,8 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else if (strcmp(key, "datasetId") == 0)
   {
-    char* detail;
-
-    if (pcheckUri((char*) value, true, &detail) == false)
-    {
-      orionldError(OrionldBadRequestData, "Not a URI", value, 400);  // FIXME: Include 'detail' and name (datasetId)
+    if (pCheckUri((char*) value, "datasetId", true) == false)
       return MHD_YES;
-    }
 
     orionldState.uriParams.datasetId = (char*) value;
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_DATASETID;

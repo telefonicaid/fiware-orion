@@ -155,13 +155,13 @@ Date: REGEX(.*)
 02. PATCH the entity adding batteryLevel with an invalid 'observedAt' and invalid Relationship 'providedBy' - see error but no crash!
 =====================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "object",
-    "title": "Invalid URI - no colon present",
+    "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -192,13 +192,13 @@ Date: REGEX(.*)
 04. PATCH the entity adding batteryLevel with an invalid Relationship 'providedBy' - see error but no crash!
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "object",
-    "title": "Invalid URI - no colon present",
+    "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

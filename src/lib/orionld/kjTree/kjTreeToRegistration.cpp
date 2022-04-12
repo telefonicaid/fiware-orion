@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
@@ -183,14 +183,10 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
     regP->id += randomId;
   }
   else
-    regP->id = orionldState.payloadIdNode->value.s;
-
-  char* uri = (char*) regP->id.c_str();
-  char* detail;
-  if (pcheckUri(uri, true, &detail) == false)
   {
-    orionldError(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), 400);
-    return false;
+    char* uri = orionldState.payloadIdNode->value.s;
+    PCHECK_URI(uri, true, 0, "Registration::id is not a URI", uri, 400);
+    regP->id = uri;
   }
 
   *regIdPP  = (char*) regP->id.c_str();

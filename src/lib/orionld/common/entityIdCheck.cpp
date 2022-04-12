@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Trace levels for logging
 
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
@@ -62,8 +62,7 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
   }
 
   // Entity ID must be a valid URI
-  char* detail;
-  if (pcheckUri(entityIdNodeP->value.s, true, &detail) == false)
+  if (pCheckUri(entityIdNodeP->value.s, "entity::id", true) == false)
   {
     LM_W(("Bad Input (CREATE/UPSERT: entity::id is a string but not a valid URI)"));
     entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400, false);

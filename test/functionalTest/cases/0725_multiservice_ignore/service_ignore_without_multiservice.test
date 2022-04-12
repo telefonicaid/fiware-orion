@@ -25,8 +25,8 @@ Ignoring service header when not running in multiservice mode
 
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DB_NAME}-foo
-dbInit ${CB_DB_NAME}-openiot
+dbInit CB foo
+dbInit CB openiot
 dbResetAll
 echo "show dbs" | mongo $CB_MONGO_HOST:$CB_MONGO_PORT | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
@@ -117,7 +117,7 @@ brokerStop CB
 dbDrop CB
 
 # The following drop is in case the test failed and two databases were actually created
-dbDrop ${CB_DB_NAME}-foo
+dbDrop CB foo
 
 # And this one ...
-dbInit ${CB_DB_NAME}-openiot
+dbInit CB openiot
