@@ -233,11 +233,6 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
       subP->notification.lastSuccess     = cSubP->lastSuccess;
       subP->notification.lastSuccessCode = cSubP->lastSuccessCode;
     }
-
-    if (cSubP->covered > subP->notification.covered)
-    {
-       subP->notification.covered = cSubP->covered;
-    }
   }
   cacheSemGive(__FUNCTION__, "get notification info");
 }

@@ -941,6 +941,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       bool coveredBool = coveredOpt.value;
       subsP->coveredProvided = true;
       subsP->notification.covered = coveredBool;
+
+      if ((subsP->notification.covered) && (subsP->notification.attributes.size() == 0))
+      {
+        return badInput(ciP, "covered true cannot be used if notification attributes list is empty");
+      }
     }
   }
 

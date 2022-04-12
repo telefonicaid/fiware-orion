@@ -258,10 +258,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addNumber("failsCounter", this->failsCounter);
   }
 
-  if (this->covered)
-  {
-    jh.addBool("covered", this->covered);
-  }
+  jh.addBool("covered", this->covered);
 
   return jh.str();
 }

@@ -523,8 +523,7 @@ in the entity. For instance, if subscription is this way:
     "temperature",
     "humidity",
     "brightness"
-  ],
-  "covered": true
+  ]
 }
 ```
 
@@ -553,6 +552,27 @@ We use the term "covered" in the sense the notification "covers" completely all 
 in the `notification.attrs` field. It can be useful for those notification endpoints that are
 not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
 in every received notification.
+
+Note that covered subscriptions need an explicit list of `attrs` in `notification`. Thus, the following
+case is not valid:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+And if you try to create/update a subscription with that you will get a 400 Bad Request error like this:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
+
 
 [Top](#top)
 
