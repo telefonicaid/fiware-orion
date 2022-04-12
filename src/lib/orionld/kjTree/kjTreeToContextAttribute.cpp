@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // pcheckGeoPropertyValue
 #include "orionld/payloadCheck/pcheckLanguagePropertyValue.h"    // pcheckLanguagePropertyValue
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
@@ -840,14 +840,12 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   }
   else if (isRelationship == true)
   {
-    char* details;
-
     if (objectP == NULL)
       ATTRIBUTE_ERROR("relationship attribute without 'object' field", attributeName);
 
     if (objectP->type == KjString)
     {
-      if (pcheckUri(objectP->value.s, true, &details) == false)
+      if (pCheckUri(objectP->value.s, "object", true) == false)
         ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
 
       caP->valueType   = orion::ValueTypeString;
@@ -861,7 +859,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
           ATTRIBUTE_ERROR("relationship attribute with 'object' array item not being a JSON string", kjValueType(nodeP->type));
 
         char* uri = nodeP->value.s;
-        if (pcheckUri(uri, true, &details) == false)
+        if (pCheckUri(uri, "object array item", true) == false)
           ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", uri);
       }
       caP->valueType      = orion::ValueTypeVector;

@@ -48,6 +48,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
+#include "orionld/payloadCheck/pCheckUri.h"                          // pCheckUriInit
 #include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
 #include "orionld/serviceRoutines/orionldPostEntity.h"               // orionldPostEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"              // orionldGetEntities
@@ -511,7 +512,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
 
 
-extern void pcheckUriInit(void);
 // -----------------------------------------------------------------------------
 //
 // orionldServiceInit -
@@ -592,5 +592,5 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   //
   // Initialize checks for incoming payloads
   //
-  pcheckUriInit();
+  pCheckUriInit();
 }

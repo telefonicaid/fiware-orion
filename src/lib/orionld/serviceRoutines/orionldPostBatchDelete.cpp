@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/db/dbConfiguration.h"                        // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_STRING, PCHECK_URI
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
 
 
@@ -76,21 +76,8 @@ bool orionldPostBatchDelete(void)
   //
   for (KjNode* idNodeP = orionldState.requestTree->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
   {
-    char* detail;
-
-    if (idNodeP->type != KjString)
-    {
-      LM_W(("Bad Input (Invalid payload - Array items must be JSON Strings)"));
-      orionldError(OrionldBadRequestData, "Invalid payload", "Array items must be JSON Strings", 400);
-      return false;
-    }
-
-    if (pcheckUri(idNodeP->value.s, true, &detail) == false)
-    {
-      LM_W(("Bad Input (Invalid payload - Array items must be valid URIs)"));
-      orionldError(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs", 400);
-      return false;
-    }
+    PCHECK_STRING(idNodeP, 0, "Invalid payload", "Array items must be JSON Strings", 400);
+    PCHECK_URI(idNodeP->value.s, true, 0, "Invalid payload", "Array items must be valid URIs", 400);
   }
 
 

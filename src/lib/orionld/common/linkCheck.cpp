@@ -24,7 +24,7 @@
 */
 #include <string.h>                                            // strcpy
 
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                    // pCheckUri
 #include "orionld/common/linkCheck.h"                          // Own interface
 
 
@@ -56,8 +56,11 @@ bool linkCheck(char* link, char** detailsP)
 
   *cP = 0;  // End of string for the URL
 
-  if (pcheckUri(link, true, detailsP) == false)
+  if (pCheckUri(link, "Link", true) == false)
+  {
+    *detailsP = (char*) "Not a valid URI";
     return false;
+  }
 
   //
   // FIXME: Parse the 'rel' and 'type' as well ?

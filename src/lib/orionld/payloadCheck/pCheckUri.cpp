@@ -33,15 +33,83 @@
 
 // -----------------------------------------------------------------------------
 //
-// validUriChars -
+// validUriChars - valid characters in a URI (according to RFC 3986):
 //
-extern char validUriChars[256];  // From pcheckUri.cpp
+//   * %
+//   * : / ? # [ ] @
+//   * ! $ & ' ( ) * + , ; =
+//   * A-Z
+//   * a-z
+//   * 0-9
+//   * - . _ ~
+//
+static char validUriChars[256];
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUri - newer version of pcheckUri - accepting OrionldProblemDetails as input/output
+// pCheckUriInit - initialize the array of valid/invalid chars for URI
+//
+void pCheckUriInit(void)
+{
+  bzero(validUriChars, sizeof(validUriChars));
+
+  // Setting VALID for A-Z
+  for (int ix = 'A'; ix <= 'Z'; ix++)
+  {
+    validUriChars[ix] = true;
+  }
+
+  // Setting VALID for a-z
+  for (int ix = 'a'; ix <= 'z'; ix++)
+  {
+    validUriChars[ix] = true;
+  }
+
+  // Setting VALID for 0-9
+  for (int ix = '0'; ix <= '9'; ix++)
+  {
+    validUriChars[ix] = true;
+  }
+
+  // Special characters
+  validUriChars['%']  = true;
+  validUriChars[':']  = true;
+  validUriChars['/']  = true;
+  validUriChars['?']  = true;
+  validUriChars['#']  = true;
+  validUriChars['[']  = true;
+  validUriChars[']']  = true;
+  validUriChars['@']  = true;
+  validUriChars['!']  = true;
+  validUriChars['$']  = true;
+  validUriChars['&']  = true;
+  validUriChars['\''] = true;
+  validUriChars['(']  = true;
+  validUriChars[')']  = true;
+  validUriChars['*']  = true;
+  validUriChars['+']  = true;
+  validUriChars[',']  = true;
+  validUriChars[':']  = true;
+  validUriChars['=']  = true;
+  validUriChars['-']  = true;
+  validUriChars['.']  = true;
+  validUriChars['_']  = true;
+  validUriChars['~']  = true;
+
+  // Not so sure about this ... (MSB set)
+  for (int ix = 0x80; ix <= 0xFF; ix++)
+  {
+    validUriChars[ix]  = true;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckUri - check that the string 'uri' is a valid URI
 //
 bool pCheckUri(const char* uri, const char* name, bool mustBeUri)
 {
@@ -75,7 +143,7 @@ bool pCheckUri(const char* uri, const char* name, bool mustBeUri)
   //
   if ((mustBeUri == true) && (hasColon == false))
   {
-    orionldError(OrionldBadRequestData, "Invalid URI - no colon present", name, 400);
+    orionldError(OrionldBadRequestData, "Invalid URI - no colon found", name, 400);
     return false;
   }
 

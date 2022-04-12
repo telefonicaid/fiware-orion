@@ -42,7 +42,6 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"         // mongoSetLdRelationshipV, mongoSetLdPropertyV, ...
 #include "orionld/mongoBackend/mongoLdRegistrationsGet.h"        // Own interface

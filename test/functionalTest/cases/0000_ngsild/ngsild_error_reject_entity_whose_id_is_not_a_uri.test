@@ -49,13 +49,13 @@ echo
 01. POST /ngsi-ld/v1/entities with an 'id' that is not a URI
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "id",
-    "title": "Not a URI",
+    "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

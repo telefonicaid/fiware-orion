@@ -40,8 +40,8 @@ extern "C"
 #include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
+#include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
-#include "orionld/payloadCheck/pcheckUri.h"                     // pcheckUri
 #include "orionld/kjTree/kjChildAddOrReplace.h"                 // kjChildAddOrReplace
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"   // Own Interface
 
@@ -541,13 +541,8 @@ bool orionldPatchRegistration(void)
 {
   char*    registrationId = orionldState.wildcard[0];
   KjNode*  propertyTree;
-  char*    detail;
 
-  if (pcheckUri(registrationId, true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId, 400);
-    return false;
-  }
+  PCHECK_URI(orionldState.wildcard[0], true, 0, "Registration ID must be a valid URI", orionldState.wildcard[0], 400);
 
   if (pcheckRegistration(orionldState.requestTree, false, &propertyTree) == false)
   {

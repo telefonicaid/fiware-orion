@@ -40,7 +40,6 @@ SET (SOURCES
      pcheckQuery.cpp
      pcheckAttrs.cpp
      pcheckQ.cpp
-     pcheckUri.cpp
      pcheckAttribute.cpp
      pCheckAttribute.cpp
      pCheckUri.cpp

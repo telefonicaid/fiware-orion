@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/pCheckUri.h"                    // pCheckUri
 #include "orionld/mqtt/mqttCheck.h"                            // mqttCheck
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // Own interface
 
@@ -211,7 +211,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
           return false;
         }
       }
-      else if (pcheckUri(uriP, true, &detail) == false)
+      else if (pCheckUri(uriP, "Endpoint::uri", true) == false)
       {
         orionldError(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid URI", 400);
         return false;

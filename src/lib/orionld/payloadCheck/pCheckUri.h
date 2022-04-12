@@ -30,16 +30,16 @@
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUri -
+// pCheckUriInit - initialize the array of valid/invalid chars for URI
 //
-extern bool pCheckUri(const char* uri, const char* name, bool mustBeUri);
+extern void pCheckUriInit(void);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckUri - older, now deprecated, function to check the validity of a URI
+// pCheckUri -
 //
-extern bool pcheckUri(char* uri, bool strict, char** detailP);
+extern bool pCheckUri(const char* uri, const char* name, bool mustBeUri);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_

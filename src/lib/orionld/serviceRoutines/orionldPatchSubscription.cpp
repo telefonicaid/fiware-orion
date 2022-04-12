@@ -46,7 +46,7 @@ extern "C"
 #include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
 #include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
 #include "orionld/db/dbConfiguration.h"                        // dbSubscriptionGet
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
@@ -845,15 +845,9 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
 //
 bool orionldPatchSubscription(void)
 {
-  char* subscriptionId = orionldState.wildcard[0];
-  char* detail;
+  PCHECK_URI(orionldState.wildcard[0], true, 0, "Subscription ID must be a valid URI", orionldState.wildcard[0], 400);
 
-  if (pcheckUri(subscriptionId, true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId, 400);
-    return false;
-  }
-
+  char*   subscriptionId         = orionldState.wildcard[0];
   KjNode* watchedAttributesNodeP = NULL;
   KjNode* timeIntervalNodeP      = NULL;
   KjNode* qP                     = NULL;

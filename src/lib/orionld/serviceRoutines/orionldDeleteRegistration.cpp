@@ -28,7 +28,7 @@
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"   // Own Interface
 
 
@@ -39,13 +39,7 @@
 //
 bool orionldDeleteRegistration(void)
 {
-  char* detail;
-
-  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0], 400);
-    return false;
-  }
+  PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Context Source Registration Identifier", orionldState.wildcard[0], 400);
 
   if (dbRegistrationExists(orionldState.wildcard[0]) == false)
   {

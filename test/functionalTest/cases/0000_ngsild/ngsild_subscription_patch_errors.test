@@ -1560,13 +1560,13 @@ Date: REGEX(.*)
 17. Attempt to PATCH the subscription with an 'entities[X]::id' that is not a URI
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "entities[X]::id",
-    "title": "Not a URI",
+    "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2448,7 +2448,7 @@ Date: REGEX(.*)
 
 {
     "detail": "endpoint::uri",
-    "title": "Not a URI",
+    "title": "Empty URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2456,13 +2456,13 @@ Date: REGEX(.*)
 81. Attempt to PATCH the subscription with a 'notification:endpoint:uri' that is not a valid URI
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 106
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "endpoint::uri",
-    "title": "Not a URI",
+    "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

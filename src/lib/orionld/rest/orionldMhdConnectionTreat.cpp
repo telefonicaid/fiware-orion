@@ -52,7 +52,6 @@ extern "C"
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
@@ -406,33 +405,49 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
 
 // -----------------------------------------------------------------------------
 //
-// linkHeaderCheck -
+// pCheckLinkHeader -
 //
-static bool linkHeaderCheck(void)
+char* pCheckLinkHeader(char* link)
 {
-  char* details;
-
-  if (orionldState.link[0] != '<')
+  if (link[0] != '<')
   {
     orionldError(OrionldBadRequestData, "invalid Link HTTP header", "link doesn't start with '<'", 400);
-    return false;
+    return NULL;
   }
 
-  ++orionldState.link;  // Step over initial '<'
+  char* linkStart = &link[1];  // Step over initial '<'
+  char* cP        = linkStart;
 
-  if (linkCheck(orionldState.link, &details) == false)
+  while (*cP != '>')
   {
-    orionldError(OrionldBadRequestData, "Invalid Link HTTP Header", details, 400);
-    return false;
+    if (*cP == 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid Link HTTP Header", "missing '>' at end of URL of link", 400);
+      return NULL;
+    }
+
+    ++cP;
   }
 
+  *cP = 0;  // End of string for the URL
+
+  if (pCheckUri(linkStart, "Link", true) == false)
+    return NULL;
+
+  return linkStart;
+}
+
+
+
+static bool linkGet(const char* link)
+{
   //
   // The HTTP headers live in the thread. Once the thread dies, the mempry is freed.
   // When calling orionldContextFromUrl, the URL must be properly allocated.
   // As it will be inserted in the Context Cache, that must survive requests, it must be
   // allocated in the global allocation buffer 'kalloc', not the thread-local 'orionldState.kalloc'.
   //
-  char* url = kaStrdup(&kalloc, orionldState.link);
+  char* url = kaStrdup(&kalloc, link);
 
   orionldState.contextP = orionldContextFromUrl(url, NULL);
   if (orionldState.contextP == NULL)
@@ -988,8 +1003,16 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED) == 0)
   {
-    if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck() == false))
-      goto respond;
+    if (orionldState.linkHttpHeaderPresent == true)
+    {
+      char* link = pCheckLinkHeader(orionldState.link);
+
+      if (link == NULL)
+        goto respond;
+
+      if (linkGet(link) == false)  // Lookup/Download if necessary
+        goto respond;
+    }
 
     //
     // Treat inline context

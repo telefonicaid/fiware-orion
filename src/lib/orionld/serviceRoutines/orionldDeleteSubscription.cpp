@@ -30,7 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
 
@@ -42,13 +42,7 @@
 //
 bool orionldDeleteSubscription(void)
 {
-  char* detail;
-
-  if (pcheckUri(orionldState.wildcard[0], true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);
-    return false;
-  }
+  PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);
 
   if (dbSubscriptionGet(orionldState.wildcard[0]) == NULL)
   {

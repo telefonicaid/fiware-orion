@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
 #include "orionld/kjTree/kjTreeToSubscriptionExpression.h"       // kjTreeToSubscriptionExpression
@@ -104,18 +104,13 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     subP->id += randomId;
   }
   else
-    subP->id = orionldState.payloadIdNode->value.s;
+  {
+    char* uri = orionldState.payloadIdNode->value.s;
+    PCHECK_URI(uri, true, 0, "Subscription::id is not a URI", uri, 400);
+    subP->id = uri;
+  }
 
   *subIdPP  = (char*) subP->id.c_str();
-
-  char* uri = (char*) subP->id.c_str();
-  char* detail;
-
-  if (pcheckUri(uri, true, &detail) == false)
-  {
-    orionldError(OrionldBadRequestData, "Subscription::id is not a URI", uri, 400);
-    return false;
-  }
 
 
   //
