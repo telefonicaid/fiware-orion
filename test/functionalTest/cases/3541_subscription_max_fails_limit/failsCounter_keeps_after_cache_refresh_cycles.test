@@ -132,7 +132,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subId, and see failsCounter=2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 416
+Content-Length: 432
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -142,6 +142,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 2,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
@@ -170,7 +171,7 @@ Date: REGEX(.*)
 04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 416
+Content-Length: 432
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -180,6 +181,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 2,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
@@ -208,7 +210,7 @@ Date: REGEX(.*)
 05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 416
+Content-Length: 432
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -218,6 +220,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 2,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"

@@ -255,7 +255,7 @@ Broker Restarted
 04. GET /v2/subscriptions/subscription_id, to check the status oneshot.
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 335
+Content-Length: 351
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -268,6 +268,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
@@ -338,7 +339,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. GET /v2/subscriptions/subscription_id, to check the status inactive.
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 459
+Content-Length: 475
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -351,6 +352,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
@@ -388,7 +390,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/subscription_id, to check the update status.
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 458
+Content-Length: 474
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -401,6 +403,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
