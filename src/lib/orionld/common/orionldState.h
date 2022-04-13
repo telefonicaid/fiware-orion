@@ -250,6 +250,9 @@ typedef struct OrionldStateIn
   char*     xForwardedFor;
   char*     connection;
   char*     servicePath;
+  char*     xAuthToken;
+  char*     authorization;
+  char*     tenant;
   char*     lang;  // Temporary
 
   // Incoming payload

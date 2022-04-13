@@ -267,10 +267,10 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
     ++header;
   }
 
-  if (orionldState.xAuthToken != NULL)
+  if (orionldState.in.xAuthToken != NULL)
   {
     headerV[header].type  = HttpHeaderXauth;
-    headerV[header].value = orionldState.xAuthToken;
+    headerV[header].value = orionldState.in.xAuthToken;
     ++header;
   }
 

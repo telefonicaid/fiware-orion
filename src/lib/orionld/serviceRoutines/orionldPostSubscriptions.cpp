@@ -205,7 +205,7 @@ bool orionldPostSubscriptions(void)
                                   &oError,
                                   orionldState.tenantP,
                                   servicePathV,
-                                  orionldState.xAuthToken,
+                                  orionldState.in.xAuthToken,
                                   orionldState.correlator,
                                   sub.ldContext,
                                   sub.lang);

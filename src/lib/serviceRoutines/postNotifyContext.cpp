@@ -59,7 +59,7 @@ std::string postNotifyContext
   TIMED_MONGO(orionldState.httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
                                                                &ncr,
                                                                orionldState.tenantP,
-                                                               orionldState.xAuthToken,
+                                                               orionldState.in.xAuthToken,
                                                                ciP->servicePathV,
                                                                orionldState.correlator,
                                                                orionldState.attrsFormat));

@@ -292,7 +292,7 @@ bool orionldPostBatchUpdate(void)
                                                    &mongoResponse,
                                                    orionldState.tenantP,
                                                    servicePathV,
-                                                   orionldState.xAuthToken,
+                                                   orionldState.in.xAuthToken,
                                                    orionldState.correlator,
                                                    orionldState.attrsFormat,
                                                    orionldState.apiVersion,

@@ -84,7 +84,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(orionldState.httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, orionldState.tenantP, orionldState.xAuthToken, ciP->servicePathV, orionldState.correlator));
+  TIMED_MONGO(orionldState.httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, orionldState.tenantP, orionldState.in.xAuthToken, ciP->servicePathV, orionldState.correlator));
   TIMED_RENDER(answer = scr.render());
 
   parseDataP->scr.res.release();

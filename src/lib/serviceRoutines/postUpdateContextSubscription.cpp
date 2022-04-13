@@ -59,7 +59,7 @@ std::string postUpdateContextSubscription
   TIMED_MONGO(orionldState.httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                            &ucsr,
                                                                            orionldState.tenantP,
-                                                                           orionldState.xAuthToken,
+                                                                           orionldState.in.xAuthToken,
                                                                            ciP->servicePathV,
                                                                            orionldState.correlator));
 

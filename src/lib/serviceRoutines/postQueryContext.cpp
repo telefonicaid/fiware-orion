@@ -133,7 +133,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       verb,
                       orionldState.tenantP->tenant,
                       servicePath,
-                      orionldState.xAuthToken,
+                      orionldState.in.xAuthToken,
                       resource,
                       mimeType,
                       payload,
