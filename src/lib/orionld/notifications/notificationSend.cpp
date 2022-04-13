@@ -358,32 +358,46 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   strcpy(contentLenHeader, "Content-Length: 0");  // Can't modify inside static strings, so need a char-vec on the stack for contentLenHeader
   snprintf(lenP, sizeLeftForLen, "%d\r\n", (int) contentLength);  // Adding Content-Length inside contentLenHeader
 
-  struct iovec  ioVec[8] = {
+  int headers  = 6;  // the minimum number of request headers
+
+  //
+  // Headers to be forwarded in notifications (taken from the request that provoked the notification)
+  //
+  if (orionldState.in.tenant     != NULL)    ++headers;
+  if (orionldState.in.xAuthToken != NULL)    ++headers;
+  if (orionldState.in.xAuthToken != NULL)    ++headers;
+
+  // Headers from Subscription::notification::endpoint::receiverInfo
+  // LATER
+
+
+  // Let's limit the number of headers to 50
+  if (headers > 50)
+    LM_X(1, ("Too many HTTP headers (>50) for a Notification - to support that many, the broker needs a SW update and to be recompiled"));
+
+  int           ioVecLen   = headers + 3;  // Request line + X headers + empty line + payload body
+  int           headerIx   = 6;
+  struct iovec  ioVec[53]  = {
     { requestHeader,                 requestHeaderLen },
     { contentLenHeader,              strlen(contentLenHeader) },
-    { (void*) contentTypeHeaderJson, 32 },
+    { (void*) contentTypeHeaderJson, 32 },  // Index 2
     { (void*) userAgentHeader,       21 },
-    // Host: IP:PORT
     { (void*) acceptHeader,          26 },
-    { (void*) normalizedHeader,      37 },  // 5
-    { (void*) "\r\n",                2  },  // 6
-    { payloadBody,                   contentLength }
+    { (void*) normalizedHeader,      37 }   // Index 5
   };
-  int ioVecLen = 8;
 
-  if (mAltP->subP->httpInfo.mimeType == JSONLD)
+  if (mAltP->subP->httpInfo.mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;
     ioVec[2].iov_len  = 35;
   }
   else  // Add Link header
   {
-    // Replace ioVec[6] - make sure to end it in double newline/linefeed
-    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n\r\n",
-             mAltP->subP->ldContext.c_str());
+    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", mAltP->subP->ldContext.c_str());
 
-    ioVec[6].iov_base = linkHeader;
-    ioVec[6].iov_len  = strlen(linkHeader);
+    ioVec[headerIx].iov_base = linkHeader;
+    ioVec[headerIx].iov_len  = strlen(linkHeader);
+    ++headerIx;
   }
 
   if (mAltP->subP->renderFormat == NGSI_LD_V1_CONCISE)
@@ -397,11 +411,56 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[5].iov_len  = 37;
   }
 
+  if (orionldState.in.tenant != NULL)
+  {
+    int   len = strlen(orionldState.in.tenant) + 20;  // Ngsild-Tenant: xxx\r\n0 - '\r' seems to not count for strlen ...
+    char* buf = kaAlloc(&orionldState.kalloc, len);
+
+    ioVec[headerIx].iov_len  = snprintf(buf, len, "Ngsild-Tenant: %s\r\n", orionldState.in.tenant);
+    ioVec[headerIx].iov_base = buf;
+
+    ++headerIx;
+  }
+
+  if (orionldState.in.xAuthToken != NULL)
+  {
+    int   len = strlen(orionldState.in.xAuthToken) + 20;  // X-Auth-Token: xxx\r\n0
+    char* buf = kaAlloc(&orionldState.kalloc, len);
+
+    ioVec[headerIx].iov_len  = snprintf(buf, len, "X-Auth-Token: %s\r\n", orionldState.in.xAuthToken);
+    ioVec[headerIx].iov_base = buf;
+    ++headerIx;
+  }
+
+  if (orionldState.in.authorization != NULL)
+  {
+    int   len = strlen(orionldState.in.authorization) + 20;  // Authorization: xxx\r\n0
+    char* buf = kaAlloc(&orionldState.kalloc, len);
+
+    ioVec[headerIx].iov_len  = snprintf(buf, len, "Authorization: %s\r\n", orionldState.in.authorization);
+    ioVec[headerIx].iov_base = buf;
+    ++headerIx;
+  }
+
+
+  // Empty line delimiting HTTP Headers and Payload Body
+  ioVec[headerIx].iov_base = (void*) "\r\n";
+  ioVec[headerIx].iov_len  = 2;
+  ++headerIx;
+
+  // Payload Body
+  ioVec[headerIx].iov_base = payloadBody;
+  ioVec[headerIx].iov_len  = contentLength;
+
+  ioVecLen = headerIx + 1;
+
   // <DEBUG>
-  LM_TMP(("Notification:"));
+  int len = 0;
+  LM_TMP(("Notification (%d iovecs):", ioVecLen));
   for (int ix = 0; ix < ioVecLen; ix++)
   {
     LM_TMP((" %d/%d %s", ioVec[ix].iov_len, strlen((char*) ioVec[ix].iov_base), (char*) ioVec[ix].iov_base));
+    len += ioVec[ix].iov_len;
   }
   // </DEBUG>
 
