@@ -587,7 +587,7 @@ Date: REGEX(.*)
 POST REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Fiware-Servicepath: /
 Content-Length: 259
-User-Agent: orion/1.15.0-next libcurl/7.68.0
+User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
 Accept: application/json
