@@ -36,6 +36,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 02. Create a subscription S2 on E2 and attribute L2, with 'lang=en'
 # 03. See subscription S2 in mongo - see lang=en
 # 04. GET subscription S2 - see lang=en
+# 04. GET ALL subscriptions see lang=en in S2
 # 05. Create an Entity E1 with a language-property L1
 # 06. Dump/Reset accumulator - see one notification for S1, with L1 as a LanguageProperty
 # 07. Create an Entity E2 with a language-property L2
@@ -109,6 +110,13 @@ echo
 echo "04. GET subscription S2 - see lang=en"
 echo "====================================="
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:subs:S2
+echo
+echo
+
+
+echo "04. GET ALL subscriptions see lang=en in S2"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
 echo
 echo
 
@@ -364,6 +372,71 @@ Date: REGEX(.*)
 }
 
 
+04. GET ALL subscriptions see lang=en in S2
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 637
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:entities:E1",
+                "type": "T"
+            }
+        ],
+        "id": "urn:subs:S1",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "L1"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "REGEX(.*)/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "L1"
+        ]
+    },
+    {
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:entities:E2",
+                "type": "T"
+            }
+        ],
+        "id": "urn:subs:S2",
+        "isActive": true,
+        "lang": "en",
+        "notification": {
+            "attributes": [
+                "L2"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "REGEX(.*)/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "L2"
+        ]
+    }
+]
+
+
 05. Create an Entity E1 with a language-property L1
 ===================================================
 HTTP/1.1 201 Created
@@ -375,7 +448,7 @@ Date: REGEX(.*)
 
 06. Dump/Reset accumulator - see one notification for S1, with L1 as a LanguageProperty
 =======================================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Fiware-Servicepath: /
 Content-Length: 292
 User-Agent: REGEX(.*)
@@ -419,7 +492,7 @@ Date: REGEX(.*)
 
 08. Dump/Reset accumulator - see one notification for S2, with L2 as a Property
 ===============================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Fiware-Servicepath: /
 Content-Length: 260
 User-Agent: REGEX(.*)
@@ -469,7 +542,7 @@ Date: REGEX(.*)
 
 11. Dump/Reset accumulator - see one notification for S3, with L3 as a String
 =============================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Fiware-Servicepath: /
 Content-Length: 220
 User-Agent: REGEX(.*)
@@ -511,7 +584,7 @@ Date: REGEX(.*)
 
 23. Dump/Reset accumulator - see one notification for S1, with L1 as a Property
 ===============================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Fiware-Servicepath: /
 Content-Length: 259
 User-Agent: orion/1.15.0-next libcurl/7.68.0
@@ -549,7 +622,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:subs:S1",
 	"expiration" : 2147483647,
-	"reference" : "http://127.0.0.1:9997/notify",
+	"reference" : "REGEX(.*)/notify",
 	"custom" : false,
 	"mimeType" : "application/json",
 	"throttling" : 0,
