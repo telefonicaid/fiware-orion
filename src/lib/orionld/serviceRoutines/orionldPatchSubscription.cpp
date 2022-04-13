@@ -755,6 +755,10 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
     {
       LM_W(("Not Implemented (Orion-LD doesn't implement periodical notifications"));
     }
+    else if (strcmp(itemP->name, "lang") == 0)
+    {
+      cSubP->lang = itemP->value.s;
+    }
     else if (strcmp(itemP->name, "q") == 0)
     {
       cSubP->expression.q = itemP->value.s;

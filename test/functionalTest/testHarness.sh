@@ -245,8 +245,10 @@ function exitFunction()
   stdoutFile=$6
   forced=$7
 
+  partOk=false
+
   logMsg "FAILURE $exitCode for test $testFile: $errorText"
-  echo -n "(FAILURE $exitCode - $errorText) "
+  #echo -n "($errorText) "
 
   if [ "$CB_FT_VERBOSE" != "" ] || [ "$loud" == "on" ]
   then
@@ -941,7 +943,7 @@ function partExecute()
       logMsg "$what $dirname/$filename: exitCode=$exitCode"
       if [ $__tryNo == $MAX_TRIES ]
       then
-        exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff 
+        exitFunction 9 "output not as expected" $path "($path) output not as expected" $dirname/$filename.diff 
       else
         echo -n "(ERROR 9 - .out and .regexpect differ) "
       fi
@@ -1254,6 +1256,7 @@ do
       fi
 
       logMsg "Calling runTest for $testFile, try $tryNo"
+      partOk=true
       runTest $testFile $tryNo
       logMsg "runTest for $testFile, try $tryNo DONE. shellResult=$shellResult"
 
@@ -1278,7 +1281,6 @@ do
         break
       else
         tryNo=$tryNo+1
-        echo
       fi
     done
   else
@@ -1308,7 +1310,13 @@ do
     else
       xsecs=$secs
     fi
-    echo $xsecs seconds
+
+    if [ "$partOk" == "true" ]
+    then
+        echo $xsecs seconds
+    else
+        echo "$xsecs seconds - ERROR: $errorText"
+    fi        
   else
     echo "SUCCESS"
   fi

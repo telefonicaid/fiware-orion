@@ -172,11 +172,13 @@ bye
 
 04. Dump accumulator, see one notification
 ==========================================
-POST REGEX(.*)
+POST REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
 Content-Length: 453
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
 
 {
     "data": [

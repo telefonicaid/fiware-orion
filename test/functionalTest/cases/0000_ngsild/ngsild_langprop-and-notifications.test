@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notifications with Language Property
+Notifications with Language Property - old style notifications
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -222,12 +222,26 @@ echo
 
 echo "21. PATCH S1 - add lang=es"
 echo "=========================="
+payload='{
+  "lang": "es"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:subs:S1 -X PATCH --payload "$payload"
 echo
 echo
 
 
 echo "22. Update E1"
 echo "============="
+payload='{
+  "L1": {
+    "languageMap": {
+      "en": "english4",
+      "es": "ingles4",
+      "sv": "engelska4"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs -X PATCH --payload "$payload"
 echo
 echo
 
@@ -236,6 +250,13 @@ echo "23. Dump/Reset accumulator - see one notification for S1, with L1 as a Pro
 echo "==============================================================================="
 accumulatorDump
 accumulatorReset
+echo
+echo
+
+
+echo "24. See the patched subscription in the database - see lang=es"
+echo "=============================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:subs:S1"})'
 echo
 echo
 
@@ -476,14 +497,95 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 21. PATCH S1 - add lang=es
 ==========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
 
 
 22. Update E1
 =============
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
 
 
 23. Dump/Reset accumulator - see one notification for S1, with L1 as a Property
 ===============================================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Fiware-Servicepath: /
+Content-Length: 259
+User-Agent: orion/1.15.0-next libcurl/7.68.0
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "data": [
+        {
+            "L1": {
+                "lang": "es",
+                "type": "Property",
+                "value": "ingles4"
+            },
+            "id": "urn:ngsi-ld:entities:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+24. See the patched subscription in the database - see lang=es
+==============================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:subs:S1",
+	"expiration" : 2147483647,
+	"reference" : "http://127.0.0.1:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:entities:E1",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized",
+	"lang" : "es"
+}
+bye
 
 
 --TEARDOWN--

@@ -311,10 +311,12 @@ Date: REGEX(.*)
 17. Dump+Reset accumulator - see three notifications: S1, S2, and S4
 ====================================================================
 #SORT_START
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S4
 Content-Length: 267
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -330,10 +332,12 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 267
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -349,10 +353,12 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 267
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -381,10 +387,12 @@ Date: REGEX(.*)
 19. Dump+Reset accumulator - see two notifications: S2 and S4
 =============================================================
 #SORT_START
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S4
 Content-Length: 267
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -400,10 +408,12 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 267
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -432,10 +442,12 @@ Date: REGEX(.*)
 21. Dump+Reset accumulator - see three notifications: S2, S4, and S5
 ====================================================================
 #SORT_START
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S5
 Content-Length: 303
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -455,10 +467,12 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S4
 Content-Length: 303
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -478,10 +492,12 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 303
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
