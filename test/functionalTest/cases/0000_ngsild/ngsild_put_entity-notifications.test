@@ -143,7 +143,7 @@ Date: REGEX(.*)
 04. Dump+Reset accumulator - see one notification
 =================================================
 POST REGEX(.*)
-Content-Length: 272
+Content-Length: 284
 User-Agent: orionld
 Accept: application/json
 Content-Type: application/json
@@ -178,8 +178,8 @@ Date: REGEX(.*)
 
 06. Dump+Reset accumulator - see one notification
 =================================================
-POST REGEX(.*)/notify?
-Content-Length: 272
+POST REGEX(.*)
+Content-Length: 284
 User-Agent: orionld
 Accept: application/json
 Content-Type: application/json

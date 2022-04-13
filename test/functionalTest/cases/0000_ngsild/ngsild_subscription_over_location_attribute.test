@@ -108,7 +108,7 @@ Date: REGEX(.*)
 ===============================================
 POST http:REGEX(.*)
 Fiware-Servicepath: /
-Content-Length: 314
+Content-Length: 326
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)

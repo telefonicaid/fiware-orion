@@ -76,44 +76,140 @@ static __thread char body[4 * 1024];
 
 // -----------------------------------------------------------------------------
 //
+// attributeToSimplified - move to its own module
+//
+// 1. Find the type
+// 2. Knowing the type, find the value ("value", "object", or "languageMap")
+// 3. Make the value node the RHS of the attribute
+//
+static void attributeToSimplified(KjNode* attrP)
+{
+  // Get the attribute type
+  KjNode* attrTypeP = kjLookup(attrP, "type");
+  if (attrTypeP == NULL)
+    LM_RVE(("Attribute '%s' has no type", attrP->name));
+  if (attrTypeP->type != KjString)
+    LM_RVE(("Attribute '%s' has a type that is not a JSON String", attrP->name));
+
+  // Get the value
+  char* valueFieldName = (char*) "value";
+  if (strcmp(attrTypeP->value.s, "Relationship") == 0)
+    valueFieldName = (char*) "object";
+  else if (strcmp(attrTypeP->value.s, "LanguageProperty") == 0)
+    valueFieldName = (char*) "languageMap";
+
+  KjNode* valueP = kjLookup(attrP, valueFieldName);
+
+  if (valueP == NULL)
+    LM_RVE(("Attribute '%s' has no value '%s'", attrP->name, valueFieldName));
+
+  attrP->type  = valueP->type;
+  attrP->value = valueP->value;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attributeToConcise - move to its own module
+//
+// 1. Find and remove the type
+// 2. If only one item left and it's "value" - Simplified
+//
+static void attributeToConcise(KjNode* attrP, bool* simplifiedP)
+{
+  // Get the attribute type and remove it
+  KjNode* attrTypeP = kjLookup(attrP, "type");
+  if (attrTypeP == NULL)
+    LM_RVE(("Attribute '%s' has no type", attrP->name));
+  if (attrTypeP->type != KjString)
+    LM_RVE(("Attribute '%s' has a type that is not a JSON String", attrP->name));
+
+  kjChildRemove(attrP, attrTypeP);
+  LM_TMP(("CONCISE: Just removed type '%s'", attrTypeP->value.s));
+
+  if ((strcmp(attrTypeP->value.s, "Property") != 0) && (strcmp(attrTypeP->value.s, "GeoProperty") != 0))
+    return;
+
+  // If only one item left in attrP - Simplified
+  if ((attrP->value.firstChildP != NULL) && (attrP->value.firstChildP->next == NULL))
+  {
+    attrP->type  = attrP->value.firstChildP->type;
+    attrP->value = attrP->value.firstChildP->value;
+    *simplifiedP = true;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // entityFix -
 //
 void entityFix(KjNode* entityP, CachedSubscription* subP)
 {
-  OrionldContext* contextP = subP->contextP;
+  kjTreeLog(entityP, "Fixing Entity");
 
-  // eqForDot + compact attribute names
+  bool simplified = (subP->renderFormat == NGSI_LD_V1_KEYVALUES);
+  bool concise    = (subP->renderFormat == NGSI_LD_V1_CONCISE);
+
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (strcmp(attrP->name, "id") == 0)
       continue;
 
-    // compaction of the value of 'type'
+    // compaction of the value of 'type' for the Entity
     if (strcmp(attrP->name, "type") == 0)
     {
-      attrP->value.s = orionldContextItemAliasLookup(contextP, attrP->value.s, NULL, NULL);
+      attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);
       continue;
     }
 
+
+    //
+    // Here we're "in attributeFix"
+    //
+
+    //
+    // Never mind "location", "observationSpace", and "operationSpace"
+    // It is pobably faster to lookup their alias (and get the same back) as it is to
+    // do three string-comparisons in every loop
+    //
     eqForDot(attrP->name);
-    attrP->name = orionldContextItemAliasLookup(contextP, attrP->name, NULL, NULL);
+    attrP->name = orionldContextItemAliasLookup(subP->contextP, attrP->name, NULL, NULL);
 
-    // eqForDot + compact sub-attribute names
-    for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
+    bool asSimplified = false;
+    if (simplified)
     {
-      if (strcmp(saP->name, "value")       == 0) continue;
-      if (strcmp(saP->name, "object")      == 0) continue;
-      if (strcmp(saP->name, "languageMap") == 0)
-      {
-        LM_TMP(("LANG: Notification: '%s' is a LanguageProperty and lang=='%s'", attrP->name, subP->lang.c_str()));
-        continue;
-      }
-      if (strcmp(saP->name, "type")        == 0) continue;
-      if (strcmp(saP->name, "observedAt")  == 0) continue;
-      if (strcmp(saP->name, "unitCode")    == 0) continue;
+      attributeToSimplified(attrP);
+      continue;
+    }
+    else if (concise)
+      attributeToConcise(attrP, &asSimplified);
 
-      eqForDot(saP->name);
-      saP->name = orionldContextItemAliasLookup(contextP, saP->name, NULL, NULL);
+    if (asSimplified == false)
+    {
+      //
+      // Here we're "in subAttributeFix"
+      //
+
+      for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
+      {
+        if (strcmp(saP->name, "value")       == 0) continue;
+        if (strcmp(saP->name, "object")      == 0) continue;
+        if (strcmp(saP->name, "languageMap") == 0) continue;
+        if (strcmp(saP->name, "type")        == 0) continue;
+        if (strcmp(saP->name, "observedAt")  == 0) continue;
+        if (strcmp(saP->name, "unitCode")    == 0) continue;
+
+        eqForDot(saP->name);
+        saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
+
+        if (subP->renderFormat == NGSI_LD_V1_KEYVALUES)
+          attributeToSimplified(saP);
+        else if (subP->renderFormat == NGSI_LD_V1_CONCISE)
+          attributeToConcise(saP, &asSimplified);  // asSimplified is not used down here
+      }
     }
   }
 }
@@ -228,6 +324,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 {
+  kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
 
   LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
@@ -292,7 +389,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   if (mAltP->subP->renderFormat == NGSI_LD_V1_CONCISE)
   {
     ioVec[5].iov_base = (void*) conciseHeader;
-    ioVec[5].iov_len  = 35;
+    ioVec[5].iov_len  = 34;
   }
   else if (mAltP->subP->renderFormat == NGSI_LD_V1_KEYVALUES)
   {
@@ -304,7 +401,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   LM_TMP(("Notification:"));
   for (int ix = 0; ix < ioVecLen; ix++)
   {
-    LM_TMP(("   %s", (char*) ioVec[ix].iov_base));
+    LM_TMP((" %d/%d %s", ioVec[ix].iov_len, strlen((char*) ioVec[ix].iov_base), (char*) ioVec[ix].iov_base));
   }
   // </DEBUG>
 

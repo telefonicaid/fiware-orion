@@ -182,7 +182,7 @@ Date: REGEX(.*)
 ========================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:
 Fiware-Servicepath: /
-Content-Length: 364
+Content-Length: 388
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -225,7 +225,7 @@ Date: REGEX(.*)
 ===============================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:
 Fiware-Servicepath: /
-Content-Length: 370
+Content-Length: 394
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)

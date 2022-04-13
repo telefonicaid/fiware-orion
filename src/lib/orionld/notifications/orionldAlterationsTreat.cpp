@@ -165,15 +165,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   if (altList->dbEntityP != NULL)
   {
-    LM_TMP(("XX: Calling dbModelToApiEntity"));
     altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
-    LM_TMP(("XX: After dbModelToApiEntity"));
+
     for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
       orionldPatchApply(altList->patchedEntity, patchP);
     }
   }
-  LM_TMP(("XX: Here"));
 
   //
   // Timestamp for sending of notification - for stats in subscriptions
@@ -217,7 +215,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       if (matchP->altAttrP)
         LM_TMP(("XX  - %s", orionldAlterationType(matchP->altAttrP->alterationType)));
     }
-    LM_TMP(("XX: Calling notificationSend for group of sub %s of %d matches", groupList->subP->subscriptionId, groupMembers));
     // </DEBUG>
 
     int fd = notificationSend(groupList, notificationTimeAsFloat);
@@ -233,7 +230,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     if (groupList == matchList)
       break;
-    LM_TMP(("Still here ..."));
   }
 
 
@@ -244,7 +240,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   fd_set          rFds;
   int             fdMax      = 0;
   int             startTime  = time(NULL);
-  struct timeval  tv         = { 1, 0 };
   bool            timeout    = false;
 
   LM_TMP(("Awaiting responses and updating cached subscriptions accordingly"));
@@ -270,8 +265,10 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     if (fdMax == 0)
       break;
 
-    LM_TMP(("Awaiting responses to the notifications"));
+    LM_TMP(("Awaiting responses to the notifications (fdMax: %d)", fdMax));
+    struct timeval  tv = { 1, 0 };
     fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
+    LM_TMP(("Got %d from select", fds));
     if (fds == -1)
     {
       if (errno != EINTR)

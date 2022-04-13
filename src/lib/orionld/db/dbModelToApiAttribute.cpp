@@ -51,8 +51,9 @@ extern "C"
 //
 // dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
 //
-void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
+void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
 {
+  LM_TMP(("**************************** IN dbModelToApiAttribute for '%s'", dbAttrP->name));
   //
   // Remove unwanted parts of the attribute from DB
   //
@@ -61,25 +62,25 @@ void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
 
   for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {
-    KjNode* nodeP = kjLookup(attrP, unwanted[ix]);
+    KjNode* nodeP = kjLookup(dbAttrP, unwanted[ix]);
 
     if (nodeP != NULL)
     {
       if ((sysAttrs == true) && (ix > 0))
       {
         char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
-        numberToDate(attrP->value.f, dateTimeBuf, 32);
-        attrP->name       = (char*) ngsildName[ix];
-        attrP->value.s    = dateTimeBuf;
-        attrP->type       = KjString;
+        numberToDate(dbAttrP->value.f, dateTimeBuf, 32);
+        dbAttrP->name       = (char*) ngsildName[ix];
+        dbAttrP->value.s    = dateTimeBuf;
+        dbAttrP->type       = KjString;
       }
       else
-        kjChildRemove(attrP, nodeP);
+        kjChildRemove(dbAttrP, nodeP);
     }
   }
 
-  KjNode* observedAtP = kjLookup(attrP, "observedAt");
-  KjNode* unitCodeP   = kjLookup(attrP, "unitCode");
+  KjNode* observedAtP = kjLookup(dbAttrP, "observedAt");
+  KjNode* unitCodeP   = kjLookup(dbAttrP, "unitCode");
 
   if (observedAtP != NULL)
   {
@@ -96,13 +97,35 @@ void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
     unitCodeP->lastChild = NULL;
   }
 
+  KjNode* typeP  = kjLookup(dbAttrP, "type");
+  KjNode* valueP = kjLookup(dbAttrP, "value");
+
+  if (typeP == NULL)
+  {
+    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbAttrP->name, 500);
+    return;
+  }
+
+  if (valueP == NULL)
+  {
+    orionldError(OrionldInternalError, "Database Error (attribute without value in database)", dbAttrP->name, 500);
+    return;
+  }
+
+  if ((typeP != NULL) && (valueP != NULL) && (typeP->type == KjString))
+  {
+    if      (strcmp(typeP->value.s, "Relationship")     == 0) valueP->name = (char*) "object";
+    else if (strcmp(typeP->value.s, "LanguageProperty") == 0) valueP->name = (char*) "languageMap";
+  }
+
+
   //
   // Sub-Attributes
   //
-  KjNode* mdP = kjLookup(attrP, "md");
+  KjNode* mdP = kjLookup(dbAttrP, "md");
   if (mdP != NULL)
   {
-    kjChildRemove(attrP, mdP);  // The content of mdP is added to attrP at the end of the if
+    kjChildRemove(dbAttrP, mdP);  // The content of mdP is added to dbAttrP at the end of the if
 
     // Special Sub-Attrs: unitCode + observedAt
     for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
@@ -124,8 +147,8 @@ void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs)
     //
     // Move all metadata (sub-attrs) up one level
     //
-    attrP->lastChild->next = mdP->value.firstChildP;
-    attrP->lastChild       = mdP->lastChild;
+    dbAttrP->lastChild->next = mdP->value.firstChildP;
+    dbAttrP->lastChild       = mdP->lastChild;
   }
 }
 

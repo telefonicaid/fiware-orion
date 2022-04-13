@@ -129,7 +129,7 @@ Date: REGEX(.*)
 =====================================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:copy-e1
 Fiware-Servicepath: /
-Content-Length: 326
+Content-Length: 338
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
@@ -141,20 +141,20 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "data": [
         {
             "P1": {
-                "type": "Property", 
+                "type": "Property",
                 "value": 1
-            }, 
+            },
             "R1": {
-                "object": "urn:ngsi-ld:entities:E2", 
+                "object": "urn:ngsi-ld:entities:E2",
                 "type": "Relationship"
-            }, 
-            "id": "urn:ngsi-ld:entities:E1", 
+            },
+            "id": "urn:ngsi-ld:entities:E1",
             "type": "T1"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "202REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:subscriptions:copy-e1", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:copy-e1",
     "type": "Notification"
 }
 =======================================
