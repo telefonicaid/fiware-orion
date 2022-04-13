@@ -40,6 +40,6 @@ extern "C"
 //
 // kjTreeFromContextAttribute -
 //
-extern KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, char** detailsP);
+extern KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, const char* lang, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCONTEXTATTRIBUTE_H_

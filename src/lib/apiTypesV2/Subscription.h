@@ -116,6 +116,7 @@ struct Subscription
   std::string   ldContext;
   int           timeInterval;
   std::string   csf;
+  std::string   lang;
 #endif
 
   std::string   toJson();

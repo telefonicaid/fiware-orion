@@ -59,6 +59,10 @@ extern "C"
 static const char* contentTypeHeaderJson   = (char*) "Content-Type: application/json\r\n";
 static const char* contentTypeHeaderJsonLd = (char*) "Content-Type: application/ld+json\r\n";
 static const char* userAgentHeader         = (char*) "User-Agent: orionld\r\n";
+static const char* acceptHeader            = (char*) "Accept: application/json\r\n";
+static const char* normalizedHeader        = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
+static const char* conciseHeader           = (char*) "Ngsild-Attribute-Format: Concise\r\n";
+static const char* simplifiedHeader        = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
 
 
 
@@ -74,8 +78,10 @@ static __thread char body[4 * 1024];
 //
 // entityFix -
 //
-void entityFix(KjNode* entityP, OrionldContext* contextP)
+void entityFix(KjNode* entityP, CachedSubscription* subP)
 {
+  OrionldContext* contextP = subP->contextP;
+
   // eqForDot + compact attribute names
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -95,12 +101,16 @@ void entityFix(KjNode* entityP, OrionldContext* contextP)
     // eqForDot + compact sub-attribute names
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
-      if (strcmp(attrP->name, "value")       == 0) continue;
-      if (strcmp(attrP->name, "object")      == 0) continue;
-      if (strcmp(attrP->name, "languageMap") == 0) continue;
-      if (strcmp(attrP->name, "type")        == 0) continue;
-      if (strcmp(attrP->name, "observedAt")  == 0) continue;
-      if (strcmp(attrP->name, "unitCode")    == 0) continue;
+      if (strcmp(saP->name, "value")       == 0) continue;
+      if (strcmp(saP->name, "object")      == 0) continue;
+      if (strcmp(saP->name, "languageMap") == 0)
+      {
+        LM_TMP(("LANG: Notification: '%s' is a LanguageProperty and lang=='%s'", attrP->name, subP->lang.c_str()));
+        continue;
+      }
+      if (strcmp(saP->name, "type")        == 0) continue;
+      if (strcmp(saP->name, "observedAt")  == 0) continue;
+      if (strcmp(saP->name, "unitCode")    == 0) continue;
 
       eqForDot(saP->name);
       saP->name = orionldContextItemAliasLookup(contextP, saP->name, NULL, NULL);
@@ -134,7 +144,7 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
   kjChildAdd(notificationP, notifiedAtNodeP);
   kjChildAdd(notificationP, dataNodeP);
 
-  entityFix(entityP, subP->contextP);
+  entityFix(entityP, subP);
   kjChildAdd(dataNodeP, entityP);
 
   if (subP->httpInfo.mimeType == JSONLD)  // Add @context to the entity
@@ -236,27 +246,33 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   // Preparing the HTTP headers which will be pretty much the same for all notifications
   // What differs is Content-Length, Content-Type, and the Request header
   //
-  char              requestHeader[128];
+  char              requestHeader[512];
   char              contentLenHeader[32];
   char*             lenP           = &contentLenHeader[16];
   int               sizeLeftForLen = 16;                   // 16: sizeof(contentLenHeader) - 16
   long unsigned int contentLength  = strlen(payloadBody);  // FIXME: kjFastRender should return the size
   char              linkHeader[512];
 
-  size_t requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s HTTP/1.1\r\n", mAltP->subP->rest);  // The slash is needed as it was removed in "urlParse" in subCache.cpp
-  strcpy(contentLenHeader, "Content-Length: 0");  // Can't modify inside static strings, so need a char-vec on the stack for contentLenHeader
+  // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
+  size_t requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
+                                     mAltP->subP->rest,
+                                     mAltP->subP->subscriptionId);
 
+  strcpy(contentLenHeader, "Content-Length: 0");  // Can't modify inside static strings, so need a char-vec on the stack for contentLenHeader
   snprintf(lenP, sizeLeftForLen, "%d\r\n", (int) contentLength);  // Adding Content-Length inside contentLenHeader
 
-  struct iovec  ioVec[6] = {
+  struct iovec  ioVec[8] = {
     { requestHeader,                 requestHeaderLen },
     { contentLenHeader,              strlen(contentLenHeader) },
     { (void*) contentTypeHeaderJson, 32 },
     { (void*) userAgentHeader,       21 },
-    { (void*) "\r\n",                2  },
+    // Host: IP:PORT
+    { (void*) acceptHeader,          26 },
+    { (void*) normalizedHeader,      37 },  // 5
+    { (void*) "\r\n",                2  },  // 6
     { payloadBody,                   contentLength }
   };
-  int ioVecLen = 6;
+  int ioVecLen = 8;
 
   if (mAltP->subP->httpInfo.mimeType == JSONLD)
   {
@@ -265,12 +281,23 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   }
   else  // Add Link header
   {
-    // Replace ioVec[4] - make sure to end it in double newline/linefeed
+    // Replace ioVec[6] - make sure to end it in double newline/linefeed
     snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n\r\n",
              mAltP->subP->ldContext.c_str());
 
-    ioVec[4].iov_base = linkHeader;
-    ioVec[4].iov_len  = strlen(linkHeader);
+    ioVec[6].iov_base = linkHeader;
+    ioVec[6].iov_len  = strlen(linkHeader);
+  }
+
+  if (mAltP->subP->renderFormat == NGSI_LD_V1_CONCISE)
+  {
+    ioVec[5].iov_base = (void*) conciseHeader;
+    ioVec[5].iov_len  = 35;
+  }
+  else if (mAltP->subP->renderFormat == NGSI_LD_V1_KEYVALUES)
+  {
+    ioVec[5].iov_base = (void*) simplifiedHeader;
+    ioVec[5].iov_len  = 37;
   }
 
   // <DEBUG>

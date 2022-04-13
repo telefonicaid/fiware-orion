@@ -128,6 +128,7 @@ static void insertInCache
 #ifdef ORIONLD
                      sub.name,
                      sub.ldContext,
+                     sub.lang,
                      sub.notification.httpInfo.mqtt.username,
                      sub.notification.httpInfo.mqtt.password,
                      sub.notification.httpInfo.mqtt.version,
@@ -163,10 +164,9 @@ std::string mongoCreateSubscription
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const char*                      xauthToken,
-  const std::string&               fiwareCorrelator
-#ifdef ORIONLD
-  , const std::string&             ldContext
-#endif
+  const std::string&               fiwareCorrelator,
+  const std::string&               ldContext,
+  const std::string&               lang
 )
 {
   bool reqSemTaken = false;
@@ -194,10 +194,10 @@ std::string mongoCreateSubscription
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
 
-#ifdef ORIONLD
   double now = orionldState.requestTime;
   if (sub.name      != "")  setName(sub, &b);
   if (sub.ldContext != "")  setContext(sub, &b);
+  if (sub.lang      != "")  setLang(sub, &b);
   if (sub.csf       != "")  setCsf(sub, &b);
 
   setTimestamp("createdAt",  now, &b);
@@ -216,7 +216,6 @@ std::string mongoCreateSubscription
   //
   // setTimeInterval(sub, &b);
 
-#endif
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
 

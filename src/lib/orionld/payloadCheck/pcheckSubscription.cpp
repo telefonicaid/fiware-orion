@@ -71,6 +71,7 @@ bool pcheckSubscription
   KjNode* expiresP                = NULL;
   KjNode* throttlingP             = NULL;
   KjNode* temporalqP              = NULL;
+  KjNode* langP                   = NULL;
   int64_t dateTime;
 
   if (subNodeP->type != KjObject)
@@ -181,6 +182,12 @@ bool pcheckSubscription
       STRING_CHECK(nodeP, nodeP->name);
       EMPTY_STRING_CHECK(nodeP, nodeP->name);
       DATETIME_CHECK(expiresP->value.s, dateTime, nodeP->name);
+    }
+    else if (strcmp(nodeP->name, "lang") == 0)
+    {
+      DUPLICATE_CHECK(langP, nodeP->name, nodeP);
+      STRING_CHECK(nodeP, nodeP->name);
+      EMPTY_STRING_CHECK(nodeP, nodeP->name);
     }
     else if (strcmp(nodeP->name, "throttling") == 0)
     {

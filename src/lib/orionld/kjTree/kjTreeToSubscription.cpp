@@ -142,13 +142,13 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    if ((strcmp(kNodeP->name, "name") == 0) || (strcmp(kNodeP->name, "subscriptionName") == 0))
     {
       DUPLICATE_CHECK(nameP, "Subscription::name", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::name");
       subP->name = nameP;
     }
-    else if (SCOMPARE12(kNodeP->name, 'd', 'e', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 0))
+    else if (strcmp(kNodeP->name, "description") == 0)
     {
       DUPLICATE_CHECK(descriptionP, "Subscription::description", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::description");
@@ -156,7 +156,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       subP->description         = descriptionP;
       subP->descriptionProvided = true;
     }
-    else if (SCOMPARE9(kNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
+    else if (strcmp(kNodeP->name, "entities") == 0)
     {
       DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, "Subscription::entities", kNodeP);
       ARRAY_CHECK(kNodeP, "Subscription::entities");
@@ -168,7 +168,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
         return false;  // orionldError is invoked by kjTreeToEntIdVector
       }
     }
-    else if (SCOMPARE18(kNodeP->name, 'w', 'a', 't', 'c', 'h', 'e', 'd', 'A', 't', 't', 'r', 'i', 'b', 'u', 't', 'e', 's', 0))
+    else if (strcmp(kNodeP->name, "watchedAttributes") == 0)
     {
       DUPLICATE_CHECK_WITH_PRESENCE(watchedAttributesPresent, watchedAttributesP, "Subscription::watchedAttributes", kNodeP);
       ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
@@ -180,25 +180,12 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
         return false;  // orionldError is invoked by kjTreeToStringList
       }
     }
-    else if (SCOMPARE13(kNodeP->name, 't', 'i', 'm', 'e', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
+    else if (strcmp(kNodeP->name, "timeInterval") == 0)
     {
-#if TIMEINTERVAL_SUPPORTED
-      DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP);
-      INTEGER_CHECK(kNodeP, "Subscription::timeInterval");
-
-      if (timeIntervalP->value.i <= 0)
-      {
-        orionldError(OrionldBadRequestData, "Invalid value in payload data", "Subscription::timeInterval has a negative value", 400);
-        return false;
-      }
-
-      subP->timeInterval = timeIntervalP->value.i;
-#else
       orionldError(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented", 501);
       return false;
-#endif
     }
-    else if (SCOMPARE2(kNodeP->name, 'q', 0))
+    else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
     {
       DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::q");
@@ -233,7 +220,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       subP->subject.condition.expression.q = stringFilterExpanded;
       subP->restriction.scopeVector.push_back(scopeP);
     }
-    else if (SCOMPARE5(kNodeP->name, 'g', 'e', 'o', 'Q', 0))
+    else if (strcmp(kNodeP->name, "geoQ") == 0)
     {
       DUPLICATE_CHECK_WITH_PRESENCE(geoQPresent, geoQP, "Subscription::geoQ", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::geoQ");
@@ -244,19 +231,19 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
         return false;  // orionldError is invoked by kjTreeToSubscriptionExpression
       }
     }
-    else if (SCOMPARE4(kNodeP->name, 'c', 's', 'f', 0))
+    else if (strcmp(kNodeP->name, "csf") == 0)
     {
       DUPLICATE_CHECK(csfP, "Subscription::csf", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::csf");
       subP->csf = csfP;
     }
-    else if (SCOMPARE9(kNodeP->name, 'i', 's', 'A', 'c', 't', 'i', 'v', 'e', 0))
+    else if (strcmp(kNodeP->name, "isActive") == 0)
     {
       DUPLICATE_CHECK_WITH_PRESENCE(isActivePresent, isActive, "Subscription::isActive", kNodeP->value.b);
       BOOL_CHECK(kNodeP, "Subscription::isActive");
       subP->status = (isActive == true)? "active" : "paused";
     }
-    else if (SCOMPARE13(kNodeP->name, 'n', 'o', 't', 'i', 'f', 'i', 'c', 'a', 't', 'i', 'o', 'n', 0))
+    else if (strcmp(kNodeP->name, "notification") == 0)
     {
       DUPLICATE_CHECK_WITH_PRESENCE(notificationPresent, notificationP, "Subscription::notification", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::notification");
@@ -273,7 +260,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       STRING_CHECK(kNodeP, "Subscription::expiresAt");
       DATETIME_CHECK(expiresP, subP->expires, "Subscription::expiresAt");
     }
-    else if (SCOMPARE11(kNodeP->name, 't', 'h', 'r', 'o', 't', 't', 'l', 'i', 'n', 'g', 0))
+    else if (strcmp(kNodeP->name, "throttling") == 0)
     {
       if (throttlingPresent == true)
       {
@@ -292,15 +279,19 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
         return false;
       }
     }
-    else if (SCOMPARE7(kNodeP->name, 's', 't', 'a', 't', 'u', 's', 0))
+    else if (strcmp(kNodeP->name, "lang") == 0)
+    {
+      subP->lang = kNodeP->value.s;
+    }
+    else if (strcmp(kNodeP->name, "status") == 0)
     {
       // Ignored - read-only
     }
-    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
+    else if (strcmp(kNodeP->name, "createdAt") == 0)
     {
       // Ignored - read-only
     }
-    else if (SCOMPARE11(kNodeP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
+    else if (strcmp(kNodeP->name, "modifiedAt") == 0)
     {
       // Ignored - read-only
     }

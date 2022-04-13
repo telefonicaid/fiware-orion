@@ -483,18 +483,25 @@ void setMetadata(const Subscription& sub, BSONObjBuilder* b)
 }
 
 
-#ifdef ORIONLD
+
 /* ****************************************************************************
 *
 * setContext -
 */
 void setContext(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 {
-  if (sub.ldContext != "")
-  {
-    bobP->append(CSUB_LDCONTEXT, sub.ldContext);
-    LM_T(LmtMongo, ("Subscription context: %s", sub.ldContext.c_str()));
-  }
+  bobP->append("ldContext", sub.ldContext);
+}
+
+
+
+/* ****************************************************************************
+*
+* setLang -
+*/
+void setLang(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append("lang", sub.lang);
 }
 
 
@@ -551,7 +558,7 @@ void setCsf(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
   if (sub.csf != "")
   {
     bobP->append("csf", sub.csf);
-    LM_T(LmtMongo, ("Subscription context: %s", sub.csf.c_str()));
+    LM_T(LmtMongo, ("Subscription CSF: %s", sub.csf.c_str()));
   }
 }
 
@@ -565,5 +572,3 @@ void setTimeInterval(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bob
 {
   bobP->append("timeInterval", sub.timeInterval);
 }
-
-#endif

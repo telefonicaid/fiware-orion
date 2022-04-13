@@ -833,6 +833,7 @@ void subCacheItemInsert
 #ifdef ORIONLD
   const std::string&                 name,
   const std::string&                 ldContext,
+  const std::string&                 lang,
   const char*                        mqttUserName,
   const char*                        mqttPassword,
   const char*                        mqttVersion,
@@ -890,6 +891,7 @@ void subCacheItemInsert
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
     cSubP->ldContext = ldContext;
+    cSubP->lang      = lang;
     cSubP->contextP  = orionldContextFromUrl((char*) cSubP->ldContext.c_str(), NULL);
 
     if (cSubP->contextP == NULL)

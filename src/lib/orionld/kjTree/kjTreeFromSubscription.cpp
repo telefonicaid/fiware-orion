@@ -484,6 +484,13 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     kjChildAdd(topP, nodeP);
   }
 
+  // lang
+  if (subscriptionP->lang != "")
+  {
+    nodeP = kjString(orionldState.kjsonP, "lang", subscriptionP->lang.c_str());
+    kjChildAdd(topP, nodeP);
+  }
+
   // FIXME: This is not how it is meant ...
   if (orionldState.out.contentType == JSONLD)
   {

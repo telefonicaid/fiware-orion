@@ -229,11 +229,13 @@ bye
 
 06. Dump accumulator - see ONE notification
 ===========================================
-POST http://127.0.0.1:9997/notify
+POST REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 302
 User-Agent: orionld
+Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
 
 {
     "data": [
