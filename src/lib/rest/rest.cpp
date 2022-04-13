@@ -307,8 +307,8 @@ static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
 {
   if      (strcasecmp(key, HTTP_CONTENT_LENGTH)     == 0) orionldState.in.contentLength    = atoi(value);
   else if (strcasecmp(key, HTTP_FIWARE_SERVICEPATH) == 0) orionldState.in.servicePath      = (char*) value;
-  else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.xAuthToken          = (char*) value;
-  else if (strcasecmp(key, "Authorization")         == 0) orionldState.authorizationHeader = (char*) value;
+  else if (strcasecmp(key, "X-Auth-Token")          == 0) orionldState.in.xAuthToken       = (char*) value;
+  else if (strcasecmp(key, "Authorization")         == 0) orionldState.in.authorization    = (char*) value;
   else if (strcasecmp(key, HTTP_ORIGIN)             == 0) orionldState.in.origin           = (char*) value;
   else if (strcasecmp(key, HTTP_X_REAL_IP)          == 0) orionldState.in.xRealIp          = (char*) value;
   else if (strcasecmp(key, HTTP_HOST)               == 0) orionldState.in.host             = (char*) value;

@@ -75,7 +75,7 @@ std::string patchSubscription
                                       &beError,
                                       orionldState.tenantP,
                                       ciP->servicePathV,
-                                      orionldState.xAuthToken,
+                                      orionldState.in.xAuthToken,
                                       orionldState.correlator));
 
   std::string  answer = "";

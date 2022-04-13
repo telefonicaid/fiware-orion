@@ -411,16 +411,8 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
     }
   }
   else if (strcasecmp(key, "Ngsiv2-AttrsFormat") == 0) orionldState.attrsFormat         = (char*) value;
-  else if (strcasecmp(key, "X-Auth-Token")       == 0)
-  {
-    orionldState.xAuthToken          = (char*) value;  // Deprecated
-    orionldState.in.xAuthToken       = (char*) value;
-  }
-  else if (strcasecmp(key, "Authorization")      == 0)
-  {
-    orionldState.authorizationHeader = (char*) value;  // Deprecated
-    orionldState.in.authorization    = (char*) value;
-  }
+  else if (strcasecmp(key, "X-Auth-Token")       == 0) orionldState.in.xAuthToken       = (char*) value;
+  else if (strcasecmp(key, "Authorization")      == 0) orionldState.in.authorization    = (char*) value;
   else if (strcasecmp(key, "Fiware-Correlator")  == 0) orionldState.correlator          = (char*) value;
   else if (strcasecmp(key, "Content-Length")     == 0) orionldState.in.contentLength    = atoi(value);
   else if (strcasecmp(key, "Prefer")             == 0) orionldState.preferHeader        = (char*) value;

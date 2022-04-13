@@ -256,9 +256,9 @@ bool orionldRequestSend
   }
 
   // Authorization header
-  if (orionldState.authorizationHeader != NULL)
+  if (orionldState.in.authorization != NULL)
   {
-    snprintf(headerString, sizeof(headerString), "Authorization:%s", orionldState.authorizationHeader);
+    snprintf(headerString, sizeof(headerString), "Authorization:%s", orionldState.in.authorization);
     headers = curl_slist_append(headers, headerString);
   }
 
