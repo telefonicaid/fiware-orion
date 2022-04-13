@@ -110,7 +110,7 @@ Date: REGEX(.*)
 ===========================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 267
+Content-Length: 291
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(.*)

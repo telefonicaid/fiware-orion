@@ -143,7 +143,7 @@ Date: REGEX(.*)
 ===========================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Fiware-Servicepath: /
-Content-Length: 254
+Content-Length: 266
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -181,7 +181,7 @@ Date: REGEX(.*)
 ============================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Fiware-Servicepath: /
-Content-Length: 254
+Content-Length: 266
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -208,7 +208,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 =======================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Fiware-Servicepath: /
-Content-Length: 254
+Content-Length: 266
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)

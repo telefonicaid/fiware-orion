@@ -222,7 +222,7 @@ Date: REGEX(.*)
 ===================================================================================
 POST http://REGEX(.*):9997/notify
 Fiware-Servicepath: /
-Content-Length: 316
+Content-Length: 328
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -249,7 +249,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "T"
         }
     ],
-    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
     "notifiedAt": "REGEX(.*)",
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"
@@ -272,7 +272,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 351
+Content-Length: 363
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -303,7 +303,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "T"
         }
     ],
-    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
     "notifiedAt": "REGEX(.*)",
     "subscriptionId": "http://a.b.c/subs/sub01",
     "type": "Notification"

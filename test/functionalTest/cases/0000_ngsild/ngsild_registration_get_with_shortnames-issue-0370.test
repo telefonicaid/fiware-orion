@@ -82,7 +82,7 @@ Date: REGEX(.*)
 02. GET all registrations, accepting application/ld+json
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 575
+Content-Length: 587
 Content-Type: application/ld+json
 Date: REGEX(.*)
 

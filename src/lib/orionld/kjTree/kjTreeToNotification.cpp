@@ -116,9 +116,10 @@ static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType acce
 //
 static bool formatExtract(char* format, ngsiv2::Subscription* subP)
 {
-  if      (strcmp(format, "keyValues")                     == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
-  else if (strcmp(format, "normalized")                    == 0) subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
+  if      (strcmp(format, "simplified")                    == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
   else if (strcmp(format, "concise")                       == 0) subP->attrsFormat = NGSI_LD_V1_CONCISE;
+  else if (strcmp(format, "keyValues")                     == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
+  else if (strcmp(format, "normalized")                    == 0) subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
   else if (strcmp(format, "x-ngsiv2-normalized")           == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED;
   else if (strcmp(format, "x-ngsiv2-keyValues")            == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES;
   else if (strcmp(format, "x-ngsiv2-normalized-compacted") == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED_COMPACT;

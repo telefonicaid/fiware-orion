@@ -49,7 +49,7 @@ extern "C"
 //
 // dbModelToApiSubAttribute -
 //
-void dbModelToApiSubAttribute(KjNode* subP)
+void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
 {
   //
   // Remove unwanted parts of the sub-attribute from DB
@@ -58,10 +58,31 @@ void dbModelToApiSubAttribute(KjNode* subP)
 
   for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {
-    KjNode* nodeP = kjLookup(subP, unwanted[ix]);
+    KjNode* nodeP = kjLookup(dbSubAttrP, unwanted[ix]);
 
     if (nodeP != NULL)
-      kjChildRemove(subP, nodeP);
+      kjChildRemove(dbSubAttrP, nodeP);
+  }
+
+  KjNode* typeP  = kjLookup(dbSubAttrP, "type");
+  KjNode* valueP = kjLookup(dbSubAttrP, "value");
+
+  if (typeP == NULL)
+  {
+    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbSubAttrP->name, 500);
+    return;
+  }
+
+  if (valueP == NULL)
+  {
+    orionldError(OrionldInternalError, "Database Error (attribute without value in database)", dbSubAttrP->name, 500);
+    return;
+  }
+
+  if ((typeP != NULL) && (valueP != NULL) && (typeP->type == KjString))
+  {
+    if      (strcmp(typeP->value.s, "Relationship")     == 0) valueP->name = (char*) "object";
+    else if (strcmp(typeP->value.s, "LanguageProperty") == 0) valueP->name = (char*) "languageMap";
   }
 }
 
@@ -158,6 +179,3 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Render
 
   return subAttrP;
 }
-
-
-

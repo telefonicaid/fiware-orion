@@ -32,12 +32,12 @@ extern "C"
 }
 
 #include "apiTypesV2/Registration.h"                           // Registration
-#include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
@@ -177,10 +177,10 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
 
   if (orionldState.payloadIdNode == NULL)
   {
-    char randomId[32];
-    mongoIdentifier(randomId);
-    regP->id  = "urn:ngsi-ld:ContextSourceRegistration:";
-    regP->id += randomId;
+    char registrationId[100];
+    strncpy(registrationId, "urn:ngsi-ld:ContextSourceRegistration:", sizeof(registrationId) - 1);
+    uuidGenerate(&registrationId[38], sizeof(registrationId) - 38, false);
+    regP->id = registrationId;
   }
   else
   {

@@ -50,6 +50,10 @@ extern "C"
 //
 // dbModelToApiEntity -
 //
+// USED BY
+//   orionldAlterationsTreat
+//
+//
 KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityId)
 {
   KjNode* apiEntityP  = kjObject(orionldState.kjsonP, NULL);

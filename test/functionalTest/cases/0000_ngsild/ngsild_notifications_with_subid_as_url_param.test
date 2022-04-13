@@ -107,7 +107,7 @@ Date: REGEX(.*)
 ===============================================================================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscription:s1
 Fiware-Servicepath: /
-Content-Length: 336
+Content-Length: 348
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -115,20 +115,20 @@ Accept: application/json
 Content-Type: application/ld+json
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
             "P1": {
-                "type": "Property", 
+                "type": "Property",
                 "value": 1
-            }, 
-            "id": "urn:ngsi-ld:Vehicle:A4501", 
+            },
+            "id": "urn:ngsi-ld:Vehicle:A4501",
             "type": "Vehicle"
         }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "urn:ngsi-ld:subscription:s1", 
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:s1",
     "type": "Notification"
 }
 =======================================

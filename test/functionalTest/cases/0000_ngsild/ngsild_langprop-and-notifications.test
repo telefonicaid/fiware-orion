@@ -450,7 +450,7 @@ Date: REGEX(.*)
 =======================================================================================
 POST REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Fiware-Servicepath: /
-Content-Length: 292
+Content-Length: 304
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
@@ -494,7 +494,7 @@ Date: REGEX(.*)
 ===============================================================================
 POST REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Fiware-Servicepath: /
-Content-Length: 260
+Content-Length: 272
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
@@ -544,7 +544,7 @@ Date: REGEX(.*)
 =============================================================================
 POST REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Fiware-Servicepath: /
-Content-Length: 220
+Content-Length: 232
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: 127.0.0.1:9997
@@ -586,7 +586,7 @@ Date: REGEX(.*)
 ===============================================================================
 POST REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Fiware-Servicepath: /
-Content-Length: 259
+Content-Length: 271
 User-Agent: orion/1.15.0-next libcurl/7.68.0
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997

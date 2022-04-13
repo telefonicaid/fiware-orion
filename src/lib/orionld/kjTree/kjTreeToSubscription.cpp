@@ -31,12 +31,12 @@ extern "C"
 }
 
 #include "apiTypesV2/Subscription.h"                             // Subscription
-#include "mongoBackend/MongoGlobal.h"                            // mongoIdentifier
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
@@ -98,10 +98,10 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   if (orionldState.payloadIdNode == NULL)
   {
-    char randomId[32];
-    mongoIdentifier(randomId);
-    subP->id  = "urn:ngsi-ld:Subscription:";
-    subP->id += randomId;
+    char subscriptionId[80];
+    strncpy(subscriptionId, "urn:ngsi-ld:Subscription:", sizeof(subscriptionId) - 1);
+    uuidGenerate(&subscriptionId[25], sizeof(subscriptionId) - 25, false);
+    subP->id = subscriptionId;
   }
   else
   {
