@@ -34,15 +34,17 @@ brokerStart CB
 # 02. GET subscription and see covered=false
 # 03. Update subscription with covered=true
 # 04. GET subscription and see covered=true
-# 05. Update subscription with covered=false
-# 06. GET subscription and see covered=false
-# 07. Update subscription without covered
-# 08. GET subscriptions and see covered=false
-# 09. Update subscription with covered=true and without attributes and see fail
-# 10. Update subscription with covered=foo and see error
-# 11. Create subscription with covered=foo and see error
-# 12. Create subscription with covered=false and without attributes and see ok
-# 13. Create subscription with covered=true and without attributes and see fail
+# 05. Update subscrption without touching covered
+# 06. GET subscription and see covered=true
+# 07. Update subscription with covered=false
+# 08. GET subscription and see covered=false
+# 09. Update subscription without covered
+# 10. GET subscriptions and see covered=false
+# 11. Update subscription with covered=true and without attributes and see fail
+# 12. Update subscription with covered=foo and see error
+# 13. Create subscription with covered=foo and see error
+# 14. Create subscription with covered=false and without attributes and see ok
+# 15. Create subscription with covered=true and without attributes and see fail
 #
 
 echo '01. Create subscription without covered'
@@ -107,7 +109,31 @@ echo
 echo
 
 
-echo '05. Update subscription with covered=false'
+echo '05. Update subscrption without touching covered'
+echo '==============================================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T2"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '06. GET subscription and see covered=true'
+echo '========================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '07. Update subscription with covered=false'
 echo '=========================================='
 payload='{
   "notification": {
@@ -127,14 +153,14 @@ echo
 echo
 
 
-echo '06. GET subscription and see covered=false'
+echo '08. GET subscription and see covered=false'
 echo '=========================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '07. Update subscription without covered'
+echo '09. Update subscription without covered'
 echo '======================================='
 payload='{
   "notification": {
@@ -153,14 +179,14 @@ echo
 echo
 
 
-echo '08. GET subscription and see covered=false'
+echo '10. GET subscription and see covered=false'
 echo '=========================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '09. Update subscription with covered=true and without attributes and see fail'
+echo '11. Update subscription with covered=true and without attributes and see fail'
 echo '============================================================================='
 payload='{
   "notification": {
@@ -175,7 +201,7 @@ echo
 echo
 
 
-echo '10. Update subscription with covered=foo and see error'
+echo '12. Update subscription with covered=foo and see error'
 echo '======================================================'
 payload='{
   "notification": {
@@ -195,7 +221,7 @@ echo
 echo
 
 
-echo '11. Create subscription with covered=foo and see error'
+echo '13. Create subscription with covered=foo and see error'
 echo '======================================================'
 payload='{
   "subject": {
@@ -223,7 +249,7 @@ echo
 echo
 
 
-echo '12. Create subscription with covered=false and without attributes and see ok'
+echo '14. Create subscription with covered=false and without attributes and see ok'
 echo '============================================================================'
 payload='{
   "subject": {
@@ -246,7 +272,7 @@ echo
 echo
 
 
-echo '13. Create subscription with covered=true and without attributes and see fail'
+echo '15. Create subscription with covered=true and without attributes and see fail'
 echo '============================================================================='
 payload='{
   "subject": {
@@ -364,16 +390,16 @@ Date: REGEX(.*)
 }
 
 
-05. Update subscription with covered=false
-==========================================
+05. Update subscrption without touching covered
+===============================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-06. GET subscription and see covered=false
-==========================================
+06. GET subscription and see covered=true
+=========================================
 HTTP/1.1 200 OK
 Content-Length: 302
 Content-Type: application/json
@@ -389,7 +415,7 @@ Date: REGEX(.*)
             "brightness"
         ],
         "attrsFormat": "normalized",
-        "covered": false,
+        "covered": true,
         "http": {
             "url": "http://localhost:9997/notify"
         },
@@ -403,15 +429,15 @@ Date: REGEX(.*)
         "entities": [
             {
                 "id": "E",
-                "type": "T"
+                "type": "T2"
             }
         ]
     }
 }
 
 
-07. Update subscription without covered
-=======================================
+07. Update subscription with covered=false
+==========================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -421,7 +447,7 @@ Date: REGEX(.*)
 08. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 303
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -449,14 +475,60 @@ Date: REGEX(.*)
         "entities": [
             {
                 "id": "E",
-                "type": "T"
+                "type": "T2"
             }
         ]
     }
 }
 
 
-09. Update subscription with covered=true and without attributes and see fail
+09. Update subscription without covered
+=======================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. GET subscription and see covered=false
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 303
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": []
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T2"
+            }
+        ]
+    }
+}
+
+
+11. Update subscription with covered=true and without attributes and see fail
 =============================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 107
@@ -470,7 +542,7 @@ Date: REGEX(.*)
 }
 
 
-10. Update subscription with covered=foo and see error
+12. Update subscription with covered=foo and see error
 ======================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 60
@@ -484,7 +556,7 @@ Date: REGEX(.*)
 }
 
 
-11. Create subscription with covered=foo and see error
+13. Create subscription with covered=foo and see error
 ======================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 60
@@ -498,7 +570,7 @@ Date: REGEX(.*)
 }
 
 
-12. Create subscription with covered=false and without attributes and see ok
+14. Create subscription with covered=false and without attributes and see ok
 ============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -508,7 +580,7 @@ Date: REGEX(.*)
 
 
 
-13. Create subscription with covered=true and without attributes and see fail
+15. Create subscription with covered=true and without attributes and see fail
 =============================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 107
