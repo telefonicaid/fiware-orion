@@ -26,6 +26,9 @@
 #include <sys/uio.h>                                             // writev
 #include <sys/select.h>                                          // select
 
+#include <string>                                                // std::string (all because of receiverInfo!!!)
+#include <map>                                                   // std::map    (all because of receiverInfo!!!)
+
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
@@ -218,10 +221,83 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 
 // -----------------------------------------------------------------------------
 //
+// orionldEntityToNgsiV2 -
+//
+KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
+{
+  KjNode* v2EntityP = kjClone(orionldState.kjsonP, entityP);
+
+  // For all attributes, create a "metadata" object and move all sub-attributes inside
+  for (KjNode* attrP = v2EntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (attrP->type != KjObject)  // attributes are objects, "id", "type", etc, are not
+      continue;
+
+    // Got an attribute
+    // - create a "metadata" object for the attribute
+    // - move all sub-attributes inside "metadata"
+    KjNode* metadataObjectP = kjObject(orionldState.kjsonP, "metadata");
+    KjNode* mdP = attrP->value.firstChildP;
+    KjNode* next;
+    while (mdP != NULL)
+    {
+      if (mdP->type != KjObject)
+      {
+        mdP = mdP->next;
+        continue;
+      }
+      next = mdP->next;
+      kjChildRemove(attrP, mdP);
+      kjChildAdd(metadataObjectP, mdP);
+      mdP = next;
+    }
+
+    kjChildAdd(attrP, metadataObjectP);
+  }
+
+  return v2EntityP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationTreeForNgsiV2 -
+//
+KjNode* notificationTreeForNgsiV2(CachedSubscription* subP, KjNode* entityP)
+{
+  KjNode* notificationP        = kjObject(orionldState.kjsonP, NULL);
+  KjNode* subscriptionIdNodeP  = kjString(orionldState.kjsonP, "subscriptionId", subP->subscriptionId);
+  KjNode* dataNodeP            = kjArray(orionldState.kjsonP,  "data");
+  bool    keyValues            = false;
+  bool    compact              = false;
+
+  if ((subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+    keyValues = true;
+
+  if ((subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+    compact = true;
+
+  KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(entityP, keyValues, compact);
+
+  kjChildAdd(dataNodeP, ngsiv2EntityP);
+  kjChildAdd(notificationP, dataNodeP);
+  kjChildAdd(notificationP, subscriptionIdNodeP);
+
+  return notificationP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // notificationTree -
 //
 KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 {
+  if (subP->renderFormat >= NGSI_LD_V1_V2_NORMALIZED)
+    return notificationTreeForNgsiV2(subP, entityP);
+
   KjNode* notificationP = kjObject(orionldState.kjsonP, NULL);
   char    notificationId[80];
 
@@ -368,7 +444,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   if (orionldState.in.xAuthToken != NULL)    ++headers;
 
   // Headers from Subscription::notification::endpoint::receiverInfo
-  // LATER
+  headers += mAltP->subP->httpInfo.headers.size();
 
 
   // Let's limit the number of headers to 50
@@ -442,6 +518,21 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ++headerIx;
   }
 
+  //
+  // FIXME: Store receiverInfo in a better way - see issue #1095
+  //
+  for (std::map<std::string, std::string>::const_iterator it = mAltP->subP->httpInfo.headers.begin(); it != mAltP->subP->httpInfo.headers.end(); ++it)
+  {
+    const char* key    = it->first.c_str();
+    const char* value  = it->second.c_str();
+    int         len    = strlen(key) + strlen(value) + 10;
+    char*       buf    = kaAlloc(&orionldState.kalloc, len);
+
+    ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
+    ioVec[headerIx].iov_base = buf;
+    ++headerIx;
+    LM_TMP(("receiverInfo header '%s': '%s'", key, value));
+  }
 
   // Empty line delimiting HTTP Headers and Payload Body
   ioVec[headerIx].iov_base = (void*) "\r\n";

@@ -1,0 +1,169 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification with forwarded headers fron receiverInfo og the subscription
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -multiservice -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 with 3 headers in receiverInfo
+# 02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization
+# 03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization
+#
+
+echo "01. Create a subscription S1 with 3 headers in receiverInfo"
+echo "==========================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "name": "Sub 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:entities:T:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "format": "concise",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "123"
+        },
+        {
+          "key": "H2",
+          "value": "456"
+        },
+        {
+          "key": "H3",
+          "value": "789"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization"
+echo "=========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1,
+    "Sub-R1": {
+      "type": "Relationship",
+      "object": "urn:E1"
+    }
+  },
+  "P2": {
+    "type": "Property",
+    "value": "ok"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "X-Auth-Token: XHT" -H "Authorization: Auth123"
+echo
+echo
+
+
+echo "03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization"
+echo "================================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 with 3 headers in receiverInfo
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization
+==========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization
+=================================================================================================================
+POST REGEX(.*)
+Content-Length: 282
+Authorization: Auth123
+X-Auth-Token: XHT
+User-Agent: orionld
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+H1: 123
+H2: 456
+H3: 789
+
+{
+    "data": [
+        {
+            "P1": {
+                "Sub-R1": {
+                    "object": "urn:E1"
+                },
+                "value": 1
+            },
+            "P2": "ok",
+            "id": "urn:ngsi-ld:entities:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
+dbDrop CB t1
