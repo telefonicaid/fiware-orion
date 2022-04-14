@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NSGI-LD Cross Notification in NGSIv2 format - normalized
+NSGI-LD Cross Notification in NGSIv2 format - keyValues
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,15 +32,15 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 --SHELL--
 
 #
-# 01. Create a subscription with accumulator receiving NGSIv2 style notifications in Normalized format
+# 01. Create a subscription with accumulator receiving NGSIv2 style notifications in keyValues format
 # 02. Create an Entity E01 with attr P1 and P2 (using the new implementation)
 # 03. Dump accumulator to see one notification
 # 04. Add a property P3 to E01
 # 05. Dump accumulator to see one notification
 #
 
-echo "01. Create a subscription with accumulator receiving NGSIv2 style notifications in Normalized format"
-echo "===================================================================================================="
+echo "01. Create a subscription with accumulator receiving NGSIv2 style notifications in keyValues format"
+echo "==================================================================================================="
 payload='{
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
@@ -51,7 +51,7 @@ payload='{
     }
   ],
   "notification": {
-    "format": "x-ngsiv2-normalized",
+    "format": "x-ngsiv2-keyValues",
     "endpoint": {
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
     }
@@ -114,8 +114,8 @@ echo
 
 
 --REGEXPECT--
-01. Create a subscription with accumulator receiving NGSIv2 style notifications in Normalized format
-====================================================================================================
+01. Create a subscription with accumulator receiving NGSIv2 style notifications in keyValues format
+===================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
@@ -135,30 +135,17 @@ Date: REGEX(.*)
 03. Dump accumulator to see one notification, then reset the accumulator
 ========================================================================
 POST http://REGEX(.*)/notify
-Content-Length: 419
+Content-Length: 241
 User-Agent: orionld
-Ngsiv2-Attrsformat: normalized
+Ngsiv2-Attrsformat: keyValues
 Accept: application/json
 Content-Type: application/json
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/default-context/P1": {
-                "metadata": {
-                    "https://uri.etsi.org/ngsi-ld/default-context/Sub-R1": {
-                        "type": "Relationship",
-                        "value": "urn:E1"
-                    }
-                },
-                "type": "Property",
-                "value": 1
-            },
-            "https://uri.etsi.org/ngsi-ld/default-context/P2": {
-                "metadata": {},
-                "type": "Property",
-                "value": "ok"
-            },
+            "https://uri.etsi.org/ngsi-ld/default-context/P1": 1,
+            "https://uri.etsi.org/ngsi-ld/default-context/P2": "ok",
             "id": "urn:ngsi-ld:E01",
             "type": "https://uri.etsi.org/ngsi-ld/default-context/T"
         }
@@ -178,35 +165,18 @@ Date: REGEX(.*)
 05. Dump accumulator to see one notification
 ============================================
 POST REGEX(.*)
-Content-Length: 513
+Content-Length: 293
 User-Agent: orionld
-Ngsiv2-Attrsformat: normalized
+Ngsiv2-Attrsformat: keyValues
 Accept: application/json
 Content-Type: application/json
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/default-context/P1": {
-                "metadata": {
-                    "https://uri.etsi.org/ngsi-ld/default-context/Sub-R1": {
-                        "type": "Relationship",
-                        "value": "urn:E1"
-                    }
-                },
-                "type": "Property",
-                "value": 1
-            },
-            "https://uri.etsi.org/ngsi-ld/default-context/P2": {
-                "metadata": {},
-                "type": "Property",
-                "value": "ok"
-            },
-            "https://uri.etsi.org/ngsi-ld/default-context/P3": {
-                "metadata": {},
-                "type": "Property",
-                "value": 3
-            },
+            "https://uri.etsi.org/ngsi-ld/default-context/P1": 1,
+            "https://uri.etsi.org/ngsi-ld/default-context/P2": "ok",
+            "https://uri.etsi.org/ngsi-ld/default-context/P3": 3,
             "id": "urn:ngsi-ld:E01",
             "type": "https://uri.etsi.org/ngsi-ld/default-context/T"
         }
