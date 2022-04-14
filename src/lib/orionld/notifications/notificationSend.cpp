@@ -271,7 +271,7 @@ KjNode* notificationTreeForNgsiV2(CachedSubscription* subP, KjNode* entityP)
   KjNode* dataNodeP            = kjArray(orionldState.kjsonP,  "data");
   bool    keyValues            = false;
   bool    compact              = false;
-  
+
   if ((subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
     keyValues = true;
 
