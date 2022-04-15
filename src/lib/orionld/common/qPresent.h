@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QPARSE_H_
-#define SRC_LIB_ORIONLD_COMMON_QPARSE_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_QPRESENT_H_
+#define SRC_LIB_ORIONLD_COMMON_QPRESENT_H_
 
 /*
 *
@@ -31,8 +31,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// qParse -
+// qPresent -
 //
-extern QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP);
+extern void qPresent(QNode* qP, const char* what);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QPARSE_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_QPRESENT_H_

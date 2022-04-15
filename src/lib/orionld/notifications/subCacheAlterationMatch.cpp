@@ -233,20 +233,10 @@ static int dotCount(char* s)
 
 // -----------------------------------------------------------------------------
 //
-// skip - just a marker for a level to be skipped
-//
-char* skip = (char*) "SKIP";
-
-
-
-// -----------------------------------------------------------------------------
-//
 // kjNavigate - true Kj-Tree navigation
 //
 static KjNode* kjNavigate(KjNode* treeP, char** compV)
 {
-  if (compV[0] == skip) return kjNavigate(treeP, &compV[1]);
-
   KjNode* hitP = kjLookup(treeP, compV[0]);
 
   if (hitP == NULL)
@@ -277,20 +267,15 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path)
   char* pathCopy = kaStrdup(&orionldState.kalloc, path);
   components = pathComponentsSplit(pathCopy, compV);
   LM_TMP(("QM: components: %d", components));
-  // As the path is done for the database:
-  // - the first component is always 'attrs'
-  // - the second is the name of the attribute - eqForDot
-  // - the third might be md - if so, the fourth is the name of a sub-attr - eqForDot
+
+  //
+  // - the first component is always the longName of the ATTRIBUTE
+  // - the second is either "value", "object", "languageMap", or the longName of the SUB-ATTRIBUTE
   //
   // 'attrs' and 'md' don't exist in an API entity and must be nulled out here.
   //
-  compV[0] = skip;     // As it is "attrs"
-  eqForDot(compV[1]);  // As it is an Attribute
-  if (strcmp(compV[2], "md") == 0)
-  {
-    compV[2] = skip;     // As it is "md"
-    eqForDot(compV[3]);  // As it is a Sub-Attribute
-  }
+  eqForDot(compV[0]);  // As it is an Attribute
+  eqForDot(compV[1]);  // As it MIGHT be a Sub-Attribute (and if not, it has no '=')
 
   compV[components] = NULL;
   return kjNavigate(treeP, compV);

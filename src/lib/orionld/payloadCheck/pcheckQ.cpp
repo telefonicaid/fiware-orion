@@ -99,7 +99,7 @@ QNode* pcheckQ(char* qString)
     return NULL;
   }
 
-  if ((qTree = qParse(lexList, &title, &detail)) == NULL)
+  if ((qTree = qParse(lexList, true, &title, &detail)) == NULL)
   {
     orionldError(OrionldBadRequestData, title, detail, 400);
     return NULL;

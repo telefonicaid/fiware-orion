@@ -134,7 +134,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     LM_TMP(("QM:   Entity Id:    %s", aP->entityId));
     LM_TMP(("QM:   Entity Type:  %s", aP->entityType));
     LM_TMP(("QM:   Attributes:   %d", aP->alteredAttributes));
-    kjTreeLog(aP->patchedEntity, "QM:   Patched Entity");
+    if (aP->patchedEntity != NULL) kjTreeLog(aP->patchedEntity, "QM:   Patched Entity");
     ++alterations;
   }
   LM_TMP(("%d Alterations present", alterations));

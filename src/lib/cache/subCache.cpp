@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/orionldState.h"             // orionldState
 #include "orionld/common/qLex.h"                     // qLex
 #include "orionld/common/qParse.h"                   // qParse
+#include "orionld/common/qPresent.h"                 // qPresent
 #include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 
 #include "cache/subCache.h"
@@ -943,9 +944,10 @@ void subCacheItemInsert
     }
     else
     {
-      cSubP->qP = qParse(qList, &title, &detail);
+      cSubP->qP = qParse(qList, false, &title, &detail);
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));
+      qPresent(cSubP->qP, "Q For Subscription");
     }
     orionldState.useMalloc = true;
   }
