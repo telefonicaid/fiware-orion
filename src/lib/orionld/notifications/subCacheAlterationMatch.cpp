@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 }
@@ -271,8 +272,11 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path)
 
   char* compV[20];
 
-  components = pathComponentsSplit(path, compV);
-
+  LM_TMP(("QM: path: '%s'", path));
+  // pathComponentsSplit destroys the path, I need to work on a copy
+  char* pathCopy = kaStrdup(&orionldState.kalloc, path);
+  components = pathComponentsSplit(pathCopy, compV);
+  LM_TMP(("QM: components: %d", components));
   // As the path is done for the database:
   // - the first component is always 'attrs'
   // - the second is the name of the attribute - eqForDot
@@ -323,8 +327,21 @@ bool qEqCompare(OrionldAlteration* altP, QNode* lhs, QNode* rhs)
   }
   else if (lhsNode->type == KjFloat)
   {
-    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.f == rhs->value.i);
-    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.f == rhs->value.f);
+    double margin = 0.000001;  // What margin should I use?
+
+    LM_TMP(("QM: LHS is a FLOAT of %f", lhsNode->value.f));
+    if (rhs->type == QNodeIntegerValue)
+    {
+      LM_TMP(("QM: RHS id an INTEGER of %d", rhs->value.i));
+      if ((lhsNode->value.f - margin < rhs->value.i) && (lhsNode->value.f + margin > rhs->value.i))
+        return true;
+    }
+    else if (rhs->type == QNodeFloatValue)
+    {
+      LM_TMP(("QM: RHS id a FLOAT of %d", rhs->value.f));
+      if ((lhsNode->value.f - margin < rhs->value.f) && (lhsNode->value.f + margin > rhs->value.f))
+        return true;
+    }
   }
   else if (lhsNode->type == KjString)
   {
@@ -349,7 +366,16 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
 {
   LM_TMP(("QM: toplevel node is of type '%s'", qNodeType(qP->type)));
 
-  if (qP->type == QNodeEQ)
+  if (qP->type == QNodeOr)
+  {
+    // If any of the children is a match, then it's a match
+    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+    {
+      if (qMatch(childP, altP) == true)
+        return true;
+    }
+  }
+  else if (qP->type == QNodeEQ)
   {
     // An EQ must have exactly two children:
     //   - LHS: a variable (a path to the value or part of the value of a (sub)attribute)
