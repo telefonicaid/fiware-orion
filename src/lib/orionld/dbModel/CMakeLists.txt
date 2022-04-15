@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,12 +21,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    dbInit.cpp
-    dbConfiguration.cpp
-    dbEntityTypesGet.cpp
-    dbEntityAttributesGet.cpp
-    dbGeoIndexAdd.cpp
-    dbGeoIndexLookup.cpp
+    dbModelFromApiEntity.cpp
+    dbModelFromApiAttribute.cpp
+    dbModelFromApiSubAttribute.cpp
+    dbModelToApiEntity.cpp
+    dbModelToApiAttribute.cpp
+    dbModelToApiSubAttribute.cpp
+    dbModelPathComponentsSplit.cpp
 )
 
 # Include directories
@@ -36,4 +37,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_db STATIC ${SOURCES})
+ADD_LIBRARY(orionld_dbModel STATIC ${SOURCES})

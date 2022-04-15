@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
-#include "orionld/db/dbModelFromApiSubAttribute.h"               // Own interface
+#include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // Own interface
 
 
 

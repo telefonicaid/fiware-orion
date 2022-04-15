@@ -40,8 +40,8 @@ extern "C"
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
-#include "orionld/db/dbModelFromApiSubAttribute.h"               // dbModelFromApiSubAttribute
-#include "orionld/db/dbModelFromApiAttribute.h"                  // Own interface
+#include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute
+#include "orionld/dbModel/dbModelFromApiAttribute.h"             // Own interface
 
 
 

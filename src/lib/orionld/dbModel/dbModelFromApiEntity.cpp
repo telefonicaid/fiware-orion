@@ -35,8 +35,8 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
-#include "orionld/db/dbModelFromApiAttribute.h"                  // dbModelFromApiAttribute
-#include "orionld/db/dbModelFromApiEntity.h"                     // Own interface
+#include "orionld/dbModel/dbModelFromApiAttribute.h"             // dbModelFromApiAttribute
+#include "orionld/dbModel/dbModelFromApiEntity.h"                // Own interface
 
 
 

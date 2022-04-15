@@ -40,9 +40,9 @@ extern "C"
 #include "orionld/common/QNode.h"                              // QNode
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjEntityNormalizedToSimplified.h"     // kjEntityNormalizedToSimplified
-#include "orionld/db/dbModelToApiEntity.h"                     // dbModelToApiEntity2
 #include "orionld/payloadCheck/pcheckQuery.h"                  // pcheckQuery
 #include "orionld/db/dbConfiguration.h"                        // dbEntitiesQuery
+#include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
 #include "orionld/serviceRoutines/orionldPostQuery.h"          // Own Interface
 
 

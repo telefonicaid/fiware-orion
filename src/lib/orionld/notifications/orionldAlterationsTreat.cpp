@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
-#include "orionld/db/dbModelToApiEntity.h"                       // dbModelToApiEntity
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
 #include "orionld/notifications/orionldAlterationsTreat.h"       // Own interface

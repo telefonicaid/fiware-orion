@@ -37,50 +37,8 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjNavigate.h"                           // kjNavigate
+#include "orionld/dbModel/dbModelPathComponentsSplit.h"          // dbModelPathComponentsSplit
 #include "orionld/common/orionldPatchApply.h"                    // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelPathComponentsSplit - move to new library orionld/dbModel/dbModelPathComponentsSplit.h/cpp
-//
-static int dbModelPathComponentsSplit(char* path, char** compV)
-{
-  int compIx = 1;
-
-  compV[0] = path;
-
-  while (*path != 0)
-  {
-    if (*path == '.')
-    {
-      *path = 0;
-      ++path;
-      compV[compIx] = path;
-
-      //
-      // We only split the first 6 components
-      // Max PATH is "attrs.P1.md.Sub-P1.value[.X]*
-      //
-      if (compIx == 5)
-        return 6;
-
-      //
-      // We break if we find "attrs.X.value", but not until we have 4 components; "attrs.P1.value.[.X]*"
-      // It is perfectly possible 'path' is only "attrs.P1.value", and if so, we'd have left the function already
-      //
-      if ((compIx == 3) && (strcmp(compV[2], "value") == 0))
-        return 4;
-
-      ++compIx;
-    }
-
-    ++path;
-  }
-
-  return compIx;
-}
 
 
 
