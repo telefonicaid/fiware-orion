@@ -28,6 +28,11 @@
 #include <vector>
 #include <map>
 
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                         // kaStrdup
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -39,8 +44,10 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
-#include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 #include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/qLex.h"                     // qLex
+#include "orionld/common/qParse.h"                   // qParse
+#include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 
 #include "cache/subCache.h"
 
@@ -918,6 +925,32 @@ void subCacheItemInsert
   cSubP->notifyConditionV       = conditionAttrs;
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
+
+  if (q != "")
+  {
+    // qLex destroys the input string, but we need it intact
+    char* qString = kaStrdup(&orionldState.kalloc, q.c_str());
+
+    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
+
+    char*  title;
+    char*  detail;
+    QNode* qList;
+    if ((qList = qLex(qString, &title, &detail)) == NULL)
+    {
+      LM_W(("Error (qLex: %s: %s)", title, detail));
+      cSubP->qP = NULL;
+    }
+    else
+    {
+      cSubP->qP = qParse(qList, &title, &detail);
+      if (cSubP->qP == NULL)
+        LM_W(("Error (qParse: %s: %s)", title, detail));
+    }
+    orionldState.useMalloc = true;
+  }
+  else
+    cSubP->qP = NULL;
 
   //
   // IP, port and rest

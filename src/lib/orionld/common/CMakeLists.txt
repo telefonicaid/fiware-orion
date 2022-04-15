@@ -60,6 +60,7 @@ SET (SOURCES
     orionldError.cpp
     orionldPatchApply.cpp
     langStringExtract.cpp
+    pathComponentsSplit.cpp
 )
 
 # Include directories

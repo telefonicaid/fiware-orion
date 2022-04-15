@@ -63,9 +63,13 @@ static const char* contentTypeHeaderJson   = (char*) "Content-Type: application/
 static const char* contentTypeHeaderJsonLd = (char*) "Content-Type: application/ld+json\r\n";
 static const char* userAgentHeader         = (char*) "User-Agent: orionld\r\n";
 static const char* acceptHeader            = (char*) "Accept: application/json\r\n";
+
 static const char* normalizedHeader        = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
 static const char* conciseHeader           = (char*) "Ngsild-Attribute-Format: Concise\r\n";
 static const char* simplifiedHeader        = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
+
+static const char* normalizedHeaderNgsiV2  = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
+static const char* keyValuesHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
 
 
 
@@ -230,8 +234,38 @@ KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
   // For all attributes, create a "metadata" object and move all sub-attributes inside
   for (KjNode* attrP = v2EntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
+    if ((compact == true) && (strcmp(attrP->name, "type") == 0))
+    {
+      eqForDot(attrP->value.s);
+      attrP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrP->value.s, NULL, NULL);
+    }
+
     if (attrP->type != KjObject)  // attributes are objects, "id", "type", etc, are not
       continue;
+
+    eqForDot(attrP->name);
+    if (compact)
+      attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrP->name, NULL, NULL);
+
+    // Turn object, languageMap to 'value'
+    KjNode* objectP      = kjLookup(attrP, "object");
+    KjNode* languageMapP = kjLookup(attrP, "languageMap");
+
+    if (objectP      != NULL)  objectP->name      = (char*) "value";
+    if (languageMapP != NULL)  languageMapP->name = (char*) "value";
+
+    if (keyValues)
+    {
+      KjNode* valueP = kjLookup(attrP, "value");
+
+      if (valueP != NULL)
+      {
+        attrP->type  = valueP->type;
+        attrP->value = valueP->value;
+      }
+
+      continue;
+    }
 
     // Got an attribute
     // - create a "metadata" object for the attribute
@@ -239,6 +273,7 @@ KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
     KjNode* metadataObjectP = kjObject(orionldState.kjsonP, "metadata");
     KjNode* mdP = attrP->value.firstChildP;
     KjNode* next;
+
     while (mdP != NULL)
     {
       if (mdP->type != KjObject)
@@ -249,6 +284,18 @@ KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
       next = mdP->next;
       kjChildRemove(attrP, mdP);
       kjChildAdd(metadataObjectP, mdP);
+
+      // Turn object, languageMap to 'value'
+      KjNode* objectP      = kjLookup(mdP, "object");
+      KjNode* languageMapP = kjLookup(mdP, "languageMap");
+
+      if (objectP      != NULL)  objectP->name      = (char*) "value";
+      if (languageMapP != NULL)  languageMapP->name = (char*) "value";
+
+      eqForDot(mdP->name);
+      if (compact)
+        mdP->name = orionldContextItemAliasLookup(orionldState.contextP, mdP->name, NULL, NULL);
+
       mdP = next;
     }
 
@@ -295,9 +342,6 @@ KjNode* notificationTreeForNgsiV2(CachedSubscription* subP, KjNode* entityP)
 //
 KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 {
-  if (subP->renderFormat >= NGSI_LD_V1_V2_NORMALIZED)
-    return notificationTreeForNgsiV2(subP, entityP);
-
   KjNode* notificationP = kjObject(orionldState.kjsonP, NULL);
   char    notificationId[80];
 
@@ -401,14 +445,22 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 {
   kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
+  bool    ngsiv2     = (mAltP->subP->renderFormat >= NGSI_LD_V1_V2_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
 
   LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
 
+  //
+  // Filter out unwanted attributes, if so requested (by the Subscription)
+  //
   if (mAltP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, mAltP);
 
-  KjNode*            notificationP    = notificationTree(mAltP->subP, apiEntityP);
+
+  //
+  // Payload Body
+  //
+  KjNode*            notificationP    = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
   char*              payloadBody      = (payloadBodySize < sizeof(body))? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
 
@@ -419,31 +471,47 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   // Preparing the HTTP headers which will be pretty much the same for all notifications
   // What differs is Content-Length, Content-Type, and the Request header
   //
+
+  //
+  // Request Header
+  //
   char              requestHeader[512];
+  size_t            requestHeaderLen;
+
+  // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
+  if (mAltP->subP->renderFormat < NGSI_LD_V1_V2_NORMALIZED)
+    requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
+                                mAltP->subP->rest,
+                                mAltP->subP->subscriptionId);
+  else
+    requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s HTTP/1.1\r\n", mAltP->subP->rest);
+
+
+  //
+  // Content-Length
+  //
   char              contentLenHeader[32];
   char*             lenP           = &contentLenHeader[16];
   int               sizeLeftForLen = 16;                   // 16: sizeof(contentLenHeader) - 16
   long unsigned int contentLength  = strlen(payloadBody);  // FIXME: kjFastRender should return the size
-  char              linkHeader[512];
-
-  // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
-  size_t requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
-                                     mAltP->subP->rest,
-                                     mAltP->subP->subscriptionId);
 
   strcpy(contentLenHeader, "Content-Length: 0");  // Can't modify inside static strings, so need a char-vec on the stack for contentLenHeader
   snprintf(lenP, sizeLeftForLen, "%d\r\n", (int) contentLength);  // Adding Content-Length inside contentLenHeader
 
   int headers  = 6;  // the minimum number of request headers
 
+
   //
   // Headers to be forwarded in notifications (taken from the request that provoked the notification)
   //
-  if (orionldState.in.tenant     != NULL)    ++headers;
-  if (orionldState.in.xAuthToken != NULL)    ++headers;
-  if (orionldState.in.xAuthToken != NULL)    ++headers;
+  if (orionldState.in.tenant        != NULL)    ++headers;
+  if (orionldState.in.xAuthToken    != NULL)    ++headers;
+  if (orionldState.in.authorization != NULL)    ++headers;
 
-  // Headers from Subscription::notification::endpoint::receiverInfo
+
+  //
+  // Headers from Subscription::notification::endpoint::receiverInfo (or custom notification in NGSIv2 ...)
+  //
   headers += mAltP->subP->httpInfo.headers.size();
 
 
@@ -462,13 +530,17 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     { (void*) normalizedHeader,      37 }   // Index 5
   };
 
+  //
+  // Content-Type and Link
+  //
   if (mAltP->subP->httpInfo.mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
-    ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;
+    ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;  // REPLACE "application/json" with "application/ld+json"
     ioVec[2].iov_len  = 35;
   }
-  else  // Add Link header
+  else if (ngsiv2 == false)  // Add Link header - but not if NGSIv2 Cross Notification
   {
+    char linkHeader[512];
     snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", mAltP->subP->ldContext.c_str());
 
     ioVec[headerIx].iov_base = linkHeader;
@@ -476,6 +548,9 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ++headerIx;
   }
 
+  //
+  // Ngsild-Attribute-Format / Ngsiv1-Attrsformat
+  //
   if (mAltP->subP->renderFormat == NGSI_LD_V1_CONCISE)
   {
     ioVec[5].iov_base = (void*) conciseHeader;
@@ -486,8 +561,22 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[5].iov_base = (void*) simplifiedHeader;
     ioVec[5].iov_len  = 37;
   }
+  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED) || (mAltP->subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT))
+  {
+    ioVec[5].iov_base = (void*) normalizedHeaderNgsiV2;
+    ioVec[5].iov_len  = 32;
+  }
+  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (mAltP->subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  {
+    ioVec[5].iov_base = (void*) keyValuesHeaderNgsiV2;
+    ioVec[5].iov_len  = 31;
+  }
 
-  if (orionldState.in.tenant != NULL)
+
+  //
+  // Ngsild-Tenant
+  //
+  if ((orionldState.in.tenant != NULL) && (ngsiv2 == false))
   {
     int   len = strlen(orionldState.in.tenant) + 20;  // Ngsild-Tenant: xxx\r\n0 - '\r' seems to not count for strlen ...
     char* buf = kaAlloc(&orionldState.kalloc, len);
@@ -498,6 +587,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ++headerIx;
   }
 
+
+  //
+  // X-Auth-Token
+  //
   if (orionldState.in.xAuthToken != NULL)
   {
     int   len = strlen(orionldState.in.xAuthToken) + 20;  // X-Auth-Token: xxx\r\n0
@@ -508,6 +601,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ++headerIx;
   }
 
+
+  //
+  // Authorization
+  //
   if (orionldState.in.authorization != NULL)
   {
     int   len = strlen(orionldState.in.authorization) + 20;  // Authorization: xxx\r\n0
@@ -534,10 +631,12 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     LM_TMP(("receiverInfo header '%s': '%s'", key, value));
   }
 
+
   // Empty line delimiting HTTP Headers and Payload Body
   ioVec[headerIx].iov_base = (void*) "\r\n";
   ioVec[headerIx].iov_len  = 2;
   ++headerIx;
+
 
   // Payload Body
   ioVec[headerIx].iov_base = payloadBody;

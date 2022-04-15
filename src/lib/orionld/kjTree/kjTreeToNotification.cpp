@@ -32,7 +32,7 @@ extern "C"
 
 #include "apiTypesV2/Subscription.h"                           // Subscription
 
-#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState, experimental
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
@@ -169,7 +169,7 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
       if (formatExtract(formatP, subP) == false)
         return false;
 
-      if ((subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+      if ((experimental == false) && ((subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT)))
       {
         LM_W(("Non-supported notification format: %s", itemP->value.s));
         orionldError(OrionldBadRequestData, "Non-supported notification format", itemP->value.s, 501);

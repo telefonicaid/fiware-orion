@@ -22,7 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldState.h"                       // Own orionldState
+#include "logMsg/logMsg.h"                                     // LM_*
+
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // Own interface
 
 
@@ -33,13 +35,19 @@
 //
 QNode* qNode(QNodeType type)
 {
-  if (orionldState.qNodeIx >= QNODE_SIZE)
-    return NULL;
+  QNode* nodeP;
 
-  QNode* nodeP = &orionldState.qNodeV[orionldState.qNodeIx++];
+  if (orionldState.useMalloc)
+    nodeP = (QNode*) malloc(sizeof(QNode));
+  else
+    nodeP = (QNode*) kaAlloc(&orionldState.kalloc, sizeof(QNode));
 
-  nodeP->type = type;
-  nodeP->next = NULL;
+  if (nodeP == NULL)
+    LM_RE(NULL, ("Internal Error (out of memory)"));
+
+  nodeP->type    = type;
+  nodeP->next    = NULL;
+  nodeP->value.i = 0;
 
   return nodeP;
 }

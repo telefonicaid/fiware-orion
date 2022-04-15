@@ -99,6 +99,7 @@ bool orionldPostSubscriptions(void)
   char*    subIdP    = NULL;
   KjNode*  endpointP = NULL;
 
+  // kjTreeToSubscription does the pCheckSubscription stuff ... for now ...
   if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
   {
     LM_E(("kjTreeToSubscription FAILED"));
@@ -167,7 +168,7 @@ bool orionldPostSubscriptions(void)
 
 
       //
-      // Establish connection qith MQTT broker
+      // Establish connection with MQTT broker
       //
       if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
       {
