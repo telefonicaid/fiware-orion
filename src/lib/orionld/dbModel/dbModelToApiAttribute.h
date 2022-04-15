@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_
-#define SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
 
 /*
 *
@@ -31,36 +31,22 @@ extern "C"
 }
 
 #include "common/RenderFormat.h"                                 // RenderFormat
-
-
-
-//
-// FIXME:
-//   Unfortunately we have two different implementations for DB Model To API Entity
-//   These two need to be unified
-//
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiEntity - produce an NGSI-LD API Entity from its DB format
+// dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
 //
-// USED BY
-//   - orionldAlterationsTreat (for notifications)
-//
-extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, const char* entityId);
+extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiEntity2 - produce an NGSI-LD API Entity from its DB format
+// dbModelToApiAttribute2 -
 //
-// USED BY
-//   - orionldGetEntities  (GET /entities)
-//   - orionldPostQuery    (POST /entityOperations/query)
-//
-extern KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
+extern KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPIENTITY_H_
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_

@@ -42,8 +42,8 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/db/dbModelToApiSubAttribute.h"                 // dbModelToApiSubAttribute
-#include "orionld/db/dbModelToApiAttribute.h"                    // Own interface
+#include "orionld/dbModel/dbModelToApiSubAttribute.h"            // dbModelToApiSubAttribute
+#include "orionld/dbModel/dbModelToApiAttribute.h"               // Own interface
 
 
 

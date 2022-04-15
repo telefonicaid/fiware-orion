@@ -54,7 +54,7 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
-#include "orionld/db/dbModelToApiEntity.h"                     // dbModelToApiEntity2
+#include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 

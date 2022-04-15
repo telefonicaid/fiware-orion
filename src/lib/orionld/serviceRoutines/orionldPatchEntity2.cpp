@@ -50,8 +50,8 @@ extern "C"
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
-#include "orionld/db/dbModelFromApiEntity.h"                     // dbModelFromApiEntity
-#include "orionld/db/dbModelToApiAttribute.h"                    // dbModelToApiAttribute
+#include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
+#include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
 

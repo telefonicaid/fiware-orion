@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/db/dbModelToApiSubAttribute.h"                 // Own interface
+#include "orionld/dbModel/dbModelToApiSubAttribute.h"            // Own interface
 
 
 

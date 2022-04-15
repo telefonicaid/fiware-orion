@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBMODELTOAPISUBATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DB_DBMODELTOAPISUBATTRIBUTE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,27 +22,49 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+#include <string.h>                                              // strcmp
+
+#include "orionld/dbModel/dbModelPathComponentsSplit.h"          // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelPathComponentsSplit -
+//
+int dbModelPathComponentsSplit(char* path, char** compV)
 {
-#include "kjson/KjNode.h"                                        // KjNode
+  int compIx = 1;
+
+  compV[0] = path;
+
+  while (*path != 0)
+  {
+    if (*path == '.')
+    {
+      *path = 0;
+      ++path;
+      compV[compIx] = path;
+
+      //
+      // We only split the first 6 components
+      // Max PATH is "attrs.P1.md.Sub-P1.value[.X]*
+      //
+      if (compIx == 5)
+        return 6;
+
+      //
+      // We break if we find "attrs.X.value", but not until we have 4 components; "attrs.P1.value.[.X]*"
+      // It is perfectly possible 'path' is only "attrs.P1.value", and if so, we'd have left the function already
+      //
+      if ((compIx == 3) && (strcmp(compV[2], "value") == 0))
+        return 4;
+
+      ++compIx;
+    }
+
+    ++path;
+  }
+
+  return compIx;
 }
-
-#include "common/RenderFormat.h"                                 // RenderFormat
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelToApiSubAttribute - produce an NGSI-LD API Sub-Attribute from its DB format
-//
-extern void dbModelToApiSubAttribute(KjNode* saP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
-//
-KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
-
-#endif  // SRC_LIB_ORIONLD_DB_DBMODELTOAPISUBATTRIBUTE_H_

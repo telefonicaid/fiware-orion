@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBMODELFROMAPIATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DB_DBMODELFROMAPIATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBATTRIBUTE_H_
 
 /*
 *
@@ -30,28 +30,22 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+
 
 
 // -----------------------------------------------------------------------------
 //
-// dbModelFromApiAttribute -
+// dbModelToApiSubAttribute - produce an NGSI-LD API Sub-Attribute from its DB format
 //
-// FOREACH attribute:
-//   * First an object "md" is created, and all fields of the attribute, except the special ones are moved inside "md".
-//     Special fields:
-//     - type
-//     - value/object/languageMap (must be renamed to "value" - that's part of the database model)
-//     - observedAt
-//     - datasetId
-//     - unitCode
-//
-//   * Actually, all children of 'attrP' are moved to 'md'
-//   * And then, all the special fields are moved back to 'attrP'
-//   * ".added"   is added
-//   * ".removed" is added
-//   * "modDate"  is added
-//   * "creDate"  is added iff the attribute did not previously exist
-//
-extern bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP);
+extern void dbModelToApiSubAttribute(KjNode* saP);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBMODELFROMAPIATTRIBUTE_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
+//
+KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
+
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBATTRIBUTE_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBMODELFROMAPISUBATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DB_DBMODELFROMAPISUBATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPIATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPIATTRIBUTE_H_
 
 /*
 *
@@ -34,14 +34,24 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// dbModelFromApiSubAttribute -
+// dbModelFromApiAttribute -
 //
-// PARAMETERS
-//   - saP            pointer to the sub-attribute KjNode tree
-//   - dbMdP          array of names od alreadty existing metadata (from DB)
-//   - mdAddedV       array of names of new metadata (sub-attributes)
-//   - mdRemovedV     array of names of sub-attributes that are to be removed (RHS == null)
+// FOREACH attribute:
+//   * First an object "md" is created, and all fields of the attribute, except the special ones are moved inside "md".
+//     Special fields:
+//     - type
+//     - value/object/languageMap (must be renamed to "value" - that's part of the database model)
+//     - observedAt
+//     - datasetId
+//     - unitCode
 //
-extern bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP);
+//   * Actually, all children of 'attrP' are moved to 'md'
+//   * And then, all the special fields are moved back to 'attrP'
+//   * ".added"   is added
+//   * ".removed" is added
+//   * "modDate"  is added
+//   * "creDate"  is added iff the attribute did not previously exist
+//
+extern bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBMODELFROMAPISUBATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPIATTRIBUTE_H_
