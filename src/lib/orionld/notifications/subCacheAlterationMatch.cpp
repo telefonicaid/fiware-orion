@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -32,7 +33,11 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/QNode.h"                              // QNode, qNodeType
+#include "orionld/common/pathComponentsSplit.h"                // pathComponentsSplit
+#include "orionld/common/eqForDot.h"                           // eqForDot
 #include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration, OrionldAlterationMatch, orionldAlterationType
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"     // Own interface
 
 
@@ -207,6 +212,160 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
 // -----------------------------------------------------------------------------
 //
+// dotCount - count number of dots in a string (no of components in a path)
+//
+static int dotCount(char* s)
+{
+  int dots = 0;
+
+  while (*s != 0)
+  {
+    if (*s == '.')
+      ++dots;
+    ++s;
+  }
+
+  return dots;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// skip - just a marker for a level to be skipped
+//
+char* skip = (char*) "SKIP";
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjNavigate - true Kj-Tree navigation
+//
+static KjNode* kjNavigate(KjNode* treeP, char** compV)
+{
+  if (compV[0] == skip) return kjNavigate(treeP, &compV[1]);
+
+  KjNode* hitP = kjLookup(treeP, compV[0]);
+
+  if (hitP == NULL)
+    return NULL;
+
+  if (compV[1] == NULL)
+    return hitP;
+
+  return kjNavigate(hitP, &compV[1]);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjNavigate2 - prepared for db-model, but also OK without
+//
+static KjNode* kjNavigate2(KjNode* treeP, char* path)
+{
+  int   components = dotCount(path) + 1;
+  if (components > 20)
+    LM_X(1, ("The current implementation of Orion-LD can only handle 20 levels of tree navigation"));
+
+  char* compV[20];
+
+  components = pathComponentsSplit(path, compV);
+
+  // As the path is done for the database:
+  // - the first component is always 'attrs'
+  // - the second is the name of the attribute - eqForDot
+  // - the third might be md - if so, the fourth is the name of a sub-attr - eqForDot
+  //
+  // 'attrs' and 'md' don't exist in an API entity and must be nulled out here.
+  //
+  compV[0] = skip;     // As it is "attrs"
+  eqForDot(compV[1]);  // As it is an Attribute
+  if (strcmp(compV[2], "md") == 0)
+  {
+    compV[2] = skip;     // As it is "md"
+    eqForDot(compV[3]);  // As it is a Sub-Attribute
+  }
+
+  compV[components] = NULL;
+  return kjNavigate(treeP, compV);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qEqCompare -
+//
+bool qEqCompare(OrionldAlteration* altP, QNode* lhs, QNode* rhs)
+{
+  LM_TMP(("QM: EQ left-hand-side:  (%s) %s", qNodeType(lhs->type), lhs->value.v));
+  LM_TMP(("QM: EQ right-hand-side: (%s)", qNodeType(rhs->type)));
+  if (altP->patchedEntity == NULL)
+    LM_TMP(("QM: no patchTree ..."));
+  else
+    kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
+
+  KjNode* lhsNode = kjNavigate2(altP->patchedEntity, lhs->value.v);
+  LM_TMP(("QM: lhsNode at %p", lhsNode));
+
+  if (lhsNode == NULL)
+    return false;
+
+  LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
+  LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
+
+  if (lhsNode->type == KjInt)
+  {
+    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.i == rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.i == rhs->value.f);
+  }
+  else if (lhsNode->type == KjFloat)
+  {
+    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.f == rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.f == rhs->value.f);
+  }
+  else if (lhsNode->type == KjString)
+  {
+    if (rhs->type == QNodeStringValue)       return (strcmp(lhsNode->value.s, rhs->value.s) == 0);
+  }
+  else if (lhsNode->type == KjBoolean)
+  {
+    if (rhs->type == QNodeTrueValue)       return (lhsNode->value.b == true);
+    if (rhs->type == QNodeFalseValue)      return (lhsNode->value.b == false);
+  }
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qMatch - FIXME: only EQ supported right now - need to include the rest
+//
+bool qMatch(QNode* qP, OrionldAlteration* altP)
+{
+  LM_TMP(("QM: toplevel node is of type '%s'", qNodeType(qP->type)));
+
+  if (qP->type == QNodeEQ)
+  {
+    // An EQ must have exactly two children:
+    //   - LHS: a variable (a path to the value or part of the value of a (sub)attribute)
+    //   - RHS: a constant (integer, float, string, or bool
+    QNode* lhs = qP->value.children;
+    QNode* rhs = qP->value.children->next;
+
+    return qEqCompare(altP, lhs, rhs);
+  }
+
+  return false;
+}
+
+
+// -----------------------------------------------------------------------------
+//
 // subCacheAlterationMatch -
 //
 OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationList, int* matchesP)
@@ -214,6 +373,10 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   OrionldAlterationMatch*  matchList = NULL;
   int                      matches   = 0;
 
+  //
+  // Loop over each alteration, and check ALL SUBSCRIPTIONS in the cache for that alteration
+  // For each matching subscription, add the alterations into 'matchList'
+  //
   for (OrionldAlteration* altP = alterationList; altP != NULL; altP = altP->next)
   {
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
@@ -260,6 +423,22 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
           continue;
       }
 
+      if ((subP->qP != NULL) && (qMatch(subP->qP, altP) == false))
+      {
+        LM_TMP(("NFY: Sub '%s' - no match due to q == '%s'", subP->subscriptionId, subP->expression.q.c_str()));
+        continue;
+      }
+
+
+      //
+      // attributeMatch is too complex ...
+      // I'd need simply a list of the attribute names that have been modified
+      //
+      // Also, I'd prefer to check for attributes before I check for 'q'
+      //
+      // 'geoQ' MUST come last as it requires a database query
+      // (OR: somehow use GEOS library and fix it that way ...)
+      //
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
   }

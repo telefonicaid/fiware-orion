@@ -43,9 +43,9 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// pathComponentsSplit -
+// dbModelPathComponentsSplit - move to new library orionld/dbModel/dbModelPathComponentsSplit.h/cpp
 //
-static int pathComponentsSplit(char* path, char** compV)
+static int dbModelPathComponentsSplit(char* path, char** compV)
 {
   int compIx = 1;
 
@@ -187,7 +187,7 @@ void orionldPatchApply(KjNode* patchBase, KjNode* patchP)
   char* compV[7];
   bool  skip       = false;
   char* path       = pathNode->value.s;
-  int   components = pathComponentsSplit(path, compV);
+  int   components = dbModelPathComponentsSplit(path, compV);
   char  buf[512];
 
   components = pathComponentsFix(compV, components, &skip);

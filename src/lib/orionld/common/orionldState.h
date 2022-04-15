@@ -48,7 +48,6 @@ extern "C"
 #include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
-#include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
@@ -59,14 +58,6 @@ extern "C"
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-
-
-
-// -----------------------------------------------------------------------------
-//
-// QNODE_SIZE - maximum number of QNodes allowed
-//
-#define QNODE_SIZE 100
 
 
 
@@ -358,8 +349,7 @@ typedef struct OrionldConnectionState
   KjNode*                 payloadIdNode;
   KjNode*                 payloadTypeNode;
   char                    contextId[256];
-  QNode                   qNodeV[QNODE_SIZE];
-  int                     qNodeIx;
+  bool                    useMalloc;         // allocate using kalloc or malloc?
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;           // Used by kjTreeFromBsonObj
 

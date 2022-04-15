@@ -25,12 +25,10 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
-#include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
@@ -259,7 +257,7 @@ static char* varFix(char* varPath, char** detailsP)
   else
     snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
 
-  return kaStrdup(&orionldState.kalloc, fullPath);
+  return (orionldState.useMalloc)? strdup(fullPath) : kaStrdup(&orionldState.kalloc, fullPath);
 }
 
 

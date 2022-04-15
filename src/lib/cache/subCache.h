@@ -40,6 +40,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
+#include "orionld/common/QNode.h"                            // QNode
 
 
 
@@ -144,6 +145,7 @@ struct CachedSubscription
   SubscriptionExpression      expression;
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
+  QNode*                      qP;
 
   bool                        isActive;
   std::string                 status;
