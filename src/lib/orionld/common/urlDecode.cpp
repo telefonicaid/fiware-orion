@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QPARSE_H_
-#define SRC_LIB_ORIONLD_COMMON_QPARSE_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +22,43 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/QNode.h"                              // QNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// qParse -
+// urlDecode -
 //
-extern QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP);
+void urlDecode(char* str)
+{
+  int   fromIx = 0;
+  int   toIx;
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QPARSE_H_
+  //
+  // Just forward until reaching the first '%'
+  //
+  while (str[fromIx] != 0)
+  {
+    if (str[fromIx] == '%')
+      break;
+    ++fromIx;
+  }
+  toIx = fromIx;
+
+  while (str[fromIx] != 0)
+  {
+    if (str[fromIx] == '%')
+    {
+      if ((str[fromIx+1] == '2') && (str[fromIx+2] == '2'))
+      {
+        str[toIx] = 0x22;  // Single quote;
+        fromIx += 2;
+      }
+    }
+    else
+      str[toIx] = str[fromIx];
+    ++fromIx;
+    ++toIx;
+  }
+  str[toIx] = 0;
+}

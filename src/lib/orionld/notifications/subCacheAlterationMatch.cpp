@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 }
@@ -34,6 +35,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode, qNodeType
+#include "orionld/common/qPresent.h"                           // qPresent
 #include "orionld/common/pathComponentsSplit.h"                // pathComponentsSplit
 #include "orionld/common/eqForDot.h"                           // eqForDot
 #include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration, OrionldAlterationMatch, orionldAlterationType
@@ -92,6 +94,53 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
 }
 
 
+#if 0
+// -----------------------------------------------------------------------------
+//
+// matchLookup -
+//
+// Look into all OrionldAttributeAlteration of all matches for the same subscription
+// if the entity ID and the alterationType coincide, then it's a match
+//
+// PARAMETERS
+//   * matchP             an item in the 'matchList' - those already programmed for notification
+//   * itemP              the candidate
+//
+bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* itemP)
+{
+  CachedSubscription* subP = matchP->subP;
+
+  while ((matchP != NULL) && (matchP->subP == subP))  // matchP is an item in the 'matchList' - those already programmed for notification
+  {
+    if (strcmp(matchP->altP->entityId, itemP->altP->entityId) == 0)
+    {
+      // Same entity - is it the same reason too?
+      OrionldAlterationType inListAlterationType = matchP->altAttrP->alterationType;
+      OrionldAlterationType candidate            = itemP->altAttrP->alterationType;
+
+      //
+      // Match if
+      //   - EntityDeleted            & EntityDeleted
+      //   - AttributeDeleted         & AttributeDeleted
+      //   - Any other AlterationType & Any other AlterationType
+      //
+
+      if      (inListAlterationType == EntityDeleted)    { if (candidate == EntityDeleted)    return true; }
+      else if (inListAlterationType == AttributeDeleted) { if (candidate == AttributeDeleted) return true; }
+      else
+      {
+        if ((candidate != EntityDeleted) && (candidate != AttributeDeleted))
+          return true;
+      }
+    }
+
+    matchP = matchP->next;
+  }
+
+  return false;
+}
+#endif
+
 
 // -----------------------------------------------------------------------------
 //
@@ -101,10 +150,14 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 {
   OrionldAlterationMatch* matchP = matchList;
 
+  // Find the same subscription, to have all alteration-matches ordered
   while (matchP != NULL)
   {
     if (matchP->subP == itemP->subP)
     {
+      //
+      // insert it in the list
+      //
       itemP->next = matchP->next;
       matchP->next = itemP;
 
@@ -113,6 +166,7 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 
     matchP = matchP->next;
   }
+
 
   // First alteration-match of a subscription - prepending it to the matchList
   itemP->next = matchList;
@@ -127,17 +181,16 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 //
 static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, OrionldAttributeAlteration* aaP)
 {
-  LM_TMP(("NFY: Alteration made it all the way for sub %s:", subP->subscriptionId));
-  if (aaP != NULL)
-  {
-    LM_TMP(("NFY:   - Alteration Type:  %s", orionldAlterationType(aaP->alterationType)));
-    LM_TMP(("NFY:   - Attribute:        %s", aaP->attrName));
-  }
-
   OrionldAlterationMatch* amP = (OrionldAlterationMatch*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlterationMatch));
   amP->altP     = altP;
   amP->altAttrP = aaP;
   amP->subP     = subP;
+
+
+  LM_TMP(("ALT: Inserting Match for entity '%s', sub '%s', AlterationType '%s' in the matchList",
+          amP->subP->subscriptionId,
+          amP->altP->entityId,
+          (amP->altAttrP != NULL)? orionldAlterationType(amP->altAttrP->alterationType) : "Entire Entity"));
 
   if (matchList == NULL)
   {
@@ -232,20 +285,10 @@ static int dotCount(char* s)
 
 // -----------------------------------------------------------------------------
 //
-// skip - just a marker for a level to be skipped
-//
-char* skip = (char*) "SKIP";
-
-
-
-// -----------------------------------------------------------------------------
-//
 // kjNavigate - true Kj-Tree navigation
 //
 static KjNode* kjNavigate(KjNode* treeP, char** compV)
 {
-  if (compV[0] == skip) return kjNavigate(treeP, &compV[1]);
-
   KjNode* hitP = kjLookup(treeP, compV[0]);
 
   if (hitP == NULL)
@@ -271,22 +314,20 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path)
 
   char* compV[20];
 
-  components = pathComponentsSplit(path, compV);
+  LM_TMP(("QM: path: '%s'", path));
+  // pathComponentsSplit destroys the path, I need to work on a copy
+  char* pathCopy = kaStrdup(&orionldState.kalloc, path);
+  components = pathComponentsSplit(pathCopy, compV);
+  LM_TMP(("QM: components: %d", components));
 
-  // As the path is done for the database:
-  // - the first component is always 'attrs'
-  // - the second is the name of the attribute - eqForDot
-  // - the third might be md - if so, the fourth is the name of a sub-attr - eqForDot
+  //
+  // - the first component is always the longName of the ATTRIBUTE
+  // - the second is either "value", "object", "languageMap", or the longName of the SUB-ATTRIBUTE
   //
   // 'attrs' and 'md' don't exist in an API entity and must be nulled out here.
   //
-  compV[0] = skip;     // As it is "attrs"
-  eqForDot(compV[1]);  // As it is an Attribute
-  if (strcmp(compV[2], "md") == 0)
-  {
-    compV[2] = skip;     // As it is "md"
-    eqForDot(compV[3]);  // As it is a Sub-Attribute
-  }
+  eqForDot(compV[0]);  // As it is an Attribute
+  eqForDot(compV[1]);  // As it MIGHT be a Sub-Attribute (and if not, it has no '=')
 
   compV[components] = NULL;
   return kjNavigate(treeP, compV);
@@ -323,12 +364,29 @@ bool qEqCompare(OrionldAlteration* altP, QNode* lhs, QNode* rhs)
   }
   else if (lhsNode->type == KjFloat)
   {
-    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.f == rhs->value.i);
-    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.f == rhs->value.f);
+    double margin = 0.000001;  // What margin should I use?
+
+    LM_TMP(("QM: LHS is a FLOAT of %f", lhsNode->value.f));
+    if (rhs->type == QNodeIntegerValue)
+    {
+      LM_TMP(("QM: RHS id an INTEGER of %d", rhs->value.i));
+      if ((lhsNode->value.f - margin < rhs->value.i) && (lhsNode->value.f + margin > rhs->value.i))
+        return true;
+    }
+    else if (rhs->type == QNodeFloatValue)
+    {
+      LM_TMP(("QM: RHS id a FLOAT of %d", rhs->value.f));
+      if ((lhsNode->value.f - margin < rhs->value.f) && (lhsNode->value.f + margin > rhs->value.f))
+        return true;
+    }
   }
   else if (lhsNode->type == KjString)
   {
-    if (rhs->type == QNodeStringValue)       return (strcmp(lhsNode->value.s, rhs->value.s) == 0);
+    if (rhs->type == QNodeStringValue)
+    {
+      LM_TMP(("QM: Comparing two strings: LHS: '%s' and RHS: '%s'", lhsNode->value.s, rhs->value.s));
+      return (strcmp(lhsNode->value.s, rhs->value.s) == 0);
+    }
   }
   else if (lhsNode->type == KjBoolean)
   {
@@ -343,13 +401,38 @@ bool qEqCompare(OrionldAlteration* altP, QNode* lhs, QNode* rhs)
 
 // -----------------------------------------------------------------------------
 //
-// qMatch - FIXME: only EQ supported right now - need to include the rest
+// qMatch - move to orionld/q/qMatch.h/cpp
 //
 bool qMatch(QNode* qP, OrionldAlteration* altP)
 {
-  LM_TMP(("QM: toplevel node is of type '%s'", qNodeType(qP->type)));
+  LM_TMP(("ALT: toplevel node is of type '%s'", qNodeType(qP->type)));
 
-  if (qP->type == QNodeEQ)
+  if (qP->type == QNodeOr)
+  {
+    // If any of the children is a match, then it's a match
+    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+    {
+      if (qMatch(childP, altP) == true)
+        return true;
+    }
+  }
+  else if (qP->type == QNodeAnd)
+  {
+    // If ALL of the children are a match, then it's a match
+    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+    {
+      LM_TMP(("ALT: Recursive call for AND item"));
+      if (qMatch(childP, altP) == false)
+      {
+        LM_TMP(("ALT: The AND is a No-Match"));
+        return false;
+      }
+    }
+
+    LM_TMP(("ALT: The AND is a Match"));
+    return true;
+  }
+  else if (qP->type == QNodeEQ)
   {
     // An EQ must have exactly two children:
     //   - LHS: a variable (a path to the value or part of the value of a (sub)attribute)

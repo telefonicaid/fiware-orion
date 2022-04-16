@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
 #include "orionld/notifications/orionldAlterationsTreat.h"       // Own interface
@@ -71,7 +72,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
     return -1;
   }
 
-  LM_TMP(("NFY: Read %d bytes of notification: %s", nb, buf));
+  // LM_TMP(("NFY: Read %d bytes of notification: %s", nb, buf));
 
   char* endOfFirstLine = strchr(buf, '\r');
 
@@ -129,9 +130,22 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
+    LM_TMP(("ALT: Alteration %d:", alterations));
+    LM_TMP(("ALT:   Entity Id:    %s", aP->entityId));
+    LM_TMP(("ALT:   Entity Type:  %s", aP->entityType));
+    LM_TMP(("ALT:   Attributes:   %d", aP->alteredAttributes));
+    // if (aP->patchedEntity != NULL) kjTreeLog(aP->patchedEntity, "ALT:   Patched Entity");
+
+    for (int ix = 0; ix < aP->alteredAttributes; ix++)
+    {
+      OrionldAttributeAlteration* altAttrP = &aP->alteredAttributeV[ix];
+
+      LM_TMP(("ALT:   Attribute        %s", altAttrP->attrName));
+      LM_TMP(("ALT:   Alteration Type: %s", orionldAlterationType(altAttrP->alterationType)));
+    }
     ++alterations;
   }
-  LM_TMP(("%d Alterations present", alterations));
+  LM_TMP(("ALT: %d Alterations present", alterations));
   // </DEBUG>
 
   OrionldAlterationMatch* matchList;

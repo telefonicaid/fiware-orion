@@ -47,6 +47,8 @@ extern "C"
 #include "orionld/common/orionldState.h"             // orionldState
 #include "orionld/common/qLex.h"                     // qLex
 #include "orionld/common/qParse.h"                   // qParse
+#include "orionld/common/qPresent.h"                 // qPresent
+#include "orionld/common/urlDecode.h"                // urlDecode
 #include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 
 #include "cache/subCache.h"
@@ -928,6 +930,7 @@ void subCacheItemInsert
 
   if (q != "")
   {
+    LM_TMP(("Got a 'q': %s", q.c_str()));
     // qLex destroys the input string, but we need it intact
     char* qString = kaStrdup(&orionldState.kalloc, q.c_str());
 
@@ -936,6 +939,8 @@ void subCacheItemInsert
     char*  title;
     char*  detail;
     QNode* qList;
+
+    urlDecode(qString);
     if ((qList = qLex(qString, &title, &detail)) == NULL)
     {
       LM_W(("Error (qLex: %s: %s)", title, detail));
@@ -943,9 +948,11 @@ void subCacheItemInsert
     }
     else
     {
-      cSubP->qP = qParse(qList, &title, &detail);
+      cSubP->qP = qParse(qList, false, &title, &detail);
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));
+      else
+        qPresent(cSubP->qP, "Q For Subscription");
     }
     orionldState.useMalloc = true;
   }

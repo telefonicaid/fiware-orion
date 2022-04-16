@@ -61,6 +61,8 @@ SET (SOURCES
     orionldPatchApply.cpp
     langStringExtract.cpp
     pathComponentsSplit.cpp
+    qPresent.cpp
+    urlDecode.cpp
 )
 
 # Include directories

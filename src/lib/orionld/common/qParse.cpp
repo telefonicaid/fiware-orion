@@ -48,7 +48,7 @@ extern "C"
 //
 // After implementing expansion in metadata names, for attr.b.c, 'b' needs expansion also
 //
-static char* varFix(char* varPath, char** detailsP)
+static char* varFix(char* varPath, bool forDb, char** detailsP)
 {
   char* cP            = varPath;
   char* attrNameP     = varPath;
@@ -248,14 +248,28 @@ static char* varFix(char* varPath, char** detailsP)
     }
   }
 
-  if (caseNo == 1)
-    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value", longName);
-  else if (caseNo == 2)
-    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value.%s", longName, rest);
-  else if (caseNo == 3)
-    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value", longName, mdNameP);
+  if (forDb)
+  {
+    if (caseNo == 1)
+      snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value", longName);
+    else if (caseNo == 2)
+      snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value.%s", longName, rest);
+    else if (caseNo == 3)
+      snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value", longName, mdNameP);
+    else
+      snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
+  }
   else
-    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
+  {
+    if (caseNo == 1)
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s.value", longName);
+    else if (caseNo == 2)
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s.value.%s", longName, rest);
+    else if (caseNo == 3)
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s.value", longName, mdNameP);
+    else
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s.value.%s", longName, mdNameP, rest);
+  }
 
   return (orionldState.useMalloc)? strdup(fullPath) : kaStrdup(&orionldState.kalloc, fullPath);
 }
@@ -306,7 +320,7 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
 // * On the same parenthesis level, the same op must be used (op: AND|OR)
 // *
 //
-QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
+QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 {
   QNode*     qNodeV[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
   int        qNodeIx    = 0;
@@ -356,11 +370,11 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
       prevP->next     = NULL;
       expressionStart = expressionStart->next;
 
-      qNodeV[qNodeIx++] = qParse(expressionStart, titleP, detailsP);
+      qNodeV[qNodeIx++] = qParse(expressionStart, forDb, titleP, detailsP);
       break;
 
     case QNodeVariable:
-      qLexP->value.v = varFix(qLexP->value.v, detailsP);
+      qLexP->value.v = varFix(qLexP->value.v, forDb, detailsP);
       if (qLexP->next == NULL)
       {
         if (compOpP == NULL)
