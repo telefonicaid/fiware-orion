@@ -21,41 +21,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldRequestSend.cpp
-    urlParse.cpp
-    linkCheck.cpp
-    httpStatusCodeToOrionldErrorType.cpp
-    numberToDate.cpp
-    orionldState.cpp
-    uuidGenerate.cpp
-    orionldServerConnect.cpp
-    dotForEq.cpp
-    eqForDot.cpp
-    entitySuccessPush.cpp
-    entityErrorPush.cpp
-    entityIdCheck.cpp
-    entityTypeCheck.cpp
-    entityLookupById.cpp
-    removeArrayEntityLookup.cpp
-    typeCheckForNonExistingEntities.cpp
-    entityIdAndTypeGet.cpp
-    orionldTenantInit.cpp
-    orionldTenantLookup.cpp
-    orionldTenantCreate.cpp
-    orionldTenantGet.cpp
-    attributeUpdated.cpp
-    attributeNotUpdated.cpp
-    isSpecialSubAttribute.cpp
-    duplicatedInstances.cpp
-    troeIgnored.cpp
-    tenantList.cpp
-    mimeTypeFromString.cpp
-    attributeTypeFromUriParam.cpp
-    orionldError.cpp
-    orionldPatchApply.cpp
-    langStringExtract.cpp
-    pathComponentsSplit.cpp
-    urlDecode.cpp
+    QNode.cpp
+    qLex.cpp
+    qLexCheck.cpp
+    qParse.cpp
+    qTreeToBsonObj.cpp
+    qAliasCompact.cpp
+    qPresent.cpp
 )
 
 # Include directories
@@ -65,4 +37,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_common STATIC ${SOURCES})
+ADD_LIBRARY(orionld_q STATIC ${SOURCES})

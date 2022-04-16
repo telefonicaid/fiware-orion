@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QPRESENT_H_
-#define SRC_LIB_ORIONLD_COMMON_QPRESENT_H_
+#ifndef SRC_LIB_ORIONLD_Q_QTREETOBSONOBJ_H_
+#define SRC_LIB_ORIONLD_Q_QTREETOBSONOBJ_H_
 
 /*
 *
@@ -25,14 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/QNode.h"                              // QNode
+#include "mongo/client/dbclient.h"                             // mongo::BSONObj
+
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// qPresent -
+// qTreeToBsonObj -
 //
-extern void qPresent(QNode* qP, const char* what);
+extern bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** titleP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QPRESENT_H_
+#endif  // SRC_LIB_ORIONLD_Q_QTREETOBSONOBJ_H_

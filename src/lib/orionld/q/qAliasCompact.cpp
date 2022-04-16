@@ -31,9 +31,9 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/qAliasCompact.h"                        // Own interface
+#include "orionld/q/qAliasCompact.h"                             // Own interface
 
 
 

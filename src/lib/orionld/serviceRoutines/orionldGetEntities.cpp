@@ -44,9 +44,9 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/qLex.h"                               // qLex
-#include "orionld/common/qParse.h"                             // qParse
-#include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
+#include "orionld/q/qLex.h"                                    // qLex
+#include "orionld/q/qParse.h"                                  // qParse
+#include "orionld/q/qTreeToBsonObj.h"                          // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/performance.h"                        // PERFORMANCE

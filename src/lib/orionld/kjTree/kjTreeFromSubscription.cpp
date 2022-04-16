@@ -43,7 +43,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/qAliasCompact.h"                        // qAliasCompact
+#include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext

@@ -27,8 +27,8 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/qTreeToBson.h"                        // Own interface
+#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qTreeToBson.h"                             // Own interface
 
 
 

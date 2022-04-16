@@ -25,23 +25,23 @@
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjArray, kjChildAdd
+#include "kjson/KjNode.h"                                          // KjNode
+#include "kjson/kjBuilder.h"                                       // kjArray, kjChildAdd
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/logMsg.h"                                         // LM_*
+#include "logMsg/traceLevels.h"                                    // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
+#include "mongoBackend/MongoGlobal.h"                              // getMongoConnection, releaseMongoConnection, ...
 
-#include "orionld/common/QNode.h"                                // QNode
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/qTreeToBsonObj.h"                       // qTreeToBsonObj
-#include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/SCOMPARE.h"                             // SCOMPARE
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
+#include "orionld/common/orionldState.h"                           // orionldState
+#include "orionld/common/orionldError.h"                           // orionldError
+#include "orionld/common/SCOMPARE.h"                               // SCOMPARE
+#include "orionld/q/QNode.h"                                       // QNode
+#include "orionld/q/qTreeToBsonObj.h"                              // qTreeToBsonObj
+#include "orionld/db/dbConfiguration.h"                            // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"  // Own interface
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"    // Own interface
 
 
 

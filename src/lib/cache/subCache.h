@@ -40,7 +40,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
-#include "orionld/common/QNode.h"                            // QNode
+#include "orionld/q/QNode.h"                                 // QNode
 
 
 

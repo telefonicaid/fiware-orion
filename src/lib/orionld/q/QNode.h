@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QNODE_H_
-#define SRC_LIB_ORIONLD_COMMON_QNODE_H_
+#ifndef SRC_LIB_ORIONLD_Q_QNODE_H_
+#define SRC_LIB_ORIONLD_Q_QNODE_H_
 
 /*
 *
@@ -114,4 +114,4 @@ extern QNode* qNode(QNodeType type);
 //
 extern const char* qNodeType(QNodeType type);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QNODE_H_
+#endif  // SRC_LIB_ORIONLD_Q_QNODE_H_

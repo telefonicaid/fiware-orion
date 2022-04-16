@@ -34,8 +34,8 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/QNode.h"                              // QNode, qNodeType
-#include "orionld/common/qPresent.h"                           // qPresent
+#include "orionld/q/QNode.h"                                   // QNode, qNodeType
+#include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/common/pathComponentsSplit.h"                // pathComponentsSplit
 #include "orionld/common/eqForDot.h"                           // eqForDot
 #include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration, OrionldAlterationMatch, orionldAlterationType

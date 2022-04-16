@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QTREETOBSON_H_
-#define SRC_LIB_ORIONLD_COMMON_QTREETOBSON_H_
+#ifndef SRC_LIB_ORIONLD_Q_QLEXCHECK_H_
+#define SRC_LIB_ORIONLD_Q_QLEXCHECK_H_
 
 /*
 *
@@ -25,16 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include <bson/bson.h>                                         // BSON
-
-#include "orionld/common/QNode.h"                              // QNode
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
 // ----------------------------------------------------------------------------
 //
-// qTreeToBson -
+// qLexCheck -
 //
-extern bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP);
+extern bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QTREETOBSON_H_
+#endif  // SRC_LIB_ORIONLD_Q_QLEXCHECK_H_

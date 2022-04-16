@@ -36,9 +36,9 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/QNode.h"                                // QNode
-#include "orionld/common/qLex.h"                                 // qLex
-#include "orionld/common/qParse.h"                               // qParse
+#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/q/qLex.h"                                      // qLex
+#include "orionld/q/qParse.h"                                    // qParse
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray
 #include "orionld/payloadCheck/pcheckAttrs.h"                    // pcheckAttrs
 #include "orionld/payloadCheck/pcheckQ.h"                        // pcheckQ

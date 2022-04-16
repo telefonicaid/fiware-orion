@@ -33,8 +33,8 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/qParse.h"                             // Own interface
+#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qParse.h"                                  // Own interface
 
 
 
