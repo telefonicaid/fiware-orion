@@ -951,7 +951,8 @@ void subCacheItemInsert
       cSubP->qP = qParse(qList, false, &title, &detail);
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));
-      qPresent(cSubP->qP, "Q For Subscription");
+      else
+        qPresent(cSubP->qP, "Q For Subscription");
     }
     orionldState.useMalloc = true;
   }
