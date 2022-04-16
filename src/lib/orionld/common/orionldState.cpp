@@ -43,7 +43,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL_V*
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/QNode.h"                                // QNode
+#include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // Own interface
 

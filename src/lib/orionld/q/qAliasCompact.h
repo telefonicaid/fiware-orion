@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QLEX_H_
-#define SRC_LIB_ORIONLD_COMMON_QLEX_H_
+#ifndef SRC_LIB_ORIONLD_Q_QALIASCOMPACT_H_
+#define SRC_LIB_ORIONLD_Q_QALIASCOMPACT_H_
 
 /*
 *
@@ -25,14 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/QNode.h"                              // QNode
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// qLex - lexical analysis of an ngsi-ld Q-filter
+// qAliasCompact -
 //
-extern QNode* qLex(char* s, char** titleP, char** detailsP);
+extern bool qAliasCompact(KjNode* qP, bool compact);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QLEX_H_
+#endif  // SRC_LIB_ORIONLD_Q_QALIASCOMPACT_H_

@@ -45,9 +45,9 @@ extern "C"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionld/common/orionldState.h"             // orionldState
-#include "orionld/common/qLex.h"                     // qLex
-#include "orionld/common/qParse.h"                   // qParse
-#include "orionld/common/qPresent.h"                 // qPresent
+#include "orionld/q/qLex.h"                          // qLex
+#include "orionld/q/qParse.h"                        // qParse
+#include "orionld/q/qPresent.h"                      // qPresent
 #include "orionld/common/urlDecode.h"                // urlDecode
 #include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 

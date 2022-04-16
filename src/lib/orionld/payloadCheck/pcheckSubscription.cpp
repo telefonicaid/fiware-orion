@@ -32,7 +32,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
-#include "orionld/common/qAliasCompact.h"                        // qAliasCompact
+#include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray

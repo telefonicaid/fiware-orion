@@ -838,7 +838,7 @@ static bool uriParamExpansion(void)
   if (pCheckPayloadEntityType()        == false) return false;
   if (pCheckUrlPathAttributeName()     == false) return false;
 
-  // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/common/qParse.cpp'
+  // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/q/qParse.cpp'
 
   return true;
 }

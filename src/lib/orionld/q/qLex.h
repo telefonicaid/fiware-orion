@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QTREETOBSONOBJ_H_
-#define SRC_LIB_ORIONLD_COMMON_QTREETOBSONOBJ_H_
+#ifndef SRC_LIB_ORIONLD_Q_QLEX_H_
+#define SRC_LIB_ORIONLD_Q_QLEX_H_
 
 /*
 *
@@ -25,16 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // mongo::BSONObj
-
-#include "orionld/common/QNode.h"                              // QNode
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// qTreeToBsonObj -
+// qLex - lexical analysis of an ngsi-ld Q-filter
 //
-extern bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** titleP, char** detailsP);
+extern QNode* qLex(char* s, char** titleP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QTREETOBSONOBJ_H_
+#endif  // SRC_LIB_ORIONLD_Q_QLEX_H_

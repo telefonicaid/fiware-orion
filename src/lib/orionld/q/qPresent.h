@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QLEXCHECK_H_
-#define SRC_LIB_ORIONLD_COMMON_QLEXCHECK_H_
+#ifndef SRC_LIB_ORIONLD_Q_QPRESENT_H_
+#define SRC_LIB_ORIONLD_Q_QPRESENT_H_
 
 /*
 *
@@ -25,14 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/QNode.h"                              // QNode
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// qLexCheck -
+// qPresent -
 //
-extern bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP);
+extern void qPresent(QNode* qP, const char* what);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QLEXCHECK_H_
+#endif  // SRC_LIB_ORIONLD_Q_QPRESENT_H_

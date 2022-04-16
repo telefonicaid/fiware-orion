@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_QALIASCOMPACT_H_
-#define SRC_LIB_ORIONLD_COMMON_QALIASCOMPACT_H_
+#ifndef SRC_LIB_ORIONLD_Q_QPARSE_H_
+#define SRC_LIB_ORIONLD_Q_QPARSE_H_
 
 /*
 *
@@ -25,17 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// qAliasCompact -
+// qParse -
 //
-extern bool qAliasCompact(KjNode* qP, bool compact);
+extern QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_QALIASCOMPACT_H_
+#endif  // SRC_LIB_ORIONLD_Q_QPARSE_H_

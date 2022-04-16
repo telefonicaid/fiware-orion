@@ -26,9 +26,9 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/qLexCheck.h"                          // qLexCheck
-#include "orionld/common/qLex.h"                               // Own interface
+#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qLexCheck.h"                               // qLexCheck
+#include "orionld/q/qLex.h"                                    // Own interface
 
 
 

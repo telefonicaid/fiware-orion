@@ -31,7 +31,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/common/QNode.h"                                // QNode
+#include "orionld/q/QNode.h"                                     // QNode
 
 
 

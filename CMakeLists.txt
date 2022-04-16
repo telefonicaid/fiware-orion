@@ -222,6 +222,7 @@ SET (ORION_LIBS
     orionld_mqtt
     orionld_types
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
+    orionld_q
     parse
     apiTypesV2
     orionTypes
@@ -347,6 +348,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
   ADD_SUBDIRECTORY(src/lib/orionld/notifications)
+  ADD_SUBDIRECTORY(src/lib/orionld/q)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/orionld/troe)
