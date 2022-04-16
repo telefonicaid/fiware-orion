@@ -23,7 +23,6 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode
@@ -183,6 +182,7 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
         {
           *titleP   = (char*) "ngsi-ld query language: after non-regexp comparison operator must come a non-regexp Value";
           *detailsP = (char*) qNodeType(nextType);
+          LM_E(("qLex Error: %s: %s", *titleP, *detailsP));
           return false;
         }
       }

@@ -34,49 +34,8 @@ extern "C"
 #include "orionld/common/QNode.h"                               // QNode
 #include "orionld/common/qLex.h"                                // qLex
 #include "orionld/common/qParse.h"                              // qParse
+#include "orionld/common/urlDecode.h"                           // urlDecode
 #include "orionld/payloadCheck/pcheckQ.h"                       // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// urldecode -
-//
-// FIXME: Move to separate module in the 'common' library
-//
-static void urldecode(char* str)
-{
-  int   fromIx = 0;
-  int   toIx;
-
-  //
-  // Just forward until reaching the first '%'
-  //
-  while (str[fromIx] != 0)
-  {
-    if (str[fromIx] == '%')
-      break;
-    ++fromIx;
-  }
-  toIx = fromIx;
-
-  while (str[fromIx] != 0)
-  {
-    if (str[fromIx] == '%')
-    {
-      if ((str[fromIx+1] == '2') && (str[fromIx+2] == '2'))
-      {
-        str[toIx] = 0x22;  // Single quote;
-        fromIx += 2;
-      }
-    }
-    else
-      str[toIx] = str[fromIx];
-    ++fromIx;
-    ++toIx;
-  }
-  str[toIx] = 0;
-}
 
 
 
@@ -91,7 +50,7 @@ QNode* pcheckQ(char* qString)
   QNode*  lexList;
   QNode*  qTree;
 
-  urldecode(qString);
+  urlDecode(qString);
 
   if ((lexList = qLex(qString, &title, &detail)) == NULL)
   {

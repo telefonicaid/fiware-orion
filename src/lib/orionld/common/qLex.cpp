@@ -25,6 +25,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode
 #include "orionld/common/qLexCheck.h"                          // qLexCheck
 #include "orionld/common/qLex.h"                               // Own interface
@@ -39,7 +40,7 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 {
   QNode* qNodeP = qNode(QNodeStringValue);
 
-  qNodeP->value.s = stringValue;
+  qNodeP->value.s = (orionldState.useMalloc == false)? stringValue : strdup(stringValue);
 
   prev->next = qNodeP;
 
@@ -337,7 +338,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       current = qOpPush(current, type);
       stringStart = sP;
     }
-    else if (*sP == ';')  // || (*sP == '&'))
+    else if ((*sP == ';') || (*sP == '&'))
     {
       *sP = 0;
       ++sP;

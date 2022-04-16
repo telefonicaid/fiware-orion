@@ -130,14 +130,22 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
-    LM_TMP(("QM: Alteration %d:", alterations));
-    LM_TMP(("QM:   Entity Id:    %s", aP->entityId));
-    LM_TMP(("QM:   Entity Type:  %s", aP->entityType));
-    LM_TMP(("QM:   Attributes:   %d", aP->alteredAttributes));
-    if (aP->patchedEntity != NULL) kjTreeLog(aP->patchedEntity, "QM:   Patched Entity");
+    LM_TMP(("ALT: Alteration %d:", alterations));
+    LM_TMP(("ALT:   Entity Id:    %s", aP->entityId));
+    LM_TMP(("ALT:   Entity Type:  %s", aP->entityType));
+    LM_TMP(("ALT:   Attributes:   %d", aP->alteredAttributes));
+    // if (aP->patchedEntity != NULL) kjTreeLog(aP->patchedEntity, "ALT:   Patched Entity");
+
+    for (int ix = 0; ix < aP->alteredAttributes; ix++)
+    {
+      OrionldAttributeAlteration* altAttrP = &aP->alteredAttributeV[ix];
+
+      LM_TMP(("ALT:   Attribute        %s", altAttrP->attrName));
+      LM_TMP(("ALT:   Alteration Type: %s", orionldAlterationType(altAttrP->alterationType)));
+    }
     ++alterations;
   }
-  LM_TMP(("%d Alterations present", alterations));
+  LM_TMP(("ALT: %d Alterations present", alterations));
   // </DEBUG>
 
   OrionldAlterationMatch* matchList;
