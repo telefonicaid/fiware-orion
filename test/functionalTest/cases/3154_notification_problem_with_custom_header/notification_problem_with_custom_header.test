@@ -156,7 +156,7 @@ Date: REGEX(.*)
 04. GET the subscriptions
 =========================
 HTTP/1.1 200 OK
-Content-Length: 920
+Content-Length: 952
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -169,6 +169,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "legacy",
+            "covered": false,
             "httpCustom": {
                 "url": "http://localhost:9997/notify"
             },
@@ -197,6 +198,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "legacy",
+            "covered": false,
             "httpCustom": {
                 "payload": "{ %22A1%22: %22Value of A1: ${A1}%22 }",
                 "url": "http://localhost:9997/notify"

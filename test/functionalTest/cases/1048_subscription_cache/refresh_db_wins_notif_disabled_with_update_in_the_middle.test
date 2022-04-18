@@ -175,7 +175,7 @@ echo
 01. GET /v2/subscriptions and see maxFailsLimit 1, status active
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 269
+Content-Length: 285
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -186,6 +186,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },
@@ -236,7 +237,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -247,6 +248,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 2,
             "http": {
                 "url": "http://localhost:9997/notify"
@@ -356,7 +358,7 @@ Date: REGEX(.*)
 08. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 473
+Content-Length: 489
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -368,6 +370,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 2,
             "http": {
                 "url": "http://localhost:9997/notify"

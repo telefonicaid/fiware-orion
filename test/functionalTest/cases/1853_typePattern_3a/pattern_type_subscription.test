@@ -127,7 +127,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 461
+Content-Length: 477
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -141,6 +141,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -181,7 +182,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 480
+Content-Length: 496
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -195,6 +196,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },

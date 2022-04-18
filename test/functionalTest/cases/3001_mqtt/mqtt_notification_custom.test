@@ -242,7 +242,7 @@ MQTT message at topic sub/E2:
 08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 464
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -254,6 +254,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "mqttCustom": {

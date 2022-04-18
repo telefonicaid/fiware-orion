@@ -413,7 +413,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 406
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -423,6 +423,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9997/notify"
         },
@@ -473,7 +474,7 @@ Date: REGEX(.*)
 07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 497
+Content-Length: 513
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -483,6 +484,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 2,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -523,7 +525,7 @@ Date: REGEX(.*)
 09. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -533,6 +535,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 3,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -582,7 +585,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2 (same as last GET)
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -592,6 +595,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 3,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -640,7 +644,7 @@ Date: REGEX(.*)
 15. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=5, failsCounter=4, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -650,6 +654,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 4,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -698,7 +703,7 @@ Date: REGEX(.*)
 18. GET /v2/subscriptions/subId, to check the status=active, timesSent=6, failsCounter=5, maxFailsLimit=5
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 497
+Content-Length: 513
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -708,6 +713,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 5,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -748,7 +754,7 @@ Date: REGEX(.*)
 20. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -758,6 +764,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 6,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -807,7 +814,7 @@ Date: REGEX(.*)
 23. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5 (same as last GET)
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -817,6 +824,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 6,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -870,7 +878,7 @@ Date: REGEX(.*)
 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 480
+Content-Length: 496
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -880,6 +888,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9997/notify"
         },
