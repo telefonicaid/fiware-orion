@@ -78,7 +78,7 @@ public:
                                                       // ContextAttribute field in the ContextAttribute type declaration)
 
 
-  bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
+  bool                      onlyValue;                // Used when only the value is meaningful in v2 updates of value, without regarding metadata
   bool                      shadowed;                 // shadowed true means that the attribute is rendered only if explicitly required
                                                       // in attrs filter (typically for builtin attributes)
 

@@ -42,6 +42,33 @@ accumulator-server.py -u
 
 **IMPORTANT:** remember to activate the virtual env (`. /path/to/ft_env/bin/activate`) before running functional tests
 
+#### Alternative installation using docker
+
+You can use the following Dockerfile to build the accumulator:
+
+```
+FROM debian:stable
+RUN apt-get update -y
+RUN apt-get install -y python3
+RUN apt-get install -y python3-pip
+RUN pip install Flask==2.0.2
+RUN pip install paho-mqtt==1.6.1
+COPY . /app
+WORKDIR /app
+ENTRYPOINT [ "python3", "./accumulator-server.py"]
+CMD ["--port", "1028", "--url", "/accumulate", "--host", "0.0.0.0", "-v"]
+```
+
+**Important note**: copy the accumulator-server.py to the same directory in which Dockerfile is, before running your `docker build` command.
+
+Once build (let's say with name 'accum') you can run it with:
+
+```
+docker run -p 0.0.0.0:1028:1028/tcp accum
+```
+
+Note the `-p` arguments, so the accumulator listening port in the container gets mapped to the one in your host.
+
 ### Run functional tests
 
 The easiest way is running just:

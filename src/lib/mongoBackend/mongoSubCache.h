@@ -88,13 +88,14 @@ extern void mongoSubCacheRefresh(const std::string& database);
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdate - 
+* mongoSubUpdateOnNotif -
+*
+* Used in notification logic
 */
-extern void mongoSubCountersUpdate
+extern void mongoSubUpdateOnNotif
 (
   const std::string&  tenant,
   const std::string&  subId,
-  long long           count,
   long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
@@ -104,5 +105,30 @@ extern void mongoSubCountersUpdate
   const std::string&  status,
   double              statusLastChange
 );
+
+
+
+/* ****************************************************************************
+*
+* mongoSubUpdateOnCacheSync -
+*
+* Used in cache sync logic
+*/
+extern void mongoSubUpdateOnCacheSync
+(
+  const std::string&  tenant,
+  const std::string&  subId,
+  long long           count,
+  long long           failsCounter,
+  int64_t*            lastNotificationTimeP,
+  int64_t*            lastFailureP,
+  int64_t*            lastSuccessP,
+  std::string*        failureReasonP,
+  int64_t*            statusCodeP,
+  std::string*        statusP,
+  double*             statusLastChangeP
+);
+
+
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

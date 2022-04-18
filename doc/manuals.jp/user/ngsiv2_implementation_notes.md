@@ -13,12 +13,14 @@
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
+* [`alterationType` 属性](#alterationtype-attribute)
 * [`actionType` メタデータ](#actiontype-metadata)
 * [`ignoreType` メタデータ](#ignoretype-metadata)
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
@@ -337,6 +339,26 @@ Orion が NGSIv2 サブスクリプション・ペイロードで実装する特
 
 [トップ](#top)
 
+<a name="alterationtype-attribute"></a>
+## `alterationType` 属性
+
+NGSIv2 仕様の "組み込み属性" (Builtin Attributes) セクションで説明されている属性から、Orion は
+`alterationType` 属性を実装します。
+
+この属性は通知でのみ使用でき (`GET /v2/entities?attrs=alterationType` などのクエリでは無視されます)、
+次の値をとることができます:
+
+* `entityCreate` 通知をトリガーする更新がエンティティ作成操作の場合
+* `entityUpdate` 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
+* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合
+* `entityDelete` 通知をトリガーする更新がエンティティ削除操作であった場合
+
+この属性のタイプは `Text` です。
+
+この組み込み属性は、[変更タイプに基づくサブスクリプション](subscriptions_alttype.md) 機能に関連しています。
+
+[トップ](#top)
+
 <a name="actiontype-metadata"></a>
 ## `actionType` メタデータ
 
@@ -417,6 +439,17 @@ NGISv2 仕様 "Ordering Results" セクションから :
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[トップ](#top)
+
+<a name="subscriptions-based-in-alteration-type"></a>
+## 変更タイプ (alteration type) に基づくサブスクリプション
+
+NGSIv2 の仕様に従ってサブスクリプションの `conditions` フィールドで許可されるサブフィールドとは別に、
+Orionは `alterationTypes` フィールドをサポートして、サブスクリプションがトリガーされる変更
+(エンティティの作成、エンティティの変更など) を指定します。
+
+詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
 
 [トップ](#top)
 
@@ -577,6 +610,10 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+同じ効果については、`entityChange` [変更タイプ](subscriptions_alttype.md) (alteration type)
+も確認してください。ただし、更新リクエストに `forcedUpdate` オプションが含まれているかどうかに
+関係なく、サブスクリプションに適用されます。
 
 [Top](#top)
 

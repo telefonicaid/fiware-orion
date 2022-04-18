@@ -13,12 +13,14 @@
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
+* [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
 * [`ignoreType` metadata](#ignoretype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
-* [Oneshot Subscription](#oneshot-subscriptions)
+* [Oneshot subscriptions](#oneshot-subscriptions)
+* [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
@@ -360,6 +362,25 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 [Top](#top)
 
+## `alterationType` attribute
+
+Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Orion implements the `alterationType` attribute.
+
+This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
+is ignored) and can take the following values:
+
+* `entityCreate` if the update that triggers the notification is a entity creation operation
+* `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+* `entityChange` if the update that triggers the notification was an update with an actual change
+* `entityDelete` if the update that triggers the notification was a entity delete operation
+
+The type of this attribute is `Text`
+
+This builtin attribute is related with the [subscriptions based in alteration type](subscriptions_alttype.md) feature.
+
+[Top](#top)
+
 ## `actionType` metadata
 
 From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
@@ -448,6 +469,14 @@ From lowest to highest:
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
 [Top](#top)
+
+## Subscriptions based in alteration type
+
+Apart from the sub-fields allowed in subscriptions `conditions` field according to NGSIv2 specifiction,
+Orion supports the `alterationTypes` field to specify under which alterations (entity creation, entity
+modification, etc.) the subscription is triggered.
+
+Please find details in [this specific documentation](subscriptions_alttype.md)
 
 ## Custom notifications without payload
 
@@ -597,6 +626,9 @@ The following requests can use the forcedUpdate URI param option:
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+Check also the `entityChange` [alteration type](subscriptions_alttype.md) for the same effect,
+but applyed to the subscription, not matter if the update request included the `forcedUpdate` option or not.
 
 [Top](#top)
 

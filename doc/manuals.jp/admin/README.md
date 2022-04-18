@@ -6,9 +6,7 @@ Orion Context Broker: インストール&管理マニュアル
 ## コンテンツ
 
 * [Orion のインストール](install.md) (Installing Orion)
-* [Yum リポジトリの使用](yum.md) (Using Yum repositories)
 * [ソースからのビルド](build_source.md) (Building from sources)
-* [Orion をシステム・サービスとして実行](running.md) (Running Orion as system service)
 * [コマンドラインからの Orion の実行](cli.md) (Running Orion from command line)
 * [データベース管理](database_admin.md) (Database administration)
 * [データ・モデル](database_model.md) (Data model)

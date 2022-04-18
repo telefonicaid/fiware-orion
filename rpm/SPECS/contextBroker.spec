@@ -193,6 +193,17 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Mar 02 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.6.0-1
+- Add: ignoreType metadata so Orion ignores attribute type semantic (supported by geo-types at the present moment) (#4032)
+- Add: URL decode in header values in custom notifications (#4071)
+- Add: new option overrideMetadata to change default update attribute behaviour (#4033)
+- Fix: attribute update doesn't override metadata by default (new option overrideMetadata has to be used for that) (#4033)
+- Fix: unify error traces with "Runtime Error" (some of them where using "Internal Error" or "Orion Bug")
+- Fix: increase severity to ERROR in some WARN traces actually meaning Runtime Error conditions
+- Fix: ForwardingError alarm logic, which was missing in some cases
+- Fix: cache status not correctly updated when several CBs are working in parallel (#4069)
+- Fix: over-updating csubs cache (#4063)
+
 * Fri Jan 28 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.5.0-1
 - Fix: avoid duplicated attributes and metadata in arrays in POST /v2/subscriptions and PATCH /v2/subscriptions/{subId} (#2101)
 - Fix: $each usage with $push operator to add several items to array (#744)

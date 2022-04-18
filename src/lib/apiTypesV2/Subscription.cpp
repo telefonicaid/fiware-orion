@@ -34,6 +34,67 @@
 
 
 
+/* ****************************************************************************
+*
+* parseAlterationType -
+*/
+ngsiv2::SubAltType parseAlterationType(const std::string& altType)
+{
+  if (altType == "entityChange")
+  {
+    return ngsiv2::SubAltType::EntityChange;
+  }
+  else if (altType == "entityUpdate")
+  {
+    return ngsiv2::SubAltType::EntityUpdate;
+  }
+  else if (altType == "entityCreate")
+  {
+    return ngsiv2::SubAltType::EntityCreate;
+  }
+  else if (altType == "entityDelete")
+  {
+    return ngsiv2::SubAltType::EntityDelete;
+  }
+  else
+  {
+    return ngsiv2::SubAltType::Unknown;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* subAltType2string -
+*/
+std::string subAltType2string(ngsiv2::SubAltType altType)
+{
+  if (altType == ngsiv2::SubAltType::EntityChange)
+  {
+    return "entityChange";
+  }
+  else if (altType == ngsiv2::SubAltType::EntityUpdate)
+  {
+    return "entityUpdate";
+  }
+  else if (altType == ngsiv2::SubAltType::EntityCreate)
+  {
+    return "entityCreate";
+  }
+  else if (altType == ngsiv2::SubAltType::EntityDelete)
+  {
+    return "entityDelete";
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown alteration type)"));
+    return "Unknown";
+  }
+}
+
+
+
 namespace ngsiv2
 {
 /* ****************************************************************************
@@ -116,27 +177,16 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastNotification", this->lastNotification);
   }
 
-  if (!this->blacklist && !this->onlyChanged)
-  {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", false);
-  }
-  else if (!this->blacklist && this->onlyChanged)
-  {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", this->onlyChanged);
-  }
-  else if (this->blacklist && this->onlyChanged)
+  if (this->blacklist)
   {
     jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", this->onlyChanged);
   }
   else
   {
-    jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", false);
+    jh.addRaw("attrs", vectorToJson(this->attributes));
   }
 
+  jh.addBool("onlyChangedAttrs", this->onlyChanged);
   jh.addString("attrsFormat", attrsFormat);
 
   if (this->type == HttpNotification)
@@ -239,6 +289,17 @@ std::string Condition::toJson()
   std::string expressionString = jhe.str();
 
   if (expressionString != "{}")         jh.addRaw("expression", expressionString);
+
+  JsonVectorHelper jhv;
+
+  for (unsigned int ix = 0 ; ix < this->altTypes.size(); ix++)
+  {
+    jhv.addString(subAltType2string(this->altTypes[ix]));
+  }
+
+  std::string operationsString = jhv.str();
+
+  if (operationsString != "[]")         jh.addRaw("alterationTypes", operationsString);
 
   return jh.str();
 }

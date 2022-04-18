@@ -4,10 +4,10 @@ name: Build CI Image
 on:
   push:
     paths:
-      - ci/rpm8/**
+      - ci/deb/**
 
 env:
-  IMAGE_NAME: fiware/orion-ci:rpm8
+  IMAGE_NAME: fiware/orion-ci:deb
 
 jobs:
   deploy:
@@ -31,10 +31,10 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ci/rpm8/
+          context: ci/deb/
           load: true
           tags: ${{ env.IMAGE_NAME }}
-          file: ci/rpm8/Dockerfile
+          file: ci/deb/Dockerfile
 
       - name: Push
         run: docker push ${{ env.IMAGE_NAME }}
