@@ -66,13 +66,13 @@ Date: REGEX(.*)
 02. Ask for E1/A2: GET /v2/entities/E1/attrs/A2/value
 =====================================================
 HTTP/1.1 404 Not Found
-Content-Length: 79
+Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "The entity does not have such an attribute",
+    "description": "The entity does not have such an attribute: { E1-Thing : [A2] }",
     "error": "NotFound"
 }
 

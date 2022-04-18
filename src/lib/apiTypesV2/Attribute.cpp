@@ -125,6 +125,7 @@ void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrNa
     contextAttributeP = NULL;
     // Look for the attribute by name
 
+    std::string NotExistingAtrr;
     ContextElementResponse* cerP = qcrs.contextElementResponseVector[0];
 
     for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
@@ -134,11 +135,16 @@ void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrNa
         contextAttributeP = cerP->entity.attributeVector[i];
         break;
       }
+      else
+      {
+        NotExistingAtrr = cerP->entity.id + "-" + cerP->entity.type + " : [" + attrName + "]";
+      }
     }
 
     if (contextAttributeP == NULL)
     {
-      oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+      std::string details = std::string("The entity does not have such an attribute: { " + NotExistingAtrr + " }");
+      oeP->fill(SccContextElementNotFound, details, ERROR_NOT_FOUND);
     }
   }
 }
