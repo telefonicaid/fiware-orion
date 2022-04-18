@@ -125,7 +125,7 @@ void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrNa
     contextAttributeP = NULL;
     // Look for the attribute by name
 
-    std::string NotExistingAtrr;
+    std::string notExistingAtrr;
     ContextElementResponse* cerP = qcrs.contextElementResponseVector[0];
 
     for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
