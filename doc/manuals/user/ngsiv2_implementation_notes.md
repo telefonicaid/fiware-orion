@@ -545,7 +545,7 @@ This default behaviour can be changed using the `covered` field set to `true` th
 ```
 
 in which case all attributes are included in the notification, no matter if they exist or not in the
-entity. For these attribute that doen't exist (`brightness` in this example) the `null`
+entity. For these attributes that don't exist (`brightness` in this example) the `null`
 value (of type `"None"`) is used.
 
 We use the term "covered" in the sense the notification "covers" completely all the attributes
