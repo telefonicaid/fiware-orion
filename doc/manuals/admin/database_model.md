@@ -336,7 +336,7 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
 -   **altTypes**: array with a list of alteration types associated to the subscription. If the field is not included, a default is assumed (check [this document](../user/subscriptions_alttype.md)).
 -   **covered**: a boolean field that specifies if all `attrs` have to be included in notifications (if value is true)
     or only the ones existing in the triggering entity (if value is false or field is omitted).
-    More information in [covered subscription section in user manual documentation](../user/ngsiv2_implementation_notes.md#covered-subscriptions)).
+    More information in [covered subscription section in user manual documentation](../user/ngsiv2_implementation_notes.md#covered-subscriptions).
 
 Example document:
 
