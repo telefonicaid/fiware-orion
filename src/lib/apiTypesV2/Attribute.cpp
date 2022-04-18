@@ -137,13 +137,13 @@ void Attribute::fill(const QueryContextResponse& qcrs, const std::string& attrNa
       }
       else
       {
-        NotExistingAtrr = cerP->entity.id + "-" + cerP->entity.type + " : [" + attrName + "]";
+        notExistingAtrr = cerP->entity.id + "-" + cerP->entity.type + " : [" + attrName + "]";
       }
     }
 
     if (contextAttributeP == NULL)
     {
-      std::string details = std::string("The entity does not have such an attribute: { " + NotExistingAtrr + " }");
+      std::string details = std::string("The entity does not have such an attribute: { " + notExistingAtrr + " }");
       oeP->fill(SccContextElementNotFound, details, ERROR_NOT_FOUND);
     }
   }
