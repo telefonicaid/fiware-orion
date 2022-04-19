@@ -195,12 +195,32 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
 
       scopeP->stringFilterP = new StringFilter(SftQ);
 
-      if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
+      subP->subject.condition.expression.q = kNodeP->value.s;
+      bool  qWithOr = false;
+      char* q       = kNodeP->value.s;
+
+      if (strchr(kNodeP->value.s, '|') != NULL)
+      {
+        //
+        // This is a difficult situation ...
+        // I need the subscription for operations that support NGSI-LD Subscription notifications.
+        // Right now (April 15 2022 - with -experimental set):
+        //   POST  /entities
+        //   PUT   /entities/{entityId}
+        //   PATCH /entities/{entityId}
+        //
+        // But, the Q-with-OR isn't valid for NGSiv2, so, it needs to be made unavailable for other operations
+        //
+        qWithOr = true;
+        q       = (char*) "P;!P";
+      }
+
+      if (scopeP->stringFilterP->parse(q, &errorString) == false)
       {
         delete scopeP->stringFilterP;
         delete scopeP;
-
-        orionldError(OrionldBadRequestData, "Invalid value for Subscription::q", kNodeP->value.s, 400);
+        LM_E(("Error parsing '%s': %s", scopeP->value.c_str(), errorString.c_str()));
+        orionldError(OrionldBadRequestData, "Invalid value for Subscription::q", errorString.c_str(), 400);
         return false;
       }
 
@@ -218,6 +238,10 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       }
 
       subP->subject.condition.expression.q = stringFilterExpanded;
+
+      if (qWithOr == true)
+        subP->subject.condition.expression.q = kNodeP->value.s;
+
       subP->restriction.scopeVector.push_back(scopeP);
     }
     else if (strcmp(kNodeP->name, "geoQ") == 0)

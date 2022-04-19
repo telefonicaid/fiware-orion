@@ -43,4 +43,15 @@
 //
 extern bool urlParse(const char* url, char* protocol, int protocolSize, char* ip, int ipSize, uint16_t* portP, char** urlPathPP, char** detailsPP);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// urlParse - extract protocol, ip, port and URL-PATH from a 'reference' string
+//
+// FIXME
+//   Unify the two urlParse functions
+//
+extern bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP);
+
 #endif  // SRC_LIB_ORIONLD_COMMON_URLPARSE_H_

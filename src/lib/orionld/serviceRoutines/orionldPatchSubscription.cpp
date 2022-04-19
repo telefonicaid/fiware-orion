@@ -603,7 +603,7 @@ static bool subCacheItemUpdateGeoQ(CachedSubscription* cSubP, KjNode* itemP)
 }
 
 
-extern bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP);
+
 // -----------------------------------------------------------------------------
 //
 // subCacheItemUpdateNotificationEndpoint -

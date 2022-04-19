@@ -339,20 +339,12 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path)
 //
 // qEqCompare -
 //
-bool qEqCompare(OrionldAlteration* altP, QNode* lhs, QNode* rhs)
+bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
 {
-  LM_TMP(("QM: EQ left-hand-side:  (%s) %s", qNodeType(lhs->type), lhs->value.v));
-  LM_TMP(("QM: EQ right-hand-side: (%s)", qNodeType(rhs->type)));
   if (altP->patchedEntity == NULL)
     LM_TMP(("QM: no patchTree ..."));
   else
     kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
-
-  KjNode* lhsNode = kjNavigate2(altP->patchedEntity, lhs->value.v);
-  LM_TMP(("QM: lhsNode at %p", lhsNode));
-
-  if (lhsNode == NULL)
-    return false;
 
   LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
   LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
@@ -401,20 +393,121 @@ bool qEqCompare(OrionldAlteration* altP, QNode* lhs, QNode* rhs)
 
 // -----------------------------------------------------------------------------
 //
+// qGtCompare -
+//
+bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
+{
+  if (altP->patchedEntity == NULL)
+    LM_TMP(("QM: no patchTree ..."));
+  else
+    kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
+
+  LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
+  LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
+
+  if (lhsNode->type == KjInt)
+  {
+    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.i > rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.i > rhs->value.f);
+  }
+  else if (lhsNode->type == KjFloat)
+  {
+    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.f > rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.f > rhs->value.f);
+  }
+  else if (lhsNode->type == KjString)
+  {
+    if (rhs->type == QNodeStringValue)
+    {
+      LM_TMP(("QM: Comparing two strings: LHS: '%s' and RHS: '%s'", lhsNode->value.s, rhs->value.s));
+      return (strcmp(lhsNode->value.s, rhs->value.s) > 0);  // "> 0" means first arg > second arg to strcmp
+    }
+  }
+  else if (lhsNode->type == KjBoolean)  // true > false ... ?
+  {
+    if (rhs->type == QNodeTrueValue)       return false;
+    if (rhs->type == QNodeFalseValue)      return (lhsNode->value.b == true);
+  }
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qLtCompare -
+//
+bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
+{
+  if (altP->patchedEntity == NULL)
+    LM_TMP(("QM: no patchTree ..."));
+  else
+    kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
+
+  LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
+  LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
+
+  if (lhsNode->type == KjInt)
+  {
+    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.i < rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.i < rhs->value.f);
+  }
+  else if (lhsNode->type == KjFloat)
+  {
+    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.f < rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.f < rhs->value.f);
+  }
+  else if (lhsNode->type == KjString)
+  {
+    if (rhs->type == QNodeStringValue)
+    {
+      LM_TMP(("QM: Comparing two strings: LHS: '%s' and RHS: '%s'", lhsNode->value.s, rhs->value.s));
+      return (strcmp(lhsNode->value.s, rhs->value.s) < 0);  // "< 0" means first arg < second arg to strcmp
+    }
+  }
+  else if (lhsNode->type == KjBoolean)  // true > false ... ?
+  {
+    if (rhs->type == QNodeTrueValue)       return false;
+    if (rhs->type == QNodeFalseValue)      return (lhsNode->value.b == true);
+  }
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // qMatch - move to orionld/q/qMatch.h/cpp
 //
 bool qMatch(QNode* qP, OrionldAlteration* altP)
 {
-  LM_TMP(("ALT: toplevel node is of type '%s'", qNodeType(qP->type)));
+  LM_TMP(("ALT: Operation: '%s'", qNodeType(qP->type)));
 
   if (qP->type == QNodeOr)
   {
-    // If any of the children is a match, then it's a match
+    qPresent(qP, "OR operation");
+    // <DEBUG>
+    int children = 0;
+    LM_TMP(("Children of OR operation:"));
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
     {
+      LM_TMP(("o %d: %s", children, qNodeType(childP->type)));
+      ++children;
+    }
+    // </DEBUG>
+
+    // If any of the children is a match, then it's a match
+    int childNo = 0;
+    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+    {
+      LM_TMP(("ALT: OR: checking child %d", childNo));
       if (qMatch(childP, altP) == true)
         return true;
+      ++childNo;
     }
+    LM_TMP(("ALT: OR: after checking %d children - no match", childNo));
   }
   else if (qP->type == QNodeAnd)
   {
@@ -432,15 +525,39 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     LM_TMP(("ALT: The AND is a Match"));
     return true;
   }
-  else if (qP->type == QNodeEQ)
+  else
   {
-    // An EQ must have exactly two children:
-    //   - LHS: a variable (a path to the value or part of the value of a (sub)attribute)
-    //   - RHS: a constant (integer, float, string, or bool
-    QNode* lhs = qP->value.children;
-    QNode* rhs = qP->value.children->next;
+    QNode* lhs = qP->value.children;        // variable-path
+    QNode* rhs = qP->value.children->next;  // constant (MULL for QNodeExists & QNodeNotExists
 
-    return qEqCompare(altP, lhs, rhs);
+    //
+    // Not OR nor AND => LHS is an  attribute from the entity
+    //
+    // Well, or a sub-attribute, or a fragment of its value ...
+    // Anyway, the attribute/sub-attribute must exist.
+    // If it does not, then the result is always "false" (except for the case "q=!P1", of course :))
+    //
+    KjNode* lhsNode = kjNavigate2(altP->patchedEntity, lhs->value.v);
+    LM_TMP(("QM: lhsNode at %p", lhsNode));
+
+    //
+    // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
+    //
+    if (lhsNode  == NULL)
+      return (qP->type == QNodeNotExists)? true : false;
+
+    if      (qP->type == QNodeNotExists)  return false;
+    else if (qP->type == QNodeExists)     return true;
+    else if (qP->type == QNodeEQ)         return  qEqCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeNE)         return !qEqCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeGT)         return  qGtCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeLT)         return  qLtCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeGE)         return !qLtCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeLE)         return !qGtCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeMatch)      return false;
+    else if (qP->type == QNodeNoMatch)    return false;
+    else if (qP->type == QNodeComma)      return false;
+    else if (qP->type == QNodeRange)      return false;
   }
 
   return false;

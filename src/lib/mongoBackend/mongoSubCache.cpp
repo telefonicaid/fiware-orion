@@ -30,7 +30,8 @@
 
 extern "C"
 {
-#include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kTime.h"                                       // kTimeGet
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
 #include "logMsg/logMsg.h"
@@ -44,14 +45,13 @@ extern "C"
 #include "rest/StringFilter.h"
 #include "cache/subCache.h"
 
-#ifdef ORIONLD
-extern "C"
-{
-#include "kalloc/kaStrdup.h"                                   // kaStrdup
-}
-
 #include "orionld/common/orionldState.h"                       // orionldState
-#endif
+
+#include "orionld/q/qLex.h"                                    // qLex
+#include "orionld/q/qParse.h"                                  // qParse
+#include "orionld/q/qPresent.h"                                // qPresent
+#include "orionld/common/urlDecode.h"                          // urlDecode
+#include "orionld/common/urlParse.h"                           // urlParse
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -225,13 +225,27 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
         if (cSubP->expression.q != "")
         {
-          if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+          // bool  qWithOr = false;
+          char* q       = (char*) cSubP->expression.q.c_str();
+
+          LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
+
+          if (strchr(q, '|') != NULL)
+          {
+            LM_TMP(("QOR: Subscription::q contains an OR - NGSIv2 doesn't support that - only NGSI-LD"));
+            // qWithOr = true;
+            q       = (char*) "P;!P";
+          }
+
+          if (!cSubP->expression.stringFilter.parse(q, &errorString))
           {
             LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
             subCacheItemDestroy(cSubP);
             delete cSubP;
             return -5;
           }
+
+          LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
         }
       }
 
@@ -313,6 +327,54 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   setStringVectorF(&sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
 
+  //
+  // Stuff done in the long subCacheItemInsert() and that's needed here as well.
+  // (the best option would be to extract all info here and call the long subCacheItemInsert() ...
+  //
+
+  // IP, port and rest
+  cSubP->url = strdup(cSubP->httpInfo.url.c_str());
+  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+
+  // q
+  if (cSubP->expression.q != "")
+  {
+    LM_TMP(("QOR: Got a 'q': %s", cSubP->expression.q.c_str()));
+    // qLex destroys the input string, but we need it intact
+    char* qString = kaStrdup(&orionldState.kalloc, cSubP->expression.q.c_str());
+
+    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
+
+    char*  title;
+    char*  detail;
+    QNode* qList;
+
+    urlDecode(qString);
+    if ((qList = qLex(qString, &title, &detail)) == NULL)
+    {
+      LM_W(("Error (qLex: %s: %s)", title, detail));
+      cSubP->qP = NULL;
+    }
+    else
+    {
+      cSubP->qP = qParse(qList, false, &title, &detail);
+      if (cSubP->qP == NULL)
+        LM_W(("Error (qParse: %s: %s)", title, detail));
+      else
+        qPresent(cSubP->qP, "Q For Subscription");
+    }
+    orionldState.useMalloc = false;
+  }
+
+  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
+  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
+  for (int ix = 0; ix < triggerArraySize; ++ix)
+  {
+    cSubP->triggers[ix] = true;
+  }
+
+
+  LM_TMP(("QOR: Calling subCacheItemInsert with q == '%s'", cSubP->expression.q.c_str()));
   subCacheItemInsert(cSubP);
 
   return 0;

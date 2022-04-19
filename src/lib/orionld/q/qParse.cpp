@@ -375,13 +375,15 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 
     case QNodeVariable:
       qLexP->value.v = varFix(qLexP->value.v, forDb, detailsP);
-      if (qLexP->next == NULL)
+      if ((qLexP->next == NULL) || (qLexP->next->type == QNodeOr) || (qLexP->next->type == QNodeAnd) || (qLexP->next->type == QNodeClose))
       {
         if (compOpP == NULL)
           compOpP = qNode(QNodeExists);
+
         qNodeAppend(compOpP, qLexP);
         qNodeV[qNodeIx++] = compOpP;
-        break;
+        compOpP = NULL;  // Current copmpOpP is taken - need a new one for the next time
+        break;  // As there is no "RHS" - EXIST is a unary operator
       }
       // NO BREAK !!!
     case QNodeStringValue:
@@ -475,7 +477,7 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
         if (qLexP->type != opNodeP->type)
         {
           *titleP   = (char*) "ngsi-ld query language: mixed AND/OR operators";
-          *detailsP = (char*) "please use parenthesis to avoid confusions";
+          *detailsP = (char*) "please use parenthesis to avoid confusion";
           return NULL;
         }
       }

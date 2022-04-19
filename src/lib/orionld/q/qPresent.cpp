@@ -49,7 +49,7 @@ static void qTreePresent(QNode* qP, int indent)
     qTreePresent(qP->value.children->next, indent+2);
   }
   else if (qP->type == QNodeVariable)
-    LM_TMP(("Q:%s%s (Variable)", indentV, qP->value.v));
+    LM_TMP(("Q:%s%s (Variable) (v at %p, qP at %p)", indentV, qP->value.v, qP->value.v, qP));
   else if (qP->type == QNodeIntegerValue)
     LM_TMP(("Q:%s%d (Int)", indentV, qP->value.i));
   else if (qP->type == QNodeFloatValue)
@@ -60,6 +60,31 @@ static void qTreePresent(QNode* qP, int indent)
     LM_TMP(("Q:%sTRUE (Bool)", indentV));
   else if (qP->type == QNodeFalseValue)
     LM_TMP(("Q:%sFALSE (Bool)", indentV));
+  else if (qP->type == QNodeExists)
+  {
+    LM_TMP(("Q:%s Exists (at %p):", indentV, qP));
+    qTreePresent(qP->value.children, indent+2);
+  }
+  else if (qP->type == QNodeNotExists)
+  {
+    LM_TMP(("Q:%s Not Exists:", indentV));
+    qTreePresent(qP->value.children, indent+2);
+  }
+
+  else if (qP->type == QNodeOr)
+  {
+    LM_TMP(("Q:%sOR:", indentV));
+    indent+=2;
+    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+      qTreePresent(childP, indent);
+  }
+  else if (qP->type == QNodeAnd)
+  {
+    LM_TMP(("Q:%sAND:", indentV));
+    indent+=2;
+    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+      qTreePresent(childP, indent);
+  }
   else
     LM_TMP(("Q:%s%s (presentation TBI)", indentV, qNodeType(qP->type)));
 }
@@ -74,4 +99,25 @@ void qPresent(QNode* qP, const char* what)
 {
   LM_TMP(("%s:", what));
   qTreePresent(qP, 0);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qListPresent -
+//
+void qListPresent(QNode* qP, const char* what)
+{
+  LM_TMP(("%s:", what));
+
+  int ix = 0;
+  while (qP != NULL)
+  {
+    if (qP->type == QNodeVariable)
+      LM_TMP(("  %s (Variable) (v at %p)", qP->value.v, qP->value.v));
+    else
+      LM_TMP(("  %02d: %s", ix, qNodeType(qP->type)));
+    qP = qP->next;
+  }
 }

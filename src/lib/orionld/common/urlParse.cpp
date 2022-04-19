@@ -25,6 +25,8 @@
 #include <stdlib.h>                               // atoi
 
 #include "logMsg/logMsg.h"                        // LM_*
+
+#include "orionld/common/orionldState.h"          // orionldState
 #include "orionld/common/urlParse.h"              // Own interface
 
 
@@ -156,6 +158,83 @@ bool urlParse
     *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
     return false;
   }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// urlParse - extract protocol, ip, port and URL-PATH from a 'reference' string
+//
+// FIXME
+//   Unify the two urlParse functions
+//
+bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP)
+{
+  char*            protocolEnd;
+  char*            colon;
+  char*            ip;
+  char*            rest;
+
+  // Check for custom url, e.g. "${abc}" - only if NGSIv2
+  if (orionldState.apiVersion != NGSI_LD_V1)
+  {
+    if (strncmp(url, "${", 2) == 0)
+    {
+      int len = strlen(url);
+
+      if (url[len - 1] == '}')
+      {
+        *protocolP = NULL;
+        *ipP       = NULL;
+        *portP     = 0;
+        *restP     = NULL;
+        return true;
+      }
+    }
+  }
+
+
+  //
+  // URL: <protocol> "://" <ip> [:<port] [path]
+  //
+  protocolEnd = strstr(url, "://");
+  if (protocolEnd != NULL)
+  {
+    *protocolEnd = 0;
+    *protocolP   = url;
+    ip           = &protocolEnd[3];
+  }
+  else
+    ip = url;
+
+  colon = strchr(ip, ':');
+  if (colon != NULL)
+  {
+    *colon = 0;
+    *portP = atoi(&colon[1]);
+    rest   = &colon[1];
+  }
+  else
+  {
+    *portP = 80;  // What should be the default port?
+    *ipP   = ip;
+    *restP = NULL;
+    return true;
+  }
+
+  *ipP   = ip;
+
+  rest = strchr(rest, '/');
+  if (rest != NULL)
+  {
+    *rest  = 0;
+    *restP = &rest[1];
+  }
+  else
+    *restP = NULL;
 
   return true;
 }
