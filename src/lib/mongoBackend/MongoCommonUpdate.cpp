@@ -3513,9 +3513,7 @@ static unsigned int updateEntity
                                                   xauthToken,
                                                   fiwareCorrelator,
                                                   notifStartCounter);
-    releaseTriggeredSubscriptions(&subsToNotify);
-
-    LM_W(("FGM: notifSent: %d", notifSent));
+    releaseTriggeredSubscriptions(&subsToNotify);    
 
     notifyCerP->release();
     delete notifyCerP;
