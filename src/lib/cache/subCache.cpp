@@ -815,7 +815,6 @@ void subCacheItemInsert
   const std::string&                      georel,
   bool                                    blacklist,
   bool                                    notifyOnMetadataChange,
-  bool                                    onlyChanged
   bool                                    onlyChanged,
   bool                                    covered
 )
