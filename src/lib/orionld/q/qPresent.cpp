@@ -115,9 +115,10 @@ void qListPresent(QNode* qP, const char* what)
   while (qP != NULL)
   {
     if (qP->type == QNodeVariable)
-      LM_TMP(("  %s (Variable) (v at %p)", qP->value.v, qP->value.v));
+      LM_TMP(("  %02d: %s (Variable) (v at %p)", ix, qP->value.v, qP->value.v));
     else
       LM_TMP(("  %02d: %s", ix, qNodeType(qP->type)));
     qP = qP->next;
+    ++ix;
   }
 }

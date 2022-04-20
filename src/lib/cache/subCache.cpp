@@ -851,7 +851,7 @@ void subCacheItemInsert
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
 
-  if (q != "")
+  if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
   {
     LM_TMP(("Got a 'q': %s", q.c_str()));
     // qLex destroys the input string, but we need it intact
