@@ -77,6 +77,7 @@ struct Notification
   bool                     blacklist;
   bool                     onlyChanged;
   bool                     notifyOnMetadataChange;
+  bool                     covered;
   long long                timesSent;
   long long                failsCounter;
   long long                maxFailsLimit;
@@ -96,6 +97,7 @@ struct Notification
     blacklist(false),
     onlyChanged(false),
     notifyOnMetadataChange(false),
+    covered(false),
     timesSent(0),
     failsCounter(0),
     maxFailsLimit(-1),

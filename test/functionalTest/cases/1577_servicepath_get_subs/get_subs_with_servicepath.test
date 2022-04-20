@@ -161,7 +161,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions for 1 servicepath
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 347
+Content-Length: 363
 Content-Type: application/json
 Fiware-Total-Count: 1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -177,6 +177,7 @@ Date: REGEX(.*)
                 "location"
             ],
             "attrsFormat": "legacy",
+            "covered": false,
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             },
@@ -207,7 +208,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions for /#
 ================================
 HTTP/1.1 200 OK
-Content-Length: 759
+Content-Length: 791
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -224,6 +225,7 @@ Date: REGEX(.*)
                 "lightstatus"
             ],
             "attrsFormat": "legacy",
+            "covered": false,
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             },
@@ -259,6 +261,7 @@ Date: REGEX(.*)
                 "location"
             ],
             "attrsFormat": "legacy",
+            "covered": false,
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             },

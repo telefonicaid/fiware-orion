@@ -69,6 +69,7 @@ public:
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsFilter,
                                 bool                             blacklist,
+                                bool                             covered,
                                 const std::vector<std::string>&  metadataFilter);
   int start();
   size_t queueSize(const std::string& service);

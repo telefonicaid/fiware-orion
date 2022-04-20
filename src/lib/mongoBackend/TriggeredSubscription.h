@@ -67,6 +67,7 @@ class TriggeredSubscription
   StringFilter*             stringFilterP;
   StringFilter*             mdStringFilterP;
   bool                      blacklist;
+  bool                      covered;
   std::vector<std::string>  metadata;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
@@ -86,7 +87,8 @@ class TriggeredSubscription
                         const ngsiv2::MqttInfo&  _mqttInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
-                        const char*              _tenant);
+                        const char*              _tenant,
+                        bool                     _covered);
 
   TriggeredSubscription(RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,

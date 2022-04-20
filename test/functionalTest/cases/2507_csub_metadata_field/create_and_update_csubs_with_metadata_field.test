@@ -126,7 +126,7 @@ Date: REGEX(.*)
 02. Get subscription and see metadata: foo
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 308
+Content-Length: 324
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,6 +138,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:1234/notify"
             },
@@ -173,7 +174,7 @@ Date: REGEX(.*)
 04. Get subscription and see metadata: foo
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 308
+Content-Length: 324
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,6 +186,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:1234/notify"
             },
@@ -220,7 +222,7 @@ Date: REGEX(.*)
 06. Get subscription and see metadata: bar, ruu
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 330
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -232,6 +234,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:1234/notify"
             },

@@ -121,7 +121,7 @@ Date: REGEX(.*)
 03. Get subs
 ============
 HTTP/1.1 200 OK
-Content-Length: 636
+Content-Length: 668
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -135,6 +135,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqtt": {
                 "qos": 0,
                 "topic": "/orion/notif",
@@ -163,6 +164,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqtt": {
                 "qos": 2,
                 "topic": "/orion/notif",

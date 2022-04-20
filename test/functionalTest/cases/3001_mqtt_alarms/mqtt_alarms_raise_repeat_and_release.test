@@ -190,7 +190,7 @@ Date: REGEX(.*)
 03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 437
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -201,6 +201,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 1,
             "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
@@ -242,7 +243,7 @@ Date: REGEX(.*)
 05. Get sub and see timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 437
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -253,6 +254,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 2,
             "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
@@ -302,7 +304,7 @@ Date: REGEX(.*)
 08. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 505
+Content-Length: 521
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -313,6 +315,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",

@@ -153,7 +153,11 @@ echo
 01. GET /v2/subscriptions and see dynamic fields set A
 ======================================================
 HTTP/1.1 200 OK
+<<<<<<< HEAD
 Content-Length: 535
+=======
+Content-Length: 521
+>>>>>>> be31922f3d47da12b0eb34a9c686c8d5687b8399
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,6 +168,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 4,
             "http": {
                 "url": "http://localhost:1028/accumulate"
@@ -202,7 +207,11 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
 ==============================================================================================
 HTTP/1.1 200 OK
+<<<<<<< HEAD
 Content-Length: 517
+=======
+Content-Length: 503
+>>>>>>> be31922f3d47da12b0eb34a9c686c8d5687b8399
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -213,6 +222,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 8,
             "http": {
                 "url": "http://localhost:1028/accumulate"
@@ -246,7 +256,11 @@ Date: REGEX(.*)
 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
+<<<<<<< HEAD
 Content-Length: 517
+=======
+Content-Length: 503
+>>>>>>> be31922f3d47da12b0eb34a9c686c8d5687b8399
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -257,6 +271,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 8,
             "http": {
                 "url": "http://localhost:1028/accumulate"

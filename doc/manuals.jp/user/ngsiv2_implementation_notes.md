@@ -24,6 +24,7 @@
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
+* [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
 * [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
@@ -485,6 +486,71 @@ Orion は、NGSIv2 仕様で説明されているものとは別に、サブス�
 例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
 A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
 が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
+
+[トップ](#top)
+
+<a name="covered-subscriptions"></a>
+## カバード・サブスクリプション (Covered subscriptions)
+
+`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれる
+エンティティ属性のサブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを
+通知します。たとえば、サブスクリプションが次のようになっている場合:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness`
+属性は通知に含まれません。
+
+このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの
+属性 (この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
+
+通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で
+"カバーされる" (covered) という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、
+受信したすべての通知で常に同じ着信属性のセットを必要とする通知エンドポイントに役立ちます。
+
+対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに
+注意してください。 したがって、次の場合は無効です:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
+発生します:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
 
 [トップ](#top)
 

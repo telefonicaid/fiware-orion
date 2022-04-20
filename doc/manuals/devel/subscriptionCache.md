@@ -68,6 +68,7 @@ When the broker starts, the subscription cache is populated with the subscriptio
   SubscriptionExpression           expression;
   bool                             blacklist;
   bool                             onlyChanged;
+  bool                             covered;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure

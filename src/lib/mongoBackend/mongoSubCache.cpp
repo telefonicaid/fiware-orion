@@ -121,6 +121,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
   cSubP->notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
+  cSubP->covered               = sub.hasField(CSUB_COVERED)?          getBoolFieldF(sub, CSUB_COVERED)                     : false;
   cSubP->next                  = NULL;
 
 
@@ -394,7 +395,7 @@ int mongoSubCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
   cSubP->notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE) ? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
-
+  cSubP->covered               = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastFailure;
   cSubP->lastFailureReason     = lastFailureReason;
