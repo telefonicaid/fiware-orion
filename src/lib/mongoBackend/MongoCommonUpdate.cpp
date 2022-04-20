@@ -1824,7 +1824,7 @@ static bool processOnChangeConditionForUpdateContext
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
   bool                             blacklist = false,
-  bool                             notifyOnMetadataChange = true
+  bool                             notifyOnMetadataChange = true,
   bool                             covered = false
 )
 {
@@ -2064,7 +2064,7 @@ static unsigned int processSubscriptions
                                                                 notifStartCounter + notifSent + 1,
                                                                 notification,
                                                                 tSubP->blacklist,
-                                                                tSubP->notifyOnMetadataChange);
+                                                                tSubP->notifyOnMetadataChange,
                                                                 tSubP->covered);
 
     if (notificationSent)
