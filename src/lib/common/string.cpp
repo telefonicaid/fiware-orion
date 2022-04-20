@@ -1117,5 +1117,17 @@ std::string offuscatePassword(const std::string& uri, const std::string& pwd)
 */
 bool regComp(regex_t* re, const char* pattern, int flags)
 {
-  return (regcomp(re, pattern, flags) == 0);
+  int r = regcomp(re, pattern, flags);
+  if (r == 0)
+  {
+    return true;
+  }
+
+  // Log error in corresponding tracelevel (see example at
+  // https://www.ibm.com/docs/en/i/7.1?topic=functions-regerror-return-error-message-regular-expression)
+  char    buffer[100];
+  regerror(r, re, buffer, 100);
+  LM_T(LmtRegexError, ("regcomp() failed for pattern '%s': %s", pattern, buffer));
+
+  return false;
 }
