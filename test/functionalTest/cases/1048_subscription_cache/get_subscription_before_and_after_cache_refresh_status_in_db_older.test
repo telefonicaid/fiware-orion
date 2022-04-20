@@ -138,7 +138,7 @@ echo
 01. GET /v2/subscriptions and see dynamic fields set A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 505
+Content-Length: 535
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -159,6 +159,7 @@ Date: REGEX(.*)
             "lastSuccess": "2020-01-01T09:00:00.000Z",
             "lastSuccessCode": 200,
             "maxFailsLimit": 1,
+            "notifyOnMetadataChange": true,
             "onlyChangedAttrs": false,
             "timesSent": 10
         },
@@ -186,7 +187,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 485
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,6 +208,7 @@ Date: REGEX(.*)
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,
+            "notifyOnMetadataChange": true,
             "onlyChangedAttrs": false,
             "timesSent": 25
         },
@@ -229,7 +231,7 @@ Date: REGEX(.*)
 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 485
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -250,6 +252,7 @@ Date: REGEX(.*)
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,
+            "notifyOnMetadataChange": true,
             "onlyChangedAttrs": false,
             "timesSent": 25
         },

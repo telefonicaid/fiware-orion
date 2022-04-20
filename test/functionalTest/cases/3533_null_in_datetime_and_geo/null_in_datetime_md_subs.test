@@ -36,7 +36,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 03. Create entity E2 with attribute A with DateTime metadata T with value null (triggers notif)
 # 04. Update E1-A-T: null (triggers notif)
 # 05. Update E2-A-T: 2020-10-01T12:43:18.000Z (triggers notif)
-# 06. Dump accumulator, see 4 notifications
+# 06. Dump accumulator, see 2 notifications
 #
 
 
@@ -142,7 +142,7 @@ echo
 echo
 
 
-echo "06. Dump accumulator, see 4 notifications"
+echo "06. Dump accumulator, see 2 notifications"
 echo "========================================="
 accumulatorDump
 accumulatorReset
@@ -197,7 +197,7 @@ Date: REGEX(.*)
 
 
 
-06. Dump accumulator, see 4 notifications
+06. Dump accumulator, see 2 notifications
 =========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -247,66 +247,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                     "T": {
                         "type": "DateTime",
                         "value": null
-                    }
-                },
-                "type": "Number",
-                "value": 24
-            },
-            "id": "E2",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 160
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {
-                    "T": {
-                        "type": "DateTime",
-                        "value": null
-                    }
-                },
-                "type": "Number",
-                "value": 42
-            },
-            "id": "E1",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 182
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {
-                    "T": {
-                        "type": "DateTime",
-                        "value": "2020-10-01T12:43:18.000Z"
                     }
                 },
                 "type": "Number",
