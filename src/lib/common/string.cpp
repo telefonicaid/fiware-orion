@@ -1105,3 +1105,17 @@ std::string offuscatePassword(const std::string& uri, const std::string& pwd)
   s.replace(uri.find(pwd), pwd.length(), "******");
   return s;
 }
+
+
+
+/* ****************************************************************************
+*
+* regComp -
+*
+* Wrapper or standard regcomp() from regex.h, including some advanced features
+* (e.g. error logging)
+*/
+bool regComp(regex_t* re, const char* pattern, int flags)
+{
+  return (regcomp(re, pattern, flags) == 0);
+}

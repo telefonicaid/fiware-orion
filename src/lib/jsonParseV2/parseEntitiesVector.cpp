@@ -36,6 +36,7 @@
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/EntID.h"
+#include "common/string.h"
 #include "common/errorMessages.h"
 #include "jsonParseV2/utilsParse.h"
 #include "jsonParseV2/parseEntitiesVector.h"
@@ -141,7 +142,7 @@ bool parseEntitiesVector
 
         // FIXME P5: Keep the regex and propagate to sub-cache
         regex_t re;
-        if (regcomp(&re, idPattern.c_str(), REG_EXTENDED) != 0)
+        if (!regComp(&re, idPattern.c_str(), REG_EXTENDED))
         {
           *errorStringP = ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN;
           return false;
@@ -199,7 +200,7 @@ bool parseEntitiesVector
 
         // FIXME P5: Keep the regex and propagate to sub-cache
         regex_t re;
-        if (regcomp(&re, typePattern.c_str(), REG_EXTENDED) != 0)
+        if (!regComp(&re, typePattern.c_str(), REG_EXTENDED))
         {
           *errorStringP = ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN;
           return false;

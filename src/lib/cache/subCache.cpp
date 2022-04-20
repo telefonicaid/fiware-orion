@@ -92,9 +92,7 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isPattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED))
     {
       alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
@@ -113,9 +111,7 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isTypePattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED))
     {
       alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
       isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
