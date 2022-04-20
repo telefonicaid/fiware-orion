@@ -875,7 +875,7 @@ bool orionldPatchSubscription(void)
   //
   // Make sure we don't get both watchedAttributed AND timeInterval
   // If so, the PATCH is invalid
-  // Right now, timeInterval id not supported, but once it is, if ever, this code will come in handy
+  // Right now, timeInterval is not supported, but once it is, if ever, this code will come in handy
   //
   if (timeIntervalNodeP != NULL)
   {

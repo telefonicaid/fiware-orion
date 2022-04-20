@@ -479,6 +479,25 @@ bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
 
 // -----------------------------------------------------------------------------
 //
+// qMatchCompare -
+//
+bool qMatchCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
+{
+  //
+  // Create the REGEX in subCache - QNode might need a new QNodeValue
+  // Here: Use regexec
+  //
+  LM_TMP(("QM: LHS is of type '%s' (must be String)", kjValueType(lhsNode->type)));
+  LM_TMP(("QM: RHS is of type '%s' (must be String)", qNodeType(rhs->type)));
+
+  LM_W(("Not Implemented"));
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // qMatch - move to orionld/q/qMatch.h/cpp
 //
 bool qMatch(QNode* qP, OrionldAlteration* altP)
@@ -554,8 +573,8 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     else if (qP->type == QNodeLT)         return  qLtCompare(altP, lhsNode, rhs);
     else if (qP->type == QNodeGE)         return !qLtCompare(altP, lhsNode, rhs);
     else if (qP->type == QNodeLE)         return !qGtCompare(altP, lhsNode, rhs);
-    else if (qP->type == QNodeMatch)      return false;
-    else if (qP->type == QNodeNoMatch)    return false;
+    else if (qP->type == QNodeMatch)      return qMatchCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeNoMatch)    return !qMatchCompare(altP, lhsNode, rhs);
     else if (qP->type == QNodeComma)      return false;
     else if (qP->type == QNodeRange)      return false;
   }

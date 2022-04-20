@@ -190,15 +190,8 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::q");
 
-      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
-      std::string  errorString;
-
-      scopeP->stringFilterP = new StringFilter(SftQ);
-
-      subP->subject.condition.expression.q = kNodeP->value.s;
       bool  qWithOr = false;
       char* q       = kNodeP->value.s;
-
       if (strchr(kNodeP->value.s, '|') != NULL)
       {
         //
@@ -209,11 +202,28 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
         //   PUT   /entities/{entityId}
         //   PATCH /entities/{entityId}
         //
-        // But, the Q-with-OR isn't valid for NGSiv2, so, it needs to be made unavailable for other operations
+        // But, the Q-with-OR isn't valid for NGSiv2, so, it needs to be made unavailable for other operations.
+        // Those "other operations" (the ones still using mongoBackend) use a Scope for the Q-filter, while the
+        // new operations uses qLex/qParse.
+        // So, the solution is to give a fake Q-filter to the Scope  (without '|') and the correct Q-filter to qLex.
+        // That is fixed right here, by setting q to "P;!P" (P Exists AND P Does Not Exist) - will never match.
         //
         qWithOr = true;
         q       = (char*) "P;!P";
       }
+      else if (strstr(kNodeP->value.s, "~=") != NULL)
+      {
+        LM_W(("Pattern Match for subscriptions - not implemented"));
+        orionldError(OrionldOperationNotSupported, "Not Implemented", "Pattern matching in Q-filter", 501);
+        return false;
+      }
+
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
+      std::string  errorString;
+
+      scopeP->stringFilterP = new StringFilter(SftQ);
+
+      subP->subject.condition.expression.q = kNodeP->value.s;
 
       if (scopeP->stringFilterP->parse(q, &errorString) == false)
       {
