@@ -1156,7 +1156,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->mqttInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
-                                                           cSubP->tenant);
+                                                           cSubP->tenant,
+                                                           cSubP->covered);
     if (cSubP->onlyChanged)
     {
       subP->blacklist = false;
@@ -1638,6 +1639,7 @@ static bool addTriggeredSubscriptions_noCache
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
+      bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1662,7 +1664,7 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
-          aList, "", "");
+          aList, "", "", covered);
 
       if (!onlyChanged)
       {
@@ -1823,6 +1825,7 @@ static bool processOnChangeConditionForUpdateContext
   const ngsiv2::Notification&      notification,
   bool                             blacklist = false,
   bool                             notifyOnMetadataChange = true
+  bool                             covered = false
 )
 {
   NotifyContextRequest   ncr;
@@ -1859,6 +1862,20 @@ static bool processOnChangeConditionForUpdateContext
            * cer.entity destructor does release() on the attrs vector */
           cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
         }
+      }
+    }
+  }
+  if (covered)
+  {
+    for (unsigned int ix = 0; ix < attrL.size(); ix++)
+    {
+      // Aviod over-adding attribute, checking first that the attribute is not already added
+      std::string attrName = attrL[ix];
+      if (cer.entity.attributeVector.get(attrName) < 0)
+      {
+        ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+        caP->valueType = orion::ValueTypeNull;
+        cer.entity.attributeVector.push_back(caP);
       }
     }
   }
@@ -1900,6 +1917,7 @@ static bool processOnChangeConditionForUpdateContext
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
+                                          covered,
                                           metadataV);
   return true;
 }
@@ -2047,6 +2065,7 @@ static unsigned int processSubscriptions
                                                                 notification,
                                                                 tSubP->blacklist,
                                                                 tSubP->notifyOnMetadataChange);
+                                                                tSubP->covered);
 
     if (notificationSent)
     {

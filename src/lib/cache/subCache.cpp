@@ -816,6 +816,8 @@ void subCacheItemInsert
   bool                                    blacklist,
   bool                                    notifyOnMetadataChange,
   bool                                    onlyChanged
+  bool                                    onlyChanged,
+  bool                                    covered
 )
 {
   //
@@ -853,6 +855,7 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
   cSubP->notifyOnMetadataChange = notifyOnMetadataChange;
+  cSubP->covered               = covered;
   cSubP->httpInfo              = httpInfo;
   cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;

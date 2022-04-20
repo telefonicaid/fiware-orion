@@ -57,6 +57,7 @@ public:
                                         RenderFormat                     renderFormat,
                                         const std::vector<std::string>&  attrsFilter,
                                         bool                             blacklist,
+                                        bool                             covered,
                                         const std::vector<std::string>&  metadataFilter);
 
 protected:
@@ -72,6 +73,7 @@ protected:
                                                              RenderFormat                     renderFormat,
                                                              const std::vector<std::string>&  attrsFilter,
                                                              bool                             blacklist,
+                                                             bool                             covered,
                                                              const std::vector<std::string>&  metadataFilter);
 };
 

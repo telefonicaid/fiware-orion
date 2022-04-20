@@ -250,6 +250,7 @@ class NotifierMock : public Notifier
                                          RenderFormat                     renderFormat,
                                          const std::vector<std::string>&  attrsFilter,
                                          bool                             blacklist,
+                                         bool                             covered,
                                          const std::vector<std::string>&  metadataFilter)
     {
       Notifier::sendNotifyContextRequest(ncr,
@@ -264,6 +265,7 @@ class NotifierMock : public Notifier
                                          renderFormat,
                                          attrsFilter,
                                          blacklist,
+                                         covered,
                                          metadataFilter);
     }
 };

@@ -76,6 +76,7 @@ void Notifier::sendNotifyContextRequest
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsFilter,
     bool                             blacklist,
+    bool                             covered,
     const std::vector<std::string>&  metadataFilter
 )
 {
@@ -92,6 +93,7 @@ void Notifier::sendNotifyContextRequest
                                                                           renderFormat,
                                                                           attrsFilter,
                                                                           blacklist,
+                                                                          covered,
                                                                           metadataFilter);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
@@ -395,6 +397,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
+  bool                             covered,
   const std::vector<std::string>&  metadataFilter
 )
 {

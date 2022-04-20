@@ -170,7 +170,7 @@ Date: REGEX(.*)
 05. Check if 1st sub notification succeed
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 417
+Content-Length: 433
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -181,6 +181,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "timeout": 12000,
             "url": "http://localhost:9997/noresponse"
@@ -209,7 +210,7 @@ Date: REGEX(.*)
 06. Check if 2nd sub notification has failsCounter: 1
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 453
+Content-Length: 469
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,6 +221,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 1,
         "http": {
             "timeout": 8000,

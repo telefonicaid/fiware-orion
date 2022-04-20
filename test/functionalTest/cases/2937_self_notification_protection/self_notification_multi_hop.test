@@ -370,7 +370,7 @@ Date: REGEX(.*)
 11. Wait for a while and check timesSent:1 for all the subscriptions in each CB
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 518
+Content-Length: 534
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -380,6 +380,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "headers": {
                 "Content-type": "application/json"
@@ -410,7 +411,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 518
+Content-Length: 534
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -420,6 +421,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "headers": {
                 "Content-type": "application/json"
@@ -450,7 +452,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 518
+Content-Length: 534
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -460,6 +462,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "headers": {
                 "Content-type": "application/json"

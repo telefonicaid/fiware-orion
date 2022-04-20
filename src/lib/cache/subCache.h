@@ -113,6 +113,7 @@ struct CachedSubscription
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             notifyOnMetadataChange;
+  bool                             covered;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
@@ -220,6 +221,8 @@ extern void subCacheItemInsert
   bool                               blacklist,
   bool                               notifyOnMetadataChange,
   bool                               onlyChanged
+  bool                               onlyChanged,
+  bool                               covered
 );
 
 
