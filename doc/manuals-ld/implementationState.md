@@ -79,8 +79,30 @@ Then I got users (a European project) using the feature and it was too late to r
   Retrieve a list of the current database indices - used for debugging purposes.
 
 
+## 5. Important Info on the NGSi-LD concepts
+### Subscriptions
+Right now, 3 operations support "Native NGSI-LD" notifications:
+* POST /entities
+* PUT /entities/{entityId}
+* PATCH /entities/{entityId}
+This is true only if Orion-LD is started with the `-experimental` CLI argument
 
-## 5. Implementation state of Services (API Endpoints)
+Now, creation/updates using those three operations match subscriptions in the new way, using the more powerful NGSI-LD 'q'.
+However, this is still under development and not everything is implemented.
+What is missing:
+* REGEX (~= and !~= operators)
+* Attribute Compound values, e.g. q=P1[a]==1
+* Sub-Attribute values, e.g.: q=P1.SubP==5
+* Sub-Attribute Compound values, e.g. q=P1SubP[a]==1
+
+Especially tricky is the balancing act between NGSIv2 subs and "Native NGSI-LD subs", or really, the dfiference in 'q'.
+For example, NGSI-LD 'q' supports OR and parenthesis while NGSIv2 'q' does not.
+This problem has been fixed by making the NGSIv2 part never match (q is set to P&!P) if the 'q' of the subscription is "too complex".
+The NGSIv2 matach is done via Scope, while NGSI-LD match is done with qLex/qParse/qMatch, and a QNode* qP of CachedSubscription and that has
+been taken advantage of to distinguish between the two.
+
+
+## 6. Implementation state of Services (API Endpoints)
 
 
 ### POST /ngsi-ld/v1/entities

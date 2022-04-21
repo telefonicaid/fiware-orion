@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qPresent.h"                                // qListPresent, qTreePresent
 #include "orionld/q/qParse.h"                                  // Own interface
 
 
@@ -283,6 +284,7 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 static QNode* qNodeAppend(QNode* container, QNode* childP)
 {
   QNode* lastP  = container->value.children;
+#if 1
   QNode* cloneP = qNode(childP->type);
 
   if (cloneP == NULL)
@@ -302,6 +304,21 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
   }
 
   return cloneP;
+#else
+  childP->next  = NULL;
+
+  if (lastP == NULL)  // No children
+    container->value.children = childP;
+  else
+  {
+    while (lastP->next != NULL)
+      lastP = lastP->next;
+
+    lastP->next = childP;
+  }
+
+  return childP;
+#endif
 }
 
 
@@ -322,14 +339,18 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
 //
 QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 {
-  QNode*     qNodeV[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-  int        qNodeIx    = 0;
-  QNode*     qLexP      = qLexList;
-  QNode*     opNodeP    = NULL;
-  QNode*     compOpP    = NULL;
-  QNode*     prevP      = NULL;
-  QNode*     leftP      = NULL;
+  QNode*     qNodeV[10]     = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+  int        qNodeIx        = 0;
+  QNode*     qLexP          = qLexList;
+  QNode*     opNodeP        = NULL;
+  QNode*     compOpP        = NULL;
+  QNode*     leftP          = NULL;
+  QNode*     expressionEnd  = NULL;
   QNode*     expressionStart;
+  QNode*     openP;
+  // QNode*     prevP      = NULL;
+
+  qListPresent(qLexList, "Incoming qLexList");
 
   while (qLexP != NULL)
   {
@@ -337,13 +358,15 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
     {
     case QNodeOpen:
       expressionStart = qLexP;
+      openP           = qLexP;
 
       // Lookup the corresponding ')'
       while ((qLexP != NULL) && ((qLexP->type != QNodeClose) || (qLexP->value.level != expressionStart->value.level)))
       {
-        prevP = qLexP;
-        qLexP = qLexP->next;
+        expressionEnd = qLexP;
+        qLexP         = qLexP->next;
       }
+      // Now qLexP points to the ')' (well, if all is good that is)
 
       if (qLexP == NULL)
       {
@@ -352,7 +375,7 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
         return NULL;
       }
 
-      if (prevP == NULL)
+      if (expressionEnd == NULL)
       {
         *titleP   = (char*) "mismatching parenthesis";
         *detailsP = (char*) "no matching ')'";
@@ -361,16 +384,24 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 
       //
       // Now, we have a new "sub-expression".
-      // - Make qLexP point to ')'->next
+      // - Make qLexP point to ')'->next (but, must free the ')' node also)
       // - Step over the '('
       // - Remove the ending ')'
       //
 
-      // free(prevP->next);
-      prevP->next     = NULL;
-      expressionStart = expressionStart->next;
+      if (forDb == false)  // It's for the subscription cache - real malloc is used
+        free(expressionEnd->next);    // ')'
 
-      qNodeV[qNodeIx++] = qParse(expressionStart, forDb, titleP, detailsP);
+      expressionEnd->next = NULL;
+      expressionStart     = expressionStart->next;
+
+      if (forDb == false)  // It's for the subscription cache - real malloc is used
+        free(openP);                  // '('
+
+      qNodeV[qNodeIx++]   = qParse(expressionStart, forDb, titleP, detailsP);
+
+      // Jump over the entire expression for the qList
+      // prevP->next = qLexP->next;
       break;
 
     case QNodeVariable:
@@ -419,6 +450,8 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 
           qNodeAppend(rangeP, lowerLimit);
           qNodeAppend(rangeP, upperLimit);
+
+          // prevP->next = qLexP->next;
         }
         else if ((qLexP->next != NULL) && (qLexP->next->type == QNodeComma))
         {
@@ -449,6 +482,8 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
           QNode* valueP = qLexP;
 
           qNodeAppend(commaP, valueP);
+
+          // prevP->next = qLexP->next;
         }
 
         //
@@ -507,6 +542,7 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
       break;
     }
 
+    // prevP = qLexP;  // is this always true?
     qLexP = qLexP->next;
   }
 
@@ -526,6 +562,7 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 
   return qNodeV[0];
 }
+
 
 
 #if 0
@@ -551,7 +588,7 @@ static const char* indentV[] = {
 //
 // qTreePresent - DEBUG function to see an entire QNode Tree in the log file
 //
-void qTreePresent(QNode* qNodeP, int level)
+static void qTreePresent(QNode* qNodeP, int level)
 {
   const char* indent = indentV[level];
 
@@ -601,7 +638,7 @@ static int qValueGet(QNode* qLexP, char* buf, int bufLen)
 //
 // qLexRender - render the linked list into a char buffer
 //
-bool qLexRender(QNode* qLexList, char* buf, int bufLen)
+static bool qLexRender(QNode* qLexList, char* buf, int bufLen)
 {
   QNode*  qLexP = qLexList;
   int     left  = bufLen;

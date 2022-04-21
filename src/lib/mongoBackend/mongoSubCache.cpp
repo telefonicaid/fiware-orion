@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/q/qLex.h"                                    // qLex
 #include "orionld/q/qParse.h"                                  // qParse
 #include "orionld/q/qPresent.h"                                // qPresent
+#include "orionld/q/qRelease.h"                                // qListRelease
 #include "orionld/common/urlDecode.h"                          // urlDecode
 #include "orionld/common/urlParse.h"                           // urlParse
 
@@ -340,16 +341,15 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   if (cSubP->expression.q != "")
   {
     LM_TMP(("QOR: Got a 'q': %s", cSubP->expression.q.c_str()));
+
     // qLex destroys the input string, but we need it intact
-    char* qString = kaStrdup(&orionldState.kalloc, cSubP->expression.q.c_str());
-
-    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
-
+    char*  qString = kaStrdup(&orionldState.kalloc, cSubP->expression.q.c_str());
     char*  title;
     char*  detail;
     QNode* qList;
 
     urlDecode(qString);
+    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
     if ((qList = qLex(qString, &title, &detail)) == NULL)
     {
       LM_W(("Error (qLex: %s: %s)", title, detail));
@@ -357,6 +357,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
     else
     {
+      // Instead of orionldState.useMalloc, I could do a qClone for the qP in the sub-cache ...
       cSubP->qP = qParse(qList, false, &title, &detail);
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));

@@ -40,11 +40,41 @@ static void qTreePresent(QNode* qP, int indent)
   char indentV[100];
 
   memset(indentV, 0x20202020, sizeof(indentV));
-  indentV[indent] = 0;
+  indentV[indent+1] = 0;
 
   if (qP->type == QNodeEQ)
   {
     LM_TMP(("Q:%sEQ:", indentV));
+    qTreePresent(qP->value.children, indent+2);
+    qTreePresent(qP->value.children->next, indent+2);
+  }
+  if (qP->type == QNodeNE)
+  {
+    LM_TMP(("Q:%sNE:", indentV));
+    qTreePresent(qP->value.children, indent+2);
+    qTreePresent(qP->value.children->next, indent+2);
+  }
+  if (qP->type == QNodeLT)
+  {
+    LM_TMP(("Q:%sLT:", indentV));
+    qTreePresent(qP->value.children, indent+2);
+    qTreePresent(qP->value.children->next, indent+2);
+  }
+  if (qP->type == QNodeLE)
+  {
+    LM_TMP(("Q:%sLE:", indentV));
+    qTreePresent(qP->value.children, indent+2);
+    qTreePresent(qP->value.children->next, indent+2);
+  }
+  if (qP->type == QNodeGT)
+  {
+    LM_TMP(("Q:%sGT:", indentV));
+    qTreePresent(qP->value.children, indent+2);
+    qTreePresent(qP->value.children->next, indent+2);
+  }
+  if (qP->type == QNodeGE)
+  {
+    LM_TMP(("Q:%sGE:", indentV));
     qTreePresent(qP->value.children, indent+2);
     qTreePresent(qP->value.children->next, indent+2);
   }
@@ -70,7 +100,6 @@ static void qTreePresent(QNode* qP, int indent)
     LM_TMP(("Q:%s Not Exists:", indentV));
     qTreePresent(qP->value.children, indent+2);
   }
-
   else if (qP->type == QNodeOr)
   {
     LM_TMP(("Q:%sOR:", indentV));
