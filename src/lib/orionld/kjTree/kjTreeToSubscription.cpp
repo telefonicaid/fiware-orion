@@ -227,9 +227,9 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
 
       if (scopeP->stringFilterP->parse(q, &errorString) == false)
       {
+        LM_E(("Error parsing '%s': %s", scopeP->value.c_str(), errorString.c_str()));
         delete scopeP->stringFilterP;
         delete scopeP;
-        LM_E(("Error parsing '%s': %s", scopeP->value.c_str(), errorString.c_str()));
         orionldError(OrionldBadRequestData, "Invalid value for Subscription::q", errorString.c_str(), 400);
         return false;
       }

@@ -604,8 +604,8 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
   cSubP->notifyConditionV.clear();
 
-//  if (cSubP->qP != NULL)
-//    qRelease(cSubP->qP);
+  if (cSubP->qP != NULL)
+    qRelease(cSubP->qP);
 
   cSubP->next = NULL;
 }
@@ -866,6 +866,7 @@ void subCacheItemInsert
 
     urlDecode(qString);
     orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
+    LM_TMP(("LEAK: ***** Calling qLex *****"));
     if ((qList = qLex(qString, &title, &detail)) == NULL)
     {
       LM_W(("Error (qLex: %s: %s)", title, detail));
@@ -873,11 +874,15 @@ void subCacheItemInsert
     }
     else
     {
-      cSubP->qP = qParse(qList, false, &title, &detail);
+      LM_TMP(("LEAK: ***** Calling qParse *****"));
+      cSubP->qP = qParse(qList, NULL, false, &title, &detail);
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));
+      else
+        qPresent(cSubP->qP, "LEAK", "Q-TREE");
     }
     orionldState.useMalloc = false;
+    qListRelease(qList);
   }
   else
     cSubP->qP = NULL;

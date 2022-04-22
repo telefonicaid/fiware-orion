@@ -48,9 +48,13 @@ void qRelease(QNode* qP)
       (qP->type == QNodeLE)         ||
       (qP->type == QNodeLT))
   {
-    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
+    QNode* childP = qP->value.children;
+    while (childP != NULL)
     {
+      QNode* next = childP->next;
+      LM_TMP(("LEAK: Current qP id %p, recursive call for child: %p", qP, childP));
       qRelease(childP);
+      childP = next;
     }
   }
   else if ((qP->type == QNodeMatch) || (qP->type == QNodeNoMatch))
@@ -59,9 +63,20 @@ void qRelease(QNode* qP)
   }
 
   if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
+  {
+    LM_TMP(("LEAK: Releasing a '%s' (at %p)", qNodeType(qP->type), qP));
+    LM_TMP(("LEAK: + Releasing its Variable Path '%s' (at %p)", qP->value.v, qP->value.v));
     free(qP->value.v);
+  }
+  else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
+  {
+    LM_TMP(("LEAK: Releasing a '%s' (at %p)", qNodeType(qP->type), qP));
+    LM_TMP(("LEAK: + Releasing its String '%s' (at %p)", qP->value.s, qP->value.s));
+    free(qP->value.v);
+  }
+  else
+    LM_TMP(("LEAK: Releasing a '%s' (at %p)", qNodeType(qP->type), qP));
 
-  LM_TMP(("Q: Releasing a %s at %p", qNodeType(qP->type), qP));
   free(qP);
 }
 
@@ -73,7 +88,25 @@ void qRelease(QNode* qP)
 //
 void qListRelease(QNode* qP)
 {
+  if (qP == NULL)
+    return;
+
   if (qP->next != NULL)
     qListRelease(qP->next);
+
+  if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
+  {
+    LM_TMP(("LEAK: Releasing a %s at %p", qNodeType(qP->type), qP));
+    LM_TMP(("LEAK: + Releasing its Variable Path '%s' at %p", qP->value.v, qP->value.v));
+    free(qP->value.v);
+  }
+  else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
+  {
+    LM_TMP(("LEAK: Releasing a %s at %p", qNodeType(qP->type), qP));
+    LM_TMP(("LEAK: + Releasing its String '%s' at %p", qP->value.s, qP->value.s));
+    free(qP->value.s);
+  }
+  else
+    LM_TMP(("LEAK: Releasing a %s at %p", qNodeType(qP->type), qP));
   free(qP);
 }

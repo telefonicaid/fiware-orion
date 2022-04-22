@@ -376,7 +376,7 @@ bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
   {
     if (rhs->type == QNodeStringValue)
     {
-      LM_TMP(("QM: Comparing two strings: LHS: '%s' and RHS: '%s'", lhsNode->value.s, rhs->value.s));
+      LM_TMP(("QM: Comparing two strings: LHS: '%s' (at %p) and RHS: '%s' (at %p)", lhsNode->value.s, lhsNode->value.s, rhs->value.s, rhs->value.s));
       return (strcmp(lhsNode->value.s, rhs->value.s) == 0);
     }
   }
@@ -506,8 +506,8 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
 
   if (qP->type == QNodeOr)
   {
-    qPresent(qP, "OR operation");
     // <DEBUG>
+    qPresent(qP, "DEBUG", "OR operation");
     int children = 0;
     LM_TMP(("Children of OR operation:"));
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)

@@ -33,7 +33,7 @@
 //
 // qPresent -
 //
-extern void qPresent(QNode* qP, const char* what);
+extern void qPresent(QNode* qP, const char* prefix, const char* what);
 
 
 
@@ -41,6 +41,6 @@ extern void qPresent(QNode* qP, const char* what);
 //
 // qListPresent -
 //
-extern void qListPresent(QNode* qP, const char* what);
+extern void qListPresent(QNode* qP, QNode* endP, const char* prefix, const char* what);
 
 #endif  // SRC_LIB_ORIONLD_Q_QPRESENT_H_

@@ -40,7 +40,7 @@ QNode* qNode(QNodeType type)
   if (orionldState.useMalloc)
   {
     nodeP = (QNode*) malloc(sizeof(QNode));
-    LM_TMP(("Q: Allocated a %s at %p", qNodeType(type), nodeP));
+    LM_TMP(("LEAK: Allocated a '%s' at %p", qNodeType(type), nodeP));
   }
   else
     nodeP = (QNode*) kaAlloc(&orionldState.kalloc, sizeof(QNode));

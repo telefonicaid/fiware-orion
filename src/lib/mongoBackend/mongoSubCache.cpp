@@ -357,14 +357,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
     else
     {
-      // Instead of orionldState.useMalloc, I could do a qClone for the qP in the sub-cache ...
-      cSubP->qP = qParse(qList, false, &title, &detail);
+      cSubP->qP = qParse(qList, NULL, false, &title, &detail);
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));
       else
-        qPresent(cSubP->qP, "Q For Subscription");
+        qPresent(cSubP->qP, "LEAK", "Q For Subscription");
     }
     orionldState.useMalloc = false;
+    qListRelease(qList);
   }
 
   // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented

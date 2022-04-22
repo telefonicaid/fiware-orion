@@ -272,7 +272,47 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
       snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s.value.%s", longName, mdNameP, rest);
   }
 
-  return (orionldState.useMalloc)? strdup(fullPath) : kaStrdup(&orionldState.kalloc, fullPath);
+  if (orionldState.useMalloc == true)
+  {
+    char* fp = strdup(fullPath);
+    LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", fp, fp));
+    return fp;
+  }
+
+  return kaStrdup(&orionldState.kalloc, fullPath);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qClone - move to ... QNode.cpp or its own module
+//
+QNode* qClone(QNode* original)
+{
+  QNode* cloneP = qNode(original->type);
+
+  if (orionldState.useMalloc == true)
+  {
+    if (original->type == QNodeVariable)
+    {
+      cloneP->value.v = strdup(original->value.v);
+      LM_TMP(("strdupped VariablePath '%s' at %p for qNode at %p", cloneP->value.v, cloneP->value.v, cloneP));
+    }
+    else if (original->type == QNodeStringValue)
+    {
+      cloneP->value.s = strdup(original->value.s);
+      LM_TMP(("strdupped String '%s' at %p for qNode at %p", cloneP->value.s, cloneP->value.s, cloneP));
+    }
+    else
+      cloneP->value  = original->value;
+  }
+  else
+    cloneP->value  = original->value;
+
+  cloneP->next   = NULL;
+
+  return cloneP;
 }
 
 
@@ -281,17 +321,23 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 //
 // qNodeAppend - append 'childP' to 'container'
 //
-static QNode* qNodeAppend(QNode* container, QNode* childP)
+static QNode* qNodeAppend(QNode* container, QNode* childP, bool clone = true)
 {
   QNode* lastP  = container->value.children;
-#if 1
-  QNode* cloneP = qNode(childP->type);
+  QNode* cloneP;
 
-  if (cloneP == NULL)
-    return NULL;
+  if (clone)
+  {
+    cloneP = qClone(childP);
 
-  cloneP->value = childP->value;
-  cloneP->next  = NULL;
+    if (cloneP == NULL)
+      return NULL;
+  }
+  else
+  {
+    LM_TMP(("LEAK: Not cloning '%s' at %p (comes from qNodeV)", qNodeType(childP->type), childP));
+    cloneP = childP;
+  }
 
   if (lastP == NULL)  // No children
     container->value.children = cloneP;
@@ -304,21 +350,6 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
   }
 
   return cloneP;
-#else
-  childP->next  = NULL;
-
-  if (lastP == NULL)  // No children
-    container->value.children = childP;
-  else
-  {
-    while (lastP->next != NULL)
-      lastP = lastP->next;
-
-    lastP->next = childP;
-  }
-
-  return childP;
-#endif
 }
 
 
@@ -337,71 +368,54 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
 // * On the same parenthesis level, the same op must be used (op: AND|OR)
 // *
 //
-QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
+QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char** detailsP)
 {
-  QNode*     qNodeV[10]     = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-  int        qNodeIx        = 0;
-  QNode*     qLexP          = qLexList;
-  QNode*     opNodeP        = NULL;
-  QNode*     compOpP        = NULL;
-  QNode*     leftP          = NULL;
-  QNode*     expressionEnd  = NULL;
-  QNode*     expressionStart;
-  QNode*     openP;
-  // QNode*     prevP      = NULL;
+  QNode*     qNodeV[10]      = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+  int        qNodeIx         = 0;
+  QNode*     qLexP           = qLexList;
+  QNode*     opNodeP         = NULL;
+  QNode*     compOpP         = NULL;
+  QNode*     leftP           = NULL;
+  QNode*     openP           = NULL;
+  QNode*     closeP          = NULL;
 
-  qListPresent(qLexList, "Incoming qLexList");
+  qListPresent(qLexList, endNodeP, "LEAK", "Incoming qLexList");
 
-  while (qLexP != NULL)
+  while (qLexP != endNodeP)
   {
     switch (qLexP->type)
     {
     case QNodeOpen:
-      expressionStart = qLexP;
-      openP           = qLexP;
+      // Extract all tokens inside the ( )  (both parenthesis on THE SAME LEVEL)
+      openP = qLexP;
 
-      // Lookup the corresponding ')'
-      while ((qLexP != NULL) && ((qLexP->type != QNodeClose) || (qLexP->value.level != expressionStart->value.level)))
+      if (openP->next == NULL)
       {
-        expressionEnd = qLexP;
-        qLexP         = qLexP->next;
-      }
-      // Now qLexP points to the ')' (well, if all is good that is)
-
-      if (qLexP == NULL)
-      {
-        *titleP   = (char*) "mismatching parenthesis";
-        *detailsP = (char*) "no matching ')'";
+        *titleP   = (char*) "Invalid Q-Filter";
+        *detailsP = (char*) "empty parenthesis";
         return NULL;
       }
 
-      if (expressionEnd == NULL)
+      // Lookup the corresponding ')' - or error if not present
+      closeP = openP->next;
+      while (true)
       {
-        *titleP   = (char*) "mismatching parenthesis";
-        *detailsP = (char*) "no matching ')'";
-        return NULL;
+        if ((closeP->type == QNodeClose) && (closeP->value.level == openP->value.level))
+          break;
+
+        closeP = closeP->next;
+        if (closeP == NULL)
+        {
+          *titleP   = (char*) "Invalid Q-Filter";
+          *detailsP = (char*) "mismatching parenthesis - no matching ')'";
+          return NULL;
+        }
       }
+      LM_TMP(("LEAK: Calling qParse from '%s' to '%s'", qNodeType(openP->next->type), qNodeType(closeP->type)));
+      qNodeV[qNodeIx++] = qParse(openP->next, closeP, forDb, titleP, detailsP);
 
-      //
-      // Now, we have a new "sub-expression".
-      // - Make qLexP point to ')'->next (but, must free the ')' node also)
-      // - Step over the '('
-      // - Remove the ending ')'
-      //
-
-      if (forDb == false)  // It's for the subscription cache - real malloc is used
-        free(expressionEnd->next);    // ')'
-
-      expressionEnd->next = NULL;
-      expressionStart     = expressionStart->next;
-
-      if (forDb == false)  // It's for the subscription cache - real malloc is used
-        free(openP);                  // '('
-
-      qNodeV[qNodeIx++]   = qParse(expressionStart, forDb, titleP, detailsP);
-
-      // Jump over the entire expression for the qList
-      // prevP->next = qLexP->next;
+      // Make qLexP point to ')' (will get ->next at the end of the loop)
+      qLexP = closeP;
       break;
 
     case QNodeVariable:
@@ -423,8 +437,11 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
     case QNodeTrueValue:
     case QNodeFalseValue:
     case QNodeRegexpValue:
-      if (compOpP == NULL)  // Left-Hand side
+      if (compOpP == NULL)  // Still no operatore - this is on the Left-Hand side - saved for later
+      {
         leftP = qLexP;
+        LM_TMP(("Saving LHS (of type '%s')", qNodeType(leftP->type)));
+      }
       else  // Right hand side
       {
         QNode* rangeP = NULL;
@@ -450,8 +467,6 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
 
           qNodeAppend(rangeP, lowerLimit);
           qNodeAppend(rangeP, upperLimit);
-
-          // prevP->next = qLexP->next;
         }
         else if ((qLexP->next != NULL) && (qLexP->next->type == QNodeComma))
         {
@@ -479,18 +494,17 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
           //
           // Appending last list item
           //
-          QNode* valueP = qLexP;
-
-          qNodeAppend(commaP, valueP);
-
-          // prevP->next = qLexP->next;
+          qNodeAppend(commaP, qLexP);
         }
 
         //
         // If operator is '!', there is no LEFT side of the expression
         //
         if (compOpP->type != QNodeNotExists)
+        {
+          LM_TMP(("Appending saved LHS"));
           qNodeAppend(compOpP, leftP);
+        }
 
         if (rangeP != NULL)
           qNodeAppend(compOpP, rangeP);
@@ -517,7 +531,7 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
         }
       }
       else
-        opNodeP = qLexP;
+        opNodeP = qClone(qLexP);
       break;
 
     case QNodeEQ:
@@ -528,11 +542,11 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
     case QNodeLT:
     case QNodeMatch:
     case QNodeNoMatch:
-      compOpP = qLexP;
+      compOpP = qClone(qLexP);
       break;
 
     case QNodeNotExists:
-      compOpP = qLexP;
+      compOpP = qClone(qLexP);
       break;
 
     default:
@@ -541,15 +555,18 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
       return NULL;
       break;
     }
-
-    // prevP = qLexP;  // is this always true?
+    LM_TMP(("LEAK: Current token: %s", qNodeType(qLexP->type)));
     qLexP = qLexP->next;
+    if (qLexP != NULL)
+      LM_TMP(("LEAK: Next token: %s", qNodeType(qLexP->type)));
+    else
+      LM_TMP(("LEAK: Next token: NULL"));
   }
 
   if (opNodeP != NULL)
   {
     for (int ix = 0; ix < qNodeIx; ix++)
-      qNodeAppend(opNodeP, qNodeV[ix]);
+      qNodeAppend(opNodeP, qNodeV[ix]);  // Shoulkd be ", false" as third parameter - in qNodeV[] there's compOp's - they're all already cloned
     return opNodeP;
   }
 
@@ -560,6 +577,7 @@ QNode* qParse(QNode* qLexList, bool forDb, char** titleP, char** detailsP)
     return NULL;
   }
 
+  qListPresent(qLexList, endNodeP, "LEAK", "Outgoing qLexList");
   return qNodeV[0];
 }
 
