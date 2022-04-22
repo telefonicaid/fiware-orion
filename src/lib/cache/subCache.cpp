@@ -719,6 +719,26 @@ void subCacheUpdateStatisticsIncrement(void)
 */
 void subCacheItemInsert(CachedSubscription* cSubP)
 {
+  //
+  // CachedSubscripion modification:
+  // - Triggers
+  // -
+  //
+
+  //
+  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
+  //
+  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
+
+  for (int ix = 0; ix < triggerArraySize; ++ix)
+  {
+    cSubP->triggers[ix] = true;
+  }
+
+
+  //
+  // List Insertion Part
+  //
   cSubP->next = NULL;
 
   ++subCache.noOfInserts;
@@ -858,8 +878,17 @@ void subCacheItemInsert
   if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
   {
     LM_TMP(("Got a 'q': %s", q.c_str()));
+
     // qLex destroys the input string, but we need it intact
-    char*  qString = kaStrdup(&orionldState.kalloc, q.c_str());
+    char        buf[512];
+    char*       qString   = buf;
+    const char* qs        = q.c_str();
+
+    if (strlen(qs) < sizeof(buf))
+      strncpy(buf, qs, sizeof(buf) - 1);
+    else
+      qString = strdup(qs);  // Freed after use - "if (qString != buf)"
+
     char*  title;
     char*  detail;
     QNode* qList;
@@ -932,16 +961,6 @@ void subCacheItemInsert
     EntityInfo* eP = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eP);
-  }
-
-  //
-  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
-  //
-  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
-
-  for (int ix = 0; ix < triggerArraySize; ++ix)
-  {
-    cSubP->triggers[ix] = true;
   }
 
   //

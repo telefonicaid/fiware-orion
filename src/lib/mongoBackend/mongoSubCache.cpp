@@ -329,8 +329,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
 
   //
-  // Stuff done in the long subCacheItemInsert() and that's needed here as well.
-  // (the best option would be to extract all info here and call the long subCacheItemInsert() ...
+  // Stuff done in the "long" subCacheItemInsert() and that's needed here as well.
+  // FIXME: Move common code between here and the "long" subCacheItemInsert() into the "short" subCacheItemInsert()
   //
 
   // IP, port and rest
@@ -338,17 +338,29 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
 
   // q
-  if (cSubP->expression.q != "")
+  const char* q = cSubP->expression.q.c_str();
+  if ((q != NULL) && (*q != 0))  // Can't really be NULL though, can it?
   {
-    LM_TMP(("QOR: Got a 'q': %s", cSubP->expression.q.c_str()));
+    LM_TMP(("QOR: Got a 'q': %s", q));
 
     // qLex destroys the input string, but we need it intact
-    char*  qString = kaStrdup(&orionldState.kalloc, cSubP->expression.q.c_str());
+    char   buf[512];
+    char*  qString   = buf;
+
+    LM_TMP(("QOR: Copying q-string"));
+    if (strlen(q) < sizeof(buf))
+      strncpy(buf, q, sizeof(buf) - 1);
+    else
+      qString = strdup(q);  // Freed after use - "if (qString != buf)"
+    LM_TMP(("QOR: Copied q-string"));
+
     char*  title   = NULL;
     char*  detail  = NULL;
     QNode* qList;
 
+    LM_TMP(("QOR: Decoding q-string '%s'", qString));
     urlDecode(qString);
+    LM_TMP(("QOR: Decoded q-string '%s'", qString));
     orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
     LM_TMP(("Calling qLex"));
     if ((qList = qLex(qString, &title, &detail)) == NULL)
@@ -371,15 +383,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     LM_TMP(("Calling qListRelease"));
     qListRelease(qList);
     LM_TMP(("After qListRelease"));
+    if (qString != buf)
+      free(qString);
   }
-
-  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
-  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
-  for (int ix = 0; ix < triggerArraySize; ++ix)
-  {
-    cSubP->triggers[ix] = true;
-  }
-
 
   LM_TMP(("QOR: Calling subCacheItemInsert with q == '%s'", cSubP->expression.q.c_str()));
   subCacheItemInsert(cSubP);
