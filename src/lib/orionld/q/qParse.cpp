@@ -274,7 +274,7 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 
   if (orionldState.useMalloc == true)
   {
-    char* fp = strdup(fullPath);
+    char* fp = strndup(fullPath, sizeof(fullPath) - 1);
     LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", fp, fp));
     return fp;
   }

@@ -259,15 +259,14 @@ do                                                \
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LM_LINE_MAX      (32 * 1024)
-#define TEXT_MAX         512
-#define FORMAT_LEN       1024
+#define LM_LINE_MAX      (2 * 1024)
+#define FORMAT_LEN       256
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
 #define F_LEN            200
 #define TF_LEN           64
-#define INFO_LEN         256
+#define INFO_LEN         128
 #define TMS_LEN          20
 #define TME_LEN          20
 #define TMS_DEF          "<trace "
@@ -1929,7 +1928,7 @@ LmStatus lmAux(char* a)
 char* lmTextGet(const char* format, ...)
 {
   va_list  args;
-  char*    vmsg = (char*) calloc(1, LM_LINE_MAX);
+  char*    vmsg = (char*) malloc(LM_LINE_MAX);
 
   if (vmsg == NULL)
     return (char*) "out of memory";
@@ -1938,7 +1937,7 @@ char* lmTextGet(const char* format, ...)
   va_start(args, format);
 
   /* Print message to variable */
-  vsnprintf(vmsg, LM_LINE_MAX, format, args);
+  vsnprintf(vmsg, LM_LINE_MAX-1, format, args);
   va_end(args);
 
   return vmsg;

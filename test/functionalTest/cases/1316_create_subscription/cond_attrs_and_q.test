@@ -34,6 +34,7 @@ accumulatorStart --pretty-print
 # 01. Create sub1: attrs = temp, temp==10
 # 02. Create sub2: attrs = temp, temp>10
 # 03. Create sub3: attrs = temp, temp<10
+# 00. Sleep 3 secs to let the sub-cache refresh itself
 # 04. Create entity temp==10
 # 05. Update entity temp==15
 # 06. Update entity temp==5
@@ -134,8 +135,14 @@ subId3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr 
 echo
 echo
 
-# Sleep for a time larger than subCacheIval
-sleep 5s
+
+# ------------------------------------------------------------------------
+#
+# Sleep for a time larger than subCacheIval - to provoke a sub-cache refresh
+sleep 3s
+#
+# ------------------------------------------------------------------------
+
 
 echo "04. Create entity temp==10"
 echo "=========================="

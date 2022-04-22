@@ -735,7 +735,7 @@ void subCacheItemInsert(CachedSubscription* cSubP)
     cSubP->triggers[ix] = true;
   }
 
-
+  LM_TMP(("Sub-Manipulation Done, Now inserting it in the list"));
   //
   // List Insertion Part
   //
@@ -1124,9 +1124,10 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 void subCacheRefresh(void)
 {
   std::vector<std::string> databases;
-
+  LM_TMP(("************************************ In subCacheRefresh *********************"));
   // Empty the cache
   subCacheDestroy();
+  LM_TMP(("After subCacheDestroy"));
 
   // Get list of database
   if (mongoMultitenant())
@@ -1141,10 +1142,12 @@ void subCacheRefresh(void)
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
+    LM_TMP(("Calling mongoSubCacheRefresh(%s)", databases[ix].c_str()));
     mongoSubCacheRefresh(databases[ix]);
   }
 
   ++subCache.noOfRefreshes;
+  LM_TMP(("************************************ After subCacheRefresh *********************"));
 }
 
 
@@ -1195,6 +1198,7 @@ void subCacheSync(void)
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
+  LM_TMP(("Got the sub-cache semaphore"));
   subCacheState = ScsSynchronizing;
 
 
@@ -1307,6 +1311,7 @@ void subCacheSync(void)
 
   subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
+  LM_TMP(("Gave back the sub-cache semaphore"));
 }
 
 
@@ -1321,7 +1326,9 @@ static void* subCacheRefresherThread(void* vP)
 
   while (1)
   {
+    LM_TMP(("Sleeping"));
     sleep(subCacheInterval);
+    LM_TMP(("Synching"));
     subCacheSync();
   }
 

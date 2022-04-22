@@ -226,16 +226,14 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
         if (cSubP->expression.q != "")
         {
-          // bool  qWithOr = false;
-          char* q       = (char*) cSubP->expression.q.c_str();
+          char* q = (char*) cSubP->expression.q.c_str();
 
           LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
 
           if (strchr(q, '|') != NULL)
           {
             LM_TMP(("QOR: Subscription::q contains an OR - NGSIv2 doesn't support that - only NGSI-LD"));
-            // qWithOr = true;
-            q       = (char*) "P;!P";
+            q = (char*) "P;!P";
           }
 
           if (!cSubP->expression.stringFilter.parse(q, &errorString))
@@ -389,6 +387,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   LM_TMP(("QOR: Calling subCacheItemInsert with q == '%s'", cSubP->expression.q.c_str()));
   subCacheItemInsert(cSubP);
+  LM_TMP(("subCacheItemInsert DONE"));
 
   return 0;
 }
@@ -659,7 +658,9 @@ void mongoSubCacheRefresh(const std::string& database)
       continue;
     }
 
+    LM_TMP(("Calling mongoSubCacheItemInsert(tenant='%s')", tenant));
     int r = mongoSubCacheItemInsert(tenant, sub);
+    LM_TMP(("After mongoSubCacheItemInsert(tenant='%s')", tenant));
     if (r == 0)
     {
       ++subNo;
@@ -667,7 +668,7 @@ void mongoSubCacheRefresh(const std::string& database)
   }
   releaseMongoConnection(connection);
 
-  LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
+  LM_TMP(("Added %d subscriptions to sub-cache from database '%s'", subNo, database.c_str()));
 }
 
 
