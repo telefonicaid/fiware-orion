@@ -906,7 +906,7 @@ void subCacheItemInsert
       LM_TMP(("LEAK: ***** Calling qParse *****"));
       cSubP->qP = qParse(qList, NULL, false, &title, &detail);
       if (cSubP->qP == NULL)
-        LM_W(("Error (qParse: %s: %s)", title, detail));
+        LM_W(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
       else
         qPresent(cSubP->qP, "LEAK", "Q-TREE");
     }

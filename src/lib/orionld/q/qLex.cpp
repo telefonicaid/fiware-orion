@@ -27,6 +27,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLexCheck.h"                               // qLexCheck
+#include "orionld/q/qRelease.h"                                // qListRelease
 #include "orionld/q/qLex.h"                                    // Own interface
 
 
@@ -390,6 +391,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         *titleP = (char*) "ngsi-ld query language: non-terminated string";
         *detailsP = sP;
 
+        if (orionldState.useMalloc == true)
+          qListRelease(dummy.next);
         return NULL;
       }
 
@@ -444,6 +447,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         *titleP = (char*) "ngsi-ld query language: non-terminated regexp";
         *detailsP = sP;
 
+        if (orionldState.useMalloc == true)
+          qListRelease(dummy.next);
         return NULL;
       }
 
@@ -460,42 +465,19 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       // - Variable: a-zA-Z0-9_.
       // - DateTime: Z0-9_:.
       //
-
-      //
       // Pretty much ALL characters should be accepted ...
+      // So, for now, no forbidden char test
       //
-#if 0
-      if ((*sP >= '0') && (*sP <= '9'))
-      {}
-      else if ((*sP >= 'a') && (*sP <= 'z'))
-      {}
-      else if ((*sP >= 'A') && (*sP <= 'Z'))
-      {}
-      else if ((*sP == '[') || (*sP == ']'))
-      {}
-      else if (*sP == '_')
-      {}
-      else if (*sP == '.')
-      {}
-      else if (*sP == '-')
-      {}
-      else if (*sP == ':')
-      {}
-      else
-      {
-        LM_W(("Bad Input (invalid character 0x%x)", *sP & 0xFF));
-        *titleP = (char*) "ngsi-ld query language: invalid character";
-        *detailsP = sP;
-        sP[1] = 0;
-        return NULL;
-      }
-#endif
       ++sP;
     }
   }
 
   if (qLexCheck(dummy.next, titleP, detailsP) == false)
+  {
+    if (orionldState.useMalloc == true)
+      qListRelease(dummy.next);
     return NULL;
+  }
 
   return dummy.next;
 }

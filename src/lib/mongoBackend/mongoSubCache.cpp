@@ -372,7 +372,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       cSubP->qP = qParse(qList, NULL, false, &title, &detail);
       LM_TMP(("After qParse"));
       if (cSubP->qP == NULL)
-        LM_W(("Error (qParse: %s: %s)", title, detail));
+        LM_W(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
       else
         qPresent(cSubP->qP, "LEAK", "Q For Subscription");
     }
@@ -384,6 +384,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     if (qString != buf)
       free(qString);
   }
+  else
+    cSubP->qP = NULL;
 
   LM_TMP(("QOR: Calling subCacheItemInsert with q == '%s'", cSubP->expression.q.c_str()));
   subCacheItemInsert(cSubP);
