@@ -344,12 +344,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
     // qLex destroys the input string, but we need it intact
     char*  qString = kaStrdup(&orionldState.kalloc, cSubP->expression.q.c_str());
-    char*  title;
-    char*  detail;
+    char*  title   = NULL;
+    char*  detail  = NULL;
     QNode* qList;
 
     urlDecode(qString);
     orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
+    LM_TMP(("Calling qLex"));
     if ((qList = qLex(qString, &title, &detail)) == NULL)
     {
       LM_W(("Error (qLex: %s: %s)", title, detail));
@@ -357,14 +358,19 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
     else
     {
+      LM_TMP(("Calling qParse"));
       cSubP->qP = qParse(qList, NULL, false, &title, &detail);
+      LM_TMP(("After qParse"));
       if (cSubP->qP == NULL)
         LM_W(("Error (qParse: %s: %s)", title, detail));
       else
         qPresent(cSubP->qP, "LEAK", "Q For Subscription");
     }
+    LM_TMP(("After qLex/Parse"));
     orionldState.useMalloc = false;
+    LM_TMP(("Calling qListRelease"));
     qListRelease(qList);
+    LM_TMP(("After qListRelease"));
   }
 
   // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
