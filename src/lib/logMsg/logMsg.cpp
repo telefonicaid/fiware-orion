@@ -1207,7 +1207,7 @@ static char* lmLineFix
     strncpy(xin, "\n", sizeof(xin) - 1);
   }
 
-  strncat(line, xin, lineLen - strlen(line) - 1);
+  strncat(line, xin, lineLen - strlen(line) - 2);
 
   return line;
 }
