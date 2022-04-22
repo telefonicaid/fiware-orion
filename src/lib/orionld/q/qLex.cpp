@@ -101,7 +101,9 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     --termLen;
   }
 
-  if ((strcmp(&term[termLen-9], "createdAt") == 0) || (strcmp(&term[termLen-10], "modifiedAt") == 0) || (strcmp(&term[termLen-10], "observedAt") == 0))
+  if ((termLen >= 9) && (strcmp(&term[termLen-9], "createdAt") == 0))
+    *lastTermIsTimestampP = true;
+  else if ((termLen >= 10) && ((strcmp(&term[termLen-10], "modifiedAt") == 0) || (strcmp(&term[termLen-10], "observedAt") == 0)))
     *lastTermIsTimestampP = true;
   else
     *lastTermIsTimestampP = false;

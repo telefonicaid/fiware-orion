@@ -1556,7 +1556,7 @@ extern LmStatus lmOut
   int          lineNo,
   const char*  fName,
   int          tLev,
-  const char*  stre,
+  const char*  stre     = NULL,
   bool         use_hook = true
 );
 

@@ -41,8 +41,12 @@ extern "C"
 //
 void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo)
 {
-  char buf[4096];  // Make the buffer size a function parameter and use kaAlloc() ?
+  if (tree == NULL)
+    LM_TMP(("%s[%d]: %s: NULL Tree", fileName, lineNo, msg));
 
+  char buf[2048];  // Make the buffer size a function parameter and use kaAlloc() ?
+
+  bzero(buf, sizeof(buf));
   kjFastRender(tree, buf);
   LM_TMP(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
 }

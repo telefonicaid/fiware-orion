@@ -259,7 +259,7 @@ do                                                \
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LM_LINE_MAX      (2 * 1024)
+#define LM_LINE_MAX      (4 * 1024)
 #define FORMAT_LEN       256
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
@@ -2351,11 +2351,11 @@ LmStatus lmOut
     {
       if (text[1] != ':')
       {
-        snprintf(line, LM_LINE_MAX, "R: %s\n%c", text, 0);
+        snprintf(line, LM_LINE_MAX -1, "R: %s\n%c", text, 0);
       }
       else
       {
-        snprintf(line, LM_LINE_MAX, "%s\n%c", text, 0);
+        snprintf(line, LM_LINE_MAX -1, "%s\n%c", text, 0);
       }
     }
     else
@@ -2366,14 +2366,10 @@ LmStatus lmOut
         continue;
       }
 
-      if ((strlen(format) + strlen(text) + strlen(line)) > LM_LINE_MAX)
-      {
-        snprintf(line, LM_LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
-      }
+      if ((strlen(format) + strlen(text) + 1) > LM_LINE_MAX)
+        snprintf(line, LM_LINE_MAX - 1, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
       else
-      {
-        snprintf(line, LM_LINE_MAX, format, text);
-      }
+        snprintf(line, LM_LINE_MAX - 1, format, text);
     }
 
     if (stre != NULL)
