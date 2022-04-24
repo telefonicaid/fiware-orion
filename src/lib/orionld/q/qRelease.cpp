@@ -88,25 +88,25 @@ void qRelease(QNode* qP)
 //
 void qListRelease(QNode* qP)
 {
-  if (qP == NULL)
-    return;
-
-  if (qP->next != NULL)
-    qListRelease(qP->next);
-
-  if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
+  while (qP != NULL)
   {
+    QNode* next = qP->next;
+
     LM_TMP(("LEAK: Releasing a %s at %p", qNodeType(qP->type), qP));
-    LM_TMP(("LEAK: + Releasing its Variable Path '%s' at %p", qP->value.v, qP->value.v));
-    free(qP->value.v);
+
+    if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
+    {
+      LM_TMP(("LEAK: + Releasing its Variable Path '%s' at %p", qP->value.v, qP->value.v));
+      free(qP->value.v);
+    }
+    else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
+    {
+      LM_TMP(("LEAK: + Releasing its String '%s' at %p", qP->value.s, qP->value.s));
+      free(qP->value.s);
+    }
+
+    free(qP);
+
+    qP = next;
   }
-  else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
-  {
-    LM_TMP(("LEAK: Releasing a %s at %p", qNodeType(qP->type), qP));
-    LM_TMP(("LEAK: + Releasing its String '%s' at %p", qP->value.s, qP->value.s));
-    free(qP->value.s);
-  }
-  else
-    LM_TMP(("LEAK: Releasing a %s at %p", qNodeType(qP->type), qP));
-  free(qP);
 }

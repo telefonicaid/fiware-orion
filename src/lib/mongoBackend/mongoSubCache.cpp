@@ -336,56 +336,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
 
   // q
-  const char* q = cSubP->expression.q.c_str();
-  if ((q != NULL) && (*q != 0))  // Can't really be NULL though, can it?
-  {
-    LM_TMP(("QOR: Got a 'q': %s", q));
 
-    // qLex destroys the input string, but we need it intact
-    char   buf[512];
-    char*  qString   = buf;
-
-    LM_TMP(("QOR: Copying q-string"));
-    if (strlen(q) < sizeof(buf))
-      strncpy(buf, q, sizeof(buf) - 1);
-    else
-      qString = strdup(q);  // Freed after use - "if (qString != buf)"
-    LM_TMP(("QOR: Copied q-string"));
-
-    char*  title   = NULL;
-    char*  detail  = NULL;
-    QNode* qList;
-
-    LM_TMP(("QOR: Decoding q-string '%s'", qString));
-    urlDecode(qString);
-    LM_TMP(("QOR: Decoded q-string '%s'", qString));
-    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
-    LM_TMP(("Calling qLex"));
-    if ((qList = qLex(qString, &title, &detail)) == NULL)
-    {
-      LM_W(("Error (qLex: %s: %s)", title, detail));
-      cSubP->qP = NULL;
-    }
-    else
-    {
-      LM_TMP(("Calling qParse"));
-      cSubP->qP = qParse(qList, NULL, false, &title, &detail);
-      LM_TMP(("After qParse"));
-      if (cSubP->qP == NULL)
-        LM_W(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
-      else
-        qPresent(cSubP->qP, "LEAK", "Q For Subscription");
-    }
-    LM_TMP(("After qLex/Parse"));
-    orionldState.useMalloc = false;
-    LM_TMP(("Calling qListRelease"));
-    qListRelease(qList);
-    LM_TMP(("After qListRelease"));
-    if (qString != buf)
-      free(qString);
-  }
-  else
-    cSubP->qP = NULL;
+  //
+  // To create the QNode tree (only used by the "new native NGSI-LD" notifications,
+  // the kalloc library is needed.
+  // The main thread cannot use the kalloc library, as its buffer would never be liberated.
+  // So, during "sub cache refresh", the QNode tree (cSunP->qP) is not built.
+  // It is not built until it is needed - which is when an NGSi-LD API endpoint that uses the new mongoc driver
+  // and the new "native NGSI-LD" notifications provokes a notification.
+  // THEN it is built and stored in the sub-cache.
+  //
+  cSubP->qP = NULL;  // Will be build on demand
 
   LM_TMP(("QOR: Calling subCacheItemInsert with q == '%s'", cSubP->expression.q.c_str()));
   subCacheItemInsert(cSubP);

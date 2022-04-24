@@ -607,7 +607,10 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   if (cSubP->qP != NULL)
     qRelease(cSubP->qP);
 
-  cSubP->next = NULL;
+  for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
+    free(cSubP->httpInfo.receiverInfo[ix]);
+
+      cSubP->next = NULL;
 }
 
 

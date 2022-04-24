@@ -259,14 +259,15 @@ do                                                \
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LM_LINE_MAX      (4 * 1024)
-#define FORMAT_LEN       256
+#define LM_LINE_MAX      (32 * 1024)
+#define TEXT_MAX         512
+#define FORMAT_LEN       1024
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
 #define F_LEN            200
 #define TF_LEN           64
-#define INFO_LEN         128
+#define INFO_LEN         256
 #define TMS_LEN          20
 #define TME_LEN          20
 #define TMS_DEF          "<trace "
@@ -1035,31 +1036,6 @@ static char* timeGet(int index, char* line, int lineSize)
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* timeStampGet -
-*
-* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
-* has been removed for the Orion Context Broker implementation, to make room for
-* a new LM_S macro, the 'S' standing for 'Summary'.
-*
-* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
-* some other project.
-*/
-static char* timeStampGet(char* line, int len)
-{
-  struct timeval tv;
-
-  gettimeofday(&tv, NULL);
-
-  snprintf(line, len, "timestamp: %d.%.6d secs\n", (int)tv.tv_sec, (int)tv.tv_usec);
-
-  return line;
-}
-#endif
-
-
 /* ****************************************************************************
 *
 * longTypeName -
@@ -1207,7 +1183,7 @@ static char* lmLineFix
     strncpy(xin, "\n", sizeof(xin) - 1);
   }
 
-  strncat(line, xin, lineLen - strlen(line));
+  strncat(line, xin, lineLen - strlen(line) - 1);
 
   return line;
 }
@@ -1928,7 +1904,7 @@ LmStatus lmAux(char* a)
 char* lmTextGet(const char* format, ...)
 {
   va_list  args;
-  char*    vmsg = (char*) malloc(LM_LINE_MAX);
+  char*    vmsg = (char*) calloc(1, LM_LINE_MAX);
 
   if (vmsg == NULL)
     return (char*) "out of memory";
@@ -1937,7 +1913,7 @@ char* lmTextGet(const char* format, ...)
   va_start(args, format);
 
   /* Print message to variable */
-  vsnprintf(vmsg, LM_LINE_MAX-1, format, args);
+  vsnprintf(vmsg, LM_LINE_MAX, format, args);
   va_end(args);
 
   return vmsg;
@@ -2351,11 +2327,11 @@ LmStatus lmOut
     {
       if (text[1] != ':')
       {
-        snprintf(line, LM_LINE_MAX -1, "R: %s\n%c", text, 0);
+        snprintf(line, LM_LINE_MAX, "R: %s\n%c", text, 0);
       }
       else
       {
-        snprintf(line, LM_LINE_MAX -1, "%s\n%c", text, 0);
+        snprintf(line, LM_LINE_MAX, "%s\n%c", text, 0);
       }
     }
     else
@@ -2366,10 +2342,14 @@ LmStatus lmOut
         continue;
       }
 
-      if ((strlen(format) + strlen(text) + 1) > LM_LINE_MAX)
-        snprintf(line, LM_LINE_MAX - 1, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
+      if ((strlen(format) + strlen(text) + strlen(line)) > LM_LINE_MAX)
+      {
+        snprintf(line, LM_LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
+      }
       else
-        snprintf(line, LM_LINE_MAX - 1, format, text);
+      {
+        snprintf(line, LM_LINE_MAX, format, text);
+      }
     }
 
     if (stre != NULL)

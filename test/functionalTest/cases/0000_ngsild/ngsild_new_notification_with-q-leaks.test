@@ -32,11 +32,11 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 --SHELL--
 
 #
-# 01. Create a subscription S1 with q=P1==0
+# 01. Create a subscription S1 with a q
 #
 
-echo "01. Create a subscription S1 with q=P1==0"
-echo "========================================="
+echo "01. Create a subscription S1 with a q"
+echo "====================================="
 payload='{
   "id": "urn:ngsi-ld:subs:S1",
   "type": "Subscription",
@@ -45,7 +45,7 @@ payload='{
       "type": "T"
     }
   ],
-  "q": "P1==%22abc%22",
+  "q": "A==0|B==0",
   "notification": {
     "format": "simplified",
     "endpoint": {
@@ -59,8 +59,8 @@ echo
 
 
 --REGEXPECT--
-01. Create a subscription S1 with q=P1==0
-=========================================
+01. Create a subscription S1 with a q
+=====================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1

@@ -274,6 +274,8 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 
   if (orionldState.useMalloc == true)
   {
+    LM_TMP(("LEAK: Releasing a Variable Path '%s' (at %p)", varPath, varPath));
+    free(varPath);
     char* fp = strndup(fullPath, sizeof(fullPath) - 1);
     LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", fp, fp));
     return fp;
@@ -566,7 +568,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
   if (opNodeP != NULL)
   {
     for (int ix = 0; ix < qNodeIx; ix++)
-      qNodeAppend(opNodeP, qNodeV[ix]);  // Shoulkd be ", false" as third parameter - in qNodeV[] there's compOp's - they're all already cloned
+      qNodeAppend(opNodeP, qNodeV[ix], false);  // 3rd param FALSE: qNodeV contains compOp's - all already cloned
     return opNodeP;
   }
 
