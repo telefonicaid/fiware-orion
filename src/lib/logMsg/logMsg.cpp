@@ -1036,31 +1036,6 @@ static char* timeGet(int index, char* line, int lineSize)
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* timeStampGet -
-*
-* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
-* has been removed for the Orion Context Broker implementation, to make room for
-* a new LM_S macro, the 'S' standing for 'Summary'.
-*
-* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
-* some other project.
-*/
-static char* timeStampGet(char* line, int len)
-{
-  struct timeval tv;
-
-  gettimeofday(&tv, NULL);
-
-  snprintf(line, len, "timestamp: %d.%.6d secs\n", (int)tv.tv_sec, (int)tv.tv_usec);
-
-  return line;
-}
-#endif
-
-
 /* ****************************************************************************
 *
 * longTypeName -

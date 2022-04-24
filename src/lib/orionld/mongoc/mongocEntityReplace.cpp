@@ -70,7 +70,7 @@ bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId)
     LM_E(("mongoc error updating entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
   }
 
-  // mongocConnectionRelease(); - done at the end of the request
+  // mongocConnectionRelease(); - Not here - done at the end of the request
 
   bson_destroy(&selector);
   bson_destroy(&replacement);

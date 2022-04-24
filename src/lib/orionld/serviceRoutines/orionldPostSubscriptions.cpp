@@ -99,6 +99,12 @@ bool orionldPostSubscriptions(void)
   char*    subIdP    = NULL;
   KjNode*  endpointP = NULL;
 
+#if 0
+  // FIXME: Move payload-checks from kjTreeToSubscription to pCheckSubscription
+  if (pCheckSubscription(orionldState.requestTree) == false)
+    return false;
+#endif
+
   // kjTreeToSubscription does the pCheckSubscription stuff ... for now ...
   if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
   {

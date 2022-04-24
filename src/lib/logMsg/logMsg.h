@@ -25,23 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdio.h>              /* !sprintf                                  */
+#include <stdio.h>                                  // snprintf
+#include <stdlib.h>                                 // malloc, free
+#include <string.h>                                 // strerror
+#include <stdarg.h>                                 // ellipses
+#include <errno.h>                                  // errno
+#include <time.h>                                   // time
+#include <stdint.h>                                 // int64_t, ...
 
-#if !defined(__APPLE__)
-#include <malloc.h>             /* free                                      */
-#endif
+#include <string>                                   // std::string
 
-#include <errno.h>              /* errno                                     */
-#include <string.h>             /* strerror                                  */
-#include <stdarg.h>             /* ellipses                                  */
-#include <stdlib.h>             /* free()                                    */
-#include <time.h>
-#include <stdint.h>             /* int64, ...                                */
-
-#include <string>               /* std::string                               */
-
-#include "common/globals.h"     /* transactionIdSet,correlatorIdSet          */
-#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+#include "common/globals.h"                         // transactionIdSet, correlatorIdSet
+#include "common/limits.h"                          // FIXME: this should be removed if this library wants to be generic again
 #include "orionld/common/performance.h"             // REQUEST_PERFORMANCE
 
 
@@ -1556,7 +1551,7 @@ extern LmStatus lmOut
   int          lineNo,
   const char*  fName,
   int          tLev,
-  const char*  stre,
+  const char*  stre     = NULL,
   bool         use_hook = true
 );
 

@@ -1,0 +1,330 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification for subscriptions with q containing the OR operator
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 on type=T and with q='P1==5|P2==9'
+# 02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5
+# 03. Dump accumulator to see one notification
+# 04. See subscription in mongo - make sure q =='P2==true|P3==9'
+# 05. Create an Entity E2/T, using POST /v2/entities, matching S5
+# 06. Dump accumulator to see NO notification
+#
+# 07. Kill broker and restart it - to take the sub from mongo and repopulate the sub-cache
+# 08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S5
+# 09. Dump accumulator to see one notification
+# 10. Create an Entity E4/T, using POST /v2/entities, matching S5
+# 11. Dump accumulator to see NO notification
+#
+
+echo "01. Create a subscription S1 on type=T and with q='P1==5|P2==9'"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "urn:T"
+    }
+  ],
+  "q": "P1==5|P2==9",
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5"
+echo "======================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E1",
+  "type": "urn:T",
+  "P1": 5
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. See subscription in mongo - make sure q =='P2==true|P3==9'"
+echo "=============================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "05. Create an Entity E2/T, using POST /v2/entities, matching S5"
+echo "==============================================================="
+payload='{
+  "id": "E2",
+  "type": "urn:T",
+  "P1": {
+    "type": "Property",
+    "value": 5
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Kill broker and restart it - to take the sub from mongo and repopulate the sub-cache"
+echo "========================================================================================"
+brokerStop CB
+brokerStart CB 0 IPv4 -experimental
+echo
+echo
+
+
+echo "08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S5"
+echo "======================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E3",
+  "type": "urn:T",
+  "P1": 5
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "09. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "10. Create an Entity E4/T, using POST /v2/entities, matching S5"
+echo "==============================================================="
+payload='{
+  "id": "E4",
+  "type": "urn:T",
+  "P1": {
+    "type": "Property",
+    "value": 5
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 on type=T and with q='P1==5|P2==9'
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see one notification
+============================================
+POST REGEX(.*)
+Content-Length: 237
+User-Agent: orionld
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "P1": 5,
+            "id": "urn:ngsi-ld:entities:T:E1",
+            "type": "urn:T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+04. See subscription in mongo - make sure q =='P2==true|P3==9'
+==============================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"expiration" : 2147483647,
+	"reference" : "REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "urn:T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "P1==5|P2==9",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+05. Create an Entity E2/T, using POST /v2/entities, matching S5
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=urn:T
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+06. Dump accumulator to see NO notification
+===========================================
+
+
+07. Kill broker and restart it - to take the sub from mongo and repopulate the sub-cache
+========================================================================================
+
+
+08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S5
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
+Date: REGEX(.*)
+
+
+
+09. Dump accumulator to see one notification
+============================================
+POST REGEX(.*)
+Content-Length: 237
+User-Agent: orionld
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "P1": 5,
+            "id": "urn:ngsi-ld:entities:T:E3",
+            "type": "urn:T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+10. Create an Entity E4/T, using POST /v2/entities, matching S5
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=urn:T
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+11. Dump accumulator to see NO notification
+===========================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

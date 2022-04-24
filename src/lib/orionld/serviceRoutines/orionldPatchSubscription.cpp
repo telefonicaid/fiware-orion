@@ -603,7 +603,7 @@ static bool subCacheItemUpdateGeoQ(CachedSubscription* cSubP, KjNode* itemP)
 }
 
 
-extern bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP);
+
 // -----------------------------------------------------------------------------
 //
 // subCacheItemUpdateNotificationEndpoint -
@@ -875,7 +875,7 @@ bool orionldPatchSubscription(void)
   //
   // Make sure we don't get both watchedAttributed AND timeInterval
   // If so, the PATCH is invalid
-  // Right now, timeInterval id not supported, but once it is, if ever, this code will come in handy
+  // Right now, timeInterval is not supported, but once it is, if ever, this code will come in handy
   //
   if (timeIntervalNodeP != NULL)
   {
@@ -932,7 +932,7 @@ bool orionldPatchSubscription(void)
   // ngsildSubscriptionPatch() performs that modification.
   //
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
-
+  LM_TMP(("Q: cSubP->qP at %p", cSubP->qP));
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
     LM_RE(false, ("KZ: ngsildSubscriptionPatch failed!"));
 

@@ -57,10 +57,13 @@ KeyValue* keyValueAdd(std::vector<KeyValue*>* array, const char* key, const char
 {
   KeyValue* kvP = (KeyValue*) malloc(sizeof(KeyValue));
 
-  strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
-  strncpy(kvP->value, value, sizeof(kvP->value) - 1);
+  if (kvP != NULL)
+  {
+    strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
+    strncpy(kvP->value, value, sizeof(kvP->value) - 1);
 
-  array->push_back(kvP);
+    array->push_back(kvP);
+  }
 
   return kvP;
 }

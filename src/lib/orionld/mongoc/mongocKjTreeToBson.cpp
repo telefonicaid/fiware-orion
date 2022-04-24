@@ -31,7 +31,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 
 
@@ -53,23 +52,27 @@ static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray)
   {
     bson_t bObject;
 
+    bson_init(&bObject);
     bson_append_document_begin(parentP, name, slen, &bObject);
     for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
       kjTreeToBson(itemP, &bObject, false);
     }
     bson_append_document_end(parentP, &bObject);
+    // bson_destroy(&bObject); ?
   }
   else if (nodeP->type == KjArray)
   {
     bson_t bArray;
 
+    bson_init(&bArray);
     bson_append_array_begin(parentP, name, slen, &bArray);
     for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
       kjTreeToBson(itemP, &bArray, true);
     }
     bson_append_array_end(parentP, &bArray);
+    // bson_destroy(&bArray); ?
   }
 }
 

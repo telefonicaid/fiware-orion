@@ -28,6 +28,7 @@ SET (SOURCES
     qTreeToBsonObj.cpp
     qAliasCompact.cpp
     qPresent.cpp
+    qRelease.cpp
 )
 
 # Include directories

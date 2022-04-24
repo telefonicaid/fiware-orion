@@ -23,11 +23,11 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLexCheck.h"                               // qLexCheck
+#include "orionld/q/qRelease.h"                                // qListRelease
 #include "orionld/q/qLex.h"                                    // Own interface
 
 
@@ -40,7 +40,13 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 {
   QNode* qNodeP = qNode(QNodeStringValue);
 
-  qNodeP->value.s = (orionldState.useMalloc == false)? stringValue : strdup(stringValue);
+  if (orionldState.useMalloc == false)
+    qNodeP->value.s = stringValue;
+  else
+  {
+    qNodeP->value.s = strdup(stringValue);
+    LM_TMP(("LEAK: + Allocated its String '%s' (at %p)", qNodeP->value.s, qNodeP->value.s));
+  }
 
   prev->next = qNodeP;
 
@@ -102,7 +108,9 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     --termLen;
   }
 
-  if ((strcmp(&term[termLen-9], "createdAt") == 0) || (strcmp(&term[termLen-10], "modifiedAt") == 0) || (strcmp(&term[termLen-10], "observedAt") == 0))
+  if ((termLen >= 9) && (strcmp(&term[termLen-9], "createdAt") == 0))
+    *lastTermIsTimestampP = true;
+  else if ((termLen >= 10) && ((strcmp(&term[termLen-10], "modifiedAt") == 0) || (strcmp(&term[termLen-10], "observedAt") == 0)))
     *lastTermIsTimestampP = true;
   else
     *lastTermIsTimestampP = false;
@@ -194,8 +202,15 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     else if (type == QNodeFloatValue)
       qNodeP->value.f = strtod(term, NULL);
     else if (type == QNodeVariable)
-      qNodeP->value.v = term;
-
+    {
+      if (orionldState.useMalloc)
+      {
+        qNodeP->value.v = strdup(term);
+        LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", qNodeP->value.v, qNodeP->value.v));
+      }
+      else
+        qNodeP->value.v = term;
+    }
     prev->next = qNodeP;
     return qNodeP;
   }
@@ -389,6 +404,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         *titleP = (char*) "ngsi-ld query language: non-terminated string";
         *detailsP = sP;
 
+        if (orionldState.useMalloc == true)
+          qListRelease(dummy.next);
         return NULL;
       }
 
@@ -443,6 +460,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         *titleP = (char*) "ngsi-ld query language: non-terminated regexp";
         *detailsP = sP;
 
+        if (orionldState.useMalloc == true)
+          qListRelease(dummy.next);
         return NULL;
       }
 
@@ -459,42 +478,19 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       // - Variable: a-zA-Z0-9_.
       // - DateTime: Z0-9_:.
       //
-
-      //
       // Pretty much ALL characters should be accepted ...
+      // So, for now, no forbidden char test
       //
-#if 0
-      if ((*sP >= '0') && (*sP <= '9'))
-      {}
-      else if ((*sP >= 'a') && (*sP <= 'z'))
-      {}
-      else if ((*sP >= 'A') && (*sP <= 'Z'))
-      {}
-      else if ((*sP == '[') || (*sP == ']'))
-      {}
-      else if (*sP == '_')
-      {}
-      else if (*sP == '.')
-      {}
-      else if (*sP == '-')
-      {}
-      else if (*sP == ':')
-      {}
-      else
-      {
-        LM_W(("Bad Input (invalid character 0x%x)", *sP & 0xFF));
-        *titleP = (char*) "ngsi-ld query language: invalid character";
-        *detailsP = sP;
-        sP[1] = 0;
-        return NULL;
-      }
-#endif
       ++sP;
     }
   }
 
   if (qLexCheck(dummy.next, titleP, detailsP) == false)
+  {
+    if (orionldState.useMalloc == true)
+      qListRelease(dummy.next);
     return NULL;
+  }
 
   return dummy.next;
 }

@@ -255,21 +255,22 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   bson_init(&selector);
   bson_append_utf8(&selector, "_id.id", 6, entityId, -1);
 
+  bson_t request;
   bson_t reply;
   bson_t set;    // No counter needed - there's always at least one 'set' - modDate on the Entity
   bson_t unset;
   bson_t pull;
   bson_t push;
-  bson_t request;
   int    unsets  = 0;
   int    pulls   = 0;
   int    pushes  = 0;
 
+  bson_init(&request);
+  bson_init(&reply);
   bson_init(&set);
   bson_init(&unset);
   bson_init(&pull);
   bson_init(&push);
-  bson_init(&request);
 
   patchApply(patchTree, &set, &unset, &unsets, &pull, &pulls, &push, &pushes);
 
@@ -303,8 +304,8 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   // mongocConnectionRelease(); - done at the end of the request
 
   bson_destroy(&request);
-  bson_destroy(&set);
   bson_destroy(&reply);
+  bson_destroy(&set);
 
   if (unsets > 0) bson_destroy(&unset);
   if (pulls  > 0) bson_destroy(&pull);

@@ -84,8 +84,6 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
   }
 
   *endOfFirstLine = 0;
-  LM_TMP(("NFY: First line: '%s'", buf));
-  LM_TMP(("NFY: Rest: '%s'", &endOfFirstLine[1]));
 
   //
   // Reading the rest of the message, using select

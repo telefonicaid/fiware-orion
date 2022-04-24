@@ -30,7 +30,8 @@
 
 extern "C"
 {
-#include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kTime.h"                                       // kTimeGet
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
 #include "logMsg/logMsg.h"
@@ -44,14 +45,14 @@ extern "C"
 #include "rest/StringFilter.h"
 #include "cache/subCache.h"
 
-#ifdef ORIONLD
-extern "C"
-{
-#include "kalloc/kaStrdup.h"                                   // kaStrdup
-}
-
 #include "orionld/common/orionldState.h"                       // orionldState
-#endif
+
+#include "orionld/q/qLex.h"                                    // qLex
+#include "orionld/q/qParse.h"                                  // qParse
+#include "orionld/q/qPresent.h"                                // qPresent
+#include "orionld/q/qRelease.h"                                // qListRelease
+#include "orionld/common/urlDecode.h"                          // urlDecode
+#include "orionld/common/urlParse.h"                           // urlParse
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -225,13 +226,25 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.q = getStringFieldF(&expression, CSUB_EXPR_Q);
         if (cSubP->expression.q != "")
         {
-          if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
+          char* q = (char*) cSubP->expression.q.c_str();
+
+          LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
+
+          if (strchr(q, '|') != NULL)
+          {
+            LM_TMP(("QOR: Subscription::q contains an OR - NGSIv2 doesn't support that - only NGSI-LD"));
+            q = (char*) "P;!P";
+          }
+
+          if (!cSubP->expression.stringFilter.parse(q, &errorString))
           {
             LM_E(("Runtime Error (error parsing string filter: %s)", errorString.c_str()));
             subCacheItemDestroy(cSubP);
             delete cSubP;
             return -5;
           }
+
+          LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
         }
       }
 
@@ -313,7 +326,31 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   setStringVectorF(&sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
 
+  //
+  // Stuff done in the "long" subCacheItemInsert() and that's needed here as well.
+  // FIXME: Move common code between here and the "long" subCacheItemInsert() into the "short" subCacheItemInsert()
+  //
+
+  // IP, port and rest
+  cSubP->url = strdup(cSubP->httpInfo.url.c_str());
+  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+
+  // q
+
+  //
+  // To create the QNode tree (only used by the "new native NGSI-LD" notifications,
+  // the kalloc library is needed.
+  // The main thread cannot use the kalloc library, as its buffer would never be liberated.
+  // So, during "sub cache refresh", the QNode tree (cSunP->qP) is not built.
+  // It is not built until it is needed - which is when an NGSi-LD API endpoint that uses the new mongoc driver
+  // and the new "native NGSI-LD" notifications provokes a notification.
+  // THEN it is built and stored in the sub-cache.
+  //
+  cSubP->qP = NULL;  // Will be build on demand
+
+  LM_TMP(("QOR: Calling subCacheItemInsert with q == '%s'", cSubP->expression.q.c_str()));
   subCacheItemInsert(cSubP);
+  LM_TMP(("subCacheItemInsert DONE"));
 
   return 0;
 }
@@ -584,7 +621,9 @@ void mongoSubCacheRefresh(const std::string& database)
       continue;
     }
 
+    LM_TMP(("Calling mongoSubCacheItemInsert(tenant='%s')", tenant));
     int r = mongoSubCacheItemInsert(tenant, sub);
+    LM_TMP(("After mongoSubCacheItemInsert(tenant='%s')", tenant));
     if (r == 0)
     {
       ++subNo;
@@ -592,7 +631,7 @@ void mongoSubCacheRefresh(const std::string& database)
   }
   releaseMongoConnection(connection);
 
-  LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
+  LM_TMP(("Added %d subscriptions to sub-cache from database '%s'", subNo, database.c_str()));
 }
 
 

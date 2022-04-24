@@ -60,3 +60,51 @@
    fun:mongoc_topology_scanner_node_setup
    fun:mongoc_topology_scanner_start
 }
+{
+   <gnutls 1>
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   fun:gnutls_x509_trust_list_add_cas
+   fun:gnutls_x509_trust_list_add_trust_mem
+   fun:gnutls_x509_trust_list_add_trust_file
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   fun:gnutls_x509_trust_list_add_trust_dir
+   fun:gnutls_certificate_set_x509_trust_dir
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+}
+{
+   <gnutls 2>
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   fun:gnutls_x509_ext_import_subject_alt_names
+   fun:gnutls_x509_crt_import
+   fun:gnutls_x509_crt_list_import
+   fun:gnutls_x509_crt_list_import2
+   fun:gnutls_x509_trust_list_add_trust_mem
+   fun:gnutls_x509_trust_list_add_trust_file
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+}
+{
+   <orionldRequestSend, curl, and GNUTLS>
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   fun:gnutls_x509_crt_get_dn_by_oid
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   fun:curl_multi_perform
+   fun:curl_easy_perform
+   fun:_Z18orionldRequestSendP21OrionldResponseBufferPKcS2_tS2_S2_iS2_PPcPbS5_S2_S2_S2_iP17OrionldHttpHeader
+}

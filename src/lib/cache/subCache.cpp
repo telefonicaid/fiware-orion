@@ -48,7 +48,9 @@ extern "C"
 #include "orionld/q/qLex.h"                          // qLex
 #include "orionld/q/qParse.h"                        // qParse
 #include "orionld/q/qPresent.h"                      // qPresent
+#include "orionld/q/qRelease.h"                      // qRelease, qListRelease
 #include "orionld/common/urlDecode.h"                // urlDecode
+#include "orionld/common/urlParse.h"                 // urlParse
 #include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 
 #include "cache/subCache.h"
@@ -602,7 +604,13 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
   cSubP->notifyConditionV.clear();
 
-  cSubP->next = NULL;
+  if (cSubP->qP != NULL)
+    qRelease(cSubP->qP);
+
+  for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
+    free(cSubP->httpInfo.receiverInfo[ix]);
+
+      cSubP->next = NULL;
 }
 
 
@@ -714,6 +722,26 @@ void subCacheUpdateStatisticsIncrement(void)
 */
 void subCacheItemInsert(CachedSubscription* cSubP)
 {
+  //
+  // CachedSubscripion modification:
+  // - Triggers
+  // -
+  //
+
+  //
+  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
+  //
+  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
+
+  for (int ix = 0; ix < triggerArraySize; ++ix)
+  {
+    cSubP->triggers[ix] = true;
+  }
+
+  LM_TMP(("Sub-Manipulation Done, Now inserting it in the list"));
+  //
+  // List Insertion Part
+  //
   cSubP->next = NULL;
 
   ++subCache.noOfInserts;
@@ -729,84 +757,6 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 
   subCache.tail->next  = cSubP;
   subCache.tail        = cSubP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// urlParse - extract protocol, ip, port and URL-PATH from a 'reference' string
-//
-// FIXME
-//   This function is generic and should be moved to its own module in orionld/common
-//   However, I think I have a function doing exactly this already ...
-//
-bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, char** restP)
-{
-  char*            protocolEnd;
-  char*            colon;
-  char*            ip;
-  char*            rest;
-
-  // Check for custom url, e.g. "${abc}" - only if NGSIv2
-  if (orionldState.apiVersion != NGSI_LD_V1)
-  {
-    if (strncmp(url, "${", 2) == 0)
-    {
-      int len = strlen(url);
-
-      if (url[len - 1] == '}')
-      {
-        *protocolP = NULL;
-        *ipP       = NULL;
-        *portP     = 0;
-        *restP     = NULL;
-        return true;
-      }
-    }
-  }
-
-
-  //
-  // URL: <protocol> "://" <ip> [:<port] [path]
-  //
-  protocolEnd = strstr(url, "://");
-  if (protocolEnd != NULL)
-  {
-    *protocolEnd = 0;
-    *protocolP   = url;
-    ip           = &protocolEnd[3];
-  }
-  else
-    ip = url;
-
-  colon = strchr(ip, ':');
-  if (colon != NULL)
-  {
-    *colon = 0;
-    *portP = atoi(&colon[1]);
-    rest   = &colon[1];
-  }
-  else
-  {
-    *portP = 80;  // What should be the default port?
-    *ipP   = ip;
-    *restP = NULL;
-    return true;
-  }
-
-  *ipP   = ip;
-
-  rest = strchr(rest, '/');
-  if (rest != NULL)
-  {
-    *rest  = 0;
-    *restP = &rest[1];
-  }
-  else
-    *restP = NULL;
-
-  return true;
 }
 
 
@@ -928,19 +878,27 @@ void subCacheItemInsert
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
 
-  if (q != "")
+  if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
   {
     LM_TMP(("Got a 'q': %s", q.c_str()));
-    // qLex destroys the input string, but we need it intact
-    char* qString = kaStrdup(&orionldState.kalloc, q.c_str());
 
-    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
+    // qLex destroys the input string, but we need it intact
+    char        buf[512];
+    char*       qString   = buf;
+    const char* qs        = q.c_str();
+
+    if (strlen(qs) < sizeof(buf))
+      strncpy(buf, qs, sizeof(buf) - 1);
+    else
+      qString = strdup(qs);  // Freed after use - "if (qString != buf)"
 
     char*  title;
     char*  detail;
     QNode* qList;
 
     urlDecode(qString);
+    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
+    LM_TMP(("LEAK: ***** Calling qLex *****"));
     if ((qList = qLex(qString, &title, &detail)) == NULL)
     {
       LM_W(("Error (qLex: %s: %s)", title, detail));
@@ -948,13 +906,15 @@ void subCacheItemInsert
     }
     else
     {
-      cSubP->qP = qParse(qList, false, &title, &detail);
+      LM_TMP(("LEAK: ***** Calling qParse *****"));
+      cSubP->qP = qParse(qList, NULL, false, &title, &detail);
       if (cSubP->qP == NULL)
-        LM_W(("Error (qParse: %s: %s)", title, detail));
+        LM_W(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
       else
-        qPresent(cSubP->qP, "Q For Subscription");
+        qPresent(cSubP->qP, "LEAK", "Q-TREE");
     }
-    orionldState.useMalloc = true;
+    orionldState.useMalloc = false;
+    qListRelease(qList);
   }
   else
     cSubP->qP = NULL;
@@ -1004,16 +964,6 @@ void subCacheItemInsert
     EntityInfo* eP = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eP);
-  }
-
-  //
-  // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
-  //
-  int triggerArraySize = sizeof(cSubP->triggers) / sizeof(cSubP->triggers[0]);
-
-  for (int ix = 0; ix < triggerArraySize; ++ix)
-  {
-    cSubP->triggers[ix] = true;
   }
 
   //
@@ -1177,9 +1127,10 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 void subCacheRefresh(void)
 {
   std::vector<std::string> databases;
-
+  LM_TMP(("************************************ In subCacheRefresh *********************"));
   // Empty the cache
   subCacheDestroy();
+  LM_TMP(("After subCacheDestroy"));
 
   // Get list of database
   if (mongoMultitenant())
@@ -1194,10 +1145,12 @@ void subCacheRefresh(void)
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
+    LM_TMP(("Calling mongoSubCacheRefresh(%s)", databases[ix].c_str()));
     mongoSubCacheRefresh(databases[ix]);
   }
 
   ++subCache.noOfRefreshes;
+  LM_TMP(("************************************ After subCacheRefresh *********************"));
 }
 
 
@@ -1248,6 +1201,7 @@ void subCacheSync(void)
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
+  LM_TMP(("Got the sub-cache semaphore"));
   subCacheState = ScsSynchronizing;
 
 
@@ -1360,6 +1314,7 @@ void subCacheSync(void)
 
   subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
+  LM_TMP(("Gave back the sub-cache semaphore"));
 }
 
 
@@ -1374,7 +1329,9 @@ static void* subCacheRefresherThread(void* vP)
 
   while (1)
   {
+    LM_TMP(("Sleeping"));
     sleep(subCacheInterval);
+    LM_TMP(("Synching"));
     subCacheSync();
   }
 

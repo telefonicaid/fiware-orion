@@ -188,6 +188,12 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
 
       LM_TMP(("LANG: Calling kjTreeFromContextAttribute for attribute '%s', type '%s', lang: '%s", aP->name.c_str(), aP->type.c_str(), lang));
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, lang, detailsP);
+      if (nodeP == NULL)
+      {
+        LM_W(("kjTreeFromContextAttribute returned NULL"));
+        continue;
+      }
+
       if ((lang != NULL) && (lang[0] != 0) && (aP->type == "LanguageProperty"))
       {
         kjTreeLog(nodeP, "LANG: after kjTreeFromContextAttribute");

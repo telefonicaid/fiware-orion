@@ -78,7 +78,6 @@ style_check test/unittests/orionTypes
 style_check test/unittests/jsonParse
 style_check test/unittests/apiTypesV2
 style_check test/unittests/cache
-style_check test/unittests/mongoBackend
 style_check test/unittests/rest
 style_check test/unittests/serviceRoutines
 

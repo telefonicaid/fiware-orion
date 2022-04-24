@@ -412,7 +412,7 @@ bool orionldGetEntities(void)
       return false;
     }
 
-    if ((qTree = qParse(lexList, true, &title, &detail)) == NULL)
+    if ((qTree = qParse(lexList, NULL, true, &title, &detail)) == NULL)
     {
       LM_W(("Bad Input (qParse: %s: %s)", title, detail));
       orionldError(OrionldBadRequestData, title, detail, 400);

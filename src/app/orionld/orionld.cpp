@@ -962,6 +962,12 @@ int main(int argC, char* argV[])
   }
 
 
+  //
+  // Initialize orionld
+  //
+  contextDownloadListInit();
+  orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
+
   // Initialize Mongo Legacy C++ driver
   mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
 
@@ -1009,12 +1015,6 @@ int main(int argC, char* argV[])
   // Actually, another interesting usage is that a functional test case could create a context before starting the broker and
   // use that conext during the test.
   //
-
-  //
-  // Initialize orionld
-  //
-  contextDownloadListInit();
-  orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
   dbInit(dbHost, dbName);
 

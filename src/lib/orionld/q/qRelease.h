@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_Q_QPARSE_H_
-#define SRC_LIB_ORIONLD_Q_QPARSE_H_
+#ifndef SRC_LIB_ORIONLD_Q_QRELEASE_H_
+#define SRC_LIB_ORIONLD_Q_QRELEASE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -31,8 +31,16 @@
 
 // -----------------------------------------------------------------------------
 //
-// qParse -
+// qRelease -
 //
-extern QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char** detailsP);
+extern void qRelease(QNode* qP);
 
-#endif  // SRC_LIB_ORIONLD_Q_QPARSE_H_
+
+
+// ----------------------------------------------------------------------------
+//
+// qListRelease -
+//
+extern void qListRelease(QNode* qP);
+
+#endif  // SRC_LIB_ORIONLD_Q_QRELEASE_H_
