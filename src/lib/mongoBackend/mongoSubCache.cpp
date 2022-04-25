@@ -31,7 +31,6 @@
 extern "C"
 {
 #include "kbase/kTime.h"                                       // kTimeGet
-#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
 #include "logMsg/logMsg.h"
@@ -154,10 +153,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
   {
-    if (orionldStartup == false)
-      cSubP->ldContext = kaStrdup(&orionldState.kalloc, ldContext);
-    else
-      cSubP->ldContext = ldContext;
+    cSubP->ldContext = ldContext;
 
     if (renderFormat == NGSI_V2_NORMALIZED)
       renderFormat = NGSI_LD_V1_NORMALIZED;
@@ -228,7 +224,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         {
           char* q = (char*) cSubP->expression.q.c_str();
 
-          LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
+          LM_TMP(("QOR: q == '%s'", q));
 
           if (strchr(q, '|') != NULL)
           {
