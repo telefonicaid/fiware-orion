@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/q/QNode.h"                                    // QNode
 #include "orionld/q/qLex.h"                                     // qLex
 #include "orionld/q/qParse.h"                                   // qParse
+#include "orionld/q/qPresent.h"                                 // qPresent
 #include "orionld/common/urlDecode.h"                           // urlDecode
 #include "orionld/payloadCheck/pcheckQ.h"                       // Own interface
 
@@ -64,5 +65,6 @@ QNode* pcheckQ(char* qString)
     return NULL;
   }
 
+  qPresent(qTree, "QP", "pcheckQ");
   return qTree;
 }

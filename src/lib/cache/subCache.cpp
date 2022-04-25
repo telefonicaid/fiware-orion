@@ -877,6 +877,7 @@ void subCacheItemInsert
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
 
+  LM_TMP(("QP: q == '%s'", q.c_str()));
   if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
     cSubP->qP = qBuild(q.c_str());
 
@@ -931,6 +932,7 @@ void subCacheItemInsert
   //
   // Insert the subscription in the cache
   //
+  LM_TMP(("QP: subCacheItemInsert calls subCacheItemInsert"));
   subCacheItemInsert(cSubP);
 }
 
