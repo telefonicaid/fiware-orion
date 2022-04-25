@@ -24,6 +24,8 @@
 */
 #include <sys/types.h>
 #include <regex.h>
+#include <string.h>
+
 #include <string>
 #include <vector>
 #include <map>
@@ -34,7 +36,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
 #include "common/string.h"
@@ -44,12 +45,10 @@ extern "C"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
+
 #include "orionld/common/orionldState.h"             // orionldState
-#include "orionld/q/qLex.h"                          // qLex
-#include "orionld/q/qParse.h"                        // qParse
-#include "orionld/q/qPresent.h"                      // qPresent
-#include "orionld/q/qRelease.h"                      // qRelease, qListRelease
-#include "orionld/common/urlDecode.h"                // urlDecode
+#include "orionld/q/qBuild.h"                        // qBuild
+#include "orionld/q/qRelease.h"                      // qRelease
 #include "orionld/common/urlParse.h"                 // urlParse
 #include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
 
@@ -610,7 +609,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
     free(cSubP->httpInfo.receiverInfo[ix]);
 
-      cSubP->next = NULL;
+  cSubP->next = NULL;
 }
 
 
@@ -879,45 +878,8 @@ void subCacheItemInsert
   cSubP->metadata               = metadata;
 
   if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
-  {
-    LM_TMP(("Got a 'q': %s", q.c_str()));
+    cSubP->qP = qBuild(q.c_str());
 
-    // qLex destroys the input string, but we need it intact
-    char        buf[512];
-    char*       qString   = buf;
-    const char* qs        = q.c_str();
-
-    if (strlen(qs) < sizeof(buf))
-      strncpy(buf, qs, sizeof(buf) - 1);
-    else
-      qString = strdup(qs);  // Freed after use - "if (qString != buf)"
-
-    char*  title;
-    char*  detail;
-    QNode* qList;
-
-    urlDecode(qString);
-    orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
-    LM_TMP(("LEAK: ***** Calling qLex *****"));
-    if ((qList = qLex(qString, &title, &detail)) == NULL)
-    {
-      LM_W(("Error (qLex: %s: %s)", title, detail));
-      cSubP->qP = NULL;
-    }
-    else
-    {
-      LM_TMP(("LEAK: ***** Calling qParse *****"));
-      cSubP->qP = qParse(qList, NULL, false, &title, &detail);
-      if (cSubP->qP == NULL)
-        LM_W(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
-      else
-        qPresent(cSubP->qP, "LEAK", "Q-TREE");
-    }
-    orionldState.useMalloc = false;
-    qListRelease(qList);
-  }
-  else
-    cSubP->qP = NULL;
 
   //
   // IP, port and rest
@@ -1127,7 +1089,7 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 void subCacheRefresh(void)
 {
   std::vector<std::string> databases;
-  LM_TMP(("************************************ In subCacheRefresh *********************"));
+  LM_TMP(("QP: ************************************ In subCacheRefresh *********************"));
   // Empty the cache
   subCacheDestroy();
   LM_TMP(("After subCacheDestroy"));
@@ -1150,7 +1112,7 @@ void subCacheRefresh(void)
   }
 
   ++subCache.noOfRefreshes;
-  LM_TMP(("************************************ After subCacheRefresh *********************"));
+  LM_TMP(("QP: ************************************ After subCacheRefresh *********************"));
 }
 
 

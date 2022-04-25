@@ -124,7 +124,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-  // <DEBUG>
+  // ----------------------------  <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
@@ -144,7 +144,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     ++alterations;
   }
   LM_TMP(("ALT: %d Alterations present", alterations));
-  // </DEBUG>
+  // ----------------------------  </DEBUG>
 
   OrionldAlterationMatch* matchList;
   int                     matches;

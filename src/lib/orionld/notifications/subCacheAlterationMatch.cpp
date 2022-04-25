@@ -35,6 +35,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode, qNodeType
+#include "orionld/q/qBuild.h"                                  // qBuild
 #include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/common/pathComponentsSplit.h"                // pathComponentsSplit
 #include "orionld/common/eqForDot.h"                           // eqForDot
@@ -583,6 +584,7 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
 // subCacheAlterationMatch -
@@ -641,6 +643,13 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
         if (entityTypeMatch(subP, altP->entityType, eItems) == false)
           continue;
       }
+
+      //
+      // Might be we come from a sub-cache-refresh, and the subscription has a "q" but its "qP" hasn't been built
+      // Only done if its an NGSI-LD operations AND if it's an NGSI-LD Subscription (has a contextP pointer)
+      //
+      if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->expression.q != ""))
+        subP->qP = qBuild(subP->expression.q.c_str());
 
       if ((subP->qP != NULL) && (qMatch(subP->qP, altP) == false))
       {

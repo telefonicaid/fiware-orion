@@ -29,6 +29,7 @@ SET (SOURCES
     qAliasCompact.cpp
     qPresent.cpp
     qRelease.cpp
+    qBuild.cpp
 )
 
 # Include directories
