@@ -122,6 +122,8 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 `docker build` コマンドのパラメータ `-t orion` は、イメージに名前を付けます。この名前は何でもかまいませんし、`-t org/fiware-orion` のような組織も含めています。この名前は後でイメージに基づいてコンテナを実行するために使用されます。
 
+上記のステップ3には、2つの Dockerfile が用意されています: Debian ベースの公式のもの (`Dockefile` 自体) と、公式ではありませんが、Alpine をベース・ディストリビューションとして使用する場合の開始点として役立つ `Dockefile.alpine` です。
+
 `docker build` のパラメータ `--build-arg`i はビルド時の変数を設定できます。
 
 | ARG             | 説明                                                           | 例                              |
