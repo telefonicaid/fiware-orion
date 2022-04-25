@@ -247,6 +247,8 @@ function exitFunction()
 
   partOk=false
 
+  programExitsWithCode=$exitCode
+
   logMsg "FAILURE $exitCode for test $testFile: $errorText"
   #echo -n "($errorText) "
 
@@ -857,7 +859,7 @@ function partExecute()
   cat $dirname/$filename.$what >> $LOG_FILE
   logMsg "=========================================================================================================="
   $dirname/$filename.$what > $dirname/$filename.$what.stdout 2> $dirname/$filename.$what.stderr
-  exitCode=$?
+  eCode=$?
   logMsg "$what part of $path is done - now checks"
 
   #
@@ -900,14 +902,14 @@ function partExecute()
   #
   # Check that exit code is ZERO
   #
-  if [ "$exitCode" != "0" ]
+  if [ "$eCode" != "0" ]
   then
-    logMsg "$what: exit code is $exitCode - retry? (try: $__tryNo, MAX_TRIES: $MAX_TRIES)"
+    logMsg "$what: exit code is $eCode - retry? (try: $__tryNo, MAX_TRIES: $MAX_TRIES)"
     if [ $__tryNo == $MAX_TRIES ]
     then
-      exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
+      exitFunction 8 $path "$what exited with code $eCode" "($path)" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
     else
-      echo -n "(ERROR 8 - $what: exited with code $exitCode) "
+      echo -n "(ERROR 8 - $what: exited with code $eCode) "
     fi
 
     partExecuteResult=8
@@ -931,16 +933,16 @@ function partExecute()
     if [ $? == 0 ]
     then
       $SCRIPT_HOME/blockSortDiff.sh --referenceFile $dirname/$filename.regexpect --brokerOutputFile $dirname/$filename.out > $dirname/$filename.blockSortDiff.out
-      exitCode=$?
+      eCode=$?
       blockDiff='yes'
     else
       $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
-      exitCode=$?
+      eCode=$?
     fi
 
-    if [ "$exitCode" != "0" ]
+    if [ "$eCode" != "0" ]
     then
-      logMsg "$what $dirname/$filename: exitCode=$exitCode"
+      logMsg "$what $dirname/$filename: eCode=$eCode"
       if [ $__tryNo == $MAX_TRIES ]
       then
         exitFunction 9 "output not as expected" $path "($path) output not as expected" $dirname/$filename.diff 
@@ -1031,9 +1033,9 @@ function runTest()
   rm -f $dirname/$filename.shellInit.stderr
   rm -f $dirname/$filename.shellInit.stdout
   $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
-  exitCode=$?
+  eCode=$?
 
-  logMsg "SHELL-INIT part for $path DONE. exitCode=$exitCode"
+  logMsg "SHELL-INIT part for $path DONE. eCode=$eCode"
   grep -v "already exists"                               $dirname/$filename.shellInit.stderr  > $dirname/$filename.shellInit.stderr2
   grep -v "mongoc: falling back to malloc for counters." $dirname/$filename.shellInit.stderr2 > $dirname/$filename.shellInit.stderr3
   grep -v "mongoc: Falling back to malloc for counters." $dirname/$filename.shellInit.stderr3 > $dirname/$filename.shellInit.stderr
@@ -1051,7 +1053,7 @@ function runTest()
     return
   fi
 
-  if [ "$exitCode" != "0" ]
+  if [ "$eCode" != "0" ]
   then
     logMsg "Trying the SHELL-INIT part AGAIN for $path"
     #
@@ -1071,9 +1073,9 @@ function runTest()
 
     logMsg "Executing SHELL-INIT part for $path"
     $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
-    exitCode=$?
+    eCode=$?
 
-    logMsg "SHELL-INIT (again) part for $path DONE. exitCode=$exitCode"
+    logMsg "SHELL-INIT (again) part for $path DONE. eCode=$eCode"
 
     grep -v "^NOTICE: "                                    $dirname/$filename.shellInit.stderr  > $dirname/$filename.shellInit.stderr2
     grep -v "mongoc: falling back to malloc for counters." $dirname/$filename.shellInit.stderr2 > $dirname/$filename.shellInit.stderr3
@@ -1089,10 +1091,10 @@ function runTest()
       return
     fi
 
-    if [ "$exitCode" != "0" ]
+    if [ "$eCode" != "0" ]
     then
-      exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
-      runTestStatus="shell-init-exited-with-"$exitCode
+      exitFunction 11 "SHELL-INIT exited with code $eCode" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
+      runTestStatus="shell-init-exited-with-"$eCode
       return
     fi
   fi
@@ -1354,7 +1356,10 @@ then
     echo "  o " ${testErrorV[$ix]}
     ix=$ix+1
   done
-  exitCode=1
+  if [ "$exitCode" == "0" ]
+  then
+      exitCode=21
+  fi
 fi
 
 
@@ -1426,4 +1431,5 @@ then
   done
 fi
 
-exit $exitCode
+echo programExitsWithCode: $programExitsWithCode
+exit $programExitsWithCode

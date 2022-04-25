@@ -144,6 +144,24 @@ function fileCleanup()
 
 # -----------------------------------------------------------------------------
 #
+# Is the broker already running?
+#
+killall orionld 2> /dev/null
+
+# Inside valgrind?
+psLine=$(ps aux | grep localhost:27017 | grep orionld) 2> /dev/null
+if [ "$psLine" != "" ]
+then
+    pid=$(echo $psLine | awk '{print $2}')
+    echo "Killing running valgrind process $pid"
+    kill $pid
+    sleep 2
+fi
+
+
+
+# -----------------------------------------------------------------------------
+#
 # If any mongo database ftest-ftest exists, strange memory leaks appear ...
 # So, before starting, it's important to remove all ftest DBs
 #
@@ -388,6 +406,10 @@ function leakInfo()
 
     lost=$(add $definitelyLost1 $indirectlyLost1 $definitelyLost2 $indirectlyLost2)
     vgDebug "Done getting leak info for $1"
+    if [ "$lost" != 0 ]
+    then
+        noOfLeaking=$noOfLeaking+1
+    fi
 }
 
 
@@ -426,8 +448,32 @@ function valgrindErrorInfo()
       fi
     fi
   done
+
+  for num in $(grep "Invalid write of size " $filename | awk '{ print $2 }')
+  do
+    xNum=$num+1
+    if [ $xNum != 0 ]
+    then
+      vErrors=$vErrors+$xNum
+    fi
+  done
+
+  for num in $(grep "Invalid read of size " $filename | awk '{ print $2 }')
+  do
+    xNum=$num+1
+    if [ $xNum != 0 ]
+    then
+      vErrors=$vErrors+$xNum
+    fi
+  done
+
   valgrindErrors=$vErrors
   vMsg valgrindErrors: $valgrindErrors
+
+  if [ "$vErrors" != 0 ]
+  then
+      noOfErroring=$noOfErroring+1
+  fi
 
   vgDebug "Done getting error info for $1"
 }
@@ -436,7 +482,7 @@ function valgrindErrorInfo()
 
 # -----------------------------------------------------------------------------
 #
-# Printing related functions
+# Print-Info functions
 #
 function printTestLinePrefix()
 {
@@ -449,13 +495,18 @@ function printTestLinePrefix()
 
   if [ $testNo -lt 10 ]
   then
-    testNoString=${name}"00"${testNo}"/"${noOfTests}": "
+      zeroPad="000"
   elif [ $testNo -lt 100 ]
   then
-    testNoString=${name}"0"${testNo}"/"${noOfTests}": "
+      zeroPad="00"
+  elif [ $testNo -lt 1000 ]
+  then
+      zeroPad="0"
   else
-    testNoString=${name}${testNo}"/"${noOfTests}": "
+      zeroPad=""
   fi
+
+  testNoString="${name}${zeroPad}${testNo}/${noOfTests}: (E:${noOfErroring}, L:${noOfLeaking}, F:${harnessErrors}): "
 }
 
 function printNotImplementedString()
@@ -512,11 +563,6 @@ function leakFound()
   _dir=$4
   _testNo=$5
 
-  if [ "$_lost" != "0" ]
-  then
-    echo "FAILED (lost: $_lost). Check $_valgrindFile for clues"
-  fi
-
   testFailures=$testFailures+1
 
   if [ "$_dir" != "" ]
@@ -541,8 +587,6 @@ function valgrindErrorFound()
   _file=$2
   _valgrindErrors=$3
   _testNo=$4
-
-  echo "FAILED (valgrind errors: $_valgrindErrors). Check $_valgrindFile for clues"
 
   valgrindErrorV[$valgrindErrorNo]="$_testNo: $_file shows $_valgrindErrors valgrind errors"
   valgrindErrorNo=$valgrindErrorNo+1
@@ -581,10 +625,14 @@ declare -A harnessErrorV
 declare -A valgrindErrorV
 typeset -i harnessErrors
 typeset -i testNo
+typeset -i noOfLeaking
+typeset -i noOfErroring
 typeset -i testFailures
 typeset -i valgrindErrorNo
 testNo=0;
 testFailures=0
+noOfLeaking=0
+noOfErroring=0
 harnessErrors=0
 valgrindErrorNo=0
 
@@ -683,7 +731,7 @@ then
     valgrindErrors=0
     if [ "$dryrun" == "off" ]
     then
-      detailForOkString=''
+      statusString=''
 
       vMsg "------------------------------------------------"
       vMsg running harnessTest.sh with $file in $(pwd)
@@ -692,16 +740,16 @@ then
       startTime=$(date +%s.%2N)
       vgDebug "Calling testHarness.sh for $file"
       VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/funcTestUnderValgrind.tmp 2>&1
-      vgDebug "testHarness.sh for $file FINISHED"
       status=$?
+      vgDebug "testHarness.sh for $file FINISHED"
       endTime=$(date +%s.%2N)
       diffTime=$(echo $endTime - $startTime | bc)
-      vMsg status=$status
+      vMsg "status=$status"
       if [ "$status" != "0" ]
       then
         mv /tmp/funcTestUnderValgrind.tmp  test/functionalTest/cases/$directory/$htest.harness.out
         cp /tmp/${BROKER}.log              test/functionalTest/cases/$directory/$htest.contextBroker.log
-        detailForOkString=" (no leak but ftest error $status)"
+        statusString=${statusString}"F=$status "
         harnessErrorV[$harnessErrors]="$xTestNo: $file (exit code $status)"
         harnessErrors=$harnessErrors+1
         # No exit here - sometimes harness tests fail under valgrind ...
@@ -743,21 +791,31 @@ then
     fi
     cd - > /dev/null
 
+    if [ "$valgrindErrors" != "0" ]
+    then
+        valgrindErrorFound "$htest.valgrind.out" $htest $valgrindErrors $xTestNo
+        statusString=${statusString}"E=$valgrindErrors "
+    fi
+
     vgDebug "Presenting result for $file"
     if [ "$lost" != "0" ]
     then
-      leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
+        leakFound "$htest.valgrind.out" $htest $lost $dir $xTestNo
+        statusString=${statusString}"L=$lost "
     fi
 
-    if [ "$valgrindErrors" != "0" ]
+    if [ "$statusString" != "" ]
     then
-      valgrindErrorFound "$htest.valgrind.out" $htest $valgrindErrors $xTestNo
+        okString=$statusString
+        statusString=""
     fi
 
-    if [ "$lost" == "0" ] && [ "$valgrindErrors" == "0" ]
-    then
-      echo $okString "($diffTime seconds)" $detailForOkString
-    fi
+    diffTimeString="$diffTime seconds               "
+    diffTimeString=${diffTimeString:0:15}
+
+    echo  "$diffTimeString $okString"
+    okString="OK"
+
     vgDebug "Test finished for $file"
     echo >> $VG_DEBUG_FILE
   done
