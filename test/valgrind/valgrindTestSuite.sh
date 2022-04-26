@@ -449,12 +449,6 @@ function valgrindErrorInfo()
     fi
   done
 
-  writeErrors=$(grep "Invalid write of size " $filename | wc -l)
-  vErrors=$vErrors+$writeErrors
-
-  readErrors=$(grep "Invalid read of size " $filename | wc -l)
-  vErrors=$vErrors+$readErrors
-
   valgrindErrors=$vErrors
   vMsg valgrindErrors: $valgrindErrors
 
