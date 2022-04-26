@@ -449,23 +449,11 @@ function valgrindErrorInfo()
     fi
   done
 
-  for num in $(grep "Invalid write of size " $filename | awk '{ print $2 }')
-  do
-    xNum=$num+1
-    if [ $xNum != 0 ]
-    then
-      vErrors=$vErrors+$xNum
-    fi
-  done
+  writeErrors=$(grep "Invalid write of size " $filename | wc -l)
+  vErrors=$vErrors+$writeErrors
 
-  for num in $(grep "Invalid read of size " $filename | awk '{ print $2 }')
-  do
-    xNum=$num+1
-    if [ $xNum != 0 ]
-    then
-      vErrors=$vErrors+$xNum
-    fi
-  done
+  readErrors=$(grep "Invalid read of size " $filename | wc -l)
+  vErrors=$vErrors+$readErrors
 
   valgrindErrors=$vErrors
   vMsg valgrindErrors: $valgrindErrors
