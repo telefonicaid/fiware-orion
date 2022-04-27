@@ -43,10 +43,19 @@ orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
-
+# After fixing issue #1492 this has become a not-bad request case, but we keep
+# in this file for simplicity (NGSIv1 is a deprecated API)
 echo "+++++ 3. URI param 'limit' == 0"
 url="/v1/queryContext?limit=000000"
-payload='NO PAYLOAD NECESSARY'
+payload='{
+    "entities": [
+        {
+            "type": "",
+            "isPattern": "false",
+            "id": "EVector"
+        }
+    ]
+}'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -94,16 +103,15 @@ Date: REGEX(.*)
 
 +++++ 3. URI param 'limit' == 0
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400",
-        "details": "JSON Parse Error",
-        "reasonPhrase": "Bad Request"
+        "code": "404",
+        "reasonPhrase": "No context element found"
     }
 }
 
