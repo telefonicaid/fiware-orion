@@ -371,7 +371,6 @@ HttpStatusCode mongoQueryContext
                      countP,
                      sortOrderList,
                      apiVersion);
-
   if (!ok)
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);

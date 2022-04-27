@@ -401,7 +401,10 @@ void mongoRegistrationsGet
     setExpires(&reg, r);
     setStatus(&reg, r);
 
-    regV->push_back(reg);
+    if (limit != 0)
+    {
+      regV->push_back(reg);
+    }
   }
 
   orion::releaseMongoConnection(connection);
