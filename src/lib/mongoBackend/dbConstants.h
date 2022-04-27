@@ -117,6 +117,7 @@
 #define CSUB_PAYLOAD                 "payload"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_ONLYCHANGED             "onlyChanged"
+#define CSUB_COVERED                 "covered"
 #define CSUB_LASTFAILURE             "lastFailure"
 #define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_LASTSUCCESS             "lastSuccess"

@@ -174,7 +174,7 @@ Date: REGEX(.*)
 02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -185,6 +185,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqtt": {
             "qos": 2,
             "topic": "/orion",
@@ -218,7 +219,7 @@ Date: REGEX(.*)
 04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -229,6 +230,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqtt": {
             "qos": 2,
             "topic": "/orion",
@@ -262,7 +264,7 @@ Date: REGEX(.*)
 06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 311
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -273,6 +275,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqtt": {
             "qos": 0,
             "topic": "/cb",
@@ -306,7 +309,7 @@ Date: REGEX(.*)
 08. Get sub, see http element
 =============================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 289
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -317,6 +320,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9999"
         },
@@ -348,7 +352,7 @@ Date: REGEX(.*)
 10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 316
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -359,6 +363,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqtt": {
             "qos": 1,
             "topic": "/orionbk",

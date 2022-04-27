@@ -13,6 +13,7 @@
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
+* [`alterationType` 属性](#alterationtype-attribute)
 * [`actionType` メタデータ](#actiontype-metadata)
 * [`ignoreType` メタデータ](#ignoretype-metadata)
 * [`noAttrDetail` オプション](#noattrdetail-option)
@@ -23,6 +24,7 @@
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
+* [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
 * [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
@@ -338,6 +340,26 @@ Orion が NGSIv2 サブスクリプション・ペイロードで実装する特
 
 [トップ](#top)
 
+<a name="alterationtype-attribute"></a>
+## `alterationType` 属性
+
+NGSIv2 仕様の "組み込み属性" (Builtin Attributes) セクションで説明されている属性から、Orion は
+`alterationType` 属性を実装します。
+
+この属性は通知でのみ使用でき (`GET /v2/entities?attrs=alterationType` などのクエリでは無視されます)、
+次の値をとることができます:
+
+* `entityCreate` 通知をトリガーする更新がエンティティ作成操作の場合
+* `entityUpdate` 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
+* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合
+* `entityDelete` 通知をトリガーする更新がエンティティ削除操作であった場合
+
+この属性のタイプは `Text` です。
+
+この組み込み属性は、[変更タイプに基づくサブスクリプション](subscriptions_alttype.md) 機能に関連しています。
+
+[トップ](#top)
+
 <a name="actiontype-metadata"></a>
 ## `actionType` メタデータ
 
@@ -464,6 +486,71 @@ Orion は、NGSIv2 仕様で説明されているものとは別に、サブス�
 例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
 A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
 が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
+
+[トップ](#top)
+
+<a name="covered-subscriptions"></a>
+## カバード・サブスクリプション (Covered subscriptions)
+
+`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれる
+エンティティ属性のサブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを
+通知します。たとえば、サブスクリプションが次のようになっている場合:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness`
+属性は通知に含まれません。
+
+このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの
+属性 (この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
+
+通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で
+"カバーされる" (covered) という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、
+受信したすべての通知で常に同じ着信属性のセットを必要とする通知エンドポイントに役立ちます。
+
+対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに
+注意してください。 したがって、次の場合は無効です:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
+発生します:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
 
 [トップ](#top)
 

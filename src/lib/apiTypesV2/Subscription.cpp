@@ -177,27 +177,16 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastNotification", this->lastNotification);
   }
 
-  if (!this->blacklist && !this->onlyChanged)
-  {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", false);
-  }
-  else if (!this->blacklist && this->onlyChanged)
-  {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", this->onlyChanged);
-  }
-  else if (this->blacklist && this->onlyChanged)
+  if (this->blacklist)
   {
     jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", this->onlyChanged);
   }
   else
   {
-    jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", false);
+    jh.addRaw("attrs", vectorToJson(this->attributes));
   }
 
+  jh.addBool("onlyChangedAttrs", this->onlyChanged);
   jh.addString("attrsFormat", attrsFormat);
 
   if (this->type == HttpNotification)
@@ -257,6 +246,8 @@ std::string Notification::toJson(const std::string& attrsFormat)
   {
     jh.addNumber("failsCounter", this->failsCounter);
   }
+
+  jh.addBool("covered", this->covered);
 
   return jh.str();
 }
