@@ -125,7 +125,7 @@ Date: REGEX(.*)
 02. Get subscription, see notification.attrs
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 618
+Content-Length: 634
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -140,6 +140,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "legacy",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -191,7 +192,7 @@ Date: REGEX(.*)
 04. Get subscription again, see notification.exceptAttrs
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 571
+Content-Length: 587
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -202,6 +203,7 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrsFormat": "normalized",
+        "covered": false,
         "exceptAttrs": [
             "tato",
             "ququ"

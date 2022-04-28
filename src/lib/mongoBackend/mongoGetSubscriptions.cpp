@@ -197,6 +197,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   nP->maxFailsLimit     = r.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(r, CSUB_MAXFAILSLIMIT)    : -1;
   nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(r, CSUB_ONLYCHANGED)                 : false;
+  nP->covered           = r.hasField(CSUB_COVERED)?          getBoolFieldF(r, CSUB_COVERED)                     : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
   nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(r, CSUB_LASTFAILUREASON)           : "";
@@ -336,10 +337,11 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  while (cursor.next(&r))
+  while ((limit != 0) && (cursor.next(&r)))
   {
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));

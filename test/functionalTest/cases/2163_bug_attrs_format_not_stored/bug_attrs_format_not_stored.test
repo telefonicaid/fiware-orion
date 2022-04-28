@@ -159,7 +159,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (and get keyValues)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 308
+Content-Length: 324
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -172,6 +172,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "keyValues",
+        "covered": false,
         "http": {
             "url": "http://localhost:1045/notify"
         },
@@ -204,7 +205,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (and get normalized)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 309
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -217,6 +218,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1045/notify"
         },
@@ -249,7 +251,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID (and get values)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 305
+Content-Length: 321
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -262,6 +264,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "values",
+        "covered": false,
         "http": {
             "url": "http://localhost:1045/notify"
         },

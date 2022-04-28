@@ -112,6 +112,7 @@ struct CachedSubscription
   SubscriptionExpression           expression;
   bool                             blacklist;
   bool                             onlyChanged;
+  bool                             covered;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
@@ -217,7 +218,8 @@ extern void subCacheItemInsert
   const std::string&                 coords,
   const std::string&                 georel,
   bool                               blacklist,
-  bool                               onlyChanged
+  bool                               onlyChanged,
+  bool                               covered
 );
 
 

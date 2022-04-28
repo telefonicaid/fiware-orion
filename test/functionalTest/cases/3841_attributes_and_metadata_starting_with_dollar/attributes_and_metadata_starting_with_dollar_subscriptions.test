@@ -220,7 +220,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Get subscription
 ====================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 418
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -233,6 +233,7 @@ Date: REGEX(.*)
                 "$temperature"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },

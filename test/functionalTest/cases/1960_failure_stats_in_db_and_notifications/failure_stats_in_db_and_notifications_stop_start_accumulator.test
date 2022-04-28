@@ -173,7 +173,7 @@ Date: REGEX(.*)
 03. GET subscription, see lastSuccess but not lastFailure or failsCounter
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 364
+Content-Length: 380
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -184,6 +184,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
@@ -223,7 +224,7 @@ Date: REGEX(.*)
 06. GET subscription, see lastFailure GT lastSuccess and failsCounter==1
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 471
+Content-Length: 487
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -234,6 +235,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 1,
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
@@ -277,7 +279,7 @@ Date: REGEX(.*)
 09. GET subscription, see lastSuccess GT lastFailure but no failsCounter
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 470
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -288,6 +290,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:REGEX(\d+)/notify"
             },

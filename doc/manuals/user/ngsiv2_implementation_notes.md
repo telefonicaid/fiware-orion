@@ -13,6 +13,7 @@
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
+* [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
 * [`ignoreType` metadata](#ignoretype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
@@ -23,6 +24,7 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
+* [Covered subscriptions](#covered-subscriptions)
 * [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
@@ -361,6 +363,25 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 [Top](#top)
 
+## `alterationType` attribute
+
+Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Orion implements the `alterationType` attribute.
+
+This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
+is ignored) and can take the following values:
+
+* `entityCreate` if the update that triggers the notification is a entity creation operation
+* `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+* `entityChange` if the update that triggers the notification was an update with an actual change
+* `entityDelete` if the update that triggers the notification was a entity delete operation
+
+The type of this attribute is `Text`
+
+This builtin attribute is related with the [subscriptions based in alteration type](subscriptions_alttype.md) feature.
+
+[Top](#top)
+
 ## `actionType` metadata
 
 From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
@@ -488,6 +509,73 @@ update modified only A, then A, B and C are notified (in other words, the trigge
 if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
 
 [Top](#top)
+
+## Covered subscriptions
+
+The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
+notification when subscription is triggered. By default Orion only notifies attributes that exist
+in the entity. For instance, if subscription is this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+but the entity only has `temperature` and `humidity` attributes, then `brightness` attribute is not included
+in notifications.
+
+This default behaviour can be changed using the `covered` field set to `true` this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+in which case all attributes are included in the notification, no matter if they exist or not in the
+entity. For these attributes that don't exist (`brightness` in this example) the `null`
+value (of type `"None"`) is used.
+
+We use the term "covered" in the sense the notification "covers" completely all the attributes
+in the `notification.attrs` field. It can be useful for those notification endpoints that are
+not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
+in every received notification.
+
+Note that covered subscriptions need an explicit list of `attrs` in `notification`. Thus, the following
+case is not valid:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+And if you try to create/update a subscription with that you will get a 400 Bad Request error like this:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
+
+
+[Top](#top)
+
 
 ## `timeout` subscriptions option
 

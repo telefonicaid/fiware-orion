@@ -1126,7 +1126,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->mqttInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
-                                                           cSubP->tenant);
+                                                           cSubP->tenant,
+                                                           cSubP->covered);
     if (cSubP->onlyChanged)
     {
       subP->blacklist = false;
@@ -1607,6 +1608,7 @@ static bool addTriggeredSubscriptions_noCache
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1630,7 +1632,7 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
-          aList, "", "");
+          aList, "", "", covered);
 
       if (!onlyChanged)
       {
@@ -1789,7 +1791,8 @@ static bool processOnChangeConditionForUpdateContext
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
-  bool                             blacklist = false
+  bool                             blacklist = false,
+  bool                             covered = false
 )
 {
   NotifyContextRequest   ncr;
@@ -1829,6 +1832,20 @@ static bool processOnChangeConditionForUpdateContext
       }
     }
   }
+  if (covered)
+  {
+    for (unsigned int ix = 0; ix < attrL.size(); ix++)
+    {
+      // Aviod over-adding attribute, checking first that the attribute is not already added
+      std::string attrName = attrL[ix];
+      if (cer.entity.attributeVector.get(attrName) < 0)
+      {
+        ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+        caP->valueType = orion::ValueTypeNull;
+        cer.entity.attributeVector.push_back(caP);
+      }
+    }
+  }
 
   /* Early exit without sending notification if attribute list is empty */
   if (cer.entity.attributeVector.size() == 0)
@@ -1859,6 +1876,7 @@ static bool processOnChangeConditionForUpdateContext
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
+                                          covered,
                                           metadataV);
   return true;
 }
@@ -2004,7 +2022,8 @@ static unsigned int processSubscriptions
                                                                 fiwareCorrelator,
                                                                 notifStartCounter + notifSent + 1,
                                                                 notification,
-                                                                tSubP->blacklist);
+                                                                tSubP->blacklist,
+                                                                tSubP->covered);
 
     if (notificationSent)
     {
@@ -3487,7 +3506,7 @@ static unsigned int updateEntity
       return 0;  // Error already in responseP
     }
 
-    addBuiltins(notifyCerP);
+    addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityDelete));
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
                                                   tenant,
@@ -3495,8 +3514,6 @@ static unsigned int updateEntity
                                                   fiwareCorrelator,
                                                   notifStartCounter);
     releaseTriggeredSubscriptions(&subsToNotify);
-
-    LM_W(("FGM: notifSent: %d", notifSent));
 
     notifyCerP->release();
     delete notifyCerP;
@@ -3647,7 +3664,7 @@ static unsigned int updateEntity
     }
 
     /* EntityUpdate subscriptions may be triggered, even in the case of no actual modification */
-    addBuiltins(notifyCerP);
+    addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityUpdate));
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
                                                   tenant,
@@ -3893,7 +3910,7 @@ static unsigned int updateEntity
    * previous addTriggeredSubscriptions() invocations. Before that, we add
    * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
    * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-  addBuiltins(notifyCerP);
+  addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChange));
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
                                                 tenant,
@@ -4364,7 +4381,7 @@ unsigned int processContextElement
          * previous addTriggeredSubscriptions() invocations. Before that, we add
          * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
          * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-        addBuiltins(notifyCerP);
+        addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityCreate));
         notifSent = processSubscriptions(subsToNotify,
                                          notifyCerP,
                                          tenant,
