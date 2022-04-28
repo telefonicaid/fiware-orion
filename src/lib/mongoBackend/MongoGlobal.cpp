@@ -1636,6 +1636,7 @@ bool entitiesQuery
           cer->entity.attributeVector.push_back(caP);
         }
       }
+
       cer->statusCode.fill(SccOk);
       cerV->push_back(cer);
     }

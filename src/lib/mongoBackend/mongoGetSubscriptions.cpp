@@ -358,6 +358,7 @@ void mongoListSubscriptions
       subs->push_back(s);
     }
   }
+
   orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
 
