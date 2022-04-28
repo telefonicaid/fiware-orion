@@ -30,96 +30,84 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/entities with limit = 0 and see error
-# 02. GET /v2/types with limit = 0 and see error
-# 03. GET /v2/subscriptions with limit = 0 and see error
-# 04. GET /v2/registrations with limit = 0 and see error
+# 01. GET /v2/entities with limit = 0
+# 02. GET /v2/types with limit = 0
+# 03. GET /v2/subscriptions with limit = 0
+# 04. GET /v2/registrations with limit = 0
 #
 #
 
-echo "01. GET /v2/entities with limit = 0 and see error"
-echo "================================================="
+echo "01. GET /v2/entities with limit = 0"
+echo "==================================="
 orionCurl --url "/v2/entities?limit=0"
 echo
 echo
 
 
-echo "02. GET /v2/types with limit = 0 and see error"
-echo "=============================================="
+echo "02. GET /v2/types with limit = 0"
+echo "================================"
 orionCurl --url "/v2/types?limit=0"
 echo
 echo
 
 
-echo "03. GET /v2/subscriptions with limit = 0 and see error"
-echo "======================================================"
+echo "03. GET /v2/subscriptions with limit = 0"
+echo "========================================"
 orionCurl --url "/v2/subscriptions?limit=0"
 echo
 echo
 
 
-echo "04. GET /v2/registrations with limit = 0 and see error"
-echo "======================================================"
+echo "04. GET /v2/registrations with limit = 0"
+echo "========================================"
 orionCurl --url "/v2/registrations?limit=0"
 echo
 echo
 
 
 --REGEXPECT--
-01. GET /v2/entities with limit = 0 and see error
-=================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 98
+01. GET /v2/entities with limit = 0
+===================================
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "Bad pagination limit: /0/ [a value of ZERO is unacceptable]",
-    "error": "BadRequest"
-}
+[]
 
 
-02. GET /v2/types with limit = 0 and see error
-==============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 98
+02. GET /v2/types with limit = 0
+================================
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "Bad pagination limit: /0/ [a value of ZERO is unacceptable]",
-    "error": "BadRequest"
-}
+[]
 
 
-03. GET /v2/subscriptions with limit = 0 and see error
-======================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 98
+03. GET /v2/subscriptions with limit = 0
+========================================
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "Bad pagination limit: /0/ [a value of ZERO is unacceptable]",
-    "error": "BadRequest"
-}
+[]
 
 
-04. GET /v2/registrations with limit = 0 and see error
-======================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 98
+04. GET /v2/registrations with limit = 0
+========================================
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "Bad pagination limit: /0/ [a value of ZERO is unacceptable]",
-    "error": "BadRequest"
-}
+[]
 
 
 --TEARDOWN--
