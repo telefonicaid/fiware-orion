@@ -374,9 +374,10 @@ void mongoRegistrationsGet
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  // Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
   int docs = 0;
   orion::BSONObj        r;
-  while (cursor.next(&r))
+  while ((limit != 0) && (cursor.next(&r)))
   {
     ngsiv2::Registration  reg;
 
@@ -401,10 +402,7 @@ void mongoRegistrationsGet
     setExpires(&reg, r);
     setStatus(&reg, r);
 
-    if (limit != 0)
-    {
-      regV->push_back(reg);
-    }
+    regV->push_back(reg);
   }
 
   orion::releaseMongoConnection(connection);

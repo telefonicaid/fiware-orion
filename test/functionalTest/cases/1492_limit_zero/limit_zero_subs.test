@@ -71,7 +71,6 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
-subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
@@ -103,7 +102,6 @@ payload='{
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
-subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 

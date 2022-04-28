@@ -337,26 +337,24 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
   unsigned int docs = 0;
 
-  if (limit != 0)
+  orion::BSONObj  r;
+  while ((limit != 0) && (cursor.next(&r)))
   {
-    orion::BSONObj  r;
-    while (cursor.next(&r))
-    {
-      docs++;
-      LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-      Subscription  s;
+    Subscription  s;
 
-      setNewSubscriptionId(&s, r);
-      setDescription(&s, r);
-      setSubject(&s, r);
-      setStatus(&s, r, tenant);
-      setNotification(&s, r, tenant);
+    setNewSubscriptionId(&s, r);
+    setDescription(&s, r);
+    setSubject(&s, r);
+    setStatus(&s, r, tenant);
+    setNotification(&s, r, tenant);
 
-      subs->push_back(s);
-    }
+    subs->push_back(s);
   }
 
   orion::releaseMongoConnection(connection);

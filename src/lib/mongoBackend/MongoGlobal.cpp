@@ -1592,54 +1592,52 @@ bool entitiesQuery
   int             errType;
   std::string     nextErr;
 
-  if (limit != 0)
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
+  while ((limit != 0) && (cursor.next(&r, &errType, &nextErr)))
   {
-    while (cursor.next(&r, &errType, &nextErr))
+    alarmMgr.dbErrorReset();
+
+    // Build CER from BSON retrieved from DB
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+
+    // Add builtin attributes and metadata (only in NGSIv2)
+    if (apiVersion == V2)
     {
-      alarmMgr.dbErrorReset();
-
-      // Build CER from BSON retrieved from DB
-      docs++;
-      LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-      ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
-
-      // Add builtin attributes and metadata (only in NGSIv2)
-      if (apiVersion == V2)
-      {
-        addBuiltins(cer, "");
-      }
-
-      /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
-      for (unsigned int ix = 0; ix < attrL.size(); ++ix)
-      {
-        bool         found     = false;
-        std::string  attrName  = attrL[ix];
-
-        /* The special case "*" is not taken into account*/
-        if (attrName == ALL_ATTRS)
-        {
-          continue;
-        }
-
-        for (unsigned int jx = 0; jx < cer->entity.attributeVector.size(); ++jx)
-        {
-          if (attrName == cer->entity.attributeVector[jx]->name)
-          {
-            found = true;
-            break;
-          }
-        }
-
-        if (!found)
-        {
-          ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
-          cer->entity.attributeVector.push_back(caP);
-        }
-      }
-
-      cer->statusCode.fill(SccOk);
-      cerV->push_back(cer);
+      addBuiltins(cer, "");
     }
+
+    /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
+    for (unsigned int ix = 0; ix < attrL.size(); ++ix)
+    {
+      bool         found     = false;
+      std::string  attrName  = attrL[ix];
+
+      /* The special case "*" is not taken into account*/
+      if (attrName == ALL_ATTRS)
+      {
+        continue;
+      }
+
+      for (unsigned int jx = 0; jx < cer->entity.attributeVector.size(); ++jx)
+      {
+        if (attrName == cer->entity.attributeVector[jx]->name)
+        {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found)
+      {
+        ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
+        cer->entity.attributeVector.push_back(caP);
+      }
+    }
+
+    cer->statusCode.fill(SccOk);
+    cerV->push_back(cer);
   }
 
   orion::releaseMongoConnection(connection);
