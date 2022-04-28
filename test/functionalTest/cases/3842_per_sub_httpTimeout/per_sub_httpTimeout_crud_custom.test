@@ -324,7 +324,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID see timeout field
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 331
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -335,6 +335,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "payload": "Custom payload",
             "timeout": 1000,
@@ -368,7 +369,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID and see timeout changed
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 331
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -379,6 +380,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "payload": "Custom payload",
             "timeout": 2000,
@@ -412,7 +414,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID and see no timeout is field is foud
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 316
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -423,6 +425,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "payload": "Custom payload",
             "url": "http://localhost:1234"
@@ -455,7 +458,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID and see the added timeout
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 331
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -466,6 +469,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "payload": "Custom payload",
             "timeout": 1000,
@@ -509,7 +513,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/ID and check no timeout field
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 316
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -520,6 +524,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "payload": "Custom payload",
             "url": "http://localhost:1234"

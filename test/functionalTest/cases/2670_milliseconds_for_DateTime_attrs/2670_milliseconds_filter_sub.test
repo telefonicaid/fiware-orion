@@ -403,7 +403,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Gets sub1, 3 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 441
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -413,6 +413,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9997/notify"
         },
@@ -443,7 +444,7 @@ Date: REGEX(.*)
 09. Gets sub2, 1 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 429
+Content-Length: 445
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -453,6 +454,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9997/notify"
         },
@@ -483,7 +485,7 @@ Date: REGEX(.*)
 10. Gets sub3, 1 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 456
+Content-Length: 472
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -493,6 +495,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9997/notify"
         },

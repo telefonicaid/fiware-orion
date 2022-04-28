@@ -158,7 +158,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       if ((*cP < '0') || (*cP > '9'))
       {
-        OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a decimal number]");
+        OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a positive integer number]");
         ciP->httpStatusCode = error.code;
         ciP->answer         = error.smartRender(ciP->apiVersion);
         return MHD_YES;
@@ -171,13 +171,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     if (limit > atoi(MAX_PAGINATION_LIMIT))
     {
       OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [max: " + MAX_PAGINATION_LIMIT + "]");
-      ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
-      return MHD_YES;
-    }
-    else if (limit == 0)
-    {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
       return MHD_YES;

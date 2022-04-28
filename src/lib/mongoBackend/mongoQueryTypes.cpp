@@ -572,7 +572,8 @@ HttpStatusCode mongoEntityTypes
   unsigned int docs = 0;
   while (cursor.next(&resultItem))
   {
-    if ((docs < offset) || (docs > offset + limit - 1))
+    // Note limit == 0 has to be checked individually given doc > offset + limit - 1 doesn't work if offset == 0 with unsigned int */
+    if ((limit == 0) || (docs < offset) || (docs > offset + limit - 1))
     {
       docs++;
       continue;
@@ -630,6 +631,7 @@ HttpStatusCode mongoEntityTypes
 
     responseP->entityTypeVector.push_back(entityType);
   }
+
   orion::releaseMongoConnection(connection);
 
   // Get count if user requested (i.e. if totalTypesP is not NULL)

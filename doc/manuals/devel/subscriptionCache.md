@@ -48,32 +48,34 @@ When the broker starts, the subscription cache is populated with the subscriptio
 (check code reference at subCache.h file):
 
 ```
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  std::vector<std::string>    metadata;
-  std::vector<std::string>    notifyConditionV;
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
-  int64_t                     failsCounter;
-  int64_t                     maxFailsLimit;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
-  std::string                 status;
-  double                      statusLastChange;
-  int64_t                     count;
-  RenderFormat                renderFormat;
-  SubscriptionExpression      expression;
-  bool                        blacklist;
-  bool                        onlyChanged;
-  ngsiv2::HttpInfo            httpInfo;
-  ngsiv2::MqttInfo            mqttInfo;
-  int64_t                     lastFailure;  // timestamp of last notification failure
-  int64_t                     lastSuccess;  // timestamp of last successful notification
-  std::string                 lastFailureReason;
-  int64_t                     lastSuccessCode;
-  struct CachedSubscription*  next;         // The cache is a linked list of CachedSubscription ...
+  std::vector<EntityInfo*>         entityIdInfos;
+  std::vector<std::string>         attributes;
+  std::vector<std::string>         metadata;
+  std::vector<std::string>         notifyConditionV;
+  std::vector<ngsiv2::SubAltType>  subAltTypeV;
+  char*                            tenant;
+  char*                            servicePath;
+  char*                            subscriptionId;
+  int64_t                          failsCounter;
+  int64_t                          maxFailsLimit;
+  int64_t                          throttling;
+  int64_t                          expirationTime;
+  int64_t                          lastNotificationTime;
+  std::string                      status;
+  double                           statusLastChange;
+  int64_t                          count;
+  RenderFormat                     renderFormat;
+  SubscriptionExpression           expression;
+  bool                             blacklist;
+  bool                             onlyChanged;
+  bool                             covered;
+  ngsiv2::HttpInfo                 httpInfo;
+  ngsiv2::MqttInfo                 mqttInfo;
+  int64_t                          lastFailure;  // timestamp of last notification failure
+  int64_t                          lastSuccess;  // timestamp of last successful notification
+  std::string                      lastFailureReason;
+  int64_t                          lastSuccessCode;
+  struct CachedSubscription*       next;        // The cache is a linked list of CachedSubscription ...
 ```
 
 ### Special subscription fields
@@ -86,7 +88,7 @@ There are a few special fields that need special care when refreshing the cache:
 * `lastSuccess` (and related field `lastSuccessCode`)
 * `status`
 
-These fields have a special treatment inside the subscription cache, to avoid to write to the database each and every time these fields change, i.e. when an update triggering the subscription occurs). They are updated in the database only on refreshing the cache, like this:
+These fields have a special treatment inside the subscription cache:
 
 * `lastNotificationTime`, is updated in the database only if it is a **later time** than the *`lastNotificationTime` stored in the database* (some other broker may have updated it with a more recent value)
 * `count` and `failsCounter` in the subscription cache are set to zero at each sub-cache-refresh, so the `count` and `failsCounter` that are in the cache simply are accumulators and its accumulated values are added
@@ -94,6 +96,9 @@ These fields have a special treatment inside the subscription cache, to avoid to
 * `lastFailure` (along with `lastFailureReason`), like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
 * `lastSuccess` (along with `lastSuccessCode`), like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
 * `status`, is updated in the database only if it is a **later time** than the one stored in the database. To check which one is newer the side field `statusLastChange` is used.
+
+They are updated in the database on refreshing the cache by the `mongoSubUpdateOnCacheSync()` function. Some of them are also updated
+at notification time, see `mongoSubUpdateOnNotif()` function.
 
 All this is to ensure that the values are correct in the case of having more than one broker working against the database (so called [active-active configurations](#active-active-configurations)).
 
@@ -179,12 +184,12 @@ After having saved that important information in a vector, the entire subscripti
 
 After repopulation of the subscription cache, the saved information in the `CachedSubSaved` vector is merged into the subscription cache and finally, the `CachedSubSaved` vector is merged into the database, using the function `mongoSubCountersUpdate`, see [special subscription fields](#special-subscription-fields).  
 
-This is a costly operation and the semaphore that protects the subscription cache must be taken during the entire process to guarantee a successful outcome. As `subCacheSync()` calls a few subscription cache functions, these functions **must not** take the semaphore - the semaphore needs to be taken in a higher level. So, in case the se function s are used separately, the caller must ensure the semaphore is taken before usage. Underlying functions may also **not** take/give the semaphore.
+This is a costly operation and the semaphore that protects the subscription cache must be taken during the entire process to guarantee a successful outcome. As `subCacheSync()` calls a few subscription cache functions, these functions **must not** take the semaphore - the semaphore needs to be taken in a higher level. So, in case the functions are used separately, the caller must ensure the semaphore is taken before usage. Underlying functions may also **not** take/give the semaphore.
 
 The functions in question are:
 
 * `subCacheRefresh()`
-* `mongoSubCountersUpdate()`
+* `mongoSubUpdateOnCacheSync()`
 * `subCacheDestroy()` (used by `subCacheRefresh())`
 * `mongoSubCacheRefresh()` (used by `subCacheRefresh()`)
 

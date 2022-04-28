@@ -134,7 +134,7 @@ A string with double-quotes: "a1"=======================================
 04. GET the subscription to see the encoded chars in custom payload
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 504
+Content-Length: 520
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -144,6 +144,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "httpCustom": {
             "headers": {
                 "hs1": "1",

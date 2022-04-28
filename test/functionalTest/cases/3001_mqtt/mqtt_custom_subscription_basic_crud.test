@@ -279,7 +279,7 @@ Date: REGEX(.*)
 07. Get subs
 ============
 HTTP/1.1 200 OK
-Content-Length: 2062
+Content-Length: 2158
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -293,6 +293,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqttCustom": {
                 "payload": "temperature:${temperature}",
                 "qos": 0,
@@ -322,6 +323,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqttCustom": {
                 "payload": "temperature:${temperature}",
                 "qos": 2,
@@ -351,6 +353,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqttCustom": {
                 "qos": 0,
                 "topic": "/orion/${dest}",
@@ -379,6 +382,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqttCustom": {
                 "qos": 2,
                 "topic": "/orion/${dest}",
@@ -407,6 +411,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqttCustom": {
                 "payload": null,
                 "qos": 0,
@@ -436,6 +441,7 @@ Date: REGEX(.*)
                 "A1"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "mqttCustom": {
                 "payload": null,
                 "qos": 2,

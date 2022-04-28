@@ -502,6 +502,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
@@ -536,6 +537,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;

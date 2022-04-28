@@ -314,7 +314,7 @@ Date: REGEX(.*)
 05. GET subs checking user1 but password offuscated
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 305
+Content-Length: 321
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -324,6 +324,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqttCustom": {
             "passwd": "*****",
             "qos": 0,
@@ -365,7 +366,7 @@ Date: REGEX(.*)
 08. GET subs checking user10 but password offuscated
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 322
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -375,6 +376,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqttCustom": {
             "passwd": "*****",
             "qos": 0,
@@ -416,7 +418,7 @@ Date: REGEX(.*)
 11. GET subs checking user and password are not shown
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 289
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -426,6 +428,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqttCustom": {
             "qos": 0,
             "topic": "/orion",
@@ -465,7 +468,7 @@ Date: REGEX(.*)
 14. GET subs checking user1 but password offuscated
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 305
+Content-Length: 321
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -475,6 +478,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "mqttCustom": {
             "passwd": "*****",
             "qos": 0,

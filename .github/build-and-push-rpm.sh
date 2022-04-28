@@ -7,10 +7,12 @@ type=$2
 
 if [ "$type" == "release" ]
 then
-  type="1"
+  rel="1"
+else
+  rel=$type
 fi
 
-docker run -e BROKER_RELEASE=$type -v $(pwd):/opt/orion --workdir=/opt/orion fiware/orion-ci:rpm8 make rpm
+docker run -e BROKER_RELEASE=$rel -v $(pwd):/opt/orion --workdir=/opt/orion fiware/orion-ci:rpm8 make rpm
 
 for file in "$(pwd)/rpm/RPMS/x86_64"/*
 do

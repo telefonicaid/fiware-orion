@@ -2,6 +2,7 @@
 
 * [禁止されている文字](#forbidden-characters)
 * [属性値の更新演算子](#update-operators-for-attribute-values)
+* [メタデータ更新セマンティクス](#metadata-update-semantics)
 * [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
@@ -12,15 +13,18 @@
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
+* [`alterationType` 属性](#alterationtype-attribute)
 * [`actionType` メタデータ](#actiontype-metadata)
 * [`ignoreType` メタデータ](#ignoretype-metadata)
 * [`noAttrDetail` オプション](#noattrdetail-option)
 * [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
+* [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
 * [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
@@ -71,6 +75,28 @@ POST /v2/entities/E/attrs/A
 この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
 アプリケーションの競合状態を回避するために役立ちます。
 詳細は[このドキュメント](update_operators.md)を参照してください。
+
+[トップ](#top)
+
+<a name="metadata-update-semantics"></a>
+## メタデータ更新セマンティクス
+
+Orion Context Broker (および関連する `overrideMetadata` オプション)
+で使用されるメタデータ更新セマンティクスについては、
+[ドキュメントのこのセクション](metadata.md#updating-metadata)
+で詳しく説明しています。
+
+さらに、NGSIv2 仕様セクション "Partial Representations" (部分表現) から:
+
+> 属性 `metadata` はリクエストで省略できます。つまり、属性に関連付けられた
+> メタデータ要素はありません。
+`overrideMetadata` が使用されているかどうかに応じて、この文には2つの解釈があります:
+
+* `overrideMetadata` が使用されていない場合 (デフォルトの動作)、"...属性に
+  関連付けられたメタデータ要素がないことを意味します。**更新する必要があります**"
+  と解釈されます
+* `overrideMetadata` が使用されている場合、"...属性に関連付けられたメタデータ要素が
+  ないことを意味します。**属性の更新の結果として**" と解釈されます
 
 [トップ](#top)
 
@@ -314,6 +340,26 @@ Orion が NGSIv2 サブスクリプション・ペイロードで実装する特
 
 [トップ](#top)
 
+<a name="alterationtype-attribute"></a>
+## `alterationType` 属性
+
+NGSIv2 仕様の "組み込み属性" (Builtin Attributes) セクションで説明されている属性から、Orion は
+`alterationType` 属性を実装します。
+
+この属性は通知でのみ使用でき (`GET /v2/entities?attrs=alterationType` などのクエリでは無視されます)、
+次の値をとることができます:
+
+* `entityCreate` 通知をトリガーする更新がエンティティ作成操作の場合
+* `entityUpdate` 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
+* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合
+* `entityDelete` 通知をトリガーする更新がエンティティ削除操作であった場合
+
+この属性のタイプは `Text` です。
+
+この組み込み属性は、[変更タイプに基づくサブスクリプション](subscriptions_alttype.md) 機能に関連しています。
+
+[トップ](#top)
+
 <a name="actiontype-metadata"></a>
 ## `actionType` メタデータ
 
@@ -397,6 +443,17 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 [トップ](#top)
 
+<a name="subscriptions-based-in-alteration-type"></a>
+## 変更タイプ (alteration type) に基づくサブスクリプション
+
+NGSIv2 の仕様に従ってサブスクリプションの `conditions` フィールドで許可されるサブフィールドとは別に、
+Orionは `alterationTypes` フィールドをサポートして、サブスクリプションがトリガーされる変更
+(エンティティの作成、エンティティの変更など) を指定します。
+
+詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
+
+[トップ](#top)
+
 <a name="custom-notifications-without-payload"></a>
 ## ペイロードなしのカスタム通知
 
@@ -429,6 +486,71 @@ Orion は、NGSIv2 仕様で説明されているものとは別に、サブス�
 例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
 A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
 が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
+
+[トップ](#top)
+
+<a name="covered-subscriptions"></a>
+## カバード・サブスクリプション (Covered subscriptions)
+
+`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれる
+エンティティ属性のサブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを
+通知します。たとえば、サブスクリプションが次のようになっている場合:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness`
+属性は通知に含まれません。
+
+このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの
+属性 (この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
+
+通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で
+"カバーされる" (covered) という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、
+受信したすべての通知で常に同じ着信属性のセットを必要とする通知エンドポイントに役立ちます。
+
+対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに
+注意してください。 したがって、次の場合は無効です:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
+発生します:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
 
 [トップ](#top)
 
@@ -554,6 +676,10 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+同じ効果については、`entityChange` [変更タイプ](subscriptions_alttype.md) (alteration type)
+も確認してください。ただし、更新リクエストに `forcedUpdate` オプションが含まれているかどうかに
+関係なく、サブスクリプションに適用されます。
 
 [Top](#top)
 

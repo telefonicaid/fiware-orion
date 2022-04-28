@@ -139,7 +139,7 @@ Date: REGEX(.*)
 04. Get /v2/subscriptions, see the subscription from step 03
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 240
+Content-Length: 256
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -150,6 +150,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "method": "PUT",
                 "url": "${abc}"
