@@ -568,14 +568,13 @@ HttpStatusCode mongoEntityTypes
   TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
   // Processing result to build response
-  // Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
   orion::BSONObj resultItem;
   unsigned int docs = 0;
   while (cursor.next(&resultItem))
   {
-    if ((docs < offset) || (docs > offset + limit - 1))
+    // Note limit == 0 has to be checked individually given doc > offset + limit - 1 doesn't work if offset == 0 with unsigned int */
+    if ((limit == 0) || (docs < offset) || (docs > offset + limit - 1))
     {
-      LM_W(("FGM: INSIDE"));
       docs++;
       continue;
     }
@@ -630,10 +629,7 @@ HttpStatusCode mongoEntityTypes
       }
     }
 
-    if (limit != 0)
-    {
-      responseP->entityTypeVector.push_back(entityType);
-    }
+    responseP->entityTypeVector.push_back(entityType);
   }
 
   orion::releaseMongoConnection(connection);
