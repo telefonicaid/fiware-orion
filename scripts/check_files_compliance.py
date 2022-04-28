@@ -143,7 +143,9 @@ def ignore(root, file):
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
                                       or file == 'cmake2junit.xsl'):
         return True
-    if 'acceptance' in root and (file.endswith('.txt') or file.endswith('.json')):
+    
+    # For several requirements.txt files we have in this repo
+    if ('acceptance' or in root or 'doc' in root) and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False
