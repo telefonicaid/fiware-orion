@@ -1589,7 +1589,7 @@ bool entitiesQuery
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  int             errType;
+  int             errType = ON_NEXT_NO_ERROR;
   std::string     nextErr;
 
   /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
