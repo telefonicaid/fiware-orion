@@ -268,7 +268,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       ncr.subscriptionId  = subscriptionId;
       ncr.contextElementResponseVector.push_back(&cer);
 
-      if (renderFormat == NGSI_V1_LEGACY)
+      if (renderFormat == RF_LEGACY)
       {
         payload = ncr.render(V1, false);
       }
@@ -287,10 +287,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         return paramsV;  // empty vector
       }
 
-      char* pload  = curl_unescape(payload.c_str(), payload.length());
-      payload      = std::string(pload);
-      renderFormat = NGSI_V2_CUSTOM;
-      mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+      char* pload   = curl_unescape(payload.c_str(), payload.length());
+
+      payload       = std::string(pload);
+      renderFormat  = RF_CUSTOM;
+      mimeType      = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+
       curl_free(pload);
     }
 
@@ -526,10 +528,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     std::string payloadString;
 
-    if (renderFormat == NGSI_V1_LEGACY)
+    if (renderFormat == RF_LEGACY)
       payloadString = ncrP->render(V2, false);
-    else if ((renderFormat >= NGSI_LD_V1_NORMALIZED) && (renderFormat <= NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+    else
     {
+      //
+      // WARNING: Old V2 used: payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+      // Perhaps do that if (ldContext == NULL) ?
+      //
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
       if (subP == NULL)
       {
@@ -556,8 +562,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       payloadString = buf;
       toFree        = buf;
     }
-    else
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
 
     /* Parse URL */
     std::string  host;
@@ -639,31 +643,19 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     // This depends on what the subscriber asked for.
     // If "x-ngsiv2-normalized-compacted" or "x-ngsiv2-keyValues-compacted", then the link is necessary.
     //
+
+    //
+    // WARNING - Perhaps the Link should only be added if (subP->ldContext != "")   ?
+    // [ In the end, when mongoc is fully used, this function won't be used for NGSI-LD operations ]
+    //
     if (subP != NULL)
     {
-      if ((renderFormat == NGSI_LD_V1_NORMALIZED)            ||
-          (renderFormat == NGSI_LD_V1_KEYVALUES)             ||
-          (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT) ||
-          (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+      if ((httpInfo.mimeType == JSON) && (renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_KEYVALUES))
       {
-        //
-        // Subscriptions created using ngsi-ld have a context - those from APIV1/2 do not
-        // This code adds the "Link" header if needed
-        //
-        if (httpInfo.mimeType == JSON)
-        {
-          if (subP->ldContext == "")
-            params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
-          else
-            params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
-        }
+        if (subP->ldContext == "")
+          params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
         else
-        {
-          //
-          // Not that this would ever happen, but, what do we do here ?
-          // Best choice seems to be to simply send the notification without the Link header.
-          //
-        }
+          params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
       }
     }
 

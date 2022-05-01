@@ -74,7 +74,7 @@ bool pCheckNotification(KjNode* notificationP, bool patch)
       PCHECK_STRING_EMPTY(formatP, 0, NULL, SubscriptionNotificationFormatPath, 400);
 
       RenderFormat rf = stringToRenderFormat(formatP->value.s, true);
-      if ((rf == NO_FORMAT) || (rf == NGSI_V1_LEGACY))
+      if ((rf == RF_NONE) || (rf == RF_LEGACY))
       {
         orionldError(OrionldBadRequestData, "Invalid value for 'Subscription::notification::format'", formatP->value.s, 400);
         return false;

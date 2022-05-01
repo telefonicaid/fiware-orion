@@ -157,8 +157,8 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 {
   kjTreeLog(entityP, "Fixing Entity");
 
-  bool simplified = (subP->renderFormat == NGSI_LD_V1_KEYVALUES) || (subP->renderFormat == NGSI_V2_KEYVALUES);
-  bool concise    = (subP->renderFormat == NGSI_LD_V1_CONCISE);
+  bool simplified = (subP->renderFormat == RF_KEYVALUES);
+  bool concise    = (subP->renderFormat == RF_CONCISE);
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -213,9 +213,9 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
         eqForDot(saP->name);
         saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
 
-        if ((subP->renderFormat == NGSI_LD_V1_KEYVALUES) || (subP->renderFormat == NGSI_V2_KEYVALUES))
+        if (subP->renderFormat == RF_KEYVALUES)
           attributeToSimplified(saP);
-        else if (subP->renderFormat == NGSI_LD_V1_CONCISE)
+        else if (subP->renderFormat == RF_CONCISE)
           attributeToConcise(saP, &asSimplified);  // asSimplified is not used down here
       }
     }
@@ -320,10 +320,10 @@ KjNode* notificationTreeForNgsiV2(CachedSubscription* subP, KjNode* entityP)
   bool    keyValues            = false;
   bool    compact              = false;
 
-  if ((subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  if ((subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
     keyValues = true;
 
-  if ((subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
     compact = true;
 
   KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(entityP, keyValues, compact);
@@ -448,7 +448,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   LM_TMP(("KZ: Subscription '%s': renderFormat: '%s'", mAltP->subP->subscriptionId, renderFormatToString(mAltP->subP->renderFormat)));
   LM_TMP(("KZ: contextP at %p", mAltP->subP->contextP));
   kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
-  bool    ngsiv2     = (mAltP->subP->renderFormat >= NGSI_LD_V1_V2_NORMALIZED);
+  bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
 
   LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
@@ -482,7 +482,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   size_t            requestHeaderLen;
 
   // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
-  if (mAltP->subP->renderFormat < NGSI_LD_V1_V2_NORMALIZED)
+  if (mAltP->subP->renderFormat < RF_CROSS_APIS_NORMALIZED)
     requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
                                 mAltP->subP->rest,
                                 mAltP->subP->subscriptionId);
@@ -557,22 +557,22 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   //
   // Ngsild-Attribute-Format / Ngsiv1-Attrsformat
   //
-  if (mAltP->subP->renderFormat == NGSI_LD_V1_CONCISE)
+  if (mAltP->subP->renderFormat == RF_CONCISE)
   {
     ioVec[5].iov_base = (void*) conciseHeader;
     ioVec[5].iov_len  = 34;
   }
-  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_KEYVALUES) || (mAltP->subP->renderFormat == NGSI_V2_KEYVALUES))
+  else if (mAltP->subP->renderFormat == RF_KEYVALUES)
   {
     ioVec[5].iov_base = (void*) simplifiedHeader;
     ioVec[5].iov_len  = 37;
   }
-  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED) || (mAltP->subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT))
+  else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_NORMALIZED) || (mAltP->subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT))
   {
     ioVec[5].iov_base = (void*) normalizedHeaderNgsiV2;
     ioVec[5].iov_len  = 32;
   }
-  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (mAltP->subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
   {
     ioVec[5].iov_base = (void*) keyValuesHeaderNgsiV2;
     ioVec[5].iov_len  = 31;

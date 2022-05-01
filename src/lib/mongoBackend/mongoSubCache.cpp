@@ -152,19 +152,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
-  {
     cSubP->ldContext = ldContext;
-
-    if (renderFormat == NGSI_V2_NORMALIZED)
-      renderFormat = NGSI_LD_V1_NORMALIZED;
-    else if (renderFormat == NGSI_V2_KEYVALUES)
-      renderFormat = NGSI_LD_V1_KEYVALUES;
-    else
-    {
-      LM_W(("No render format in DB for NGSI-LD subscription - using NGSI-LD NORMALIZED"));
-      renderFormat = NGSI_LD_V1_NORMALIZED;
-    }
-  }
 
   cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(&sub, CSUB_SERVICE_PATH) : "/");

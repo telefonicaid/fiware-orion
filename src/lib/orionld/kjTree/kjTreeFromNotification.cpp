@@ -95,7 +95,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   KjNode*          nodeP;
   KjNode*          rootP             = kjObject(orionldState.kjsonP, NULL);
   OrionldContext*  contextP          = orionldContextCacheLookup(context);
-  bool             crossNotification = (renderFormat >= NGSI_LD_V1_V2_NORMALIZED);           // NGSI_LD_V1_V2_[NORMALIZED|KEYVALUES|NORMALIZED_COMPACT|KEYVALUES_COMPACT]
+  bool             crossNotification = (renderFormat >= RF_CROSS_APIS_NORMALIZED);           // RF_CROSS_APIS_[NORMALIZED|KEYVALUES|NORMALIZED_COMPACT|KEYVALUES_COMPACT]
 
   if (crossNotification == false)  // Meaning: NGSI-LD format
   {
@@ -116,7 +116,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   kjChildAdd(rootP, nodeP);
 
   // context - if JSONLD
-  if ((mimeType == JSONLD) && (renderFormat != NGSI_LD_V1_V2_NORMALIZED))
+  if ((mimeType == JSONLD) && (renderFormat != RF_CROSS_APIS_NORMALIZED))
   {
     if (context == NULL)
       nodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
@@ -167,7 +167,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // entity type - Mandatory URI
-    if ((renderFormat != NGSI_LD_V1_V2_NORMALIZED) && (renderFormat != NGSI_LD_V1_V2_KEYVALUES))
+    if ((renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_KEYVALUES))
     {
       alias = orionldContextItemAliasLookup(contextP, ceP->entityId.type.c_str(), NULL, NULL);
       nodeP = kjString(orionldState.kjsonP, "type", alias);
@@ -206,7 +206,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     //
     // Concise - transform/simplify the normalized format
     //
-    if (renderFormat == NGSI_LD_V1_CONCISE)
+    if (renderFormat == RF_CONCISE)
       kjEntityNormalizedToConcise(objectP, NULL);
   }
 

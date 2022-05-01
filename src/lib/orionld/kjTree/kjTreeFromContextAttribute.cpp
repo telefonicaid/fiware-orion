@@ -87,20 +87,11 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
-  bool     ngsild    = (renderFormat == NGSI_LD_V1_NORMALIZED)             ||
-                       (renderFormat == NGSI_LD_V1_KEYVALUES)              ||
-                       (renderFormat == NGSI_LD_V1_V2_NORMALIZED)          ||
-                       (renderFormat == NGSI_LD_V1_V2_KEYVALUES)           ||
-                       (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT)  ||
-                       (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT);
+
   //
-  // We want shortnames for:
-  //   NGSI_LD_V1_NORMALIZED
-  //   NGSI_LD_V1_KEYVALUES
-  //   NGSI_LD_V1_V2_NORMALIZED_COMPACT
-  //   NGSI_LD_V1_V2_KEYVALUES_COMPACT
+  // We want shortnames unless it's Cross API and not COMPACT
   //
-  if ((renderFormat != NGSI_LD_V1_V2_NORMALIZED) && (renderFormat != NGSI_LD_V1_V2_KEYVALUES))
+  if ((renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_KEYVALUES))
   {
     char* alias = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
@@ -112,7 +103,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   //
   // keyValues
   //
-  if ((renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  if ((renderFormat == RF_KEYVALUES) || (renderFormat == RF_CROSS_APIS_KEYVALUES) || (renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
   {
     //
     // FIXME: This almost identical switch is in many places. Time to unite ...
@@ -186,7 +177,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     kjChildAdd(aTopNodeP, typeNodeP);
 
-    if ((strcmp(typeNodeP->value.s, "Relationship") == 0) && (ngsild == true))
+    if (strcmp(typeNodeP->value.s, "Relationship") == 0)
       isRelationship = true;
   }
 
@@ -244,7 +235,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   //   Empty of not, it is always rendered
   //
   KjNode* mdArrayNodeP = NULL;
-  if ((renderFormat == NGSI_LD_V1_V2_NORMALIZED) || (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT))
+  if ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT))
   {
     mdArrayNodeP = kjObject(orionldState.kjsonP, "metadata");
     kjChildAdd(aTopNodeP, mdArrayNodeP);
@@ -299,10 +290,9 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
       if (strcmp(mdP->type.c_str(), "Relationship") == 0)
       {
-        if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_CONCISE))
-          valueNodeP = kjString(orionldState.kjsonP, "object", mdP->stringValue.c_str());
-        else
-          valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
+        const char* valueName = (renderFormat < RF_CROSS_APIS_NORMALIZED)? "object" : "value";  // Not Cross API: "object"
+
+        valueNodeP = kjString(orionldState.kjsonP, valueName, mdP->stringValue.c_str());
       }
       else if (strcmp(mdP->type.c_str(), "Property") == 0)
       {

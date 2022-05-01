@@ -228,9 +228,9 @@ static void optionsParse(const char* options)
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
     orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when /simplified/ output format is selected", 400);
   else if (orionldState.uriParamOptions.keyValues)
-    orionldState.out.format = NGSI_LD_V1_KEYVALUES;
+    orionldState.out.format = RF_KEYVALUES;
   else if (orionldState.uriParamOptions.concise)
-    orionldState.out.format = NGSI_LD_V1_CONCISE;
+    orionldState.out.format = RF_CONCISE;
 }
 
 

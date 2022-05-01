@@ -152,7 +152,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   // Default values
   //
-  subP->attrsFormat                        = NGSI_LD_V1_KEYVALUES;
+  subP->attrsFormat                        = RF_NORMALIZED;
   subP->descriptionProvided                = false;
   subP->expires                            = 0;
   subP->throttling                         = 0;

@@ -185,7 +185,7 @@ static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant
   nP->lastSuccess       = rP->hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(rP, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
-  subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : RF_LEGACY;
 
 
   //

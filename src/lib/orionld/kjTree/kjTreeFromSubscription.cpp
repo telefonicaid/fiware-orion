@@ -341,10 +341,10 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   }
 
   // notification::format
-  if (subscriptionP->attrsFormat == NGSI_V2_KEYVALUES)
-    nodeP = kjString(orionldState.kjsonP, "format", "keyValues");
-  else
-    nodeP = kjString(orionldState.kjsonP, "format", "normalized");
+  if (subscriptionP->attrsFormat == RF_KEYVALUES)    nodeP = kjString(orionldState.kjsonP, "format", "keyValues");
+  else if (subscriptionP->attrsFormat == RF_CONCISE) nodeP = kjString(orionldState.kjsonP, "format", "concise");
+  else                                               nodeP = kjString(orionldState.kjsonP, "format", "normalized");
+
   kjChildAdd(notificationP, nodeP);
 
   // notification::endpoint

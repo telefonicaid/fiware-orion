@@ -209,16 +209,12 @@ bool subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, Orion
 
     if (formatP != NULL)
     {
-      LM_TMP(("====================================================="));
-      LM_TMP(("format: '%s'", formatP->value.s));
       cSubP->renderFormat = stringToRenderFormat(formatP->value.s, true);
-      if (cSubP->renderFormat == NO_FORMAT)
-        cSubP->renderFormat = NGSI_LD_V1_NORMALIZED;
-      LM_TMP(("cSubP->renderFormat: %d", cSubP->renderFormat));
-      LM_TMP(("====================================================="));
+      if (cSubP->renderFormat == RF_NONE)
+        cSubP->renderFormat = RF_NORMALIZED;
     }
     else
-      cSubP->renderFormat = NGSI_LD_V1_NORMALIZED;
+      cSubP->renderFormat = RF_NORMALIZED;
 
     if (endpointP != NULL)  // pCheckSubscription already ensures "endpoint" is present !!!
     {

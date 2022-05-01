@@ -33,7 +33,7 @@
 *
 * DEFAULT_RENDER_FORMAT - 
 */
-#define DEFAULT_RENDER_FORMAT         NGSI_V2_NORMALIZED
+#define DEFAULT_RENDER_FORMAT         RF_NORMALIZED
 
 
 
@@ -43,20 +43,18 @@
 */
 typedef enum RenderFormat
 {
-  NO_FORMAT                         = 0,
-  NGSI_V1_LEGACY                    = 1,
-  NGSI_V2_NORMALIZED                = 2,
-  NGSI_V2_KEYVALUES                 = 3,
-  NGSI_V2_VALUES                    = 4,
-  NGSI_V2_UNIQUE_VALUES             = 5,
-  NGSI_V2_CUSTOM                    = 6,
-  NGSI_LD_V1_NORMALIZED             = 10,  // normalized (default) - but inside an NGSI-LD subscription
-  NGSI_LD_V1_KEYVALUES              = 11,  // keyValues - but inside an NGSI-LD subscription
-  NGSI_LD_V1_CONCISE                = 12,  // concise format - as compact as possible while still lossless
-  NGSI_LD_V1_V2_NORMALIZED          = 13,  // x-ngsiv2-normalized
-  NGSI_LD_V1_V2_KEYVALUES           = 14,  // x-ngsiv2-keyValues
-  NGSI_LD_V1_V2_NORMALIZED_COMPACT  = 15,  // x-ngsiv2-normalized-compacted
-  NGSI_LD_V1_V2_KEYVALUES_COMPACT   = 16   // x-ngsiv2-keyValues-compacted
+  RF_NONE                           = 0,   // Invalid
+  RF_LEGACY                         = 1,   // NGSIv1 only
+  RF_NORMALIZED                     = 2,   // DEFAULT
+  RF_CONCISE                        = 3,   // NGSI-LD Only - Concise format - as compact as possible while still lossless
+  RF_KEYVALUES                      = 4,   // keyValues/Simplified
+  RF_VALUES                         = 5,   // NGSIv2 only  - just the value, not even the key
+  RF_UNIQUE_VALUES                  = 6,   // NGSIv2 only  - just the value, not even the key, and no repitition of values
+  RF_CUSTOM                         = 7,   // NGSIv2 only  - custom format
+  RF_CROSS_APIS_NORMALIZED          = 12,  // NGSI-LD Only - x-ngsiv2-normalized
+  RF_CROSS_APIS_KEYVALUES           = 13,  // NGSI-LD Only - x-ngsiv2-keyValues
+  RF_CROSS_APIS_NORMALIZED_COMPACT  = 22,  // NGSI-LD Only - x-ngsiv2-normalized-compacted
+  RF_CROSS_APIS_KEYVALUES_COMPACT   = 23   // NGSI-LD Only - x-ngsiv2-keyValues-compacted
 } RenderFormat;
 
 

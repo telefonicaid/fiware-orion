@@ -72,7 +72,7 @@ std::string NotifyContextRequest::toJson
   bool                             blacklist
 )
 {
-  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
+  if ((renderFormat != RF_NORMALIZED) && (renderFormat != RF_KEYVALUES) && (renderFormat != RF_VALUES))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
