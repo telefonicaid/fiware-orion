@@ -1,4 +1,4 @@
-z/*
+/*
 *
 * Copyright 2019 FIWARE Foundation e.V.
 *
