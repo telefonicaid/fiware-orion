@@ -163,7 +163,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================
@@ -199,7 +199,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================

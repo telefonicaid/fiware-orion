@@ -121,6 +121,7 @@ typedef struct NotifierInfo
 struct CachedSubscription
 {
   char*                       subscriptionId;
+  char*                       description;
   std::string                 name;
 
   char*                       url;       // Copy of httpInfo.url (parsed and destroyed) - allocated and must be freed
@@ -146,6 +147,7 @@ struct CachedSubscription
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
   QNode*                      qP;
+  char*                       qText;  // Note that NGSIv2/m0ngoBackend q/mq are inside SubscriptionExpression
 
   bool                        isActive;
   std::string                 status;

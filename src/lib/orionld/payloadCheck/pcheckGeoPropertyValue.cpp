@@ -78,7 +78,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
     {
       DUPLICATE_CHECK(coordinatesNodeP, "geo-location::coordinates", nodeP);
       // Point, LineString, Polygon ... in the first level they're all Arrays
-      ARRAY_CHECK(coordinatesNodeP, "the 'coordinates' field of a GeoJSON object must be a JSON Array");
+      ARRAY_CHECK(coordinatesNodeP, "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)");
     }
     else
     {

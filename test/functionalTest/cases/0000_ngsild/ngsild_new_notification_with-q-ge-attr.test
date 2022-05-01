@@ -667,13 +667,13 @@ Date: REGEX(.*)
 31. Attempt to create a subscription S3 with q=P1>=true - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 186
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "values of type /Bool/ not supported for operator /GreaterThanOrEqual/",
-    "title": "Invalid value for Subscription::q",
+    "detail": "invalid operator for boolean value",
+    "title": "Invalid Q-Filter",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -82,7 +82,7 @@ static bool pcheckGeoMultiPoint(KjNode* geoPointCoordinatesNodeP)
 {
   if (geoPointCoordinatesNodeP->type != KjArray)
   {
-    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array", 400);
+    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array (or a String)", 400);
     return false;
   }
 
@@ -313,6 +313,15 @@ static bool pcheckGeoMultiPolygon(KjNode* geoPointCoordinatesNodeP)
 //
 bool pcheckGeoqCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType)
 {
+  //
+  // It's either an Array OR A STRING !!!
+  //
+  if (coordinatesP->type == KjString)
+  {
+    // FIXME: make sure the coordinates string is correct!
+    return true;
+  }
+
   switch (geoType)
   {
   case GeoJsonPoint:            return pcheckGeoPoint(coordinatesP);           break;

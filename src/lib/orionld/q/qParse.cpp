@@ -385,6 +385,16 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
 
   while (qLexP != endNodeP)
   {
+    if ((compOpP != NULL) && ((qLexP->type == QNodeTrueValue) || (qLexP->type == QNodeFalseValue)))
+    {
+      if ((compOpP->type != QNodeEQ) && (compOpP->type != QNodeNE))
+      {
+        *titleP   = (char*) "Invalid Q-Filter";
+        *detailsP = (char*) "invalid operator for boolean value";
+        return NULL;
+      }
+    }
+
     switch (qLexP->type)
     {
     case QNodeOpen:

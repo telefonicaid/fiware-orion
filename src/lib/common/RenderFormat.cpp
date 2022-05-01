@@ -80,6 +80,7 @@ RenderFormat stringToRenderFormat(const char* s, bool noDefault)
   if (strcmp(s, "legacy")       == 0) return NGSI_V1_LEGACY;
   if (strcmp(s, "normalized")   == 0) return NGSI_V2_NORMALIZED;
   if (strcmp(s, "keyValues")    == 0) return NGSI_V2_KEYVALUES;
+  if (strcmp(s, "simplified")   == 0) return NGSI_V2_KEYVALUES;
   if (strcmp(s, "concise")      == 0) return NGSI_LD_V1_CONCISE;
   if (strcmp(s, "values")       == 0) return NGSI_V2_VALUES;
   if (strcmp(s, "uniqueValues") == 0) return NGSI_V2_UNIQUE_VALUES;

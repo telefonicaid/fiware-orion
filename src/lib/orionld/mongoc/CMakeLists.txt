@@ -27,14 +27,17 @@ SET (SOURCES
     mongocEntityLookup.cpp
     mongocEntityUpdate.cpp
     mongocEntityReplace.cpp
+    mongocEntityRetrieve.cpp
+    mongocEntityInsert.cpp
     mongocKjTreeFromBson.cpp
     mongocKjTreeToBson.cpp
     mongocContextCacheGet.cpp
     mongocContextCachePersist.cpp
     mongocContextCacheDelete.cpp
     mongocRegistrationLookup.cpp
-    mongocEntityRetrieve.cpp
-    mongocEntityInsert.cpp
+    mongocSubscriptionLookup.cpp
+    mongocSubscriptionExists.cpp
+    mongocSubscriptionInsert.cpp
 )
 
 # Include directories

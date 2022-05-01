@@ -157,7 +157,7 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 {
   kjTreeLog(entityP, "Fixing Entity");
 
-  bool simplified = (subP->renderFormat == NGSI_LD_V1_KEYVALUES);
+  bool simplified = (subP->renderFormat == NGSI_LD_V1_KEYVALUES) || (subP->renderFormat == NGSI_V2_KEYVALUES);
   bool concise    = (subP->renderFormat == NGSI_LD_V1_CONCISE);
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -168,6 +168,7 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
     // compaction of the value of 'type' for the Entity
     if (strcmp(attrP->name, "type") == 0)
     {
+      LM_TMP(("KZ orionldContextItemAliasLookup(contextP:%p, type:'%s')", subP->contextP, attrP->value.s));
       attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);
       continue;
     }
@@ -212,7 +213,7 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
         eqForDot(saP->name);
         saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
 
-        if (subP->renderFormat == NGSI_LD_V1_KEYVALUES)
+        if ((subP->renderFormat == NGSI_LD_V1_KEYVALUES) || (subP->renderFormat == NGSI_V2_KEYVALUES))
           attributeToSimplified(saP);
         else if (subP->renderFormat == NGSI_LD_V1_CONCISE)
           attributeToConcise(saP, &asSimplified);  // asSimplified is not used down here
@@ -444,6 +445,8 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 {
+  LM_TMP(("KZ: Subscription '%s': renderFormat: '%s'", mAltP->subP->subscriptionId, renderFormatToString(mAltP->subP->renderFormat)));
+  LM_TMP(("KZ: contextP at %p", mAltP->subP->contextP));
   kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
   bool    ngsiv2     = (mAltP->subP->renderFormat >= NGSI_LD_V1_V2_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
@@ -510,9 +513,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 
 
   //
-  // Headers from Subscription::notification::endpoint::receiverInfo (or custom notification in NGSIv2 ...)
+  // Headers from Subscription::notification::endpoint::receiverInfo+headers (or custom notification in NGSIv2 ...)
   //
   headers += mAltP->subP->httpInfo.headers.size();
+  headers += mAltP->subP->httpInfo.receiverInfo.size();
 
 
   // Let's limit the number of headers to 50
@@ -540,8 +544,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   }
   else if (ngsiv2 == false)  // Add Link header - but not if NGSIv2 Cross Notification
   {
-    char linkHeader[512];
-    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", mAltP->subP->ldContext.c_str());
+    char         linkHeader[512];
+    const char*  link = (mAltP->subP->ldContext == "")? ORIONLD_CORE_CONTEXT_URL_V1_0 : mAltP->subP->ldContext.c_str();
+
+    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", link);
 
     ioVec[headerIx].iov_base = linkHeader;
     ioVec[headerIx].iov_len  = strlen(linkHeader);
@@ -556,7 +562,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[5].iov_base = (void*) conciseHeader;
     ioVec[5].iov_len  = 34;
   }
-  else if (mAltP->subP->renderFormat == NGSI_LD_V1_KEYVALUES)
+  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_KEYVALUES) || (mAltP->subP->renderFormat == NGSI_V2_KEYVALUES))
   {
     ioVec[5].iov_base = (void*) simplifiedHeader;
     ioVec[5].iov_len  = 37;
@@ -616,7 +622,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   }
 
   //
-  // FIXME: Store receiverInfo in a better way - see issue #1095
+  // FIXME: Store headers in a better way - see issue #1095
   //
   for (std::map<std::string, std::string>::const_iterator it = mAltP->subP->httpInfo.headers.begin(); it != mAltP->subP->httpInfo.headers.end(); ++it)
   {
@@ -628,7 +634,21 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
     ioVec[headerIx].iov_base = buf;
     ++headerIx;
-    LM_TMP(("receiverInfo header '%s': '%s'", key, value));
+    LM_TMP(("HttpInfo header '%s': '%s'", key, value));
+  }
+
+  // receiverInfo
+  for (unsigned int ix = 0; ix < mAltP->subP->httpInfo.receiverInfo.size(); ix++)
+  {
+    const char* key    = mAltP->subP->httpInfo.receiverInfo[ix]->key;
+    const char* value  = mAltP->subP->httpInfo.receiverInfo[ix]->value;
+    int         len    = strlen(key) + strlen(value) + 10;
+    char*       buf    = kaAlloc(&orionldState.kalloc, len);
+
+    ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
+    ioVec[headerIx].iov_base = buf;
+    ++headerIx;
+    LM_TMP(("HttpInfo receiverInfo '%s': '%s'", key, value));
   }
 
 
@@ -656,16 +676,16 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 
 
   // Connect
-  LM_TMP(("KZ: Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
+  LM_TMP(("Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
   int fd = orionldServerConnect(mAltP->subP->ip, mAltP->subP->port);
 
   if (fd == -1)
   {
-    LM_E(("KZ: Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
+    LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
     subscriptionFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
     return -1;
   }
-  LM_TMP(("KZ: Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
+  LM_TMP(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
 
   // Send
   int nb;

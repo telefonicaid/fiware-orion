@@ -377,8 +377,8 @@ bool orionldPostEntitiesWithMongoBackend(void)
 //
 bool orionldPostEntities(void)
 {
-  if ((experimental == false) || (orionldState.in.lang != NULL))                      // Some day ...
-    return orionldPostEntitiesWithMongoBackend();  // ... this will be removed!! :)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+    return orionldPostEntitiesWithMongoBackend();
 
   char*    entityId;
   char*    entityType;
@@ -390,7 +390,7 @@ bool orionldPostEntities(void)
 
 
   //
-  // If the entity already exists, an error is returned
+  // If the entity already exists, a "409 Conflict" is returned
   //
   if (mongocEntityLookup(entityId) != NULL)
   {

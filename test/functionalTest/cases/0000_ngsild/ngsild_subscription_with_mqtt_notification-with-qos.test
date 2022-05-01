@@ -179,7 +179,7 @@ MongoDB server version: REGEX(.*)
 		"MQTT-QoS" : "2"
 	},
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{

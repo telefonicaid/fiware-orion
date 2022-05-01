@@ -27,6 +27,7 @@ SET (SOURCES
     dbModelToApiEntity.cpp
     dbModelToApiAttribute.cpp
     dbModelToApiSubAttribute.cpp
+    dbModelFromApiSubscription.cpp
     dbModelPathComponentsSplit.cpp
 )
 

@@ -46,19 +46,20 @@ struct Notification
 {
   std::vector<std::string> attributes;
   std::vector<std::string> metadata;
+  HttpInfo                 httpInfo;
   bool                     blacklist;
   long long                timesSent;
   double                   lastNotification;
-  HttpInfo                 httpInfo;
-  std::string              toJson(const std::string& attrsFormat);
   double                   lastFailure;
   double                   lastSuccess;
+
+  std::string              toJson(const std::string& attrsFormat);
   Notification():
     attributes(),
+    httpInfo(),
     blacklist(false),
     timesSent(0),
     lastNotification(-1),
-    httpInfo(),
     lastFailure(-1),
     lastSuccess(-1)
   {}
@@ -117,6 +118,7 @@ struct Subscription
   int           timeInterval;
   std::string   csf;
   std::string   lang;
+  std::string   ldQ;
 #endif
 
   std::string   toJson();

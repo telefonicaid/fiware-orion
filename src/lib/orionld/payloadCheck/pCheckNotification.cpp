@@ -29,76 +29,80 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                      // LM_*
 
+#include "common/RenderFormat.h"                                // RenderFormat, stringToRenderFormat
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
-#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
-#include "orionld/payloadCheck/pcheckEndpoint.h"                // pcheckEndpoint
-#include "orionld/payloadCheck/pcheckNotification.h"            // Own interface
+#include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
+#include "orionld/payloadCheck/fieldPaths.h"                    // SubscriptionNotificationPath, ...
+#include "orionld/payloadCheck/pcheckEndpoint.h"                // pCheckEndpoint
+#include "orionld/payloadCheck/pCheckNotification.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckNotification -
+// pCheckNotification -
 //
-bool pcheckNotification(KjNode* notificationP, bool patch)
+bool pCheckNotification(KjNode* notificationP, bool patch)
 {
   KjNode* attributesP = NULL;
   KjNode* formatP     = NULL;
   KjNode* endpointP   = NULL;
 
-  OBJECT_CHECK(notificationP, "notification");
-  EMPTY_OBJECT_CHECK(notificationP, "notification");
+  PCHECK_OBJECT(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
+  PCHECK_OBJECT_EMPTY(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
 
   for (KjNode* nItemP = notificationP->value.firstChildP; nItemP != NULL; nItemP = nItemP->next)
   {
     if (strcmp(nItemP->name, "attributes") == 0)
     {
-      DUPLICATE_CHECK(attributesP, "attributes", nItemP);
-      ARRAY_CHECK(nItemP, "attributes");
-      EMPTY_ARRAY_CHECK(nItemP, "attributes");
+      PCHECK_DUPLICATE(attributesP, nItemP, 0, NULL, SubscriptionNotificationAttributesPath, 400);
+      PCHECK_ARRAY(nItemP, 0, NULL, SubscriptionNotificationAttributesPath, 400);
+      PCHECK_ARRAY_EMPTY(nItemP, 0, NULL, SubscriptionNotificationAttributesPath, 400);
 
       for (KjNode* attrP = nItemP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
-        STRING_CHECK(attrP, "attributes array item");
+        PCHECK_STRING(attrP, 0, NULL, SubscriptionNotificationAttributesItemPath, 400);
         attrP->value.s = orionldAttributeExpand(orionldState.contextP, attrP->value.s, true, NULL);
       }
     }
     else if (strcmp(nItemP->name, "format") == 0)
     {
-      DUPLICATE_CHECK(formatP, "format", nItemP);
-      STRING_CHECK(formatP, "format");
-      EMPTY_STRING_CHECK(formatP, "format");
-      if ((strcmp(formatP->value.s, "keyValues") != 0) && (strcmp(formatP->value.s, "normalized") != 0))
+      PCHECK_DUPLICATE(formatP, nItemP, 0, NULL, SubscriptionNotificationFormatPath, 400);
+      PCHECK_STRING(formatP, 0, NULL, SubscriptionNotificationFormatPath, 400);
+      PCHECK_STRING_EMPTY(formatP, 0, NULL, SubscriptionNotificationFormatPath, 400);
+
+      RenderFormat rf = stringToRenderFormat(formatP->value.s, true);
+      if ((rf == NO_FORMAT) || (rf == NGSI_V1_LEGACY))
       {
-        orionldError(OrionldBadRequestData, "Invalid value of 'format' (must be either 'keyValues' or 'normalized'", formatP->value.s, 400);
+        orionldError(OrionldBadRequestData, "Invalid value for 'Subscription::notification::format'", formatP->value.s, 400);
         return false;
       }
     }
     else if (strcmp(nItemP->name, "endpoint") == 0)
     {
-      DUPLICATE_CHECK(endpointP, "endpoint", nItemP);
-      OBJECT_CHECK(endpointP, "endpoint");
-      EMPTY_OBJECT_CHECK(endpointP, "endpoint");
+      PCHECK_DUPLICATE(endpointP, nItemP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
+      PCHECK_OBJECT(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
+      PCHECK_OBJECT_EMPTY(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       if (pcheckEndpoint(endpointP, patch) == false)
         return false;
     }
     else if (strcmp(nItemP->name, "status") == 0)
     {
-      orionldError(OrionldBadRequestData, "Invalid field for notification", "'status' is read-only", 400);
+      orionldError(OrionldBadRequestData, "Invalid field for Subscription::notification", "'status' is read-only", 400);
       return false;
     }
     else
     {
-      orionldError(OrionldBadRequestData, "Invalid field for notification", nItemP->name, 400);
+      orionldError(OrionldBadRequestData, "Invalid field for Subscription::notification", nItemP->name, 400);
       return false;
     }
   }
 
   if (endpointP == NULL)
   {
-    orionldError(OrionldBadRequestData, "Mandatory field missing", "endpoint", 400);
+    orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionNotificationEndpointPath, 400);
     return false;
   }
 

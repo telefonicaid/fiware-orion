@@ -67,7 +67,7 @@ static bool entityIdMatch(CachedSubscription* subP, const char* entityId, int eI
     }
   }
 
-  LM_TMP(("NFY: Sub '%s': no match due to Entity ID", subP->subscriptionId));
+  LM_TMP(("Sub '%s': no match due to Entity ID", subP->subscriptionId));
   return false;
 }
 
@@ -90,7 +90,7 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
       return true;
   }
 
-  LM_TMP(("NFY: Sub '%s': no match due to Entity Type", subP->subscriptionId));
+  LM_TMP(("Sub '%s': no match due to Entity Type", subP->subscriptionId));
   return false;
 }
 
@@ -187,12 +187,6 @@ static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchLis
   amP->altAttrP = aaP;
   amP->subP     = subP;
 
-
-  LM_TMP(("ALT: Inserting Match for entity '%s', sub '%s', AlterationType '%s' in the matchList",
-          amP->subP->subscriptionId,
-          amP->altP->entityId,
-          (amP->altAttrP != NULL)? orionldAlterationType(amP->altAttrP->alterationType) : "Entire Entity"));
-
   if (matchList == NULL)
   {
     matchList = amP;
@@ -223,7 +217,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
       ++matches;
     }
     else
-      LM_TMP(("NFY: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
+      LM_TMP(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
   }
 
   for (int aaIx = 0; aaIx < altP->alteredAttributes; aaIx++)
@@ -234,7 +228,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     while (nIx < watchAttrs)
     {
-      // LM_TMP(("NFY: Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
+      // LM_TMP(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
       if (strcmp(aaP->attrName, subP->notifyConditionV[nIx].c_str()) == 0)
         break;
       ++nIx;
@@ -246,7 +240,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[aaP->alterationType] == false)
     {
-      LM_TMP(("NFY: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
+      LM_TMP(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
       continue;
     }
 
@@ -255,7 +249,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
   }
 
   if (matches == 0)
-    LM_TMP(("NFY: Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
+    LM_TMP(("Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
 
   *matchesP += matches;
 
@@ -593,6 +587,8 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 {
   OrionldAlterationMatch*  matchList = NULL;
   int                      matches   = 0;
+  int                      altIx     = 0;  // DEBUG
+  int                      subIx     = 0;  // DEBUG
 
   //
   // Loop over each alteration, and check ALL SUBSCRIPTIONS in the cache for that alteration
@@ -602,27 +598,28 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   {
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
     {
+      ++subIx;
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
       {
-        LM_TMP(("NFY: Sub '%s' - no match due to tenant", subP->subscriptionId));
+        LM_TMP(("Sub '%s' - no match due to tenant", subP->subscriptionId));
         continue;
       }
 
       if (subP->isActive == false)
       {
-        LM_TMP(("NFY: Sub '%s' - no match due to isActive == false", subP->subscriptionId));
+        LM_TMP(("Sub '%s' - no match due to isActive == false", subP->subscriptionId));
         continue;
       }
 
       if (strcmp(subP->status.c_str(), "active") != 0)
       {
-        LM_TMP(("NFY: Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
+        LM_TMP(("Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
         continue;
       }
 
-      if (subP->expirationTime < orionldState.requestTime)
+      if ((subP->expirationTime > 0) && (subP->expirationTime < orionldState.requestTime))
       {
-        LM_TMP(("NFY: Sub '%s' - no match due to expiration", subP->subscriptionId));
+        LM_TMP(("Sub '%s' - no match due to expiration (now:%f, expired:%f)", subP->subscriptionId, orionldState.requestTime, subP->expirationTime));
         subP->status   = "expired";
         subP->isActive = false;
         continue;
@@ -630,7 +627,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       if ((subP->throttling > 0) && ((orionldState.requestTime - subP->lastNotificationTime) < subP->throttling))
       {
-        LM_TMP(("NFY: Sub '%s' - no match due to throttling", subP->subscriptionId));
+        LM_TMP(("Sub '%s' - no match due to throttling", subP->subscriptionId));
         continue;
       }
 
@@ -648,12 +645,15 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       // Might be we come from a sub-cache-refresh, and the subscription has a "q" but its "qP" hasn't been built
       // Only done if its an NGSI-LD operations AND if it's an NGSI-LD Subscription (has a contextP pointer)
       //
-      if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->expression.q != ""))
-        subP->qP = qBuild(subP->expression.q.c_str());
+      if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->qText != NULL))
+      {
+        LM_TMP(("Q: Building qP from: '%s'", subP->qText));
+        subP->qP = qBuild(subP->qText);
+      }
 
       if ((subP->qP != NULL) && (qMatch(subP->qP, altP) == false))
       {
-        LM_TMP(("NFY: Sub '%s' - no match due to q == '%s'", subP->subscriptionId, subP->expression.q.c_str()));
+        LM_TMP(("Sub '%s' - no match due to q == '%s'", subP->subscriptionId, subP->expression.q.c_str()));
         continue;
       }
 
@@ -669,6 +669,8 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       //
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
+
+    ++altIx;
   }
 
   *matchesP = matches;

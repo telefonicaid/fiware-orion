@@ -132,7 +132,7 @@ void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
 
     // Give it its new value
     languageMapP->value.s = stringValue;
-    LM_TMP(("KZ: stringValue: %s", stringValue));
+
     // NULL out the lastChild
     languageMapP->lastChild = NULL;
 

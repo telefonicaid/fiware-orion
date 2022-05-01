@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/urlDecode.h"                          // urlDecode
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLex.h"                                    // qLex
@@ -64,13 +65,19 @@ QNode* qBuild(const char* q)
   orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
   LM_TMP(("LEAK: ***** Calling qLex *****"));
   if ((qList = qLex(qString, &title, &detail)) == NULL)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
     LM_RE(NULL, ("Error (qLex: %s: %s)", title, detail));
+  }
   else
   {
     LM_TMP(("LEAK: ***** Calling qParse *****"));
     qP = qParse(qList, NULL, false, &title, &detail);
     if (qP == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
       LM_RE(NULL, ("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
+    }
 
     qPresent(qP, "LEAK", "Q-TREE");
   }

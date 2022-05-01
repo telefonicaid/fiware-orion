@@ -268,7 +268,7 @@ do                                                                              
 #define DATETIME_CHECK(stringValue, dateTimeValue, fieldName)                                                \
 do                                                                                                           \
 {                                                                                                            \
-  if ((dateTimeValue = parse8601Time(stringValue)) == -1)                                                    \
+  if ((dateTimeValue = parse8601Time(stringValue)) < 0)                                                      \
   {                                                                                                          \
     orionldError(OrionldBadRequestData, "Invalid DateTime value", fieldName, 400);                           \
     return false;                                                                                            \

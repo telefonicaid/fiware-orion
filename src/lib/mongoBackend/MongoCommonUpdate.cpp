@@ -1286,8 +1286,8 @@ static bool addTriggeredSubscriptions_withCache
   {
     CachedSubscription* cSubP = subVec[ix];
 
-    // Outdated subscriptions are skipped
-    if (cSubP->expirationTime < orionldState.requestTime)
+    // Outdated subscriptions are skipped (0 == no expiration time)
+    if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
     {
       continue;
     }
@@ -2276,7 +2276,6 @@ static bool processSubscriptions
 
     /* Send notification */
     bool  notificationSent;
-
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
                                                                 tSubP->metadata,

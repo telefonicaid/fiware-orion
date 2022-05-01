@@ -43,14 +43,14 @@ extern "C"
 //
 // pcheckEntityInfo -
 //
-bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
+bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char* fieldPath)
 {
   KjNode* idP         = NULL;
   KjNode* idPatternP  = NULL;
   KjNode* typeP       = NULL;
 
-  OBJECT_CHECK(entityInfoP, "entities[X]");
-  EMPTY_OBJECT_CHECK(entityInfoP, "entities[X]");
+  OBJECT_CHECK(entityInfoP, fieldPath);
+  EMPTY_OBJECT_CHECK(entityInfoP, fieldPath);
 
   for (KjNode* entityItemP = entityInfoP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
   {

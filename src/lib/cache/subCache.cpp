@@ -170,7 +170,7 @@ bool EntityInfo::match
   }
   else
   {
-    LM_TMP(("KZ No match due to Entity ID"));
+    LM_TMP(("No match due to Entity ID"));
     matchedId = false;
   }
 
@@ -185,7 +185,7 @@ bool EntityInfo::match
     }
     else if ((type != "")  && (entityType != "") && (entityType != type))
     {
-      LM_TMP(("KZ No match due to Entity Type"));
+      LM_TMP(("No match due to Entity Type"));
       matchedType = false;
     }
     else
@@ -437,21 +437,21 @@ static bool subMatch
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
         // No match due to tenant I
-        LM_TMP(("KZ: No match due to tenant I"));
+        LM_TMP(("No match due to tenant I"));
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
         // No match due to tenant II
-        LM_TMP(("KZ: No match due to tenant II"));
+        LM_TMP(("No match due to tenant II"));
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
       // No match due to tenant III
-      LM_TMP(("KZ: No match due to tenant III"));
+      LM_TMP(("No match due to tenant III"));
       return false;
     }
   }
@@ -459,7 +459,7 @@ static bool subMatch
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
     // No match due to servicePath
-    LM_TMP(("KZ: No match due to servicePath"));
+    LM_TMP(("No match due to servicePath"));
     return false;
   }
 
@@ -473,7 +473,7 @@ static bool subMatch
   if (!attributeMatch(cSubP, attrV))
   {
     // No match due to attributes
-    LM_TMP(("KZ: No match due to attributes"));
+    LM_TMP(("No match due to attributes"));
     return false;
   }
 
@@ -567,7 +567,29 @@ int subCacheMatch
 */
 void subCacheItemDestroy(CachedSubscription* cSubP)
 {
-  free(cSubP->url);
+  if (cSubP->subscriptionId != NULL)
+  {
+    free(cSubP->subscriptionId);
+    cSubP->subscriptionId = NULL;
+  }
+
+  if (cSubP->description != NULL)
+  {
+    free(cSubP->description);
+    cSubP->description = NULL;
+  }
+
+  if (cSubP->qText != NULL)
+  {
+    free(cSubP->qText);
+    cSubP->url = NULL;
+  }
+
+  if (cSubP->url != NULL)
+  {
+    free(cSubP->url);
+    cSubP->url = NULL;
+  }
 
   if (cSubP->tenant != NULL)
   {
@@ -579,12 +601,6 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   {
     free(cSubP->servicePath);
     cSubP->servicePath = NULL;
-  }
-
-  if (cSubP->subscriptionId != NULL)
-  {
-    free(cSubP->subscriptionId);
-    cSubP->subscriptionId = NULL;
   }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
@@ -767,6 +783,7 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 * Note that 'count', which is the counter of how many times a notification has been
 * fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
 * has made a notification to be triggered/fired upon creation-time of the subscription.
+* UPDATE: Initial Notifications have been removed => always 0
 */
 void subCacheItemInsert
 (
@@ -826,7 +843,7 @@ void subCacheItemInsert
   cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
-  cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->count                 = 0;
   cSubP->status                = status;
 
   if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))

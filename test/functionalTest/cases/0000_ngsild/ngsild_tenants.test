@@ -252,7 +252,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/json",
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{
@@ -302,7 +302,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/json",
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{

@@ -26,12 +26,13 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 extern "C"
 {
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
+#include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjString, kjChildAdd, ...
 }
 
 #include "common/globals.h"                                    // parse8601Time
@@ -39,44 +40,34 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
+#include "cache/subCache.h"                                    // subCacheItemLookup
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/common/uuidGenerate.h"                       // uuidGenerate
+#include "orionld/common/subCacheApiSubscriptionInsert.h"      // subCacheApiSubscriptionInsert
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
+#include "orionld/kjTree/kjChildPrepend.h"                     // kjChildPrepend
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
+#include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
+#include "orionld/mongoc/mongocSubscriptionExists.h"           // mongocSubscriptionExists
+#include "orionld/mongoc/mongocSubscriptionInsert.h"           // mongocSubscriptionInsert
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
+#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qRender.h"                                 // qRender
+#include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldPostSubscriptions -
+// orionldPostSubscriptionsWithMongoBackend -
 //
-// A ngsi-ld subscription contains the following fields:
-// - id                 Subscription::id                                              (URI given by creating request or auto-generated)
-// - type               Not in DB                                                     (must be "Subscription" - will not be saved in mongo)
-// - name               NOT SUPPORTED                                                 (String)
-// - description        Subscription::description                                     (String)
-// - entities           Subscription::Subject::entities                               (Array of EntityInfo which is a subset of EntID)
-// - watchedAttributes  Subscription::Notification::attributes                        (Array of String)
-// - timeInterval       NOT SUPPORTED                                                 (will not be implemented any time soon - not very useful)
-// - q                  Subscription::Subject::Condition::SubscriptionExpression::q
-// - geoQ               NOT SUPPORTED
-// - csf                NOT SUPPORTED
-// - isActive           May not be necessary to store in mongo - "status" is enough?
-// - notification       Subscription::Notification + Subscription::attrsFormat?
-// - expires            Subscription::expires                                         (DateTime)
-// - throttling         Subscription::throttling                                      (Number - in seconds)
-// - status             Subscription::status                                          (builtin String: "active", "paused", "expired")
-//
-// * At least one of 'entities' and 'watchedAttributes' must be present.
-// * Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them
-// * For now, 'timeInterval' will not be implemented. If ever ...
-//
-bool orionldPostSubscriptions(void)
+static bool orionldPostSubscriptionsWithMongoBackend(void)
 {
   ngsiv2::Subscription sub;
   std::string          subId;
@@ -98,12 +89,6 @@ bool orionldPostSubscriptions(void)
 
   char*    subIdP    = NULL;
   KjNode*  endpointP = NULL;
-
-#if 0
-  // FIXME: Move payload-checks from kjTreeToSubscription to pCheckSubscription
-  if (pCheckSubscription(orionldState.requestTree) == false)
-    return false;
-#endif
 
   // kjTreeToSubscription does the pCheckSubscription stuff ... for now ...
   if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
@@ -206,7 +191,7 @@ bool orionldPostSubscriptions(void)
   // Create the subscription
   //
   std::vector<std::string> servicePathV;
-  servicePathV.push_back("/");
+  servicePathV.push_back("/#");
 
   subId = mongoCreateSubscription(sub,
                                   &oError,
@@ -220,6 +205,152 @@ bool orionldPostSubscriptions(void)
 
   orionldState.httpStatusCode = SccCreated;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str());
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qFix
+//
+// 'q' ... one for Native NGSI-LD notifications, another one for NGSIv2 notifications
+//
+// If it turns out to be an 'mq' (q=A.B... => mq) for mongoBackend then an mq node is added to subP and
+// dbModelFromApiSubscription moves it to its place.
+//
+// Either way, the NGSI-LD q will be on the toplevel as "ldQ"
+//
+bool qFix(KjNode* subP, KjNode* qNode, QNode* qTree)
+{
+  char qText[512];
+  bool mq = false;
+
+  //
+  // The q-text might need to be re-written for NGSIv2, might even be an mq and not a q
+  // The q-text might also be invalid for NGSIv2, in which case it is replaced by "P;!P" => no notifications
+  //
+  KjNode* qNodeForV2;
+  KjNode* mqNodeForV2;
+
+  LM_TMP(("QR: Calling qRender(qTree=%p)", qTree));
+  if (qRender(qTree, V2, qText, sizeof(qText), &mq) == false)
+  {
+    qNodeForV2  = kjString(orionldState.kjsonP, "q", "P;!P");
+    mqNodeForV2 = kjString(orionldState.kjsonP, "mq", "P.P;!P.P");
+  }
+  else if (mq == false)
+  {
+    qNodeForV2  = kjString(orionldState.kjsonP, "q", qText);
+    mqNodeForV2 = kjString(orionldState.kjsonP, "mq", "P.P;!P.P");
+  }
+  else
+  {
+    qNodeForV2  = kjString(orionldState.kjsonP, "q", "P;!P");
+    mqNodeForV2 = kjString(orionldState.kjsonP, "mq", qText);
+  }
+
+  LM_TMP(("QR: V2-Rendered qTest: '%s'", qText));
+
+  qNode->name = (char*) "ldQ";  // The original "q" is taken for NGSI-LD
+  qRender(qTree, NGSI_LD_V1, qText, sizeof(qText), &mq);
+
+
+  kjChildAdd(subP, qNodeForV2);
+  kjChildAdd(subP, mqNodeForV2);
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldPostSubscriptions -
+//
+bool orionldPostSubscriptions(void)
+{
+  if (experimental == false)
+    return orionldPostSubscriptionsWithMongoBackend();  // this will be removed!! :)
+
+  KjNode*  subP      = orionldState.requestTree;
+  KjNode*  subIdP    = orionldState.payloadIdNode;
+  KjNode*  endpointP = NULL;
+  KjNode*  qNode     = NULL;
+  QNode*   qTree     = NULL;
+  char*    qText     = NULL;
+  char*    subId;
+
+  if (pCheckSubscription(subP, orionldState.payloadIdNode, orionldState.payloadTypeNode, &endpointP, &qNode, &qTree, &qText) == false)
+    return false;
+
+  if (subIdP != NULL)
+  {
+    subId = subIdP->value.s;
+
+    // 'id' needs to be '_id' - mongo stuff ...
+    subIdP->name = (char*) "_id";
+
+    //
+    // If the subscription already exists, a "409 Conflict" is returned
+    //
+    char* detail = NULL;
+    if ((subCacheItemLookup(orionldState.tenantP->tenant, subId) != NULL) || (mongocSubscriptionExists(subId, &detail) == true))
+    {
+      if (detail == NULL)
+        orionldError(OrionldAlreadyExists, "Subscription already exists", subId, 409);
+      else
+        orionldError(OrionldInternalError, "Database Error", detail, 500);
+
+      return false;
+    }
+  }
+  else
+  {
+    char subscriptionId[80];
+    strncpy(subscriptionId, "urn:ngsi-ld:subscription:", sizeof(subscriptionId) - 1);
+    uuidGenerate(&subscriptionId[25], sizeof(subscriptionId) - 25, false);
+
+    subIdP = kjString(orionldState.kjsonP, "_id", subscriptionId);
+  }
+
+  // Add subId to the tree
+  kjChildPrepend(subP, subIdP);
+
+  // The two 'q's ...
+  if ((qText != NULL) && (qFix(subP, qNode, qTree) == false))
+    return false;
+
+  // Timestamps
+  KjNode* createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
+  KjNode* modifiedAt = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
+
+  kjChildAdd(subP, createdAt);
+  kjChildAdd(subP, modifiedAt);
+
+  // Counters
+
+  // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
+  subCacheApiSubscriptionInsert(subP, qTree, orionldState.contextP);
+
+  // dbModel
+  KjNode* dbSubscriptionP = subP;
+  dbModelFromApiSubscription(dbSubscriptionP, false);
+  kjTreeLog(dbSubscriptionP, "SB Model Subscription");
+
+  // sub to db - mongocSubscriptionInsert(subP);
+  if (mongocSubscriptionInsert(dbSubscriptionP, subIdP->value.s) == false)
+  {
+    LM_TMP(("mongocSubscriptionInsert failed"));
+    // orionldError is part of mongocSubscriptionInsert
+    // Remove from cache
+    return false;
+  }
+
+  LM_TMP(("mongocSubscriptionInsert OK"));
+  orionldState.httpStatusCode = 201;
+  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subIdP->value.s);
 
   return true;
 }

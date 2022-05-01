@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                            // dotForEq
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
+#include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pcheckGeoType.h"                 // pcheckGeoType
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"         // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoqGeorel.h"              // pcheckGeoqGeorel
@@ -60,6 +61,13 @@ bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldNa
     orionldError(OrionldBadRequestData, "Internal Error", "Unable to extract the geometry of a geoQ for coordinmate APIv1 fix", 400);
     return false;
   }
+
+  // Must be called "coords" in the database
+  coordinatesP->name = (char*) "coords";
+
+  // If already a String, then we're done
+  if (coordinatesP->type == KjString)
+    return true;
 
   if (strcmp(geometryP->value.s, "Point") == 0)
     isPoint = true;
@@ -94,7 +102,6 @@ bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldNa
     kjFastRender(coordinatesP, buf);
   }
 
-  coordinatesP->name    = (char*) "coords";
   coordinatesP->type    = KjString;
   coordinatesP->value.s = buf;
 
@@ -126,7 +133,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
     else if (strcmp(itemP->name, "coordinates") == 0)
     {
       DUPLICATE_CHECK(coordinatesP, "coordinates", itemP);
-      ARRAY_CHECK(coordinatesP, "the 'coordinates' field of a GeoJSON object must be a JSON Array");
+      PCHECK_STRING_OR_ARRAY(coordinatesP, 0, "Invalid Data Type", "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)", 400);
     }
     else if (strcmp(itemP->name, "georel") == 0)
     {
@@ -197,7 +204,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
   }
 
   //
-  // Render the coordinates and convert to a string - for the NGSIv1 database model ... ?
+  // Render the coordinates and convert to a string - for the NGSIv1 database model
   //
   if (coordsToString == true)
   {

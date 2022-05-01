@@ -244,7 +244,7 @@ typedef struct OrionldStateIn
   char*     xAuthToken;
   char*     authorization;
   char*     tenant;
-  char*     lang;  // Temporary
+  char*     legacy;          // Use legacy mongodb driver / mongoBackend
 
   // Incoming payload
   char*     payload;

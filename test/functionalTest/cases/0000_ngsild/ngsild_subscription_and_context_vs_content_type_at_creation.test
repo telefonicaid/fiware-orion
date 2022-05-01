@@ -31,51 +31,51 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create a subscription S1, with Content-Type: application/json and contexzt in Link header
-# 02. Create a subscription S2, with Content-Type: application/json and contexzt in Link header
+# 01. Create a subscription S1, with Content-Type: application/json and context in Link header
+# 02. Create a subscription S2, with Content-Type: application/json and context in Link header
 #
 
 
-echo "01. Create a subscription S1, with Content-Type: application/json and contexzt in Link header"
-echo "============================================================================================="
+echo "01. Create a subscription S1, with Content-Type: application/json and context in Link header"
+echo "============================================================================================"
 payload='{
   "id": "urn:ngsi-ld:subscriptions:S1",
-	"type": "Subscription",
+  "type": "Subscription",
   "description": "Notify me of low stock in Store 001",
-	"entities": [{"type": "Shelf"}],
-	"watchedAttributes": ["numberOfItems"],
-	"q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Building:store001",
-	"notification": {
-		"attributes": ["numberOfItems", "stocks", "locatedIn"],
-		"format": "keyValues",
-		"endpoint": {
-			"uri": "http://tutorial:3000/subscription/low-stock-store001",
-			"accept": "application/json"
-		}
-	}
+  "entities": [{"type": "Shelf"}],
+  "watchedAttributes": ["numberOfItems"],
+  "q": "numberOfItems<10;locatedIn==%22urn:ngsi-ld:Building:store001%22",
+  "notification": {
+    "attributes": ["numberOfItems", "stocks", "locatedIn"],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://tutorial:3000/subscription/low-stock-store001",
+      "accept": "application/json"
+    }
+  }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "02. Create a subscription S2, with Content-Type: application/json and contexzt in Link header"
-echo "============================================================================================="
+echo "02. Create a subscription S2, with Content-Type: application/json and context in Link header"
+echo "============================================================================================"
 payload='{
   "id": "urn:ngsi-ld:subscriptions:S2",
-	"type": "Subscription",
+  "type": "Subscription",
   "description": "Notify me of low stock in Store 001",
-	"entities": [{"type": "Shelf"}],
-	"watchedAttributes": ["numberOfItems"],
-	"q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Building:store001",
-	"notification": {
-		"attributes": ["numberOfItems", "stocks", "locatedIn"],
-		"format": "keyValues",
-		"endpoint": {
-			"uri": "http://tutorial:3000/subscription/low-stock-store001",
-			"accept": "application/json"
-		}
-	}
+  "entities": [{"type": "Shelf"}],
+  "watchedAttributes": ["numberOfItems"],
+  "q": "numberOfItems<10;locatedIn==%22urn:ngsi-ld:Building:store001%22",
+  "notification": {
+    "attributes": ["numberOfItems", "stocks", "locatedIn"],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://tutorial:3000/subscription/low-stock-store001",
+      "accept": "application/json"
+    }
+  }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
@@ -83,8 +83,8 @@ echo
 
 
 --REGEXPECT--
-01. Create a subscription S1, with Content-Type: application/json and contexzt in Link header
-=============================================================================================
+01. Create a subscription S1, with Content-Type: application/json and context in Link header
+============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
@@ -92,8 +92,8 @@ Date: REGEX(.*)
 
 
 
-02. Create a subscription S2, with Content-Type: application/json and contexzt in Link header
-=============================================================================================
+02. Create a subscription S2, with Content-Type: application/json and context in Link header
+============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2

@@ -145,7 +145,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/json",
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
 	"status" : "active",
 	"entities" : [

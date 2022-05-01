@@ -38,6 +38,9 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
+#include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload
+#include "orionld/q/qBuild.h"                                    // qBuild
+#include "orionld/q/qRender.h"                                   // qRender
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
 #include "orionld/kjTree/kjTreeToSubscriptionExpression.h"       // kjTreeToSubscriptionExpression
@@ -53,6 +56,7 @@ bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
 
   if (strchr(q, '|') != NULL)
   {
+    LM_TMP(("KZ: pipe in 'q' - not valid for mongoBackend q"));
     //
     // This is a difficult situation ...
     // I need the subscription for operations that support NGSI-LD Subscription notifications.
@@ -72,11 +76,13 @@ bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
   }
   else if (strstr(q, "~=") != NULL)
   {
+    LM_TMP(("KZ: pattern-match in 'q' - not valid for mongoBackend q"));
     LM_W(("Pattern Match for subscriptions - not implemented"));
     orionldError(OrionldOperationNotSupported, "Not Implemented", "Pattern matching in Q-filter", 501);
     return false;
   }
 
+  LM_TMP(("Creating Scope from q '%s'", qOrig));
   Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qOrig);
   std::string  errorString;
 
@@ -148,7 +154,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   subP->attrsFormat                        = NGSI_LD_V1_KEYVALUES;
   subP->descriptionProvided                = false;
-  subP->expires                            = 0x7FFFFFFF;
+  subP->expires                            = 0;
   subP->throttling                         = 0;
   subP->subject.condition.expression.isSet = false;
   subP->notification.blacklist             = false;
@@ -230,9 +236,9 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (strcmp(kNodeP->name, "entities") == 0)
     {
-      DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, "Subscription::entities", kNodeP);
-      ARRAY_CHECK(kNodeP, "Subscription::entities");
-      EMPTY_ARRAY_CHECK(kNodeP, "Subscription::entities");
+      DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, SubscriptionEntitiesPath, kNodeP);
+      ARRAY_CHECK(kNodeP, SubscriptionEntitiesPath);
+      EMPTY_ARRAY_CHECK(kNodeP, SubscriptionEntitiesPath);
 
       if (kjTreeToEntIdVector(entitiesP, &subP->subject.entities) == false)
       {
@@ -259,11 +265,15 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
     {
-      DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
+      LM_TMP(("KZ: Got a 'q': '%s'", kNodeP->value.s));
       STRING_CHECK(kNodeP, "Subscription::q");
+      DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
 
-      if (oldTreatmentForQ(subP, kNodeP->value.s) == false)
+      if (oldTreatmentForQ(subP, kNodeP->value.s) == false)  // New treatment doesn't even use this function - just the Kj Tree
+      {
+        LM_TMP(("KZ: oldTreatmentForQ failed"));
         return false;
+      }
     }
     else if (strcmp(kNodeP->name, "geoQ") == 0)
     {

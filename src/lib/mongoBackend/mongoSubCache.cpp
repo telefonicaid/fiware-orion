@@ -251,6 +251,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
         if (cSubP->expression.mq != "")
         {
+          LM_TMP(("cSubP->expression.mq == '%s'", cSubP->expression.mq.c_str()));
           if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
           {
             LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
@@ -332,6 +333,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
 
   // q
+  cSubP->qText = sub.hasField("ldQ")? strdup(getStringFieldF(&sub, "ldQ")) : NULL;
+  LM_TMP(("KZ: qText: '%s'", cSubP->qText));
 
   //
   // To create the QNode tree (only used by the "new native NGSI-LD" notifications,

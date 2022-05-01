@@ -31,6 +31,7 @@
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldGetSubscription.h"      // Own Interface
 
 
@@ -46,16 +47,32 @@ bool orionldGetSubscription(void)
   char*                 details = (char*) "subscription not found";
   CachedSubscription*   cSubP   = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
 
+#if 0
+  LM_TMP(("Looking up sub '%s' in the sub-cache (tenant: '%s')", subscriptionId, orionldState.tenantP->tenant));
+  if (cSubP != NULL)
+  {
+    LM_TMP(("Found it in the cache - need to render a KjNode tree from the cache contents ..."));
+    // orionldState.httpStatusCode = SccOk;
+    // orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP);
+    // kjTreeLog(orionldState.responseTree, "Subscription");
+
+    // return true;
+  }
+#endif
+
   subscription.descriptionProvided = false;
   subscription.expires             = -1;  // 0?
   subscription.throttling          = -1;  // 0?
   subscription.timeInterval        = -1;  // 0?
 
-  if ((cSubP == NULL) || (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false))
+  // if (cSubP == NULL) - once I havce the function to "render a KjNode tree from the cache contents"
   {
-    LM_E(("mongoGetLdSubscription error: %s", details));
-    orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
-    return false;
+    if (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false)
+    {
+      LM_E(("mongoGetLdSubscription error: %s", details));
+      orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
+      return false;
+    }
   }
 
   // Transform to KjNode tree

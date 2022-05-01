@@ -192,7 +192,7 @@ MongoDB server version: REGEX(.*)
 		"B" : "2"
 	},
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{
@@ -290,7 +290,7 @@ MongoDB server version: REGEX(.*)
 		"B" : "22"
 	},
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{
