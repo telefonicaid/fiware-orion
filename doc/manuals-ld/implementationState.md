@@ -216,6 +216,7 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 ### DELETE /ngsi-ld/v1/entities/*/attrs/*
 * Supports datasetId
+* No Notifications (notifications on DELETE is not yet part of the NGSI-LD API - hopefully for 1.6.1)
 * Not using mongoBackend, but using the the mongo C++ legacy driver 
   * dbEntityAttributeInstanceLookup
   * dbEntityAttributeLookup

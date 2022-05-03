@@ -36,7 +36,7 @@ sudo aptitude install libssl1.0-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev 
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
 * Mongo C++ Driver:   legacy-1.1.2
-* Mongo C driver:     1.17.5
+* Mongo C driver:     1.21.1
 * libmicrohttpd:      0.9.72
 * rapidjson:          1.0.2
 * kbase:              0.8
@@ -93,9 +93,9 @@ cd /opt
 sudo mkdir mongoc
 sudo chown $USER:$GROUP mongoc
 cd mongoc
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
-tar xzf mongo-c-driver-1.17.5.tar.gz
-cd mongo-c-driver-1.17.5
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
+tar xzf mongo-c-driver-1.21.1.tar.gz
+cd mongo-c-driver-1.21.1
 mkdir cmake-build
 cd cmake-build
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
