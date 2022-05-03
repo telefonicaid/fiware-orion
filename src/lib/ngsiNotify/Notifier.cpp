@@ -656,8 +656,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
           (renderFormat            != RF_CROSS_APIS_KEYVALUES)  &&
           (orionldState.apiVersion == NGSI_LD_V1))
       {
-        if (subP->ldContext == "")
+        if (subP->ldContext != "")
           params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
+        else
+          params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
       }
     }
 
