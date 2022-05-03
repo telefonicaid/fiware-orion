@@ -278,7 +278,7 @@ void ngsildExpiresToAPIv1Datamodel(KjNode* expiresP)
 //
 // Until Issue #369 is fixed, the "information" can have only ONE item.
 // This is due to the fact that APIv2 only allows for ONE item and will be fixed by NOT using mongoBackend for any
-// of the Registration requests.
+// of the Registration requests. Actually, also without using mongoBackend, we still have the problem with the old DB Model ...
 //
 // PAYLOAD of an NGSI-LD Registration
 // {

@@ -57,7 +57,6 @@ extern "C"
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
-#include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own Interface
 

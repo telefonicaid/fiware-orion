@@ -30,10 +30,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
