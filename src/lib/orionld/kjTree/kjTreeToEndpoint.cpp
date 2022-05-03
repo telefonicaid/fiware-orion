@@ -139,10 +139,17 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
       return false;
     }
 
-    KeyValue* keyValueP = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
+    //
+    // Seems a bit stupid to allocate room for copies here ...
+    // However, the current implementation needs this to work.
+    // Should be easy enough to fix (and avoid unnecessary allocations)
+    //
+    KeyValue* keyValueP = (KeyValue*) malloc(sizeof(KeyValue));
 
     strncpy(keyValueP->key,   key,   sizeof(keyValueP->key) - 1);
     strncpy(keyValueP->value, value, sizeof(keyValueP->value) - 1);
+
+    LM_TMP(("VE: Adding notifierInfo %p: %s:%s", keyValueP->key, keyValueP->value));
     httpInfoP->notifierInfo.push_back(keyValueP);
 
     //

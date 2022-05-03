@@ -99,9 +99,9 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"value" : 1,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
 			"mdNames" : [ ]
 		}
 	},

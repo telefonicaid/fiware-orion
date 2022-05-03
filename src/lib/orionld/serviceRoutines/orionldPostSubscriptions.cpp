@@ -58,6 +58,7 @@ extern "C"
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qRender.h"                                 // qRender
+#include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
@@ -283,7 +284,12 @@ bool orionldPostSubscriptions(void)
   char*    subId;
 
   if (pCheckSubscription(subP, orionldState.payloadIdNode, orionldState.payloadTypeNode, &endpointP, &qNode, &qTree, &qText) == false)
+  {
+    if (qTree != NULL)
+      qRelease(qTree);
+
     return false;
+  }
 
   if (subIdP != NULL)
   {
@@ -303,6 +309,9 @@ bool orionldPostSubscriptions(void)
       else
         orionldError(OrionldInternalError, "Database Error", detail, 500);
 
+      if (qTree != NULL)
+        qRelease(qTree);
+
       return false;
     }
   }
@@ -320,7 +329,12 @@ bool orionldPostSubscriptions(void)
 
   // The two 'q's ...
   if ((qText != NULL) && (qFix(subP, qNode, qTree) == false))
+  {
+    if (qTree != NULL)
+      qRelease(qTree);
+
     return false;
+  }
 
   // Timestamps
   KjNode* createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
@@ -345,6 +359,10 @@ bool orionldPostSubscriptions(void)
     LM_TMP(("mongocSubscriptionInsert failed"));
     // orionldError is part of mongocSubscriptionInsert
     // Remove from cache
+
+    if (qTree != NULL)
+      qRelease(qTree);
+
     return false;
   }
 

@@ -152,11 +152,11 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
 
       if ((type != NULL) && (strcmp(type->value.s, "GeoProperty") == 0))
       {
-        geoPropertyP = kjLookup(geoPropertyP, "value");
+        KjNode* valueP = kjLookup(geoPropertyP, "value");
 
-        if (geoPropertyP != NULL)
+        if (valueP != NULL)
         {
-          geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
+          geoPropertyP = kjClone(orionldState.kjsonP, valueP);
           geoPropertyP->name = (char*) "geometry";
         }
         else
@@ -172,6 +172,7 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
           if (valueP != NULL)
             geoPropertyP = valueP;
         }
+
         geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
         geoPropertyP->name = (char*) "geometry";
       }

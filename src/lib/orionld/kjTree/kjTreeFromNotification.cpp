@@ -45,7 +45,6 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/contextCache/orionldContextCacheLookup.h"    // orionldContextCacheLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
-#include "orionld/kjTree/kjTreeLog.h"        // kjTreeLog
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromNotification.h"             // Own interface
 
@@ -55,7 +54,7 @@ extern "C"
 //
 // langFix -
 //
-static void langFix(KjNode* attrP, const char* lang)
+void langFix(KjNode* attrP, const char* lang)
 {
   KjNode* typeP        = kjLookup(attrP, "type");
   KjNode* languageMapP = kjLookup(attrP, "value");
@@ -116,7 +115,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   kjChildAdd(rootP, nodeP);
 
   // context - if JSONLD
-  if ((mimeType == JSONLD) && (renderFormat != RF_CROSS_APIS_NORMALIZED))
+  if ((mimeType == JSONLD) && (crossNotification == false))
   {
     if (context == NULL)
       nodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
@@ -125,10 +124,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
 
     kjChildAdd(rootP, nodeP);
   }
-  else
-  {
-    // Context for HTTP Link Header is done in Notifier::buildSenderParams (Notifier.cpp)
-  }
+  // else - Context for HTTP Link Header is done in Notifier::buildSenderParams (Notifier.cpp)
 
   // notifiedAt
   if (crossNotification == false)  // Meaning: NGSI-LD format
@@ -186,7 +182,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       if (strcmp(attrName, "@context") == 0)
         continue;
 
-      LM_TMP(("LANG: Calling kjTreeFromContextAttribute for attribute '%s', type '%s', lang: '%s", aP->name.c_str(), aP->type.c_str(), lang));
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, lang, detailsP);
       if (nodeP == NULL)
       {
@@ -194,12 +189,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
         continue;
       }
 
-      if ((lang != NULL) && (lang[0] != 0) && (aP->type == "LanguageProperty"))
-      {
-        kjTreeLog(nodeP, "LANG: after kjTreeFromContextAttribute");
-        langFix(nodeP, lang);
-        kjTreeLog(nodeP, "LANG: after langFix");
-      }
       kjChildAdd(objectP, nodeP);
     }
 

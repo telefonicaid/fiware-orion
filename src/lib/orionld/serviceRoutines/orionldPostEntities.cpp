@@ -431,7 +431,12 @@ bool orionldPostEntities(void)
 
   if (dbModelFromApiEntity(orionldState.requestTree, NULL, NULL, true) == false)
   {
-    orionldError(OrionldInternalError, "Out of memory?", "Need more info here", 500);
+    //
+    // Not calling orionldError as a better error message is overwritten if I do.
+    // Once we have "Error Stacking", orionldError should be called.
+    //
+    // orionldError(OrionldInternalError, "Internal Error", "Unable to convert API Entity into DB Model Entity", 500);
+
     return false;
   }
   KjNode* dbEntityP = orionldState.requestTree;  // More adecuate to talk about DB-Entity from here on

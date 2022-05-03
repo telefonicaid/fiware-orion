@@ -543,8 +543,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         return paramsV;
       }
 
-      char*    details;
-      KjNode*  kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, subP->lang.c_str(), &details);
+      char*        details;
+      const char*  lang   = (subP->lang == "")? NULL : subP->lang.c_str();
+      KjNode*      kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, lang, &details);
 
       if (kjTree == NULL)
       {

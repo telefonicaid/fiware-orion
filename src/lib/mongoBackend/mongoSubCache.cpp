@@ -638,7 +638,7 @@ static void mongoSubCountersUpdateCount
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id"  << OID(subId));
+  condition = BSON("_id"  << subId);
   update    = BSON("$inc" << BSON(CSUB_COUNT << count));
 
   if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
@@ -664,7 +664,7 @@ static void mongoSubCountersUpdateLastNotificationTime
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+  condition = BSON("_id" << subId << "$or" << BSON_ARRAY(
                      BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
                      BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
@@ -692,7 +692,7 @@ static void mongoSubCountersUpdateLastFailure
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+  condition = BSON("_id" << subId << "$or" << BSON_ARRAY(
                      BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
                      BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
@@ -720,7 +720,7 @@ static void mongoSubCountersUpdateLastSuccess
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+  condition = BSON("_id" << subId << "$or" << BSON_ARRAY(
                      BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
                      BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
   update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));

@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qPresent.h"                                // qListPresent, qTreePresent
+#include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/q/qParse.h"                                  // Own interface
 
 
@@ -391,6 +392,12 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
       {
         *titleP   = (char*) "Invalid Q-Filter";
         *detailsP = (char*) "invalid operator for boolean value";
+        qRelease(compOpP);
+        qListRelease(qLexList);
+        // Free nodes in qNodeV ?
+        if (opNodeP != NULL)
+          qRelease(opNodeP);
+
         return NULL;
       }
     }

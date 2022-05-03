@@ -132,13 +132,13 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
 			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
 			"value" : {
 				"en" : "English",
 				"es" : "Castellano",
 				"sv" : "Svenska"
 			},
-			"modDate" : REGEX(.*),
-			"creDate" : REGEX(.*),
 			"mdNames" : [
 				"observedAt",
 				"https://uri.etsi.org/ngsi-ld/default-context/Sub-P",

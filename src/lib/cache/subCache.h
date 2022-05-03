@@ -89,30 +89,6 @@ struct EntityInfo
 };
 
 
-#if 0
-// -----------------------------------------------------------------------------
-//
-// ReceiverInfo - move to orionld/types/ReceiverInfo.h
-//
-typedef struct ReceiverInfo
-{
-  char*  key;            // Need to know the name of the key - in case of overriding ...
-  char*  httpHeader;     // complete string key: value\r\n
-  int    httpHeaderLen;  // strlen(httpHeader)
-} ReceiverInfo;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// NotifierInfo - move to orionld/types/NotifierInfo.h
-//
-typedef struct NotifierInfo
-{
-} NotifierInfo;
-#endif
-
-
 
 /* ****************************************************************************
 *
@@ -157,11 +133,7 @@ struct CachedSubscription
   double                      lastSuccess;           // timestamp of last successful notification
   int                         consecutiveErrors;     // Not in DB
   char                        lastErrorReason[128];
-#if 0
-  ReceiverInfo*               receiverInfo;          // Dynamic array of headers, from sub:notification:endpoint:receiverInfo
-  int                         receiverInfoSize;      // Number of items in the receiverInfo array
-  NotifierInfo                notifierInfo;          // struct with mqttQoS, etc - fields are known!
-#endif
+
   struct CachedSubscription*  next;
 };
 

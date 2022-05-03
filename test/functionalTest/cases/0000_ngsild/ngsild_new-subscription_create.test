@@ -324,6 +324,7 @@ payload='{
       "type": "T1"
     }
   ],
+  "q": "P2>10",
   "notification": {
     "attributes": [ "P1" ],
     "format": "keyValues",
@@ -356,6 +357,7 @@ payload='{
       "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
     }
   ],
+  "q": "P2>10",
   "notification": {
     "format": "normalized",
     "endpoint": {
@@ -663,7 +665,7 @@ Date: REGEX(.*)
 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 444
+Content-Length: 456
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -692,6 +694,7 @@ Date: REGEX(.*)
         "format": "keyValues",
         "status": "ok"
     },
+    "q": "P2>10",
     "status": "active",
     "type": "Subscription"
 }
@@ -722,6 +725,7 @@ MongoDB server REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
+	"ldQ" : "P2>10",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"throttling" : 0,
@@ -730,8 +734,8 @@ MongoDB server REGEX(.*)
 		"coords" : "",
 		"georel" : "",
 		"geoproperty" : "",
-		"q" : "",
-		"mq" : ""
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+		"mq" : "P.P;!P.P"
 	},
 	"format" : "normalized",
 	"reference" : "http://tutorial:3000/subscription/test0001",

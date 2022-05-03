@@ -582,7 +582,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   if (cSubP->qText != NULL)
   {
     free(cSubP->qText);
-    cSubP->url = NULL;
+    cSubP->qText = NULL;
   }
 
   if (cSubP->url != NULL)
@@ -620,10 +620,20 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   cSubP->notifyConditionV.clear();
 
   if (cSubP->qP != NULL)
+  {
+    LM_TMP(("QP: Freeing a QNode Tree at %p", cSubP->qP));
     qRelease(cSubP->qP);
+    cSubP->qP = NULL;
+  }
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
     free(cSubP->httpInfo.receiverInfo[ix]);
+
+  for (int ix = 0; ix < (int) cSubP->httpInfo.notifierInfo.size(); ++ix)
+  {
+    LM_TMP(("VE: Freeing notifierInfo %p: %s:%s", cSubP->httpInfo.notifierInfo[ix], cSubP->httpInfo.notifierInfo[ix]->key, cSubP->httpInfo.notifierInfo[ix]->value));
+    free(cSubP->httpInfo.notifierInfo[ix]);
+  }
 
   cSubP->next = NULL;
 }

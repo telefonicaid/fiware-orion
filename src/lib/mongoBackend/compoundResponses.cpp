@@ -51,6 +51,7 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   if ((e.type() != mongo::String)       &&
       (e.type() != mongo::Bool)         &&
       (e.type() != mongo::NumberDouble) &&
+      (e.type() != mongo::NumberInt)    &&
       (e.type() != mongo::jstNULL)      &&
       (e.type() != mongo::Object)       &&
       (e.type() != mongo::Array))
@@ -76,6 +77,11 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
     break;
 
   case mongo::NumberDouble:
+    child->valueType  = orion::ValueTypeNumber;
+    child->numberValue = e.Number();
+    break;
+
+  case mongo::NumberInt:
     child->valueType  = orion::ValueTypeNumber;
     child->numberValue = e.Number();
     break;

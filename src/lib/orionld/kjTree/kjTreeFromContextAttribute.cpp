@@ -40,7 +40,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjTreeLog.h"            // kjTreeLog
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // Own interface
 
@@ -79,11 +78,38 @@ static void langFixSimplified(KjNode* languageMapP, const char* lang)
 
 // -----------------------------------------------------------------------------
 //
+// langFixNormalized -
+//
+static void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP, const char* lang)
+{
+  KjNode* valueP = kjLookup(languageMapP, lang);
+  if (valueP == NULL)
+    valueP = kjLookup(languageMapP, "en");
+  if (valueP == NULL)
+    valueP = languageMapP->value.firstChildP;
+
+  languageMapP->type     = KjString;
+  languageMapP->value.s  = (valueP != NULL)? valueP->value.s : (char*) "empty languageMap";
+
+  languageMapP->name = (char*) "value";
+  typeP->value.s     = (char*) "Property";
+
+  if (valueP != NULL)
+  {
+    KjNode* langP = kjString(orionldState.kjsonP, "lang", valueP->name);  // The name of the chosen language
+    kjChildAdd(attrP, langP);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromContextAttribute -
 //
 KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, const char* lang, char** detailsP)
 {
-  LM_TMP(("LANG: Attribute: '%s', type: '%s', lang: '%s'", caP->name.c_str(), caP->type.c_str(), lang));
+  LM_TMP(("LANG: Attribute: '%s', type: '%s', lang at: '%p'", caP->name.c_str(), caP->type.c_str(), lang));
 
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
@@ -101,7 +127,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
 
   //
-  // keyValues
+  // keyValues?
   //
   if ((renderFormat == RF_KEYVALUES) || (renderFormat == RF_CROSS_APIS_KEYVALUES) || (renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
   {
@@ -133,7 +159,6 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
-      LM_TMP(("LANG: Calling kjTreeFromCompoundValue for '%s' of type '%s' (lang == '%s')", caP->name.c_str(), caP->type.c_str(), lang));
       nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
       if (nodeP == NULL)
         return NULL;
@@ -163,15 +188,17 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     return NULL;
   }
 
-  bool isRelationship = false;
+  bool     isRelationship = false;
+  bool     isLanguageMap  = false;
+  KjNode*  typeNodeP      = NULL;
+
   if (caP->type != "")
   {
-    KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", caP->type.c_str());
+    typeNodeP = kjString(orionldState.kjsonP, "type", caP->type.c_str());
 
     if (typeNodeP == NULL)
     {
       *detailsP = (char*) "unable to create KjString node for attribute type";
-      free(aTopNodeP);
       return NULL;
     }
 
@@ -179,10 +206,18 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     if (strcmp(typeNodeP->value.s, "Relationship") == 0)
       isRelationship = true;
+    else if (strcmp(typeNodeP->value.s, "LanguageProperty") == 0)
+      isLanguageMap = true;
   }
 
   // Value
-  char* valueName = (isRelationship == false)? (char*) "value" : (char*) "object";
+  char* valueName = (char*) "value";
+
+  if (isRelationship == true)
+    valueName = (char*) "object";
+  else if (isLanguageMap  == true)
+    valueName = (char*) "languageMap";
+
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
@@ -208,9 +243,16 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
     nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
+
     if (nodeP == NULL)
       return NULL;
+
     nodeP->name = valueName;
+    if (isLanguageMap == true)
+    {
+      if ((lang != NULL) && (lang[0] != 0))
+        langFixNormalized(aTopNodeP, typeNodeP, nodeP, lang);
+    }
     break;
 
   case orion::ValueTypeNotGiven:
@@ -218,6 +260,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     ALLOCATION_CHECK(nodeP);
     break;
   }
+
   kjChildAdd(aTopNodeP, nodeP);
 
   bool isGeoProperty = false;

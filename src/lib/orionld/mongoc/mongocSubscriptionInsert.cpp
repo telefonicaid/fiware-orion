@@ -77,6 +77,6 @@ bool mongocSubscriptionInsert(KjNode* dbSubscriptionP, const char* subscriptionI
   bson_destroy(&document);
   bson_destroy(&reply);
 
-  LM_TMP(("Inserted subscription in DB '%s', comllection '%s'", orionldState.tenantP->mongoDbName, "csubs"));
+  LM_TMP(("Inserted subscription in DB '%s', collection '%s'", orionldState.tenantP->mongoDbName, "csubs"));
   return b;
 }

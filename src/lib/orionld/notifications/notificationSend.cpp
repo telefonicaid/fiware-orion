@@ -180,7 +180,7 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 
     //
     // Never mind "location", "observationSpace", and "operationSpace"
-    // It is pobably faster to lookup their alias (and get the same back) as it is to
+    // It is probably faster to lookup their alias (and get the same back) as it is to
     // do three string-comparisons in every loop
     //
     eqForDot(attrP->name);
@@ -194,6 +194,27 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
     }
     else if (concise)
       attributeToConcise(attrP, &asSimplified);
+    else  // normalized
+    {
+      //
+      // Changing "value" back to "object" / "languageMap"
+      // Though, this should have been done long before!
+      //
+      KjNode* attrTypeP = kjLookup(attrP, "type");
+
+      if ((attrTypeP != NULL) && (attrTypeP->type == KjString))
+      {
+        KjNode* valueP = kjLookup(attrP, "value");
+
+        if (valueP != NULL)
+        {
+          if (strcmp(attrTypeP->value.s, "LanguageMap") == 0)
+            valueP->name = (char*) "langeuageMap";
+          else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
+            valueP->name = (char*) "object";
+        }
+      }
+    }
 
     if (asSimplified == false)
     {

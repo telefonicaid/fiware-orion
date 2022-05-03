@@ -82,6 +82,14 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     return true;
   }
 
+  if (attrP->type == KjArray)
+  {
+    LM_W(("Datasets present - not yet implemented"));
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Datasets not implemented", 501);
+    return false;
+  }
+
+  KjNode*  dbAttrP = (dbAttrsP != NULL)? kjLookup(dbAttrsP, attrEqName) : NULL;
 
   // Move everything into "md", leaving attrP EMPTY
   mdP = kjObject(orionldState.kjsonP, "md");
@@ -89,6 +97,15 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   mdP->lastChild           = attrP->lastChild;
   attrP->value.firstChildP = NULL;
   attrP->lastChild         = NULL;
+
+  //
+  // DB Model (NGSIv1) has the order:
+  // - type
+  // - creDate
+  // - modeDate
+  // - value
+  // - mdNames
+  //
 
   // Move special fields back to "attrP"
   const char* specialV[] = { "type", "value", "object", "languageMap", "datasetId" };  // observedAt+unitCode are mds (db-model)
@@ -102,16 +119,22 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
       kjChildRemove(mdP, nodeP);
       kjChildAdd(attrP, nodeP);
+
+      // After "type", add creDate, modDate
+      if (ix == 0)
+      {
+        if (dbAttrP == NULL)  // Attribute does not already exist
+          kjTimestampAdd(attrP, "creDate");
+
+        // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
+        kjTimestampAdd(attrP, "modDate");
+      }
     }
   }
-
-  // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
-  kjTimestampAdd(attrP, "modDate");
 
   KjNode*  mdAddedP     = NULL;
   KjNode*  mdRemovedP   = NULL;
   KjNode*  mdNamesP     = NULL;
-  KjNode*  dbAttrP      = (dbAttrsP != NULL)? kjLookup(dbAttrsP, attrEqName) : NULL;
   KjNode*  dbMdP        = NULL;
 
   if (dbAttrP == NULL)  // Attribute does not already exist
@@ -122,8 +145,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       *ignoreP = true;
       return true;  // Just ignore it
     }
-
-    kjTimestampAdd(attrP, "creDate");
 
     // The "attrNames" array stores the sub-attribute names in their original names, with dots - attrDotName
     kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrDotName));
@@ -155,8 +176,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       mdNamesP->name = (char*) ".names";  // We hijack the 'mdNames' array for the compilation of the Patch Tree
     }
 
-    kjChildAdd(attrP, mdNamesP);
-
     // if (dbMdP != NULL)  // .added/.removed should not be needed if dbMdP == NULL ...
     {
       mdAddedP   = kjArrayAdd(attrP, ".added");
@@ -176,6 +195,8 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
         kjChildAdd(mdP, mdObservedAt);
       }
     }
+
+    kjChildAdd(attrP, mdNamesP);
   }
 
   if (attrP->type == KjNull)
