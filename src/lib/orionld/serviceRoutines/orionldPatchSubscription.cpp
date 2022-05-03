@@ -387,7 +387,7 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
   if (notifierInfoP != NULL)
   {
     //
-    // notifierInfo is storeed in cSubP->httpInfo.headers
+    // notifierInfo is stored in cSubP->httpInfo.headers
     // - just set it (in the std::map)
     //
     for (KjNode* riP = notifierInfoP->value.firstChildP; riP != NULL; riP = riP->next)
