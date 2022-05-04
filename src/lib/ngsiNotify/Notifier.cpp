@@ -522,27 +522,23 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     // this FIXME will be removed (and all the test harness adjusted, if needed)
     //
     if (!atLeastOneNotDefault)
-    {
       spathList = "";
-    }
 
     std::string payloadString;
 
+    subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
+    if (subP == NULL)
+    {
+      LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
+      return paramsV;
+    }
+
     if (renderFormat == RF_LEGACY)
       payloadString = ncrP->render(V2, false);
+    else if (subP->ldContext == "")
+      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
     else
     {
-      //
-      // WARNING: Old V2 used: payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
-      // Perhaps do that if (ldContext == NULL) ?
-      //
-      subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
-      if (subP == NULL)
-      {
-        LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
-        return paramsV;
-      }
-
       char*        details;
       const char*  lang   = (subP->lang == "")? NULL : subP->lang.c_str();
       KjNode*      kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, lang, &details);
