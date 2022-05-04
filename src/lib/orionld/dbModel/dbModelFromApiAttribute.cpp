@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, kjChildAdd, ...
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -82,6 +83,7 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
     }
 
     kjChildAdd(orionldState.datasets, datasetArrayP);
+    LM_TMP(("DS: Created a dataset array for the attribute '%s'", attrNameEq));
   }
 
 
@@ -105,6 +107,7 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
         return false;
       }
 
+      LM_TMP(("DS: Got a default instance of attribute '%s'", attrNameEq));
       if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP) == false)
         return false;
 
@@ -112,6 +115,8 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
     }
     else
     {
+      LM_TMP(("DS: Got a dataset instance (%s) of attribute '%s' - adding it to dataset array for '%s'", datasetIdNodeP->value.s, attrNameEq, datasetArrayP->name));
+
       kjChildRemove(attrArrayP, attrP);  // Remove the attribute instance from the attribute ...
       kjChildAdd(datasetArrayP, attrP);  // ... And insert it under @datasets::attrName
 
@@ -121,30 +126,51 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
       // Should they be removed here or are they already removed by pCheckAttribute?
       // For now, I remove them here - then we'll see ...
       //
+      LM_TMP(("DS: Adding timestamps for attr '%s'", attrP->name));
       KjNode* createdAtP  = kjLookup(attrP, "createdAt");
       KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
 
       if (createdAtP  != NULL) kjChildRemove(attrP, createdAtP);
       if (modifiedAtP != NULL) kjChildRemove(attrP, modifiedAtP);
 
-      createdAtP  = kjFloat(orionldState.kjsonP, "createdAt", orionldState.requestTime);
+      createdAtP  = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
       modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
 
+      LM_TMP(("DS: Adding timestamps for attr '%s' (of type '%s')", attrP->name, kjValueType(attrP->type)));
+      kjTreeLog(attrP, "DS: attrP");
+      LM_TMP(("DS: attrP->lastChild at %p", attrP->lastChild));
       kjChildAdd(attrP, createdAtP);
+      LM_TMP(("DS: Adding timestamps for attr '%s'", attrP->name));
       kjChildAdd(attrP, modifiedAtP);
+      LM_TMP(("DS: Added timestamps for attr '%s'", attrP->name));
     }
 
     attrP = next;
+    LM_TMP(("And the loop continues? (attrP==%p)", attrP));
   }
 
+  LM_TMP(("Done"));
   // No datasets?
   if (datasetArrayP->value.firstChildP == NULL)
+  {
+    LM_TMP(("DS: No datasets for attribute '%s'", datasetArrayP->name));
     kjChildRemove(orionldState.datasets, datasetArrayP);
+  }
+  LM_TMP(("Done"));
 
-  // The array of the attribute now needs to be an object - just the default attribute
-  attrArrayP->type  = attrArrayP->value.firstChildP->type;
-  attrArrayP->value = attrArrayP->value.firstChildP->value;
+  //
+  // The array of the attribute now needs to be an object - just the default attribute is left in there -
+  // all other instances (with datasetId) have been moved to datasetArrayP (that's inside orionldState.datasets).
+  // Unless it is empty of course ...
+  //
+  if (attrArrayP->value.firstChildP != NULL)
+  {
+    attrArrayP->type  = attrArrayP->value.firstChildP->type;
+    LM_TMP(("Done"));
+    attrArrayP->value = attrArrayP->value.firstChildP->value;
+  }
 
+  LM_TMP(("Done"));
   return true;
 }
 
@@ -176,6 +202,8 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
   char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);
 
+  LM_TMP(("DS: dbModelFromApiAttribute(%s)", attrEqName));
+
   // attrP->name is cloned as we can't destroy the context (expansion of attr name comes from there)
   dotForEq(attrEqName);      // Orion DB-Model states that dots are replaced for equal signs in attribute names
   attrP->name = attrEqName;  // Cause, that's the name of the attribute in the database
@@ -189,6 +217,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
   if (attrP->type == KjArray)
   {
+    LM_TMP(("DS: Attribute '%s' is an array", attrP->name));
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DATASET_SUPPORT) == 0)
     {
       LM_W(("Datasets present - not yet implemented"));
@@ -196,6 +225,37 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       return false;
     }
 
+    return dbModelFromApiAttributeDatasetArray(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP);
+  }
+  else
+    LM_TMP(("DS: Attribute '%s' is NOT an array", attrP->name));
+
+  // Can also be datasetId without the attribute to be an array - just one instance BUT with a datasetId !
+  KjNode* datasetIdP = kjLookup(attrP, "datasetId");
+  if (datasetIdP != NULL)
+  {
+    //
+    // WARNING !!!
+    // Is it safe to remove the attribute from its container???
+    // - Probably not
+    //
+    // Let's do it in a different way, by "cloning" attrP (copy it's type and value) and after that modift attrP to be an array
+    // This way, "attrP" stays in its place in the KjNode-Tree, with it's next pointer, etc all correct.
+    // Only, after this, "attrP" is an array, and it contains a clone of its former self
+    //
+    KjNode* newAttrP    = kjClone(orionldState.kjsonP, attrP);
+
+    LM_TMP(("DS: Morphing attribute '%s' into an array", attrEqName));
+    // Now morph attrP into an Array:
+    attrP->type = KjArray;
+
+    // And make newAttrP its only child
+    attrP->value.firstChildP = newAttrP;
+    attrP->lastChild         = newAttrP;
+
+    LM_TMP(("DS: Must remove the attr '%s' from its entity and put under $datasets!", attrP->name));
+    kjTreeLog(attrP, "DS: Morphed attr into array with itself as only member");
+    *ignoreP = true;
     return dbModelFromApiAttributeDatasetArray(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP);
   }
 
