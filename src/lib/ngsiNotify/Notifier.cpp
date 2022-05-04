@@ -526,19 +526,19 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     std::string payloadString;
 
-    subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
-    if (subP == NULL)
-    {
-      LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
-      return paramsV;
-    }
-
     if (renderFormat == RF_LEGACY)
       payloadString = ncrP->render(V2, false);
-    else if (subP->ldContext == "")
+    else if (orionldState.apiVersion != NGSI_LD_V1)
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
     else
     {
+      subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
+      if (subP == NULL)
+      {
+        LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
+        return paramsV;
+      }
+
       char*        details;
       const char*  lang   = (subP->lang == "")? NULL : subP->lang.c_str();
       KjNode*      kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, lang, &details);
