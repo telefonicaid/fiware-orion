@@ -1106,6 +1106,26 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 
 
 
+static void debugSubCache(const char* prefix, const char* title)
+{
+  CachedSubscription* subP = subCache.head;
+
+  LM_TMP(("%s%s", prefix, title));
+  while (subP != NULL)
+  {
+    LM_TMP(("%s  * Subscription %s:",       prefix, subP->subscriptionId));
+    LM_TMP(("%s    - lastNotification: %f", prefix, subP->lastNotificationTime));
+    LM_TMP(("%s    - lastSuccess:      %f", prefix, subP->lastSuccess));
+    LM_TMP(("%s    - lastFailure:      %f", prefix, subP->lastFailure));
+    LM_TMP(("%s    - timesSent:        %d", prefix, subP->count));
+    LM_TMP(("%s", prefix));
+
+    subP = subP->next;
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * subCacheRefresh -
@@ -1117,6 +1137,8 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 */
 void subCacheRefresh(void)
 {
+  debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
+
   std::vector<std::string> databases;
   LM_TMP(("QP: ************************************ In subCacheRefresh *********************"));
   // Empty the cache
@@ -1142,6 +1164,8 @@ void subCacheRefresh(void)
 
   ++subCache.noOfRefreshes;
   LM_TMP(("QP: ************************************ After subCacheRefresh *********************"));
+
+  debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
 }
 
 
