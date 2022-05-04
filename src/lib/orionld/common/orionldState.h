@@ -400,7 +400,7 @@ typedef struct OrionldConnectionState
   //
   KjNode*                 creDatesP;
   bool                    onlyCount;
-  KjNode*                 datasets;
+  KjNode*                 datasets;  // Also used w/o mongoBackend, (dbModelFromApiAttribute)
 
   //
   // General Behavior

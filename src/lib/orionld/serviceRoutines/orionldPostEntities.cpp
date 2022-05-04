@@ -441,6 +441,10 @@ bool orionldPostEntities(void)
   }
   KjNode* dbEntityP = orionldState.requestTree;  // More adecuate to talk about DB-Entity from here on
 
+  // datasets?
+  if (orionldState.datasets != NULL)
+    kjChildAdd(dbEntityP, orionldState.datasets);
+
   //
   // Put Entity ID and TYPE back - inside _id as first members of the tree
   //

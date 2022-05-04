@@ -107,6 +107,7 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_SERVICE_OPTION_EXPAND_TYPE                           (1 << 8)
 #define ORIONLD_SERVICE_OPTION_EXPAND_ATTR                           (1 << 9)
 #define ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL                    (1 << 10)
+#define ORIONLD_SERVICE_OPTION_DATASET_SUPPORT                       (1 << 11)
 
 
 
