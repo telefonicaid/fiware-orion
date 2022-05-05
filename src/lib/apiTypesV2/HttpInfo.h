@@ -34,24 +34,7 @@
 
 #include "common/MimeType.h"              // MimeType
 #include "orionld/types/KeyValue.h"       // KeyValue
-
-
-
-/* ****************************************************************************
-*
-* MqttInfo - FIXME: move!
-*/
-typedef struct MqttInfo
-{
-  bool            mqtts;
-  char            host[64];
-  unsigned short  port;
-  char            topic[128];
-  char            username[128];
-  char            password[128];
-  char            version[16];
-  int             qos;
-} MqttInfo;
+#include "orionld/types/MqttInfo.h"       // MqttInfo
 
 
 

@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -26,33 +26,34 @@
 #include <MQTTClient.h>                                        // MQTT Client header
 
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
-#include "orionld/mqtt/mqttConnectionList.h"                   // mqttConnectionList
-#include "orionld/mqtt/mqttRelease.h"                          // Own Interface
+#include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
+#include "orionld/mqtt/mqttDisconnect.h"                       // Own Interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mqttRelease -
+// mqttDisconnect -
 //
-void mqttRelease(void)
+void mqttDisconnect(const char* host, unsigned short port, const char* username, const char* password, const char* version)
 {
-  if (mqttConnectionList == NULL)
+  //
+  // What if the connection is used by more than one subscription?
+  // In such case I can't disconnect!  (just decrease by 1 and return)
+  //
+  MqttConnection* mcP = mqttConnectionLookup(host, port, username, password, version);
+  if (mcP == NULL)
     return;
 
-  for (int ix = 0; ix < mqttConnectionListIx; ix++)
-  {
-    MqttConnection* mcP = &mqttConnectionList[ix];
+  mcP->connections -= 1;
+  if (mcP->connections > 0)
+    return;
 
-    if (mcP->host     != NULL)      free(mcP->host);
-    if (mcP->username != NULL)      free(mcP->username);
-    if (mcP->password != NULL)      free(mcP->password);
-    if (mcP->version  != NULL)      free(mcP->version);
+  if (mcP->host     != NULL)      free(mcP->host);
+  if (mcP->username != NULL)      free(mcP->username);
+  if (mcP->password != NULL)      free(mcP->password);
+  if (mcP->version  != NULL)      free(mcP->version);
 
-    MQTTClient_disconnect(&mcP->client, 10000);
-    MQTTClient_destroy(&mcP->client);
-  }
-
-  free(mqttConnectionList);
-  mqttConnectionList = NULL;
+  MQTTClient_disconnect(&mcP->client, 10000);
+  MQTTClient_destroy(&mcP->client);
 }

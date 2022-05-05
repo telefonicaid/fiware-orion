@@ -41,6 +41,7 @@ typedef struct MqttConnection
   char*           password;
   char*           version;
   MQTTClient      client;
+  int             connections;  // When down at 0 - the connection is closed
 } MqttConnection;
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTION_H_

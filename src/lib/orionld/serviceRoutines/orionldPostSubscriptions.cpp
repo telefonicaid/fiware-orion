@@ -29,6 +29,7 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_FT
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
@@ -40,7 +41,7 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
-#include "cache/subCache.h"                                    // subCacheItemLookup
+#include "cache/subCache.h"                                    // subCacheItemLookup, CachedSubscription
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
 
@@ -56,6 +57,7 @@ extern "C"
 #include "orionld/mongoc/mongocSubscriptionInsert.h"           // mongocSubscriptionInsert
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
+#include "orionld/mqtt/mqttDisconnect.h"                       // mqttDisconnect
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qRender.h"                                 // qRender
 #include "orionld/q/qRelease.h"                                // qRelease
@@ -73,6 +75,8 @@ static bool orionldPostSubscriptionsWithMongoBackend(void)
   ngsiv2::Subscription sub;
   std::string          subId;
   OrionError           oError;
+
+  LM_TMP(("In old PostSubscription function - using mongoBackend"));
 
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
@@ -162,6 +166,12 @@ static bool orionldPostSubscriptionsWithMongoBackend(void)
       //
       // Establish connection with MQTT broker
       //
+      LM_TMP(("MQTT: mqtts:        %s", K_FT(mqtts)));
+      LM_TMP(("MQTT: mqttUser:     %s", mqttUser));
+      LM_TMP(("MQTT: mqttPassword: %s", mqttPassword));
+      LM_TMP(("MQTT: mqttHost:     %s", mqttHost));
+      LM_TMP(("MQTT: mqttPort:     %d", mqttPort));
+      LM_TMP(("MQTT: mqttVersion:  %s", mqttVersion));
       if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
       {
         orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
@@ -235,7 +245,6 @@ bool qFix(KjNode* subP, KjNode* qNode, QNode* qTree)
   KjNode* qNodeForV2;
   KjNode* mqNodeForV2;
 
-  LM_TMP(("QR: Calling qRender(qTree=%p)", qTree));
   if (qRender(qTree, V2, qText, sizeof(qText), &mq) == false)
   {
     qNodeForV2  = kjString(orionldState.kjsonP, "q", "P;!P");
@@ -273,17 +282,19 @@ bool qFix(KjNode* subP, KjNode* qNode, QNode* qTree)
 bool orionldPostSubscriptions(void)
 {
   if (experimental == false)
-    return orionldPostSubscriptionsWithMongoBackend();  // this will be removed!! :)
+    return orionldPostSubscriptionsWithMongoBackend();  // this will be removed!! (after thorough testing)
 
-  KjNode*  subP      = orionldState.requestTree;
-  KjNode*  subIdP    = orionldState.payloadIdNode;
-  KjNode*  endpointP = NULL;
-  KjNode*  qNode     = NULL;
-  QNode*   qTree     = NULL;
-  char*    qText     = NULL;
+  KjNode*  subP           = orionldState.requestTree;
+  KjNode*  subIdP         = orionldState.payloadIdNode;
+  KjNode*  endpointP      = NULL;
+  KjNode*  qNode          = NULL;
+  KjNode*  uriP           = NULL;
+  KjNode*  notifierInfoP  = NULL;
+  QNode*   qTree          = NULL;
+  char*    qText          = NULL;
   char*    subId;
 
-  if (pCheckSubscription(subP, orionldState.payloadIdNode, orionldState.payloadTypeNode, &endpointP, &qNode, &qTree, &qText) == false)
+  if (pCheckSubscription(subP, orionldState.payloadIdNode, orionldState.payloadTypeNode, &endpointP, &qNode, &qTree, &qText, &uriP, &notifierInfoP) == false)
   {
     if (qTree != NULL)
       qRelease(qTree);
@@ -343,10 +354,71 @@ bool orionldPostSubscriptions(void)
   kjChildAdd(subP, createdAt);
   kjChildAdd(subP, modifiedAt);
 
-  // Counters
+  // Counters ...
+
+
+  //
+  // If MQTT, the connection to the NQTT broker needs to be established before the subscription is accepted
+  //
+  bool            mqttSubscription = false;
+  bool            mqtts            = false;
+  char*           mqttUser         = NULL;
+  char*           mqttPassword     = NULL;
+  char*           mqttHost         = NULL;
+  unsigned short  mqttPort         = 0;
+  char*           mqttTopic        = NULL;
+  char*           mqttVersion      = NULL;  // NOTE, my (KZ) local mosquitto seems to only support "mqtt3.1.1"
+  int             mqttQoS          = 0;
+
+  if (strncmp(uriP->value.s, "mqtt://", 7) == 0)  // pCheckSubscription guarantees uriP is non-NULL and a KjString
+  {
+    char*           detail        = NULL;
+    char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
+
+    if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+    {
+      orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
+      return false;
+    }
+
+    //
+    // Get MQTT Version  from Subscription::notification::endpoint::notifierInfo Array, "key == MQTT-Version"
+    // Get MQTT QoS      from Subscription::notification::endpoint::notifierInfo Array, "key == MQTT-QoS"
+    //
+    // Validity of the values is verified in pcheckNotifierInfo
+    //
+    if (notifierInfoP)
+    {
+      for (KjNode* kvPairP = notifierInfoP->value.firstChildP; kvPairP != NULL; kvPairP = kvPairP->next)
+      {
+        KjNode* keyP   = kjLookup(kvPairP, "key");
+        KjNode* valueP = kjLookup(kvPairP, "value");
+
+        if      (strcmp(keyP->name, "MQTT-Version") == 0)  mqttVersion = valueP->value.s;
+        else if (strcmp(keyP->name, "MQTT-QoS")     == 0)  mqttQoS     = atoi(valueP->value.s);
+      }
+    }
+
+    //
+    // Establish connection with MQTT broker
+    //
+    LM_TMP(("MQTT: mqtts:        %s", K_FT(mqtts)));
+    LM_TMP(("MQTT: mqttUser:     %s", mqttUser));
+    LM_TMP(("MQTT: mqttPassword: %s", mqttPassword));
+    LM_TMP(("MQTT: mqttHost:     %s", mqttHost));
+    LM_TMP(("MQTT: mqttPort:     %d", mqttPort));
+    LM_TMP(("MQTT: mqttVersion:  %s", mqttVersion));
+    if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
+    {
+      orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
+      return false;
+    }
+
+    mqttSubscription = true;
+  }
 
   // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
-  subCacheApiSubscriptionInsert(subP, qTree, orionldState.contextP);
+  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, orionldState.contextP);
 
   // dbModel
   KjNode* dbSubscriptionP = subP;
@@ -356,9 +428,12 @@ bool orionldPostSubscriptions(void)
   // sub to db - mongocSubscriptionInsert(subP);
   if (mongocSubscriptionInsert(dbSubscriptionP, subIdP->value.s) == false)
   {
-    LM_TMP(("mongocSubscriptionInsert failed"));
-    // orionldError is part of mongocSubscriptionInsert
-    // Remove from cache
+    // orionldError is done by mongocSubscriptionInsert
+    LM_E(("mongocSubscriptionInsert failed"));
+    if (mqttSubscription == true)
+      mqttDisconnect(mqttHost, mqttPort, mqttUser, mqttPassword, mqttVersion);
+
+    subCacheItemRemove(cSubP);
 
     if (qTree != NULL)
       qRelease(qTree);
@@ -366,7 +441,23 @@ bool orionldPostSubscriptions(void)
     return false;
   }
 
-  LM_TMP(("mongocSubscriptionInsert OK"));
+  //
+  // MQTT details to the cached subscription
+  //
+  bzero(&cSubP->httpInfo.mqtt.mqtts, sizeof(cSubP->httpInfo.mqtt.mqtts));
+  if (mqttSubscription == true)
+  {
+    cSubP->httpInfo.mqtt.mqtts = mqtts;
+    cSubP->httpInfo.mqtt.port  = mqttPort;
+    cSubP->httpInfo.mqtt.qos   = mqttQoS;
+
+    if (mqttHost     != NULL)  strncpy(cSubP->httpInfo.mqtt.host,     mqttHost,     sizeof(cSubP->httpInfo.mqtt.host)     - 1);
+    if (mqttUser     != NULL)  strncpy(cSubP->httpInfo.mqtt.username, mqttUser,     sizeof(cSubP->httpInfo.mqtt.username) - 1);
+    if (mqttPassword != NULL)  strncpy(cSubP->httpInfo.mqtt.password, mqttPassword, sizeof(cSubP->httpInfo.mqtt.password) - 1);
+    if (mqttVersion  != NULL)  strncpy(cSubP->httpInfo.mqtt.version,  mqttVersion,  sizeof(cSubP->httpInfo.mqtt.version)  - 1);
+    if (mqttTopic    != NULL)  strncpy(cSubP->httpInfo.mqtt.topic,    mqttTopic,    sizeof(cSubP->httpInfo.mqtt.topic)    - 1);
+  }
+
   orionldState.httpStatusCode = 201;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subIdP->value.s);
 

@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldContextSimplify.h"            // orionldContextSimplify
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // Own interface
 
@@ -492,6 +493,21 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
   // And finally, the @context
   if (orionldState.payloadContextNode != NULL)
   {
+    // Simplify if possible
+    int items;
+    if (orionldState.payloadContextNode->type == KjArray)
+    {
+      orionldState.payloadContextNode = orionldContextSimplify(orionldState.payloadContextNode, &items);
+      if (items == 1)
+      {
+        orionldState.payloadContextNode->type  = orionldState.payloadContextNode->value.firstChildP->type;
+        orionldState.payloadContextNode->value = orionldState.payloadContextNode->value.firstChildP->value;
+      }
+    }
+
+    if (orionldState.payloadContextNode->type != KjString)
+      LM_W(("Mayday Mayday - context is not a string ..."));
+
     orionldState.payloadContextNode->name = (char*) "ldContext";
     kjChildAdd(apiSubscriptionP, orionldState.payloadContextNode);
   }

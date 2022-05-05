@@ -92,7 +92,18 @@ extern "C"
 // * Either 'timeInterval' or 'watchedAttributes' must be present. But not both of them
 // * For now, 'timeInterval' will not be implemented. If ever ...
 //
-bool pCheckSubscription(KjNode* subP, KjNode* idP, KjNode* typeP, KjNode** endpointP, KjNode** qNodeP, QNode** qTreeP, char** qTextP)
+bool pCheckSubscription
+(
+  KjNode*   subP,
+  KjNode*   idP,
+  KjNode*   typeP,
+  KjNode**  endpointP,
+  KjNode**  qNodeP,
+  QNode**   qTreeP,
+  char**    qTextP,
+  KjNode**  uriPP,
+  KjNode**  notifierInfoPP
+)
 {
   PCHECK_OBJECT(subP, 0, NULL, "A Subscription must be a JSON Object", 400);
 
@@ -196,7 +207,7 @@ bool pCheckSubscription(KjNode* subP, KjNode* idP, KjNode* typeP, KjNode** endpo
     {
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       PCHECK_DUPLICATE(notificationP,  subItemP, 0, NULL, SubscriptionNotificationPath, 400);
-      if (pCheckNotification(notificationP, false) == false)
+      if (pCheckNotification(notificationP, false, uriPP, notifierInfoPP) == false)
         return false;
     }
     else if ((strcmp(subItemP->name, "expiresAt") == 0) || (strcmp(subItemP->name, "expires") == 0))

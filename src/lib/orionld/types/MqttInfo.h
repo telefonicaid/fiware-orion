@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
-#define SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_MQTTINFO_H_
+#define SRC_LIB_ORIONLD_TYPES_MQTTINFO_H_
 
 /*
 *
@@ -25,21 +25,23 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+
+
+
+/* ****************************************************************************
+*
+* MqttInfo -
+*/
+typedef struct MqttInfo
 {
-#include "kjson/KjNode.h"                                      // KjNode
-}
+  bool            mqtts;
+  char            host[64];
+  unsigned short  port;
+  char            topic[128];
+  char            username[128];
+  char            password[128];
+  char            version[16];
+  int             qos;
+} MqttInfo;
 
-#include "cache/subCache.h"                                    // CachedSubscription
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-
-
-
-// -----------------------------------------------------------------------------
-//
-// subCacheApiSubscriptionInsert -
-//
-extern CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, OrionldContext* contextP);
-
-#endif  // SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_MQTTINFO_H_

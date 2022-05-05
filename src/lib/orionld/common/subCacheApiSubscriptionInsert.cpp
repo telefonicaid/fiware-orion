@@ -52,7 +52,7 @@ extern "C"
 // subCacheApiSubscriptionInsert -
 // subCacheDbSubscriptionInsert - later ...
 //
-bool subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, OrionldContext* contextP)
+CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, OrionldContext* contextP)
 {
   CachedSubscription* cSubP = new CachedSubscription();
 
@@ -289,5 +289,5 @@ bool subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, Orion
 
   subCacheItemInsert(cSubP);
 
-  return true;
+  return cSubP;
 }

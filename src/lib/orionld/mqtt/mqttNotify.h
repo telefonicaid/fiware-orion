@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
-#define SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#ifndef SRC_LIB_ORIONLD_MQTT_MQTTNOTIFY_H_
+#define SRC_LIB_ORIONLD_MQTT_MQTTNOTIFY_H_
 
 /*
 *
@@ -25,21 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
+#include <sys/uio.h>                                           // struct iovec
 
 #include "cache/subCache.h"                                    // CachedSubscription
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// subCacheApiSubscriptionInsert -
+// mqttNotify -
 //
-extern CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, OrionldContext* contextP);
+extern int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTNOTIFY_H_

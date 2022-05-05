@@ -36,6 +36,17 @@ extern "C"
 //
 // pCheckSubscription -
 //
-extern bool pCheckSubscription(KjNode* subP, KjNode* idP, KjNode* typeP, KjNode** endpointP, KjNode** qNodeP, QNode** qTreeP, char** qTextP);
+extern bool pCheckSubscription
+(
+  KjNode*   subP,
+  KjNode*   idP,
+  KjNode*   typeP,
+  KjNode**  endpointP,
+  KjNode**  qNodeP,
+  QNode**   qTreeP,
+  char**    qTextP,
+  KjNode**  uriPP,
+  KjNode**  notifierInfoPP
+);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_

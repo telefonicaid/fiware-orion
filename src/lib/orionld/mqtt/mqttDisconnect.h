@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
-#define SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#ifndef SRC_LIB_ORIONLD_MQTT_MQTTDISCONNECT_H_
+#define SRC_LIB_ORIONLD_MQTT_MQTTDISCONNECT_H_
 
 /*
 *
@@ -25,21 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
-
-#include "cache/subCache.h"                                    // CachedSubscription
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
 
 
 
 // -----------------------------------------------------------------------------
 //
-// subCacheApiSubscriptionInsert -
+// mqttConnect -
 //
-extern CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, OrionldContext* contextP);
+extern void mqttDisconnect(const char* host, unsigned short port, const char* username, const char* password, const char* version);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTDISCONNECT_H_

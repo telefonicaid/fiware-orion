@@ -216,7 +216,10 @@ bool pcheckSubscription
     }
   }
 
-  if ((notificationP != NULL) && (pCheckNotification(notificationP, patch) == false))
+  KjNode* uriP;
+  KjNode* notifierInfoP;
+
+  if ((notificationP != NULL) && (pCheckNotification(notificationP, patch, &uriP, &notifierInfoP) == false))
       return false;
 
   return true;

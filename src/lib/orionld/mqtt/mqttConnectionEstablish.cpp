@@ -37,11 +37,19 @@
 //
 bool mqttConnectionEstablish(bool mqtts, const char* username, const char* password, const char* host, unsigned short port, const char* version)
 {
-  if (mqttConnectionLookup(host, port, username, password, version) != NULL)
-    return true;  // Already connected
+  MqttConnection* mqP = mqttConnectionLookup(host, port, username, password, version);
 
-  if (mqttConnectionAdd(mqtts, username, password, host, port, version) == NULL)
+  if (mqP != NULL)
+  {
+    // Already connected
+    mqP->connections += 1;
+    return true;
+  }
+
+  mqP = mqttConnectionAdd(mqtts, username, password, host, port, version);
+  if (mqP == NULL)
     return false;
 
+  mqP->connections = 1;
   return true;
 }

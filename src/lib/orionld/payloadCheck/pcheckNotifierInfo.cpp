@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdlib.h>                                             // strtoul
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
@@ -77,6 +79,53 @@ bool pcheckNotifierInfo(KjNode* niP)
     if (valueP == NULL)
     {
       orionldError(OrionldBadRequestData, "Mandatory field missing in endpoint::notifierInfo array item", "value", 400);
+      return false;
+    }
+
+    //
+    // Only two "notifier infos" are supported at the moment:
+    // * MQTT-Version
+    // * MQTT-QoS
+    // And these two support just a few values:
+    // * MQTT-Version:
+    //   - mqtt5.0 (default)
+    //   - mqtt3.1.1
+    //
+    // * MQTT-QoS
+    //   - 0
+    //   - 1
+    //   - 2
+    //
+    if (strcmp(keyP->value.s, "MQTT-Version") == 0)
+    {
+      if ((strcmp(valueP->value.s, "mqtt5.0") != 0) && (strcmp(valueP->value.s, "mqtt3.1.1") != 0))
+      {
+        orionldError(OrionldBadRequestData, "Invalid value for notifierInfo item /MQTT-Version/", valueP->value.s, 400);
+        return false;
+      }
+    }
+    else if (strcmp(keyP->value.s, "MQTT-QoS") == 0)
+    {
+      char*        rest = NULL;
+      unsigned int QoS  = strtoul(valueP->value.s, &rest, 10);
+
+      if (*rest != 0)
+      {
+        LM_TMP(("ERROR: keyP->value.s == '%s'", keyP->value.s));
+        LM_TMP(("ERROR: rest == '%s'", rest));
+        orionldError(OrionldBadRequestData, "Invalid value for notifierInfo item /MQTT-OoS/ - not a valid number", valueP->value.s, 400);
+        return false;
+      }
+
+      if (QoS > 2)
+      {
+        orionldError(OrionldBadRequestData, "Invalid value for notifierInfo item /MQTT-OoS/ - only 0, 1, and 2 are allowed", valueP->value.s, 400);
+        return false;
+      }
+    }
+    else
+    {
+      orionldError(OrionldBadRequestData, "Non-supported key in notifierInfo", keyP->value.s, 400);
       return false;
     }
   }

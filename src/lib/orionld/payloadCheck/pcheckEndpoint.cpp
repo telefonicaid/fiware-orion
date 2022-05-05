@@ -42,7 +42,7 @@ extern "C"
 //
 // pcheckEndpoint -
 //
-bool pcheckEndpoint(KjNode* endpointP, bool patch)
+bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP)
 {
   KjNode* uriP           = NULL;
   KjNode* acceptP        = NULL;
@@ -96,6 +96,9 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch)
     orionldError(OrionldBadRequestData, "Mandatory field missing in 'endpoint'", "uri", 400);
     return false;
   }
+
+  *uriPP          = uriP;
+  *notifierInfoPP = notifierInfoP;
 
   return true;
 }

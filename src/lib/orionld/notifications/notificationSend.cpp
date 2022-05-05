@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/notifications/notificationSend.h"              // Own interface
@@ -695,6 +696,12 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   }
   // </DEBUG>
 
+  //
+  // Now, the message is ready, is this an HTTP notification?
+  // If it's MQTT, then something very different will have to be done instead !
+  //
+  if (strcmp(mAltP->subP->protocol, "mqtt") == 0)
+    return mqttNotify(mAltP->subP, ioVec, ioVecLen);
 
   // Connect
   LM_TMP(("Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));

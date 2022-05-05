@@ -316,7 +316,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     }
   }
 
-  LM_TMP(("Mark all subs for unanswered notifications as timed out if npP->fd != -1"));
+  LM_TMP(("Mark all non-mqtt subs for unanswered notifications as timed out if npP->fd != -1"));
   NotificationPending* npP = notificationList;
   while (npP != NULL)
   {
