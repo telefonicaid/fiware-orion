@@ -310,7 +310,7 @@ Notifications: 1
     "H2": "456",
     "Link": "REGEX(.*)",
     "Ngsild-Attribute-Format": "Normalized",
-    "User-Agent": "orionld"
+    "User-Agent": "orionld/REGEX(.*)"
   }
 }
 =======================================
@@ -405,7 +405,7 @@ Notifications: 1
     "H2": "456",
     "Link": "REGEX(.*)",
     "Ngsild-Attribute-Format": "Normalized",
-    "User-Agent": "orionld",
+    "User-Agent": "orionld/REGEX(.*)",
     "X-Auth-Token": "x-auth-token-is-not-verified"
   }
 }

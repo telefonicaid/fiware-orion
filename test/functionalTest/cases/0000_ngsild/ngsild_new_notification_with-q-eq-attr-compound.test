@@ -135,7 +135,7 @@ Date: REGEX(.*)
 ==============================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subs:S1
 Content-Length: 244
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
