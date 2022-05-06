@@ -53,6 +53,11 @@ Subscription::~Subscription()
     }
     restriction.scopeVector.vec.clear();
   }
+
+  for (unsigned int ix = 0; ix < notification.httpInfo.notifierInfo.size(); ix++)
+  {
+    free(notification.httpInfo.notifierInfo[ix]);
+  }
 }
 
 

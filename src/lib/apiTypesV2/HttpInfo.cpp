@@ -33,6 +33,7 @@
 #include "mongoBackend/safeMongo.h"
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/KeyValue.h"                            // KeyValue, keyValueAdd
 
 #include "apiTypesV2/HttpInfo.h"
 
@@ -165,12 +166,8 @@ void HttpInfo::fill(const BSONObj* boP)
 
       const char*  key   = be.fieldName();
       const char*  value = be.String().c_str();
-      KeyValue*    kvP   = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
 
-      strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
-      strncpy(kvP->value, value, sizeof(kvP->value) - 1);
-
-      notifierInfo.push_back(kvP);
+      keyValueAdd(&notifierInfo, key, value);
     }
   }
 

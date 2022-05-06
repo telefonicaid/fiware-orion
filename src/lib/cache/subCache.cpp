@@ -627,11 +627,14 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   }
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
+  {
+    LM_TMP(("VE: Freeing Key-Value Pair %p: %s:%s (receiverInfo)", cSubP->httpInfo.notifierInfo[ix], cSubP->httpInfo.notifierInfo[ix]->key, cSubP->httpInfo.notifierInfo[ix]->value));
     free(cSubP->httpInfo.receiverInfo[ix]);
+  }
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.notifierInfo.size(); ++ix)
   {
-    LM_TMP(("VE: Freeing notifierInfo %p: %s:%s", cSubP->httpInfo.notifierInfo[ix], cSubP->httpInfo.notifierInfo[ix]->key, cSubP->httpInfo.notifierInfo[ix]->value));
+    LM_TMP(("VE: Freeing Key-Value Pair %p: %s:%s (notifierInfo)", cSubP->httpInfo.notifierInfo[ix], cSubP->httpInfo.notifierInfo[ix]->key, cSubP->httpInfo.notifierInfo[ix]->value));
     free(cSubP->httpInfo.notifierInfo[ix]);
   }
 
