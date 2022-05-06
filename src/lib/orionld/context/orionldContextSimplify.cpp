@@ -59,7 +59,10 @@ KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
     KjNode* next = nodeP->next;
 
     if ((nodeP->type == KjString) && (strcmp(nodeP->value.s, coreContextUrl) == 0))
+    {
+      LM_TMP(("VL: Removing Core Context from Array"));
       kjChildRemove(contextTreeP, nodeP);
+    }
     else
       ++itemsInArray;
 

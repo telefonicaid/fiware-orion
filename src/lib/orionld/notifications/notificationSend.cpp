@@ -42,7 +42,7 @@ extern "C"
 #include "logMsg/logMsg.h"
 
 #include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
+#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
@@ -52,6 +52,7 @@ extern "C"
 #include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -60,17 +61,20 @@ extern "C"
 //
 // Fixed value headers
 //
-static const char* contentTypeHeaderJson   = (char*) "Content-Type: application/json\r\n";
-static const char* contentTypeHeaderJsonLd = (char*) "Content-Type: application/ld+json\r\n";
-static const char* userAgentHeader         = (char*) "User-Agent: orionld\r\n";
-static const char* acceptHeader            = (char*) "Accept: application/json\r\n";
+static const char* contentTypeHeaderJson    = (char*) "Content-Type: application/json\r\n";
+static const char* contentTypeHeaderJsonLd  = (char*) "Content-Type: application/ld+json\r\n";
+static const char* contentTypeHeaderGeoJson = (char*) "Content-Type: application/geo+json\r\n";
+static const char* acceptHeader             = (char*) "Accept: application/json\r\n";
 
-static const char* normalizedHeader        = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
-static const char* conciseHeader           = (char*) "Ngsild-Attribute-Format: Concise\r\n";
-static const char* simplifiedHeader        = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
+static const char* normalizedHeader         = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
+static const char* conciseHeader            = (char*) "Ngsild-Attribute-Format: Concise\r\n";
+static const char* simplifiedHeader         = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
 
-static const char* normalizedHeaderNgsiV2  = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
-static const char* keyValuesHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
+static const char* normalizedHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
+static const char* keyValuesHeaderNgsiV2    = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
+
+char    userAgentHeader[64];     // "User-Agent: orionld/" + ORIONLD_VERSION + \r\n" - initialized by orionldServiceInit()
+size_t  userAgentHeaderLen = 0;  // Also set in orionldServiceInit()
 
 
 
@@ -481,11 +485,16 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   if (mAltP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, mAltP);
 
+  LM_TMP(("GEO: sub::accept: %s", mimeTypeToString(mAltP->subP->httpInfo.mimeType)));
 
   //
   // Payload Body
   //
   KjNode*            notificationP    = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
+
+  if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
+    notificationDataToGeoJson(notificationP);
+
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
   char*              payloadBody      = (payloadBodySize < sizeof(body))? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
 
@@ -551,7 +560,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     { requestHeader,                 requestHeaderLen },
     { contentLenHeader,              strlen(contentLenHeader) },
     { (void*) contentTypeHeaderJson, 32 },  // Index 2
-    { (void*) userAgentHeader,       21 },
+    { (void*) userAgentHeader,       userAgentHeaderLen },
     { (void*) acceptHeader,          26 },
     { (void*) normalizedHeader,      37 }   // Index 5
   };
@@ -559,12 +568,20 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   //
   // Content-Type and Link
   //
+  bool addLinkHeader = true;
   if (mAltP->subP->httpInfo.mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;  // REPLACE "application/json" with "application/ld+json"
     ioVec[2].iov_len  = 35;
+    addLinkHeader     = false;
   }
-  else if (ngsiv2 == false)  // Add Link header - but not if NGSIv2 Cross Notification
+  else if (mAltP->subP->httpInfo.mimeType == GEOJSON)
+  {
+    ioVec[2].iov_base = (void*) contentTypeHeaderGeoJson;  // REPLACE "application/json" with "application/geo+json"
+    ioVec[2].iov_len  = 36;
+  }
+
+  if ((addLinkHeader == true) && (ngsiv2 == false))  // Add Link header - but not if NGSIv2 Cross Notification
   {
     char         linkHeader[512];
     const char*  link = (mAltP->subP->ldContext == "")? ORIONLD_CORE_CONTEXT_URL_V1_0 : mAltP->subP->ldContext.c_str();

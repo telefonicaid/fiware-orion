@@ -51,10 +51,11 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
 }
 
+#include "cache/subCache.h"                                    // CachedSubscription
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
-#include "cache/subCache.h"                                    // CachedSubscription
+#include "orionld/notifications/notificationDataToGeoJson.h"   // notificationDataToGeoJson
 #endif
 
 #include "ngsiNotify/Notifier.h"
@@ -405,30 +406,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
   }
 
   return paramsV;
-}
-
-
-
-
-/* ****************************************************************************
-*
-* notificationDataToGeoJson -
-*/
-static void notificationDataToGeoJson(KjNode* notificationNodeP)
-{
-  KjNode* dataP = kjLookup(notificationNodeP, "data");
-
-  if (dataP != NULL)
-  {
-    kjChildRemove(notificationNodeP, dataP);
-
-    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP);
-
-    geojsonTree->name = (char*) "data";
-    kjChildAdd(notificationNodeP, geojsonTree);
-  }
-  else
-    LM_E(("Internal Error (no 'data' member found in a notification node)"));
 }
 
 

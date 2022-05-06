@@ -44,7 +44,7 @@ extern "C"
 #include "kjson/kjParse.h"                                           // kjParse
 }
 
-#include "orionld/common/orionldState.h"                             // orionldState
+#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
@@ -521,10 +521,11 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 //
 void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, char* cachedContextDir)
 {
-  int svIx;    // Service Vector Index
-
   bzero(orionldRestServiceV, sizeof(orionldRestServiceV));
 
+  userAgentHeaderLen = snprintf(userAgentHeader, sizeof(userAgentHeader) -1, "User-Agent: orionld/%s\r\n", ORIONLD_VERSION);  // Used in notifications as value of HTTP Header User-Agent
+
+  int svIx;    // Service Vector Index
   for (svIx = 0; svIx < vecItems; svIx++)
   {
     // svIx is really the Verb (GET=0, POST=2, up to NOVERB=9. See src/lib/rest/Verb.h)

@@ -497,9 +497,13 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     int items;
     if (orionldState.payloadContextNode->type == KjArray)
     {
+      LM_TMP(("VL: Simplifying Array context at %p", orionldState.payloadContextNode));
       orionldState.payloadContextNode = orionldContextSimplify(orionldState.payloadContextNode, &items);
+      LM_TMP(("VL: Simplified Array context now at %p", orionldState.payloadContextNode));
+
       if (items == 1)
       {
+        LM_TMP(("VL: Converting an Array to a String"));
         orionldState.payloadContextNode->type  = orionldState.payloadContextNode->value.firstChildP->type;
         orionldState.payloadContextNode->value = orionldState.payloadContextNode->value.firstChildP->value;
       }

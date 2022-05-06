@@ -62,7 +62,7 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** noti
       DUPLICATE_CHECK(acceptP, "endpoint::accept", epItemP);
       STRING_CHECK(acceptP, "endpoint::accept");
       EMPTY_STRING_CHECK(acceptP, "endpoint::accept");
-      if ((strcmp(acceptP->value.s, "application/json") != 0) && (strcmp(acceptP->value.s, "application/ld+json") != 0))
+      if ((strcmp(acceptP->value.s, "application/json") != 0) && (strcmp(acceptP->value.s, "application/ld+json") != 0) && (strcmp(acceptP->value.s, "application/geo+json") != 0))
       {
         orionldError(OrionldBadRequestData, "Unsupported Mime-type in 'accept'", epItemP->value.s, 400);
         return false;
