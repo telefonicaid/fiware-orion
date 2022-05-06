@@ -64,3 +64,31 @@ void orionldError
 
   LM_E(("***** ERROR %s: %s (status code: %d)", title, detail, status));
 }
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldError2 - to be used together with the macros OERROR/OERRORV
+//
+void orionldError2
+(
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               detail,
+  int                       status,
+  const char*               fileName,
+  int                       lineNo,
+  const char*               funcName
+)
+{
+  orionldState.pd.type    = errorType;
+  orionldState.pd.title   = (title  != NULL)? kaStrdup(&orionldState.kalloc, title)  : NULL;
+  orionldState.pd.detail  = (detail != NULL)? kaStrdup(&orionldState.kalloc, detail) : NULL;
+  orionldState.pd.status  = status;
+  // Copy also fileName, lineNo, funcName into orionldState.pd?
+
+  orionldState.httpStatusCode = status;  // FIXME: To Remove - Use orionldState.pd.status instead
+
+  LM_E(("***** ERROR %s: %s | sc: %d | %s[%d]:%s", title, detail, status, fileName, lineNo, funcName));
+}
