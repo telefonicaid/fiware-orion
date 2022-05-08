@@ -554,7 +554,7 @@ void exitFunc(void)
   mqttRelease();
 
   //
-  // Free the kalloc buffer
+  // Free the kalloc buffer - the buffer that should not be used!
   //
   kaBufferReset(&kalloc, false);
 

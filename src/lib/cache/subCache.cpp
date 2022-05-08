@@ -628,17 +628,26 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
   {
-    LM_TMP(("VE: Freeing Key-Value Pair %p: %s:%s (receiverInfo)", cSubP->httpInfo.notifierInfo[ix], cSubP->httpInfo.notifierInfo[ix]->key, cSubP->httpInfo.notifierInfo[ix]->value));
-    free(cSubP->httpInfo.receiverInfo[ix]);
+    if (cSubP->httpInfo.receiverInfo[ix] != NULL)
+    {
+      LM_TMP(("VE: Freeing Key-Value Pair at %p (receiverInfo)", cSubP->httpInfo.receiverInfo[ix]));
+      free(cSubP->httpInfo.receiverInfo[ix]);
+      cSubP->httpInfo.receiverInfo[ix] = NULL;
+    }
   }
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.notifierInfo.size(); ++ix)
   {
-    LM_TMP(("VE: Freeing Key-Value Pair %p: %s:%s (notifierInfo)", cSubP->httpInfo.notifierInfo[ix], cSubP->httpInfo.notifierInfo[ix]->key, cSubP->httpInfo.notifierInfo[ix]->value));
-    free(cSubP->httpInfo.notifierInfo[ix]);
+    if (cSubP->httpInfo.notifierInfo[ix] != NULL)
+    {
+      LM_TMP(("VE: Freeing Key-Value Pair at %p (notifierInfo)", cSubP->httpInfo.notifierInfo[ix]));
+      free(cSubP->httpInfo.notifierInfo[ix]);
+      cSubP->httpInfo.notifierInfo[ix] = NULL;
+    }
   }
 
   cSubP->next = NULL;
+  LM_TMP(("VL: All Done"));
 }
 
 
@@ -818,7 +827,6 @@ void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
-#ifdef ORIONLD
   const std::string&                 name,
   const std::string&                 ldContext,
   const std::string&                 lang,
@@ -826,14 +834,11 @@ void subCacheItemInsert
   const char*                        mqttPassword,
   const char*                        mqttVersion,
   int                                mqttQoS,
-#endif
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-#ifdef ORIONLD
   const std::string&                 geoproperty,
-#endif
   bool                               blacklist
 )
 {
@@ -876,7 +881,7 @@ void subCacheItemInsert
   cSubP->name                    = name;
   cSubP->expression.geoproperty  = geoproperty;
 
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (ldContext != "")
   {
     cSubP->ldContext = ldContext;
     cSubP->lang      = lang;
@@ -888,6 +893,8 @@ void subCacheItemInsert
       cSubP->contextP = orionldState.contextP;
     }
   }
+  else
+    cSubP->ldContext = "";
 
   // Counters and stats
   cSubP->lastNotificationTime  = 0;  // Or, does this come from DB ?
@@ -1183,6 +1190,7 @@ typedef struct CachedSubSaved
   int64_t  count;
   double   lastFailure;
   double   lastSuccess;
+  bool     ngsild;
 } CachedSubSaved;
 
 
@@ -1246,6 +1254,7 @@ void subCacheSync(void)
     cssP->count                = cSubP->count;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
+    cssP->ngsild               = (cSubP->ldContext != "")? true : false;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1309,7 +1318,8 @@ void subCacheSync(void)
                              cssP->count,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
-                             cssP->lastSuccess);
+                             cssP->lastSuccess,
+                             cssP->ngsild);
 
       // Keeping lastFailure and lastSuccess in sub cache
       cSubP->lastFailure = cssP->lastFailure;
@@ -1394,15 +1404,15 @@ extern bool noCache;
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
+void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors, bool ngsild)
 {
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
     if (errors == 0)
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime, ngsild);  // lastFailure == -1
     else
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1);  // lastSuccess == -1, count == 0
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1, ngsild);  // lastSuccess == -1, count == 0
 
     return;
   }

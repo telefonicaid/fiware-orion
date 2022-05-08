@@ -65,7 +65,7 @@ bool orionldGetSubscription(void)
   subscription.throttling          = -1;  // 0?
   subscription.timeInterval        = -1;  // 0?
 
-  // if (cSubP == NULL) - once I havce the function to "render a KjNode tree from the cache contents"
+  // if (cSubP == NULL) - once I have the function to "render a KjNode tree from the cache contents"
   {
     if (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false)
     {

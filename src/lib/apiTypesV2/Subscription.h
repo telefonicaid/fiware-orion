@@ -110,7 +110,6 @@ struct Subscription
   RenderFormat  attrsFormat;
   Restriction   restriction;
 
-#ifdef ORIONLD
   double        createdAt;
   double        modifiedAt;
   std::string   name;
@@ -119,7 +118,6 @@ struct Subscription
   std::string   csf;
   std::string   lang;
   std::string   ldQ;
-#endif
 
   std::string   toJson();
 

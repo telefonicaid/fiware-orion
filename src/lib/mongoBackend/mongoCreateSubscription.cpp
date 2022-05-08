@@ -246,6 +246,13 @@ std::string mongoCreateSubscription
     setLastNotification(lastNotification, &b);
     setCount(1, &b);
   }
+#if 0
+  else
+  {
+    setLastNotification(0, &b);
+    setCount(0, &b);
+  }
+#endif
 
   setExpression(sub, &b);
   setFormat(sub, &b);

@@ -28,6 +28,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"                         // orionldState
+
 #include "common/JsonHelper.h"
 #include "common/globals.h"
 #include "apiTypesV2/Subscription.h"
@@ -54,9 +56,18 @@ Subscription::~Subscription()
     restriction.scopeVector.vec.clear();
   }
 
-  for (unsigned int ix = 0; ix < notification.httpInfo.notifierInfo.size(); ix++)
+  // Free notifierInfo, UNLESS this subscription is now part of the cache
+  if ((orionldState.serviceP != NULL) && (orionldState.verb == GET))
   {
-    free(notification.httpInfo.notifierInfo[ix]);
+    for (unsigned int ix = 0; ix < notification.httpInfo.notifierInfo.size(); ix++)
+    {
+      if (notification.httpInfo.notifierInfo[ix] != NULL)
+      {
+        LM_TMP(("VE: Freeing Key-Value Pair at %p (notifierInfo)", notification.httpInfo.notifierInfo[ix]));
+        free(notification.httpInfo.notifierInfo[ix]);
+        notification.httpInfo.notifierInfo[ix] = NULL;
+      }
+    }
   }
 }
 

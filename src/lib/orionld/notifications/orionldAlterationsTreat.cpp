@@ -152,7 +152,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   matchList = subCacheAlterationMatch(altList, &matches);
 
   if (matchList == NULL)
-    LM_RVE(("No matching subscriptions"));
+    return;
 
 
   //

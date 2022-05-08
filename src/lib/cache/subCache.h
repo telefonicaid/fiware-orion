@@ -365,7 +365,8 @@ extern void subCacheItemNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors
+  int                 errors,
+  bool                ngsild
 );
 
 
