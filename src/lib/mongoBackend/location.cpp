@@ -97,6 +97,7 @@ static bool stringArray2coords
 }
 
 
+
 /* ****************************************************************************
 *
 * isFeatureGeoJson -
@@ -116,6 +117,7 @@ static bool isFeatureGeoJson(const ContextAttribute* caP)
   }
   return false;
 }
+
 
 
 /* ****************************************************************************
@@ -206,6 +208,8 @@ static bool getGeoJson
      */
     orion::BSONObjBuilder bo;
 
+    // GeoJSON Feature has an especial treatmente, the geometry is extracted from
+    // "geometry" field at the first level
     if (isFeatureGeoJson(caP))
     {
       for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)

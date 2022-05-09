@@ -33,6 +33,12 @@ brokerStart CB
 # 01. Create entity with geo:json using Feature type
 # 02. Get entity and see Feature
 # 03. Geoquery covering the location returns the entity
+# 04. Update entity with a regular geo:json Point
+# 05. Get entity and see Point
+# 06. Geoquery covering the location returns the entity
+# 07. Update entity with a Feature again
+# 08. Get entity and see Feature
+# 09. Geoquery covering the location returns the entity
 #
 
 echo "01. Create entity with geo:json using Feature type"
@@ -72,6 +78,78 @@ echo
 echo "03. Geoquery covering the location returns the entity"
 echo "====================================================="
 orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=40.539019,-3.612711'
+echo
+echo
+
+
+echo "04. Update entity with a regular geo:json Point"
+echo "==============================================="
+payload='{
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        3.6127119138731127,
+        42.53901978067972
+      ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Get entity and see Point"
+echo "============================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "06. Geoquery covering the location returns the entity"
+echo "====================================================="
+orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=42.539019,3.612711'
+echo
+echo
+
+
+echo "07. Update entity with a Feature again"
+echo "======================================"
+payload='{
+  "location": {
+    "value": {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+            -23.6127119138731127,
+            50.53901978067972
+        ]
+      },
+      "properties": {
+        "label": "-23.6127119138731127, 50.53901978067972"
+      }
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. Get entity and see Feature"
+echo "=============================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "09. Geoquery covering the location returns the entity"
+echo "====================================================="
+orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=50.539019,-23.612711'
 echo
 echo
 
@@ -142,6 +220,138 @@ Date: REGEX(.*)
                 },
                 "properties": {
                     "label": "-3.6127119138731127, 40.53901978067972"
+                },
+                "type": "Feature"
+            }
+        },
+        "type": "T"
+    }
+]
+
+
+04. Update entity with a regular geo:json Point
+===============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Get entity and see Point
+============================
+HTTP/1.1 200 OK
+Content-Length: 132
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "E",
+    "location": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                3.612711914,
+                42.539019781
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+06. Geoquery covering the location returns the entity
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    3.612711914,
+                    42.539019781
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T"
+    }
+]
+
+
+07. Update entity with a Feature again
+======================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Get entity and see Feature
+==============================
+HTTP/1.1 200 OK
+Content-Length: 229
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "E",
+    "location": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "geometry": {
+                "coordinates": [
+                    -23.612711914,
+                    50.539019781
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "label": "-23.6127119138731127, 50.53901978067972"
+            },
+            "type": "Feature"
+        }
+    },
+    "type": "T"
+}
+
+
+09. Geoquery covering the location returns the entity
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 231
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "geometry": {
+                    "coordinates": [
+                        -23.612711914,
+                        50.539019781
+                    ],
+                    "type": "Point"
+                },
+                "properties": {
+                    "label": "-23.6127119138731127, 50.53901978067972"
                 },
                 "type": "Feature"
             }
