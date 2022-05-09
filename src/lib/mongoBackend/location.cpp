@@ -40,6 +40,7 @@
 #include "mongoDriver/BSONArrayBuilder.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/location.h"
+#include "mongoBackend/compoundValueBson.h"
 
 
 
@@ -95,6 +96,26 @@ static bool stringArray2coords
   return true;
 }
 
+
+/* ****************************************************************************
+*
+* isFeatureGeoJson -
+*
+* Returns true if GeoJson attribute is of type feature
+*/
+static bool isFeatureGeoJson(const ContextAttribute* caP)
+{
+  for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
+  {
+     CompoundValueNode* childP = caP->compoundValueP->childV[ix];
+     if ((childP->name == "type") && (childP->valueType == orion::ValueTypeString)
+         && (childP->stringValue == "Feature"))
+     {
+       return true;
+     }
+  }
+  return false;
+}
 
 
 /* ****************************************************************************
@@ -185,9 +206,24 @@ static bool getGeoJson
      */
     orion::BSONObjBuilder bo;
 
-    // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
-    caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
-    geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
+    if (isFeatureGeoJson(caP))
+    {
+      for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
+      {
+        CompoundValueNode* childP = caP->compoundValueP->childV[ix];
+        if (childP->name == "geometry")
+        {
+          compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
+          break;
+        }
+      }
+    }
+    else
+    {
+      // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
+      caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
+      geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
+    }
 
     return true;
   }
