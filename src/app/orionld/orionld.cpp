@@ -218,7 +218,8 @@ bool            forwarding;
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
-bool            experimental = false;
+bool            experimental    = false;
+bool            experimental2   = false;
 
 
 
@@ -294,6 +295,8 @@ bool            experimental = false;
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
 #define EXPERIMENTAL_DESC      "enable experimental implementation"
+#define EXPERIMENTAL2_DESC     "enable experimental implementation + turn off mongo legacy driver"
+
 
 
 /* ****************************************************************************
@@ -368,6 +371,7 @@ PaArgument paArgs[] =
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
+  { "-experimental2",         &experimental2,           "EXPERIMENTAL2",             PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL2_DESC       },
 
   PA_END_OF_ARGS
 };
@@ -880,6 +884,13 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+  bool noLegacyDriver = false;
+  if (experimental2 == true)
+  {
+    experimental   = true;
+    noLegacyDriver = true;
+  }
+
   if (noswap == true)
   {
     LM_W(("All the broker's memory is locked in RAM - swapping disabled!!!"));
@@ -968,8 +979,11 @@ int main(int argC, char* argV[])
   contextDownloadListInit();
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
-  // Initialize Mongo Legacy C++ driver
-  mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  if (noLegacyDriver == false)
+  {
+    // Initialize Mongo Legacy C++ driver
+    mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  }
 
   // Initialize orion libs
   alarmMgr.init(relogAlarms);
@@ -991,15 +1005,18 @@ int main(int argC, char* argV[])
     orionldStartup = true;
     subCacheInit(multitenancy);
 
-    if (subCacheInterval == 0)
+    if (noLegacyDriver == false)
     {
-      // Populate subscription cache from database
-      subCacheRefresh();
-    }
-    else
-    {
-      // Populate subscription cache AND start sub-cache-refresh-thread
-      subCacheStart();
+      if (subCacheInterval == 0)
+      {
+        // Populate subscription cache from database
+        subCacheRefresh();
+      }
+      else
+      {
+        // Populate subscription cache AND start sub-cache-refresh-thread
+        subCacheStart();
+      }
     }
     orionldStartup = false;
   }
@@ -1016,7 +1033,8 @@ int main(int argC, char* argV[])
   // use that conext during the test.
   //
 
-  dbInit(dbHost, dbName);
+  if (noLegacyDriver == false)
+    dbInit(dbHost, dbName);
 
   //
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
@@ -1087,6 +1105,9 @@ int main(int argC, char* argV[])
   }
 
   LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
+
+  if (noLegacyDriver == true)
+    LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only 4 requests work in this mode"));
 
   if (socketService == true)
   {

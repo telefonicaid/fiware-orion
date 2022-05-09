@@ -84,4 +84,5 @@ void mongocInit(const char* dbHost, const char* dbName)
   // Semaphore for the 'contexts' collection on DB 'orionld' - hopefully not needed in the end ...
   //
   sem_init(&mongocContextsSem, 0, 1);  // 0: shared between threads of the same process. 1: free to be taken
+  LM_K(("mongoc initialized"));
 }
