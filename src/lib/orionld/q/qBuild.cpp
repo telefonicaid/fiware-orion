@@ -63,7 +63,6 @@ QNode* qBuild(const char* q)
 
   urlDecode(qString);
   orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
-  LM_TMP(("LEAK: ***** Calling qLex *****"));
   if ((qList = qLex(qString, &title, &detail)) == NULL)
   {
     orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
@@ -71,15 +70,12 @@ QNode* qBuild(const char* q)
   }
   else
   {
-    LM_TMP(("LEAK: ***** Calling qParse *****"));
     qP = qParse(qList, NULL, false, &title, &detail);
     if (qP == NULL)
     {
       orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
       LM_RE(NULL, ("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
     }
-
-    qPresent(qP, "LEAK", "Q-TREE");
   }
 
   if (qString != buf)

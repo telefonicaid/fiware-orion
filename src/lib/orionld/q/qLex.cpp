@@ -43,10 +43,7 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
   if (orionldState.useMalloc == false)
     qNodeP->value.s = stringValue;
   else
-  {
     qNodeP->value.s = strdup(stringValue);
-    LM_TMP(("LEAK: + Allocated its String '%s' (at %p)", qNodeP->value.s, qNodeP->value.s));
-  }
 
   prev->next = qNodeP;
 
@@ -204,10 +201,7 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     else if (type == QNodeVariable)
     {
       if (orionldState.useMalloc)
-      {
         qNodeP->value.v = strdup(term);
-        LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", qNodeP->value.v, qNodeP->value.v));
-      }
       else
         qNodeP->value.v = term;
     }

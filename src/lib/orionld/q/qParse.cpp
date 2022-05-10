@@ -288,10 +288,8 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 
   if (orionldState.useMalloc == true)
   {
-    LM_TMP(("LEAK: Releasing a Variable Path '%s' (at %p)", varPath, varPath));
     free(varPath);
     char* fp = strndup(fullPath, sizeof(fullPath) - 1);
-    LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", fp, fp));
     LM_TMP(("Q: From varFix returning '%s'", fp));
     return fp;
   }
@@ -353,7 +351,7 @@ static QNode* qNodeAppend(QNode* container, QNode* childP, bool clone = true)
   }
   else
   {
-    LM_TMP(("LEAK: Not cloning '%s' at %p (comes from qNodeV)", qNodeType(childP->type), childP));
+    LM_TMP(("Not cloning '%s' at %p (comes from qNodeV)", qNodeType(childP->type), childP));
     cloneP = childP;
   }
 
@@ -396,8 +394,6 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
   QNode*     leftP           = NULL;
   QNode*     openP           = NULL;
   QNode*     closeP          = NULL;
-
-  qListPresent(qLexList, endNodeP, "LEAK", "Incoming qLexList");
 
   while (qLexP != endNodeP)
   {
@@ -445,7 +441,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
           return NULL;
         }
       }
-      LM_TMP(("LEAK: Calling qParse from '%s' to '%s'", qNodeType(openP->next->type), qNodeType(closeP->type)));
+      LM_TMP(("Calling qParse from '%s' to '%s'", qNodeType(openP->next->type), qNodeType(closeP->type)));
       qNodeV[qNodeIx++] = qParse(openP->next, closeP, forDb, titleP, detailsP);
 
       // Make qLexP point to ')' (will get ->next at the end of the loop)
@@ -589,12 +585,12 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
       return NULL;
       break;
     }
-    LM_TMP(("LEAK: Current token: %s", qNodeType(qLexP->type)));
+    LM_TMP(("Current token: %s", qNodeType(qLexP->type)));
     qLexP = qLexP->next;
     if (qLexP != NULL)
-      LM_TMP(("LEAK: Next token: %s", qNodeType(qLexP->type)));
+      LM_TMP(("Next token: %s", qNodeType(qLexP->type)));
     else
-      LM_TMP(("LEAK: Next token: NULL"));
+      LM_TMP(("Next token: NULL"));
   }
 
   if (opNodeP != NULL)
@@ -611,7 +607,6 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
     return NULL;
   }
 
-  qListPresent(qLexList, endNodeP, "LEAK", "Outgoing qLexList");
   return qNodeV[0];
 }
 
