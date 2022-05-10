@@ -16,7 +16,7 @@ subscription is triggered. At the present moment, the following alteration types
 * `entityUpdate`: notification is sent whenever a entity covered by the subscription is updated
   (no matter if the entity actually changed or not)
 * `entityChange`: notification is sent whenever a entity covered by the subscription is updated
-  and it actually changes (or if it is not an actual upate, but [`forcedUpdate` option](ngsiv2_implementation_notes.md#forcedupdate-option)
+  and it actually changes (or if it is not an actual update, but [`forcedUpdate` option](ngsiv2_implementation_notes.md#forcedupdate-option)
   is used in the update request)
 * `entityCreate`: notification is sent whenever a entity covered by the subscription is created
 * `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted
