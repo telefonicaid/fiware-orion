@@ -235,7 +235,10 @@ We have successfully tested the following types:
 On the contrary, the following types doesn't work (you will get a "Database Error" if you try to use them):
 
 * GeometryCollection
-* FeatureCollection
+
+With regards to `FeatureCollection`, it is supported only if it contains a single Feature (i.e.
+the `features` field has only one element), in which case the value of `geometry` field of
+such element is used.
 
 More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
 

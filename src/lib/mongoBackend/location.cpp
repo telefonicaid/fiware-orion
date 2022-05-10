@@ -100,17 +100,17 @@ static bool stringArray2coords
 
 /* ****************************************************************************
 *
-* isFeatureGeoJson -
+* isOfSpecialGeoJsonType -
 *
-* Returns true if GeoJson attribute is of type feature
+* Returns true if GeoJson attribute is of special kind (Feature, FeatureCollecion, etc.)
 */
-static bool isFeatureGeoJson(const ContextAttribute* caP)
+static bool isOfSpecialGeoJsonType(const ContextAttribute* caP, const std::string& type)
 {
   for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
   {
      CompoundValueNode* childP = caP->compoundValueP->childV[ix];
      if ((childP->name == "type") && (childP->valueType == orion::ValueTypeString)
-         && (childP->stringValue == "Feature"))
+         && (childP->stringValue == type))
      {
        return true;
      }
@@ -208,9 +208,9 @@ static bool getGeoJson
      */
     orion::BSONObjBuilder bo;
 
-    // GeoJSON Feature has an especial treatmente, the geometry is extracted from
+    // GeoJSON Feature has an especial treatment, the geometry is extracted from
     // "geometry" field at the first level
-    if (isFeatureGeoJson(caP))
+    if (isOfSpecialGeoJsonType(caP, "Feature"))
     {
       for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
       {
@@ -220,7 +220,38 @@ static bool getGeoJson
           compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
           break;
         }
+        // FIXME PR: what about if field "geometry" is missing? Return error (cover it with test)
       }
+    }
+    // GeoJSON FeatureCollection has an especial treatment, the geometry is extracted from
+    // "geometry" field at the first level of the first Feature in the vector. If more
+    // than one Feature exists an error will be returned (and Orion doesn't know which
+    // element in the vector has to be used to set the entity location)
+    else if (isOfSpecialGeoJsonType(caP, "FeatureCollection"))
+    {
+      for (unsigned int jx = 0; jx < caP->compoundValueP->childV.size(); ++jx)
+      {
+        CompoundValueNode* childP = caP->compoundValueP->childV[jx];
+        if (childP->name == "features")
+        {
+          CompoundValueNode* feature = caP->compoundValueP->childV[jx]->childV[0];
+
+          for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
+          {
+            CompoundValueNode* childP = feature->childV[ix];
+            if (childP->name == "geometry")
+            {
+              compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
+              break;
+            }
+            // FIXME PR: what about if field "geometry" is missing? Return error (cover it with test)
+          }
+        }
+      }
+
+      // FIXME PR: what about if field "features" is missing? Return error (cover it with test)
+      // FIXME PR: what about if they are more than one elements in "features"  Return error (cover it with test)
+      // FIXME PR: what about if field "geometry" is missing in the first element? Return error (cover it with test)
     }
     else
     {
