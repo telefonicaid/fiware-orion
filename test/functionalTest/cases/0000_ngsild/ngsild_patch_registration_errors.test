@@ -1528,12 +1528,12 @@ Date: REGEX(.*)
 15. Attempt to PATCH the registration with an 'information::entities that is not an array' - see failure
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities",
+    "detail": "Registration::information::entities",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1542,12 +1542,12 @@ Date: REGEX(.*)
 16. Attempt to PATCH the registration with an 'information::entities array item that is not an object' - see failure
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 136
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]",
+    "detail": "Registration::information::entities",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1556,12 +1556,12 @@ Date: REGEX(.*)
 17. Attempt to PATCH the registration with an 'information::entities array that is empty' - see failure
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 103
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities",
+    "detail": "Registration::information::entities",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2326,12 +2326,12 @@ Date: REGEX(.*)
 73. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is not an Array - see failure
 =========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 164
+Content-Length: 176
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
+    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

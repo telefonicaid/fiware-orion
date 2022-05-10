@@ -136,7 +136,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Content-Length: 419
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Accept: application/json
 Content-Type: application/json
@@ -179,7 +179,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 513
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Accept: application/json
 Content-Type: application/json

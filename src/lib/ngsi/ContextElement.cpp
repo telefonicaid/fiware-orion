@@ -125,7 +125,7 @@ std::string ContextElement::toJson
 {
   std::string out;
 
-  if (renderFormat != NGSI_V2_VALUES)
+  if (renderFormat != RF_VALUES)
   {
     out += entityId.toJson();
     if (contextAttributeVector.size() != 0)

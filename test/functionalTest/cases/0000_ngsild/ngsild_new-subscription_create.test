@@ -1,0 +1,756 @@
+# Copyright 2018 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation - new NGSI-LD native Subscriptions
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/subscriptions, with sub-id http://a.b.c/subs/sub01
+# 02. Check mongo
+# 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
+# 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
+# 05. Attempt to create a subscription with an ID that is not a URI - see failure
+# 06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure
+# 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
+# 08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK
+# 09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
+# 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
+#
+# 11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895
+# 12. See the subscription in mongo
+#
+
+
+echo "01. POST /ngsi-ld/v1/subscriptions, with a sub-id"
+echo "================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10|P1==7",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": "1,2",
+    "georel": "near;maxDistance==1000",
+    "geoproperty": "location"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-QoS",
+          "value": "0"
+        }
+      ],
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "header 1"
+        }
+      ]
+    }
+  },
+  "expiresAt": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Check subscription in mongo"
+echo "==============================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header"
+echo "====================================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload"
+echo "===================================================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+
+echo "05. Attempt to create a subscription with an ID that is not a URI - see failure"
+echo "==============================================================================="
+payload='{
+  "id": "sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expiresAt": "2028-12-31T10:00:00Z",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure"
+echo "============================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub02",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": "1,2",
+    "georel": "near;minDistance==50",
+    "geoproperty": "location6"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "expiresAt": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure"
+echo "==================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub03",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "timeInterval": 12,
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expiresAt": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK"
+echo "============================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub03",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": "1,2",
+    "georel": "near;maxDistance==50",
+    "geoproperty": "localtion8"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "expiresAt": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK"
+echo "========================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub09",
+  "type": "Subscription",
+  "name": "Test subscription 09",
+  "description": "Description of Test subscription 09",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "q": "P2>10",
+  "notification": {
+    "attributes": [ "P1" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned"
+echo "==================================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09?options=sysAttrs' -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895"
+echo "======================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:subs:11",
+  "description": "test0001",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
+    }
+  ],
+  "q": "P2>10",
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://tutorial:3000/subscription/test0001",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "12. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:11"})'
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/subscriptions, with a sub-id
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Date: REGEX(.*)
+
+
+
+02. Check subscription in mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "http://a.b.c/subs/sub01",
+	"name" : "Test subscription 01",
+	"description" : "Description of Test subscription 01",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "http://a.b.c/E02",
+			"type" : "http://example.org/T2",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : ".*E03.*",
+			"type" : "http://example.org/T3",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"http://example.org/P2"
+	],
+	"ldQ" : "P2>10|P1==7",
+	"expression" : {
+		"geometry" : "Point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance==1000",
+		"geoproperty" : "location",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"status" : "inactive",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"http://example.org/P1",
+		"http://example.org/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"format" : "keyValues",
+	"reference" : "http://valid.url/url",
+	"mimeType" : "application/ld+json",
+	"headers" : {
+		"H1" : "header 1"
+	},
+	"notifierInfo" : {
+		"MQTT-QoS" : "0"
+	},
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}
+bye
+
+
+03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1132
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10|P1==7",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==1000",
+    "geoproperty": "location"
+  },
+  "status": "inactive",
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-QoS",
+          "value": "0"
+        }
+      ],
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "header 1"
+        }
+      ]
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:00:00.000Z",
+  "throttling": 5
+}
+
+
+
+04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1221
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10|P1==7",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==1000",
+    "geoproperty": "location"
+  },
+  "status": "inactive",
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-QoS",
+          "value": "0"
+        }
+      ],
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "header 1"
+        }
+      ]
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:00:00.000Z",
+  "throttling": 5,
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}
+
+
+
+05. Attempt to create a subscription with an ID that is not a URI - see failure
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Invalid URI - no colon found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 173
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "At least one of 'entities' and 'watchedAttributes' must be present",
+    "title": "Mandatory field missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
+===================================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Time-Interval for Subscriptions",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub03
+Date: REGEX(.*)
+
+
+
+09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09
+Date: REGEX(.*)
+
+
+
+10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 456
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": REGEX(.*),
+    "description": "Description of Test subscription 09",
+    "entities": [
+        {
+            "id": "urn:ngsi-ld:E01",
+            "type": "T1"
+        }
+    ],
+    "id": "http://a.b.c/subs/sub09",
+    "isActive": true,
+    "modifiedAt": REGEX(.*),
+    "name": "Test subscription 09",
+    "notification": {
+        "attributes": [
+            "P1"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "uri": "http://valid.url/url"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "q": "P2>10",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895
+======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:11
+Date: REGEX(.*)
+
+
+
+12. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:11",
+	"description" : "test0001",
+	"entities" : [
+		{
+			"type" : "http://XXXX/YYYY/ngsi-context.jsonld#Person",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "P2>10",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+		"mq" : "P.P;!P.P"
+	},
+	"format" : "normalized",
+	"reference" : "http://tutorial:3000/subscription/test0001",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

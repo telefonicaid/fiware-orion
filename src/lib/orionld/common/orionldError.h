@@ -42,4 +42,28 @@ extern void orionldError
   int                       status
 );
 
+
+
+// -----------------------------------------------------------------------------
+//
+// OERROR
+//
+#define OERROR(retVal, errorType, title, detail, status)                              \
+do {                                                                                  \
+  orionldError2(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__);  \
+  return retVal;                                                                      \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OERRORV
+//
+#define OERRORV(errorType, title, detail, status)                                     \
+do {                                                                                  \
+  orionldError2(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__);  \
+  return;                                                                             \
+} while (0)
+
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDERROR_H_

@@ -139,12 +139,6 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
       return false;
     }
 
-    KeyValue* keyValueP = (KeyValue*) kaAlloc(&orionldState.kalloc, sizeof(KeyValue));
-
-    strncpy(keyValueP->key,   key,   sizeof(keyValueP->key) - 1);
-    strncpy(keyValueP->value, value, sizeof(keyValueP->value) - 1);
-    httpInfoP->notifierInfo.push_back(keyValueP);
-
     //
     // Known key-values are extracted
     //
@@ -174,6 +168,13 @@ static bool kjTreeToNotifierInfo(KjNode* notifierInfoP, ngsiv2::HttpInfo* httpIn
       orionldError(OrionldBadRequestData, "Bad Input", "Invalid key in Endpoint::notifierInfo", 400);
       return false;
     }
+
+    //
+    // Seems a bit stupid to allocate room for copies here ...
+    // However, the current implementation needs this to work.
+    // Should be easy enough to fix (and avoid unnecessary allocations)
+    //
+    keyValueAdd(&httpInfoP->notifierInfo, key, value);
   }
 
   return true;

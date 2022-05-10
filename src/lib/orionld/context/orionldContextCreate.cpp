@@ -82,6 +82,10 @@ OrionldContextOrigin orionldOriginFromString(const char* s)
 //
 // orionldContextCreate -
 //
+// FIXME: If the context is to be saved in the cache, then 'kalloc' can't be used.
+//        Might need two version of this function, one for kaAlloc, one for malloc
+//
+int cloned = 0;
 OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origin, const char* id, KjNode* tree, bool keyValues)
 {
   OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
@@ -101,7 +105,10 @@ OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origi
     //
     // If just a string, no clone needed
     //
+    if (tree->type != KjString)
+      ++cloned;
     contextP->tree = (tree->type != KjString)? kjClone(NULL, tree) : tree;
+    LM_TMP(("VL: Cloned tree %d of context '%s' to %p", cloned, contextP->url, contextP->tree));
   }
   else
   {

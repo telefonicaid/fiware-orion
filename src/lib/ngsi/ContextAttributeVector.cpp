@@ -190,7 +190,7 @@ std::string ContextAttributeVector::toJson
         continue;
       }
 
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == RF_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -200,7 +200,7 @@ std::string ContextAttributeVector::toJson
 
       ++validAttributes;
 
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == RF_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }
@@ -256,7 +256,7 @@ std::string ContextAttributeVector::toJson
 
       ++renderedAttributes;
 
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == RF_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -266,7 +266,7 @@ std::string ContextAttributeVector::toJson
 
       out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat, metadataFilter);
 
-      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == RF_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }

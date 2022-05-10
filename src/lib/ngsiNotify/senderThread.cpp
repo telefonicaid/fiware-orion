@@ -56,16 +56,6 @@ void* startSenderThread(void* p)
     //
     strcpy(transactionId, params->transactionId);
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-                       params->ip.c_str(),
-                       params->port,
-                       params->verb.c_str(),
-                       params->tenant.c_str(),
-                       params->servicePath.c_str(),
-                       params->xauthToken.c_str(),
-                       params->resource.c_str(),
-                       params->content_type.c_str()));
-
     if (!simulatedNotification)
     {
       std::string  out;
@@ -96,27 +86,25 @@ void* startSenderThread(void* p)
         params->toFree = NULL;
       }
 
+      CachedSubscription*  subP               = subCacheItemLookup(params->tenant.c_str(), params->subscriptionId.c_str());
+      bool                 ngsildSubscription = ((subP != NULL) && (subP->ldContext != ""))? true : false;
+
       if (r == 0)
       {
         statisticsUpdate(NotifyContextSent, params->mimeType);
         alarmMgr.notificationErrorReset(url);
 
         if (params->registration == false)
-        {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
-        }
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, ngsildSubscription);
       }
       else
       {
         if (params->registration == false)
-        {
-          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
-        }
+          subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1, ngsildSubscription);
       }
     }
     else
     {
-      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
       __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
       alarmMgr.notificationError(url, "notification failure for sender-thread");
     }

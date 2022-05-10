@@ -999,7 +999,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   // NOTE: orionldState.link is set by orionldHttpHeaderReceive() called by orionldMhdConnectionInit()
   //
-  // NOTE: Some requests don't use the context and thus should simplt ignore the Link header
+  // NOTE: Some requests don't use the context and thus should simply ignore the Link header
   //
   if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED) == 0)
   {

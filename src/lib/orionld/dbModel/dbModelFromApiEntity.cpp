@@ -149,9 +149,25 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, &ignore) == false)
     {
       if (ignore == true)
+      {
+        LM_TMP(("DS: Attribute '%s' to be ignored - removing it from attrsP", attrP->name));
         kjChildRemove(attrsP, attrP);
+      }
       else
+      {
+        //
+        // Not calling orionldError as a better error message is overwritten if I do.
+        // Once we have "Error Stacking", orionldError should be called.
+        //
+        // orionldError(OrionldInternalError, "Unable to convert API Attribute into DB Model Attribute", attrP->name, 500);
+
         return false;
+      }
+    }
+    else if (ignore == true)
+    {
+      LM_TMP(("DS: Attribute '%s' to be ignored - removing it from attrsP", attrP->name));
+      kjChildRemove(attrsP, attrP);
     }
 
     attrP = next;

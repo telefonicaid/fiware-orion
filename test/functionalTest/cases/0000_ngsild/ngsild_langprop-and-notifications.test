@@ -135,7 +135,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "LANG: yes"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -162,7 +162,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "LANG: yes"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -215,7 +215,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "LANG: yes"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -295,42 +295,40 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:subs:S2",
-	"expiration" : 2147483647,
-	"reference" : "http://127.0.0.1:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/json",
-	"throttling" : 0,
-	"servicePath" : "/",
-	"status" : "active",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:entities:E2",
-			"isPattern" : "false",
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "false",
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/L2"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"lang" : "en",
-	"createdAt" : REGEX(.*),
-	"modifiedAt" : REGEX(.*),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/L2"
 	],
+	"lang" : "en",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
 	"expression" : {
-		"q" : "",
-		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
 		"georel" : "",
-		"geoproperty" : ""
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
 	},
-	"format" : "normalized"
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L2"
+	],
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"format" : "normalized",
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -450,7 +448,7 @@ Date: REGEX(.*)
 =======================================================================================
 POST REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Fiware-Servicepath: /
-Content-Length: 304
+Content-Length: 310
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
@@ -462,12 +460,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "data": [
         {
             "L1": {
-                "type": "LanguageProperty",
-                "value": {
+                "languageMap": {
                     "en": "english",
                     "es": "ingles",
                     "sv": "engelska"
-                }
+                },
+                "type": "LanguageProperty"
             },
             "id": "urn:ngsi-ld:entities:E1",
             "type": "T"
@@ -621,41 +619,39 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:subs:S1",
-	"expiration" : 2147483647,
-	"reference" : "REGEX(.*)/notify",
-	"custom" : false,
-	"mimeType" : "application/json",
-	"throttling" : 0,
-	"servicePath" : "/",
-	"status" : "active",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:entities:E1",
-			"isPattern" : "false",
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "false",
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/L1"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"createdAt" : REGEX(.*),
-	"modifiedAt" : REGEX(.*),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/L1"
 	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
 	"expression" : {
-		"q" : "",
-		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
 		"georel" : "",
-		"geoproperty" : ""
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
 	},
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
+	],
+	"reference" : "REGEX(.*)/notify",
+	"mimeType" : "application/json",
 	"format" : "normalized",
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"lang" : "es"
 }
 bye

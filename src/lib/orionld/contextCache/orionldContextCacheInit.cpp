@@ -154,7 +154,7 @@ void orionldContextCacheInit(void)
     contextNodeP = next;
   }
 
-  // 1.5. Still no core context?
+  // Still no core context? - download it
   if (orionldCoreContextP == NULL)
   {
     orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL);

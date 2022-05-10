@@ -25,12 +25,36 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                     // KjNode
+}
+
 #include "logMsg/logMsg.h"                                    // LM_*
 
 #include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
 #include "orionld/payloadCheck/pCheckUri.h"                   // pCheckUri
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_DUPLICATE -
+//
+#define PCHECK_DUPLICATE(pointer, pointerValue, _type, _title, _detail, status)              \
+do                                                                                           \
+{                                                                                            \
+  if (pointer != NULL)                                                                       \
+  {                                                                                          \
+    int         type   = (_type  ==    0)? OrionldBadRequestData : _type;                    \
+    const char* title  = (_title == NULL)? "Duplicated field" : _title;                      \
+    orionldError((OrionldResponseErrorType) type, title, _detail, status);                   \
+    return false;                                                                            \
+  }                                                                                          \
+  pointer = pointerValue;                                                                    \
+} while (0)
 
 
 
@@ -45,6 +69,80 @@ do                                                                              
   {                                                                                          \
     int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
     const char* title = (_title == NULL)? "Not a JSON String"   : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_STRING_EMPTY -
+//
+#define PCHECK_STRING_EMPTY(kNodeP, _type, _title, detail, status)                           \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->value.s[0] == 0)                                                               \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Empty String"   : _title;                         \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_STRING_OR_ARRAY -
+//
+#define PCHECK_STRING_OR_ARRAY(kNodeP, _type, _title, detail, status)                        \
+do                                                                                           \
+{                                                                                            \
+  if ((kNodeP->type != KjArray) && (kNodeP->type != KjString))                               \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON String nor Array"   : _title;          \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_BOOL -
+//
+#define PCHECK_BOOL(kNodeP, _type, _title, detail, status)                                   \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->type != KjBoolean)                                                             \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON Boolean"  : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_NUMBER -
+//
+#define PCHECK_NUMBER(kNodeP, _type, _title, detail, status)                                 \
+do                                                                                           \
+{                                                                                            \
+  if ((kNodeP->type != KjInt) && (kNodeP->type != KjFloat))                                  \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON Number"   : _title;                    \
                                                                                              \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \
@@ -74,6 +172,25 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_OBJECT_EMPTY -
+//
+#define PCHECK_OBJECT_EMPTY(kNodeP, _type, _title, detail, status)                           \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->value.firstChildP == NULL)                                                     \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Empty Object"        : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // PCHECK_ARRAY -
 //
 #define PCHECK_ARRAY(kNodeP, _type, _title, detail, status)                                  \
@@ -93,6 +210,25 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_ARRAY_EMPTY -
+//
+#define PCHECK_ARRAY_EMPTY(kNodeP, _type, _title, detail, status)                            \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->value.firstChildP == NULL)                                                     \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Empty Array"         : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // PCHECK_URI -
 //
 #define PCHECK_URI(uri, mustBeUri, _type, _title, detail, status)                            \
@@ -102,6 +238,25 @@ do                                                                              
   const char* title = (_title == NULL)? "Invalid URI"         : _title;                      \
                                                                                              \
   if (pCheckUri(uri, uri, mustBeUri) == false)                                               \
+  {                                                                                          \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_ISO8601 -
+//
+#define PCHECK_ISO8601(iso8601Var, iso8601String, _type, _title, detail, status)             \
+do                                                                                           \
+{                                                                                            \
+  int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                       \
+  const char* title = (_title == NULL)? "Invalid ISO8601"     : _title;                      \
+                                                                                             \
+  if ((iso8601Var = parse8601Time(iso8601String)) == -1)                                     \
   {                                                                                          \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \

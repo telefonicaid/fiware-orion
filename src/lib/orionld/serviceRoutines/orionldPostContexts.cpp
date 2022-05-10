@@ -36,7 +36,7 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree

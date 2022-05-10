@@ -21,44 +21,47 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-     pcheckEntityInfo.cpp
-     pcheckEntityInfoArray.cpp
-     pcheckEntity.cpp
-     pcheckGeoType.cpp
-     pcheckGeoqCoordinates.cpp
-     pcheckGeoqGeorel.cpp
-     pcheckGeoPropertyValue.cpp
-     pcheckGeoQ.cpp
-     pcheckEndpoint.cpp
-     pcheckNotification.cpp
-     pcheckSubscription.cpp
-     pcheckInformationItem.cpp
-     pcheckInformation.cpp
-     pcheckTimeInterval.cpp
-     pcheckRegistration.cpp
-     pcheckName.cpp
-     pcheckQuery.cpp
-     pcheckAttrs.cpp
-     pcheckQ.cpp
-     pcheckAttribute.cpp
+     fieldPaths.cpp
      pCheckAttribute.cpp
-     pCheckUri.cpp
+     pCheckAttributeType.cpp
      pCheckEntity.cpp
      pCheckEntityId.cpp
      pCheckEntityType.cpp
-     pCheckGeoPointCoordinates.cpp
-     pCheckGeoPolygonCoordinates.cpp
      pCheckGeoLineStringCoordinates.cpp
+     pCheckGeoMultiLineStringCoordinates.cpp
      pCheckGeoMultiPointCoordinates.cpp
      pCheckGeoMultiPolygonCoordinates.cpp
-     pCheckGeoMultiLineStringCoordinates.cpp
+     pCheckGeoPointCoordinates.cpp
+     pCheckGeoPolygonCoordinates.cpp
      pCheckGeoPropertyCoordinates.cpp
      pCheckGeoPropertyType.cpp
      pCheckGeoPropertyValue.cpp
-     pCheckAttributeType.cpp
-     pcheckReceiverInfo.cpp
-     pcheckNotifierInfo.cpp
+     pCheckNotification.cpp
+     pCheckSubscription.cpp
+     pCheckUri.cpp
+     pCheckStringArray.cpp
+     pcheckAttribute.cpp
+     pcheckAttrs.cpp
+     pcheckEndpoint.cpp
+     pcheckEntity.cpp
+     pcheckEntityInfo.cpp
+     pcheckEntityInfoArray.cpp
+     pcheckGeoPropertyValue.cpp
+     pcheckGeoQ.cpp
+     pcheckGeoType.cpp
+     pcheckGeoqCoordinates.cpp
+     pcheckGeoqGeorel.cpp
+     pcheckInformation.cpp
+     pcheckInformationItem.cpp
      pcheckLanguagePropertyValue.cpp
+     pcheckName.cpp
+     pcheckNotifierInfo.cpp
+     pcheckQ.cpp
+     pcheckQuery.cpp
+     pcheckReceiverInfo.cpp
+     pcheckRegistration.cpp
+     pcheckSubscription.cpp
+     pcheckTimeInterval.cpp
 )
 
 # Include directories

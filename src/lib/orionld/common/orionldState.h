@@ -65,7 +65,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v1.0.0"
+#define ORIONLD_VERSION "post-v1.0.1"
 
 
 
@@ -244,7 +244,7 @@ typedef struct OrionldStateIn
   char*     xAuthToken;
   char*     authorization;
   char*     tenant;
-  char*     lang;  // Temporary
+  char*     legacy;          // Use legacy mongodb driver / mongoBackend
 
   // Incoming payload
   char*     payload;
@@ -400,7 +400,7 @@ typedef struct OrionldConnectionState
   //
   KjNode*                 creDatesP;
   bool                    onlyCount;
-  KjNode*                 datasets;
+  KjNode*                 datasets;  // Also used w/o mongoBackend, (dbModelFromApiAttribute)
 
   //
   // General Behavior
@@ -557,6 +557,8 @@ extern char              mongoServerVersion[32];
 extern bool              experimental;             // From orionld.cpp
 extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
 extern int               maxAge;                   // From orionld.cpp (CORS)
+extern char              userAgentHeader[64];      // From notificationSend.cpp
+extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
 
 
 

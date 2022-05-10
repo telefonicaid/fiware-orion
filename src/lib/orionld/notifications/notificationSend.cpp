@@ -42,15 +42,17 @@ extern "C"
 #include "logMsg/logMsg.h"
 
 #include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
+#include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -59,17 +61,20 @@ extern "C"
 //
 // Fixed value headers
 //
-static const char* contentTypeHeaderJson   = (char*) "Content-Type: application/json\r\n";
-static const char* contentTypeHeaderJsonLd = (char*) "Content-Type: application/ld+json\r\n";
-static const char* userAgentHeader         = (char*) "User-Agent: orionld\r\n";
-static const char* acceptHeader            = (char*) "Accept: application/json\r\n";
+static const char* contentTypeHeaderJson    = (char*) "Content-Type: application/json\r\n";
+static const char* contentTypeHeaderJsonLd  = (char*) "Content-Type: application/ld+json\r\n";
+static const char* contentTypeHeaderGeoJson = (char*) "Content-Type: application/geo+json\r\n";
+static const char* acceptHeader             = (char*) "Accept: application/json\r\n";
 
-static const char* normalizedHeader        = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
-static const char* conciseHeader           = (char*) "Ngsild-Attribute-Format: Concise\r\n";
-static const char* simplifiedHeader        = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
+static const char* normalizedHeader         = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
+static const char* conciseHeader            = (char*) "Ngsild-Attribute-Format: Concise\r\n";
+static const char* simplifiedHeader         = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
 
-static const char* normalizedHeaderNgsiV2  = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
-static const char* keyValuesHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
+static const char* normalizedHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
+static const char* keyValuesHeaderNgsiV2    = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
+
+char    userAgentHeader[64];     // "User-Agent: orionld/" + ORIONLD_VERSION + \r\n" - initialized by orionldServiceInit()
+size_t  userAgentHeaderLen = 0;  // Also set in orionldServiceInit()
 
 
 
@@ -157,8 +162,8 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 {
   kjTreeLog(entityP, "Fixing Entity");
 
-  bool simplified = (subP->renderFormat == NGSI_LD_V1_KEYVALUES);
-  bool concise    = (subP->renderFormat == NGSI_LD_V1_CONCISE);
+  bool simplified = (subP->renderFormat == RF_KEYVALUES);
+  bool concise    = (subP->renderFormat == RF_CONCISE);
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -168,6 +173,7 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
     // compaction of the value of 'type' for the Entity
     if (strcmp(attrP->name, "type") == 0)
     {
+      LM_TMP(("KZ orionldContextItemAliasLookup(contextP:%p, type:'%s')", subP->contextP, attrP->value.s));
       attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);
       continue;
     }
@@ -179,7 +185,7 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 
     //
     // Never mind "location", "observationSpace", and "operationSpace"
-    // It is pobably faster to lookup their alias (and get the same back) as it is to
+    // It is probably faster to lookup their alias (and get the same back) as it is to
     // do three string-comparisons in every loop
     //
     eqForDot(attrP->name);
@@ -193,6 +199,27 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
     }
     else if (concise)
       attributeToConcise(attrP, &asSimplified);
+    else  // normalized
+    {
+      //
+      // Changing "value" back to "object" / "languageMap"
+      // Though, this should have been done long before!
+      //
+      KjNode* attrTypeP = kjLookup(attrP, "type");
+
+      if ((attrTypeP != NULL) && (attrTypeP->type == KjString))
+      {
+        KjNode* valueP = kjLookup(attrP, "value");
+
+        if (valueP != NULL)
+        {
+          if (strcmp(attrTypeP->value.s, "LanguageMap") == 0)
+            valueP->name = (char*) "langeuageMap";
+          else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
+            valueP->name = (char*) "object";
+        }
+      }
+    }
 
     if (asSimplified == false)
     {
@@ -212,9 +239,9 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
         eqForDot(saP->name);
         saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
 
-        if (subP->renderFormat == NGSI_LD_V1_KEYVALUES)
+        if (subP->renderFormat == RF_KEYVALUES)
           attributeToSimplified(saP);
-        else if (subP->renderFormat == NGSI_LD_V1_CONCISE)
+        else if (subP->renderFormat == RF_CONCISE)
           attributeToConcise(saP, &asSimplified);  // asSimplified is not used down here
       }
     }
@@ -319,10 +346,10 @@ KjNode* notificationTreeForNgsiV2(CachedSubscription* subP, KjNode* entityP)
   bool    keyValues            = false;
   bool    compact              = false;
 
-  if ((subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  if ((subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
     keyValues = true;
 
-  if ((subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT) || (subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
     compact = true;
 
   KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(entityP, keyValues, compact);
@@ -444,8 +471,10 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 {
+  LM_TMP(("KZ: Subscription '%s': renderFormat: '%s'", mAltP->subP->subscriptionId, renderFormatToString(mAltP->subP->renderFormat)));
+  LM_TMP(("KZ: contextP at %p", mAltP->subP->contextP));
   kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
-  bool    ngsiv2     = (mAltP->subP->renderFormat >= NGSI_LD_V1_V2_NORMALIZED);
+  bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
 
   LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
@@ -456,11 +485,16 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   if (mAltP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, mAltP);
 
+  LM_TMP(("GEO: sub::accept: %s", mimeTypeToString(mAltP->subP->httpInfo.mimeType)));
 
   //
   // Payload Body
   //
   KjNode*            notificationP    = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
+
+  if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
+    notificationDataToGeoJson(notificationP);
+
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
   char*              payloadBody      = (payloadBodySize < sizeof(body))? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
 
@@ -479,7 +513,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   size_t            requestHeaderLen;
 
   // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
-  if (mAltP->subP->renderFormat < NGSI_LD_V1_V2_NORMALIZED)
+  if (mAltP->subP->renderFormat < RF_CROSS_APIS_NORMALIZED)
     requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
                                 mAltP->subP->rest,
                                 mAltP->subP->subscriptionId);
@@ -510,9 +544,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 
 
   //
-  // Headers from Subscription::notification::endpoint::receiverInfo (or custom notification in NGSIv2 ...)
+  // Headers from Subscription::notification::endpoint::receiverInfo+headers (or custom notification in NGSIv2 ...)
   //
   headers += mAltP->subP->httpInfo.headers.size();
+  headers += mAltP->subP->httpInfo.receiverInfo.size();
 
 
   // Let's limit the number of headers to 50
@@ -525,7 +560,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     { requestHeader,                 requestHeaderLen },
     { contentLenHeader,              strlen(contentLenHeader) },
     { (void*) contentTypeHeaderJson, 32 },  // Index 2
-    { (void*) userAgentHeader,       21 },
+    { (void*) userAgentHeader,       userAgentHeaderLen },
     { (void*) acceptHeader,          26 },
     { (void*) normalizedHeader,      37 }   // Index 5
   };
@@ -533,15 +568,25 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   //
   // Content-Type and Link
   //
+  bool addLinkHeader = true;
   if (mAltP->subP->httpInfo.mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;  // REPLACE "application/json" with "application/ld+json"
     ioVec[2].iov_len  = 35;
+    addLinkHeader     = false;
   }
-  else if (ngsiv2 == false)  // Add Link header - but not if NGSIv2 Cross Notification
+  else if (mAltP->subP->httpInfo.mimeType == GEOJSON)
   {
-    char linkHeader[512];
-    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", mAltP->subP->ldContext.c_str());
+    ioVec[2].iov_base = (void*) contentTypeHeaderGeoJson;  // REPLACE "application/json" with "application/geo+json"
+    ioVec[2].iov_len  = 36;
+  }
+
+  if ((addLinkHeader == true) && (ngsiv2 == false))  // Add Link header - but not if NGSIv2 Cross Notification
+  {
+    char         linkHeader[512];
+    const char*  link = (mAltP->subP->ldContext == "")? ORIONLD_CORE_CONTEXT_URL_V1_0 : mAltP->subP->ldContext.c_str();
+
+    snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", link);
 
     ioVec[headerIx].iov_base = linkHeader;
     ioVec[headerIx].iov_len  = strlen(linkHeader);
@@ -551,22 +596,22 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   //
   // Ngsild-Attribute-Format / Ngsiv1-Attrsformat
   //
-  if (mAltP->subP->renderFormat == NGSI_LD_V1_CONCISE)
+  if (mAltP->subP->renderFormat == RF_CONCISE)
   {
     ioVec[5].iov_base = (void*) conciseHeader;
     ioVec[5].iov_len  = 34;
   }
-  else if (mAltP->subP->renderFormat == NGSI_LD_V1_KEYVALUES)
+  else if (mAltP->subP->renderFormat == RF_KEYVALUES)
   {
     ioVec[5].iov_base = (void*) simplifiedHeader;
     ioVec[5].iov_len  = 37;
   }
-  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED) || (mAltP->subP->renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT))
+  else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_NORMALIZED) || (mAltP->subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT))
   {
     ioVec[5].iov_base = (void*) normalizedHeaderNgsiV2;
     ioVec[5].iov_len  = 32;
   }
-  else if ((mAltP->subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (mAltP->subP->renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+  else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
   {
     ioVec[5].iov_base = (void*) keyValuesHeaderNgsiV2;
     ioVec[5].iov_len  = 31;
@@ -616,7 +661,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   }
 
   //
-  // FIXME: Store receiverInfo in a better way - see issue #1095
+  // FIXME: Store headers in a better way - see issue #1095
   //
   for (std::map<std::string, std::string>::const_iterator it = mAltP->subP->httpInfo.headers.begin(); it != mAltP->subP->httpInfo.headers.end(); ++it)
   {
@@ -628,7 +673,21 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
     ioVec[headerIx].iov_base = buf;
     ++headerIx;
-    LM_TMP(("receiverInfo header '%s': '%s'", key, value));
+    LM_TMP(("HttpInfo header '%s': '%s'", key, value));
+  }
+
+  // receiverInfo
+  for (unsigned int ix = 0; ix < mAltP->subP->httpInfo.receiverInfo.size(); ix++)
+  {
+    const char* key    = mAltP->subP->httpInfo.receiverInfo[ix]->key;
+    const char* value  = mAltP->subP->httpInfo.receiverInfo[ix]->value;
+    int         len    = strlen(key) + strlen(value) + 10;
+    char*       buf    = kaAlloc(&orionldState.kalloc, len);
+
+    ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
+    ioVec[headerIx].iov_base = buf;
+    ++headerIx;
+    LM_TMP(("HttpInfo receiverInfo '%s': '%s'", key, value));
   }
 
 
@@ -654,18 +713,24 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   }
   // </DEBUG>
 
+  //
+  // Now, the message is ready, is this an HTTP notification?
+  // If it's MQTT, then something very different will have to be done instead !
+  //
+  if (strcmp(mAltP->subP->protocol, "mqtt") == 0)
+    return mqttNotify(mAltP->subP, ioVec, ioVecLen);
 
   // Connect
-  LM_TMP(("KZ: Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
+  LM_TMP(("Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
   int fd = orionldServerConnect(mAltP->subP->ip, mAltP->subP->port);
 
   if (fd == -1)
   {
-    LM_E(("KZ: Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
+    LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
     subscriptionFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
     return -1;
   }
-  LM_TMP(("KZ: Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
+  LM_TMP(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
 
   // Send
   int nb;

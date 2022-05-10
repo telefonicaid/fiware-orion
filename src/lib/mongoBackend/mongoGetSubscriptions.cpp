@@ -129,7 +129,6 @@ static void setSubject(Subscription* s, const BSONObj* rP)
       en.typePattern = type;
     }
 
-
     s->subject.entities.push_back(en);
   }
 
@@ -180,13 +179,13 @@ static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant
 
   subP->throttling      = rP->hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(rP, CSUB_THROTTLING)       : -1;
   nP->lastNotification  = rP->hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(rP, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = rP->hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(rP, CSUB_COUNT)           : -1;
+  nP->timesSent         = rP->hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(rP, CSUB_COUNT)           : 0;
   nP->blacklist         = rP->hasField(CSUB_BLACKLIST)?        getBoolFieldF(rP, CSUB_BLACKLIST)                  : false;
   nP->lastFailure       = rP->hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(rP, CSUB_LASTFAILURE)      : -1;
   nP->lastSuccess       = rP->hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(rP, CSUB_LASTSUCCESS)      : -1;
 
   // Attributes format
-  subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : RF_LEGACY;
 
 
   //
@@ -196,36 +195,22 @@ static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant
   //
   cacheSemTake(__FUNCTION__, "get lastNotification and count");
   CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subP->id.c_str());
-  if (cSubP)
+  if (cSubP != NULL)
   {
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
     {
       subP->notification.lastNotification = cSubP->lastNotificationTime;
     }
 
-    if (cSubP->count != 0)
-    {
-      //
-      // First, compensate for -1 in 'timesSent'
-      //
-      if (subP->notification.timesSent == -1)
-      {
-        subP->notification.timesSent = 0;
-      }
-
-      subP->notification.timesSent += cSubP->count;
-    }
+    subP->notification.timesSent += cSubP->count;
 
     if (cSubP->lastFailure > subP->notification.lastFailure)
-    {
       subP->notification.lastFailure = cSubP->lastFailure;
-    }
 
     if (cSubP->lastSuccess > subP->notification.lastSuccess)
-    {
       subP->notification.lastSuccess = cSubP->lastSuccess;
-    }
   }
+
   cacheSemGive(__FUNCTION__, "get lastNotification and count");
 }
 
@@ -321,6 +306,17 @@ static void setCsf(Subscription* subP, const BSONObj* rP)
 
 /* ****************************************************************************
 *
+* setLdQ -
+*/
+static void setLdQ(Subscription* subP, const BSONObj* rP)
+{
+  if (rP->hasField("ldQ"))
+    subP->ldQ = getStringFieldF(rP, "ldQ");
+}
+
+
+/* ****************************************************************************
+*
 * setMimeType -
 */
 static void setMimeType(Subscription* s, const BSONObj* rP)
@@ -408,7 +404,7 @@ void mongoListSubscriptions
 
   while (moreSafe(cursor))
   {
-    BSONObj  r;
+    BSONObj r;
 
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
@@ -421,9 +417,9 @@ void mongoListSubscriptions
 
     Subscription  sub;
 
+    setSubject(&sub, &r);
     setNewSubscriptionId(&sub, &r);
     setDescription(&sub, &r);
-    setSubject(&sub, &r);
     setStatus(&sub, r);
     setNotification(&sub, &r, tenantP);
 
@@ -552,10 +548,9 @@ bool mongoGetLdSubscription
 
   reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo Get Subscription"));
-
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
+
   if (!collectionQuery(connection, tenantP->subscriptions, q, &cursor, &err))
   {
     releaseMongoConnection(connection);
@@ -593,6 +588,7 @@ bool mongoGetLdSubscription
     extractContext(subP, &r);
     extractLang(subP, &r);
     setCsf(subP, &r);
+    setLdQ(subP, &r);
     setTimeInterval(subP, r);
     mongoSetLdTimestamp(&subP->createdAt, "createdAt", r);
     mongoSetLdTimestamp(&subP->modifiedAt, "modifiedAt", r);
@@ -712,6 +708,7 @@ bool mongoGetLdSubscriptions
     extractContext(&s, &r);
     extractLang(&s, &r);
     setCsf(&s, &r);
+    setLdQ(&s, &r);
     setTimeInterval(&s, r);
 
     subVecP->push_back(s);

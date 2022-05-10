@@ -29,9 +29,12 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjRender.h"                                    // kjFastRender
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/logMsg.h"                                     // LM_*
+
+#include "orionld/common/orionldState.h"                       // orionldState
 
 
 
@@ -44,9 +47,18 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int 
   if (tree == NULL)
     LM_TMP(("%s[%d]: %s: NULL Tree", fileName, lineNo, msg));
 
-  char buf[2048];  // Make the buffer size a function parameter and use kaAlloc() ?
+  int bufSize = kjFastRenderSize(tree);
 
-  bzero(buf, sizeof(buf));
-  kjFastRender(tree, buf);
-  LM_TMP(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
+  // Too big trees will not be rendered - this is just tracing
+  if (bufSize < 2048)
+  {
+    char* buf = kaAlloc(&orionldState.kalloc, bufSize + 512);
+
+    if (buf != NULL)
+    {
+      bzero(buf, bufSize);
+      kjFastRender(tree, buf);
+      LM_TMP(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
+    }
+  }
 }

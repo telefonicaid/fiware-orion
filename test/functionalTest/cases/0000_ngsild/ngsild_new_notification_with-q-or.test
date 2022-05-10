@@ -35,7 +35,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 01. Create a subscription S1 on type=T and with q='P1==5|P2==9'
 # 02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5
 # 03. Dump accumulator to see one notification
-# 04. See subscription in mongo - make sure q =='P2==true|P3==9'
+# 04. See subscription in mongo - make sure ldQ =='P2==true|P3==9', and that q+mq are P&!P
 # 05. Create an Entity E2/T, using POST /v2/entities, matching S5
 # 06. Dump accumulator to see NO notification
 #
@@ -89,8 +89,8 @@ echo
 echo
 
 
-echo "04. See subscription in mongo - make sure q =='P2==true|P3==9'"
-echo "=============================================================="
+echo "04. See subscription in mongo - make sure ldQ =='P2==true|P3==9', and that q+mq are P&!P"
+echo "========================================================================================"
 mongoCmd2 ftest "db.csubs.findOne()"
 echo
 echo
@@ -193,7 +193,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 237
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -215,44 +215,43 @@ Ngsild-Attribute-Format: Simplified
 =======================================
 
 
-04. See subscription in mongo - make sure q =='P2==true|P3==9'
-==============================================================
+04. See subscription in mongo - make sure ldQ =='P2==true|P3==9', and that q+mq are P&!P
+========================================================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subs:S1",
-	"expiration" : 2147483647,
-	"reference" : "REGEX(.*)/notify",
-	"custom" : false,
-	"mimeType" : "application/json",
-	"throttling" : 0,
-	"servicePath" : "/",
-	"status" : "active",
 	"entities" : [
 		{
-			"id" : "",
-			"isPattern" : "",
 			"type" : "urn:T",
+			"id" : ".*",
+			"isPattern" : "true",
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [ ],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldQ" : "P1==5|P2==9",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
-	"conditions" : [ ],
+	"throttling" : 0,
 	"expression" : {
-		"q" : "P1==5|P2==9",
-		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
 		"georel" : "",
-		"geoproperty" : ""
+		"geoproperty" : "",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
 	},
-	"format" : "keyValues"
+	"format" : "simplified",
+	"reference" : "REGEX(.*)/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -288,7 +287,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 237
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

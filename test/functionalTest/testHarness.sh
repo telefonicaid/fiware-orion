@@ -1431,5 +1431,4 @@ then
   done
 fi
 
-echo programExitsWithCode: $programExitsWithCode
 exit $programExitsWithCode

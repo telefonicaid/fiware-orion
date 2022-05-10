@@ -43,15 +43,20 @@ extern "C"
 //
 void orionldContextCacheRelease(void)
 {
+  int freed = 0;
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
     if (orionldContextCache[ix] == NULL)
       continue;
 
+    ++freed;
     if (orionldContextCache[ix]->tree != NULL)
     {
+      LM_TMP(("VL: FREE(%d, context '%s', tree:%p): %d", freed, orionldContextCache[ix]->url, orionldContextCache[ix]->tree));
       kjFree(orionldContextCache[ix]->tree);
       orionldContextCache[ix]->tree = NULL;
     }
+    else
+      LM_TMP(("VL: NFRE(%d, context '%s', tree:NULL): %d", freed, orionldContextCache[ix]->url));
   }
 }

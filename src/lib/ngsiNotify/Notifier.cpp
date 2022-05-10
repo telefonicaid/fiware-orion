@@ -51,10 +51,11 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
 }
 
+#include "cache/subCache.h"                                    // CachedSubscription
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
-#include "cache/subCache.h"                                    // CachedSubscription
+#include "orionld/notifications/notificationDataToGeoJson.h"   // notificationDataToGeoJson
 #endif
 
 #include "ngsiNotify/Notifier.h"
@@ -268,7 +269,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       ncr.subscriptionId  = subscriptionId;
       ncr.contextElementResponseVector.push_back(&cer);
 
-      if (renderFormat == NGSI_V1_LEGACY)
+      if (renderFormat == RF_LEGACY)
       {
         payload = ncr.render(V1, false);
       }
@@ -287,10 +288,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         return paramsV;  // empty vector
       }
 
-      char* pload  = curl_unescape(payload.c_str(), payload.length());
-      payload      = std::string(pload);
-      renderFormat = NGSI_V2_CUSTOM;
-      mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+      char* pload   = curl_unescape(payload.c_str(), payload.length());
+
+      payload       = std::string(pload);
+      renderFormat  = RF_CUSTOM;
+      mimeType      = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+
       curl_free(pload);
     }
 
@@ -407,30 +410,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
 
 
-
-/* ****************************************************************************
-*
-* notificationDataToGeoJson -
-*/
-static void notificationDataToGeoJson(KjNode* notificationNodeP)
-{
-  KjNode* dataP = kjLookup(notificationNodeP, "data");
-
-  if (dataP != NULL)
-  {
-    kjChildRemove(notificationNodeP, dataP);
-
-    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP);
-
-    geojsonTree->name = (char*) "data";
-    kjChildAdd(notificationNodeP, geojsonTree);
-  }
-  else
-    LM_E(("Internal Error (no 'data' member found in a notification node)"));
-}
-
-
-
 /* ****************************************************************************
 *
 * Notifier::buildSenderParams -
@@ -520,15 +499,15 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     // this FIXME will be removed (and all the test harness adjusted, if needed)
     //
     if (!atLeastOneNotDefault)
-    {
       spathList = "";
-    }
 
     std::string payloadString;
 
-    if (renderFormat == NGSI_V1_LEGACY)
+    if (renderFormat == RF_LEGACY)
       payloadString = ncrP->render(V2, false);
-    else if ((renderFormat >= NGSI_LD_V1_NORMALIZED) && (renderFormat <= NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+    else if (orionldState.apiVersion != NGSI_LD_V1)
+      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
+    else
     {
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
       if (subP == NULL)
@@ -537,8 +516,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         return paramsV;
       }
 
-      char*    details;
-      KjNode*  kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, subP->lang.c_str(), &details);
+      char*        details;
+      const char*  lang   = (subP->lang == "")? NULL : subP->lang.c_str();
+      KjNode*      kjTree = kjTreeFromNotification(ncrP, subP->ldContext.c_str(), subP->httpInfo.mimeType, subP->renderFormat, lang, &details);
 
       if (kjTree == NULL)
       {
@@ -556,8 +536,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       payloadString = buf;
       toFree        = buf;
     }
-    else
-      payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
 
     /* Parse URL */
     std::string  host;
@@ -639,31 +617,22 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     // This depends on what the subscriber asked for.
     // If "x-ngsiv2-normalized-compacted" or "x-ngsiv2-keyValues-compacted", then the link is necessary.
     //
+
+    //
+    // WARNING - Perhaps the Link should only be added if (subP->ldContext != "")   ?
+    // [ In the end, when mongoc is fully used, this function won't be used for NGSI-LD operations ]
+    //
     if (subP != NULL)
     {
-      if ((renderFormat == NGSI_LD_V1_NORMALIZED)            ||
-          (renderFormat == NGSI_LD_V1_KEYVALUES)             ||
-          (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT) ||
-          (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+      if ((httpInfo.mimeType       == JSON)                     &&
+          (renderFormat            != RF_CROSS_APIS_NORMALIZED) &&
+          (renderFormat            != RF_CROSS_APIS_KEYVALUES)  &&
+          (orionldState.apiVersion == NGSI_LD_V1))
       {
-        //
-        // Subscriptions created using ngsi-ld have a context - those from APIV1/2 do not
-        // This code adds the "Link" header if needed
-        //
-        if (httpInfo.mimeType == JSON)
-        {
-          if (subP->ldContext == "")
-            params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
-          else
-            params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
-        }
+        if (subP->ldContext != "")
+          params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;
         else
-        {
-          //
-          // Not that this would ever happen, but, what do we do here ?
-          // Best choice seems to be to simply send the notification without the Link header.
-          //
-        }
+          params->extraHeaders["Link"] = std::string("<") + coreContextUrl + ">; " + LINK_REL_AND_TYPE;
       }
     }
 

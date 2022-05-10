@@ -90,7 +90,8 @@ extern void mongoSubCountersUpdate
   long long           count,
   double              lastNotificationTime,
   double              lastFailure,
-  double              lastSuccess
+  double              lastSuccess,
+  bool                ngsild
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

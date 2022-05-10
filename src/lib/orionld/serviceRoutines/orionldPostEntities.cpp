@@ -377,8 +377,8 @@ bool orionldPostEntitiesWithMongoBackend(void)
 //
 bool orionldPostEntities(void)
 {
-  if ((experimental == false) || (orionldState.in.lang != NULL))                      // Some day ...
-    return orionldPostEntitiesWithMongoBackend();  // ... this will be removed!! :)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+    return orionldPostEntitiesWithMongoBackend();
 
   char*    entityId;
   char*    entityType;
@@ -390,7 +390,7 @@ bool orionldPostEntities(void)
 
 
   //
-  // If the entity already exists, an error is returned
+  // If the entity already exists, a "409 Conflict" is returned
   //
   if (mongocEntityLookup(entityId) != NULL)
   {
@@ -431,10 +431,19 @@ bool orionldPostEntities(void)
 
   if (dbModelFromApiEntity(orionldState.requestTree, NULL, NULL, true) == false)
   {
-    orionldError(OrionldInternalError, "Out of memory?", "Need more info here", 500);
+    //
+    // Not calling orionldError as a better error message is overwritten if I do.
+    // Once we have "Error Stacking", orionldError should be called.
+    //
+    // orionldError(OrionldInternalError, "Internal Error", "Unable to convert API Entity into DB Model Entity", 500);
+
     return false;
   }
   KjNode* dbEntityP = orionldState.requestTree;  // More adecuate to talk about DB-Entity from here on
+
+  // datasets?
+  if (orionldState.datasets != NULL)
+    kjChildAdd(dbEntityP, orionldState.datasets);
 
   //
   // Put Entity ID and TYPE back - inside _id as first members of the tree

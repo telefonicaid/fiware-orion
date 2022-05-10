@@ -36,6 +36,7 @@ accumulatorStart --pretty-print
 # 02. Create a matching Entity urn:ngsi-ld:Vehicle:A4501, with a 'location' property
 # 03. Dump the accumulator to see the notification, make sure the 'location' property is OK
 # 04. See the entity in mongo
+# 05. See the subscription in mongo
 #
 
 echo "01. Create a subscription"
@@ -97,6 +98,13 @@ echo
 echo "04. See the entity in mongo"
 echo "==========================="
 mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
 echo
 echo
 
@@ -189,6 +197,49 @@ MongoDB server version: REGEX(.*)
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : ""
+}
+bye
+
+
+05. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:01",
+	"expiration" : 0,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "Notify me of all product vehicles changes",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
 }
 bye
 

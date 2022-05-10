@@ -184,7 +184,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY),
+  // FIXME P5: RenderFormat right now hardcoded to "JSON" (RF_LEGACY),
   //           in the future the RenderFormat will be taken from the payload
   //
 
@@ -204,7 +204,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to NGSI_V1_LEGACY,
+  // FIXME P5: RenderFormat right now hardcoded to RF_LEGACY,
   //           in the future the RenderFormat will be taken from the payload
   //
 
@@ -213,7 +213,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
                                   requestP->attributeList,
                                   requestP->subscriptionId.get(),
                                   getStringFieldF(&sub, CASUB_REFERENCE),
-                                  NGSI_V1_LEGACY,
+                                  RF_LEGACY,
                                   tenantP,
                                   fiwareCorrelator);
 

@@ -199,7 +199,7 @@ MongoDB server version: REGEX(.*)
 		"MQTT-Version" : "mqtt5.0"
 	},
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{
@@ -297,7 +297,7 @@ MongoDB server version: REGEX(.*)
 		"MQTT-Version" : "mqtt3.1.1"
 	},
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"status" : "active",
 	"entities" : [
 		{

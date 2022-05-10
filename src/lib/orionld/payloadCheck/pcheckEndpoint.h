@@ -36,6 +36,6 @@ extern "C"
 //
 // pcheckEndpoint -
 //
-extern bool pcheckEndpoint(KjNode* endpointP, bool patch);
+extern bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_

@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qPresent.h"                                // qListPresent, qTreePresent
+#include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/q/qParse.h"                                  // Own interface
 
 
@@ -61,13 +62,13 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
   char* rest          = NULL;
   char  fullPath[1100];
 
-
+  LM_TMP(("Q: In varFix for varPath '%s'", varPath));
   //
-  // Cases:
+  // Cases (for forDb==true):
   //
   // 1. A                 => single attribute     => attrs.A.value
   // 2. A[B]    (qPath)   => B is inside A.value  => attrs.A.value.B
-  // 3. A.B     (mqPath)  => B is a metadata      => attrs.A.md.B.value
+  // 3. A.B     (mqPath)  => B is a metadata      => attrs.A.md.B.value   OR  "attrs.A.md.B" if B is TIMESTAMP and forDb==false
   // 4. A.B.C   (mqPath)  => B is a metadata      => attrs.A.md.B.value.C
   //
   // - There can be only one '[' in the path
@@ -140,7 +141,7 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
   // Again, four cases:
   // 1. A
   // 2. A[B]
-  // 3. A.B
+  // 3. A.B   (special case if B is timestamp and if forDb==false)
   // 4. A.B.C
   //
   // - If A:  ((startBracketP == NULL) && (firstDotP == NULL))
@@ -262,25 +263,38 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
   }
   else
   {
+    // If observedAt, createdAt, modifiedAt, unitCode, ...   No ".value" must be appended
+    if (caseNo == 3)
+    {
+      LM_TMP(("Q: case 3 for attr '%s', sub-attr: '%s'", longName, mdNameP));
+      if ((strcmp(mdNameP, "observedAt") == 0) || (strcmp(mdNameP, "modifiededAt") == 0) || (strcmp(mdNameP, "createdAt") == 0))
+      {
+        LM_TMP(("Q: case 5 !"));
+        caseNo = 5;
+      }
+    }
+
     if (caseNo == 1)
       snprintf(fullPath, sizeof(fullPath) - 1, "%s.value", longName);
     else if (caseNo == 2)
       snprintf(fullPath, sizeof(fullPath) - 1, "%s.value.%s", longName, rest);
     else if (caseNo == 3)
       snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s.value", longName, mdNameP);
-    else
+    else if (caseNo == 4)
       snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s.value.%s", longName, mdNameP, rest);
+    else if (caseNo == 5)
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s", longName, mdNameP);
   }
 
   if (orionldState.useMalloc == true)
   {
-    LM_TMP(("LEAK: Releasing a Variable Path '%s' (at %p)", varPath, varPath));
     free(varPath);
     char* fp = strndup(fullPath, sizeof(fullPath) - 1);
-    LM_TMP(("LEAK: Allocated a Variable Path '%s' (at %p)", fp, fp));
+    LM_TMP(("Q: From varFix returning '%s'", fp));
     return fp;
   }
 
+  LM_TMP(("Q: From varFix returning '%s'", fullPath));
   return kaStrdup(&orionldState.kalloc, fullPath);
 }
 
@@ -337,7 +351,7 @@ static QNode* qNodeAppend(QNode* container, QNode* childP, bool clone = true)
   }
   else
   {
-    LM_TMP(("LEAK: Not cloning '%s' at %p (comes from qNodeV)", qNodeType(childP->type), childP));
+    LM_TMP(("Not cloning '%s' at %p (comes from qNodeV)", qNodeType(childP->type), childP));
     cloneP = childP;
   }
 
@@ -381,10 +395,24 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
   QNode*     openP           = NULL;
   QNode*     closeP          = NULL;
 
-  qListPresent(qLexList, endNodeP, "LEAK", "Incoming qLexList");
-
   while (qLexP != endNodeP)
   {
+    if ((compOpP != NULL) && ((qLexP->type == QNodeTrueValue) || (qLexP->type == QNodeFalseValue)))
+    {
+      if ((compOpP->type != QNodeEQ) && (compOpP->type != QNodeNE))
+      {
+        *titleP   = (char*) "Invalid Q-Filter";
+        *detailsP = (char*) "invalid operator for boolean value";
+        qRelease(compOpP);
+        qListRelease(qLexList);
+        // Free nodes in qNodeV ?
+        if (opNodeP != NULL)
+          qRelease(opNodeP);
+
+        return NULL;
+      }
+    }
+
     switch (qLexP->type)
     {
     case QNodeOpen:
@@ -413,7 +441,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
           return NULL;
         }
       }
-      LM_TMP(("LEAK: Calling qParse from '%s' to '%s'", qNodeType(openP->next->type), qNodeType(closeP->type)));
+      LM_TMP(("Calling qParse from '%s' to '%s'", qNodeType(openP->next->type), qNodeType(closeP->type)));
       qNodeV[qNodeIx++] = qParse(openP->next, closeP, forDb, titleP, detailsP);
 
       // Make qLexP point to ')' (will get ->next at the end of the loop)
@@ -557,12 +585,12 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
       return NULL;
       break;
     }
-    LM_TMP(("LEAK: Current token: %s", qNodeType(qLexP->type)));
+    LM_TMP(("Current token: %s", qNodeType(qLexP->type)));
     qLexP = qLexP->next;
     if (qLexP != NULL)
-      LM_TMP(("LEAK: Next token: %s", qNodeType(qLexP->type)));
+      LM_TMP(("Next token: %s", qNodeType(qLexP->type)));
     else
-      LM_TMP(("LEAK: Next token: NULL"));
+      LM_TMP(("Next token: NULL"));
   }
 
   if (opNodeP != NULL)
@@ -579,7 +607,6 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
     return NULL;
   }
 
-  qListPresent(qLexList, endNodeP, "LEAK", "Outgoing qLexList");
   return qNodeV[0];
 }
 

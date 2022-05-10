@@ -35,7 +35,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
@@ -177,7 +176,7 @@ void orionldStateInit(MHD_Connection* connection)
   //
   // Default format is Normalized
   //
-  orionldState.out.format         = NGSI_LD_V1_NORMALIZED;
+  orionldState.out.format         = RF_NORMALIZED;
 
   //
   // Default response status code is 200 OK

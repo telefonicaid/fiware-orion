@@ -38,11 +38,89 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
+#include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload
+#include "orionld/q/qBuild.h"                                    // qBuild
+#include "orionld/q/qRender.h"                                   // qRender
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
 #include "orionld/kjTree/kjTreeToSubscriptionExpression.h"       // kjTreeToSubscriptionExpression
 #include "orionld/kjTree/kjTreeToNotification.h"                 // kjTreeToNotification
 #include "orionld/kjTree/kjTreeToSubscription.h"                 // Own interface
+
+
+
+bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
+{
+  bool  qWithOr = false;
+  char* qOrig   = q;
+
+  if (strchr(q, '|') != NULL)
+  {
+    LM_TMP(("KZ: pipe in 'q' - not valid for mongoBackend q"));
+    //
+    // This is a difficult situation ...
+    // I need the subscription for operations that support NGSI-LD Subscription notifications.
+    // Right now (April 15 2022 - with -experimental set):
+    //   POST  /entities
+    //   PUT   /entities/{entityId}
+    //   PATCH /entities/{entityId}
+    //
+    // But, the Q-with-OR isn't valid for NGSiv2, so, it needs to be made unavailable for other operations.
+    // Those "other operations" (the ones still using mongoBackend) use a Scope for the Q-filter, while the
+    // new operations uses qLex/qParse.
+    // So, the solution is to give a fake Q-filter to the Scope  (without '|') and the correct Q-filter to qLex.
+    // That is fixed right here, by setting q to "P;!P" (P Exists AND P Does Not Exist) - will never match.
+    //
+    qWithOr = true;
+    q       = (char*) "P;!P";
+  }
+  else if (strstr(q, "~=") != NULL)
+  {
+    LM_TMP(("KZ: pattern-match in 'q' - not valid for mongoBackend q"));
+    LM_W(("Pattern Match for subscriptions - not implemented"));
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Pattern matching in Q-filter", 501);
+    return false;
+  }
+
+  LM_TMP(("Creating Scope from q '%s'", qOrig));
+  Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qOrig);
+  std::string  errorString;
+
+  scopeP->stringFilterP = new StringFilter(SftQ);
+
+  subP->subject.condition.expression.q = qOrig;
+
+  if (scopeP->stringFilterP->parse(q, &errorString) == false)
+  {
+    LM_E(("Error parsing '%s': %s", scopeP->value.c_str(), errorString.c_str()));
+    delete scopeP->stringFilterP;
+    delete scopeP;
+    orionldError(OrionldBadRequestData, "Invalid value for Subscription::q", errorString.c_str(), 400);
+    return false;
+  }
+
+  char stringFilterExpanded[512];
+  bool b;
+
+  b = scopeP->stringFilterP->render(stringFilterExpanded, sizeof(stringFilterExpanded), &errorString);
+  if (b == false)
+  {
+    delete scopeP->stringFilterP;
+    delete scopeP;
+
+    orionldError(OrionldInternalError, "Internal Error", "Unable to render StringFilter", 500);
+    return false;
+  }
+
+  subP->subject.condition.expression.q = stringFilterExpanded;
+
+  if (qWithOr == true)
+    subP->subject.condition.expression.q = qOrig;
+
+  subP->restriction.scopeVector.push_back(scopeP);
+
+  return true;
+}
 
 
 
@@ -74,9 +152,9 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   // Default values
   //
-  subP->attrsFormat                        = NGSI_LD_V1_KEYVALUES;
+  subP->attrsFormat                        = RF_NORMALIZED;
   subP->descriptionProvided                = false;
-  subP->expires                            = 0x7FFFFFFF;
+  subP->expires                            = 0;
   subP->throttling                         = 0;
   subP->subject.condition.expression.isSet = false;
   subP->notification.blacklist             = false;
@@ -158,9 +236,9 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (strcmp(kNodeP->name, "entities") == 0)
     {
-      DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, "Subscription::entities", kNodeP);
-      ARRAY_CHECK(kNodeP, "Subscription::entities");
-      EMPTY_ARRAY_CHECK(kNodeP, "Subscription::entities");
+      DUPLICATE_CHECK_WITH_PRESENCE(entitiesPresent, entitiesP, SubscriptionEntitiesPath, kNodeP);
+      ARRAY_CHECK(kNodeP, SubscriptionEntitiesPath);
+      EMPTY_ARRAY_CHECK(kNodeP, SubscriptionEntitiesPath);
 
       if (kjTreeToEntIdVector(entitiesP, &subP->subject.entities) == false)
       {
@@ -187,72 +265,15 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
     {
-      DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
+      LM_TMP(("KZ: Got a 'q': '%s'", kNodeP->value.s));
       STRING_CHECK(kNodeP, "Subscription::q");
+      DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
 
-      bool  qWithOr = false;
-      char* q       = kNodeP->value.s;
-      if (strchr(kNodeP->value.s, '|') != NULL)
+      if (oldTreatmentForQ(subP, kNodeP->value.s) == false)  // New treatment doesn't even use this function - just the Kj Tree
       {
-        //
-        // This is a difficult situation ...
-        // I need the subscription for operations that support NGSI-LD Subscription notifications.
-        // Right now (April 15 2022 - with -experimental set):
-        //   POST  /entities
-        //   PUT   /entities/{entityId}
-        //   PATCH /entities/{entityId}
-        //
-        // But, the Q-with-OR isn't valid for NGSiv2, so, it needs to be made unavailable for other operations.
-        // Those "other operations" (the ones still using mongoBackend) use a Scope for the Q-filter, while the
-        // new operations uses qLex/qParse.
-        // So, the solution is to give a fake Q-filter to the Scope  (without '|') and the correct Q-filter to qLex.
-        // That is fixed right here, by setting q to "P;!P" (P Exists AND P Does Not Exist) - will never match.
-        //
-        qWithOr = true;
-        q       = (char*) "P;!P";
-      }
-      else if (strstr(kNodeP->value.s, "~=") != NULL)
-      {
-        LM_W(("Pattern Match for subscriptions - not implemented"));
-        orionldError(OrionldOperationNotSupported, "Not Implemented", "Pattern matching in Q-filter", 501);
+        LM_TMP(("KZ: oldTreatmentForQ failed"));
         return false;
       }
-
-      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
-      std::string  errorString;
-
-      scopeP->stringFilterP = new StringFilter(SftQ);
-
-      subP->subject.condition.expression.q = kNodeP->value.s;
-
-      if (scopeP->stringFilterP->parse(q, &errorString) == false)
-      {
-        LM_E(("Error parsing '%s': %s", scopeP->value.c_str(), errorString.c_str()));
-        delete scopeP->stringFilterP;
-        delete scopeP;
-        orionldError(OrionldBadRequestData, "Invalid value for Subscription::q", errorString.c_str(), 400);
-        return false;
-      }
-
-      char stringFilterExpanded[512];
-      bool b;
-
-      b = scopeP->stringFilterP->render(stringFilterExpanded, sizeof(stringFilterExpanded), &errorString);
-      if (b == false)
-      {
-        delete scopeP->stringFilterP;
-        delete scopeP;
-
-        orionldError(OrionldInternalError, "Internal Error", "Unable to render StringFilter", 500);
-        return false;
-      }
-
-      subP->subject.condition.expression.q = stringFilterExpanded;
-
-      if (qWithOr == true)
-        subP->subject.condition.expression.q = kNodeP->value.s;
-
-      subP->restriction.scopeVector.push_back(scopeP);
     }
     else if (strcmp(kNodeP->name, "geoQ") == 0)
     {

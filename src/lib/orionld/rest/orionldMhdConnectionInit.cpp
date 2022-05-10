@@ -228,9 +228,9 @@ static void optionsParse(const char* options)
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
     orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when /simplified/ output format is selected", 400);
   else if (orionldState.uriParamOptions.keyValues)
-    orionldState.out.format = NGSI_LD_V1_KEYVALUES;
+    orionldState.out.format = RF_KEYVALUES;
   else if (orionldState.uriParamOptions.concise)
-    orionldState.out.format = NGSI_LD_V1_CONCISE;
+    orionldState.out.format = RF_CONCISE;
 }
 
 
@@ -381,15 +381,12 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
-  // <TEMP>
-  if (strcmp(key, "LANG") == 0)
+  if (strcmp(key, "Orionld-Legacy") == 0)
   {
-    orionldState.in.lang = (char*) value;
-    LM_TMP(("LANG: Got header '%s' = '%s'", key, value));
+    orionldState.in.legacy = (char*) value;
+    LM_TMP(("Got header '%s' = '%s'", key, value));
   }
-  else
-  // </TEMP>
-  if (strcmp(key, "NGSILD-Scope") == 0)
+  else if (strcmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));
     if (orionldState.scopes == -1)

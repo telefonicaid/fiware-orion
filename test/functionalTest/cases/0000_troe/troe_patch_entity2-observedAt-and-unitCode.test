@@ -167,9 +167,9 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P" : {
 			"type" : "Property",
-			"value" : 25,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 25,
 			"mdNames" : [
 				"observedAt",
 				"unitCode",
@@ -250,9 +250,9 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P" : {
 			"type" : "Property",
-			"value" : 78,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 78,
 			"mdNames" : [
 				"observedAt",
 				"unitCode",
@@ -332,3 +332,4 @@ https://uri.etsi.org/ngsi-ld/default-context/PP,Number,urn:E1,urn:ngsi-ld:attrib
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+pgDrop $CB_DB_NAME

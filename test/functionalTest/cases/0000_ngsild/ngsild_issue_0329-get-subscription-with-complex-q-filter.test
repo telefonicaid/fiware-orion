@@ -50,7 +50,7 @@ payload='{
     }
   ],
   "watchedAttributes": [ "numberOfItems" ],
-  "q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Store:001",
+  "q": "numberOfItems<10;locatedIn==%22urn:ngsi-ld:Store:001%22",
   "notification": {
     "attributes": [ "numberOfItems", "stocks", "locatedIn" ],
     "format": "keyValues",
@@ -102,7 +102,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 0,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "Description of Test subscription 01",
 	"status" : "active",
 	"entities" : [
@@ -128,7 +128,7 @@ MongoDB server version: REGEX(.*)
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/numberOfItems"
 	],
 	"expression" : {
-		"q" : "https://fiware=github=io/tutorials=Step-by-Step/schema/numberOfItems<10;https://fiware=github=io/tutorials=Step-by-Step/schema/locatedIn==urn:ngsi-ld:Store:001",
+		"q" : "https://fiware=github=io/tutorials=Step-by-Step/schema/numberOfItems<10;https://fiware=github=io/tutorials=Step-by-Step/schema/locatedIn==%22urn:ngsi-ld:Store:001%22",
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
@@ -143,7 +143,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/urn:ngsi-ld:subscription:S1, make sure the Q-filter is OK
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 620
+Content-Length: 626
 Content-Type: application/json
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -171,7 +171,7 @@ Date: REGEX(.*)
         "format": "keyValues",
         "status": "ok"
     },
-    "q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Store:001",
+    "q": "numberOfItems<10;locatedIn==%22urn:ngsi-ld:Store:001%22",
     "status": "active",
     "type": "Subscription",
     "watchedAttributes": [

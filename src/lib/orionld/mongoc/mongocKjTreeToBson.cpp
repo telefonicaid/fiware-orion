@@ -38,14 +38,26 @@ extern "C"
 //
 // kjTreeToBson -
 //
-static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray)
+static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray, int arrayIndex = 0)
 {
-  int         slen = (inArray == true)? 1 : -1;
-  const char* name = (inArray == true)? "0" : nodeP->name;  // Always "0" seems to work, but should really be "0", "1", "2", ...
+  char  nameBuf[16];
+  int   slen;
+  char* name;
+
+  if (inArray == true)
+  {
+    slen = snprintf(nameBuf, sizeof(nameBuf), "%d", arrayIndex);
+    name = nameBuf;
+  }
+  else
+  {
+    name = nodeP->name;
+    slen = strlen(name);
+  }
 
   if      (nodeP->type == KjString)    bson_append_utf8(parentP, name, slen, nodeP->value.s, -1);
   else if (nodeP->type == KjInt)       bson_append_int32(parentP, name, slen, nodeP->value.i);
-  else if (nodeP->type == KjFloat)     bson_append_double(parentP, name, slen, nodeP->value.f);
+  else if (nodeP->type == KjFloat)     { bson_append_double(parentP, name, slen, nodeP->value.f); LM_TMP(("VL128: Created '%s' (DOUBLE) and added it to parent %p", name, parentP)); }
   else if (nodeP->type == KjBoolean)   bson_append_bool(parentP, name, slen, nodeP->value.b);
   else if (nodeP->type == KjNull)      bson_append_null(parentP, name, slen);
   else if (nodeP->type == KjObject)
@@ -54,12 +66,13 @@ static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray)
 
     bson_init(&bObject);
     bson_append_document_begin(parentP, name, slen, &bObject);
+    LM_TMP(("VL128: Prepared '%s' (OBJECT at %p) for addition to parent %p", name, &bObject, parentP));
     for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
       kjTreeToBson(itemP, &bObject, false);
     }
     bson_append_document_end(parentP, &bObject);
-    // bson_destroy(&bObject); ?
+    LM_TMP(("VL128: Added '%s' (OBJECT) to parent %p", name, parentP));
   }
   else if (nodeP->type == KjArray)
   {
@@ -69,7 +82,8 @@ static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray)
     bson_append_array_begin(parentP, name, slen, &bArray);
     for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
-      kjTreeToBson(itemP, &bArray, true);
+      kjTreeToBson(itemP, &bArray, true, arrayIndex);
+      arrayIndex += 1;
     }
     bson_append_array_end(parentP, &bArray);
     // bson_destroy(&bArray); ?
@@ -87,7 +101,7 @@ void mongocKjTreeToBson(KjNode* treeP, bson_t* bsonP)
   bool inArray = (treeP->type == KjArray);
 
   bson_init(bsonP);
-
+  LM_TMP(("VL128: Top level %s '%s' at %p", (inArray == true)? "ARRAY" : "OBJECT", treeP->name, bsonP));
   for (KjNode* itemP = treeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     kjTreeToBson(itemP, bsonP, inArray);

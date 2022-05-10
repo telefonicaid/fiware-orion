@@ -171,7 +171,7 @@ This service is experimental and is only in place when Orion-LD is started with 
   * LanguageProperty attributes are supported
   * TRoE is almost fully working - we need to add an opMode in the sub-attrs table to indicate "Removal of Sub-Attribute"
 
-## Missing
+#### Missing
   * Multi-attributes
   * New "native NGSI-LD" Notifications are supported but some parts are missing: { "q", "geoQ" }. It is also very green.
   * Forwarding
@@ -183,7 +183,7 @@ This service is experimental and is only in place when Orion-LD is started with 
 #### Done
   * Uses the new mongoc driver
 
-## Missing
+#### Missing
   * Multi-attributes
   * New "native NGSI-LD" Notifications are supported but some parts are missing: { "q", "geoQ" }. It is also very green.
   * Forwarding
@@ -197,8 +197,8 @@ This service is experimental and is only in place when Orion-LD is started with 
   * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
   * TRoE
   * Notifications - using the Legacy driver
-
-## Missing
+  * datasetId (using the Legacy driver)
+#### Missing
   * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
   * Multi-attributes
   * LanguageProperty attributes
@@ -206,20 +206,44 @@ This service is experimental and is only in place when Orion-LD is started with 
 ------ TBI --------------------------------------------------------
 
 ### DELETE /ngsi-ld/v1/entities/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbEntityLookup
+  * dbEntityDelete
+* No Notifications (notifications on DELETE is not yet part of the NGSI-LD API - hopefully for 1.6.1)
 
 ### POST /ngsi-ld/v1/entities/*/attrs
 ### PATCH /ngsi-ld/v1/entities/*/attrs
 
 ### DELETE /ngsi-ld/v1/entities/*/attrs/*
-
+* Supports datasetId
+* No Notifications (notifications on DELETE is not yet part of the NGSI-LD API - hopefully for 1.6.1)
+* Not using mongoBackend, but using the the mongo C++ legacy driver 
+  * dbEntityAttributeInstanceLookup
+  * dbEntityAttributeLookup
+  * dbEntityAttributeWithDatasetsLookup
+  * dbEntityAttributesDelete
+  * dbEntityFieldDelete
+  * dbEntityFieldReplace
+  
 ### POST /ngsi-ld/v1/entityOperations/create
 ### POST /ngsi-ld/v1/entityOperations/upsert
 ### POST /ngsi-ld/v1/entityOperations/update
 ### POST /ngsi-ld/v1/entityOperations/delete
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbEntityListLookupWithIdTypeCreDate
+  * dbEntitiesDelete
+
 ### POST /ngsi-ld/v1/entityOperations/query
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbEntitiesQuery
 
 ### GET /ngsi-ld/v1/types
+* Not using mongoBackend, but using the the mongo C++ legacy driver 
+  * dbEntityTypesGet
+
 ### GET /ngsi-ld/v1/types/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver 
+  * dbEntityTypeGet
 
 ### GET /ngsi-ld/v1/attributes
 ### GET /ngsi-ld/v1/attributes/*
@@ -229,14 +253,28 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 ### GET /ngsi-ld/v1/subscriptions/*
 ### PATCH /ngsi-ld/v1/subscriptions/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbSubscriptionGet
+  * dbSubscriptionReplace
+
 ### DELETE /ngsi-ld/v1/subscriptions/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbSubscriptionGet
+  * dbSubscriptionDelete
 
 ### POST /ngsi-ld/v1/csourceRegistrations
 ### GET /ngsi-ld/v1/csourceRegistrations
 
 ### PATCH /ngsi-ld/v1/csourceRegistrations/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbRegistrationGet
+  * dbRegistrationReplace
+
 ### GET /ngsi-ld/v1/csourceRegistrations/*
 ### DELETE /ngsi-ld/v1/csourceRegistrations/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbRegistrationExists
+  * dbRegistrationDelete
 
 ### POST /ngsi-ld/v1/jsonldContexts
 ### GET /ngsi-ld/v1/jsonldContexts

@@ -129,7 +129,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "Description of Test subscription 01",
 	"status" : "paused",
 	"entities" : [

@@ -170,7 +170,7 @@ bool EntityInfo::match
   }
   else
   {
-    LM_TMP(("KZ No match due to Entity ID"));
+    LM_TMP(("No match due to Entity ID"));
     matchedId = false;
   }
 
@@ -185,7 +185,7 @@ bool EntityInfo::match
     }
     else if ((type != "")  && (entityType != "") && (entityType != type))
     {
-      LM_TMP(("KZ No match due to Entity Type"));
+      LM_TMP(("No match due to Entity Type"));
       matchedType = false;
     }
     else
@@ -437,21 +437,21 @@ static bool subMatch
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
         // No match due to tenant I
-        LM_TMP(("KZ: No match due to tenant I"));
+        LM_TMP(("No match due to tenant I"));
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
         // No match due to tenant II
-        LM_TMP(("KZ: No match due to tenant II"));
+        LM_TMP(("No match due to tenant II"));
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
       // No match due to tenant III
-      LM_TMP(("KZ: No match due to tenant III"));
+      LM_TMP(("No match due to tenant III"));
       return false;
     }
   }
@@ -459,7 +459,7 @@ static bool subMatch
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
     // No match due to servicePath
-    LM_TMP(("KZ: No match due to servicePath"));
+    LM_TMP(("No match due to servicePath"));
     return false;
   }
 
@@ -473,7 +473,7 @@ static bool subMatch
   if (!attributeMatch(cSubP, attrV))
   {
     // No match due to attributes
-    LM_TMP(("KZ: No match due to attributes"));
+    LM_TMP(("No match due to attributes"));
     return false;
   }
 
@@ -567,7 +567,29 @@ int subCacheMatch
 */
 void subCacheItemDestroy(CachedSubscription* cSubP)
 {
-  free(cSubP->url);
+  if (cSubP->subscriptionId != NULL)
+  {
+    free(cSubP->subscriptionId);
+    cSubP->subscriptionId = NULL;
+  }
+
+  if (cSubP->description != NULL)
+  {
+    free(cSubP->description);
+    cSubP->description = NULL;
+  }
+
+  if (cSubP->qText != NULL)
+  {
+    free(cSubP->qText);
+    cSubP->qText = NULL;
+  }
+
+  if (cSubP->url != NULL)
+  {
+    free(cSubP->url);
+    cSubP->url = NULL;
+  }
 
   if (cSubP->tenant != NULL)
   {
@@ -579,12 +601,6 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   {
     free(cSubP->servicePath);
     cSubP->servicePath = NULL;
-  }
-
-  if (cSubP->subscriptionId != NULL)
-  {
-    free(cSubP->subscriptionId);
-    cSubP->subscriptionId = NULL;
   }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
@@ -604,12 +620,34 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   cSubP->notifyConditionV.clear();
 
   if (cSubP->qP != NULL)
+  {
+    LM_TMP(("QP: Freeing a QNode Tree at %p", cSubP->qP));
     qRelease(cSubP->qP);
+    cSubP->qP = NULL;
+  }
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
-    free(cSubP->httpInfo.receiverInfo[ix]);
+  {
+    if (cSubP->httpInfo.receiverInfo[ix] != NULL)
+    {
+      LM_TMP(("VE: Freeing Key-Value Pair at %p (receiverInfo)", cSubP->httpInfo.receiverInfo[ix]));
+      free(cSubP->httpInfo.receiverInfo[ix]);
+      cSubP->httpInfo.receiverInfo[ix] = NULL;
+    }
+  }
+
+  for (int ix = 0; ix < (int) cSubP->httpInfo.notifierInfo.size(); ++ix)
+  {
+    if (cSubP->httpInfo.notifierInfo[ix] != NULL)
+    {
+      LM_TMP(("VE: Freeing Key-Value Pair at %p (notifierInfo)", cSubP->httpInfo.notifierInfo[ix]));
+      free(cSubP->httpInfo.notifierInfo[ix]);
+      cSubP->httpInfo.notifierInfo[ix] = NULL;
+    }
+  }
 
   cSubP->next = NULL;
+  LM_TMP(("VL: All Done"));
 }
 
 
@@ -767,6 +805,7 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 * Note that 'count', which is the counter of how many times a notification has been
 * fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
 * has made a notification to be triggered/fired upon creation-time of the subscription.
+* UPDATE: Initial Notifications have been removed => always 0
 */
 void subCacheItemInsert
 (
@@ -788,7 +827,6 @@ void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
-#ifdef ORIONLD
   const std::string&                 name,
   const std::string&                 ldContext,
   const std::string&                 lang,
@@ -796,14 +834,11 @@ void subCacheItemInsert
   const char*                        mqttPassword,
   const char*                        mqttVersion,
   int                                mqttQoS,
-#endif
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-#ifdef ORIONLD
   const std::string&                 geoproperty,
-#endif
   bool                               blacklist
 )
 {
@@ -826,7 +861,7 @@ void subCacheItemInsert
   cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
-  cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->count                 = 0;
   cSubP->status                = status;
 
   if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
@@ -846,7 +881,7 @@ void subCacheItemInsert
   cSubP->name                    = name;
   cSubP->expression.geoproperty  = geoproperty;
 
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (ldContext != "")
   {
     cSubP->ldContext = ldContext;
     cSubP->lang      = lang;
@@ -858,6 +893,8 @@ void subCacheItemInsert
       cSubP->contextP = orionldState.contextP;
     }
   }
+  else
+    cSubP->ldContext = "";
 
   // Counters and stats
   cSubP->lastNotificationTime  = 0;  // Or, does this come from DB ?
@@ -877,6 +914,7 @@ void subCacheItemInsert
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
 
+  LM_TMP(("QP: q == '%s'", q.c_str()));
   if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
     cSubP->qP = qBuild(q.c_str());
 
@@ -931,6 +969,7 @@ void subCacheItemInsert
   //
   // Insert the subscription in the cache
   //
+  LM_TMP(("QP: subCacheItemInsert calls subCacheItemInsert"));
   subCacheItemInsert(cSubP);
 }
 
@@ -1077,6 +1116,26 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 
 
 
+static void debugSubCache(const char* prefix, const char* title)
+{
+  CachedSubscription* subP = subCache.head;
+
+  LM_TMP(("%s%s", prefix, title));
+  while (subP != NULL)
+  {
+    LM_TMP(("%s  * Subscription %s:",       prefix, subP->subscriptionId));
+    LM_TMP(("%s    - lastNotification: %f", prefix, subP->lastNotificationTime));
+    LM_TMP(("%s    - lastSuccess:      %f", prefix, subP->lastSuccess));
+    LM_TMP(("%s    - lastFailure:      %f", prefix, subP->lastFailure));
+    LM_TMP(("%s    - timesSent:        %d", prefix, subP->count));
+    LM_TMP(("%s", prefix));
+
+    subP = subP->next;
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * subCacheRefresh -
@@ -1088,6 +1147,8 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 */
 void subCacheRefresh(void)
 {
+  debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
+
   std::vector<std::string> databases;
   LM_TMP(("QP: ************************************ In subCacheRefresh *********************"));
   // Empty the cache
@@ -1113,6 +1174,8 @@ void subCacheRefresh(void)
 
   ++subCache.noOfRefreshes;
   LM_TMP(("QP: ************************************ After subCacheRefresh *********************"));
+
+  debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
 }
 
 
@@ -1127,6 +1190,7 @@ typedef struct CachedSubSaved
   int64_t  count;
   double   lastFailure;
   double   lastSuccess;
+  bool     ngsild;
 } CachedSubSaved;
 
 
@@ -1190,6 +1254,7 @@ void subCacheSync(void)
     cssP->count                = cSubP->count;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
+    cssP->ngsild               = (cSubP->ldContext != "")? true : false;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1253,7 +1318,8 @@ void subCacheSync(void)
                              cssP->count,
                              cssP->lastNotificationTime,
                              cssP->lastFailure,
-                             cssP->lastSuccess);
+                             cssP->lastSuccess,
+                             cssP->ngsild);
 
       // Keeping lastFailure and lastSuccess in sub cache
       cSubP->lastFailure = cssP->lastFailure;
@@ -1338,15 +1404,15 @@ extern bool noCache;
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
 */
-void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
+void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors, bool ngsild)
 {
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
     if (errors == 0)
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime, ngsild);  // lastFailure == -1
     else
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1);  // lastSuccess == -1, count == 0
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1, ngsild);  // lastSuccess == -1, count == 0
 
     return;
   }

@@ -223,11 +223,14 @@ static bool patchApply
     else if (tree->type == KjBoolean)  bson_append_bool(setP,   path, -1, tree->value.b);
     else if (tree->type == KjArray)
     {
+      LM_TMP(("LEAK: Creating an array at %p", &compound));
       mongocKjTreeToBson(tree, &compound);
       bson_append_array(setP, path, -1, &compound);
     }
     else if (tree->type == KjObject)
     {
+      bson_init(&compound);
+      LM_TMP(("LEAK: Creating an object at %p", &compound));
       mongocKjTreeToBson(tree, &compound);
       bson_append_document(setP, path, -1, &compound);
     }
@@ -272,18 +275,16 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   bson_init(&pull);
   bson_init(&push);
 
+  LM_TMP(("VL128: Initialized bson_t request at %p", &request));
+  LM_TMP(("VL128: Initialized bson_t set at %p", &set));
   patchApply(patchTree, &set, &unset, &unsets, &pull, &pulls, &push, &pushes);
 
   bson_append_document(&request, "$set", 4, &set);
+  LM_TMP(("VL128: Added set %p to request %p", &set, &request));
 
-  if (unsets > 0)
-    bson_append_document(&request, "$unset", 6, &unset);
-
-  if (pulls > 0)
-    bson_append_document(&request, "$pull", 5, &pull);
-
-  if (pushes > 0)
-    bson_append_document(&request, "$push", 5, &push);
+  if (unsets > 0)    bson_append_document(&request, "$unset", 6, &unset);
+  if (pulls  > 0)    bson_append_document(&request, "$pull",  5, &pull);
+  if (pushes > 0)    bson_append_document(&request, "$push",  5, &push);
 
   bool b = mongoc_collection_update_one(orionldState.mongoc.entitiesP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
@@ -310,6 +311,9 @@ bool mongocEntityUpdate(const char* entityId, KjNode* patchTree)
   if (unsets > 0) bson_destroy(&unset);
   if (pulls  > 0) bson_destroy(&pull);
   if (pushes > 0) bson_destroy(&push);
+
+  LM_TMP(("VL128: Destroyed request at %p", &request));
+  LM_TMP(("VL128: Destroyed set at %p", &set));
 
   return b;
 }

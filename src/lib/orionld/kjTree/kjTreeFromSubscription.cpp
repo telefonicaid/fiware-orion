@@ -156,6 +156,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   size = subscriptionP->subject.entities.size();
   if (size != 0)
   {
+    LM_TMP(("Got an entities array of %d items", size));
     arrayP = kjArray(orionldState.kjsonP, "entities");
 
     for (ix = 0; ix < size; ix++)
@@ -214,11 +215,13 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
 
   // q
-  const char* q = subscriptionP->subject.condition.expression.q.c_str();
+  const char* q = (subscriptionP->ldQ != "")? subscriptionP->ldQ.c_str() : subscriptionP->subject.condition.expression.q.c_str();
+  LM_TMP(("KZ: q == '%s'", q));
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
     qAliasCompact(nodeP, true);
+    LM_TMP(("compacted q == '%s'", nodeP->value.s));
     kjChildAdd(topP, nodeP);
   }
 
@@ -286,17 +289,37 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     kjChildAdd(topP, nodeP);
   }
 
-  // status
-  if (subscriptionP->expires < orionldState.requestTime)
-    cSubP->status = (char*) "expired";
+  if (cSubP != NULL)
+  {
+    // status
+    if ((subscriptionP->expires > 0) && (subscriptionP->expires < orionldState.requestTime))
+      cSubP->status = (char*) "expired";
 
-  nodeP = kjString(orionldState.kjsonP, "status", cSubP->status.c_str());
-  kjChildAdd(topP, nodeP);
+    LM_TMP(("status: '%s'", cSubP->status.c_str()));
+    nodeP = kjString(orionldState.kjsonP, "status", cSubP->status.c_str());
+    kjChildAdd(topP, nodeP);
 
 
-  // isActive
-  nodeP = kjBoolean(orionldState.kjsonP, "isActive", (cSubP->isActive == false)? false : true);
-  kjChildAdd(topP, nodeP);
+    // isActive
+    nodeP = kjBoolean(orionldState.kjsonP, "isActive", (cSubP->isActive == false)? false : true);
+    kjChildAdd(topP, nodeP);
+  }
+  else  // Take the valus from the subscription from the database
+  {
+    // status
+    char* status = (char*) subscriptionP->status.c_str();
+    if ((subscriptionP->expires > 0) && (subscriptionP->expires < orionldState.requestTime))
+      status = (char*) "expired";
+    nodeP = kjString(orionldState.kjsonP, "status", status);
+    kjChildAdd(topP, nodeP);
+
+    // isActive
+    bool isActive = true;
+    if (strcmp(status, "active") != 0)
+      isActive = false;
+    nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
+    kjChildAdd(topP, nodeP);
+  }
 
   // notification
   KjNode* notificationP = kjObject(orionldState.kjsonP, "notification");
@@ -318,10 +341,10 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   }
 
   // notification::format
-  if (subscriptionP->attrsFormat == NGSI_V2_KEYVALUES)
-    nodeP = kjString(orionldState.kjsonP, "format", "keyValues");
-  else
-    nodeP = kjString(orionldState.kjsonP, "format", "normalized");
+  if (subscriptionP->attrsFormat == RF_KEYVALUES)    nodeP = kjString(orionldState.kjsonP, "format", "keyValues");
+  else if (subscriptionP->attrsFormat == RF_CONCISE) nodeP = kjString(orionldState.kjsonP, "format", "concise");
+  else                                               nodeP = kjString(orionldState.kjsonP, "format", "normalized");
+
   kjChildAdd(notificationP, nodeP);
 
   // notification::endpoint
@@ -404,81 +427,124 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   kjChildAdd(notificationP, endpointP);
 
 
-  // notification::status - taken from sub cache
-  if (cSubP->consecutiveErrors == 0)
+  // Notification Status and counters - from Cached Sub if possible
+  if (cSubP != NULL)
   {
-    nodeP = kjString(orionldState.kjsonP, "status", "ok");
-    kjChildAdd(notificationP, nodeP);
+    // notification::status
+    if (cSubP->consecutiveErrors == 0)
+    {
+      nodeP = kjString(orionldState.kjsonP, "status", "ok");
+      kjChildAdd(notificationP, nodeP);
+    }
+    else
+    {
+      nodeP = kjString(orionldState.kjsonP, "status", "failed");
+      kjChildAdd(notificationP, nodeP);
+    }
+
+    // notification::timesSent - taken from sub cache
+    if (cSubP->count > 0)
+    {
+      nodeP = kjInteger(orionldState.kjsonP, "timesSent", cSubP->count);
+      kjChildAdd(notificationP, nodeP);
+    }
+
+    // notification::lastNotification - taken from sub cache
+    if (cSubP->lastNotificationTime > 0)
+    {
+      numberToDate(cSubP->lastNotificationTime, dateTime, sizeof(dateTime));
+      nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
+      kjChildAdd(notificationP, nodeP);
+    }
+
+    // notification::lastFailure - taken from sub cache
+    LM_TMP(("Getting lastFailure from sub cache"));
+    if (cSubP->lastFailure > 0)
+    {
+      numberToDate(cSubP->lastFailure, dateTime, sizeof(dateTime));
+      nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
+      kjChildAdd(notificationP, nodeP);
+    }
+
+    // notification::lastSuccess - taken from sub cache
+    if (cSubP->lastSuccess > 0)
+    {
+      numberToDate(cSubP->lastSuccess, dateTime, sizeof(dateTime));
+      nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);
+      kjChildAdd(notificationP, nodeP);
+    }
+
+    // notification::consecutiveErrors - taken from sub cache
+    if (cSubP->consecutiveErrors > 0)
+    {
+      nodeP = kjInteger(orionldState.kjsonP, "consecutiveErrors", cSubP->consecutiveErrors);
+      kjChildAdd(notificationP, nodeP);
+    }
+
+    if (cSubP->lastErrorReason[0] != 0)
+    {
+      nodeP = kjString(orionldState.kjsonP, "lastErrorReason", cSubP->lastErrorReason);
+      kjChildAdd(notificationP, nodeP);
+    }
   }
   else
   {
-    nodeP = kjString(orionldState.kjsonP, "status", "failed");
+    // status
+    LM_TMP(("lastFailure: %f", subscriptionP->notification.lastFailure));
+    LM_TMP(("lastSuccess: %f", subscriptionP->notification.lastSuccess));
+    if (subscriptionP->notification.lastFailure > subscriptionP->notification.lastSuccess)
+      nodeP = kjString(orionldState.kjsonP, "status", "failed");
+    else
+      nodeP = kjString(orionldState.kjsonP, "status", "ok");
     kjChildAdd(notificationP, nodeP);
-  }
 
-  // notification::timesSent - taken from sub cache
-  if (cSubP->count > 0)
-  {
-    nodeP = kjInteger(orionldState.kjsonP, "timesSent", cSubP->count);
-    kjChildAdd(notificationP, nodeP);
-  }
+    // timesSent
+    if (subscriptionP->notification.timesSent > 0)
+    {
+      nodeP = kjInteger(orionldState.kjsonP, "timesSent", subscriptionP->notification.timesSent);
+      kjChildAdd(notificationP, nodeP);
+    }
 
-  // notification::lastNotification - taken from sub cache
-  if (cSubP->lastNotificationTime > 0)
-  {
-    numberToDate(cSubP->lastNotificationTime, dateTime, sizeof(dateTime));
-    nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
-    kjChildAdd(notificationP, nodeP);
-  }
+    // lastNotification
+    if (subscriptionP->notification.lastNotification > 0)
+    {
+      numberToDate(subscriptionP->notification.lastNotification, dateTime, sizeof(dateTime));
+      nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
+      kjChildAdd(notificationP, nodeP);
+    }
 
-  // notification::lastFailure - taken from sub cache
-  if (cSubP->lastFailure > 0)
-  {
-    numberToDate(cSubP->lastFailure, dateTime, sizeof(dateTime));
-    nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
-    kjChildAdd(notificationP, nodeP);
-  }
+    // lastFailure
+    if (subscriptionP->notification.lastFailure > 0)
+    {
+      numberToDate(subscriptionP->notification.lastFailure, dateTime, sizeof(dateTime));
+      nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
+      kjChildAdd(notificationP, nodeP);
+    }
 
-  // notification::lastSuccess - taken from sub cache
-  if (cSubP->lastSuccess > 0)
-  {
-    numberToDate(cSubP->lastSuccess, dateTime, sizeof(dateTime));
-    nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);
-    kjChildAdd(notificationP, nodeP);
-  }
-
-  // notification::consecutiveErrors - taken from sub cache
-  if (cSubP->consecutiveErrors > 0)
-  {
-    nodeP = kjInteger(orionldState.kjsonP, "consecutiveErrors", cSubP->consecutiveErrors);
-    kjChildAdd(notificationP, nodeP);
-  }
-
-  if (cSubP->lastErrorReason[0] != 0)
-  {
-    nodeP = kjString(orionldState.kjsonP, "lastErrorReason", cSubP->lastErrorReason);
-    kjChildAdd(notificationP, nodeP);
+    // lastSuccess
+    if (subscriptionP->notification.lastSuccess > 0)
+    {
+      numberToDate(subscriptionP->notification.lastSuccess, dateTime, sizeof(dateTime));
+      nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);
+      kjChildAdd(notificationP, nodeP);
+    }
   }
 
   kjChildAdd(topP, notificationP);
 
 
   // expires
-  if (subscriptionP->expires != 0x7FFFFFFF)
+  if (subscriptionP->expires > 0)
   {
     char date[64];
 
-    if (numberToDate(subscriptionP->expires, date, sizeof(date)) == false)
-    {
-      orionldError(OrionldInternalError, "Unable to create a stringified expires date", NULL, 500);
-      return NULL;
-    }
+    numberToDate(subscriptionP->expires, date, sizeof(date));
     nodeP = kjString(orionldState.kjsonP, "expiresAt", date);  // expiresAt is v1.3? of the spec ... it was called expires before
     kjChildAdd(topP, nodeP);
   }
 
   // throttling
-  if (subscriptionP->throttling != 0)
+  if (subscriptionP->throttling > 0)
   {
     nodeP = kjFloat(orionldState.kjsonP, "throttling", subscriptionP->throttling);
     kjChildAdd(topP, nodeP);

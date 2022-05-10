@@ -25,12 +25,10 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjFree.h"                                      // kjFree
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -97,6 +95,7 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
 
   case orion::ValueTypeNotGiven:
   default:
+    LM_E(("WARNING: no valid value-type"));
     nodeP = kjString(orionldState.kjsonP, name, "UNKNOWN TYPE");
     kjChildAdd(parentP, nodeP);
     break;
@@ -117,10 +116,8 @@ KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* con
 
   if (topNodeP == NULL)
   {
-    if (compoundP->valueType == orion::ValueTypeObject)
-      topNodeP = kjObject(orionldState.kjsonP, NULL);
-    else if (compoundP->valueType == orion::ValueTypeVector)
-      topNodeP = kjArray(orionldState.kjsonP, NULL);
+    if      (compoundP->valueType == orion::ValueTypeObject)  topNodeP = kjObject(orionldState.kjsonP, NULL);
+    else if (compoundP->valueType == orion::ValueTypeVector)  topNodeP = kjArray(orionldState.kjsonP, NULL);
     else
     {
       *detailsP = (char*) "not a compound";
@@ -139,10 +136,7 @@ KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* con
   {
     KjNode* nodeP = kjTreeFromCompoundValue2(topNodeP, compoundP->childV[ix], valueMayBeCompacted, detailsP);
     if (nodeP == NULL)
-    {
-      kjFree(topNodeP);
       return NULL;
-    }
 
     kjChildAdd(topNodeP, nodeP);
   }

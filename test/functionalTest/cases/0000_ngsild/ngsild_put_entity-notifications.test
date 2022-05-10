@@ -144,7 +144,7 @@ Date: REGEX(.*)
 =================================================
 POST REGEX(.*)
 Content-Length: 284
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -163,7 +163,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================
@@ -180,7 +180,7 @@ Date: REGEX(.*)
 =================================================
 POST REGEX(.*)
 Content-Length: 284
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -199,7 +199,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
     "type": "Notification"
 }
 =======================================

@@ -560,7 +560,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "Description of Test subscription S01",
 	"status" : "active",
 	"entities" : [
@@ -794,7 +794,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "active",
 	"entities" : [
@@ -914,7 +914,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "active",
 	"entities" : [
@@ -1048,7 +1048,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "active",
 	"entities" : [
@@ -1168,7 +1168,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "active",
 	"entities" : [
@@ -1394,7 +1394,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "inactive",
 	"entities" : [
@@ -1535,7 +1535,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/json",
 	"throttling" : 5,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "inactive",
 	"entities" : [
@@ -1839,7 +1839,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/json",
 	"throttling" : 12,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "New Description",
 	"status" : "inactive",
 	"entities" : [
@@ -1960,7 +1960,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 34,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "Description 34",
 	"status" : "active",
 	"entities" : [
@@ -2023,7 +2023,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"mimeType" : "application/ld+json",
 	"throttling" : 34,
-	"servicePath" : "/",
+	"servicePath" : "/#",
 	"description" : "Description 34",
 	"status" : "active",
 	"entities" : [

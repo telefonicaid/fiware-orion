@@ -132,8 +132,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   if (subId != "")
     cSubP->subscriptionId = strdup(subId.c_str());
 
-  LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
-
   if (cSubP == NULL)
   {
     // FIXME P7: See github issue #1362
@@ -152,19 +150,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
-  {
     cSubP->ldContext = ldContext;
-
-    if (renderFormat == NGSI_V2_NORMALIZED)
-      renderFormat = NGSI_LD_V1_NORMALIZED;
-    else if (renderFormat == NGSI_V2_KEYVALUES)
-      renderFormat = NGSI_LD_V1_KEYVALUES;
-    else
-    {
-      LM_W(("No render format in DB for NGSI-LD subscription - using NGSI-LD NORMALIZED"));
-      renderFormat = NGSI_LD_V1_NORMALIZED;
-    }
-  }
 
   cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(&sub, CSUB_SERVICE_PATH) : "/");
@@ -251,6 +237,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
         if (cSubP->expression.mq != "")
         {
+          LM_TMP(("cSubP->expression.mq == '%s'", cSubP->expression.mq.c_str()));
           if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
           {
             LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
@@ -332,6 +319,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
 
   // q
+  cSubP->qText = sub.hasField("ldQ")? strdup(getStringFieldF(&sub, "ldQ")) : NULL;
+  LM_TMP(("KZ: qText: '%s'", cSubP->qText));
 
   //
   // To create the QNode tree (only used by the "new native NGSI-LD" notifications,
@@ -408,8 +397,6 @@ int mongoSubCacheItemInsert
   // 02. Allocate CachedSubscription
   //
   CachedSubscription* cSubP = new CachedSubscription();
-
-  LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   if (cSubP == NULL)
   {
@@ -521,9 +508,6 @@ int mongoSubCacheItemInsert
     cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("set lastNotificationTime to %f for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
-
-
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
@@ -584,8 +568,6 @@ char* tenantFromDb(const char* db)
 */
 void mongoSubCacheRefresh(const std::string& database)
 {
-  LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
-
   BSONObj                        query;      // empty query (all subscriptions)
   char*                          tenant      = tenantFromDb(database.c_str());
   char                           collectionPath[80];
@@ -640,20 +622,23 @@ static void mongoSubCountersUpdateCount
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           count
+  long long           count,
+  bool                ngsild
 )
 {
   BSONObj      condition;
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id"  << OID(subId));
-  update    = BSON("$inc" << BSON(CSUB_COUNT << count));
+  if (ngsild == true)
+    condition = BSON("_id"  << subId);
+  else
+    condition = BSON("_id"  << OID(subId));
+
+  update = BSON("$inc" << BSON(CSUB_COUNT << count));
 
   if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
-  {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));
-  }
 }
 
 
@@ -666,17 +651,28 @@ static void mongoSubCountersUpdateLastNotificationTime
 (
   const std::string&  collection,
   const std::string&  subId,
-  double              lastNotificationTime
+  double              lastNotificationTime,
+  bool                ngsild
 )
 {
   BSONObj      condition;
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                     BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
-                     BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
+  if (ngsild == true)
+  {
+    condition = BSON("_id" << subId << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
+  }
+  else
+  {
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
+  }
+
+  update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
   if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
@@ -694,17 +690,28 @@ static void mongoSubCountersUpdateLastFailure
 (
   const std::string&  collection,
   const std::string&  subId,
-  double              lastFailure
+  double              lastFailure,
+  bool                ngsild
 )
 {
   BSONObj      condition;
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                     BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
-                     BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
+  if (ngsild == true)
+  {
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
+                       BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
+  }
+  else
+  {
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
+                       BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
+  }
+
+  update = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure));
 
   if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
@@ -722,17 +729,28 @@ static void mongoSubCountersUpdateLastSuccess
 (
   const std::string&  collection,
   const std::string&  subId,
-  double              lastSuccess
+  double              lastSuccess,
+  bool                ngsild
 )
 {
   BSONObj      condition;
   BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                     BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
-                     BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));
+  if (ngsild == true)
+  {
+    condition = BSON("_id" << subId << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
+                       BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
+  }
+  else
+  {
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
+                       BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
+  }
+
+  update = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess));
 
   if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
   {
@@ -754,7 +772,8 @@ void mongoSubCountersUpdate
   long long          count,
   double             lastNotificationTime,
   double             lastFailure,
-  double             lastSuccess
+  double             lastSuccess,
+  bool               ngsild
 )
 {
   if (subId == "")
@@ -770,23 +789,8 @@ void mongoSubCountersUpdate
   else
     snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", dbName);
 
-  if (count > 0)
-  {
-    mongoSubCountersUpdateCount(collectionPath, subId, count);
-  }
-
-  if (lastNotificationTime > 0)
-  {
-    mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime);
-  }
-
-  if (lastFailure > 0)
-  {
-    mongoSubCountersUpdateLastFailure(collectionPath, subId, lastFailure);
-  }
-
-  if (lastSuccess > 0)
-  {
-    mongoSubCountersUpdateLastSuccess(collectionPath, subId, lastSuccess);
-  }
+  if (count                 > 0)  mongoSubCountersUpdateCount(collectionPath, subId, count, ngsild);
+  if (lastNotificationTime  > 0)  mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime, ngsild);
+  if (lastFailure           > 0)  mongoSubCountersUpdateLastFailure(collectionPath, subId, lastFailure, ngsild);
+  if (lastSuccess           > 0)  mongoSubCountersUpdateLastSuccess(collectionPath, subId, lastSuccess, ngsild);
 }

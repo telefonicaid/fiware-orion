@@ -38,7 +38,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 04. GET subscription S2 - see lang=en
 # 05. Create an Entity E1 with a language-property L1
 # 06. Dump/Reset accumulator - see one notification for S1, with L1 as a LanguageProperty
-
+#
 
 echo "01. Create a subscription S1 on E1 and attribute L1, without 'lang'"
 echo "==================================================================="
@@ -156,42 +156,40 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:subs:S2",
-	"expiration" : 2147483647,
-	"reference" : "http://127.0.0.1:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/json",
-	"throttling" : 0,
-	"servicePath" : "/",
-	"status" : "active",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:entities:E2",
-			"isPattern" : "false",
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "false",
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/L2"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"lang" : "en",
-	"createdAt" : REGEX(.*),
-	"modifiedAt" : REGEX(.*),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/L2"
 	],
+	"lang" : "en",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
 	"expression" : {
-		"q" : "",
-		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
 		"georel" : "",
-		"geoproperty" : ""
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
 	},
-	"format" : "normalized"
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L2"
+	],
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"format" : "normalized",
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -246,7 +244,7 @@ Date: REGEX(.*)
 =======================================================================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
 Content-Length: 310
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

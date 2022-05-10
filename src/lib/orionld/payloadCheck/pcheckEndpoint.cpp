@@ -42,7 +42,7 @@ extern "C"
 //
 // pcheckEndpoint -
 //
-bool pcheckEndpoint(KjNode* endpointP, bool patch)
+bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP)
 {
   KjNode* uriP           = NULL;
   KjNode* acceptP        = NULL;
@@ -62,7 +62,7 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch)
       DUPLICATE_CHECK(acceptP, "endpoint::accept", epItemP);
       STRING_CHECK(acceptP, "endpoint::accept");
       EMPTY_STRING_CHECK(acceptP, "endpoint::accept");
-      if ((strcmp(acceptP->value.s, "application/json") != 0) && (strcmp(acceptP->value.s, "application/ld+json") != 0))
+      if ((strcmp(acceptP->value.s, "application/json") != 0) && (strcmp(acceptP->value.s, "application/ld+json") != 0) && (strcmp(acceptP->value.s, "application/geo+json") != 0))
       {
         orionldError(OrionldBadRequestData, "Unsupported Mime-type in 'accept'", epItemP->value.s, 400);
         return false;
@@ -96,6 +96,9 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch)
     orionldError(OrionldBadRequestData, "Mandatory field missing in 'endpoint'", "uri", 400);
     return false;
   }
+
+  *uriPP          = uriP;
+  *notifierInfoPP = notifierInfoP;
 
   return true;
 }

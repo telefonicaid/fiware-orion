@@ -213,7 +213,7 @@ static void* workerFunc(void* pSyncQ)
 
           if (params->registration == false)
           {
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0);
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, ngsildSubscription);
           }
         }
         else
@@ -223,7 +223,7 @@ static void* workerFunc(void* pSyncQ)
 
           if (params->registration == false)
           {
-            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1);
+            subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1, ngsildSubscription);
           }
         }
       }

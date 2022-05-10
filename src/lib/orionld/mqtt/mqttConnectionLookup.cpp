@@ -22,10 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include <MQTTClient.h>                                        // MQTT Client header
+#include <string.h>                                            // strcmp
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List
@@ -43,17 +42,11 @@ MqttConnection* mqttConnectionLookup(const char* host, unsigned short port, cons
   {
     MqttConnection* mqP = &mqttConnectionList[ix];
 
-    if (mqP->port != port)
-      continue;
-
-    if (strcmp(host, mqP->host) != 0)
-      continue;
-    if ((mqP->username != NULL) && (strcmp(username, mqP->username) != 0))
-      continue;
-    if ((mqP->password != NULL) && (strcmp(password, mqP->password) != 0))
-      continue;
-    if ((mqP->version != NULL) && (strcmp(version, mqP->version)    != 0))
-      continue;
+    if (mqP->port != port)                                                  continue;
+    if (strcmp(host, mqP->host) != 0)                                       continue;
+    if ((mqP->username != NULL) && (strcmp(username, mqP->username) != 0))  continue;
+    if ((mqP->password != NULL) && (strcmp(password, mqP->password) != 0))  continue;
+    if ((mqP->version  != NULL) && (strcmp(version,  mqP->version)  != 0))  continue;
 
     return mqP;
   }

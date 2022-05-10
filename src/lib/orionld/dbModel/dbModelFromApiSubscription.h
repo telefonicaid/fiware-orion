@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPISUBSCRIPTION_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPISUBSCRIPTION_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,15 +27,15 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckNotification -
+// dbModelFromApiSubscription - modify the API Subscription tree to match the DB Model
 //
-extern bool pcheckNotification(KjNode* notificationP, bool patch);
+extern bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPISUBSCRIPTION_H_

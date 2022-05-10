@@ -46,39 +46,21 @@ extern "C"
 //
 // pcheckSubscriptionAcceptAndFormat - check that the 'format' and the 'accept' are compatible
 //
-// format                                    valid 'accept'
-// ----------------------------------        ---------------------------------------------
-// NGSI_V1_LEGACY                            application/json
-// NGSI_V2_NORMALIZED                        application/json
-// NGSI_V2_KEYVALUES                         application/json
-// NGSI_V2_VALUES                            application/json
-// NGSI_V2_UNIQUE_VALUES                     application/json
-// NGSI_V2_CUSTOM                            application/json
-// NGSI_LD_V1_NORMALIZED                     application/json, application/ld+json, application/geo+json
-// NGSI_LD_V1_KEYVALUES                      application/json, application/ld+json, application/geo+json
-// NGSI_LD_V1_CONCISE                        application/json, application/ld+json, application/geo+json
-// NGSI_LD_V1_V2_NORMALIZED                  application/json
-// NGSI_LD_V1_V2_KEYVALUES                   application/json
-// NGSI_LD_V1_V2_NORMALIZED_COMPACT          application/json
-// NGSI_LD_V1_V2_KEYVALUES_COMPACT           application/json
-//
 static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType accept)
 {
   switch (format)
   {
-  case NGSI_V1_LEGACY:
-  case NGSI_V2_NORMALIZED:
-  case NGSI_V2_KEYVALUES:
-  case NGSI_V2_VALUES:
-  case NGSI_V2_UNIQUE_VALUES:
-  case NGSI_V2_CUSTOM:
+  case RF_LEGACY:
+  case RF_VALUES:
+  case RF_UNIQUE_VALUES:
+  case RF_CUSTOM:
     LM_W(("Bad Input (invalid notification-format for an NGSI-LD subscription)"));
     return false;
     break;
 
-  case NGSI_LD_V1_NORMALIZED:
-  case NGSI_LD_V1_KEYVALUES:
-  case NGSI_LD_V1_CONCISE:
+  case RF_NORMALIZED:
+  case RF_KEYVALUES:
+  case RF_CONCISE:
     if ((accept != JSON) && (accept != JSONLD) && (accept != GEOJSON))
     {
       LM_W(("Bad Input (invalid notification-accept MimeType for an NGSI-LD notification) - '%s'", mimeTypeToLongString(accept)));
@@ -87,10 +69,10 @@ static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType acce
     return true;
     break;
 
-  case NGSI_LD_V1_V2_NORMALIZED:
-  case NGSI_LD_V1_V2_KEYVALUES:
-  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:
-  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:
+  case RF_CROSS_APIS_NORMALIZED:
+  case RF_CROSS_APIS_KEYVALUES:
+  case RF_CROSS_APIS_NORMALIZED_COMPACT:
+  case RF_CROSS_APIS_KEYVALUES_COMPACT:
     if (accept != JSON)
     {
       LM_W(("Bad Input (invalid notification-accept MimeType for a cross NGSI-LD to NGSIv2 notification) - '%s'", mimeTypeToLongString(accept)));
@@ -99,7 +81,7 @@ static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType acce
     return true;
     break;
 
-  case NO_FORMAT:
+  case RF_NONE:
     break;
   }
 
@@ -116,15 +98,15 @@ static bool pcheckSubscriptionAcceptAndFormat(RenderFormat format, MimeType acce
 //
 static bool formatExtract(char* format, ngsiv2::Subscription* subP)
 {
-  if      (strcmp(format, "simplified")                    == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
-  else if (strcmp(format, "concise")                       == 0) subP->attrsFormat = NGSI_LD_V1_CONCISE;
-  else if (strcmp(format, "keyValues")                     == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
-  else if (strcmp(format, "normalized")                    == 0) subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
-  else if (strcmp(format, "x-ngsiv2-normalized")           == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED;
-  else if (strcmp(format, "x-ngsiv2-keyValues")            == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES;
-  else if (strcmp(format, "x-ngsiv2-normalized-compacted") == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED_COMPACT;
-  else if (strcmp(format, "x-ngsiv2")                      == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED_COMPACT;
-  else if (strcmp(format, "x-ngsiv2-keyValues-compacted")  == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES_COMPACT;
+  if      (strcmp(format, "normalized")                    == 0) subP->attrsFormat = RF_NORMALIZED;
+  else if (strcmp(format, "concise")                       == 0) subP->attrsFormat = RF_CONCISE;
+  else if (strcmp(format, "simplified")                    == 0) subP->attrsFormat = RF_KEYVALUES;
+  else if (strcmp(format, "keyValues")                     == 0) subP->attrsFormat = RF_KEYVALUES;
+  else if (strcmp(format, "x-ngsiv2-normalized")           == 0) subP->attrsFormat = RF_CROSS_APIS_NORMALIZED;
+  else if (strcmp(format, "x-ngsiv2-keyValues")            == 0) subP->attrsFormat = RF_CROSS_APIS_KEYVALUES;
+  else if (strcmp(format, "x-ngsiv2-normalized-compacted") == 0) subP->attrsFormat = RF_CROSS_APIS_NORMALIZED_COMPACT;
+  else if (strcmp(format, "x-ngsiv2")                      == 0) subP->attrsFormat = RF_CROSS_APIS_NORMALIZED_COMPACT;
+  else if (strcmp(format, "x-ngsiv2-keyValues-compacted")  == 0) subP->attrsFormat = RF_CROSS_APIS_KEYVALUES_COMPACT;
   else
   {
     orionldError(OrionldBadRequestData, "Invalid value for Notification::format", format, 400);
@@ -148,7 +130,7 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
   KjNode*   itemP;
 
   // Set default values
-  subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
+  subP->attrsFormat = RF_NORMALIZED;
 
   // Extract the info from the kjTree
   for (itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
@@ -169,7 +151,7 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
       if (formatExtract(formatP, subP) == false)
         return false;
 
-      if ((experimental == false) && ((subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT)))
+      if ((experimental == false) && ((subP->attrsFormat == RF_CROSS_APIS_KEYVALUES) || (subP->attrsFormat == RF_CROSS_APIS_KEYVALUES_COMPACT)))
       {
         LM_W(("Non-supported notification format: %s", itemP->value.s));
         orionldError(OrionldBadRequestData, "Non-supported notification format", itemP->value.s, 501);

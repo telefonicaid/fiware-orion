@@ -797,9 +797,9 @@ std::string ContextAttribute::toJson
     }
   }
 
-  if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
+  if ((renderFormat == RF_VALUES) || (renderFormat == RF_KEYVALUES) || (renderFormat == RF_UNIQUE_VALUES))
   {
-    out = (renderFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
+    out = (renderFormat == RF_KEYVALUES)? JSON_STR(name) + ":" : "";
 
     if (compoundValueP != NULL)
     {

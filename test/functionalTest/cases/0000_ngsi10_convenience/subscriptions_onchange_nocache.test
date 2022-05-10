@@ -29,6 +29,8 @@ brokerStart CB 0 IPv4 -noCache
 accumulatorStart --pretty-print
 
 --SHELL--
+echo "01. Create a subscription"
+echo "========================="
 url="/v1/contextSubscriptions"
 payload='{
     "entities": [
@@ -55,8 +57,10 @@ payload='{
     ]
 }'
 orionCurl --url "$url" --payload "$payload"
-
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
+echo
+echo
+
 
 echo "1: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -264,6 +268,8 @@ echo "10: ++++++++++++++++++++"
 accumulatorDump
 
 --REGEXPECT--
+01. Create a subscription
+=========================
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
@@ -276,6 +282,8 @@ Date: REGEX(.*)
         "subscriptionId": "REGEX([0-9a-f]{24})"
     }
 }
+
+
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 253

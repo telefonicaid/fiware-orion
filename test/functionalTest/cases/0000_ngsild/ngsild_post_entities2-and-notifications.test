@@ -132,13 +132,13 @@ MongoDB server version: REGEX(.*)
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/L" : {
 			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
 			"value" : {
 				"en" : "English",
 				"es" : "Castellano",
 				"sv" : "Svenska"
 			},
-			"modDate" : REGEX(.*),
-			"creDate" : REGEX(.*),
 			"mdNames" : [
 				"observedAt",
 				"https://uri.etsi.org/ngsi-ld/default-context/Sub-P",
@@ -174,7 +174,7 @@ bye
 ==========================================
 POST REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
 Content-Length: 453
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

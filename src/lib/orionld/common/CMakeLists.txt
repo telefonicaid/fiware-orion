@@ -56,6 +56,7 @@ SET (SOURCES
     langStringExtract.cpp
     pathComponentsSplit.cpp
     urlDecode.cpp
+    subCacheApiSubscriptionInsert.cpp
 )
 
 # Include directories

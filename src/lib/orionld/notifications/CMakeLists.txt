@@ -24,6 +24,7 @@ SET (SOURCES
     orionldAlterationsTreat.cpp
     subCacheAlterationMatch.cpp
     notificationSend.cpp
+    notificationDataToGeoJson.cpp
 )
 
 # Include directories

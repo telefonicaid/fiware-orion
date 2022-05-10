@@ -53,7 +53,6 @@ payload='{
     }
   ],
   "notification": {
-    "attributes": [ ],
     "format": "simplified",
     "endpoint": {
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -145,7 +144,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 322
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Simplified
@@ -179,7 +178,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 329
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Simplified

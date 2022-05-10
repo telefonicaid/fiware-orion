@@ -46,7 +46,7 @@ extern "C"
 // If after processing, there is only ONE item in the array, that item is returned
 // as the context, regardless of its type.
 //
-// If on the other hand the array becomes empty after removel of Core Context, the NULL is returned.
+// If on the other hand the array becomes empty after removal of Core Context, the NULL is returned.
 // The caller needs to check for this.
 //
 KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
@@ -59,7 +59,10 @@ KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
     KjNode* next = nodeP->next;
 
     if ((nodeP->type == KjString) && (strcmp(nodeP->value.s, coreContextUrl) == 0))
+    {
+      LM_TMP(("VL: Removing Core Context from Array"));
       kjChildRemove(contextTreeP, nodeP);
+    }
     else
       ++itemsInArray;
 

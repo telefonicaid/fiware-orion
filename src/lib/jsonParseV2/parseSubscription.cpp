@@ -555,10 +555,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     const char*   attrsFormatString = attrsFormatOpt.value.c_str();
     RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
-    if (nFormat == NO_FORMAT)
-    {
+    if (nFormat == RF_NONE)
       return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT);
-    }
+
     subsP->attrsFormatProvided = true;
     subsP->attrsFormat = nFormat;
   }

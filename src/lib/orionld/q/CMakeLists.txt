@@ -30,6 +30,7 @@ SET (SOURCES
     qPresent.cpp
     qRelease.cpp
     qBuild.cpp
+    qRender.cpp
 )
 
 # Include directories

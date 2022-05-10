@@ -82,11 +82,11 @@ std::string Entity::render(bool comma)
     return oe.toJson();
   }
 
-  RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
+  RenderFormat  renderFormat = RF_NORMALIZED;
 
-  if      (orionldState.uriParamOptions.keyValues    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
-  else if (orionldState.uriParamOptions.values       == true)  { renderFormat = NGSI_V2_VALUES;        }
-  else if (orionldState.uriParamOptions.uniqueValues == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
+  if      (orionldState.uriParamOptions.keyValues    == true)  { renderFormat = RF_KEYVALUES;     }
+  else if (orionldState.uriParamOptions.values       == true)  { renderFormat = RF_VALUES;        }
+  else if (orionldState.uriParamOptions.uniqueValues == true)  { renderFormat = RF_UNIQUE_VALUES; }
 
   std::string               out;
   std::vector<std::string>  metadataFilter;
@@ -133,7 +133,7 @@ std::string Entity::render(bool comma)
     }
   }
 
-  if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
+  if ((renderFormat == RF_VALUES) || (renderFormat == RF_UNIQUE_VALUES))
   {
     out = "[";
     if (attributeVector.size() != 0)

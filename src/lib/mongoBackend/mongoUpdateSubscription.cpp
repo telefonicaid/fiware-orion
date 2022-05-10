@@ -387,7 +387,7 @@ static void setCondsAndInitialNotify
     bool                      blacklist;
     std::vector<std::string>  notifAttributesV;
     std::vector<std::string>  metadataV;
-    RenderFormat              attrsFormat = NGSI_V2_NORMALIZED;
+    RenderFormat              attrsFormat = RF_NORMALIZED;
 
     if (subUp.statusProvided)
     {
@@ -778,7 +778,7 @@ void updateInCache
   std::string         geom;
   std::string         coords;
   std::string         georel;
-  RenderFormat        renderFormat = NGSI_V2_NORMALIZED;  // Default value
+  RenderFormat        renderFormat = RF_NORMALIZED;  // Default value
 
   if (doc.hasField(CSUB_FORMAT))
   {

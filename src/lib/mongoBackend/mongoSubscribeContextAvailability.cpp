@@ -122,12 +122,12 @@ HttpStatusCode mongoSubscribeContextAvailability
   sub.append(CASUB_ATTRS, attrs.arr());
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to "JSON" (NGSI_V1_LEGACY),
+  // FIXME P5: RenderFormat right now hardcoded to "JSON" (RF_LEGACY),
   //           in the future the RenderFormat will be taken from the payload
   //
 
   /* Adding format to use in notifications */
-  sub.append(CASUB_FORMAT, renderFormatToString(NGSI_V1_LEGACY));
+  sub.append(CASUB_FORMAT, renderFormatToString(RF_LEGACY));
 
   /* Insert document in database */
   std::string err;
@@ -139,7 +139,7 @@ HttpStatusCode mongoSubscribeContextAvailability
   }
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to NGSI_V1_LEGACY,
+  // FIXME P5: RenderFormat right now hardcoded to RF_LEGACY,
   //           in the future the RenderFormat will be taken from the payload
   //
   /* Send notifications for matching context registrations */
@@ -147,7 +147,7 @@ HttpStatusCode mongoSubscribeContextAvailability
                                   requestP->attributeList,
                                   oid.toString(),
                                   requestP->reference.get(),
-                                  NGSI_V1_LEGACY,
+                                  RF_LEGACY,
                                   tenantP,
                                   fiwareCorrelator);
 

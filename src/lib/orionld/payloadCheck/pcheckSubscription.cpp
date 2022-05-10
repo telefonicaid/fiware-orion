@@ -34,16 +34,19 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload, e.g. subscriptionNotification = Subscription::notification"
 #include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray
-#include "orionld/payloadCheck/pcheckNotification.h"             // pcheckNotification
+#include "orionld/payloadCheck/pCheckNotification.h"             // pCheckNotification
 #include "orionld/payloadCheck/pcheckSubscription.h"             // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckSubscription -
+// pcheckSubscription - need to merge with pCheckSubscription
+//
+// Used by orionldPatchSubscription()
 //
 bool pcheckSubscription
 (
@@ -121,7 +124,7 @@ bool pcheckSubscription
       DUPLICATE_CHECK(entitiesP, "entities", nodeP);
       ARRAY_CHECK(entitiesP, "entities");
       EMPTY_ARRAY_CHECK(entitiesP, "entities");
-      if (pcheckEntityInfoArray(entitiesP, true) == false)  // FIXME: Why is the entity type mandatory?
+      if (pcheckEntityInfoArray(entitiesP, true, SubscriptionEntitiesPath) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "watchedAttributes") == 0)
@@ -213,7 +216,10 @@ bool pcheckSubscription
     }
   }
 
-  if ((notificationP != NULL) && (pcheckNotification(notificationP, patch) == false))
+  KjNode* uriP;
+  KjNode* notifierInfoP;
+
+  if ((notificationP != NULL) && (pCheckNotification(notificationP, patch, &uriP, &notifierInfoP) == false))
       return false;
 
   return true;

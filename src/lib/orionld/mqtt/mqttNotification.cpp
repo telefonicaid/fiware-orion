@@ -36,7 +36,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
@@ -56,7 +55,12 @@ int  mqttTimeout = 10000;  // FIXME: This variable should be a CLI for Orion-LD
 
 // -----------------------------------------------------------------------------
 //
-// mqttNotification -
+// mqttNotification - send a notification via MQTT
+//
+// NOTE
+//   This function is used by legacy implementation (ngsiNotify, i.e. mongoBackend).
+//   The function is deprecated and not to be used anymore.
+//   Use mqttNotify instead
 //
 int mqttNotification
 (
@@ -151,7 +155,7 @@ int mqttNotification
     mqttP = mqttConnectionAdd(false, username, password, host, port, mqttVersion);
     if (mqttP == NULL)
     {
-      LM_E(("Internal Error (unable to connec t to MQTT broker at %s:%d)", host, port));
+      LM_E(("Internal Error (unable to connect to MQTT broker at %s:%d)", host, port));
       return -1;
     }
   }

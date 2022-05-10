@@ -43,4 +43,7 @@ void kjNodeDecouple(KjNode* parent, KjNode* nodeToDecouple, KjNode* prev)
     prev->next = nodeToDecouple->next;
   else
     parent->value.firstChildP = nodeToDecouple->next;
+
+  if (parent->lastChild == nodeToDecouple)
+    parent->lastChild = prev;
 }

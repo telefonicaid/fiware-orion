@@ -494,7 +494,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 233
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -558,7 +558,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 239
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -622,7 +622,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 237
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -667,13 +667,13 @@ Date: REGEX(.*)
 31. Attempt to create a subscription S3 with q=P1<true - see error
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 176
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "values of type /Bool/ not supported for operator /LessThan/",
-    "title": "Invalid value for Subscription::q",
+    "detail": "invalid operator for boolean value",
+    "title": "Invalid Q-Filter",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -700,7 +700,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 243
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -745,7 +745,7 @@ Date: REGEX(.*)
 =============================================
 POST REGEX(.*)
 Content-Length: 247
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -768,7 +768,7 @@ Ngsild-Attribute-Format: Simplified
 =======================================
 POST REGEX(.*)
 Content-Length: 234
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -819,7 +819,7 @@ Date: REGEX(.*)
 ============================================
 POST REGEX(.*)
 Content-Length: 241
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

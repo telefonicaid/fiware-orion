@@ -147,23 +147,23 @@ MongoDB server version: REGEX(.*)4.4.13
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"value" : 1,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"value" : 2,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 2,
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"value" : 3,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3,
 			"mdNames" : [ ]
 		}
 	},
@@ -200,23 +200,23 @@ MongoDB server version: REGEX(.*)4.4.13
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
-			"value" : 31,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 31,
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
-			"value" : 32,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 32,
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
 			"type" : "Property",
-			"value" : 33,
-			"modDate" : REGEX(.*),
 			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 33,
 			"mdNames" : [ ]
 		}
 	},
@@ -231,7 +231,7 @@ bye
 ===========================================
 POST REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 302
-User-Agent: orionld
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

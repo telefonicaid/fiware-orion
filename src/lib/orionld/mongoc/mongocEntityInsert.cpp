@@ -67,7 +67,7 @@ bool mongocEntityInsert(KjNode* dbEntityP, const char* entityId)
     LM_E(("mongoc error inserting entity '%s': [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
   }
 
-  // mongocConnectionRelease(); - done at the end of the request
+  // mongocConnectionRelease(); - done at the end of the request - the connection is needed for Subs, Regs, ...
 
   bson_destroy(&document);
   bson_destroy(&reply);
