@@ -38,6 +38,8 @@ SET (SOURCES
     mongocSubscriptionLookup.cpp
     mongocSubscriptionExists.cpp
     mongocSubscriptionInsert.cpp
+    mongocTenantExists.cpp
+    mongocTenantsGet.cpp
 )
 
 # Include directories

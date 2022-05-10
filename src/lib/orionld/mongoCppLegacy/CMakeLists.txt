@@ -44,7 +44,6 @@ SET (SOURCES
     mongoCppLegacyRegistrationReplace.cpp
     mongoCppLegacyEntityTypesFromRegistrationsGet.cpp
     mongoCppLegacyEntitiesGet.cpp
-    mongoCppLegacyTenantsGet.cpp
     mongoCppLegacyGeoIndexInit.cpp
     mongoCppLegacyGeoIndexCreate.cpp
     mongoCppLegacyIdIndexCreate.cpp
@@ -60,7 +59,6 @@ SET (SOURCES
     mongoCppLegacyEntitiesAttributeLookup.cpp
     mongoCppLegacyDatasetGet.cpp
     mongoCppLegacyEntityTypeGet.cpp
-    mongoCppLegacyTenantExists.cpp
 )
 
 # Include directories

@@ -58,7 +58,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"           // mongoCppLegacyEntityRetrieve
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"            // mongoCppLegacyEntitiesQuery
 #include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"               // mongoCppLegacyDatasetGet
-#include "orionld/mongoCppLegacy/mongoCppLegacyTenantExists.h"             // mongoCppLegacyTenantExists
+#include "orionld/mongoc/mongocTenantExists.h"                             // mongocTenantExists
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -112,7 +112,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbIdIndexCreate                          = mongoCppLegacyIdIndexCreate;
   dbEntitiesQuery                          = mongoCppLegacyEntitiesQuery;
   dbDatasetGet                             = mongoCppLegacyDatasetGet;
-  dbTenantExists                           = mongoCppLegacyTenantExists;
+  dbTenantExists                           = mongocTenantExists;
 
   mongoCppLegacyInit(dbHost, dbName);
 

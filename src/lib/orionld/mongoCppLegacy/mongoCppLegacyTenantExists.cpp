@@ -29,13 +29,10 @@
 #include "mongo/client/dbclient.h"                                   // mongo legacy driver
 
 #include "logMsg/logMsg.h"                                           // LM_*
-#include "logMsg/traceLevels.h"                                      // Lmt*
 
 #include "mongoBackend/MongoGlobal.h"                                // getMongoConnection
 
 #include "orionld/common/orionldState.h"                             // orionldState, dbName
-#include "orionld/common/orionldTenantCreate.h"                      // orionldTenantCreate
-#include "orionld/common/orionldTenantLookup.h"                      // orionldTenantLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"   // mongoCppLegacyDbStringFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"         // mongoCppLegacyDbFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyTenantExists.h"       // Own interface

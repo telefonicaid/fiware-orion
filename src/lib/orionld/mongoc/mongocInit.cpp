@@ -29,6 +29,8 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocPool, ...
+#include "orionld/mongoc/mongocTenantsGet.h"                     // mongocTenantsGet
+#include "orionld/mongoc/mongocInit.h"                           // Own interface
 
 
 
@@ -59,12 +61,9 @@ void mongocInit(const char* dbHost, const char* dbName)
   mongocUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
   if (mongocUri == NULL)
   {
-    if ((dbUser[0] != 0) && (dbPwd[0] != 0))
-      LM_W(("Database username: '%s', password: '%s'", dbUser, dbPwd));
-    else if (dbUser[0] != 0)
-      LM_W(("Database username given but no database password"));
-    else if (dbPwd[0] != 0)
-      LM_W(("Database password given but no database username"));
+    if      ((dbUser[0] != 0) && (dbPwd[0] != 0))      LM_W(("Database username: '%s', password: '%s'", dbUser, dbPwd));
+    else if  (dbUser[0] != 0)                          LM_W(("Database username given but no database password"));
+    else if  (dbPwd[0]  != 0)                          LM_W(("Database password given but no database username"));
 
     LM_X(1, ("Unable to connect to mongo(URI: %s): %s", mongoUri, mongoError.message));
   }
@@ -84,4 +83,9 @@ void mongocInit(const char* dbHost, const char* dbName)
   // Semaphore for the 'contexts' collection on DB 'orionld' - hopefully not needed in the end ...
   //
   sem_init(&mongocContextsSem, 0, 1);  // 0: shared between threads of the same process. 1: free to be taken
+
+  if (mongocTenantsGet() == false)
+    LM_X(1, ("Unable to extract tenants from the database - fatal error"));
+
+  // mongocGeoIndexInit();
 }
