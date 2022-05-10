@@ -37,4 +37,4 @@ Default `alterationTypes` (i.e. the one for subscription not explicitly specifyi
 is `["entityCreate", "entityChange"]`.
 
 The particular alteration type can be got in notifications using the
-[`alterationType` builtin attribute](ngsiv2_implementation_nodes.md#alterationtype-attribute).
+[`alterationType` builtin attribute](ngsiv2_implementation_notes.md#alterationtype-attribute).
