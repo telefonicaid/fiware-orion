@@ -190,6 +190,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Date: REGEX(.*)
 
 [
+#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -226,6 +227,7 @@ Date: REGEX(.*)
         "id": "urn:ngsi-ld:entity:E3",
         "type": "Vehicle"
     }
+#SORT_END
 ]
 
 
@@ -254,6 +256,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Date: REGEX(.*)
 
 [
+#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -310,6 +313,7 @@ Date: REGEX(.*)
         "id": "urn:ngsi-ld:entity:E4",
         "type": "Vehicle"
     }
+#SORT_END
 ]
 
 
