@@ -35,29 +35,24 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                          // kalloc
 #include "orionld/common/dotForEq.h"                              // dotForEq
-#include "orionld/db/dbGeoIndexAdd.h"                             // dbGeoIndexAdd
 #include "orionld/mongoc/mongocConnectionGet.h"                   // mongocConnectionGet
-#include "orionld/mongoc/mongocGeoIndexCreate.h"                  // Own interface
+#include "orionld/mongoc/mongocIdIndexCreate.h"                   // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocGeoIndexCreate -
+// mongocIdIndexCreate -
 //
-bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
+bool mongocIdIndexCreate(OrionldTenant* tenantP)
 {
-  char         indexPath[1024];
-  char         eqName[512];   // To not destroy the original attribute name
-  char*        collectionName = (char*) "entities";
-
-  strncpy(eqName, attrLongName, sizeof(eqName) - 1);
-  dotForEq(eqName);
-  snprintf(indexPath, sizeof(indexPath) - 1, "attrs.%s.value", eqName);
-
+  char*  collectionName = (char*) "entities";
   bson_t key;
+
   bson_init(&key);
-  BSON_APPEND_UTF8(&key, indexPath, "2dsphere");
+  BSON_APPEND_INT32(&key, "_id.id", 1);
+
+  mongocConnectionGet();
 
   mongoc_database_t*  dbP                = mongoc_client_get_database(orionldState.mongoc.client, tenantP->mongoDbName);
   char*               indexName          = mongoc_collection_keys_to_index_string(&key);
@@ -76,14 +71,11 @@ bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
   bson_error_t  mcError;
   bson_t        reply;
 
-  mongocConnectionGet();
   if (mongoc_database_write_command_with_opts(dbP, createIndexCommand, NULL, &reply, &mcError) == false)
   {
-    LM_E(("Database Error (error creating 2dsphere index for attribute '%s' for db '%s': %s)", eqName, tenantP->mongoDbName, mcError.message));
+    LM_E(("Database Error (error creating index for _id.id for db '%s': %s)", tenantP->mongoDbName, mcError.message));
     return false;
   }
-
-  dbGeoIndexAdd(tenantP->tenant, eqName);
 
   return true;
 }

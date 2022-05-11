@@ -29,3 +29,4 @@
 * Issue #280   Subscription creation using the new mongo driver (experimental)
 * Issue #280   Common functions for Getting and Listing tenants now using the new mongo driver
 * Issue #280   Common functions for Geo indices now using the new mongo driver
+* Issue #280   Common function for creation of the _id.id entities index now using the new mongo driver

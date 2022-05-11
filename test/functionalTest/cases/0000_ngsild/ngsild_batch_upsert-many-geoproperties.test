@@ -221,6 +221,7 @@ Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json
 Date: REGEX(.*)
 
 [
+#SORT_START
     {
         "hasStop": [
             "urn:ngsi-ld:GtfsStop:000008012713:MS",
@@ -254,6 +255,7 @@ Date: REGEX(.*)
         "name": "Leipzig, Hauptbahnhof",
         "type": "GtfsStation"
     }
+#SORT_END
 ]
 
 
@@ -282,6 +284,7 @@ Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json
 Date: REGEX(.*)
 
 [
+#SORT_START
     {
         "hasStop": [
             "urn:ngsi-ld:GtfsStop:000008010205:MS",
@@ -331,6 +334,7 @@ Date: REGEX(.*)
         "name": "Leipzig, Hauptbahnhof",
         "type": "GtfsStation"
     }
+#SORT_END
 ]
 
 
