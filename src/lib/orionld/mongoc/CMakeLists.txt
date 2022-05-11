@@ -40,6 +40,8 @@ SET (SOURCES
     mongocSubscriptionInsert.cpp
     mongocTenantExists.cpp
     mongocTenantsGet.cpp
+    mongocGeoIndexInit.cpp
+    mongocGeoIndexCreate.cpp
 )
 
 # Include directories
