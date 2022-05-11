@@ -32,9 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/db/dbConfiguration.h"                        // dbIdIndexCreate
-#include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/mongoc/mongocIdIndexCreate.h"                // mongocIdIndexCreate
+#include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/tenantList.h"                         // tenantList
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
@@ -74,7 +74,7 @@ OrionldTenant* orionldTenantCreate(const char* tenantName)
   tenantList    = tenantP;
 
   if (idIndex == true)
-    dbIdIndexCreate(tenantP);
+    mongocIdIndexCreate(tenantP);
 
   // if TRoE is on, need to create the DB in postgres
   if (troe)

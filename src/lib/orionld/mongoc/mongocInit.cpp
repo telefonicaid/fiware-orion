@@ -29,8 +29,10 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocPool, ...
+#include "orionld/common/tenantList.h"                           // tenant0 - the default tenant
 #include "orionld/mongoc/mongocTenantsGet.h"                     // mongocTenantsGet
 #include "orionld/mongoc/mongocGeoIndexInit.h"                   // mongocGeoIndexInit
+#include "orionld/mongoc/mongocIdIndexCreate.h"                  // mongocIdIndexCreate
 #include "orionld/mongoc/mongocInit.h"                           // Own interface
 
 
@@ -91,5 +93,6 @@ void mongocInit(const char* dbHost, const char* dbName)
   if (mongocGeoIndexInit() == false)
     LM_X(1, ("Unable to initialize geo indices in database - fatal error"));
 
-  // FIXME: Create the _id.id index !
+  if (mongocIdIndexCreate(&tenant0) == false)
+    LM_W(("Unable to create the index on Entity ID in the default database (%s)", dbName));
 }

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCGEOINDEXINIT_H_
-#define SRC_LIB_ORIONLD_MONGOC_MONGOCGEOINDEXINIT_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCIDINDEXCREATE_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCIDINDEXCREATE_H_
 
 /*
 *
@@ -25,13 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldTenant.h"                  // OrionldTenant
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocGeoIndexInit -
+// mongocIdIndexCreate -
 //
-extern bool mongocGeoIndexInit(void);
+extern bool mongocIdIndexCreate(OrionldTenant* tenantP);
 
-#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCGEOINDEXINIT_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCIDINDEXCREATE_H_
