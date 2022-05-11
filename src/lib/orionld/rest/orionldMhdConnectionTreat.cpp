@@ -62,6 +62,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
@@ -947,7 +948,7 @@ MHD_Result orionldMhdConnectionTreat(void)
         // Tenant does not exist in the tenant cache of this broker
         // However, some other broker (load balancer) might have created the tenant!
         //
-        if (dbTenantExists(orionldState.tenantName) == false)
+        if (mongocTenantExists(orionldState.tenantName) == false)
         {
           orionldError(OrionldNonExistingTenant, "No such tenant", orionldState.tenantName, 404);
           goto respond;

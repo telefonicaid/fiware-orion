@@ -51,7 +51,7 @@ static StringListItem*  contextDownloadList = NULL;
 
 // -----------------------------------------------------------------------------
 //
-// contextDownloadListInit - initiaize the 'context download list'
+// contextDownloadListInit - initialize the 'context download list'
 //
 void contextDownloadListInit(void)
 {

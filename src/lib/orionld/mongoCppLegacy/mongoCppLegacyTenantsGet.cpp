@@ -29,7 +29,6 @@
 #include "mongo/client/dbclient.h"                             // mongo legacy driver
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
 

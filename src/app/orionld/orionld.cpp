@@ -73,7 +73,11 @@
 
 extern "C"
 {
+#include "kbase/kInit.h"                                    // kInit
+#include "kalloc/kaInit.h"                                  // kaInit
+#include "kalloc/kaBufferInit.h"                            // kaBufferInit
 #include "kalloc/kaBufferReset.h"                           // kaBufferReset
+#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
 #include "kjson/kjFree.h"                                   // kjFree
 }
 
@@ -113,6 +117,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                      // orionldStateRelease, kalloc, ...
 #include "orionld/common/tenantList.h"                        // tenantList, tenant0
 #include "orionld/common/branchName.h"                        // ORIONLD_BRANCH
+#include "orionld/mongoc/mongocInit.h"                        // mongocInit
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
 #include "orionld/db/dbInit.h"                                // dbInit
@@ -772,6 +777,54 @@ static void versionInfo(void)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// libLogBuffer -
+//
+thread_local char libLogBuffer[1024 * 32];
+
+
+
+// -----------------------------------------------------------------------------
+//
+// libLogFunction -
+//
+static void libLogFunction
+(
+  int          severity,              // 1: Error, 2: Warning, 3: Info, 4: Verbose, 5: Trace
+  int          level,                 // Trace level || Error code || Info Code
+  const char*  fileName,
+  int          lineNo,
+  const char*  functionName,
+  const char*  format,
+  ...
+)
+{
+  va_list  args;
+
+  /* "Parse" the variable arguments */
+  va_start(args, format);
+
+  /* Print message to variable */
+  vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
+  va_end(args);
+
+  // LM_K(("Got a lib log message, severity: %d: %s", severity, libLogBuffer));
+
+  if (severity == 1)
+    lmOut(libLogBuffer, 'E', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 2)
+    lmOut(libLogBuffer, 'W', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 3)
+    lmOut(libLogBuffer, 'I', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 4)
+    lmOut(libLogBuffer, 'V', fileName, lineNo, functionName, 0, NULL);
+  else if (severity == 5)
+    lmOut(libLogBuffer, 'T', fileName, lineNo, functionName, level + LmtKjlParse, NULL);
+}
+
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -974,9 +1027,41 @@ int main(int argC, char* argV[])
 
 
   //
-  // Initialize orionld
+  // Initialize the 'context download list' - to avoid multiple downloads of the same contexts
   //
   contextDownloadListInit();
+
+
+
+  //
+  // Initialize the KBASE library
+  // This call redirects all log messahes from the K-libs to the brokers log file.
+  //
+  kInit(libLogFunction);
+
+
+  //
+  // Initialize the KALLOC library
+  //
+  kaInit(libLogFunction);
+  kaBufferInit(&kalloc, kallocBuffer, sizeof(kallocBuffer), 32 * 1024, NULL, "Global KAlloc buffer");
+
+
+  //
+  // Initialize the KJSON library
+  // This sets up the global kjson instance with preallocated kalloc buffer
+  //
+  kjsonP = kjBufferCreate(&kjson, &kalloc);
+
+
+  //
+  // Get the hostname - needed for contexts created by the broker
+  //
+  gethostname(orionldHostName, sizeof(orionldHostName));
+  orionldHostNameLen = strlen(orionldHostName);
+
+  orionldStateInit(NULL);  // This is the "global instance" of orionldState
+  mongocInit(dbHost, "orionld");
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
   if (noLegacyDriver == false)

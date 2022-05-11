@@ -35,7 +35,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // dbHost, coreContextUrl
-#include "orionld/mongoc/mongocInit.h"                           // mongocInit
 #include "orionld/mongoc/mongocContextCacheGet.h"                // mongocContextCacheGet
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
@@ -97,8 +96,6 @@ void orionldContextCacheInit(void)
 
   if (sem_init(&orionldContextCacheSem, 0, 1) == -1)
     LM_X(1, ("Runtime Error (error initializing semaphore for orionld context list; %s)", strerror(errno)));
-
-  mongocInit(dbHost, "orionld");  // If mongocInit fails, an exit is issued
 
   //
   // Retrieve the context cache from the database and populate the context cache in RAM

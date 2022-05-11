@@ -26,3 +26,5 @@
 * Issue #280   Implemented a new POST /entities - also "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
 * Issue #280   Post Query: "type": "Query" is mandatory in highest level of payload body
 * Issue #280   POST Query was broken - fixed it, including correct treatment of language properties
+* Issue #280   Subscription creation using the new mongo driver (experimental)
+* Issue #280   Common functions for Getting and Listing tenants now using the new mongo driver
