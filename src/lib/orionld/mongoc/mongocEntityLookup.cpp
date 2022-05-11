@@ -47,7 +47,7 @@ KjNode* mongocEntityLookup(const char* entityId)
   bson_t            mongoFilter;
   const bson_t*     mongoDocP;
   mongoc_cursor_t*  mongoCursorP;
-  bson_error_t      mongoError;
+  bson_error_t      mcError;
   char*             title;
   char*             details;
   KjNode*           entityNodeP = NULL;
@@ -79,9 +79,9 @@ KjNode* mongocEntityLookup(const char* entityId)
     break;  // Just using the first one - should be no more than one!
   }
 
-  if (mongoc_cursor_error(mongoCursorP, &mongoError))
+  if (mongoc_cursor_error(mongoCursorP, &mcError))
   {
-    LM_E(("Internal Error (DB Error '%s')", mongoError.message));
+    LM_E(("Internal Error (DB Error '%s')", mcError.message));
     return NULL;
   }
 

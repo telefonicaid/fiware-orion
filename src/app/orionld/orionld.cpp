@@ -1192,7 +1192,7 @@ int main(int argC, char* argV[])
   LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
 
   if (noLegacyDriver == true)
-    LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only 4 requests work in this mode"));
+    LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only 5 requests work in this mode"));
 
   if (socketService == true)
   {

@@ -30,6 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocPool, ...
 #include "orionld/mongoc/mongocTenantsGet.h"                     // mongocTenantsGet
+#include "orionld/mongoc/mongocGeoIndexInit.h"                   // mongocGeoIndexInit
 #include "orionld/mongoc/mongocInit.h"                           // Own interface
 
 
@@ -87,5 +88,8 @@ void mongocInit(const char* dbHost, const char* dbName)
   if (mongocTenantsGet() == false)
     LM_X(1, ("Unable to extract tenants from the database - fatal error"));
 
-  // mongocGeoIndexInit();
+  if (mongocGeoIndexInit() == false)
+    LM_X(1, ("Unable to initialize geo indices in database - fatal error"));
+
+  // FIXME: Create the _id.id index !
 }
