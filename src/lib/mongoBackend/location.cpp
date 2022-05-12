@@ -263,44 +263,6 @@ static bool getGeoJson
      */
     orion::BSONObjBuilder bo;
 
-#if 0
-
-    if (isOfSpecialGeoJsonType(caP, "Feature"))
-    {
-      for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
-      {
-        CompoundValueNode* childP = caP->compoundValueP->childV[ix];
-        if (childP->name == "geometry")
-        {
-          compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
-          break;
-        }
-      }
-    }
-
-    else if (isOfSpecialGeoJsonType(caP, "FeatureCollection"))
-    {
-      for (unsigned int jx = 0; jx < caP->compoundValueP->childV.size(); ++jx)
-      {
-        CompoundValueNode* childP = caP->compoundValueP->childV[jx];
-        if (childP->name == "features")
-        {
-          CompoundValueNode* feature = caP->compoundValueP->childV[jx]->childV[0];
-
-          // FIXME PR: refactorize this common code
-          for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
-          {
-            CompoundValueNode* childP = feature->childV[ix];
-            if (childP->name == "geometry")
-            {
-              compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
-              break;
-            }
-          }
-        }
-      }
-    }
-#endif
     // Feature and FeatureCollection has an special treatment, done insise isSpecialGeoJsonType()
     // For other cases (i.e. when isSpecialGeoJsonType() returns false) do it in the "old way"
     if (!isSpecialGeoJsonType(caP, geoJson, apiVersion))
