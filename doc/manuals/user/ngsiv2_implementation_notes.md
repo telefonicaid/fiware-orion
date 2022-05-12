@@ -218,8 +218,9 @@ part in geo-queries.
 ## Supported GeoJSON types in `geo:json` attributes
 
 NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
-`geo:json` attributes. However, the current implementation in Orion (based in the MongoDB capabilities)
-introduces some limitations.
+`geo:json` attributes. However, the current implementation in Orion (based in
+the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces
+some limitations.
 
 We have successfully tested the following types:
 
@@ -229,12 +230,15 @@ We have successfully tested the following types:
 * MultiLineString
 * Polygon
 * MultiPolygon
+* Feature (using the value of `geometry` field at the first level)
 
 On the contrary, the following types doesn't work (you will get a "Database Error" if you try to use them):
 
-* Feature
 * GeometryCollection
-* FeatureCollection
+
+With regards to `FeatureCollection`, it is supported only if it contains a single Feature (i.e.
+the `features` field has only one element), in which case the value of `geometry` field of
+such element is used.
 
 More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
 

@@ -1,3 +1,4 @@
+- Add: support for Feature and FeaturesCollection GeoJSON types in entity locations (#4114)
 - Fix: allow limit=0 in all paginated operations in the NGSIv2 API (entities, entity types, subscriptions and registrations) (#1492)
 - Add: conditions.alterationTypes subscription fuctionality (#1494)
 - Add: alterationType built-in atrribute in notifications (#1494)
