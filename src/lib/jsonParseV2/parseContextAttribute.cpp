@@ -86,7 +86,7 @@ static std::string checkFeatureCollectionGeoJson(orion::CompoundValueNode* featu
      {
        if (childP->valueType != orion::ValueTypeVector)
        {
-         return "features in FeatureCollection is not a vector";
+         return "features in FeatureCollection is not an array";
        }
        else if (childP->childV.size() == 0)
        {

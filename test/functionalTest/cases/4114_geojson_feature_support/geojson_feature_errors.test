@@ -35,13 +35,38 @@ brokerStart CB
 # 03. Create entity with location geo:json using FeatureCollection type without features field, see error
 # 04. Create entity with location geo:json using FeatureCollection type without features field but invalid, see error
 # 05. Create entity with location geo:json using FeatureCollection with features field but 0 items, see error
-# 06. Create entity with locaiton geo:json using FeatureCollection with features field but more than 1 item, see error
+# 06. Create entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
 # 07. Create entity with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
 # 08. Create entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
+#
 # 09. Create entity with location field
-# 0x. (All the above updating the entity)
-# 0x. (All the above updating the attributue with PUT)
-# 0x. (All the above updating the attributue value directly)
+# 10. Update entity with location geo:json using Feature type without geometry field, see error
+# 11. Update entity with location geo:json using Feature type with geometry field but invalid, see error
+# 12. Update entity with location geo:json using FeatureCollection type without features field, see error
+# 13. Update entity with location geo:json using FeatureCollection type without features field but invalid, see error
+# 14. Update entity with location geo:json using FeatureCollection with features field but 0 items, see error
+# 15. Update entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
+# 16. Update entity with location geo:json u    sing FeatureCollection with features field, one item but without geometry field, see error
+# 17. Update entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
+#
+# 18. Update attr with location geo:json using Feature type without geometry field, see error
+# 19. Update attr with location geo:json using Feature type with geometry field but invalid, see error
+# 20. Update attr with location geo:json using FeatureCollection type without features field, see error
+# 21. Update attr with location geo:json using FeatureCollection type without features field but invalid, see error
+# 22. Update attr with location geo:json using FeatureCollection with features field but 0 items, see error
+# 23. Update attr with location geo:json using FeatureCollection with features field but more than 1 item, see error
+# 24. Update attr with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
+# 25. Update attr with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
+#
+# FIXME #4122: currently disabled, given that PUT /v2/entities/E/location/value doesn't work with geo locations (see issue)
+# 26. Update attr value with location geo:json using Feature type without geometry field, see error
+# 27. Update attr value with location geo:json using Feature type with geometry field but invalid, see error
+# 28. Update attr value with location geo:json using FeatureCollection type without features field, see error
+# 29. Update attr value with location geo:json using FeatureCollection type without features field but invalid, see error
+# 30. Update attr value with location geo:json using FeatureCollection with features field but 0 items, see error
+# 31. Update attr value with location geo:json using FeatureCollection with features field but more than 1 item, see error
+# 32. Update attr value with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
+# 33. Update attr value with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
 #
 
 echo "01. Create entity with location geo:json using Feature type without geometry field, see error"
@@ -138,7 +163,7 @@ echo
 echo
 
 
-echo "06. Create entity with locaiton geo:json using FeatureCollection with features field but more than 1 item, see error"
+echo "06. Create entity with location geo:json using FeatureCollection with features field but more than 1 item, see error"
 echo "===================================================================================================================="
 payload='{
   "id": "E",
@@ -226,6 +251,465 @@ echo
 echo
 
 
+echo "09. Create entity with location field"
+echo "====================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [
+          -3.6127119138731127,
+          40.53901978067972
+      ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "10. Update entity with location geo:json using Feature type without geometry field, see error"
+echo "============================================================================================="
+payload='{
+  "location": {
+    "value": {
+      "type": "Feature",
+      "properties": {
+        "label": "-3.6127119138731127, 40.53901978067972"
+      }
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "11. Update entity with location geo:json using Feature type with geometry field but invalid, see error"
+echo "======================================================================================================"
+payload='{
+  "location": {
+    "value": {
+      "type": "Feature",
+      "geometry": "foo",
+      "properties": {
+        "label": "-3.6127119138731127, 40.53901978067972"
+      }
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "12. Update entity with location geo:json using FeatureCollection type without features field, see error"
+echo "======================================================================================================="
+payload='{
+  "location": {
+    "value": {
+      "type": "FeatureCollection"
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "13. Update entity with location geo:json using FeatureCollection type with features field but invalid, see error"
+echo "================================================================================================================"
+payload='{
+  "location": {
+    "value": {
+      "type": "FeatureCollection",
+      "features": {}
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "14. Update entity with location geo:json using FeatureCollection with features field but 0 items, see error"
+echo "==========================================================================================================="
+payload='{
+  "location": {
+    "value": {
+      "type": "FeatureCollection",
+      "features": []
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "15. Update entity with location geo:json using FeatureCollection with features field but more than 1 item, see error"
+echo "===================================================================================================================="
+payload='{
+  "location": {
+    "value": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -3.6127119138731127,
+              40.53901978067972
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -3.6127119138731127,
+              40.53901978067972
+            ]
+          }
+        }
+      ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "16. Update entity with location geo:json using FeatureCollection with features field, one item but without geometry field, see error"
+echo "===================================================================================================================================="
+payload='{
+  "location": {
+    "value": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {}
+        }
+      ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "17. Update entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error"
+echo "============================================================================================================================================"
+payload='{
+  "location": {
+    "value": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": []
+        }
+      ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "18. Update attr with location geo:json using Feature type without geometry field, see error"
+echo "==========================================================================================="
+payload='{
+    "value": {
+      "type": "Feature",
+      "properties": {
+        "label": "-3.6127119138731127, 40.53901978067972"
+      }
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "19. Update attr with location geo:json using Feature type with geometry field but invalid, see error"
+echo "===================================================================================================="
+payload='{
+    "value": {
+      "type": "Feature",
+      "geometry": "foo",
+      "properties": {
+        "label": "-3.6127119138731127, 40.53901978067972"
+      }
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "20. Update attr with location geo:json using FeatureCollection type without features field, see error"
+echo "====================================================================================================="
+payload='{
+    "value": {
+      "type": "FeatureCollection"
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "21. Update attr with location geo:json using FeatureCollection type with features field but invalid, see error"
+echo "=============================================================================================================="
+payload='{
+    "value": {
+      "type": "FeatureCollection",
+      "features": {}
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "22. Update attr with location geo:json using FeatureCollection with features field but 0 items, see error"
+echo "========================================================================================================="
+payload='{
+    "value": {
+      "type": "FeatureCollection",
+      "features": []
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "23. Update attr with location geo:json using FeatureCollection with features field but more than 1 item, see error"
+echo "=================================================================================================================="
+payload='{
+    "value": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -3.6127119138731127,
+              40.53901978067972
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -3.6127119138731127,
+              40.53901978067972
+            ]
+          }
+        }
+      ]
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "24. Update attr with location geo:json using FeatureCollection with features field, one item but without geometry field, see error"
+echo "=================================================================================================================================="
+payload='{
+    "value": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {}
+        }
+      ]
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "25. Update attr with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error"
+echo "=========================================================================================================================================="
+payload='{
+    "value": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": []
+        }
+      ]
+    },
+    "type": "geo:json"
+}'
+orionCurl --url /v2/entities/E/attrs/location -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "26. Update attr value with location geo:json using Feature type without geometry field, see error"
+echo "================================================================================================="
+payload='{
+      "type": "Feature",
+      "properties": {
+        "label": "-3.6127119138731127, 40.53901978067972"
+      }
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "27. Update attr value with location geo:json using Feature type with geometry field but invalid, see error"
+echo "=========================================================================================================="
+payload='{
+      "type": "Feature",
+      "geometry": "foo",
+      "properties": {
+        "label": "-3.6127119138731127, 40.53901978067972"
+      }
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "28. Update attr value with location geo:json using FeatureCollection type without features field, see error"
+echo "==========================================================================================================="
+payload='{
+      "type": "FeatureCollection"
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "29. Update attr value with location geo:json using FeatureCollection type with features field but invalid, see error"
+echo "===================================================================================================================="
+payload='{
+      "type": "FeatureCollection",
+      "features": {}
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "30. Update attr value with location geo:json using FeatureCollection with features field but 0 items, see error"
+echo "==============================================================================================================="
+payload='{
+      "type": "FeatureCollection",
+      "features": []
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "31. Update attr value with location geo:json using FeatureCollection with features field but more than 1 item, see error"
+echo "========================================================================================================================"
+payload='{
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -3.6127119138731127,
+              40.53901978067972
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -3.6127119138731127,
+              40.53901978067972
+            ]
+          }
+        }
+      ]
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "32. Update attr value with location geo:json using FeatureCollection with features field, one item but without geometry field, see error"
+echo "========================================================================================================================================"
+payload='{
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {}
+        }
+      ]
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "33. Update attr value with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error"
+echo "================================================================================================================================================"
+payload='{
+  "type": "Point",
+  "coordinates": [
+    -3.6127119138731127,
+    40.53901978067972
+  ]
+}'
+#orionCurl --url /v2/entities/E/attrs/location/value -X PUT --payload "$payload"
+echo
+echo
+
 
 --REGEXPECT--
 01. Create entity with location geo:json using Feature type without geometry field, see error
@@ -279,7 +763,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection is not a vector",
+    "description": "features in FeatureCollection is not an array",
     "error": "BadRequest"
 }
 
@@ -298,7 +782,7 @@ Date: REGEX(.*)
 }
 
 
-06. Create entity with locaiton geo:json using FeatureCollection with features field but more than 1 item, see error
+06. Create entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 89
@@ -338,6 +822,272 @@ Date: REGEX(.*)
     "description": "geometry in Feature is not an object",
     "error": "BadRequest"
 }
+
+
+09. Create entity with location field
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Update entity with location geo:json using Feature type without geometry field, see error
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature not found",
+    "error": "BadRequest"
+}
+
+
+11. Update entity with location geo:json using Feature type with geometry field but invalid, see error
+======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature is not an object",
+    "error": "BadRequest"
+}
+
+
+12. Update entity with location geo:json using FeatureCollection type without features field, see error
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features field not found in FeatureCollection",
+    "error": "BadRequest"
+}
+
+
+13. Update entity with location geo:json using FeatureCollection type with features field but invalid, see error
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features in FeatureCollection is not an array",
+    "error": "BadRequest"
+}
+
+
+14. Update entity with location geo:json using FeatureCollection with features field but 0 items, see error
+===========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features in FeatureCollection has 0 items",
+    "error": "BadRequest"
+}
+
+
+15. Update entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features in FeatureCollection has more than 1 item",
+    "error": "BadRequest"
+}
+
+
+16. Update entity with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
+====================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature not found",
+    "error": "BadRequest"
+}
+
+
+17. Update entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
+============================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature is not an object",
+    "error": "BadRequest"
+}
+
+
+18. Update attr with location geo:json using Feature type without geometry field, see error
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature not found",
+    "error": "BadRequest"
+}
+
+
+19. Update attr with location geo:json using Feature type with geometry field but invalid, see error
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature is not an object",
+    "error": "BadRequest"
+}
+
+
+20. Update attr with location geo:json using FeatureCollection type without features field, see error
+=====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features field not found in FeatureCollection",
+    "error": "BadRequest"
+}
+
+
+21. Update attr with location geo:json using FeatureCollection type with features field but invalid, see error
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features in FeatureCollection is not an array",
+    "error": "BadRequest"
+}
+
+
+22. Update attr with location geo:json using FeatureCollection with features field but 0 items, see error
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features in FeatureCollection has 0 items",
+    "error": "BadRequest"
+}
+
+
+23. Update attr with location geo:json using FeatureCollection with features field but more than 1 item, see error
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "features in FeatureCollection has more than 1 item",
+    "error": "BadRequest"
+}
+
+
+24. Update attr with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
+==================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature not found",
+    "error": "BadRequest"
+}
+
+
+25. Update attr with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
+==========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry in Feature is not an object",
+    "error": "BadRequest"
+}
+
+
+26. Update attr value with location geo:json using Feature type without geometry field, see error
+=================================================================================================
+
+
+27. Update attr value with location geo:json using Feature type with geometry field but invalid, see error
+==========================================================================================================
+
+
+28. Update attr value with location geo:json using FeatureCollection type without features field, see error
+===========================================================================================================
+
+
+29. Update attr value with location geo:json using FeatureCollection type with features field but invalid, see error
+====================================================================================================================
+
+
+30. Update attr value with location geo:json using FeatureCollection with features field but 0 items, see error
+===============================================================================================================
+
+
+31. Update attr value with location geo:json using FeatureCollection with features field but more than 1 item, see error
+========================================================================================================================
+
+
+32. Update attr value with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
+========================================================================================================================================
+
+
+33. Update attr value with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
+================================================================================================================================================
 
 
 --TEARDOWN--
