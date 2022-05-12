@@ -106,6 +106,12 @@ static bool stringArray2coords
 */
 static bool isOfSpecialGeoJsonType(const ContextAttribute* caP, const std::string& type)
 {
+  if (caP->compoundValueP == NULL)
+  {
+    // This is the case when geo location attribute has null value
+    return false;
+  }
+
   for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
   {
      CompoundValueNode* childP = caP->compoundValueP->childV[ix];
@@ -128,6 +134,9 @@ static bool isOfSpecialGeoJsonType(const ContextAttribute* caP, const std::strin
 * ContextAttribute provided as parameter.
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
+*
+* FIXME P6: review the cases in which this function returns false. Maybe many cases (or all them)
+* can be moved to checkGeoJson() in the parsing layer, as preconditions.
 */
 static bool getGeoJson
 (
@@ -189,13 +198,6 @@ static bool getGeoJson
 
   if (caP->type == GEO_JSON)
   {
-    // If attribute value is not null, then it has to be object in this case
-    if ((caP->valueType != orion::ValueTypeNull) && ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isObject())))
-    {
-      *errDetail = "geo:json needs an object or null as value";
-      return false;
-    }
-
     /* FIXME P5: the procedure we are currently using is sub-optimal, as valueBson() is
      * called from location.cpp one time to generate the BSON for the location.coords field
      * and called again (before or after... I'm not sure right now and may depend on the

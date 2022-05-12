@@ -115,6 +115,7 @@ static std::string checkFeatureCollectionGeoJson(orion::CompoundValueNode* featu
 * Do checking that ensure getGeoJson() function in the mongoBackend layer will not
 * break. In particular:
 *
+* - Attribute is null or an object
 * - For Feature, that geometry field exists and it's an object
 * - For FeatureCollection:
 *   * the feature field exists
@@ -124,6 +125,25 @@ static std::string checkFeatureCollectionGeoJson(orion::CompoundValueNode* featu
 */
 static std::string checkGeoJson(ContextAttribute* caP)
 {
+  if (caP->compoundValueP == NULL)
+  {
+    // In no object or vector, only null is allowed
+    if (caP->valueType == orion::ValueTypeNull)
+    {
+      return "OK";
+    }
+    else
+    {
+      return "geo:json needs an object or null as value";
+    }
+  }
+
+  // Vector not allowed
+  if (!caP->compoundValueP->isObject())
+  {
+    return "geo:json needs an object or null as value";
+  }
+
   for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
   {
      orion::CompoundValueNode* childP = caP->compoundValueP->childV[ix];
