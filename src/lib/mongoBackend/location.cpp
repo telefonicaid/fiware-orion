@@ -209,7 +209,8 @@ static bool getGeoJson
     orion::BSONObjBuilder bo;
 
     // GeoJSON Feature has an especial treatment, the geometry is extracted from
-    // "geometry" field at the first level
+    // "geometry" field at the first level.
+    // Preconditions and checked by checkGeoJson() function at parsing layer.
     if (isOfSpecialGeoJsonType(caP, "Feature"))
     {
       for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
@@ -220,13 +221,13 @@ static bool getGeoJson
           compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
           break;
         }
-        // FIXME PR: what about if field "geometry" is missing? Return error (cover it with test)
       }
     }
     // GeoJSON FeatureCollection has an especial treatment, the geometry is extracted from
     // "geometry" field at the first level of the first Feature in the vector. If more
     // than one Feature exists an error will be returned (and Orion doesn't know which
     // element in the vector has to be used to set the entity location)
+    // Preconditions and checked by checkGeoJson() function at parsing layer.
     else if (isOfSpecialGeoJsonType(caP, "FeatureCollection"))
     {
       for (unsigned int jx = 0; jx < caP->compoundValueP->childV.size(); ++jx)
@@ -236,6 +237,7 @@ static bool getGeoJson
         {
           CompoundValueNode* feature = caP->compoundValueP->childV[jx]->childV[0];
 
+          // FIXME PR: refactorize this common code
           for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
           {
             CompoundValueNode* childP = feature->childV[ix];
@@ -244,14 +246,9 @@ static bool getGeoJson
               compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
               break;
             }
-            // FIXME PR: what about if field "geometry" is missing? Return error (cover it with test)
           }
         }
       }
-
-      // FIXME PR: what about if field "features" is missing? Return error (cover it with test)
-      // FIXME PR: what about if they are more than one elements in "features"  Return error (cover it with test)
-      // FIXME PR: what about if field "geometry" is missing in the first element? Return error (cover it with test)
     }
     else
     {
