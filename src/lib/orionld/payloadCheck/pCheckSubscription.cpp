@@ -140,6 +140,7 @@ bool pCheckSubscription
   {
     if ((strcmp(subItemP->name, "subscriptionName") == 0) || (strcmp(subItemP->name, "name") == 0))
     {
+      subItemP->name = (char*) "name";  // Must be called "name" in the database
       PCHECK_STRING(subItemP, 0, NULL, SubscriptionNamePath, 400);
       PCHECK_DUPLICATE(nameP, subItemP, 0, NULL, SubscriptionNamePath, 400);
     }
