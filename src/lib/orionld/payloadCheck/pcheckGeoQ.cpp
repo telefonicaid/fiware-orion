@@ -179,7 +179,10 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
 
   if (pcheckGeoqCoordinates(coordinatesP, geoJsonType) == false)
   {
-    orionldError(OrionldBadRequestData, "Invalid Payload Data", "invalid coordinates", 400);
+    //
+    // Not overwriting - putting the call to orionldError back once I have error stacking
+    // orionldError(OrionldBadRequestData, "Invalid Payload Data", "invalid coordinates", 400);
+    //
     return false;
   }
 

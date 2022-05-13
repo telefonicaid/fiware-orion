@@ -88,11 +88,11 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
       if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP) == false)
         return false;
     }
-    else if (strcmp(nItemP->name, "status") == 0)
-    {
-      orionldError(OrionldBadRequestData, "Invalid field for Subscription::notification", "'status' is read-only", 400);
-      return false;
-    }
+    else if (strcmp(nItemP->name, "status")           == 0) {}  // Ignored
+    else if (strcmp(nItemP->name, "timesSent")        == 0) {}  // Ignored
+    else if (strcmp(nItemP->name, "lastNotification") == 0) {}  // Ignored
+    else if (strcmp(nItemP->name, "lastSuccess")      == 0) {}  // Ignored
+    else if (strcmp(nItemP->name, "lastFailure")      == 0) {}  // Ignored
     else
     {
       orionldError(OrionldBadRequestData, "Invalid field for Subscription::notification", nItemP->name, 400);
