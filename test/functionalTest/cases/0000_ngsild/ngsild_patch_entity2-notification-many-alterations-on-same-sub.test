@@ -132,7 +132,7 @@ Date: REGEX(.*)
 ================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
-MongoDB server version: REGEX(.*)4.4.13
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 ================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
-MongoDB server version: REGEX(.*)4.4.13
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:E1",

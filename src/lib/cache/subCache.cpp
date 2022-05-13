@@ -46,7 +46,9 @@ extern "C"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "orionld/types/OrionldTenant.h"             // OrionldTenant
 #include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/tenantList.h"               // tenantList
 #include "orionld/q/qBuild.h"                        // qBuild
 #include "orionld/q/qRelease.h"                      // qRelease
 #include "orionld/common/urlParse.h"                 // urlParse
@@ -1149,31 +1151,22 @@ void subCacheRefresh(void)
 {
   debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
 
-  std::vector<std::string> databases;
-  LM_TMP(("QP: ************************************ In subCacheRefresh *********************"));
   // Empty the cache
   subCacheDestroy();
-  LM_TMP(("After subCacheDestroy"));
 
-  // Get list of database
-  if (mongoMultitenant())
+  // Recreate the subCache for the default tenant
+  mongoSubCacheRefresh(dbName);
+
+  // Recreate the subCache for each and every tenant
+  OrionldTenant* tenantP = tenantList;
+  while (tenantP != NULL)
   {
-    getOrionDatabases(&databases);
-  }
-
-  // Add the 'default tenant'
-  databases.push_back(getDbPrefix());
-
-
-  // Now refresh the subCache for each and every tenant
-  for (unsigned int ix = 0; ix < databases.size(); ++ix)
-  {
-    LM_TMP(("Calling mongoSubCacheRefresh(%s)", databases[ix].c_str()));
-    mongoSubCacheRefresh(databases[ix]);
+    LM_TMP(("KZ: Calling mongoSubCacheRefresh for tenant '%s'", tenantP->mongoDbName));
+    mongoSubCacheRefresh(tenantP->mongoDbName);
+    tenantP = tenantP->next;
   }
 
   ++subCache.noOfRefreshes;
-  LM_TMP(("QP: ************************************ After subCacheRefresh *********************"));
 
   debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
 }
