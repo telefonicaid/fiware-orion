@@ -151,6 +151,7 @@ bool pCheckSubscription
     else if (strcmp(subItemP->name, "entities") == 0)
     {
       PCHECK_ARRAY(subItemP, 0, NULL, SubscriptionEntitiesPath, 400);
+      PCHECK_ARRAY_EMPTY(subItemP, 0, NULL, SubscriptionEntitiesPath, 400);
       PCHECK_DUPLICATE(entitiesP,  subItemP, 0, NULL, SubscriptionEntitiesPath, 400);
 
       if (pcheckEntityInfoArray(entitiesP, true, SubscriptionEntitiesItemPath) == false)
@@ -160,6 +161,7 @@ bool pCheckSubscription
     {
       PCHECK_DUPLICATE(watchedAttributesP, subItemP, 0, NULL, SubscriptionWatchedAttributesPath, 400);
       PCHECK_ARRAY(watchedAttributesP, 0, NULL, SubscriptionWatchedAttributesPath, 400);
+      PCHECK_ARRAY_EMPTY(watchedAttributesP, 0, NULL, SubscriptionWatchedAttributesPath, 400);
 
       // pCheckStringArray expands (w/ orionldState.contextP) as well as checks validity
       if (pCheckStringArray(watchedAttributesP, SubscriptionWatchedAttributesItemPath, true) == false)
@@ -226,11 +228,6 @@ bool pCheckSubscription
       PCHECK_STRING(subItemP, 0, NULL, SubscriptionLangPath, 400);
       PCHECK_DUPLICATE(langP, subItemP, 0, NULL, SubscriptionLangPath, 400);
     }
-    else if ((strcmp(subItemP->name, "status") == 0) || (strcmp(subItemP->name, "createdAt") == 0) || (strcmp(subItemP->name, "modifiedAt") == 0))
-    {
-      orionldError(OrionldBadRequestData, "Read-only field for subscription", subItemP->name, 400);
-      return false;
-    }
     else if (strcmp(subItemP->name, "temporalQ") == 0)
     {
       orionldError(OrionldOperationNotSupported, "Not Implemented", SubscriptionTemporalQPath, 501);
@@ -241,6 +238,9 @@ bool pCheckSubscription
       orionldError(OrionldOperationNotSupported, "Not Implemented", SubscriptionScopePath, 501);
       return false;
     }
+    else if (strcmp(subItemP->name, "status")           == 0) {}  // Ignored
+    else if (strcmp(subItemP->name, "createdAt")        == 0) {}  // Ignored
+    else if (strcmp(subItemP->name, "modifiedAt")       == 0) {}  // Ignored
     else
     {
       orionldError(OrionldBadRequestData, "Unknown field for subscription", subItemP->name, 400);
