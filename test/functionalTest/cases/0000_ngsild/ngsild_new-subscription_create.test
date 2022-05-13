@@ -52,7 +52,7 @@ echo "================================================="
 payload='{
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
-  "name": "Test subscription 01",
+  "subscriptionName": "Test subscription 01",
   "description": "Description of Test subscription 01",
   "entities": [
     {
