@@ -30,3 +30,4 @@
 * Issue #280   Common functions for Getting and Listing tenants now using the new mongo driver
 * Issue #280   Common functions for Geo indices now using the new mongo driver
 * Issue #280   Common function for creation of the _id.id entities index now using the new mongo driver
+* Issue #280   Using the tenant list when populating the subscription cache insterad of querying the database (less Mongo C++ Legacy driver usage)
