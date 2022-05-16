@@ -26,8 +26,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
-#include "kjson/kjRenderSize.h"                                 // kjFastRenderSize
-#include "kjson/kjRender.h"                                     // kjFastRender
+#include "kjson/kjParse.h"                                      // kjParse
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
@@ -40,73 +39,10 @@ extern "C"
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
-#include "orionld/payloadCheck/pcheckGeoType.h"                 // pcheckGeoType
+#include "orionld/payloadCheck/pCheckGeoGeometry.h"             // pCheckGeoGeometry
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"         // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoqGeorel.h"              // pcheckGeoqGeorel
 #include "orionld/payloadCheck/pcheckGeoQ.h"                    // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ngsildCoordinatesToAPIv1Datamodel -
-//
-bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldName, KjNode* geometryP)
-{
-  bool   isPoint = false;
-  char*  buf;
-
-  if (geometryP == NULL)
-  {
-    orionldError(OrionldBadRequestData, "Internal Error", "Unable to extract the geometry of a geoQ for coordinmate APIv1 fix", 400);
-    return false;
-  }
-
-  // Must be called "coords" in the database
-  coordinatesP->name = (char*) "coords";
-
-  // If already a String, then we're done
-  if (coordinatesP->type == KjString)
-    return true;
-
-  if (strcmp(geometryP->value.s, "Point") == 0)
-    isPoint = true;
-
-  if (isPoint)
-  {
-    // A point is an array ( [ 1, 2 ] ) in NGSI-LD, but in APIv1 database mode it is a string ( "1,2" )
-    int    coords = 0;
-    float  coordV[3];
-
-    for (KjNode* coordP = coordinatesP->value.firstChildP; coordP != NULL; coordP = coordP->next)
-    {
-      if (coordP->type == KjFloat)
-        coordV[coords] = coordP->value.f;
-      else
-        coordV[coords] = (float) coordP->value.i;
-
-      ++coords;
-    }
-
-    int bufSize = 128;
-    buf = kaAlloc(&orionldState.kalloc, bufSize);
-    if (coords == 2)
-      snprintf(buf, bufSize, "%f,%f", coordV[0], coordV[1]);
-    else
-      snprintf(buf, bufSize, "%f,%f,%f", coordV[0], coordV[1], coordV[2]);
-  }
-  else
-  {
-    int bufSize = kjFastRenderSize(coordinatesP);
-    buf = kaAlloc(&orionldState.kalloc, bufSize);
-    kjFastRender(coordinatesP, buf);
-  }
-
-  coordinatesP->type    = KjString;
-  coordinatesP->value.s = buf;
-
-  return true;
-}
 
 
 
@@ -114,7 +50,7 @@ bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldNa
 //
 // pcheckGeoQ -
 //
-bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
+bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscription)
 {
   KjNode*                geometryP    = NULL;
   KjNode*                coordinatesP = NULL;
@@ -170,11 +106,20 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
     return false;
   }
 
-  char* detail;
-  if (pcheckGeoType(geometryP->value.s, &geoJsonType, &detail) == false)  // Rename to pcheckGeoqGeometry
+  if (pCheckGeoGeometry(geometryP->value.s, &geoJsonType, isSubscription) == false)
   {
-    orionldError(OrionldBadRequestData, "Invalid Payload Data", detail, 400);
+    // orionldError(OrionldBadRequestData, "Invalid Payload Data", detail, 400);
     return false;
+  }
+
+  if (coordinatesP->type == KjString)
+  {
+    coordinatesP = kjParse(orionldState.kjsonP, coordinatesP->value.s);
+    if (coordinatesP == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' as string is not a valid JSON Array", 400);
+      return false;
+    }
   }
 
   if (pcheckGeoqCoordinates(coordinatesP, geoJsonType) == false)
@@ -185,6 +130,9 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
     //
     return false;
   }
+
+  if (geoCoordinatesPP != NULL)
+    *geoCoordinatesPP = coordinatesP;
 
   if (pcheckGeoqGeorel(georelP, geoJsonType, &pd) == false)
   {
@@ -204,15 +152,6 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
       geopropertyP->value.s = orionldAttributeExpand(orionldState.contextP, pName, true, NULL);
       dotForEq(geopropertyP->value.s);
     }
-  }
-
-  //
-  // Render the coordinates and convert to a string - for the NGSIv1 database model
-  //
-  if (coordsToString == true)
-  {
-    if (ngsildCoordinatesToAPIv1Datamodel(coordinatesP, "geoQ::coordinates", geometryP) == false)
-      return false;
   }
 
   return true;

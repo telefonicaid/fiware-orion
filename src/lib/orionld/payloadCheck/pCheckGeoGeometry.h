@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOTYPE_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOTYPE_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOGEOMETRY_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOGEOMETRY_H_
 
 /*
 *
@@ -36,8 +36,8 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// pcheckGeoType -
+// pCheckGeoGeometry -
 //
-extern bool pcheckGeoType(char* typeName, OrionldGeoJsonType* typeP, char** detailsP);
+extern bool pCheckGeoGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOTYPE_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOGEOMETRY_H_

@@ -57,10 +57,10 @@ payload='{
   ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": "[1,2]",
+    "georel": "near;maxDistance==1",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,

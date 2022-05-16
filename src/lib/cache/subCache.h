@@ -123,7 +123,8 @@ struct CachedSubscription
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
   QNode*                      qP;
-  char*                       qText;  // Note that NGSIv2/m0ngoBackend q/mq are inside SubscriptionExpression
+  char*                       qText;  // Note that NGSIv2/mongoBackend q/mq are inside SubscriptionExpression
+  KjNode*                     geoCoordinatesP;
 
   bool                        isActive;
   std::string                 status;

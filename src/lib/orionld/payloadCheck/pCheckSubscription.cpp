@@ -102,7 +102,8 @@ bool pCheckSubscription
   QNode**   qTreeP,
   char**    qTextP,
   KjNode**  uriPP,
-  KjNode**  notifierInfoPP
+  KjNode**  notifierInfoPP,
+  KjNode**  geoCoordinatesPP
 )
 {
   PCHECK_OBJECT(subP, 0, NULL, "A Subscription must be a JSON Object", 400);
@@ -193,7 +194,7 @@ bool pCheckSubscription
     {
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionGeoqPath, 400);
       PCHECK_DUPLICATE(geoqP, subItemP, 0, NULL, SubscriptionGeoqPath, 400);
-      if (pcheckGeoQ(geoqP, true) == false)
+      if (pcheckGeoQ(geoqP, geoCoordinatesPP, true) == false)
         return false;
     }
     else if (strcmp(subItemP->name, "csf") == 0)

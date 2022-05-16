@@ -36,6 +36,6 @@ extern "C"
 //
 // pcheckGeoQ -
 //
-extern bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString);
+extern bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool pCheckGeoGeometry);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQ_H_

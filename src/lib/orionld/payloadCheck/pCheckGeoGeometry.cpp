@@ -26,34 +26,37 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/payloadCheck/pcheckGeoType.h"                // Own interface
+#include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/payloadCheck/pCheckGeoGeometry.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckGeoType -
+// pCheckGeoGeometry -
 //
-bool pcheckGeoType(char* typeName, OrionldGeoJsonType* typeP, char** detailsP)
+bool pCheckGeoGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription)
 {
   if (typeName[0] == 0)
   {
-    LM_E(("Invalid GeoJSON type: 'Empty String'"));
-    *detailsP = (char*) "geometry cannot be an empty string";
+    orionldError(OrionldBadRequestData, "Invalid geometry", "empty string", 400);
     return false;
   }
-  else if (SCOMPARE6(typeName,  'P', 'o', 'i', 'n', 't', 0))                                                      *typeP = GeoJsonPoint;
-  else if (SCOMPARE11(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'i', 'n', 't', 0))                             *typeP = GeoJsonMultiPoint;
-  else if (SCOMPARE11(typeName, 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))                             *typeP = GeoJsonLineString;
-  else if (SCOMPARE16(typeName, 'M', 'u', 'l', 't', 'i', 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))    *typeP = GeoJsonMultiLineString;
-  else if (SCOMPARE8(typeName,  'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                                            *typeP = GeoJsonPolygon;
-  else if (SCOMPARE13(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                   *typeP = GeoJsonMultiPolygon;
+  if      (strcmp(typeName, "Point")           == 0) *typeP = GeoJsonPoint;
+  else if (strcmp(typeName, "MultiPoint")      == 0) *typeP = GeoJsonMultiPoint;
+  else if (strcmp(typeName, "LineString")      == 0) *typeP = GeoJsonLineString;
+  else if (strcmp(typeName, "MultiLineString") == 0) *typeP = GeoJsonMultiLineString;
+  else if (strcmp(typeName, "Polygon")         == 0) *typeP = GeoJsonPolygon;
+  else if (strcmp(typeName, "MultiPolygon")    == 0) *typeP = GeoJsonMultiPolygon;
   else
   {
-    LM_E(("Invalid GeoJSON type: %s", typeName));
-    *detailsP = (char*) "invalid geometry";
+    orionldError(OrionldBadRequestData, "Invalid geometry", typeName, 400);
+    return false;
+  }
 
+  if ((isSubscription == true) && (*typeP != GeoJsonPoint))
+  {
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Subscriptions only support Point for geometry (right now)", 501);
     return false;
   }
 

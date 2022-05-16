@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjParse.h"                                       // kjParse
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -33,8 +34,9 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECKx()
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
-#include "orionld/payloadCheck/pcheckGeoType.h"                  // pcheckGeoType
+#include "orionld/payloadCheck/pCheckGeoGeometry.h"             // pCheckGeoGeometry
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"          // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // Own interface
 
@@ -61,15 +63,13 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
   {
     if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
     {
-      char* detail;
-
       DUPLICATE_CHECK(typeNodeP, "geo-location::type", nodeP);
       STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object must be a JSON String");
       EMPTY_STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object cannot be an empty string");
 
-      if (pcheckGeoType(typeNodeP->value.s, &geoType, &detail) == false)
+      if (pCheckGeoGeometry(typeNodeP->value.s, &geoType, false) == false)
       {
-        orionldError(OrionldBadRequestData, detail, typeNodeP->value.s, 400);
+        // orionldError(OrionldBadRequestData, detail, typeNodeP->value.s, 400);
         return false;
       }
       geoTypeString = typeNodeP->value.s;
@@ -77,8 +77,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
     else if (SCOMPARE12(nodeP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
     {
       DUPLICATE_CHECK(coordinatesNodeP, "geo-location::coordinates", nodeP);
-      // Point, LineString, Polygon ... in the first level they're all Arrays
-      ARRAY_CHECK(coordinatesNodeP, "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)");
+      PCHECK_STRING_OR_ARRAY(coordinatesNodeP, 0, "Invalid Data Type", "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)", 400);
     }
     else
     {
@@ -112,6 +111,16 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
   }
 
   // Check that the coordinates (coordinatesNodeP) JSON Array coincides with the type 'geoType'
+  if (coordinatesNodeP->type == KjString)
+  {
+    coordinatesNodeP = kjParse(orionldState.kjsonP, coordinatesNodeP->value.s);
+    if (coordinatesNodeP == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' as string is not a valid JSON Array", 400);
+      return false;
+    }
+  }
+
   if (pcheckGeoqCoordinates(coordinatesNodeP, geoType) == false)
     return false;
 

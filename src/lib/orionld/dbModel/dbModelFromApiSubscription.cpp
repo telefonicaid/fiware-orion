@@ -30,6 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjChildAdd, ...
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -43,7 +45,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// dbModelFromApiKeyValues -
+// dbModelFromApiKeyValues - own module!
 //
 static KjNode* dbModelFromApiKeyValues(KjNode* kvObjectArray, const char* name)
 {
@@ -62,6 +64,127 @@ static KjNode* dbModelFromApiKeyValues(KjNode* kvObjectArray, const char* name)
   }
 
   return kvs;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelFromCoordinates - own module!
+//
+static bool dbModelFromCoordinates(KjNode* coordinatesP, const char* fieldName, KjNode* geometryP)
+{
+  bool   isPoint = false;
+  char*  buf;
+
+  if (geometryP == NULL)
+  {
+    orionldError(OrionldBadRequestData, "Internal Error", "Unable to extract the geometry of a geoQ for coordinmate APIv1 fix", 400);
+    return false;
+  }
+
+  // Must be called "coords" in the database
+  coordinatesP->name = (char*) "coords";
+
+  // If already a String, then we're almost done - just need to remove the '[]'
+  if (coordinatesP->type == KjString)
+  {
+    if (coordinatesP->value.s[0] == '[')
+    {
+      coordinatesP->value.s = &coordinatesP->value.s[1];
+      char* endP = &coordinatesP->value.s[strlen(coordinatesP->value.s) - 1];
+      *endP = 0;
+    }
+
+    return true;
+  }
+
+  if (strcmp(geometryP->value.s, "point") == 0)
+    isPoint = true;
+
+  if (isPoint)
+  {
+    // A point is an array ( [ 1, 2 ] ) in NGSI-LD, but in APIv1 database mode it is a string ( "1,2" )
+    int    coords = 0;
+    float  coordV[3];
+    bool   floats = false;
+
+    for (KjNode* coordP = coordinatesP->value.firstChildP; coordP != NULL; coordP = coordP->next)
+    {
+      if (coordP->type == KjFloat)
+      {
+        coordV[coords] = coordP->value.f;
+        floats = true;
+      }
+      else
+        coordV[coords] = (float) coordP->value.i;
+
+      ++coords;
+    }
+
+    int bufSize = 128;
+    buf = kaAlloc(&orionldState.kalloc, bufSize);
+
+    if (floats == true)
+    {
+      if (coords == 2) snprintf(buf, bufSize, "%f,%f", coordV[0], coordV[1]);
+      else             snprintf(buf, bufSize, "%f,%f,%f", coordV[0], coordV[1], coordV[2]);
+    }
+    else
+    {
+      if (coords == 2) snprintf(buf, bufSize, "%d,%d", (int) coordV[0], (int) coordV[1]);
+      else             snprintf(buf, bufSize, "%d,%d,%d", (int) coordV[0], (int) coordV[1], (int) coordV[2]);
+    }
+  }
+  else
+  {
+    int bufSize = kjFastRenderSize(coordinatesP);
+    buf = kaAlloc(&orionldState.kalloc, bufSize);
+    kjFastRender(coordinatesP, buf);
+  }
+
+  coordinatesP->type    = KjString;
+  coordinatesP->value.s = buf;
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelFromGeometry - own module!
+//
+const char* dbModelFromGeometry(char* geometry)
+{
+  if (strcmp(geometry, "Point") == 0)
+    return "point";
+
+  return geometry;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelFromGeorel - own module!
+//
+const char* dbModelFromGeorel(char* georel)
+{
+  char* eq = strstr(georel, "==");
+
+  if (eq != NULL)
+  {
+    *eq = ':';          // Overwrite first '=' with a ':'
+    ++eq;               // Point to second '='
+    while (*eq != 0)    // Shift Left 1 the rest of the string
+    {
+      eq[0] = eq[1];
+      ++eq;
+    }
+  }
+
+  return georel;
 }
 
 
@@ -87,9 +210,9 @@ static KjNode* dbModelFromApiKeyValues(KjNode* kvObjectArray, const char* name)
 //   "watchedAttributes": [ "P2" ],           => "watchedAttributes" => "conditions"
 //   "q": "P2>10",                            => "q" => "expression.q"
 //   "geoQ": {                                => disappears: its children go into "expression"
-//     "geometry": "circle",                  => "geoQ.geometry" => "expression.geometry"
-//     "coordinates": "1,2",                  => "geoQ.coordinates" => "expression.coords"
-//     "georel": "near",                      => "geoQ.georel" => "expression.georel"
+//     "geometry": "Point",                   => "geoQ.geometry" => "expression.geometry"
+//     "coordinates": [1,2],                  => "geoQ.coordinates" => "expression.coords"
+//     "georel": "near;maxDistance==1",       => "geoQ.georel" => "expression.georel"
 //     "geoproperty": "not supported"         => MUST BE ADDED: expression.geoproperty
 //   },
 //   "csf": "not implemented",                => NEW and added to the datamodel
@@ -140,9 +263,9 @@ static KjNode* dbModelFromApiKeyValues(KjNode* kvObjectArray, const char* name)
 //   "expression" : {
 //     "q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
 //     "mq" : "",
-//     "geometry" : "circle",
+//     "geometry" : "point",
 //     "coords" : "1,2",
-//     "georel" : "near"
+//     "georel" : "near;maxDistance:1"
 //   },
 //   "format" : "keyValues"
 // }
@@ -194,8 +317,6 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
   KjNode* watchedAttributesP  = NULL;
   KjNode* isActiveP           = NULL;
 
-  kjTreeLog(apiSubscriptionP, "Incoming");
-  LM_TMP(("subP->lastChild: '%s' (%s)", apiSubscriptionP->lastChild->name, kjValueType(apiSubscriptionP->lastChild->type)));
   //
   // Loop over the patch-tree and modify to make it compatible with the database model for APIv1
   //
@@ -248,15 +369,9 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
       fragmentP->name = (char*) "conditions";
     }
     else if (strcmp(fragmentP->name, "q") == 0)
-    {
       qP = fragmentP;
-      LM_TMP(("Got a 'q': '%s'", qP->value.s));
-    }
     else if (strcmp(fragmentP->name, "mq") == 0)  // Not NGSI-LD, but added in qFix() (orionldPostSubscriptions.cpp)
-    {
       mqP = fragmentP;
-      LM_TMP(("Got an 'mq': '%s'", mqP->value.s));
-    }
     else if (strcmp(fragmentP->name, "geoQ") == 0)
       geoqP = fragmentP;
     else if (strcmp(fragmentP->name, "isActive") == 0)
@@ -272,10 +387,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
       fragmentP->value.s = (fragmentP->value.b == true)? (char*) "active" : (char*) "inactive";
     }
     else if (strcmp(fragmentP->name, "notification") == 0)
-    {
       notificationP = fragmentP;
-      LM_TMP(("Got a notification"));
-    }
     else if ((strcmp(fragmentP->name, "expires") == 0) || (strcmp(fragmentP->name, "expiresAt") == 0))
     {
       fragmentP->name    = (char*) "expiration";
@@ -304,15 +416,35 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
 
   if (geoqP != NULL)
   {
+    KjNode* coordinatesP = kjLookup(geoqP, "coordinates");
+    KjNode* geometryP    = kjLookup(geoqP, "geometry");
+    KjNode* georelP      = kjLookup(geoqP, "georel");
+    KjNode* geopropertyP = kjLookup(geoqP, "geoproperty");
+
     //
-    // As "geoQ" in NGSI-LD Subscription contains 3-4/6 fields of what is "expression" in the DB Model
-    // if present, it is simply renamed to "expression"
+    // As "geoQ" in NGSI-LD Subscription contains many fields (4 out of 6) of what is "expression" in the DB Model
+    // it is simply renamed to "expression" and then 'q' and 'mq' are added to it
     //
     geoqP->name = (char*) "expression";
     expressionP = geoqP;
 
+    // Change Point to point
+    if (geometryP != NULL)
+      geometryP->value.s = (char*) dbModelFromGeometry(geometryP->value.s);
+
+    // near;maxDistance==X => near;maxDistance:X
+    if (georelP != NULL)
+      georelP->value.s = (char*) dbModelFromGeorel(georelP->value.s);
+
+    // Change "coordinates" to "coord", and remove '[]'
+    if (coordinatesP != NULL)  // Can't be NULL !!!
+    {
+      coordinatesP->name = (char*) "coords";
+      if (dbModelFromCoordinates(coordinatesP, "geoQ::coordinates", geometryP) == false)
+        return false;
+    }
+
     // If 'geoproperty' is not there, add it:
-    KjNode* geopropertyP = kjLookup(expressionP, "geoproperty");
     if ((geopropertyP == NULL) && (patch == false))
     {
       geopropertyP = kjString(orionldState.kjsonP, "geoproperty", "");

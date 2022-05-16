@@ -129,10 +129,10 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": "[1,2]",
+    "georel": "near;maxDistance==1",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -170,10 +170,10 @@ payload='{
   "description": "Description of Test subscription 01",
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -213,10 +213,10 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -261,10 +261,10 @@ payload='{
   "watchedAttributes": [ ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -318,10 +318,10 @@ payload='{
   "timeInterval": 12,
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -365,10 +365,10 @@ payload='{
   ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -414,10 +414,10 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -463,10 +463,10 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==5",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,

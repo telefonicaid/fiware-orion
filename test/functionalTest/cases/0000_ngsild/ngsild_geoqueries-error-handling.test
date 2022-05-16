@@ -217,13 +217,13 @@ Date: REGEX(.*)
 02. Non array 'coordinate' in payload for creation - see error
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 176
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)",
-    "title": "Not a JSON Array",
+    "detail": "'coordinates' as string is not a valid JSON Array",
+    "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -293,7 +293,7 @@ Date: REGEX(.*)
 
 {
     "detail": "invalid string for geo type",
-    "title": "invalid geometry",
+    "title": "Invalid geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
