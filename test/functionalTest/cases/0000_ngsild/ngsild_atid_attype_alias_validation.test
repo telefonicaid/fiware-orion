@@ -84,10 +84,10 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
+    "geometry": "Point",
+    "coordinates": "[1,2]",
     "georel": "near",
-    "geoproperty": "not supported"
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,

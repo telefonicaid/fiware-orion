@@ -71,9 +71,9 @@ do
       "watchedAttributes": [ "P2" ],
       "q": "P2>10",
       "geoQ": {
-        "geometry": "circle",
-        "coordinates": "1,2",
-        "georel": "near"
+        "geometry": "Point",
+        "coordinates": "[1,2]",
+        "georel": "near;maxDistance==10"
       },
       "isActive": false,
       "notification": {
@@ -382,7 +382,7 @@ Date: REGEX(.*)
 02. GET subscriptions - see the first 20
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 12441
+Content-Length: 12741
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -406,9 +406,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
@@ -452,9 +455,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
@@ -498,9 +504,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
@@ -544,9 +553,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
@@ -590,9 +602,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
@@ -636,9 +651,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0006",
         "isActive": false,
@@ -682,9 +700,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0007",
         "isActive": false,
@@ -728,9 +749,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0008",
         "isActive": false,
@@ -774,9 +798,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0009",
         "isActive": false,
@@ -820,9 +847,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0010",
         "isActive": false,
@@ -866,9 +896,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0011",
         "isActive": false,
@@ -912,9 +945,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0012",
         "isActive": false,
@@ -958,9 +994,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0013",
         "isActive": false,
@@ -1004,9 +1043,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0014",
         "isActive": false,
@@ -1050,9 +1092,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0015",
         "isActive": false,
@@ -1096,9 +1141,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0016",
         "isActive": false,
@@ -1142,9 +1190,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0017",
         "isActive": false,
@@ -1188,9 +1239,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0018",
         "isActive": false,
@@ -1234,9 +1288,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0019",
         "isActive": false,
@@ -1280,9 +1337,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0020",
         "isActive": false,
@@ -1314,7 +1374,7 @@ Date: REGEX(.*)
 03. GET subscriptions with limit 5 - see the first 5
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 3111
+Content-Length: 3186
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1338,9 +1398,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
@@ -1384,9 +1447,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
@@ -1430,9 +1496,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
@@ -1476,9 +1545,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
@@ -1522,9 +1594,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
@@ -1556,7 +1631,7 @@ Date: REGEX(.*)
 04. GET subscriptions with limit 5 and offset 25, see subs 25-29
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 3111
+Content-Length: 3186
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1580,9 +1655,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0026",
         "isActive": false,
@@ -1626,9 +1704,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0027",
         "isActive": false,
@@ -1672,9 +1753,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0028",
         "isActive": false,
@@ -1718,9 +1802,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0029",
         "isActive": false,
@@ -1764,9 +1851,12 @@ Date: REGEX(.*)
         ],
         "expiresAt": "2028-12-31T10:00:00.000Z",
         "geoQ": {
-            "coordinates": "1,2",
-            "geometry": "circle",
-            "georel": "near"
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
         },
         "id": "urn:ngsi-ld:Subscription:sub0030",
         "isActive": false,

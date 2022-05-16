@@ -44,6 +44,7 @@ extern bool pcheckSubscription
   KjNode**         timeIntervalPP,
   KjNode**         qPP,
   KjNode**         geoqPP,
+  KjNode**         geoCoordinatesP,
   bool             patch
 );
 

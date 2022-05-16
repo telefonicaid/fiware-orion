@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjParse.h"                                     // kjParse
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -47,7 +48,7 @@ static bool pcheckGeoPoint(KjNode* geoPointCoordinatesNodeP)
 
   if (geoPointCoordinatesNodeP->type != KjArray)
   {
-    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array", 400);
+    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be an Array", 400);
     return false;
   }
 
@@ -316,10 +317,10 @@ bool pcheckGeoqCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType)
   //
   // It's either an Array OR A STRING !!!
   //
-  if (coordinatesP->type == KjString)
+  if (coordinatesP->type != KjArray)
   {
-    // FIXME: make sure the coordinates string is correct!
-    return true;
+    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be an Array", 400);
+    return false;
   }
 
   switch (geoType)

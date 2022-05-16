@@ -115,6 +115,8 @@ brokerStart CB
 # 44. Attempt to PATCH the subscription with a POINT whose 'geoQ:coordinates' is an array with four numbers
 # 45. Attempt to PATCH the subscription with a POINT whose 'geoQ:coordinates' is an array with one non-number item
 #
+# Now that I only accept Point as geoQ::geometry, the test cases 46 to 58 are removed - find them in
+# ngsild_subscription_patch_geometry_errors.test.DISABLED
 # 46. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array
 # 47. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array of arrays
 # 48. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array of arrays of arrays
@@ -714,188 +716,6 @@ payload='{
     "geometry": "Point",
     "coordinates": [ 1, "b" ],
     "georel": "near;maxDistance==100"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "46. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array"
-echo "============================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": 1,
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "47. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array of arrays"
-echo "======================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ 1 ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "48. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array of arrays of arrays"
-echo "================================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ [ 1 ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "49. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has a point with only one number"
-echo "=============================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ [ [ 0, 0 ], [ 0, 1 ], [ -1 ], [ 0, 0 ]  ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "50. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has a point with four numbers"
-echo "==========================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ [ [ 0, 0 ], [ 0, 1 ], [ -1, 0, 1, 2 ], [ 0, 0 ]  ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "51. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has a point with a non-number item"
-echo "================================================================================================================"
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ [ [ 0, 0 ], [ 0, 1 ], [ -1, true ], [ 0, 0 ]  ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "52. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has only three points"
-echo "==================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ [ [ 0, 0 ], [ 0, 1 ], [ -1, 0 ] ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "53. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' aren't a closed circle"
-echo "===================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "Polygon",
-    "coordinates": [ [ [ 0, 0 ], [ 0, 1 ], [ -1, 0 ], [ 0, 1 ] ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "54. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' is not an array"
-echo "================================================================================================"
-payload='{
-  "geoQ": {
-    "geometry": "LineString",
-    "coordinates": false,
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "55. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' is not an array of arrays"
-echo "=========================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "LineString",
-    "coordinates": [ 0, 0 ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "56. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' has a point with only one number"
-echo "================================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "LineString",
-    "coordinates": [ [ 0 ], [ 0, 1 ], [ -1, 0 ], [ 0, 1 ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "57. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' has a point with four numbers"
-echo "=============================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "LineString",
-    "coordinates": [ [ 0, 0, 0, 0 ], [ 0, 1 ], [ -1, 0 ], [ 0, 1 ] ],
-    "georel": "within"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "58. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' has a point with a non-number item"
-echo "==================================================================================================================="
-payload='{
-  "geoQ": {
-    "geometry": "LineString",
-    "coordinates": [ [ 0, 0 ], [ 0, 1 ], [ -1, "0" ], [ 0, 1 ] ],
-    "georel": "within"
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
@@ -1812,13 +1632,13 @@ Date: REGEX(.*)
 35. Attempt to PATCH the subscription with a 'geoQ:geometry' that is an empty string
 ====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geometry cannot be an empty string",
-    "title": "Invalid Payload Data",
+    "detail": "empty string",
+    "title": "Invalid geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1826,13 +1646,13 @@ Date: REGEX(.*)
 36. Attempt to PATCH the subscription with a 'geoQ:geometry' that has an invalid value
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid geometry",
-    "title": "Invalid Payload Data",
+    "detail": "Punto",
+    "title": "Invalid geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1882,13 +1702,13 @@ Date: REGEX(.*)
 40. Attempt to PATCH the subscription with a 'geoQ:coordinates' that is an empty array
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid geometry",
-    "title": "Invalid Payload Data",
+    "detail": "Punto",
+    "title": "Invalid geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1951,188 +1771,6 @@ Date: REGEX(.*)
 
 45. Attempt to PATCH the subscription with a POINT whose 'geoQ:coordinates' is an array with one non-number item
 ================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 165
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-46. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array
-=============================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 177
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)",
-    "title": "Invalid Data Type",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-47. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array of arrays
-=======================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 180
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-48. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' is not an array of arrays of arrays
-=================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 191
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-49. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has a point with only one number
-==============================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 191
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-50. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has a point with four numbers
-===========================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 191
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-51. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has a point with a non-number item
-================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 191
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-52. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' has only three points
-===================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 136
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "A Polygon must have at least 4 points",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-53. Attempt to PATCH the subscription with a POLYGON whose 'geoQ:coordinates' aren't a closed circle
-====================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 162
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "In a Polygon, the first and the last position must be identical",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-54. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' is not an array
-================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 177
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)",
-    "title": "Invalid Data Type",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-55. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' is not an array of arrays
-==========================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 174
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-56. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' has a point with only one number
-=================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 180
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-57. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' has a point with four numbers
-==============================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 180
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
-    "title": "Invalid GeoJSON",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-58. Attempt to PATCH the subscription with a LINESTRING whose 'geoQ:coordinates' has a point with a non-number item
-===================================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 165
 Content-Type: application/json

@@ -46,9 +46,9 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2==1",
   "geoQ": {
-    "geometry": "valid geometry",
+    "geometry": "Point",
     "coordinates": [ 1, 2 ],
-    "georel": "valid georel",
+    "georel": "near;maxDistance==12",
     "geoproperty": "not supported"
   },
   "csf": "not implemented",
@@ -129,9 +129,9 @@ MongoDB server version: REGEX(.*)
 	"expression" : {
 		"q" : "http://example=org/P2==1",
 		"mq" : "",
-		"geometry" : "valid geometry",
+		"geometry" : "point",
 		"coords" : "1,2",
-		"georel" : "valid georel",
+		"georel" : "near;maxDistance:12",
 		"geoproperty" : "not supported"
 	},
 	"format" : "keyValues"

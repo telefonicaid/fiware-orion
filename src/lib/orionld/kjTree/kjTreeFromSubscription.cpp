@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdio.h>                                               // snprintf
+#include <string.h>                                              // strstr
 #include <strings.h>                                             // bzero
 #include <string>                                                // std::string
 #include <map>                                                   // std::map
@@ -57,13 +59,11 @@ extern "C"
 //
 // coordinateTransform -
 //
-void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
+void coordinateTransform(OrionldGeoJsonType geometry, char* to, int toLen, char* from)
 {
-  if ((strcmp(geometry, "Point") == 0) || (strcmp(geometry, "Polygon") == 0))
-  {
+  if (geometry == GeoJsonPoint)
     snprintf(to, toLen, "[%s]", from);
-    return;
-  }
+
 #if 0
   int toIx = 0;
 
@@ -154,9 +154,8 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
   // entities
   size = subscriptionP->subject.entities.size();
-  if (size != 0)
+  if (size > 0)
   {
-    LM_TMP(("Got an entities array of %d items", size));
     arrayP = kjArray(orionldState.kjsonP, "entities");
 
     for (ix = 0; ix < size; ix++)
@@ -216,12 +215,11 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
   // q
   const char* q = (subscriptionP->ldQ != "")? subscriptionP->ldQ.c_str() : subscriptionP->subject.condition.expression.q.c_str();
-  LM_TMP(("KZ: q == '%s'", q));
+
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
     qAliasCompact(nodeP, true);
-    LM_TMP(("compacted q == '%s'", nodeP->value.s));
     kjChildAdd(topP, nodeP);
   }
 
@@ -229,12 +227,25 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   // geoQ
   if (subscriptionP->subject.condition.expression.geometry != "")
   {
-    objectP = kjObject(orionldState.kjsonP, "geoQ");
+    char*               geometryStringV2 = (char*) subscriptionP->subject.condition.expression.geometry.c_str();
+    char*               geometryStringLD = (char*) "NoGeometry";
+    OrionldGeoJsonType  geometry         = GeoJsonNoType;
 
-    nodeP = kjString(orionldState.kjsonP, "geometry", subscriptionP->subject.condition.expression.geometry.c_str());
+    //
+    // The geometry can only be "point" - which is translated from v2 to LD to "Point"
+    // However, let's make sure ...
+    //
+    if (strcmp(geometryStringV2, "point") == 0)
+    {
+      geometry = GeoJsonPoint;
+      geometryStringLD = (char*) "Point";
+    }
+
+    objectP = kjObject(orionldState.kjsonP, "geoQ");
+    nodeP   = kjString(orionldState.kjsonP, "geometry", geometryStringLD);
     kjChildAdd(objectP, nodeP);
 
-    if ((subscriptionP->subject.condition.expression.geometry == "Point") || (subscriptionP->subject.condition.expression.geometry == "Polygon"))
+    if (geometry == GeoJsonPoint)
     {
       //
       // The "coordinates" have been saved as a string but should be a json array.
@@ -245,7 +256,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
       char*    coordinateVector    = (char*) malloc(coordinateVectorLen);
       KjNode*  coordValueP;
 
-      coordinateTransform(subscriptionP->subject.condition.expression.geometry.c_str(), coordinateVector, coordinateVectorLen, coordinateString);
+      coordinateTransform(geometry, coordinateVector, coordinateVectorLen, coordinateString);
 
       coordValueP = kjParse(orionldState.kjsonP, coordinateVector);
       free(coordinateVector);
@@ -266,7 +277,20 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
       kjChildAdd(objectP, nodeP);
     }
 
-    nodeP = kjString(orionldState.kjsonP, "georel", subscriptionP->subject.condition.expression.georel.c_str());
+    // georel: "near;mxxDistance:NUM" => "near;mxxDistance==NUM"
+    char* georel           = (char*) subscriptionP->subject.condition.expression.georel.c_str();
+    char* distanceP        = strstr(georel, "Distance:");
+    char* adjustedGeorelP  = georel;
+    char  adjustedGeorelBuf[64];
+    if (distanceP != NULL)
+    {
+      int distance = atoi(&distanceP[9]);
+
+      distanceP[8] = 0;  // NULL out the ':'
+      snprintf(adjustedGeorelBuf, sizeof(adjustedGeorelBuf) - 1, "%s==%d", georel, distance);
+      adjustedGeorelP = adjustedGeorelBuf;
+    }
+    nodeP = kjString(orionldState.kjsonP, "georel", adjustedGeorelP);
     kjChildAdd(objectP, nodeP);
 
     if (subscriptionP->subject.condition.expression.geoproperty != "")
@@ -295,7 +319,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     if ((subscriptionP->expires > 0) && (subscriptionP->expires < orionldState.requestTime))
       cSubP->status = (char*) "expired";
 
-    LM_TMP(("status: '%s'", cSubP->status.c_str()));
     nodeP = kjString(orionldState.kjsonP, "status", cSubP->status.c_str());
     kjChildAdd(topP, nodeP);
 
@@ -458,7 +481,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     }
 
     // notification::lastFailure - taken from sub cache
-    LM_TMP(("Getting lastFailure from sub cache"));
     if (cSubP->lastFailure > 0)
     {
       numberToDate(cSubP->lastFailure, dateTime, sizeof(dateTime));
@@ -490,8 +512,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   else
   {
     // status
-    LM_TMP(("lastFailure: %f", subscriptionP->notification.lastFailure));
-    LM_TMP(("lastSuccess: %f", subscriptionP->notification.lastSuccess));
     if (subscriptionP->notification.lastFailure > subscriptionP->notification.lastSuccess)
       nodeP = kjString(orionldState.kjsonP, "status", "failed");
     else

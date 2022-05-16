@@ -63,10 +63,10 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
+    "geometry": "Point",
     "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "georel": "near;maxDistance==100",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "isActive": false,
@@ -136,7 +136,7 @@ Date: REGEX(.*)
 02. GET subscription 'http://a.b.c/subs/sub01' and see it
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 910
+Content-Length: 940
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -165,10 +165,13 @@ Date: REGEX(.*)
   ],
   "q": "P2>10",
   "geoQ": {
-    "geometry": "circle",
-    "coordinates": "1,2",
-    "georel": "near",
-    "geoproperty": "not supported"
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==100",
+    "geoproperty": "location"
   },
   "csf": "not implemented",
   "status": "paused",
@@ -245,10 +248,10 @@ MongoDB server version: REGEX(.*)
 	"expression" : {
 		"q" : "http://example=org/P2>10",
 		"mq" : "",
-		"geometry" : "circle",
+		"geometry" : "point",
 		"coords" : "1,2",
-		"georel" : "near",
-		"geoproperty" : "not supported"
+		"georel" : "near;maxDistance:100",
+		"geoproperty" : "location"
 	},
 	"format" : "keyValues"
 }

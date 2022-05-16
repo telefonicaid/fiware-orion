@@ -72,7 +72,7 @@ payload='{
   "q": "P2>10|P1==7",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": "1,2",
+    "coordinates": "[1,2]",
     "georel": "near;maxDistance==1000",
     "geoproperty": "location"
   },
@@ -194,7 +194,7 @@ payload='{
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": "1,2",
+    "coordinates": "[1,2]",
     "georel": "near;minDistance==50",
     "geoproperty": "location6"
   },
@@ -242,7 +242,7 @@ payload='{
   "q": "P2>10",
   "geoQ": {
     "geometry": "circle",
-    "coordinates": "1,2",
+    "coordinates": "[1,2]",
     "georel": "near",
     "geoproperty": "not supported"
   },
@@ -289,7 +289,7 @@ payload='{
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": "1,2",
+    "coordinates": "[1,2]",
     "georel": "near;maxDistance==50",
     "geoproperty": "localtion8"
   },
@@ -422,9 +422,9 @@ MongoDB server version: REGEX(.*)
 	],
 	"ldQ" : "P2>10|P1==7",
 	"expression" : {
-		"geometry" : "Point",
+		"geometry" : "point",
 		"coords" : "1,2",
-		"georel" : "near;maxDistance==1000",
+		"georel" : "near;maxDistance:1000",
 		"geoproperty" : "location",
 		"q" : "P;!P",
 		"mq" : "P.P;!P.P"

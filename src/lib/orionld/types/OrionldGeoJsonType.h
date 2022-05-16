@@ -30,7 +30,7 @@
 
 // -----------------------------------------------------------------------------
 //
-// OrionldGeoJsonType -
+// OrionldGeoJsonType - change name as this is the "geometry"
 //
 typedef enum OrionldGeoJsonType
 {

@@ -56,6 +56,7 @@ bool pcheckSubscription
   KjNode**         timeIntervalPP,
   KjNode**         qPP,
   KjNode**         geoqPP,
+  KjNode**         geoCoordinatesPP,
   bool             patch
 )
 {
@@ -158,7 +159,7 @@ bool pcheckSubscription
       DUPLICATE_CHECK(geoqP, "geoQ", nodeP);
       OBJECT_CHECK(nodeP, "geoQ");
       EMPTY_OBJECT_CHECK(nodeP, "geoQ");
-      if (pcheckGeoQ(nodeP, true) == false)  // true: convert coordinates from array to string
+      if (pcheckGeoQ(nodeP, geoCoordinatesPP, true) == false)
         return false;
       *geoqPP = geoqP;
     }

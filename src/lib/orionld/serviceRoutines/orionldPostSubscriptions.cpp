@@ -34,6 +34,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjChildAdd, ...
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "common/globals.h"                                    // parse8601Time
@@ -76,7 +77,7 @@ static bool orionldPostSubscriptionsWithMongoBackend(void)
   std::string          subId;
   OrionError           oError;
 
-  LM_TMP(("In old PostSubscription function - using mongoBackend"));
+  LM_TMP(("KZ: In old POST Subscription function - using mongoBackend"));
 
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
@@ -284,17 +285,29 @@ bool orionldPostSubscriptions(void)
   if (experimental == false)
     return orionldPostSubscriptionsWithMongoBackend();  // this will be removed!! (after thorough testing)
 
-  KjNode*  subP           = orionldState.requestTree;
-  KjNode*  subIdP         = orionldState.payloadIdNode;
-  KjNode*  endpointP      = NULL;
-  KjNode*  qNode          = NULL;
-  KjNode*  uriP           = NULL;
-  KjNode*  notifierInfoP  = NULL;
-  QNode*   qTree          = NULL;
-  char*    qText          = NULL;
+  KjNode*  subP            = orionldState.requestTree;
+  KjNode*  subIdP          = orionldState.payloadIdNode;
+  KjNode*  endpointP       = NULL;
+  KjNode*  qNode           = NULL;
+  KjNode*  uriP            = NULL;
+  KjNode*  notifierInfoP   = NULL;
+  KjNode*  geoCoordinatesP = NULL;
+  QNode*   qTree           = NULL;
+  char*    qText           = NULL;
   char*    subId;
+  bool     b;
 
-  if (pCheckSubscription(subP, orionldState.payloadIdNode, orionldState.payloadTypeNode, &endpointP, &qNode, &qTree, &qText, &uriP, &notifierInfoP) == false)
+  b = pCheckSubscription(subP,
+                         orionldState.payloadIdNode,
+                         orionldState.payloadTypeNode,
+                         &endpointP,
+                         &qNode,
+                         &qTree,
+                         &qText,
+                         &uriP,
+                         &notifierInfoP,
+                         &geoCoordinatesP);
+  if (b == false)
   {
     if (qTree != NULL)
       qRelease(qTree);
@@ -460,6 +473,9 @@ bool orionldPostSubscriptions(void)
 
   orionldState.httpStatusCode = 201;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subIdP->value.s);
+
+  // geoCoords to cached sub;
+  cSubP->geoCoordinatesP = (geoCoordinatesP != NULL)? kjClone(NULL, geoCoordinatesP) : NULL;
 
   return true;
 }

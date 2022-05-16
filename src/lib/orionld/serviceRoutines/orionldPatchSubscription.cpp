@@ -31,6 +31,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
 #include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjFree.h"                                      // kjFree
 #include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjRender.h"                                    // kjFastRender
 }
@@ -439,7 +440,7 @@ static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* it
 //
 // subCacheItemUpdate -
 //
-static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionId, KjNode* subscriptionTree)
+static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionId, KjNode* subscriptionTree, KjNode* geoCoordinatesP)
 {
   CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subscriptionId);
   bool                r     = true;
@@ -450,16 +451,20 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
   cacheSemTake(__FUNCTION__, "Updating a cached subscription");
   subCacheState = ScsSynchronizing;
 
+  if (geoCoordinatesP != NULL)
+  {
+    if (cSubP->geoCoordinatesP != NULL)
+      kjFree(cSubP->geoCoordinatesP);
+    cSubP->geoCoordinatesP = kjClone(NULL, geoCoordinatesP);
+  }
+
   for (KjNode* itemP = subscriptionTree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if ((strcmp(itemP->name, "subscriptionName") == 0) || (strcmp(itemP->name, "name") == 0))
-    {
-      // If v1.1-1.3? give error if "subscriptionName" ?
-      // If > v1.3?   give error if "name"             ?
       cSubP->name = itemP->value.s;
-    }
     else if (strcmp(itemP->name, "description") == 0)
     {
+      //
       // The description is only stored in the database ...
       //
       // cSubP->description = itemP->value.s;
@@ -577,8 +582,9 @@ bool orionldPatchSubscription(void)
   KjNode* timeIntervalNodeP      = NULL;
   KjNode* qP                     = NULL;
   KjNode* geoqP                  = NULL;
+  KjNode* geoCoordinatesP        = NULL;
 
-  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP, true) == false)
+  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP, &geoCoordinatesP, true) == false)
   {
     LM_E(("pcheckSubscription FAILED"));
     return false;
@@ -681,7 +687,7 @@ bool orionldPatchSubscription(void)
   }
 
   // Modify the subscription in the subscription cache
-  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody) == false)
+  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP) == false)
     LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
 
   // All OK? 204 No Content

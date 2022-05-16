@@ -41,6 +41,16 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// dbModelFromGeorel   - from dbModelFromApiSubscription.cpp - own module!
+// dbModelFromGeometry - from dbModelFromApiSubscription.cpp - own module!
+//
+extern const char* dbModelFromGeorel(char* georel);
+extern const char* dbModelFromGeometry(char* geometry);
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeToSubscriptionExpression -
 //
 bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subExpressionP)
@@ -102,29 +112,50 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     return false;
   }
 
+  //
+  // Subscriptions only support "Point"
+  //
+  if (strcmp(geometryP, "Point") != 0)
+  {
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Subscriptions only support Point for geometry (right now)", 501);
+    return false;
+  }
+
+  char  coords[512];  // 512 should be enough for most cases - if not, kaAlloc
+  char* coordsP = NULL;
+
   if (coordinatesNodeP->type == KjArray)
   {
-    char  coords[512];  // 512 should be enough for most cases - if not, kaAlloc
-    char* coordsString   = coords;
-    int   coordinatesLen = kjFastRenderSize(coordinatesNodeP);
+    int coordinatesLen = kjFastRenderSize(coordinatesNodeP);
 
     if (coordinatesLen > 512)
-      coordsString = kaAlloc(&orionldState.kalloc, coordinatesLen);
+      coordsP = kaAlloc(&orionldState.kalloc, coordinatesLen);
+    else
+      coordsP = coords;
 
-    //
-    // We have a little problem here ...
-    // SubscriptionExpression::coords is a std::string in APIv2.
-    // NGSI-LD needs it to be able to be an array.
-    // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
-    //
-    kjFastRender(coordinatesNodeP, coordsString);
-    coordsString[strlen(coordsString) - 1] = 0;       // Removing last ']'
-    subExpressionP->coords = &coordsString[1];        // Removing first '['
+    kjFastRender(coordinatesNodeP, coordsP);
   }
-  else
-    subExpressionP->coords = coordinatesNodeP->value.s;
+  else  // it's a String
+    coordsP = coordinatesNodeP->value.s;
 
-  subExpressionP->geometry    = geometryP;
+  //
+  // The coordinates are stored in the DB as a String.
+  // That's why the Array was coinverted to a String.
+  // Furthermore, the coordinates are stored in the DB without '[]' - so the brackets must be removed
+  //
+  if (coordsP[0] == '[')
+  {
+    coordsP = &coordsP[1];             // Removing first '['
+    coordsP[strlen(coordsP) - 1] = 0;  // Removing last ']'
+  }
+
+  subExpressionP->coords = coordsP;
+
+  // Database Model: "near;maxDistance==10" => "near;maxDistance:10"
+  if (strncmp(georelP, "near;", 5) == 0)
+    dbModelFromGeorel(georelP);
+
+  subExpressionP->geometry    = dbModelFromGeometry(geometryP);
   subExpressionP->georel      = georelP;
   subExpressionP->geoproperty = (geopropertyP != NULL)? geopropertyP : "";
 
