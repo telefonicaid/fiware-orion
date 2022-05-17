@@ -56,7 +56,6 @@ struct HttpInfo
   MimeType                            mimeType;
   MqttInfo                            mqtt;
   std::vector<KeyValue*>              notifierInfo;
-  std::vector<KeyValue*>              receiverInfo;
 #endif
   HttpInfo();
   explicit HttpInfo(const std::string& _url);

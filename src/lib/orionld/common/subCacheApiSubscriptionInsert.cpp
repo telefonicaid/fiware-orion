@@ -260,8 +260,7 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
           KjNode* keyP   = kjLookup(riP, "key");
           KjNode* valueP = kjLookup(riP, "value");
 
-          if ((keyP != NULL) && (valueP != NULL))
-            keyValueAdd(&cSubP->httpInfo.receiverInfo, keyP->value.s, valueP->value.s);
+          cSubP->httpInfo.headers[keyP->value.s] = valueP->value.s;
         }
       }
 
@@ -269,10 +268,13 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
       {
         for (KjNode* niP = notifierInfoP->value.firstChildP; niP != NULL; niP = niP->next)
         {
-          KjNode* keyP   = kjLookup(niP, "key");
-          KjNode* valueP = kjLookup(niP, "value");
+          KjNode*   keyP   = kjLookup(niP, "key");
+          KjNode*   valueP = kjLookup(niP, "value");
+          KeyValue* kvP    = keyValueLookup(cSubP->httpInfo.notifierInfo, keyP->value.s);
 
-          if ((keyP != NULL) && (valueP != NULL))
+          if (kvP != NULL)
+            strncpy(kvP->value, valueP->value.s, sizeof(kvP->value) - 1);
+          else
             keyValueAdd(&cSubP->httpInfo.notifierInfo, keyP->value.s, valueP->value.s);
         }
       }

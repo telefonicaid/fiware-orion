@@ -236,7 +236,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 487
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 {
     "entities": [
         {
-            "type": "AirQualityObserved"
+            "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
         },
         {
             "type": "AirQualityObserved2"
@@ -332,7 +332,7 @@ Notifications: 1
 07. GET the subscription, without context => AirQualityObserved as longname
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 505
+Content-Length: 487
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -381,9 +381,9 @@ Date: REGEX(.*)
 07. GET the subscription, with context => AirQualityObserved as shortname
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 449
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

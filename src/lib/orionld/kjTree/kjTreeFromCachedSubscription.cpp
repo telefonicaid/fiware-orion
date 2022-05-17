@@ -92,7 +92,7 @@ KjNode* dbModelToCoordinates(const char* coordinatesString)
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromCachedSubscription - in NGSI-LD API format 
+// kjTreeFromCachedSubscription - in NGSI-LD API format
 //
 KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, bool contextInBody)
 {
@@ -176,7 +176,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
       char* shortType = orionldContextItemAliasLookup(orionldState.contextP, eiP->entityType.c_str(), NULL, NULL);
       nodeP = kjString(orionldState.kjsonP, "type", shortType);
       NULL_CHECK(nodeP);
-      
+
       kjChildAdd(eObjectP, nodeP);
 
       // Add the entitySelector object to the entities array
@@ -239,7 +239,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
     }
 
     LM_TMP(("KZ: .value-fixed qText: '%s'", nodeP->value.s));
-    
+
     NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
   }
@@ -346,19 +346,21 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   kjChildAdd(endpointNodeP, nodeP);
 
   // notification::endpoint::receiverInfo
-  int ris = cSubP->httpInfo.receiverInfo.size();
+  int ris = cSubP->httpInfo.headers.size();
   if (ris > 0)
   {
     KjNode* ri = kjArray(orionldState.kjsonP, "receiverInfo");
     NULL_CHECK(ri);
 
-    for (int ix = 0; ix < ris; ix++)
+    for (std::map<std::string, std::string>::const_iterator it = cSubP->httpInfo.headers.begin(); it != cSubP->httpInfo.headers.end(); ++it)
     {
-      KjNode* kvP  = kjObject(orionldState.kjsonP, NULL);
+      const char* key   = it->first.c_str();
+      const char* value = it->second.c_str();
+      KjNode*     kvP   = kjObject(orionldState.kjsonP, NULL);
       NULL_CHECK(kvP);
-      KjNode* keyP = kjString(orionldState.kjsonP, "key",   cSubP->httpInfo.receiverInfo[ix]->key);
+      KjNode* keyP      = kjString(orionldState.kjsonP, "key",   key);
       NULL_CHECK(keyP);
-      KjNode* valueP = kjString(orionldState.kjsonP, "value", cSubP->httpInfo.receiverInfo[ix]->value);
+      KjNode* valueP    = kjString(orionldState.kjsonP, "value", value);
       NULL_CHECK(valueP);
 
       kjChildAdd(kvP, keyP);
@@ -469,7 +471,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   }
 
   kjChildAdd(sP, notificationNodeP);
-  
+
   //
   // expiresAt
   //

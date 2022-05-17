@@ -547,7 +547,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   // Headers from Subscription::notification::endpoint::receiverInfo+headers (or custom notification in NGSIv2 ...)
   //
   headers += mAltP->subP->httpInfo.headers.size();
-  headers += mAltP->subP->httpInfo.receiverInfo.size();
 
 
   // Let's limit the number of headers to 50
@@ -675,21 +674,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ++headerIx;
     LM_TMP(("HttpInfo header '%s': '%s'", key, value));
   }
-
-  // receiverInfo
-  for (unsigned int ix = 0; ix < mAltP->subP->httpInfo.receiverInfo.size(); ix++)
-  {
-    const char* key    = mAltP->subP->httpInfo.receiverInfo[ix]->key;
-    const char* value  = mAltP->subP->httpInfo.receiverInfo[ix]->value;
-    int         len    = strlen(key) + strlen(value) + 10;
-    char*       buf    = kaAlloc(&orionldState.kalloc, len);
-
-    ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
-    ioVec[headerIx].iov_base = buf;
-    ++headerIx;
-    LM_TMP(("HttpInfo receiverInfo '%s': '%s'", key, value));
-  }
-
 
   // Empty line delimiting HTTP Headers and Payload Body
   ioVec[headerIx].iov_base = (void*) "\r\n";

@@ -628,16 +628,6 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->qP = NULL;
   }
 
-  for (int ix = 0; ix < (int) cSubP->httpInfo.receiverInfo.size(); ++ix)
-  {
-    if (cSubP->httpInfo.receiverInfo[ix] != NULL)
-    {
-      LM_TMP(("VE: Freeing Key-Value Pair at %p (receiverInfo)", cSubP->httpInfo.receiverInfo[ix]));
-      free(cSubP->httpInfo.receiverInfo[ix]);
-      cSubP->httpInfo.receiverInfo[ix] = NULL;
-    }
-  }
-
   for (int ix = 0; ix < (int) cSubP->httpInfo.notifierInfo.size(); ++ix)
   {
     if (cSubP->httpInfo.notifierInfo[ix] != NULL)
