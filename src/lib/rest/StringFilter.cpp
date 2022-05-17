@@ -306,12 +306,12 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   else  // NOT the first item
   {
     if ((vType == SfvtString) && (valueType == SfvtStringList))
-    {
-      // by the moment, null in list is supported only for the string case
+    {      
       stringList.push_back(str);
     }
     else if ((vType == SfvtNull) && (valueType == SfvtStringList))
     {
+      // by the moment, null in list is supported only for the string case
       nullInList = true;
     }
     else if ((vType == SfvtDate) && (valueType == SfvtDateList))
