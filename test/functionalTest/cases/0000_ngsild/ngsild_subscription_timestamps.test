@@ -294,7 +294,7 @@ bye
 03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 469
+Content-Length: 481
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -311,7 +311,6 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
-    "name": "Test subscription 01",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -321,6 +320,7 @@ Date: REGEX(.*)
         "status": "ok"
     },
     "status": "active",
+    "subscriptionName": "Test subscription 01",
     "throttling": 1.459,
     "type": "Subscription"
 }
@@ -376,7 +376,7 @@ Date: REGEX(.*)
 07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 570
+Content-Length: 582
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -393,7 +393,6 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
-    "name": "Test subscription 01",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -406,6 +405,7 @@ Date: REGEX(.*)
         "timesSent": 2
     },
     "status": "active",
+    "subscriptionName": "Test subscription 01",
     "throttling": 1.459,
     "type": "Subscription"
 }
@@ -424,7 +424,7 @@ Date: REGEX(.*)
 09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 583
+Content-Length: 595
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -441,7 +441,6 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
-    "name": "New Name for Test subscription 01",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -454,6 +453,7 @@ Date: REGEX(.*)
         "timesSent": 2
     },
     "status": "active",
+    "subscriptionName": "New Name for Test subscription 01",
     "throttling": 1.459,
     "type": "Subscription"
 }
@@ -477,7 +477,7 @@ Date: REGEX(.*)
 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 624
+Content-Length: 636
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -494,7 +494,6 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
-    "name": "New Name for Test subscription 01",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -508,6 +507,7 @@ Date: REGEX(.*)
         "timesSent": 3
     },
     "status": "active",
+    "subscriptionName": "New Name for Test subscription 01",
     "throttling": 1.459,
     "type": "Subscription"
 }

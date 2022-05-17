@@ -382,7 +382,7 @@ Date: REGEX(.*)
 02. GET subscriptions - see the first 20
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 12741
+Content-Length: 12981
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -415,7 +415,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
-        "name": "Test subscription 0001",
         "notification": {
             "attributes": [
                 "P1",
@@ -431,6 +430,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0001",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -464,7 +464,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
-        "name": "Test subscription 0002",
         "notification": {
             "attributes": [
                 "P1",
@@ -480,6 +479,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0002",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -513,7 +513,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
-        "name": "Test subscription 0003",
         "notification": {
             "attributes": [
                 "P1",
@@ -529,6 +528,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0003",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -562,7 +562,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
-        "name": "Test subscription 0004",
         "notification": {
             "attributes": [
                 "P1",
@@ -578,6 +577,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0004",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -611,7 +611,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
-        "name": "Test subscription 0005",
         "notification": {
             "attributes": [
                 "P1",
@@ -627,6 +626,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0005",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -660,7 +660,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0006",
         "isActive": false,
-        "name": "Test subscription 0006",
         "notification": {
             "attributes": [
                 "P1",
@@ -676,6 +675,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0006",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -709,7 +709,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0007",
         "isActive": false,
-        "name": "Test subscription 0007",
         "notification": {
             "attributes": [
                 "P1",
@@ -725,6 +724,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0007",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -758,7 +758,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0008",
         "isActive": false,
-        "name": "Test subscription 0008",
         "notification": {
             "attributes": [
                 "P1",
@@ -774,6 +773,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0008",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -807,7 +807,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0009",
         "isActive": false,
-        "name": "Test subscription 0009",
         "notification": {
             "attributes": [
                 "P1",
@@ -823,6 +822,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0009",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -856,7 +856,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0010",
         "isActive": false,
-        "name": "Test subscription 0010",
         "notification": {
             "attributes": [
                 "P1",
@@ -872,6 +871,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0010",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -905,7 +905,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0011",
         "isActive": false,
-        "name": "Test subscription 0011",
         "notification": {
             "attributes": [
                 "P1",
@@ -921,6 +920,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0011",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -954,7 +954,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0012",
         "isActive": false,
-        "name": "Test subscription 0012",
         "notification": {
             "attributes": [
                 "P1",
@@ -970,6 +969,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0012",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1003,7 +1003,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0013",
         "isActive": false,
-        "name": "Test subscription 0013",
         "notification": {
             "attributes": [
                 "P1",
@@ -1019,6 +1018,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0013",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1052,7 +1052,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0014",
         "isActive": false,
-        "name": "Test subscription 0014",
         "notification": {
             "attributes": [
                 "P1",
@@ -1068,6 +1067,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0014",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1101,7 +1101,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0015",
         "isActive": false,
-        "name": "Test subscription 0015",
         "notification": {
             "attributes": [
                 "P1",
@@ -1117,6 +1116,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0015",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1150,7 +1150,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0016",
         "isActive": false,
-        "name": "Test subscription 0016",
         "notification": {
             "attributes": [
                 "P1",
@@ -1166,6 +1165,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0016",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1199,7 +1199,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0017",
         "isActive": false,
-        "name": "Test subscription 0017",
         "notification": {
             "attributes": [
                 "P1",
@@ -1215,6 +1214,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0017",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1248,7 +1248,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0018",
         "isActive": false,
-        "name": "Test subscription 0018",
         "notification": {
             "attributes": [
                 "P1",
@@ -1264,6 +1263,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0018",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1297,7 +1297,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0019",
         "isActive": false,
-        "name": "Test subscription 0019",
         "notification": {
             "attributes": [
                 "P1",
@@ -1313,6 +1312,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0019",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1346,7 +1346,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0020",
         "isActive": false,
-        "name": "Test subscription 0020",
         "notification": {
             "attributes": [
                 "P1",
@@ -1362,6 +1361,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0020",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1374,7 +1374,7 @@ Date: REGEX(.*)
 03. GET subscriptions with limit 5 - see the first 5
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 3186
+Content-Length: 3246
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1407,7 +1407,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
-        "name": "Test subscription 0001",
         "notification": {
             "attributes": [
                 "P1",
@@ -1423,6 +1422,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0001",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1456,7 +1456,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
-        "name": "Test subscription 0002",
         "notification": {
             "attributes": [
                 "P1",
@@ -1472,6 +1471,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0002",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1505,7 +1505,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
-        "name": "Test subscription 0003",
         "notification": {
             "attributes": [
                 "P1",
@@ -1521,6 +1520,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0003",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1554,7 +1554,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
-        "name": "Test subscription 0004",
         "notification": {
             "attributes": [
                 "P1",
@@ -1570,6 +1569,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0004",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1603,7 +1603,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
-        "name": "Test subscription 0005",
         "notification": {
             "attributes": [
                 "P1",
@@ -1619,6 +1618,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0005",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1631,7 +1631,7 @@ Date: REGEX(.*)
 04. GET subscriptions with limit 5 and offset 25, see subs 25-29
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 3186
+Content-Length: 3246
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1664,7 +1664,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0026",
         "isActive": false,
-        "name": "Test subscription 0026",
         "notification": {
             "attributes": [
                 "P1",
@@ -1680,6 +1679,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0026",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1713,7 +1713,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0027",
         "isActive": false,
-        "name": "Test subscription 0027",
         "notification": {
             "attributes": [
                 "P1",
@@ -1729,6 +1728,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0027",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1762,7 +1762,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0028",
         "isActive": false,
-        "name": "Test subscription 0028",
         "notification": {
             "attributes": [
                 "P1",
@@ -1778,6 +1777,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0028",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1811,7 +1811,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0029",
         "isActive": false,
-        "name": "Test subscription 0029",
         "notification": {
             "attributes": [
                 "P1",
@@ -1827,6 +1826,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0029",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [
@@ -1860,7 +1860,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub0030",
         "isActive": false,
-        "name": "Test subscription 0030",
         "notification": {
             "attributes": [
                 "P1",
@@ -1876,6 +1875,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Test subscription 0030",
         "throttling": 5,
         "type": "Subscription",
         "watchedAttributes": [

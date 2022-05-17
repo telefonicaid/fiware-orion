@@ -192,6 +192,7 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "concise")       == 0)  orionldState.uriParamOptions.concise       = true;
       else if (strcmp(optionStart, "normalized")    == 0)  orionldState.uriParamOptions.normalized    = true;
       else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
+      else if (strcmp(optionStart, "fromDb")        == 0)  orionldState.uriParamOptions.fromDb        = true;
       else if (strcmp(optionStart, "append")        == 0)  orionldState.uriParamOptions.append        = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "count")         == 0)  orionldState.uriParams.count               = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "values")        == 0)  orionldState.uriParamOptions.values        = true;  // NGSIv2 compatibility

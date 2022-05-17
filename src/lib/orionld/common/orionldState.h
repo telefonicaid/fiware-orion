@@ -91,18 +91,19 @@ struct OrionLdRestService;
 //
 typedef struct OrionldUriParamOptions
 {
-  bool sysAttrs;
-  bool noOverwrite;
   bool update;
   bool replace;
+  bool noOverwrite;
   bool keyValues;
   bool concise;
+  bool sysAttrs;
   bool normalized;
+  bool fromDb;
+  bool append;         // Only NGSIv2
   bool values;         // Only NGSIv2
   bool uniqueValues;   // Only NGSIv2
   bool dateCreated;    // Only NGSIv2
   bool dateModified;   // Only NGSIv2
-  bool append;         // Only NGSIv2
   bool noAttrDetail;   // Only NGSIv2
   bool upsert;         // Only NGSIv2
 } OrionldUriParamOptions;

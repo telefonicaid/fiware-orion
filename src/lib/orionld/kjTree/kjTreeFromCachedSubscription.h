@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
-#define SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCACHEDSUBSCRIPTION_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCACHEDSUBSCRIPTION_H_
 
 /*
 *
@@ -27,19 +27,17 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "cache/subCache.h"                                    // CachedSubscription
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "cache/subCache.h"                                      // CachedSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// subCacheApiSubscriptionInsert -
+// kjTreeFromCachedSubscription - in NGSI-LD API format 
 //
-extern CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP);
+extern KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, bool contextInBody);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCACHEDSUBSCRIPTION_H_

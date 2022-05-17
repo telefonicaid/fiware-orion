@@ -30,6 +30,7 @@
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
+#include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldGetSubscription.h"      // Own Interface
@@ -43,38 +44,31 @@
 bool orionldGetSubscription(void)
 {
   char*                 subscriptionId = orionldState.wildcard[0];
+  CachedSubscription*   cSubP          = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+
+  if ((experimental == true) && (cSubP != NULL) && (orionldState.uriParamOptions.fromDb == false))
+  {
+    orionldState.httpStatusCode = 200;
+    orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+
+    return true;
+  }
+
   ngsiv2::Subscription  subscription;
   char*                 details = (char*) "subscription not found";
-  CachedSubscription*   cSubP   = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
-
-#if 0
-  LM_TMP(("Looking up sub '%s' in the sub-cache (tenant: '%s')", subscriptionId, orionldState.tenantP->tenant));
-  if (cSubP != NULL)
-  {
-    LM_TMP(("Found it in the cache - need to render a KjNode tree from the cache contents ..."));
-    // orionldState.httpStatusCode = SccOk;
-    // orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP);
-    // kjTreeLog(orionldState.responseTree, "Subscription");
-
-    // return true;
-  }
-#endif
 
   subscription.descriptionProvided = false;
   subscription.expires             = -1;  // 0?
   subscription.throttling          = -1;  // 0?
   subscription.timeInterval        = -1;  // 0?
 
-  // if (cSubP == NULL) - once I have the function to "render a KjNode tree from the cache contents"
+  if (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false)
   {
-    if (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false)
-    {
-      LM_E(("mongoGetLdSubscription error: %s", details));
-      orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
-      return false;
-    }
+    LM_E(("mongoGetLdSubscription error: %s", details));
+    orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
+    return false;
   }
-
+  LM_TMP(("KZ: sub ldQ: '%s'", subscription.ldQ));
   // Transform to KjNode tree
   orionldState.httpStatusCode = SccOk;
   orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP);

@@ -1,0 +1,306 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Retrieval from cache and from DB
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create a subscription
+# 02. See the subscription in the database
+# 03. GET the subscription - from DB (options=fromDb)
+# 04. GET the subscription - from sub-cache (default since Summer '22)
+#
+
+
+echo "01. Create a subscription"
+echo "========================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "subscriptionName": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==100",
+    "geoproperty": "location"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "expiresAt": "2028-12-31T10:00:00",
+  "throttling": 5
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See the subscription in the database"
+echo "========================================"
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription - from DB (options=fromDb)"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?options=fromDb&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET the subscription - from sub-cache (default since Summer '22)"
+echo "===================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+Date: REGEX(.*)
+
+
+
+02. See the subscription in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S1",
+	"name" : "Test subscription 01",
+	"description" : "Description of Test subscription 01",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "http://a.b.c/E02",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : ".*E03.*",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"ldQ" : "https://uri.etsi.org/ngsi-ld/default-context/P2>10",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:100",
+		"geoproperty" : "location",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+		"mq" : "P.P;!P.P"
+	},
+	"status" : "inactive",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"format" : "keyValues",
+	"reference" : "http://valid.url/url",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+03. GET the subscription - from DB (options=fromDb)
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 953
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "subscriptionName": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==100",
+    "geoproperty": "location"
+  },
+  "status": "paused",
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:00:00.000Z",
+  "throttling": 5,
+  "origin": "database"
+}
+
+
+
+04. GET the subscription - from sub-cache (default since Summer '22)
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 950
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "subscriptionName": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "georel": "near;maxDistance==100",
+    "coordinates": [
+      1,
+      2
+    ],
+    "geoproperty": "location"
+  },
+  "status": "paused",
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:00:00.000Z",
+  "throttling": 5,
+  "origin": "cache"
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

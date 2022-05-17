@@ -602,7 +602,7 @@ bye
 03. GET subscription from the broker
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 826
+Content-Length: 838
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -610,7 +610,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "Test subscription S01",
+  "subscriptionName": "Test subscription S01",
   "description": "Description of Test subscription S01",
   "entities": [
     {
@@ -663,7 +663,7 @@ Date: REGEX(.*)
 05. GET subscription and see the new 'name'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 813
+Content-Length: 825
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -671,7 +671,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "Description of Test subscription S01",
   "entities": [
     {
@@ -724,7 +724,7 @@ Date: REGEX(.*)
 07. GET subscription and see the new 'description'
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 792
+Content-Length: 804
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -732,7 +732,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -842,7 +842,7 @@ bye
 10. GET subscription and see the new 'entities'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 793
+Content-Length: 805
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -850,7 +850,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -962,7 +962,7 @@ bye
 13. GET subscription and see the new 'watchedAttributes'
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 793
+Content-Length: 805
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -970,7 +970,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1096,7 +1096,7 @@ bye
 17. GET subscription and see the new 'q'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 802
+Content-Length: 814
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1104,7 +1104,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1215,7 +1215,7 @@ bye
 20. GET subscription and see the new 'geoQ'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 800
+Content-Length: 812
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1223,7 +1223,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1278,7 +1278,7 @@ Date: REGEX(.*)
 22. GET subscription and see the new 'csf'
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 815
+Content-Length: 827
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1286,7 +1286,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1397,7 +1397,7 @@ bye
 25. GET subscription and see the new 'isActive'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 816
+Content-Length: 828
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1405,7 +1405,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1516,7 +1516,7 @@ bye
 28. GET subscription and see the new 'notification'
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 815
+Content-Length: 827
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1524,7 +1524,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1579,7 +1579,7 @@ Date: REGEX(.*)
 30. GET subscription and see the new 'expiresAt'
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 815
+Content-Length: 827
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1587,7 +1587,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1642,7 +1642,7 @@ Date: REGEX(.*)
 32. GET subscription and see the new 'throttling'
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 816
+Content-Length: 828
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1650,7 +1650,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "New Name",
+  "subscriptionName": "New Name",
   "description": "New Description",
   "entities": [
     {
@@ -1761,7 +1761,7 @@ Date: REGEX(.*)
 35. GET subscription and see all the fields
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 853
+Content-Length: 865
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1769,7 +1769,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "Name 34",
+  "subscriptionName": "Name 34",
   "description": "Description 34",
   "entities": [
     {
@@ -1941,7 +1941,7 @@ bye
 39. GET subscription and see A=1 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 951
+Content-Length: 963
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1949,7 +1949,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "Name 34",
+  "subscriptionName": "Name 34",
   "description": "Description 34",
   "entities": [
     {
@@ -2012,7 +2012,7 @@ Date: REGEX(.*)
 41. GET subscription and see A=2 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 951
+Content-Length: 963
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -2020,7 +2020,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
   "type": "Subscription",
-  "name": "Name 34",
+  "subscriptionName": "Name 34",
   "description": "Description 34",
   "entities": [
     {

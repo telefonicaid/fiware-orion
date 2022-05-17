@@ -197,7 +197,7 @@ bye
 03. GET the subscription - see its initial state
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 615
+Content-Length: 627
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -205,7 +205,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:01",
   "type": "Subscription",
-  "name": "Test subscription S01",
+  "subscriptionName": "Test subscription S01",
   "entities": [
     {
       "id": "urn:ngsi-ld:E01",
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 780
+Content-Length: 792
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -256,7 +256,7 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:subscriptions:01",
   "type": "Subscription",
-  "name": "Changed Name for Test subscription S01",
+  "subscriptionName": "Changed Name for Test subscription S01",
   "description": "New Description of Test subscription S01",
   "createdAt": "REGEX(.*)",
   "modifiedAt": "REGEX(.*)",

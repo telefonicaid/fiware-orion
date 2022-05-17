@@ -219,7 +219,7 @@ bye
 02. GET subscriptions, no Accept MIME type, make sure application/json is returned
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 623
+Content-Length: 635
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -252,7 +252,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub01",
         "isActive": false,
-        "name": "Sub 01",
         "notification": {
             "attributes": [
                 "P1",
@@ -268,6 +267,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Sub 01",
         "throttling": 5.001,
         "type": "Subscription",
         "watchedAttributes": [
@@ -280,7 +280,7 @@ Date: REGEX(.*)
 03. GET subscriptions, Accept MIME type explicitly set to application/json, make sure application/json is returned
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 623
+Content-Length: 635
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -313,7 +313,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub01",
         "isActive": false,
-        "name": "Sub 01",
         "notification": {
             "attributes": [
                 "P1",
@@ -329,6 +328,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Sub 01",
         "throttling": 5.001,
         "type": "Subscription",
         "watchedAttributes": [
@@ -341,7 +341,7 @@ Date: REGEX(.*)
 04. GET subscriptions, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 ========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 708
+Content-Length: 720
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -374,7 +374,6 @@ Date: REGEX(.*)
         },
         "id": "urn:ngsi-ld:Subscription:sub01",
         "isActive": false,
-        "name": "Sub 01",
         "notification": {
             "attributes": [
                 "P1",
@@ -390,6 +389,7 @@ Date: REGEX(.*)
         },
         "q": "P2>10",
         "status": "paused",
+        "subscriptionName": "Sub 01",
         "throttling": 5.001,
         "type": "Subscription",
         "watchedAttributes": [
@@ -402,7 +402,7 @@ Date: REGEX(.*)
 05. GET particular subscription, no Accept MIME type, make sure application/json is returned
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 621
+Content-Length: 633
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -434,7 +434,6 @@ Date: REGEX(.*)
     },
     "id": "urn:ngsi-ld:Subscription:sub01",
     "isActive": false,
-    "name": "Sub 01",
     "notification": {
         "attributes": [
             "P1",
@@ -450,6 +449,7 @@ Date: REGEX(.*)
     },
     "q": "P2>10",
     "status": "paused",
+    "subscriptionName": "Sub 01",
     "throttling": 5.001,
     "type": "Subscription",
     "watchedAttributes": [
@@ -461,7 +461,7 @@ Date: REGEX(.*)
 06. GET particular subscription, Accept MIME type explicitly set to application/json, make sure application/json is returned
 ============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 621
+Content-Length: 633
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -493,7 +493,6 @@ Date: REGEX(.*)
     },
     "id": "urn:ngsi-ld:Subscription:sub01",
     "isActive": false,
-    "name": "Sub 01",
     "notification": {
         "attributes": [
             "P1",
@@ -509,6 +508,7 @@ Date: REGEX(.*)
     },
     "q": "P2>10",
     "status": "paused",
+    "subscriptionName": "Sub 01",
     "throttling": 5.001,
     "type": "Subscription",
     "watchedAttributes": [
@@ -520,7 +520,7 @@ Date: REGEX(.*)
 07. GET particular subscription, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 ==================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 706
+Content-Length: 718
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -552,7 +552,6 @@ Date: REGEX(.*)
     },
     "id": "urn:ngsi-ld:Subscription:sub01",
     "isActive": false,
-    "name": "Sub 01",
     "notification": {
         "attributes": [
             "P1",
@@ -568,6 +567,7 @@ Date: REGEX(.*)
     },
     "q": "P2>10",
     "status": "paused",
+    "subscriptionName": "Sub 01",
     "throttling": 5.001,
     "type": "Subscription",
     "watchedAttributes": [

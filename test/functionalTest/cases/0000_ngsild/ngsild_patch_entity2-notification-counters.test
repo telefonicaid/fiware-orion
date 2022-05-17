@@ -223,7 +223,7 @@ HTTP/1.1 204 No Content
 07. GET S1 - see lastSuccess==now, lastFailure==never, errors==0, timesSent==10, status==active
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 344
+Content-Length: 361
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -248,6 +248,7 @@ Date: REGEX(.*)
         "status": "ok",
         "timesSent": 10
     },
+    "origin": "cache",
     "status": "active",
     "type": "Subscription"
 }
@@ -256,7 +257,7 @@ Date: REGEX(.*)
 08. GET S2 - see lastSuccess==never, lastFailure==now, timesSent==4, status==paused
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 433
+Content-Length: 450
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -283,6 +284,7 @@ Date: REGEX(.*)
         "status": "failed",
         "timesSent": 3
     },
+    "origin": "cache",
     "status": "paused",
     "type": "Subscription"
 }
