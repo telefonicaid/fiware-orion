@@ -306,7 +306,7 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   else  // NOT the first item
   {
     if ((vType == SfvtString) && (valueType == SfvtStringList))
-    {      
+    {
       stringList.push_back(str);
     }
     else if ((vType == SfvtNull) && (valueType == SfvtStringList))
