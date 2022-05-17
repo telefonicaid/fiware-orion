@@ -47,7 +47,7 @@
 *
 * StringFilterItem::StringFilterItem -
 */
-StringFilterItem::StringFilterItem() : compiledPattern(false)
+StringFilterItem::StringFilterItem() : compiledPattern(false), nullInList(false)
 {
   numberList.clear();
   stringList.clear();
@@ -76,6 +76,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
   attributeName         = sfiP->attributeName;
   metadataName          = sfiP->metadataName;
   compiledPattern       = sfiP->compiledPattern;
+  nullInList            = sfiP->nullInList;
   type                  = sfiP->type;
   compoundPath          = sfiP->compoundPath;
 
@@ -290,6 +291,12 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
       valueType = SfvtNumberList;
       numberList.push_back(d);
     }
+    else if (vType == SfvtNull)
+    {
+      // by the moment, null in list is supported only for the string case
+      valueType = SfvtStringList;
+      nullInList = true;
+    }
     else
     {
       *errorStringP = "invalid JSON value type in list";
@@ -301,6 +308,11 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
     if ((vType == SfvtString) && (valueType == SfvtStringList))
     {
       stringList.push_back(str);
+    }
+    else if ((vType == SfvtNull) && (valueType == SfvtStringList))
+    {
+      // by the moment, null in list is supported only for the string case
+      nullInList = true;
     }
     else if ((vType == SfvtDate) && (valueType == SfvtDateList))
     {
@@ -892,7 +904,6 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
     return matchEquals(compoundValueP);
   }
 
-
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
     if ((mdP->numberValue < numberRangeFrom) || (mdP->numberValue > numberRangeTo))
@@ -929,6 +940,12 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
   }
   else if (valueType == SfvtStringList)
   {
+    // null check is special
+    if (nullInList && mdP->valueType == orion::ValueTypeNull)
+    {
+      return MrMatch;
+    }
+
     MatchResult match = MrNoMatch;
 
     // the metadata value has to match at least one of the elements in the vector (OR)
@@ -1032,6 +1049,12 @@ MatchResult StringFilterItem::matchEquals(orion::CompoundValueNode* cvP)
   }
   else if (valueType == SfvtStringList)
   {
+    // null check is special
+    if (nullInList && cvP->valueType == orion::ValueTypeNull)
+    {
+      return MrMatch;
+    }
+
     MatchResult match = MrNoMatch;
 
     // the attribute value has to match at least one of the elements in the vector (OR)
@@ -1159,6 +1182,12 @@ MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
   }
   else if (valueType == SfvtStringList)
   {
+    // null check is special
+    if (nullInList && caP->valueType == orion::ValueTypeNull)
+    {
+      return MrMatch;
+    }
+
     MatchResult match = MrNoMatch;
 
     // the attribute value has to match at least one of the elements in the vector (OR)
@@ -1881,6 +1910,10 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         {
           ba.append(itemP->stringList[ix]);
         }
+        if (itemP->nullInList)
+        {
+          ba.appendNull();
+        }
         bb.append("$in", ba.arr());
         break;
 
@@ -1959,6 +1992,11 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         for (unsigned int ix = 0; ix < itemP->stringList.size(); ++ix)
         {
           ba.append(itemP->stringList[ix]);
+        }
+
+        if (itemP->nullInList)
+        {
+          ba.appendNull();
         }
 
         // In this case we cannot avoid to use $exists. Otherwise, $nin will match entities
