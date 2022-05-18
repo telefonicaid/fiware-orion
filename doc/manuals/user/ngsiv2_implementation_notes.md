@@ -248,7 +248,6 @@ the full content would be implemented (more detail [in this issue](https://githu
 With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
 `Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
 
-
 The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
 if you try to use them).
 
