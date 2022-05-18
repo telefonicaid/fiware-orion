@@ -1914,7 +1914,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         {
           ba.appendNull();
 
-          // If we don't add $exist true in this case, k: null will catch alsa
+          // If we don't add $exists: true in this case, then k: null will catch alsa
           // entities without k field
           bb.append("$exists", true);
         }
