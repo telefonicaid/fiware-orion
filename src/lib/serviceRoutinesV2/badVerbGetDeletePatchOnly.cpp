@@ -65,7 +65,7 @@ std::string badVerbGetDeletePatchOnly
   ciP->httpHeaderValue.push_back(headerValue);
   ciP->httpStatusCode = SccBadVerb;
 
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(clientIp, details, "");
 
   return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
 }

@@ -169,7 +169,7 @@ static bool treat
       {
         std::string details = std::string("found a forbidden value in '") + value + "'";
           
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(clientIp, details, "");
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return false;
@@ -268,7 +268,7 @@ static void eatCompound
   if (deep > MAX_JSON_NESTING)
   {
     std::string details = std::string("compound attribute value has overpassed maximum nesting limit");
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
 
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = details;
@@ -294,7 +294,7 @@ static void eatCompound
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
         std::string details = std::string("found a forbidden value in compound '") + nodeValue + "'";
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(clientIp, details, "");
 
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
@@ -414,10 +414,9 @@ static std::string jsonParse
     if (ciP->answer.empty())
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
-      alarmMgr.badInput(clientIp, ciP->answer);
     }
 
-    alarmMgr.badInput(clientIp, ciP->answer);
+    alarmMgr.badInput(clientIp, ciP->answer, "");
     return ciP->answer;
   }
 
@@ -433,7 +432,7 @@ static std::string jsonParse
     if (out != "OK")
     {
       std::string details = std::string("JSON parse error: '") + out + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(clientIp, details, "");
       return out;
     }
   }
@@ -557,7 +556,7 @@ std::string jsonParse
     if (res != "OK")
     {
       std::string details = std::string("JSON parse error: '") + res + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(clientIp, details, "");
       return res;
     }
   }

@@ -98,14 +98,14 @@ std::string postEntityByIdAttributeByNameWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->rcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
 
     TIMED_RENDER(answer = parseDataP->rcrs.res.toJsonV1());
   }
   else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     parseDataP->rcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
 
     TIMED_RENDER(answer = parseDataP->rcrs.res.toJsonV1());
   }

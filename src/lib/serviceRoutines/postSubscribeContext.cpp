@@ -73,7 +73,7 @@ std::string postSubscribeContext
     ciP->httpStatusCode           = SccOk;  // NGSIv1 is weird... it uses 200 OK at HTTP level for errors
     std::string details           = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
 
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 

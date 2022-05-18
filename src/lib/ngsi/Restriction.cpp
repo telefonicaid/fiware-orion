@@ -52,7 +52,7 @@ std::string Restriction::check(int counter)
 
   if ((scopeVector.size() == 0) && (attributeExpression.isEmpty()))
   {
-    alarmMgr.badInput(clientIp, "empty restriction");
+    alarmMgr.badInput(clientIp, "empty restriction", "");
     return "empty restriction";
   }
 
@@ -60,7 +60,7 @@ std::string Restriction::check(int counter)
       ((res = attributeExpression.check()) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(clientIp, res, "");
 
     return res;
   }

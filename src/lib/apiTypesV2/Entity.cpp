@@ -471,7 +471,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
     {
       snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
+      alarmMgr.badInput(clientIp, errorMsg, "");
       return std::string(errorMsg);
     }
 
@@ -483,7 +483,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
     {
       snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
+      alarmMgr.badInput(clientIp, errorMsg, "");
       return std::string(errorMsg);
     }
 
@@ -495,7 +495,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     // isPattern MUST be either "true" or "false" (or empty => "false")
     if ((isPattern != "true") && (isPattern != "false"))
     {
-      alarmMgr.badInput(clientIp, "invalid value for isPattern");
+      alarmMgr.badInput(clientIp, "invalid value for isPattern", isPattern);
       return "Invalid value for isPattern";
     }
 
@@ -504,7 +504,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     {
       if (forbiddenIdChars(V2, id.c_str()))
       {
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, id);
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
     }
@@ -512,7 +512,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
     {
       snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
+      alarmMgr.badInput(clientIp, errorMsg, "");
       return std::string(errorMsg);
     }
 
@@ -521,7 +521,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
       if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
       {
         snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-        alarmMgr.badInput(clientIp, errorMsg);
+        alarmMgr.badInput(clientIp, errorMsg, "");
         return std::string(errorMsg);
       }
     }
@@ -531,7 +531,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     {
       if (forbiddenIdChars(V2, type.c_str()))
       {
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, type);
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
     }

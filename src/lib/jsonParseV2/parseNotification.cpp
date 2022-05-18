@@ -136,7 +136,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -145,7 +145,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -153,7 +153,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   }
   else if (document.ObjectEmpty())
   {
-    alarmMgr.badInput(clientIp, "Empty JSON payload");
+    alarmMgr.badInput(clientIp, "Empty JSON payload", "");
     oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -161,7 +161,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   }
   else if (!document.HasMember("subscriptionId"))
   {
-    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID);
+    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID, "");
     oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_NO_SUBSCRIPTION_ID, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -171,7 +171,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   {
     std::string  details = "Invalid JSON payload, mandatory field /data/ not found";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
     oeP->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -189,7 +189,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
       {
         oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, ERROR_BAD_REQUEST);
 
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING, "");
         ciP->httpStatusCode = SccBadRequest;
 
         return false;
@@ -203,7 +203,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
       {
         oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, ERROR_BAD_REQUEST);
 
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY, "");
         ciP->httpStatusCode = SccBadRequest;
 
         return false;
@@ -211,7 +211,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
       if (parseNotificationData(ciP, iter, ncrP, oeP) == false)
       {
-        alarmMgr.badInput(clientIp, oeP->details);
+        alarmMgr.badInput(clientIp, oeP->details, "");
         ciP->httpStatusCode = SccBadRequest;
 
         return false;
@@ -221,7 +221,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
     {
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
-      alarmMgr.badInput(clientIp, description);
+      alarmMgr.badInput(clientIp, description, "");
       oeP->fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 

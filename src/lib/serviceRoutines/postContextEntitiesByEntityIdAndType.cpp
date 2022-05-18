@@ -91,7 +91,7 @@ std::string postContextEntitiesByEntityIdAndType
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.registrationId.set("000000000000000000000000");
@@ -102,7 +102,7 @@ std::string postContextEntitiesByEntityIdAndType
   }
   else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.registrationId.set("000000000000000000000000");

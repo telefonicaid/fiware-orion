@@ -209,7 +209,7 @@ std::string payloadParse
   }
   else
   {
-    alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
+    alarmMgr.badInput(clientIp, "payload mime-type is not JSON", "");
     return "Bad inMimeType";
   }
 
@@ -248,7 +248,7 @@ std::string tenantCheck(const std::string& tenant)
     snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
 
     std::string details = std::string("a tenant name can be max ") + numV1 + " characters long. Length: " + numV2;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
 
     return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
@@ -259,7 +259,7 @@ std::string tenantCheck(const std::string& tenant)
     {
       std::string details = std::string("bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: ") + *name;
 
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(clientIp, details, "");
       return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
@@ -537,7 +537,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.toJsonV1();
 
-    alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
+    alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'", "");
     restReply(ciP, response);
 
     return std::string("Empty URL");
@@ -556,7 +556,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
     {
-      alarmMgr.badInput(clientIp, oe.details);
+      alarmMgr.badInput(clientIp, oe.details, "");
       ciP->httpStatusCode = SccBadRequest;
       restReply(ciP, oe.smartRender(ciP->apiVersion));
       return "URL PATH component error";
@@ -624,7 +624,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       if (response != "OK")
       {
-        alarmMgr.badInput(clientIp, response);
+        alarmMgr.badInput(clientIp, response, "");
         restReply(ciP, response);
 
         if (jsonReqP != NULL)
@@ -663,7 +663,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
 
-      alarmMgr.badInput(clientIp, result);
+      alarmMgr.badInput(clientIp, result, "");
 
       restReply(ciP, response);
 
@@ -752,7 +752,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string  answer;
 
   restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(clientIp, details, "");
   ciP->httpStatusCode = SccBadRequest;
   restReply(ciP, answer);
 

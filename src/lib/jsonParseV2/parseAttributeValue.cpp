@@ -50,7 +50,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(clientIp, "JSON parse error", "");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -59,7 +59,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject() && !document.IsArray())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(clientIp, "JSON parse error", "");
     oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -71,14 +71,14 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   if (r == "max deep reached")
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(clientIp, r, "");
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }
   else if (r != "OK")  // other error cases get a general treatment
   {
     OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(clientIp, r, "");
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
   }

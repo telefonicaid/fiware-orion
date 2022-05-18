@@ -125,7 +125,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 
   if (value.empty())
   {
-    alarmMgr.badInput(clientIp, "empty attribute name");
+    alarmMgr.badInput(clientIp, "empty attribute name", "");
     reqDataP->errorString = "Empty attribute name";
   }
 
@@ -172,7 +172,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   if (value.empty())
   {
-    alarmMgr.badInput(clientIp, "empty attribute expression");
+    alarmMgr.badInput(clientIp, "empty attribute expression", "");
     reqDataP->errorString = "Empty attribute expression";
   }
 

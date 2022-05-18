@@ -95,14 +95,14 @@ extern std::string putAllEntitiesWithTypeAndId
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     TIMED_RENDER(answer = response.toJsonV1(asJsonObject, AllEntitiesWithTypeAndId));
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     TIMED_RENDER(answer = response.toJsonV1( asJsonObject, AllEntitiesWithTypeAndId));
     return answer;

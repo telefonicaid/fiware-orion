@@ -58,7 +58,7 @@ std::string badVerbAllFour
   ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE");
   ciP->httpStatusCode = SccBadVerb;
 
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(clientIp, details, "");
 
   return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
 }

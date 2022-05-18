@@ -150,7 +150,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
            ((res = attributeList.check())              != "OK") ||
            ((res = restriction.check(restrictions))    != "OK"))
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(clientIp, res, "");
     response.errorCode.fill(SccBadRequest, res);
   }
   else

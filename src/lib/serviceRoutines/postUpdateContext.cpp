@@ -124,7 +124,7 @@ static bool updateForward
   {
     std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, upcrP->contextProvider);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
@@ -557,7 +557,7 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    alarmMgr.badInput(clientIp, "more than one service path for an update request");
+    alarmMgr.badInput(clientIp, "more than one service path for an update request", "");
 
     TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
     upcrP->release();

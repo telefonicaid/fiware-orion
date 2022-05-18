@@ -104,7 +104,7 @@ std::string postAllEntitiesWithTypeAndId
   {
     std::string  out;
 
-    alarmMgr.badInput(clientIp, "unknown field");
+    alarmMgr.badInput(clientIp, "unknown field", "");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
@@ -116,7 +116,7 @@ std::string postAllEntitiesWithTypeAndId
   // 03. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
@@ -128,7 +128,7 @@ std::string postAllEntitiesWithTypeAndId
   }
   else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");

@@ -131,7 +131,7 @@ std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
     {
       if (apiVersion == V2)
       {
-        alarmMgr.badInput(clientIp, "invalid vector of Entity");
+        alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
       }
       return res;
     }

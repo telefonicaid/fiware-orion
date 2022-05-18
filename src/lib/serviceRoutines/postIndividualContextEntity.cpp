@@ -109,7 +109,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::id differs in URL and payload";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(clientIp, error, "");
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
@@ -122,7 +122,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::type differs in URL and payload";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(clientIp, error, "");
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
@@ -136,7 +136,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::isPattern set to true in contextUpdate convenience operation";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(clientIp, error, "");
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
@@ -148,7 +148,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "invalid request: mandatory entityId::id missing";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(clientIp, error, "");
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));

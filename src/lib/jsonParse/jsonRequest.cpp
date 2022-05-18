@@ -147,7 +147,7 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
   }
 
   std::string details = std::string("no request found for RequestType '") + requestType(request) + "'', method '" + method + "'";
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(clientIp, details, "");
 
   return NULL;
 }
@@ -198,7 +198,7 @@ std::string jsonTreat
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
 
     details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
 
     return errorReply;
   }
@@ -222,7 +222,7 @@ std::string jsonTreat
     std::string errorReply;
 
     restErrorReplyGet(ciP, SccBadRequest, "JSON Parse Error", &errorReply);
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
     return errorReply;
   }
   catch (...)
@@ -230,7 +230,7 @@ std::string jsonTreat
     std::string errorReply;
 
     restErrorReplyGet(ciP, SccBadRequest, "JSON Generic Error", &errorReply);
-    alarmMgr.badInput(clientIp, "JSON parse generic error");
+    alarmMgr.badInput(clientIp, "JSON parse generic error", "");
     return errorReply;
   }
 
@@ -239,7 +239,7 @@ std::string jsonTreat
     std::string details = std::string("JSON parse error: ") + res;
     std::string answer;
     
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
     ciP->httpStatusCode = SccBadRequest;
     restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
     return answer;
@@ -258,7 +258,7 @@ std::string jsonTreat
   if (res != "OK")
   {
     std::string details = reqP->keyword + ": " + res;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, "");
   }
 
   return res;
