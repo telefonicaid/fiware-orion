@@ -35,7 +35,8 @@ accumulatorStart --pretty-print
 # 02. Create entity E1 with attribute A=null
 # 03. Create entity E2 with attribute A=foo
 # 04. Create entity E3 with attribute A=bar
-# 05. Check notifications see two ones (E1 and E2)
+# 05. Create entity E4 without attribute A
+# 06. Check notifications see two ones (E1 and E2)
 #
 
 
@@ -111,7 +112,22 @@ echo
 echo
 
 
-echo "05. Check notifications see two ones (E1 and E2)"
+echo "05. Create entity E4 without attribute A"
+echo "========================================"
+payload='{
+    "id": "E4",
+    "type": "T",
+    "B": {
+        "value": "zzz",
+        "type": "Text"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Check notifications see two ones (E1 and E2)"
 echo "================================================"
 accumulatorDump
 echo
@@ -159,7 +175,17 @@ Date: REGEX(.*)
 
 
 
-05. Check notifications see two ones (E1 and E2)
+05. Create entity E4 without attribute A
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Check notifications see two ones (E1 and E2)
 ================================================
 POST http://127.0.0.1:9997/notify
 Fiware-Servicepath: /
