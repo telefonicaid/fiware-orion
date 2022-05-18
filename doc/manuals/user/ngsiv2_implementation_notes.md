@@ -245,9 +245,9 @@ creation/updating time. However, from the point of view of normalization with ot
 it has been decided to return only the `geometry` part. In the future, maybe a flag to return
 the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
 
-Additionally, with regards to `FeatureCollection`, and addition check is done. It is accepted at
-creation/update time only if it contains a single `Feature` (i.e. the `features` field has
-only one element).
+With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
+`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
+
 
 The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
 if you try to use them).
