@@ -1913,6 +1913,10 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         if (itemP->nullInList)
         {
           ba.appendNull();
+
+          // If we don't add $exist true in this case, k: null will catch alsa
+          // entities without k field
+          bb.append("$exists", true);
         }
         bb.append("$in", ba.arr());
         break;
