@@ -113,7 +113,7 @@ static orion::CompoundValueNode* getGeometryFromFeature(orion::CompoundValueNode
     }
   }
 
-  LM_E(("Runtime Error (geometry field expected in GeoJson Features)"));
+  LM_E(("Runtime Error (geometry field expected in GeoJson Feature)"));
   return NULL;
 }
 
