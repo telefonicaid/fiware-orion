@@ -230,17 +230,26 @@ We have successfully tested the following types:
 * MultiLineString
 * Polygon
 * MultiPolygon
-* Feature (using the value of `geometry` field at the first level)
-
-On the contrary, the following types doesn't work (you will get a "Database Error" if you try to use them):
-
-* GeometryCollection
-
-With regards to `FeatureCollection`, it is supported only if it contains a single Feature (i.e.
-the `features` field has only one element), in which case the value of `geometry` field of
-such element is used.
 
 More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
+
+The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
+use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
+the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
+
+* the `geometry` field, in the case of `Feature`
+* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
+
+Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
+creation/updating time. However, from the point of view of normalization with other `geo:json` types,
+it has been decided to return only the `geometry` part. In the future, maybe a flag to return
+the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
+
+With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
+`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
+
+The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
+if you try to use them).
 
 ## Legacy attribute format in notifications
 

@@ -31,13 +31,13 @@ brokerStart CB
 
 #
 # 01. Create entity with geo:json using Feature type
-# 02. Get entity and see Feature
+# 02. Get entity and see Feature geometry
 # 03. Geoquery covering the location returns the entity
 # 04. Update entity with a regular geo:json Point
 # 05. Get entity and see Point
 # 06. Geoquery covering the location returns the entity
 # 07. Update entity with a Feature again
-# 08. Get entity and see Feature
+# 08. Get entity and see Feature geometry
 # 09. Geoquery covering the location returns the entity
 #
 
@@ -68,8 +68,8 @@ echo
 echo
 
 
-echo "02. Get entity and see Feature"
-echo "=============================="
+echo "02. Get entity and see Feature geometry"
+echo "======================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -140,8 +140,8 @@ echo
 echo
 
 
-echo "08. Get entity and see Feature"
-echo "=============================="
+echo "08. Get entity and see Feature geometry"
+echo "======================================="
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -165,10 +165,10 @@ Date: REGEX(.*)
 
 
 
-02. Get entity and see Feature
-==============================
+02. Get entity and see Feature geometry
+=======================================
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -179,17 +179,11 @@ Date: REGEX(.*)
         "metadata": {},
         "type": "geo:json",
         "value": {
-            "geometry": {
-                "coordinates": [
-                    -3.612711914,
-                    40.539019781
-                ],
-                "type": "Point"
-            },
-            "properties": {
-                "label": "-3.6127119138731127, 40.53901978067972"
-            },
-            "type": "Feature"
+            "coordinates": [
+                -3.612711914,
+                40.539019781
+            ],
+            "type": "Point"
         }
     },
     "type": "T"
@@ -199,7 +193,7 @@ Date: REGEX(.*)
 03. Geoquery covering the location returns the entity
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 135
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -211,17 +205,11 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "geo:json",
             "value": {
-                "geometry": {
-                    "coordinates": [
-                        -3.612711914,
-                        40.539019781
-                    ],
-                    "type": "Point"
-                },
-                "properties": {
-                    "label": "-3.6127119138731127, 40.53901978067972"
-                },
-                "type": "Feature"
+                "coordinates": [
+                    -3.612711914,
+                    40.539019781
+                ],
+                "type": "Point"
             }
         },
         "type": "T"
@@ -297,10 +285,10 @@ Date: REGEX(.*)
 
 
 
-08. Get entity and see Feature
-==============================
+08. Get entity and see Feature geometry
+=======================================
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 134
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -311,17 +299,11 @@ Date: REGEX(.*)
         "metadata": {},
         "type": "geo:json",
         "value": {
-            "geometry": {
-                "coordinates": [
-                    -23.612711914,
-                    50.539019781
-                ],
-                "type": "Point"
-            },
-            "properties": {
-                "label": "-23.6127119138731127, 50.53901978067972"
-            },
-            "type": "Feature"
+            "coordinates": [
+                -23.612711914,
+                50.539019781
+            ],
+            "type": "Point"
         }
     },
     "type": "T"
@@ -331,7 +313,7 @@ Date: REGEX(.*)
 09. Geoquery covering the location returns the entity
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 231
+Content-Length: 136
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -343,17 +325,11 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "geo:json",
             "value": {
-                "geometry": {
-                    "coordinates": [
-                        -23.612711914,
-                        50.539019781
-                    ],
-                    "type": "Point"
-                },
-                "properties": {
-                    "label": "-23.6127119138731127, 50.53901978067972"
-                },
-                "type": "Feature"
+                "coordinates": [
+                    -23.612711914,
+                    50.539019781
+                ],
+                "type": "Point"
             }
         },
         "type": "T"
