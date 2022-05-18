@@ -235,7 +235,7 @@ More information on the tests conducted can be found [here](https://github.com/t
 
 The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
 use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
-the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of
+the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
 
 * the `geometry` field, in the case of `Feature`
 * the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
