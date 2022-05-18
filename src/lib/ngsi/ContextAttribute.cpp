@@ -930,6 +930,62 @@ void ContextAttribute::filterAndOrderMetadata
 }
 
 
+static orion::CompoundValueNode* getGeometryFromFeature(orion::CompoundValueNode* feature)
+{
+  for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
+  {
+    orion::CompoundValueNode* childP = feature->childV[ix];
+    if (childP->name == "geometry")
+    {
+      return childP;
+    }
+  }
+
+  LM_E(("Runtime Error (geometry field expected in GeoJson Features)"));
+  return NULL;
+}
+
+
+static orion::CompoundValueNode* getGeometryFromFeatureCollection(orion::CompoundValueNode* featureCollection)
+{
+  for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
+  {
+    orion::CompoundValueNode* childP = featureCollection->childV[ix];
+    if (childP->name == "features")
+    {
+      return getGeometryFromFeature(featureCollection->childV[ix]->childV[0]);
+    }
+  }
+
+  LM_E(("Runtime Error (feature field expected in GeoJson FeatureCollection)"));
+  return NULL;
+}
+
+
+
+static orion::CompoundValueNode* getGeometryToRender(orion::CompoundValueNode* compoundValueP)
+{
+  for (unsigned int ix = 0; ix < compoundValueP->childV.size(); ++ix)
+  {
+     orion::CompoundValueNode* childP = compoundValueP->childV[ix];
+     if ((childP->name == "type") && (childP->valueType == orion::ValueTypeString))
+     {
+       if (childP->stringValue == "Feature")
+       {
+         return getGeometryFromFeature(compoundValueP);
+       }
+       if (childP->stringValue == "FeatureCollection")
+       {
+         return getGeometryFromFeatureCollection(compoundValueP);
+       }
+     }
+  }
+
+  // Regular geo:json
+  return compoundValueP;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -959,7 +1015,18 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson());
+    orion::CompoundValueNode* childToRenderP = compoundValueP;
+    if (type == GEO_JSON)
+    {
+      childToRenderP = getGeometryToRender(compoundValueP);
+    }
+
+    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
+    // of DB entities) may lead to NULL, so the check is needed
+    if (childToRenderP != NULL)
+    {
+      jh.addRaw("value", childToRenderP->toJson());
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
