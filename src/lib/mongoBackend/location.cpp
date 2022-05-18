@@ -100,6 +100,79 @@ static bool stringArray2coords
 
 /* ****************************************************************************
 *
+* getGeometryFromFeature -
+*/
+static orion::CompoundValueNode* getGeometryFromFeature(orion::CompoundValueNode* feature)
+{
+  for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
+  {
+    orion::CompoundValueNode* childP = feature->childV[ix];
+    if (childP->name == "geometry")
+    {
+      return childP;
+    }
+  }
+
+  LM_E(("Runtime Error (geometry field expected in GeoJson Features)"));
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* getGeometryFromFeatureCollection -
+*/
+static orion::CompoundValueNode* getGeometryFromFeatureCollection(orion::CompoundValueNode* featureCollection)
+{
+  for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
+  {
+    orion::CompoundValueNode* childP = featureCollection->childV[ix];
+    if (childP->name == "features")
+    {
+      return getGeometryFromFeature(featureCollection->childV[ix]->childV[0]);
+    }
+  }
+
+  LM_E(("Runtime Error (feature field expected in GeoJson FeatureCollection)"));
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* getGeometry -
+*
+* Get geometry compound value from attribute, taking into account special GeoJSON
+* types such as Feature and FeatureCollection
+*/
+orion::CompoundValueNode* getGeometry(orion::CompoundValueNode* compoundValueP)
+{
+  for (unsigned int ix = 0; ix < compoundValueP->childV.size(); ++ix)
+  {
+     orion::CompoundValueNode* childP = compoundValueP->childV[ix];
+     if ((childP->name == "type") && (childP->valueType == orion::ValueTypeString))
+     {
+       if (childP->stringValue == "Feature")
+       {
+         return getGeometryFromFeature(compoundValueP);
+       }
+       if (childP->stringValue == "FeatureCollection")
+       {
+         return getGeometryFromFeatureCollection(compoundValueP);
+       }
+     }
+  }
+
+  // Regular geo:json
+  return compoundValueP;
+}
+
+
+
+/* ****************************************************************************
+*
 * isFeatureType -
 *
 * GeoJSON Feature has an especial treatment. The geometry is extracted from
@@ -150,7 +223,11 @@ static bool isFeatureCollectionType(CompoundValueNode* featureCollection, orion:
 }
 
 
-
+/* ****************************************************************************
+*
+* isSpecialGeoJsonType -
+*
+*/
 static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion)
 {
   if (caP->compoundValueP == NULL)
