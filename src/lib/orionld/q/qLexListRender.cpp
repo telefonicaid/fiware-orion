@@ -46,174 +46,36 @@ extern char* qVariableFix(char* varPath, bool forDb, bool* isMqP, char** details
 
 // -----------------------------------------------------------------------------
 //
-// PUSH_1 -
+// intToString -
 //
-#define PUSH_1(c)          \
-do {                       \
-  outP[outIx] = c;         \
-  ++outIx;                 \
-} while (0)
+const char* intToString(QNode* qItemP, char* buf, int bufLen)
+{
+  snprintf(buf, bufLen - 1, "%lld", qItemP->value.i);
+  return buf;
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PUSH_2 -
+// floatToString -
 //
-#define PUSH_2(c1, c2)     \
-do {                       \
-  outP[outIx]   = c1;      \
-  outP[outIx+1] = c2;      \
-  outIx += 2;              \
-} while (0)
+const char* floatToString(QNode* qItemP, char* buf, int bufLen)
+{
+  snprintf(buf, bufLen - 1, "%f", qItemP->value.f);
+  return buf;
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PUSH_3 -
+// regexToString -
 //
-#define PUSH_3(c1, c2, c3) \
-do {                       \
-  outP[outIx]   = c1;      \
-  outP[outIx+1] = c2;      \
-  outP[outIx+2] = c3;      \
-  outIx += 3;              \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PUSH_VARIABLE -
-//
-#define PUSH_VARIABLE()                                                                                 \
-do {                                                                                                    \
-  char* detail;                                                                                         \
-  char* varPath  = qVariableFix(qItemP->value.v, false, isMqP, &detail);                                \
-                                                                                                        \
-  if (varPath == NULL)                                                                                  \
-  {                                                                                                     \
-      orionldError(OrionldInternalError, "qVariableFix failed", detail, 500);                           \
-      return NULL;                                                                                      \
-  }                                                                                                     \
-                                                                                                        \
-  int len = strlen(varPath);                                                                            \
-  if (outIx + len >= outSize)                                                                           \
-  {                                                                                                     \
-    if ((outP = (char*) realloc(outP, outSize + 512)) == NULL)                                          \
-    {                                                                                                   \
-      orionldError(OrionldInternalError, "Out of memory", "allocating room for Q-List Variable", 500);  \
-      return NULL;                                                                                      \
-    }                                                                                                   \
-    outSize += 512;                                                                                     \
-  }                                                                                                     \
-  strncpy(&outP[outIx], varPath, len + 1);                                                              \
-  outIx += len;                                                                                         \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PUSH_FLOAT -
-//
-#define PUSH_FLOAT()                                                                                \
-do                                                                                                  \
-{                                                                                                   \
-  char buf[32];                                                                                     \
-  int  len = snprintf(buf, sizeof(buf) - 1, "%f", qItemP->value.f);                                 \
-  if (outIx + len >= outSize)                                                                       \
-  {                                                                                                 \
-    if ((outP = (char*) realloc(outP, outSize + 512)) == NULL)                                      \
-    {                                                                                               \
-      orionldError(OrionldInternalError, "Out of memory", "allocating room for Q-List Text", 500);  \
-      return NULL;                                                                                  \
-    }                                                                                               \
-    outSize += 512;                                                                                 \
-  }                                                                                                 \
-  strncpy(&outP[outIx], buf, len + 1);                                                              \
-  outIx += len;                                                                                     \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PUSH_STRING -
-//
-#define PUSH_STRING()                                                                                   \
-do {                                                                                                    \
-  int len = strlen(qItemP->value.s);                                                                    \
-  if (outIx + len >= outSize)                                                                           \
-  {                                                                                                     \
-    if ((outP = (char*) realloc(outP, outSize + 512)) == NULL)                                          \
-    {                                                                                                   \
-      orionldError(OrionldInternalError, "Out of memory", "allocating room for Q-List String", 500);    \
-      return NULL;                                                                                      \
-    }                                                                                                   \
-    outSize += 512;                                                                                     \
-  }                                                                                                     \
-  strncpy(&outP[outIx], qItemP->value.s, len + 1);                                                      \
-  outIx += len;                                                                                         \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PUSH_INTEGER -
-//
-#define PUSH_INTEGER()                                                                              \
-do {                                                                                                \
-  char buf[20];                                                                                     \
-  int  len = snprintf(buf, sizeof(buf) - 1, "%lld", qItemP->value.i);                               \
-  if (outIx + len >= outSize)                                                                       \
-  {                                                                                                 \
-    if ((outP = (char*) realloc(outP, outSize + 512)) == NULL)                                      \
-    {                                                                                               \
-      orionldError(OrionldInternalError, "Out of memory", "allocating room for Q-List Text", 500);  \
-      return NULL;                                                                                  \
-    }                                                                                               \
-    outSize += 512;                                                                                 \
-  }                                                                                                 \
-  strncpy(&outP[outIx], buf, len+1);                                                                \
-  outIx += len;                                                                                     \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PUSH_BOOLEAN -
-//
-#define PUSH_BOOLEAN(val)                                                                              \
-do {                                                                                                   \
-  int len = strlen(val);                                                                               \
-  if (outIx + len >= outSize)                                                                          \
-  {                                                                                                    \
-    if ((outP = (char*) realloc(outP, outSize + 512)) == NULL)                                         \
-    {                                                                                                  \
-      orionldError(OrionldInternalError, "Out of memory", "allocating room for Q-List Boolean", 500);  \
-      return NULL;                                                                                     \
-    }                                                                                                  \
-    outSize += 512;                                                                                    \
-  }                                                                                                    \
-  strncpy(&outP[outIx], val, len+1);                                                                   \
-  outIx += len;                                                                                        \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// PUSH_REGEX -
-//
-#define PUSH_REGEX()                             \
-do {                                             \
-  strncpy(&outP[outIx], "REGEX\0", 6);           \
-  outIx += 5;                                    \
-} while (0)
+const char* regexToString(QNode* qItemP, char* buf, int bufLen)
+{
+  return "REGEX";
+}
 
 
 
@@ -223,45 +85,78 @@ do {                                             \
 //
 char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
 {
-  int   outSize = 512;
-  char* outP    = (char*) malloc(outSize);  // realloc if needed
-  int   outIx   = 0;
+  int    outSize = 512;
+  char*  outP    = (char*) malloc(outSize);  // realloc if needed
+  int    outIx   = 0;
+  char*  detail;
 
   *validInV2P = true;   // Set to false later if need be (in the switch below)
-  *isMqP      = false;  // Set to true later if need be (in macro PUSH_VARIABLE)
+  *isMqP      = false;  // Set to true later if need be (qVariableFix)
 
-  int ix = 0;  // DEBUG
   for (QNode* qItemP = qListP; qItemP != NULL; qItemP = qItemP->next)
   {
+    char  buf[32];
+    char* bufP = buf;
+
     switch (qItemP->type)
     {
-    case QNodeVoid:                                            break;
-    case QNodeOpen:         PUSH_1('('); *validInV2P = false;  break;
-    case QNodeClose:        PUSH_1(')'); *validInV2P = false;  break;
-    case QNodeAnd:          PUSH_1(';');                       break;
-    case QNodeOr:           PUSH_1('|'); *validInV2P = false;  break;
-    case QNodeExists:                                          break;
-    case QNodeNotExists:    PUSH_1('!');                       break;
-    case QNodeGT:           PUSH_1('>');                       break;
-    case QNodeLT:           PUSH_1('<');                       break;
-    case QNodeEQ:           PUSH_2('=', '=');                  break;
-    case QNodeNE:           PUSH_2('=', '=');                  break;
-    case QNodeGE:           PUSH_2('>', '=');                  break;
-    case QNodeLE:           PUSH_2('<', '=');                  break;
-    case QNodeMatch:        PUSH_2('~', '=');                  break;
-    case QNodeNoMatch:      PUSH_3('!', '~', '=');             break;
-    case QNodeComma:        PUSH_1(',');                       break;
-    case QNodeRange:        PUSH_2('.', '.');                  break;
-    case QNodeVariable:     PUSH_VARIABLE();                   break;
-    case QNodeFloatValue:   PUSH_FLOAT();                      break;
-    case QNodeStringValue:  PUSH_STRING();                     break;
-    case QNodeIntegerValue: PUSH_INTEGER();                    break;
-    case QNodeTrueValue:    PUSH_BOOLEAN("true");              break;
-    case QNodeFalseValue:   PUSH_BOOLEAN("false");             break;
-    case QNodeRegexpValue:  PUSH_REGEX(); *validInV2P = false; break;
+    case QNodeVoid:         bufP = NULL;                                 break;
+    case QNodeOpen:         bufP = (char*) "("; *validInV2P = false;     break;
+    case QNodeClose:        bufP = (char*) ")"; *validInV2P = false;     break;
+    case QNodeAnd:          bufP = (char*) ";";                          break;
+    case QNodeOr:           bufP = (char*) "|"; *validInV2P = false;     break;
+    case QNodeExists:       bufP = NULL;                                 break;
+    case QNodeNotExists:    bufP = (char*) "!";                          break;
+    case QNodeGT:           bufP = (char*) ">";                          break;
+    case QNodeLT:           bufP = (char*) "<";                          break;
+    case QNodeEQ:           bufP = (char*) "==";                         break;
+    case QNodeNE:           bufP = (char*) "!=";                         break;
+    case QNodeGE:           bufP = (char*) ">=";                         break;
+    case QNodeLE:           bufP = (char*) "<=";                         break;
+    case QNodeMatch:        bufP = (char*) "~=";                         break;
+    case QNodeNoMatch:      bufP = (char*) "!~=";                        break;
+    case QNodeComma:        bufP = (char*) ",";                          break;
+    case QNodeRange:        bufP = (char*) "..";                         break;
+    case QNodeIntegerValue: intToString(qItemP, buf, sizeof(buf));       break;
+    case QNodeFloatValue:   floatToString(qItemP, buf, sizeof(buf));     break;
+    case QNodeStringValue:  bufP = qItemP->value.s;                      break;
+    case QNodeTrueValue:    bufP = (char*) "true";                       break;
+    case QNodeFalseValue:   bufP = (char*) "false";                      break;
+    case QNodeRegexpValue:
+      regexToString(qItemP, buf, sizeof(buf));
+      *validInV2P = false;
+      break;
+    case QNodeVariable:
+      bufP = qVariableFix(qItemP->value.v, false, isMqP, &detail);
+      if (bufP == NULL)
+      {
+        orionldError(OrionldInternalError, "qVariableFix failed", detail, 500);
+        return NULL;
+      }
+      break;
     }
-    ++ix;
+
+    if (bufP == NULL)
+      continue;
+
+    int len = strlen(bufP);
+    if (outIx + len >= outSize)
+    {
+      char* newBuf = (char*) realloc(outP, outSize + 512);
+
+      if (newBuf == NULL)
+      {
+        free(outP);
+        orionldError(OrionldInternalError, "Out of memory", "allocating room for Q-List", 500);
+        return NULL;
+      }
+      outP = newBuf;
+      outSize += 512;
+    }
+    strncpy(&outP[outIx], bufP, len);
+    outIx += len;
   }
 
+  outP[outIx] = 0;
   return outP;
 }
