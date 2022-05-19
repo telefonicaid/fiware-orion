@@ -36,7 +36,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromCachedSubscription - in NGSI-LD API format 
+// kjTreeFromCachedSubscription - in NGSI-LD API format
 //
 extern KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, bool contextInBody);
 
