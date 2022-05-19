@@ -166,7 +166,7 @@ do {                                                                            
 //
 #define PUSH_INTEGER()                                                                              \
 do {                                                                                                \
-  char buf[32];                                                                                     \
+  char buf[20];                                                                                     \
   int  len = snprintf(buf, sizeof(buf) - 1, "%lld", qItemP->value.i);                               \
   if (outIx + len >= outSize)                                                                       \
   {                                                                                                 \
