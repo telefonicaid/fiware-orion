@@ -351,7 +351,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
 
   if (result == -1)
   {
-    alarmMgr.badInput(clientIp, "ERROR in duration string", "");
+    alarmMgr.badInput(clientIp, "ERROR in duration string", std::string(1, what));
   }
 
   return result;

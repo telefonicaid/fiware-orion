@@ -100,7 +100,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   }
   else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
     response.fill(SccBadRequest, "non-matching entity::types in URL");
     TIMED_RENDER(answer = response.toJsonV1(false, false));
     return answer;

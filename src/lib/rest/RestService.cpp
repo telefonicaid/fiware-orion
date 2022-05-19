@@ -209,7 +209,7 @@ std::string payloadParse
   }
   else
   {
-    alarmMgr.badInput(clientIp, "payload mime-type is not JSON", "");
+    alarmMgr.badInput(clientIp, "payload mime-type is not JSON or TEXT", "");
     return "Bad inMimeType";
   }
 

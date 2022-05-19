@@ -105,7 +105,7 @@ std::string getNgsi10ContextEntityTypes
   else if ((typeNameFromUriParam != typeName) && (!typeNameFromUriParam.empty()))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
 
     TIMED_RENDER(answer = parseDataP->qcrs.res.toJsonV1(asJsonObject));
 

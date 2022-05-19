@@ -1511,7 +1511,7 @@ static int connectionTreat
 
   if (ciP->httpStatusCode != SccOk)
   {
-    alarmMgr.badInput(clientIp, "error in URI parameters", "");
+    alarmMgr.badInput(clientIp, "error in URI parameters", ciP->uriForLogs);
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }

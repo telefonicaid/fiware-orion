@@ -103,7 +103,7 @@ std::string deleteAllEntitiesWithTypeAndId
   }
   else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", "");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 

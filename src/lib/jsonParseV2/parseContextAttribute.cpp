@@ -397,7 +397,7 @@ std::string parseContextAttribute
     }
     else
     {
-      alarmMgr.badInput(clientIp, "bad type for ContextAttribute", "");
+      alarmMgr.badInput(clientIp, "bad JSON type for ContextAttribute", "");
       ciP->httpStatusCode = SccBadRequest;
       return "invalid JSON type for ContextAttribute";
     }

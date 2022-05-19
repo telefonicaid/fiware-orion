@@ -348,7 +348,7 @@ std::string Metadata::check(ApiVersion apiVersion)
 
     if (apiVersion == V1 && stringValue.empty())
     {
-      alarmMgr.badInput(clientIp, "missing metadata value", "");
+      alarmMgr.badInput(clientIp, "missing metadata value", name);
       return "missing metadata value";
     }
   }

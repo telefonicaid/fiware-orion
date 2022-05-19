@@ -124,13 +124,14 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     }
     else if (name == "actionType")
     {
-      ActionType actionType;
-      if ((actionType = parseActionTypeV2(iter->value.GetString())) == ActionTypeUnknown)
+      ActionType   actionType;
+      std::string  actionTypeStr = iter->value.GetString();
+      if ((actionType = parseActionTypeV2(actionTypeStr)) == ActionTypeUnknown)
       {
         std::string details = "invalid update action type: right ones are: "
           "append, appendStric, delete, replace, update";
 
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, details, actionTypeStr);
         oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 

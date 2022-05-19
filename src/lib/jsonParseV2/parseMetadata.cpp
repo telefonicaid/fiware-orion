@@ -114,7 +114,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
     }
     else
     {
-      alarmMgr.badInput(clientIp, "invalid JSON field for attribute metadata", "");
+      alarmMgr.badInput(clientIp, "invalid JSON field for attribute metadata", name);
       return "invalid JSON field for attribute metadata";
     }
   }
