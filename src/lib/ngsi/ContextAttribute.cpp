@@ -589,21 +589,9 @@ std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion api
     if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
       // First lookup in the metadata included in the request
-      // FIXME PR: lookupByName + hastIgnoreType
-      for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+      if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
       {
-        // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
-        if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
-        {
-          if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
-          {
-            return "";
-          }
-          else  // false or not a boolean
-          {
-            return LOCATION_WGS84;
-          }
-        }
+        return hasIgnoreType() ? "" : LOCATION_WGS84;
       }
 
       // If ignoreType has not yet found, second lookup in the existing metadata attributes
