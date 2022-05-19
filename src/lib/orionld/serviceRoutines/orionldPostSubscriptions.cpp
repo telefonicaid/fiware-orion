@@ -34,7 +34,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjChildAdd, ...
-#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "common/globals.h"                                    // parse8601Time
@@ -62,6 +61,8 @@ extern "C"
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qRender.h"                                 // qRender
 #include "orionld/q/qRelease.h"                                // qRelease
+#include "orionld/q/qAliasCompact.h"                           // qAliasCompact
+#include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
@@ -239,6 +240,9 @@ bool qFix(KjNode* subP, KjNode* qNode, QNode* qTree)
   char qText[512];
   bool mq = false;
 
+  LM_TMP(("KZ: qNode: '%s'", qNode->value.s));
+  LM_TMP(("KZ: qTree: '%s'", qTree->value.s));
+
   //
   // The q-text might need to be re-written for NGSIv2, might even be an mq and not a q
   // The q-text might also be invalid for NGSIv2, in which case it is replaced by "P;!P" => no notifications
@@ -262,15 +266,15 @@ bool qFix(KjNode* subP, KjNode* qNode, QNode* qTree)
     mqNodeForV2 = kjString(orionldState.kjsonP, "mq", qText);
   }
 
-  LM_TMP(("QR: V2-Rendered qTest: '%s'", qText));
-
   qNode->name = (char*) "ldQ";  // The original "q" is taken for NGSI-LD
-  qRender(qTree, NGSI_LD_V1, qText, sizeof(qText), &mq);
 
-
+  // qNode (ldQ) is already in the tree - adding 'q' and 'mq'
   kjChildAdd(subP, qNodeForV2);
   kjChildAdd(subP, mqNodeForV2);
 
+  LM_TMP(("KZ: %s: '%s'", qNode->name,       qNode->value.s));
+  LM_TMP(("KZ: %s: '%s'", qNodeForV2->name,  qNodeForV2->value.s));
+  LM_TMP(("KZ: %s: '%s'", mqNodeForV2->name, mqNodeForV2->value.s));
   return true;
 }
 
@@ -293,9 +297,11 @@ bool orionldPostSubscriptions(void)
   KjNode*  notifierInfoP   = NULL;
   KjNode*  geoCoordinatesP = NULL;
   QNode*   qTree           = NULL;
-  char*    qText           = NULL;
+  char*    qRenderedForDb  = NULL;
   char*    subId;
   bool     b;
+  bool     qValidForV2;
+  bool     qIsMq;
 
   b = pCheckSubscription(subP,
                          orionldState.payloadIdNode,
@@ -303,7 +309,9 @@ bool orionldPostSubscriptions(void)
                          &endpointP,
                          &qNode,
                          &qTree,
-                         &qText,
+                         &qRenderedForDb,
+                         &qValidForV2,
+                         &qIsMq,
                          &uriP,
                          &notifierInfoP,
                          &geoCoordinatesP);
@@ -351,13 +359,40 @@ bool orionldPostSubscriptions(void)
   // Add subId to the tree
   kjChildPrepend(subP, subIdP);
 
-  // The two 'q's ...
-  if ((qText != NULL) && (qFix(subP, qNode, qTree) == false))
+  // The three 'q's ...
+  if (qNode != NULL)
   {
-    if (qTree != NULL)
-      qRelease(qTree);
+    qNode->name    = (char*) "ldQ";
+    qNode->value.s = qRenderedForDb;
 
-    return false;
+    LM_TMP(("LL: qTree:               %p", qTree));
+    LM_TMP(("LL: qRenderedForDb:      %s", qRenderedForDb));
+    LM_TMP(("LL: Valid for NGSIv2:    %s", K_FT(qValidForV2)));
+    LM_TMP(("LL: Metadata for NGSIv2: %s", K_FT(qIsMq)));
+    LM_TMP(("qText: %s", qRenderedForDb));
+    qPresent(qTree, "KZ", "Q-Tree for subscription");
+
+    // We robbed the "q" for "ldQ", need to add "q" and "mq" now - for NGSIv2
+    KjNode* qNode;
+    KjNode* mqNode;
+
+    if (qValidForV2 == false)
+    {
+      qNode  = kjString(orionldState.kjsonP, "q", "P;!P");
+      mqNode = kjString(orionldState.kjsonP, "mq", "P.P;!P.P");
+      kjChildAdd(subP, qNode);
+      kjChildAdd(subP, mqNode);
+    }
+    else if (qIsMq == false)
+    {
+      qNode  = kjString(orionldState.kjsonP, "q", qRenderedForDb);
+      kjChildAdd(subP, qNode);
+    }
+    else
+    {
+      mqNode = kjString(orionldState.kjsonP, "mq", qRenderedForDb);
+      kjChildAdd(subP, mqNode);
+    }
   }
 
   // Timestamps
@@ -424,6 +459,10 @@ bool orionldPostSubscriptions(void)
     if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
     {
       orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
+
+      if (qTree != NULL)
+        qRelease(qTree);
+
       return false;
     }
 
@@ -431,12 +470,11 @@ bool orionldPostSubscriptions(void)
   }
 
   // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
-  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, orionldState.contextP);
+  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, geoCoordinatesP, orionldState.contextP);
 
   // dbModel
   KjNode* dbSubscriptionP = subP;
   dbModelFromApiSubscription(dbSubscriptionP, false);
-  kjTreeLog(dbSubscriptionP, "SB Model Subscription");
 
   // sub to db - mongocSubscriptionInsert(subP);
   if (mongocSubscriptionInsert(dbSubscriptionP, subIdP->value.s) == false)
@@ -473,9 +511,6 @@ bool orionldPostSubscriptions(void)
 
   orionldState.httpStatusCode = 201;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subIdP->value.s);
-
-  // geoCoords to cached sub;
-  cSubP->geoCoordinatesP = (geoCoordinatesP != NULL)? kjClone(NULL, geoCoordinatesP) : NULL;
 
   return true;
 }

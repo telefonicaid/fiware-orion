@@ -33,11 +33,14 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create a subscription S1 with q=A==0|B==0 - q-tree created by postSubscriptions
-# 02. Wait 2.1 seconds, to give the broker time to refresh its sub cache
-# 03. Create an Entity E1 with A==1 - no notification
-# 04. Create an Entity E2 with B==1 - no notification
-# 05. Create an Entity E3 with A==0 - notification
-# 06. Dump accumulator and see the notification for E3 only
+# 02. 01. See the subscription in the database
+# 03. GET the subscription - from the sub-cache
+# 04. Wait 2.1 seconds, to give the broker time to refresh its sub cache
+# 05. GET the subscription - from the sub-cache
+# 06. Create an Entity E1 with A==1 - no notification
+# 07. Create an Entity E2 with B==1 - no notification
+# 08. Create an Entity E3 with A==0 - notification
+# 09. Dump accumulator and see the notification for E3 only
 #
 
 echo "01. Create a subscription S1 with q=A==0|B==0 - q-tree created by postSubscriptions"
@@ -63,7 +66,21 @@ echo
 echo
 
 
-echo "02. Wait 2.1 seconds, to give the broker time to refresh its sub cache"
+echo "02. See the subscription in the database"
+echo "========================================"
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription - from the sub-cache"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "04. Wait 2.1 seconds, to give the broker time to refresh its sub cache"
 echo "======================================================================"
 sleep 2.1s
 echo Slept 2.1 seconds
@@ -71,7 +88,14 @@ echo
 echo
 
 
-echo "03. Create an Entity E1 with A==1 (qP missing is created) - no notification"
+echo "05. GET the subscription - from the sub-cache"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "06. Create an Entity E1 with A==1 (qP missing is created) - no notification"
 echo "==========================================================================="
 payload='{
   "id": "urn:ngsi-ld:T:E1",
@@ -83,7 +107,7 @@ echo
 echo
 
 
-echo "04. Create an Entity E2 with B==1 - no notification"
+echo "07. Create an Entity E2 with B==1 - no notification"
 echo "==================================================="
 payload='{
   "id": "urn:ngsi-ld:T:E2",
@@ -95,7 +119,7 @@ echo
 echo
 
 
-echo "05. Create an Entity E3 with A==0 - notification"
+echo "08. Create an Entity E3 with A==0 - notification"
 echo "================================================"
 payload='{
   "id": "urn:ngsi-ld:T:E3",
@@ -107,7 +131,7 @@ echo
 echo
 
 
-echo "06. Dump accumulator and see the notification for E3 only"
+echo "09. Dump accumulator and see the notification for E3 only"
 echo "========================================================="
 accumulatorDump
 accumulatorReset
@@ -125,12 +149,115 @@ Date: REGEX(.*)
 
 
 
-02. Wait 2.1 seconds, to give the broker time to refresh its sub cache
+02. See the subscription in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A.value==0|https://uri=etsi=org/ngsi-ld/default-context/B.value==0",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+03. GET the subscription - from the sub-cache
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "A==0|B==0",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+04. Wait 2.1 seconds, to give the broker time to refresh its sub cache
 ======================================================================
 Slept 2.1 seconds
 
 
-03. Create an Entity E1 with A==1 (qP missing is created) - no notification
+05. GET the subscription - from the sub-cache
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "A==0|B==0",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+06. Create an Entity E1 with A==1 (qP missing is created) - no notification
 ===========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -139,7 +266,7 @@ Date: REGEX(.*)
 
 
 
-04. Create an Entity E2 with B==1 - no notification
+07. Create an Entity E2 with B==1 - no notification
 ===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -148,7 +275,7 @@ Date: REGEX(.*)
 
 
 
-05. Create an Entity E3 with A==0 - notification
+08. Create an Entity E3 with A==0 - notification
 ================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -157,7 +284,7 @@ Date: REGEX(.*)
 
 
 
-06. Dump accumulator and see the notification for E3 only
+09. Dump accumulator and see the notification for E3 only
 =========================================================
 POST REGEX(.*)
 Content-Length: 223

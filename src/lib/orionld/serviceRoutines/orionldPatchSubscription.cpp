@@ -368,35 +368,35 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
   if (receiverInfoP != NULL)
   {
     //
-    // for each key-value pair in "receiverInfo" -
-    // - look it up in cSubP->httpInfo.receiverInfo
-    // - replace the value if there, add if not there
+    // receiverInfo is stored in cSubP->httpInfo.headers
+    // - just set it (in the std::map)
     //
     for (KjNode* riP = receiverInfoP->value.firstChildP; riP != NULL; riP = riP->next)
     {
       KjNode*   keyP   = kjLookup(riP, "key");
       KjNode*   valueP = kjLookup(riP, "value");
-      KeyValue* kvP    = keyValueLookup(cSubP->httpInfo.receiverInfo, keyP->value.s);
 
-      if (kvP != NULL)
-        strncpy(kvP->value, valueP->value.s, sizeof(kvP->value) - 1);
-      else
-        keyValueAdd(&cSubP->httpInfo.receiverInfo, keyP->value.s, valueP->value.s);
+      cSubP->httpInfo.headers[keyP->value.s] = valueP->value.s;
     }
   }
 
   if (notifierInfoP != NULL)
   {
     //
-    // notifierInfo is stored in cSubP->httpInfo.headers
-    // - just set it (in the std::map)
+    // For each key-value pair in "notifierInfo":
+    //   - lookup the key in cSubP->httpInfo.notifierInfo
+    //   - replace the value if present, add it if not
     //
     for (KjNode* riP = notifierInfoP->value.firstChildP; riP != NULL; riP = riP->next)
     {
       KjNode*   keyP   = kjLookup(riP, "key");
       KjNode*   valueP = kjLookup(riP, "value");
+      KeyValue* kvP    = keyValueLookup(cSubP->httpInfo.notifierInfo, keyP->value.s);
 
-      cSubP->httpInfo.headers[keyP->value.s] = valueP->value.s;
+      if (kvP != NULL)
+        strncpy(kvP->value, valueP->value.s, sizeof(kvP->value) - 1);
+      else
+        keyValueAdd(&cSubP->httpInfo.notifierInfo, keyP->value.s, valueP->value.s);
     }
   }
 

@@ -336,7 +336,7 @@ bye
 04. GET subscription S2 - see lang=en
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 340
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -362,6 +362,7 @@ Date: REGEX(.*)
         "format": "normalized",
         "status": "ok"
     },
+    "origin": "cache",
     "status": "active",
     "type": "Subscription",
     "watchedAttributes": [
@@ -373,7 +374,7 @@ Date: REGEX(.*)
 04. GET ALL subscriptions see lang=en in S2
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 637
+Content-Length: 677
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -399,6 +400,7 @@ Date: REGEX(.*)
             "format": "normalized",
             "status": "ok"
         },
+        "origin": "database",
         "status": "active",
         "type": "Subscription",
         "watchedAttributes": [
@@ -426,6 +428,7 @@ Date: REGEX(.*)
             "format": "normalized",
             "status": "ok"
         },
+        "origin": "database",
         "status": "active",
         "type": "Subscription",
         "watchedAttributes": [

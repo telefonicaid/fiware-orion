@@ -35,7 +35,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 01. Create a subscription S1 on type=T and with q='P1==5|P2==9'
 # 02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5
 # 03. Dump accumulator to see one notification
-# 04. See subscription in mongo - make sure ldQ =='P2==true|P3==9', and that q+mq are P&!P
+# 04. See subscription in mongo - make sure ldQ =='P1==5|P2==9', and that q+mq are P&!P
 # 05. Create an Entity E2/T, using POST /v2/entities, matching S5
 # 06. Dump accumulator to see NO notification
 #
@@ -89,8 +89,8 @@ echo
 echo
 
 
-echo "04. See subscription in mongo - make sure ldQ =='P2==true|P3==9', and that q+mq are P&!P"
-echo "========================================================================================"
+echo "04. See subscription in mongo - make sure ldQ =='P1==5|P2==9', and that q+mq are P&!P"
+echo "====================================================================================="
 mongoCmd2 ftest "db.csubs.findOne()"
 echo
 echo
@@ -215,8 +215,8 @@ Ngsild-Attribute-Format: Simplified
 =======================================
 
 
-04. See subscription in mongo - make sure ldQ =='P2==true|P3==9', and that q+mq are P&!P
-========================================================================================
+04. See subscription in mongo - make sure ldQ =='P1==5|P2==9', and that q+mq are P&!P
+=====================================================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -230,7 +230,7 @@ MongoDB server version: REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
-	"ldQ" : "P1==5|P2==9",
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P1.value==5|https://uri=etsi=org/ngsi-ld/default-context/P2.value==9",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"throttling" : 0,

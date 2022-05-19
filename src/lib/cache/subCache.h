@@ -135,6 +135,9 @@ struct CachedSubscription
   int                         consecutiveErrors;     // Not in DB
   char                        lastErrorReason[128];
 
+  double                      createdAt;
+  double                      modifiedAt;
+
   struct CachedSubscription*  next;
 };
 

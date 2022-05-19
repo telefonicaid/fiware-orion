@@ -54,39 +54,24 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // Own interface
 
 
+extern void dbModelValueStrip(KjNode* nodeP);  // FIXME: to its own modult under dbModel library
 
 // -----------------------------------------------------------------------------
 //
 // coordinateTransform -
 //
-void coordinateTransform(OrionldGeoJsonType geometry, char* to, int toLen, char* from)
+char* coordinateTransform(OrionldGeoJsonType geometry, char* to, int toLen, char* from)
 {
   if (geometry == GeoJsonPoint)
-    snprintf(to, toLen, "[%s]", from);
-
-#if 0
-  int toIx = 0;
-
-  to[0] = '[';
-  ++toIx;
-
-  while (*from != 0)
   {
-    if (*from == ';')
+    if (from[0] != '[')
     {
-      to[toIx++] = ']';
-      to[toIx++] = ',';
-      to[toIx++] = '[';
+      snprintf(to, toLen, "[%s]", from);
+      return to;
     }
-    else
-    {
-      to[toIx++] = *from;
-    }
-    ++from;
   }
 
-  to[toIx] = ']';
-#endif
+  return to;
 }
 
 
@@ -119,10 +104,9 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   // name
   if (subscriptionP->name != "")
   {
-    nodeP = kjString(orionldState.kjsonP, "name", subscriptionP->name.c_str());
+    nodeP = kjString(orionldState.kjsonP, "subscriptionName", subscriptionP->name.c_str());
     kjChildAdd(topP, nodeP);
   }
-
 
   // description
   if (subscriptionP->description != "")
@@ -215,11 +199,14 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
   // q
   const char* q = (subscriptionP->ldQ != "")? subscriptionP->ldQ.c_str() : subscriptionP->subject.condition.expression.q.c_str();
-
+  LM_TMP(("KZ: subscriptionP->ldQ: '%s'", subscriptionP->ldQ.c_str()));
+  LM_TMP(("KZ: q: '%s'", q));
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
+    dbModelValueStrip(nodeP);
     qAliasCompact(nodeP, true);
+    LM_TMP(("KZ: q after qAliasCompact: '%s'", nodeP->value.s));
     kjChildAdd(topP, nodeP);
   }
 
@@ -256,9 +243,9 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
       char*    coordinateVector    = (char*) malloc(coordinateVectorLen);
       KjNode*  coordValueP;
 
-      coordinateTransform(geometry, coordinateVector, coordinateVectorLen, coordinateString);
+      coordinateString = coordinateTransform(geometry, coordinateVector, coordinateVectorLen, coordinateString);
 
-      coordValueP = kjParse(orionldState.kjsonP, coordinateVector);
+      coordValueP = kjParse(orionldState.kjsonP, coordinateString);
       free(coordinateVector);
 
       if (coordValueP == NULL)
@@ -313,36 +300,27 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     kjChildAdd(topP, nodeP);
   }
 
-  if (cSubP != NULL)
-  {
-    // status
-    if ((subscriptionP->expires > 0) && (subscriptionP->expires < orionldState.requestTime))
-      cSubP->status = (char*) "expired";
+  // status
+  char* status = (char*) ((cSubP != NULL)? cSubP->status.c_str() : subscriptionP->status.c_str());
 
-    nodeP = kjString(orionldState.kjsonP, "status", cSubP->status.c_str());
-    kjChildAdd(topP, nodeP);
+  if ((subscriptionP->expires > 0) && (subscriptionP->expires < orionldState.requestTime))
+    status = (char*) "expired";
+  else if (strcmp(status, "inactive") == 0)
+    status = (char*) "paused";
+
+  nodeP = kjString(orionldState.kjsonP, "status", status);
+  kjChildAdd(topP, nodeP);
 
 
-    // isActive
-    nodeP = kjBoolean(orionldState.kjsonP, "isActive", (cSubP->isActive == false)? false : true);
-    kjChildAdd(topP, nodeP);
-  }
-  else  // Take the valus from the subscription from the database
-  {
-    // status
-    char* status = (char*) subscriptionP->status.c_str();
-    if ((subscriptionP->expires > 0) && (subscriptionP->expires < orionldState.requestTime))
-      status = (char*) "expired";
-    nodeP = kjString(orionldState.kjsonP, "status", status);
-    kjChildAdd(topP, nodeP);
+  // isActive
+  bool isActive = (cSubP != NULL)? cSubP->isActive : false;
 
-    // isActive
-    bool isActive = true;
-    if (strcmp(status, "active") != 0)
-      isActive = false;
-    nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
-    kjChildAdd(topP, nodeP);
-  }
+  if ((isActive == false) && strcmp(status, "active") == 0)
+    isActive = true;
+
+  nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
+  kjChildAdd(topP, nodeP);
+
 
   // notification
   KjNode* notificationP = kjObject(orionldState.kjsonP, "notification");
@@ -399,25 +377,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
       KjNode* kvObject = kjObject(orionldState.kjsonP, NULL);
       KjNode* keyP     = kjString(orionldState.kjsonP, "key",   subscriptionP->notification.httpInfo.notifierInfo[ix]->key);
       KjNode* valueP   = kjString(orionldState.kjsonP, "value", subscriptionP->notification.httpInfo.notifierInfo[ix]->value);
-
-      kjChildAdd(kvObject, keyP);
-      kjChildAdd(kvObject, valueP);
-      kjChildAdd(niArray,  kvObject);
-    }
-    kjChildAdd(endpointP, niArray);
-  }
-
-
-  // notification::endpoint::receiverInfo
-  if (subscriptionP->notification.httpInfo.receiverInfo.size() > 0)
-  {
-    KjNode* niArray = kjArray(orionldState.kjsonP, "receiverInfo");
-
-    for (unsigned int ix = 0; ix < subscriptionP->notification.httpInfo.receiverInfo.size(); ix++)
-    {
-      KjNode* kvObject = kjObject(orionldState.kjsonP, NULL);
-      KjNode* keyP     = kjString(orionldState.kjsonP, "key",   subscriptionP->notification.httpInfo.receiverInfo[ix]->key);
-      KjNode* valueP   = kjString(orionldState.kjsonP, "value", subscriptionP->notification.httpInfo.receiverInfo[ix]->value);
 
       kjChildAdd(kvObject, keyP);
       kjChildAdd(kvObject, valueP);
@@ -574,6 +533,13 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   if (subscriptionP->lang != "")
   {
     nodeP = kjString(orionldState.kjsonP, "lang", subscriptionP->lang.c_str());
+    kjChildAdd(topP, nodeP);
+  }
+
+  // origin
+  if (experimental == true)
+  {
+    nodeP = kjString(orionldState.kjsonP, "origin", "database");
     kjChildAdd(topP, nodeP);
   }
 

@@ -824,6 +824,7 @@ static void libLogFunction
 }
 
 
+// char* SUB_CACHE_DISABLED = NULL;
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -832,6 +833,20 @@ static void libLogFunction
 */
 int main(int argC, char* argV[])
 {
+# if 0
+  //
+  // Just an experiment.
+  // It's an interesting way of "comparing strings"
+  // The problem is "const chasr*" vs "char*" - stupid C++ and its type checking!!!
+  //
+  char* sc = SUB_CACHE_DISABLED;
+  if (sc == SUB_CACHE_DISABLED)
+  {
+    printf("the sub cache is disabled\n");
+    exit(1);
+  }
+#endif
+
 #if LEAK_TEST
   char* allocated = strdup("123");
   if (allocated == NULL)

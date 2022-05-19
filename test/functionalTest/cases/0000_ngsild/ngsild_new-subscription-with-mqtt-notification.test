@@ -38,7 +38,7 @@ mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROK
 # 04. Create an entity matching the subscription
 # 05. Dump and Reset the MQTT test client and see one notification
 # 06. Restart the broker
-# 07. GET the subscription
+# 07. GET the subscription, without context => AirQualityObserved as longname
 # 08. Create another entity matching the subscription
 # 09. Dump the MQTT test client and see one notification
 #
@@ -134,9 +134,16 @@ echo
 echo
 
 
-echo "07. GET the subscription"
-echo "========================"
+echo "07. GET the subscription, without context => AirQualityObserved as longname"
+echo "==========================================================================="
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+echo
+echo
+
+
+echo "07. GET the subscription, with context => AirQualityObserved as shortname"
+echo "========================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification  -H 'Link: <https://fiware.github.io/data-models/context.jsonld>'
 echo
 echo
 
@@ -229,7 +236,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 487
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -237,7 +244,7 @@ Date: REGEX(.*)
 {
     "entities": [
         {
-            "type": "AirQualityObserved"
+            "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
         },
         {
             "type": "AirQualityObserved2"
@@ -269,6 +276,7 @@ Date: REGEX(.*)
         "format": "normalized",
         "status": "ok"
     },
+    "origin": "cache",
     "status": "active",
     "type": "Subscription"
 }
@@ -321,12 +329,61 @@ Notifications: 1
 ======================
 
 
-07. GET the subscription
-========================
+07. GET the subscription, without context => AirQualityObserved as longname
+===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 487
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
+        },
+        {
+            "type": "AirQualityObserved2"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:mqttNotification",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "123"
+                },
+                {
+                    "key": "H2",
+                    "value": "456"
+                }
+            ],
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+07. GET the subscription, with context => AirQualityObserved as shortname
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 449
+Content-Type: application/json
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -364,6 +421,7 @@ Date: REGEX(.*)
         "format": "normalized",
         "status": "ok"
     },
+    "origin": "cache",
     "status": "active",
     "type": "Subscription"
 }

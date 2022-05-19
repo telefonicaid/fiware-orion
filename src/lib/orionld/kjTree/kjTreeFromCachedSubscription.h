@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCACHEDSUBSCRIPTION_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCACHEDSUBSCRIPTION_H_
 
 /*
 *
@@ -27,29 +27,17 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                     // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
+
+#include "cache/subCache.h"                                      // CachedSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckSubscription -
+// kjTreeFromCachedSubscription - in NGSI-LD API format
 //
-extern bool pCheckSubscription
-(
-  KjNode*   subP,
-  KjNode*   idP,
-  KjNode*   typeP,
-  KjNode**  endpointP,
-  KjNode**  qNodeP,
-  QNode**   qTreeP,
-  char**    qTextP,
-  bool*     qValidForV2P,
-  bool*     qIsMqP,
-  KjNode**  uriPP,
-  KjNode**  notifierInfoPP,
-  KjNode**  geoCoordinatesPP
-);
+extern KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, bool contextInBody);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCACHEDSUBSCRIPTION_H_

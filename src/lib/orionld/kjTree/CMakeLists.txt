@@ -60,6 +60,7 @@ SET (SOURCES
     kjChildPrepend.cpp
     kjNodeDecouple.cpp
     kjNavigate.cpp
+    kjTreeFromCachedSubscription.cpp
 )
 
 # Include directories

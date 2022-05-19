@@ -370,7 +370,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     }
     else if (strcmp(fragmentP->name, "q") == 0)
       qP = fragmentP;
-    else if (strcmp(fragmentP->name, "mq") == 0)  // Not NGSI-LD, but added in qFix() (orionldPostSubscriptions.cpp)
+    else if (strcmp(fragmentP->name, "mq") == 0)  // Not NGSI-LD, but added by orionldPostSubscriptions(), for NGSIv2
       mqP = fragmentP;
     else if (strcmp(fragmentP->name, "geoQ") == 0)
       geoqP = fragmentP;

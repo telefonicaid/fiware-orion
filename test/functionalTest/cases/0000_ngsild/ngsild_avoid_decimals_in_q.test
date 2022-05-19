@@ -138,7 +138,7 @@ bye
 03. GET the subscription and see the Q String Filter P2>10
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 549
+Content-Length: 561
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 {
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
-  "name": "Test subscription 01",
+  "subscriptionName": "Test subscription 01",
   "description": "Description of Test subscription 01",
   "entities": [
     {

@@ -42,7 +42,7 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// varFix -
+// qVariableFix -
 //
 // - If simple attribute name - all OK
 // - If attr.b.c, then 'attr' must be extracted, expanded and then '.md.b.c' appended
@@ -50,8 +50,13 @@ extern "C"
 //
 // After implementing expansion in metadata names, for attr.b.c, 'b' needs expansion also
 //
-static char* varFix(char* varPath, bool forDb, char** detailsP)
+char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
 {
+  char  varPath[1024];  // Can't destroy varPathIn - need to copy it
+
+  strncpy(varPath, varPathIn, sizeof(varPath) - 1);
+  LM_TMP(("QM: In varFix for varPath '%s'", varPath));
+
   char* cP            = varPath;
   char* attrNameP     = varPath;
   char* firstDotP     = NULL;
@@ -60,9 +65,8 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
   char* endBracketP   = NULL;
   char* mdNameP       = NULL;
   char* rest          = NULL;
-  char  fullPath[1100];
+  char  fullPath[1024];
 
-  LM_TMP(("Q: In varFix for varPath '%s'", varPath));
   //
   // Cases (for forDb==true):
   //
@@ -112,6 +116,7 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 
     ++cP;
   }
+
 
   //
   // Error handling
@@ -203,10 +208,15 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
     return NULL;
   }
 
+  if ((caseNo == 3) || (caseNo == 4))
+    *isMdP = true;
+
   //
   // All OK - let's compose ...
   //
+  LM_TMP(("KZ: Expanding attr '%s'", attrNameP));
   char* longNameP = orionldAttributeExpand(orionldState.contextP, attrNameP, true, NULL);
+  LM_TMP(("KZ: Expanded '%s'", longNameP));
 
   //
   // Now 'longNameP' needs to be adjusted forthe DB model, that changes '.' for '=' in the database.
@@ -250,6 +260,8 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
     }
   }
 
+  LM_TMP(("QM: Case No: %d", caseNo));
+
   if (forDb)
   {
     if (caseNo == 1)
@@ -288,13 +300,13 @@ static char* varFix(char* varPath, bool forDb, char** detailsP)
 
   if (orionldState.useMalloc == true)
   {
-    free(varPath);
+    // free(varPath);
     char* fp = strndup(fullPath, sizeof(fullPath) - 1);
-    LM_TMP(("Q: From varFix returning '%s'", fp));
+    LM_TMP(("QM: returning '%s'", fp));
     return fp;
   }
 
-  LM_TMP(("Q: From varFix returning '%s'", fullPath));
+  LM_TMP(("QM: returning '%s'", fullPath));
   return kaStrdup(&orionldState.kalloc, fullPath);
 }
 
@@ -384,7 +396,7 @@ static QNode* qNodeAppend(QNode* container, QNode* childP, bool clone = true)
 // * On the same parenthesis level, the same op must be used (op: AND|OR)
 // *
 //
-QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char** detailsP)
+QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, char** titleP, char** detailsP)
 {
   QNode*     qNodeV[10]      = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
   int        qNodeIx         = 0;
@@ -413,6 +425,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
       }
     }
 
+    bool isMd;   // Needed for qVariableFix - not used here
     switch (qLexP->type)
     {
     case QNodeOpen:
@@ -442,14 +455,15 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char*
         }
       }
       LM_TMP(("Calling qParse from '%s' to '%s'", qNodeType(openP->next->type), qNodeType(closeP->type)));
-      qNodeV[qNodeIx++] = qParse(openP->next, closeP, forDb, titleP, detailsP);
+      qNodeV[qNodeIx++] = qParse(openP->next, closeP, forDb, qToDbModel, titleP, detailsP);
 
       // Make qLexP point to ')' (will get ->next at the end of the loop)
       qLexP = closeP;
       break;
 
     case QNodeVariable:
-      qLexP->value.v = varFix(qLexP->value.v, forDb, detailsP);
+      if (qToDbModel == true)
+        qLexP->value.v = qVariableFix(qLexP->value.v, forDb, &isMd, detailsP);
       if ((qLexP->next == NULL) || (qLexP->next->type == QNodeOr) || (qLexP->next->type == QNodeAnd) || (qLexP->next->type == QNodeClose))
       {
         if (compOpP == NULL)

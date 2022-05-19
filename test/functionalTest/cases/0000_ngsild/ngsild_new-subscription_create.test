@@ -420,7 +420,7 @@ MongoDB server version: REGEX(.*)
 	"conditions" : [
 		"http://example.org/P2"
 	],
-	"ldQ" : "P2>10|P1==7",
+	"ldQ" : "http://example=org/P2.value>10|http://example=org/P1.value==7",
 	"expression" : {
 		"geometry" : "point",
 		"coords" : "1,2",
@@ -459,7 +459,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1132
+Content-Length: 1163
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -467,7 +467,7 @@ Date: REGEX(.*)
 {
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
-  "name": "Test subscription 01",
+  "subscriptionName": "Test subscription 01",
   "description": "Description of Test subscription 01",
   "entities": [
     {
@@ -489,14 +489,14 @@ Date: REGEX(.*)
   "q": "P2>10|P1==7",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==1000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==1000",
     "geoproperty": "location"
   },
-  "status": "inactive",
+  "status": "paused",
   "isActive": false,
   "notification": {
     "attributes": [
@@ -508,88 +508,16 @@ Date: REGEX(.*)
     "endpoint": {
       "uri": "http://valid.url/url",
       "accept": "application/ld+json",
-      "notifierInfo": [
-        {
-          "key": "MQTT-QoS",
-          "value": "0"
-        }
-      ],
       "receiverInfo": [
         {
           "key": "H1",
           "value": "header 1"
         }
-      ]
-    },
-    "status": "ok"
-  },
-  "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
-}
-
-
-
-04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
-====================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 1221
-Content-Type: application/ld+json
-Date: REGEX(.*)
-
-{
-  "id": "http://a.b.c/subs/sub01",
-  "type": "Subscription",
-  "name": "Test subscription 01",
-  "description": "Description of Test subscription 01",
-  "entities": [
-    {
-      "id": "urn:ngsi-ld:E01",
-      "type": "T1"
-    },
-    {
-      "id": "http://a.b.c/E02",
-      "type": "T2"
-    },
-    {
-      "idPattern": ".*E03.*",
-      "type": "T3"
-    }
-  ],
-  "watchedAttributes": [
-    "P2"
-  ],
-  "q": "P2>10|P1==7",
-  "geoQ": {
-    "geometry": "Point",
-    "coordinates": [
-      1,
-      2
-    ],
-    "georel": "near;maxDistance==1000",
-    "geoproperty": "location"
-  },
-  "status": "inactive",
-  "isActive": false,
-  "notification": {
-    "attributes": [
-      "P1",
-      "P2",
-      "A3"
-    ],
-    "format": "keyValues",
-    "endpoint": {
-      "uri": "http://valid.url/url",
-      "accept": "application/ld+json",
+      ],
       "notifierInfo": [
         {
           "key": "MQTT-QoS",
           "value": "0"
-        }
-      ],
-      "receiverInfo": [
-        {
-          "key": "H1",
-          "value": "header 1"
         }
       ]
     },
@@ -597,6 +525,80 @@ Date: REGEX(.*)
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
+  "origin": "cache"
+}
+
+
+
+04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1252
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "subscriptionName": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10|P1==7",
+  "geoQ": {
+    "geometry": "Point",
+    "georel": "near;maxDistance==1000",
+    "coordinates": [
+      1,
+      2
+    ],
+    "geoproperty": "location"
+  },
+  "status": "paused",
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json",
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "header 1"
+        }
+      ],
+      "notifierInfo": [
+        {
+          "key": "MQTT-QoS",
+          "value": "0"
+        }
+      ]
+    },
+    "status": "ok"
+  },
+  "expiresAt": "2028-12-31T10:00:00.000Z",
+  "throttling": 5,
+  "origin": "cache",
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
@@ -665,7 +667,7 @@ Date: REGEX(.*)
 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 456
+Content-Length: 485
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -682,7 +684,6 @@ Date: REGEX(.*)
     "id": "http://a.b.c/subs/sub09",
     "isActive": true,
     "modifiedAt": REGEX(.*),
-    "name": "Test subscription 09",
     "notification": {
         "attributes": [
             "P1"
@@ -694,8 +695,10 @@ Date: REGEX(.*)
         "format": "keyValues",
         "status": "ok"
     },
+    "origin": "cache",
     "q": "P2>10",
     "status": "active",
+    "subscriptionName": "Test subscription 09",
     "type": "Subscription"
 }
 
@@ -725,7 +728,7 @@ MongoDB server REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
-	"ldQ" : "P2>10",
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"throttling" : 0,
@@ -735,7 +738,7 @@ MongoDB server REGEX(.*)
 		"georel" : "",
 		"geoproperty" : "",
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
-		"mq" : "P.P;!P.P"
+		"mq" : ""
 	},
 	"format" : "normalized",
 	"reference" : "http://tutorial:3000/subscription/test0001",

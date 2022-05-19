@@ -136,7 +136,7 @@ Date: REGEX(.*)
 02. GET subscription 'http://a.b.c/subs/sub01' and see it
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 940
+Content-Length: 952
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -144,7 +144,7 @@ Date: REGEX(.*)
 {
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
-  "name": "Test subscription 01",
+  "subscriptionName": "Test subscription 01",
   "description": "Description of Test subscription 01",
   "entities": [
     {

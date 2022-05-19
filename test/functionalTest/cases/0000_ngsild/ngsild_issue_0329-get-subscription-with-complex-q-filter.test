@@ -143,7 +143,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/urn:ngsi-ld:subscription:S1, make sure the Q-filter is OK
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 626
+Content-Length: 638
 Content-Type: application/json
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -157,7 +157,6 @@ Date: REGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscription:S1",
     "isActive": true,
-    "name": "Test subscription 01",
     "notification": {
         "attributes": [
             "numberOfItems",
@@ -173,6 +172,7 @@ Date: REGEX(.*)
     },
     "q": "numberOfItems<10;locatedIn==%22urn:ngsi-ld:Store:001%22",
     "status": "active",
+    "subscriptionName": "Test subscription 01",
     "type": "Subscription",
     "watchedAttributes": [
         "numberOfItems"

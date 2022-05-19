@@ -325,9 +325,6 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
   eqForDot(compV[0]);  // As it is an Attribute
   eqForDot(compV[1]);  // As it MIGHT be a Sub-Attribute (and if not, it has no '=')
 
-  LM_TMP(("QM: compV[0] == '%s'", compV[0]));
-  LM_TMP(("QM: compV[1] == '%s'", compV[1]));
-
   //
   // Is it a timestamp?   (if so, an ISO8601 string must be turned into a float/integer to be compared
   //
@@ -339,6 +336,8 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
 
   compV[components] = NULL;
   kjTreeLog(treeP, "QM: Tree to navigate");
+  LM_TMP(("QM: compV[0] == '%s'", compV[0]));
+  LM_TMP(("QM: compV[1] == '%s'", compV[1]));
   return kjNavigate(treeP, compV);
 }
 
@@ -788,20 +787,25 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       //
       // Might be we come from a sub-cache-refresh, and the subscription has a "q" but its "qP" hasn't been built
-      // Only done if its an NGSI-LD operations AND if it's an NGSI-LD Subscription (has a contextP pointer)
+      // Only done if its an NGSI-LD operation AND if it's an NGSI-LD Subscription (ldContext has a value != "")
       //
       if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->qText != NULL))
       {
-        LM_TMP(("Q: Building qP from: '%s'", subP->qText));
-        subP->qP = qBuild(subP->qText);
+        LM_TMP(("KZ: ********************** Building qP from: '%s'", subP->qText));
+        subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false);
       }
 
-      if ((subP->qP != NULL) && (qMatch(subP->qP, altP) == false))
+      if (subP->qP != NULL)
       {
-        LM_TMP(("Sub '%s' - no match due to q == '%s'", subP->subscriptionId, subP->expression.q.c_str()));
-        continue;
-      }
+        LM_TMP(("Calling qMatch for subP->qP and altP"));
+        qPresent(subP->qP, "QM", "qP for qMatch");
 
+        if (qMatch(subP->qP, altP) == false)
+        {
+          LM_TMP(("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
+          continue;
+        }
+      }
 
       //
       // attributeMatch is too complex ...

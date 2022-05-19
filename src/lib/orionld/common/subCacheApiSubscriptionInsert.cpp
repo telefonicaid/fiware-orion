@@ -31,6 +31,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // kjBufferCreate
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjRender.h"                                      // kjFastRender
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -52,18 +53,18 @@ extern "C"
 // subCacheApiSubscriptionInsert -
 // subCacheDbSubscriptionInsert - later ...
 //
-CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, OrionldContext* contextP)
+CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP)
 {
   CachedSubscription* cSubP = new CachedSubscription();
 
   cSubP->tenant              = (orionldState.in.tenant == NULL)? NULL : strdup(orionldState.in.tenant);
   cSubP->servicePath         = strdup("/#");
   cSubP->qP                  = qTree;
-  cSubP->contextP            = contextP;
-  cSubP->ldContext           = contextP->url;
+  cSubP->contextP            = contextP;        // Right now, this is orionldState.contextP, i.e., the @context used when creating
+  cSubP->ldContext           = contextP->url;   // the subscription. Soon, the subscription will contain a field for its context instead.
 
   KjNode* subscriptionIdP    = kjLookup(apiSubscriptionP, "_id");  // "id" was changed to "_id" by orionldPostSubscriptions to accomodate the DB insertion
-  KjNode* subscriptionNameP  = kjLookup(apiSubscriptionP, "subscriptionName");
+  KjNode* subscriptionNameP  = kjLookup(apiSubscriptionP, "subscriptionName");  // "name" is accepted too ...
   KjNode* descriptionP       = kjLookup(apiSubscriptionP, "description");
   KjNode* entitiesP          = kjLookup(apiSubscriptionP, "entities");
   KjNode* watchedAttributesP = kjLookup(apiSubscriptionP, "watchedAttributes");
@@ -76,9 +77,14 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   KjNode* expiresAtP         = kjLookup(apiSubscriptionP, "expiresAt");
   KjNode* throttlingP        = kjLookup(apiSubscriptionP, "throttling");
   KjNode* langP              = kjLookup(apiSubscriptionP, "lang");
+  KjNode* createdAtP         = kjLookup(apiSubscriptionP, "createdAt");
+  KjNode* modifiedAtP        = kjLookup(apiSubscriptionP, "modifiedAt");
 
   if (subscriptionIdP != NULL)
     cSubP->subscriptionId = strdup(subscriptionIdP->value.s);
+
+  if (subscriptionNameP == NULL)
+    subscriptionNameP = kjLookup(apiSubscriptionP, "name");
 
   if (subscriptionNameP != NULL)
     cSubP->name = subscriptionNameP->value.s;
@@ -87,12 +93,20 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     cSubP->description = strdup(descriptionP->value.s);
 
   if (qP != NULL)
+  {
     cSubP->expression.q = qP->value.s;
+    LM_TMP(("KZ: q: '%s'", cSubP->expression.q.c_str()));
+  }
   if (mqP != NULL)
-    cSubP->expression.mq = qP->value.s;
+  {
+    cSubP->expression.mq = mqP->value.s;
+    LM_TMP(("KZ: mq: '%s'", cSubP->expression.mq.c_str()));
+  }
   if (ldqP != NULL)
-    cSubP->qText = strdup(qP->value.s);
-
+  {
+    cSubP->qText = strdup(ldqP->value.s);
+    LM_TMP(("KZ: ldQ: '%s'", cSubP->qText));
+  }
 
   if (isActiveP != NULL)
   {
@@ -138,7 +152,6 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   if (geoqP != NULL)
   {
     KjNode* geometryP    = kjLookup(geoqP, "geometry");
-    KjNode* coordinatesP = kjLookup(geoqP, "coordinates");
     KjNode* georelP      = kjLookup(geoqP, "georel");
     KjNode* geopropertyP = kjLookup(geoqP, "geoproperty");
 
@@ -151,12 +164,14 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     if (geopropertyP != NULL)
       cSubP->expression.geoproperty = geopropertyP->value.s;
 
-    if (coordinatesP != NULL)
+    if (geoCoordinatesP != NULL)
     {
-      if (coordinatesP->type == KjArray)
+      cSubP->geoCoordinatesP = kjClone(NULL, geoCoordinatesP);
+
+      if (geoCoordinatesP->type == KjArray)
       {
         char coords[1024];
-        kjFastRender(coordinatesP, coords);
+        kjFastRender(geoCoordinatesP, coords);
         cSubP->expression.coords = coords;  // Not sure this is 100% correct format, but is it used? DB is used for Geo ...
       }
     }
@@ -245,8 +260,7 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
           KjNode* keyP   = kjLookup(riP, "key");
           KjNode* valueP = kjLookup(riP, "value");
 
-          if ((keyP != NULL) && (valueP != NULL))
-            keyValueAdd(&cSubP->httpInfo.receiverInfo, keyP->value.s, valueP->value.s);
+          cSubP->httpInfo.headers[keyP->value.s] = valueP->value.s;
         }
       }
 
@@ -254,10 +268,13 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
       {
         for (KjNode* niP = notifierInfoP->value.firstChildP; niP != NULL; niP = niP->next)
         {
-          KjNode* keyP   = kjLookup(niP, "key");
-          KjNode* valueP = kjLookup(niP, "value");
+          KjNode*   keyP   = kjLookup(niP, "key");
+          KjNode*   valueP = kjLookup(niP, "value");
+          KeyValue* kvP    = keyValueLookup(cSubP->httpInfo.notifierInfo, keyP->value.s);
 
-          if ((keyP != NULL) && (valueP != NULL))
+          if (kvP != NULL)
+            strncpy(kvP->value, valueP->value.s, sizeof(kvP->value) - 1);
+          else
             keyValueAdd(&cSubP->httpInfo.notifierInfo, keyP->value.s, valueP->value.s);
         }
       }
@@ -286,6 +303,12 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
       LM_E(("Subscription '%s': invalid 'mq': %s", mqP->value.s, cSubP->subscriptionId));
     }
   }
+
+  if (createdAtP != NULL)
+    cSubP->createdAt = createdAtP->value.f;
+
+  if (modifiedAtP != NULL)
+    cSubP->modifiedAt = modifiedAtP->value.f;
 
   subCacheItemInsert(cSubP);
 

@@ -1,0 +1,173 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New subscription with a complex q, for creation, update and sub-cache-refresh
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -subCacheIval 5
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 with q=(temp<18|temp>25)&(humidity<20|humidity>80)
+# 02. See the subscription in mongo - see ldQ as expanded q with '.value' and '=' ???
+# 03. GET the subscription from cache - assure 'q' is OK
+# 04. GET the subscription from DB - assure 'q' is OK
+# 05. Create a matching Entity E1, to provoke a notification
+# 06. Create a non-matching Entity E2, to NOT provoke any notification
+# 07. Dump+Reset accumulator, see ONE notification (E1)
+#
+# 08. PATCH sub with q=(temp<19|temp>26)&(humidity<21|humidity>81)
+# 09. See the subscription in mongo - see ldQ as expanded q with '.value' and '='
+# 10. GET the subscription from cache - assure 'q' is OK
+# 11. GET the subscription from DB - assure 'q' is OK
+# 12. Create a matching Entity E3, to provoke a notification
+# 13. Create a non-matching Entity E4, to NOT provoke any notification
+# 14. Dump+Reset accumulator, see ONE notification (E3)
+#
+# 15. Sleep 5 secs, to give the broker time to refresh the subcache
+# 16. GET the subscription from cache - assure 'q' is OK
+# 17. GET the subscription from DB - assure 'q' is OK
+# 18. Create a matching Entity E5, to provoke a notification
+# 19. Create a non-matching Entity E6, to NOT provoke any notification
+# 20. Dump+Reset accumulator, see ONE notification (E5)
+#
+# 21. Restart the broker
+# 22. GET the subscription from cache - assure 'q' is OK
+# 23. GET the subscription from DB - assure 'q' is OK
+# 24. Create a matching Entity E7, to provoke a notification
+# 25. Create a non-matching Entity E8, to NOT provoke any notification
+# 26. Dump+Reset accumulator, see ONE notification (E7)
+#
+
+
+echo "01. Create a subscription S1 with q=(temp<18|temp>25)&(humidity<20|humidity>80)"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "(temp<18|temp>25)&(humidity<20|humidity>80)",
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See the subscription in mongo - see ldQ as expanded q with '.value' and '='"
+echo "==============================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription from cache - assure 'q' is OK"
+echo "======================================================"
+#orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "04. GET the subscription from DB - assure 'q' is OK"
+echo "==================================================="
+#orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 with q=(temp<18|temp>25)&(humidity<20|humidity>80)
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. See the subscription in mongo - see ldQ as expanded q with '.value' and '='
+===============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "(https://uri=etsi=org/ngsi-ld/default-context/temp.value<18|https://uri=etsi=org/ngsi-ld/default-context/temp.value>25);(https://uri=etsi=org/ngsi-ld/default-context/humidity.value<20|https://uri=etsi=org/ngsi-ld/default-context/humidity.value>80)",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+03. GET the subscription from cache - assure 'q' is OK
+======================================================
+
+
+04. GET the subscription from DB - assure 'q' is OK
+===================================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
