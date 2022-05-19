@@ -42,6 +42,7 @@
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
+#include "mongoBackend/location.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundValueBson.h"
@@ -959,7 +960,18 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson());
+    orion::CompoundValueNode* childToRenderP = compoundValueP;
+    if (type == GEO_JSON)
+    {
+      childToRenderP = getGeometry(compoundValueP);
+    }
+
+    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
+    // of DB entities) may lead to NULL, so the check is needed
+    if (childToRenderP != NULL)
+    {
+      jh.addRaw("value", childToRenderP->toJson());
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
