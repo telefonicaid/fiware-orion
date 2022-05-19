@@ -90,7 +90,7 @@ echo
 
 
 echo "04. See subscription in mongo - make sure ldQ =='P1==5|P2==9', and that q+mq are P&!P"
-echo "========================================================================================"
+echo "====================================================================================="
 mongoCmd2 ftest "db.csubs.findOne()"
 echo
 echo
@@ -230,7 +230,7 @@ MongoDB server version: REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
-	"ldQ" : "https://uri.etsi.org/ngsi-ld/default-context/P1==5|https://uri.etsi.org/ngsi-ld/default-context/P2==9",
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P1.value==5|https://uri=etsi=org/ngsi-ld/default-context/P2.value==9",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"throttling" : 0,

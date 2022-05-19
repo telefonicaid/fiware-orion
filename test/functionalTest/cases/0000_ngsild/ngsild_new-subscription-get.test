@@ -147,14 +147,14 @@ MongoDB server version: REGEX(.*)
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
-	"ldQ" : "https://uri.etsi.org/ngsi-ld/default-context/P2>10",
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
 	"expression" : {
 		"geometry" : "point",
 		"coords" : "1,2",
 		"georel" : "near;maxDistance:100",
 		"geoproperty" : "location",
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
-		"mq" : "P.P;!P.P"
+		"mq" : ""
 	},
 	"status" : "inactive",
 	"expiration" : 1861869600,

@@ -798,6 +798,11 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 * fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
 * has made a notification to be triggered/fired upon creation-time of the subscription.
 * UPDATE: Initial Notifications have been removed => always 0
+*
+* Who calls this function?
+* ONLY mongoCreateSubscription (via a static function called "insertInCache")
+* Meaning, it's only "old" stuff, either NGSIv2, or NGSI-LD using mongoBackend.
+*
 */
 void subCacheItemInsert
 (
@@ -895,8 +900,43 @@ void subCacheItemInsert
   cSubP->consecutiveErrors     = 0;
   cSubP->lastErrorReason[0]    = 0;
 
+  //
+  // The three 'q's
+  //
+  cSubP->qText      = NULL;
+  cSubP->qP         = NULL;
 
-  cSubP->expression.q           = q;
+  bool validForV2 = true;
+  bool isMq       = false;
+
+  if (q != "")
+  {
+    if (orionldState.apiVersion == NGSI_LD_V1)
+    {
+      LM_TMP(("QP: q == '%s'", q.c_str()));
+      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // qBuild allocates cSubP->qText
+    }
+    else
+      cSubP->qText = (char*) strdup(q.c_str());
+
+    if (validForV2 == false)
+    {
+      cSubP->expression.q           = "P;!P";
+      cSubP->expression.mq          = "P.P;!P.P";
+    }
+    else if (isMq)
+    {
+      cSubP->expression.mq          = cSubP->qText;
+      cSubP->expression.q           = "P;!P";
+    }
+    else
+    {
+      cSubP->expression.q           = cSubP->qText;
+      cSubP->expression.mq          = "P.P;!P.P";
+    }
+  }
+
+
   cSubP->expression.geometry    = geometry;
   cSubP->expression.coords      = coords;
   cSubP->expression.georel      = georel;
@@ -905,10 +945,6 @@ void subCacheItemInsert
   cSubP->notifyConditionV       = conditionAttrs;
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
-
-  LM_TMP(("QP: q == '%s'", q.c_str()));
-  if ((q != "") && (orionldState.apiVersion == NGSI_LD_V1))
-    cSubP->qP = qBuild(q.c_str());
 
 
   //

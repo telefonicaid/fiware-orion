@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // Own interface
 
 
+extern void dbModelValueStrip(KjNode* nodeP);  // FIXME: to its own modult under dbModel library
 
 // -----------------------------------------------------------------------------
 //
@@ -203,6 +204,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
+    dbModelValueStrip(nodeP);
     qAliasCompact(nodeP, true);
     LM_TMP(("KZ: q after qAliasCompact: '%s'", nodeP->value.s));
     kjChildAdd(topP, nodeP);

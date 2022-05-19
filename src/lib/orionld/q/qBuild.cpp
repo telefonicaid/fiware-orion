@@ -34,7 +34,8 @@
 #include "orionld/q/qLex.h"                                    // qLex
 #include "orionld/q/qParse.h"                                  // qParse
 #include "orionld/q/qRelease.h"                                // qListRelease
-#include "orionld/q/qPresent.h"                                // qPresent
+#include "orionld/q/qPresent.h"                                // qPresent, qListPresent
+#include "orionld/q/qLexListRender.h"                          // qLexListRender
 #include "orionld/q/qBuild.h"                                  // Own interface
 
 
@@ -43,14 +44,37 @@
 //
 // qBuild - build QNode tree
 //
-QNode* qBuild(const char* q)
+// DESCRIPTION
+//   'q' filters are used for querying entities (GET /entities, POST /entityOperations/query) and
+//   for subscriptions/notifications.
+//
+//   For entity queries, the filter is parsed, used and thrown away - kalloc is used.
+//
+//   However, for subscriptions:
+//   - the filter needs to be expanded and saved in the database
+//   - the filter needs to ba allocated and stored in the subscription cache (for GET /subscriptions ops)
+//   - the resulting QNode tree needs to be allocated and stored in the subscription cache
+//
+//   At startup, when the subscription cache is populated from the database content, the same applies (for subscriptions).
+//   As well as for regular sub-cache refresh operations.
+//
+//   We assume for now that "GET /subscriptions" operations always use the sub-cache.
+//
+// PARAMETERS
+//   q            the string as it figures in uri param or payload body
+//   qRenderP     output parameter for the prepared filter (expansion, dotForEq, '.value')
+//   v2ValidP     output parameter indicating whether the q string id valid for NGSIv2
+//   isMqP        output parameter indicating whether the q para meter corresponds to 'mq' in NGSIv2
+//   qToDbModel   transform the variables in 'q' to look like they look in the q in the database
+//
+QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool qToDbModel)
 {
-  QNode*      qP        = NULL;
+  QNode*      qP = NULL;
   char*       title;
   char*       detail;
   QNode*      qList;
 
-  LM_TMP(("Got a 'q': %s", q));
+  LM_TMP(("QQ: Got a 'q': %s", q));
 
   // qLex destroys the input string, but we need it intact
   char        buf[512];
@@ -70,12 +94,27 @@ QNode* qBuild(const char* q)
   }
   else
   {
-    qP = qParse(qList, NULL, false, &title, &detail);
+    qListPresent(qList, NULL, "QQ", "Q Lex List");
+    if (qRenderP != NULL)
+    {
+      LM_TMP(("KZ: Rendering q"));
+      // NOTE: qLexListRender MUST NOT destroy the qList!!!
+      *qRenderP = qLexListRender(qList, v2ValidP, isMqP);  // qLexListRender allocates the string - must be freed!
+      if (*qRenderP == NULL)
+      {
+        // qLexListRender prepares orionldError
+        return NULL;
+      }
+      LM_TMP(("LL: Rendered Q for DB: '%s'", *qRenderP));
+    }
+
+    qP = qParse(qList, NULL, false, qToDbModel, &title, &detail);  // 3rd parameter: forDb=false
     if (qP == NULL)
     {
       orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
       LM_RE(NULL, ("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
     }
+    qPresent(qP, "QQ", "Q Tree");
   }
 
   if (qString != buf)

@@ -60,7 +60,7 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   cSubP->tenant              = (orionldState.in.tenant == NULL)? NULL : strdup(orionldState.in.tenant);
   cSubP->servicePath         = strdup("/#");
   cSubP->qP                  = qTree;
-  cSubP->contextP            = contextP;        // Right now, this is orionldState.contextP, i.e., the @context used when creating 
+  cSubP->contextP            = contextP;        // Right now, this is orionldState.contextP, i.e., the @context used when creating
   cSubP->ldContext           = contextP->url;   // the subscription. Soon, the subscription will contain a field for its context instead.
 
   KjNode* subscriptionIdP    = kjLookup(apiSubscriptionP, "_id");  // "id" was changed to "_id" by orionldPostSubscriptions to accomodate the DB insertion

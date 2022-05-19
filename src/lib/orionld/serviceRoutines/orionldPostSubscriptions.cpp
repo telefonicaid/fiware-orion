@@ -62,6 +62,7 @@ extern "C"
 #include "orionld/q/qRender.h"                                 // qRender
 #include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/q/qAliasCompact.h"                           // qAliasCompact
+#include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
@@ -296,9 +297,11 @@ bool orionldPostSubscriptions(void)
   KjNode*  notifierInfoP   = NULL;
   KjNode*  geoCoordinatesP = NULL;
   QNode*   qTree           = NULL;
-  char*    qText           = NULL;
+  char*    qRenderedForDb  = NULL;
   char*    subId;
   bool     b;
+  bool     qValidForV2;
+  bool     qIsMq;
 
   b = pCheckSubscription(subP,
                          orionldState.payloadIdNode,
@@ -306,7 +309,9 @@ bool orionldPostSubscriptions(void)
                          &endpointP,
                          &qNode,
                          &qTree,
-                         &qText,
+                         &qRenderedForDb,
+                         &qValidForV2,
+                         &qIsMq,
                          &uriP,
                          &notifierInfoP,
                          &geoCoordinatesP);
@@ -354,20 +359,40 @@ bool orionldPostSubscriptions(void)
   // Add subId to the tree
   kjChildPrepend(subP, subIdP);
 
-  // The two 'q's ...
+  // The three 'q's ...
   if (qNode != NULL)
   {
-    if (qFix(subP, qNode, qTree) == false)
+    qNode->name    = (char*) "ldQ";
+    qNode->value.s = qRenderedForDb;
+
+    LM_TMP(("LL: qTree:               %p", qTree));
+    LM_TMP(("LL: qRenderedForDb:      %s", qRenderedForDb));
+    LM_TMP(("LL: Valid for NGSIv2:    %s", K_FT(qValidForV2)));
+    LM_TMP(("LL: Metadata for NGSIv2: %s", K_FT(qIsMq)));
+    LM_TMP(("qText: %s", qRenderedForDb));
+    qPresent(qTree, "KZ", "Q-Tree for subscription");
+
+    // We robbed the "q" for "ldQ", need to add "q" and "mq" now - for NGSIv2
+    KjNode* qNode;
+    KjNode* mqNode;
+
+    if (qValidForV2 == false)
     {
-      if (qTree != NULL)
-        qRelease(qTree);
-
-      return false;
+      qNode  = kjString(orionldState.kjsonP, "q", "P;!P");
+      mqNode = kjString(orionldState.kjsonP, "mq", "P.P;!P.P");
+      kjChildAdd(subP, qNode);
+      kjChildAdd(subP, mqNode);
     }
-
-    LM_TMP(("KZ: qNode: '%s': '%s'", qNode->name, qNode->value.s));
-    qAliasCompact(qNode, false);
-    LM_TMP(("KZ: qNode: '%s': '%s'", qNode->name, qNode->value.s));
+    else if (qIsMq == false)
+    {
+      qNode  = kjString(orionldState.kjsonP, "q", qRenderedForDb);
+      kjChildAdd(subP, qNode);
+    }
+    else
+    {
+      mqNode = kjString(orionldState.kjsonP, "mq", qRenderedForDb);
+      kjChildAdd(subP, mqNode);
+    }
   }
 
   // Timestamps

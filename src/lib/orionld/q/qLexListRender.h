@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_Q_QLEXLISTRENDER_H_
+#define SRC_LIB_ORIONLD_Q_QLEXLISTRENDER_H_
 
 /*
 *
@@ -25,31 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                     // KjNode
-}
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckSubscription -
+// qLexListRender -
 //
-extern bool pCheckSubscription
-(
-  KjNode*   subP,
-  KjNode*   idP,
-  KjNode*   typeP,
-  KjNode**  endpointP,
-  KjNode**  qNodeP,
-  QNode**   qTreeP,
-  char**    qTextP,
-  bool*     qValidForV2P,
-  bool*     qIsMqP,
-  KjNode**  uriPP,
-  KjNode**  notifierInfoPP,
-  KjNode**  geoCoordinatesPP
-);
+extern char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_Q_QLEXLISTRENDER_H_

@@ -420,7 +420,7 @@ MongoDB server version: REGEX(.*)
 	"conditions" : [
 		"http://example.org/P2"
 	],
-	"ldQ" : "http://example.org/P2>10|http://example.org/P1==7",
+	"ldQ" : "http://example=org/P2.value>10|http://example=org/P1.value==7",
 	"expression" : {
 		"geometry" : "point",
 		"coords" : "1,2",
@@ -728,7 +728,7 @@ MongoDB server REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
-	"ldQ" : "https://uri.etsi.org/ngsi-ld/default-context/P2>10",
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"throttling" : 0,
@@ -738,7 +738,7 @@ MongoDB server REGEX(.*)
 		"georel" : "",
 		"geoproperty" : "",
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
-		"mq" : "P.P;!P.P"
+		"mq" : ""
 	},
 	"format" : "normalized",
 	"reference" : "http://tutorial:3000/subscription/test0001",

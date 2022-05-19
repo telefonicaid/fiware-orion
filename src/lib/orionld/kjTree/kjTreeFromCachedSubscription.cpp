@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <map>                                                   // std::map (for httpInfo.headers)
+#include <string>                                                // std::string (for httpInfo.headers iterator)
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -86,6 +89,31 @@ KjNode* dbModelToCoordinates(const char* coordinatesString)
     coordValueP->name = (char*) "coordinates";
 
   return coordValueP;
+}
+
+
+
+void dbModelValueStrip(KjNode* nodeP)
+{
+  while (true)
+  {
+    char* dotValue = strstr(nodeP->value.s, ".value");
+
+    if (dotValue == NULL)
+      break;
+
+    // Left-Shift six steps
+    char* to = dotValue;
+
+    while (to[6] != 0)
+    {
+      to[0] = to[6];
+      ++to;
+    }
+    *to = 0;
+  }
+
+  LM_TMP(("KZ: .value-fixed qText: '%s'", nodeP->value.s));
 }
 
 
@@ -214,33 +242,10 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   {
     LM_TMP(("KZ: cSubP->qText: '%s' (should be EXACTLY as ldQ in the database)", cSubP->qText));
     nodeP = kjString(orionldState.kjsonP, "q", cSubP->qText);
+    NULL_CHECK(nodeP);
+    dbModelValueStrip(nodeP);
     qAliasCompact(nodeP, true);  // qAliasCompact uses orionldState.contextP - all OK
     LM_TMP(("KZ: Compacted qText: '%s'", nodeP->value.s));
-
-    //
-    // The ".value" is necessary for the database, but, we don't want to see it in a "GET /subscriptions/{subId}"
-    //
-    while (true)
-    {
-      char* dotValue = strstr(nodeP->value.s, ".value");
-
-      if (dotValue == NULL)
-        break;
-
-      // Left-Shift six steps
-      char* to = dotValue;
-
-      while (to[6] != 0)
-      {
-        to[0] = to[6];
-        ++to;
-      }
-      *to = 0;
-    }
-
-    LM_TMP(("KZ: .value-fixed qText: '%s'", nodeP->value.s));
-
-    NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
   }
 
@@ -341,7 +346,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   kjChildAdd(endpointNodeP, nodeP);
 
   // notification::endpoint::accept
-  nodeP	= kjString(orionldState.kjsonP, "accept", mimeTypeToLongString(cSubP->httpInfo.mimeType));
+  nodeP = kjString(orionldState.kjsonP, "accept", mimeTypeToLongString(cSubP->httpInfo.mimeType));
   NULL_CHECK(nodeP);
   kjChildAdd(endpointNodeP, nodeP);
 
@@ -392,7 +397,6 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
       kjChildAdd(ni, kvP);
     }
     kjChildAdd(endpointNodeP, ni);
-
   }
   kjChildAdd(notificationNodeP, endpointNodeP);
 

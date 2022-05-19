@@ -33,6 +33,28 @@
 //
 // qBuild - build QNode tree
 //
-extern QNode* qBuild(const char* q);
+// DESCRIPTION
+//   'q' filters are used for querying entities (GET /entities, POST /entityOperations/query) and
+//   for subscriptions/notifications.
+//
+//   For entity queries, the filter is parsed, used and thrown away - kalloc is used.
+//
+//   However, for subscriptions:
+//   - the filter needs to be expanded and saved in the database
+//   - the filter needs to ba allocated and stored in the subscription cache (for GET /subscriptions ops)
+//   - the resulting QNode tree needs to be allocated and stored in the subscription cache
+//
+//   At startup, when the subscription cache is populated from the database content, the same applies (for subscriptions).
+//   As well as for regular sub-cache refresh operations.
+//
+//   We assume for now that "GET /subscriptions" operations always use the sub-cache.
+//
+// PARAMETERS
+//   q          the string as it figures in uri param or payload body
+//   qRenderP   output parameter for the prepared filter (expansion, dotForEq, '.value')
+//   v2ValidP   output parameter indicating whether the q string id valid for NGSIv2
+//   isMdP      output parameter indicating whether the q para meter corresponds to 'mq' in NGSIv2
+//
+extern QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMdP, bool qToDbModel);
 
 #endif  // SRC_LIB_ORIONLD_Q_QBUILD_H_

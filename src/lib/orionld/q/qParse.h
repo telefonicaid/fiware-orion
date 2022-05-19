@@ -33,6 +33,6 @@
 //
 // qParse -
 //
-extern QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, char** titleP, char** detailsP);
+extern QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, char** titleP, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_Q_QPARSE_H_

@@ -85,13 +85,13 @@ static bool qRenderOp(QNode* qP, const char* opString, ApiVersion apiVersion, ch
   return true;
 }
 
-
+// qRenderAND - any number of children
 
 // -----------------------------------------------------------------------------
 //
 // qRender -
 //
-bool qRender(QNode* qP, ApiVersion apiVersion, char* buf, int bufLen, bool* mqP, int* bufIxP)
+static bool qRender(QNode* qP, ApiVersion apiVersion, char* buf, int bufLen, bool* mqP, int* bufIxP)
 {
   LM_TMP(("QR: qP at %p (type: %s)", qP, (qP == NULL)? "NULL" : qNodeType(qP->type)));
   if ((qP->type == QNodeOr) && (apiVersion == V2))

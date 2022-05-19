@@ -31,6 +31,7 @@ SET (SOURCES
     qRelease.cpp
     qBuild.cpp
     qRender.cpp
+    qLexListRender.cpp
 )
 
 # Include directories
