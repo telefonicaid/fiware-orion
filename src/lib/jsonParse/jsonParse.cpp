@@ -167,9 +167,7 @@ static bool treat
     {
       if (forbiddenChars(value.c_str()) == true)
       {
-        std::string details = std::string("found a forbidden value in '") + value + "'";
-          
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, "found a forbidden value", value);
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return false;
@@ -293,8 +291,7 @@ static void eatCompound
     {
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
-        std::string details = std::string("found a forbidden value in compound '") + nodeValue + "'";
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, "details", nodeValue);
 
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
@@ -431,8 +428,7 @@ static std::string jsonParse
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
     if (out != "OK")
     {
-      std::string details = std::string("JSON parse error: '") + out + "'";
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, "JSON parse error", out);
       return out;
     }
   }
@@ -555,8 +551,7 @@ std::string jsonParse
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);
     if (res != "OK")
     {
-      std::string details = std::string("JSON parse error: '") + res + "'";
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, "JSON parse error", res);
       return res;
     }
   }
