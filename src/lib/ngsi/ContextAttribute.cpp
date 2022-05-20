@@ -589,20 +589,9 @@ std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion api
     if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
       // First lookup in the metadata included in the request
-      for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+      if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
       {
-        // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
-        if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
-        {
-          if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
-          {
-            return "";
-          }
-          else  // false or not a boolean
-          {
-            return LOCATION_WGS84;
-          }
-        }
+        return hasIgnoreType() ? "" : LOCATION_WGS84;
       }
 
       // If ignoreType has not yet found, second lookup in the existing metadata attributes
@@ -961,7 +950,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   if (compoundValueP != NULL)
   {
     orion::CompoundValueNode* childToRenderP = compoundValueP;
-    if (type == GEO_JSON)
+    if ((type == GEO_JSON) && (!hasIgnoreType()))
     {
       childToRenderP = getGeometry(compoundValueP);
     }
@@ -1384,4 +1373,30 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
   }
 
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::hasIgnoreType -
+*/
+bool ContextAttribute::hasIgnoreType(void) const
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+  {
+    if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
+    {
+      if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
+      {
+        return true;
+      }
+      else  // false or not a boolean
+      {
+        return false;
+      }
+    }
+  }
+
+  return false;
 }
