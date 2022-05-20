@@ -374,7 +374,7 @@ Date: REGEX(.*)
 04. GET ALL subscriptions see lang=en in S2
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 677
+Content-Length: 671
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -400,7 +400,7 @@ Date: REGEX(.*)
             "format": "normalized",
             "status": "ok"
         },
-        "origin": "database",
+        "origin": "cache",
         "status": "active",
         "type": "Subscription",
         "watchedAttributes": [
@@ -428,7 +428,7 @@ Date: REGEX(.*)
             "format": "normalized",
             "status": "ok"
         },
-        "origin": "database",
+        "origin": "cache",
         "status": "active",
         "type": "Subscription",
         "watchedAttributes": [

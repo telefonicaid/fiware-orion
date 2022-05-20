@@ -34,11 +34,12 @@ extern "C"
 
 #include "common/string.h"                                       // toString
 #include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
+#include "cache/subCache.h"                                      // CachedSubscription, subCacheHeadGet, subCacheItemLookup
 #include "mongoBackend/mongoGetSubscriptions.h"                  // mongoListSubscriptions
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
 
@@ -46,9 +47,9 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetSubscriptions -
+// orionldGetSubscriptionsWithMongoBackend -
 //
-bool orionldGetSubscriptions(void)
+static bool orionldGetSubscriptionsWithMongoBackend(void)
 {
   std::vector<ngsiv2::Subscription> subVec;
   OrionError                        oe;
@@ -71,6 +72,69 @@ bool orionldGetSubscriptions(void)
       kjChildAdd(orionldState.responseTree, subscriptionNodeP);
     }
   }
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldGetSubscriptions -
+//
+bool orionldGetSubscriptions(void)
+{
+  if ((experimental == false) || (orionldState.uriParamOptions.fromDb == true))
+    return orionldGetSubscriptionsWithMongoBackend();
+
+  int      offset    = orionldState.uriParams.offset;
+  int      limit     = orionldState.uriParams.limit;
+  KjNode*  subArray  = kjArray(orionldState.kjsonP, NULL);
+  int      ix        = 0;
+  int      subs      = 0;
+
+  if (orionldState.uriParams.count == true)  // Empty loop over the subscriptions, just to count how many there are
+  {
+    int count = 0;
+    for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
+    {
+      ++count;
+    }
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
+  }
+
+  if (limit != 0)
+  {
+    for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
+    {
+      if (ix < offset)
+      {
+        ++ix;
+        continue;
+      }
+
+      KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+
+      if (subP == NULL)
+      {
+        LM_E(("Internal Error (kjTreeFromCachedSubscription failed for subscription '%s')", cSubP->subscriptionId));
+        ++ix;
+        continue;
+      }
+
+      kjChildAdd(subArray, subP);
+      ++ix;
+      ++subs;
+
+      if (subs >= limit)
+        break;
+    }
+  }
+  else
+    orionldState.noLinkHeader = true;  // Don't want the Link header if there is no payload body (empty array)
+
+  orionldState.httpStatusCode = 200;
+  orionldState.responseTree   = subArray;
 
   return true;
 }

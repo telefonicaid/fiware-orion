@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_FT
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -139,8 +140,12 @@ bool pCheckSubscription
     }
   }
 
-  for (KjNode* subItemP = subP->value.firstChildP; subItemP != NULL; subItemP = subItemP->next)
+  KjNode* subItemP = subP->value.firstChildP;
+  KjNode* next;
+  while (subItemP != NULL)
   {
+    next = subItemP->next;
+
     if ((strcmp(subItemP->name, "subscriptionName") == 0) || (strcmp(subItemP->name, "name") == 0))
     {
       subItemP->name = (char*) "name";  // Must be called "name" in the database
@@ -243,14 +248,16 @@ bool pCheckSubscription
       orionldError(OrionldOperationNotSupported, "Not Implemented", SubscriptionScopePath, 501);
       return false;
     }
-    else if (strcmp(subItemP->name, "status")           == 0) {}  // Ignored
-    else if (strcmp(subItemP->name, "createdAt")        == 0) {}  // Ignored
-    else if (strcmp(subItemP->name, "modifiedAt")       == 0) {}  // Ignored
+    else if (strcmp(subItemP->name, "status")           == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
+    else if (strcmp(subItemP->name, "createdAt")        == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
+    else if (strcmp(subItemP->name, "modifiedAt")       == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
     else
     {
       orionldError(OrionldBadRequestData, "Unknown field for subscription", subItemP->name, 400);
       return false;
     }
+
+    subItemP = next;
   }
 
   // Make sure all mandatory fields are present
