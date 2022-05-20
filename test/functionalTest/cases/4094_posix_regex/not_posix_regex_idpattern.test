@@ -25,12 +25,13 @@ Not POSIX regex in idPattern result in error
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4
+brokerStart CB 56 IPv4
 
 --SHELL--
 
 #
 # 01. Create subscription with not POSIX regex in idPattern, see error
+# 02. See extra info in logs
 #
 
 echo "01. Create subscription with not POSIX regex in idPattern, see error"
@@ -55,6 +56,13 @@ echo
 echo
 
 
+echo "02. See extra info in logs"
+echo "=========================="
+cat /tmp/contextBroker.log | grep 'lvl=DEBUG' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create subscription with not POSIX regex in idPattern, see error
 ====================================================================
@@ -68,6 +76,11 @@ Date: REGEX(.*)
     "description": "Invalid regex for entity idPattern",
     "error": "BadRequest"
 }
+
+
+02. See extra info in logs
+==========================
+regcomp() failed for pattern '^(?!avoid).*': Invalid preceding regular expression
 
 
 --TEARDOWN--
