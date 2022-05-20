@@ -3515,8 +3515,6 @@ static unsigned int updateEntity
                                                   notifStartCounter);
     releaseTriggeredSubscriptions(&subsToNotify);
 
-    LM_W(("FGM: notifSent: %d", notifSent));
-
     notifyCerP->release();
     delete notifyCerP;
 

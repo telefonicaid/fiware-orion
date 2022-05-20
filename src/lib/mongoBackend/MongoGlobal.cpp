@@ -1589,10 +1589,11 @@ bool entitiesQuery
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  int             errType;
+  int             errType = ON_NEXT_NO_ERROR;
   std::string     nextErr;
 
-  while (cursor.next(&r, &errType, &nextErr))
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
+  while ((limit != 0) && (cursor.next(&r, &errType, &nextErr)))
   {
     alarmMgr.dbErrorReset();
 

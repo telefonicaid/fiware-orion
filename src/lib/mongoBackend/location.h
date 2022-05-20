@@ -83,4 +83,15 @@ extern bool processLocationAtAppendAttribute
   OrionError*              oe
 );
 
+
+
+/* ****************************************************************************
+*
+* getGeometry -
+*
+* Get geometry compound value from attribute, taking into account special GeoJSON
+* types such as Feature and FeatureCollection
+*/
+extern orion::CompoundValueNode* getGeometry(orion::CompoundValueNode* compoundValueP);
+
 #endif  // SRC_LIB_MONGOBACKEND_LOCATION_H_

@@ -20,6 +20,14 @@
 # iot_support at tid dot es
 #
 
+# How this hook thing works? :) It a way of telling dockerhub autobuild how
+# to build the container. It is explained at https://docs.docker.com/docker-hub/builds/advanced,
+# including the different env var (such as IMAGE_NAME, etc.) that can be used here. An
+# easy to understand example can be found here: https://dev.to/samuelea/automate-your-builds-on-docker-hub-by-writing-a-build-hook-script-13fp
+#
+# Not every repository needs hooks, only the ones that needs special tunning. Standard
+# dockerhub autobuild works well most of the times.
+
 # -e, to end execution immediately if 'cd ..' fails
 # -x, to print output as we go
 set -ex
