@@ -234,6 +234,8 @@ NGSIv2 仕様では、`geo:json` 属性に使用される可能性のある GeoJ
 実際には、Orion は `Feature` または `FeatureCollection` の作成/更新時に使用される完全な値を保存することに注意してください。
 ただし、他の `geo:json` タイプでの正規化の観点から、`geometry` 部分のみを返すことが決定されました。将来的には、コンテンツ全体を
 返すフラグが実装される可能性があります (詳細は、[この Issue](https://github.com/telefonicaid/fiware-orion/issues/4125) を参照)。
+`Feature` または `FeatureCollection` の特別な処理を無効にする別の方法は、[`ignoreType` メタデータ](#ignoretype-metadata)
+を使用することですが、その場合、エンティティのロケーション (entity location) も無視されます。
 
 `FeatureCollection` に関しては、単一の `Feature` が含まれている場合 (つまり、`features` フィールドに要素が1つしかない場合) にのみ、
 作成/更新時に受け入れられます。それ以外の場合、Orion は `BadRequest` エラーを返します。
