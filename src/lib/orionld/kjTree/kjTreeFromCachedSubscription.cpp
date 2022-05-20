@@ -40,6 +40,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
+#include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // Own interface
 
@@ -61,59 +63,6 @@ static KjNode* outOfMemory(void)
 {
   LM_E(("Internal Error (out of memory creating a KjNode-tree for a Subscription)"));
   return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelToCoordinates -
-//
-KjNode* dbModelToCoordinates(const char* coordinatesString)
-{
-  int      coordinatesVectorLen = strlen(coordinatesString) * 4 + 10;
-  char*    coordinatesVector    = kaAlloc(&orionldState.kalloc, coordinatesVectorLen);
-  KjNode*  coordValueP;
-
-  //
-  // The "coords" are stored as a STRING in orion's database ...
-  // This here is a hack to make the string an array
-  // and then parse it using kjParse and get a KjNode tree
-  //
-  snprintf(coordinatesVector, coordinatesVectorLen, "[%s]", coordinatesString);
-  LM_TMP(("KZ: coordinatesVector: %s", coordinatesVector));
-  coordValueP = kjParse(orionldState.kjsonP, coordinatesVector);
-  if (coordValueP == NULL)
-    coordValueP = kjString(orionldState.kjsonP, "coordinates", "internal error parsing DB coordinates");
-  else
-    coordValueP->name = (char*) "coordinates";
-
-  return coordValueP;
-}
-
-
-
-void dbModelValueStrip(KjNode* nodeP)
-{
-  while (true)
-  {
-    char* dotValue = strstr(nodeP->value.s, ".value");
-
-    if (dotValue == NULL)
-      break;
-
-    // Left-Shift six steps
-    char* to = dotValue;
-
-    while (to[6] != 0)
-    {
-      to[0] = to[6];
-      ++to;
-    }
-    *to = 0;
-  }
-
-  LM_TMP(("KZ: .value-fixed qText: '%s'", nodeP->value.s));
 }
 
 
@@ -268,8 +217,8 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
 
     LM_TMP(("KZ: cSubP->expression.coords: '%s'", cSubP->expression.coords.c_str()));
     LM_TMP(("KZ: cSubP->geoCoordinatesP at %p", cSubP->geoCoordinatesP));
-    // nodeP = dbModelToCoordinates(cSubP->expression.coords.c_str());
-    LM_TMP(("KZ: cSubP->geoCoordinatesP is of tyoe '%s'", kjValueType(cSubP->geoCoordinatesP->type)));
+    // nodeP = dbModelToApiCoordinates(cSubP->expression.coords.c_str());
+    LM_TMP(("KZ: cSubP->geoCoordinatesP is of type '%s'", kjValueType(cSubP->geoCoordinatesP->type)));
     nodeP = kjClone(orionldState.kjsonP, cSubP->geoCoordinatesP);
     nodeP->name = (char*) "coordinates";
     NULL_CHECK(nodeP);

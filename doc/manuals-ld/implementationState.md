@@ -7,7 +7,7 @@ All Services:
 * Use of the **new C driver "mongoc"** vs the _deprecated MongoDB Lecacy C++ driver_
 
 Entity Services:
-* Support of **LanguageProperty**
+* Support of **LanguageProperty**  (supported everywhere)
 * **Forwarding**, as of NGSI-LD API spec 1.6 (due summer 2022)
 * Support for **Multi-Attributes** (datasetId)
 
@@ -46,12 +46,15 @@ Then I got users (a European project) using the feature and it was too late to r
 
 
 ## 3. Other critical stuff that need to be implemented
+* Once PATCH /entities/{entityId} got implemented, the brpkler can now delete individual sub-attributes.
+    That was not possible before and there is no "opCode" in the TRoE table "subAttributes" to reflect this.
+    We need to modify the TRoE database and add an "opCode" to the "subAttributes" table - then mark it as DELETED.
 * Memory management for containers
 * Safe connection to MongoDB Server (-dbSSL and -dbAuthDb CLI arguments that Orion now implements)
 * Subscription matching for Notification directly on DB (the matching is done on the Subscription Cache)
 * Complete rewrite of the Subscription Cache and especially how brokers on the same DB communicate.
-  Right now, the communication is done via the database and that is ... well, the _easiest possible way_, but also
-  the **worst possible way**
+    Right now, the communication is done via the database and that is ... well, the _easiest possible way_, but also
+    the **worst possible way**
 * Registration Cache
 * Perhaps even an Entity Cache?
 
@@ -80,7 +83,7 @@ Then I got users (a European project) using the feature and it was too late to r
 
 
 ## 5. Important Info on the NGSi-LD concepts
-### Subscriptions
+### Subscriptions/Notifications
 Right now, 3 operations support "Native NGSI-LD" notifications:
 * POST /entities
 * PUT /entities/{entityId}
@@ -91,9 +94,6 @@ Now, creation/updates using those three operations match subscriptions in the ne
 However, this is still under development and not everything is implemented.
 What is missing:
 * REGEX (~= and !~= operators)
-* Attribute Compound values, e.g. q=P1[a]==1
-* Sub-Attribute values, e.g.: q=P1.SubP==5
-* Sub-Attribute Compound values, e.g. q=P1SubP[a]==1
 
 Especially tricky is the balancing act between NGSIv2 subs and "Native NGSI-LD subs", or really, the dfiference in 'q'.
 For example, NGSI-LD 'q' supports OR and parenthesis while NGSIv2 'q' does not.
@@ -101,9 +101,35 @@ This problem has been fixed by making the NGSIv2 part never match (q is set to P
 The NGSIv2 matach is done via Scope, while NGSI-LD match is done with qLex/qParse/qMatch, and a QNode* qP of CachedSubscription and that has
 been taken advantage of to distinguish between the two.
 
+### Support of the new mongoc driver
+The following API endpoint use "mongoc" - the new Mongo C driver:
+* PATCH /entities/{entityId}
+* PUT /entities/{entityId}
+
+The following API endpoint use "mongoc" if Orion-LD is started with the `-experimental` CLI parameter:
+* POST /entities
+* GET /entities/{entityId}
+* POST /subscriptions
+
+So, without using the old Mongo C++ Legacy driver, it is now possible to:
+* Create entities
+* Update create (PATCH+P(UT)
+* Create subscription
+* Retrieve entity
+* Retrieve subscription (is uses the subscription cache, no DB request is performed)
+* List subscriptions (is uses the subscription cache, no DB request is performed)
+* Create JSONLD Contexts
+* Retrieve JSONLD Contexts
+* List JSONLD Contexts
+
+Also, the following common features use "mongoc":
+* Tenants
+* Creation of Geo-indexes
+
+Still missing (quite important) is to make the subscription cache use "mongoc"
+
 
 ## 6. Implementation state of Services (API Endpoints)
-
 
 ### POST /ngsi-ld/v1/entities
 Creation of an entity.
@@ -115,13 +141,12 @@ There are two different implementations of this API endpoint.
 - A new one that uses the new mongoc driver
 
 The old implementation supports everything but Forwarding (well, apart from using the old Legacy driver ...)
-and is used by default by Orion-LD.  
+and is used by default by Orion-LD. 
 The new implementation is just that, brand new (as of April 8 2022).
 To test it, Orion-LD must be started with the CLI parameter `-experimental`.
 
 #### Done in old implementation
   * TRoE is fully working
-  * LanguageProperty attributes are supported
   * Multi-attributes are supported
 
 #### Missing in old implementation
@@ -131,21 +156,18 @@ To test it, Orion-LD must be started with the CLI parameter `-experimental`.
 
 #### Done in new implementation
   * Uses the new mongoc driver
-  * LanguageProperty attributes are supported
   * TRoE is implemented
 
 #### Missing in new implementation
   * Multi-attributes
-  * Notifications
   * Forwarding
 
 
 ### GET /ngsi-ld/v1/entities
 #### Done
-  * LanguageProperty attributes are supported
+  * Optionally uses mongoc (CLI option -experimental)
 
 #### Missing
-  * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
   * Multi-attributes
   * Forwarding - the old NGSIv2 style forwarding has been disabled
 
@@ -155,9 +177,8 @@ To test it, Orion-LD must be started with the CLI parameter `-experimental`.
 ### GET /ngsi-ld/v1/entities/*
 #### Done
   * Uses the new mongoc driver
-  * LanguageProperty attributes are supported
   * Multi-attributes are supported
-  * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
+  * Forwarding - new for NGSI-LD but not according to the version 1.6 of the NGSI-LD API spec
 
 #### Missing
   * Forwarding 100% according to the version 1.6 of the NGSI-LD API spec
@@ -168,12 +189,11 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 #### Done
   * Uses the new mongoc driver
-  * LanguageProperty attributes are supported
   * TRoE is almost fully working - we need to add an opMode in the sub-attrs table to indicate "Removal of Sub-Attribute"
 
 #### Missing
   * Multi-attributes
-  * New "native NGSI-LD" Notifications are supported but some parts are missing: { "q", "geoQ" }. It is also very green.
+  * New "native NGSI-LD" Notifications are supported but "geoQ" is still missing. It is also quite green.
   * Forwarding
 
 
@@ -185,25 +205,48 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 #### Missing
   * Multi-attributes
-  * New "native NGSI-LD" Notifications are supported but some parts are missing: { "q", "geoQ" }. It is also very green.
+  * New "native NGSI-LD" Notifications are supported but "geoQ" is still missing. It is also quite green.
   * Forwarding
-  * LanguageProperty attributes
-  * TRoE
+  * TRoE is almost fully working - we need to add an opMode in the sub-attrs table to indicate "Removal of Sub-Attribute"
 
 
 ### PATCH /ngsi-ld/v1/entities/*/attrs/*
 
 #### Done
-  * Forwarding - new for NGSI-LD but not fully according to the version 1.6 of the NGSI-LD API spec
+  * Forwarding - new for NGSI-LD but not according to the version 1.6 of the NGSI-LD API spec
   * TRoE
   * Notifications - using the Legacy driver
   * datasetId (using the Legacy driver)
 #### Missing
   * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
   * Multi-attributes
-  * LanguageProperty attributes
+
+### POST /ngsi-ld/v1/subscriptions
+
+#### Done
+  * Uses the new mongoc driver (only if -experimental is set)
+
+### GET /ngsi-ld/v1/subscriptions
+
+#### Done
+  * Uses the new mongoc driver (only if -experimental is set)
+
+### GET /ngsi-ld/v1/subscriptions/*
+
+#### Done
+  * Uses the new mongoc driver (only if -experimental is set)
 
 ------ TBI --------------------------------------------------------
+
+### PATCH /ngsi-ld/v1/subscriptions/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbSubscriptionGet
+  * dbSubscriptionReplace
+
+### DELETE /ngsi-ld/v1/subscriptions/*
+* Not using mongoBackend, but using the the mongo C++ legacy driver:
+  * dbSubscriptionGet
+  * dbSubscriptionDelete
 
 ### DELETE /ngsi-ld/v1/entities/*
 * Not using mongoBackend, but using the the mongo C++ legacy driver:
@@ -247,20 +290,6 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 ### GET /ngsi-ld/v1/attributes
 ### GET /ngsi-ld/v1/attributes/*
-
-### POST /ngsi-ld/v1/subscriptions
-### GET /ngsi-ld/v1/subscriptions
-
-### GET /ngsi-ld/v1/subscriptions/*
-### PATCH /ngsi-ld/v1/subscriptions/*
-* Not using mongoBackend, but using the the mongo C++ legacy driver:
-  * dbSubscriptionGet
-  * dbSubscriptionReplace
-
-### DELETE /ngsi-ld/v1/subscriptions/*
-* Not using mongoBackend, but using the the mongo C++ legacy driver:
-  * dbSubscriptionGet
-  * dbSubscriptionDelete
 
 ### POST /ngsi-ld/v1/csourceRegistrations
 ### GET /ngsi-ld/v1/csourceRegistrations

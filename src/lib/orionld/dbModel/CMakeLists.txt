@@ -29,6 +29,14 @@ SET (SOURCES
     dbModelToApiSubAttribute.cpp
     dbModelFromApiSubscription.cpp
     dbModelPathComponentsSplit.cpp
+    dbModelValueStrip.cpp
+    dbModelToApiCoordinates.cpp
+    dbModelFromApiKeyValues.cpp
+    dbModelFromApiCoordinates.cpp
+    dbModelFromGeometry.cpp
+    dbModelFromGeorel.cpp
+    dbModelToObservedAt.cpp
+    dbModelFromApiAttributeDatasetArray.cpp
 )
 
 # Include directories
