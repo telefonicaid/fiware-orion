@@ -676,71 +676,61 @@ std::string postUpdateContext
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
 
-    if (cerP->entity.attributeVector.size() == 0)
+    for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
+      ContextAttribute* aP = cerP->entity.attributeVector[aIx];
+
       //
-      // If we find a contextElement without attributes here, then something is wrong
+      // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
       //
-      LM_E(("Runtime Error (empty contextAttributeVector for ContextElementResponse %d)", cerIx));
-    }
-    else
-    {
-      for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
+      if (aP->found == false)
       {
-        ContextAttribute* aP = cerP->entity.attributeVector[aIx];
-
-        //
-        // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
-        //
-        if (aP->found == false)
-        {
-          ContextAttribute ca(aP);
-          response.notFoundPush(&cerP->entity, &ca, NULL);
-          continue;
-        }
-
-
-        //
-        // 1. If the attribute is found locally - just add the attribute to the outgoing response
-        //
-        if (aP->providingApplication.get().empty())
-        {
-          ContextAttribute ca(aP);
-          response.foundPush(&cerP->entity, &ca);
-          continue;
-        }
-
-
-        //
-        // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
-        //    If not found, add one.
-        UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
-        if (reqP == NULL)
-        {
-          reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
-          reqP->updateActionType = ActionTypeUpdate;
-          requestV.push_back(reqP);
-          regIdsV.push_back(aP->providingApplication.getRegId());
-        }
-
-        //
-        // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
-        //    If not found, add one (to the EntityVector of the UpdateContextRequest).
-        //
-        Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
-        if (eP == NULL)
-        {
-          eP = new Entity();
-          eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
-          reqP->entityVector.push_back(eP);
-        }
-
-
-        //
-        // 4. Add ContextAttribute to the correct ContextElement in the correct UpdateContextRequest
-        //
-        eP->attributeVector.push_back(new ContextAttribute(aP));
+        ContextAttribute ca(aP);
+        response.notFoundPush(&cerP->entity, &ca, NULL);
+        continue;
       }
+
+
+      //
+      // 1. If the attribute is found locally - just add the attribute to the outgoing response
+      //
+      if (aP->providingApplication.get().empty())
+      {
+        ContextAttribute ca(aP);
+        response.foundPush(&cerP->entity, &ca);
+        continue;
+      }
+
+
+      //
+      // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
+      //    If not found, add one.
+      UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
+      if (reqP == NULL)
+      {
+        reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
+        reqP->updateActionType = ActionTypeUpdate;
+        requestV.push_back(reqP);
+        regIdsV.push_back(aP->providingApplication.getRegId());
+      }
+
+      //
+      // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
+      //    If not found, add one (to the EntityVector of the UpdateContextRequest).
+      //
+      Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
+      if (eP == NULL)
+      {
+        eP = new Entity();
+        eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+        reqP->entityVector.push_back(eP);
+      }
+
+
+      //
+      // 4. Add ContextAttribute to the correct ContextElement in the correct UpdateContextRequest
+      //
+      eP->attributeVector.push_back(new ContextAttribute(aP));
     }
   }
 

@@ -3599,7 +3599,6 @@ static unsigned int updateEntity
     {
       if (!attrs.hasField (eP->attributeVector[ix]->name))
       {
-        alarmMgr.badInput(clientIp, "attribute not exists");
         *attributeNotExistingError = true;
 
         // Add to the list of non existing attributes - for the error response
