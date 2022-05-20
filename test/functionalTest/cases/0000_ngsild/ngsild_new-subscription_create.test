@@ -115,7 +115,7 @@ echo
 
 echo "03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header"
 echo "====================================================================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2&options=sysAttrs' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -459,7 +459,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1163
+Content-Length: 1250
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -525,6 +525,8 @@ Date: REGEX(.*)
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
+  "createdAt": "202REGEX(.*)",
+  "modifiedAt": "202REGEX(.*)",
   "origin": "cache"
 }
 
