@@ -38,9 +38,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/dbModel/dbModelToObservedAt.h"                 // dbModelToObservedAt
 #include "orionld/dbModel/dbModelToApiSubAttribute.h"            // Own interface
 
 
@@ -84,40 +84,6 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
     if      (strcmp(typeP->value.s, "Relationship")     == 0) valueP->name = (char*) "object";
     else if (strcmp(typeP->value.s, "LanguageProperty") == 0) valueP->name = (char*) "languageMap";
   }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelToObservedAt -
-//
-KjNode* dbModelToObservedAt(KjNode* dbObservedAtP)
-{
-  char   buf[80];
-  char*  bufP = NULL;
-
-  if (dbObservedAtP->type == KjObject)
-  {
-    KjNode* valueP = kjLookup(dbObservedAtP, "value");
-
-    if ((valueP != NULL) && (valueP->type == KjFloat))
-    {
-      numberToDate(valueP->value.f, buf, sizeof(buf) - 1);
-      bufP = buf;
-    }
-  }
-  else if (dbObservedAtP->type == KjString)
-    bufP = dbObservedAtP->value.s;
-
-  if (bufP == NULL)
-  {
-    orionldError(OrionldInternalError, "Database Error", "Invalid observedAt in DB", 500);
-    return kjString(orionldState.kjsonP, "observedAt", "ERROR");
-  }
-
-  KjNode* observedAtP = kjString(orionldState.kjsonP, "observedAt", bufP);
-  return observedAtP;
 }
 
 

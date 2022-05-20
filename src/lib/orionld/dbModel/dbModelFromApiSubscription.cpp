@@ -22,170 +22,25 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_VEC_SIZE
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjChildAdd, ...
-#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
-#include "kjson/kjRender.h"                                    // kjFastRender
 }
+
+#include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextSimplify.h"            // orionldContextSimplify
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
+#include "orionld/dbModel/dbModelFromApiKeyValues.h"           // dbModelFromApiKeyValues
+#include "orionld/dbModel/dbModelFromApiCoordinates.h"         // dbModelFromApiCoordinates
+#include "orionld/dbModel/dbModelFromGeometry.h"               // dbModelFromGeometry
+#include "orionld/dbModel/dbModelFromGeorel.h"                 // dbModelFromGeorel
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelFromApiKeyValues - own module!
-//
-static KjNode* dbModelFromApiKeyValues(KjNode* kvObjectArray, const char* name)
-{
-  KjNode* kvs = kjObject(orionldState.kjsonP, name);
-
-  for (KjNode* kv = kvObjectArray->value.firstChildP; kv != NULL; kv = kv->next)
-  {
-    KjNode* key   = kjLookup(kv, "key");
-    KjNode* value = kjLookup(kv, "value");
-
-    // Steal 'value' from 'kv'
-    kjChildRemove(kv, value);
-
-    value->name = key->value.s;
-    kjChildAdd(kvs, value);
-  }
-
-  return kvs;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelFromCoordinates - own module!
-//
-static bool dbModelFromCoordinates(KjNode* coordinatesP, const char* fieldName, KjNode* geometryP)
-{
-  bool   isPoint = false;
-  char*  buf;
-
-  if (geometryP == NULL)
-  {
-    orionldError(OrionldBadRequestData, "Internal Error", "Unable to extract the geometry of a geoQ for coordinmate APIv1 fix", 400);
-    return false;
-  }
-
-  // Must be called "coords" in the database
-  coordinatesP->name = (char*) "coords";
-
-  // If already a String, then we're almost done - just need to remove the '[]'
-  if (coordinatesP->type == KjString)
-  {
-    if (coordinatesP->value.s[0] == '[')
-    {
-      coordinatesP->value.s = &coordinatesP->value.s[1];
-      char* endP = &coordinatesP->value.s[strlen(coordinatesP->value.s) - 1];
-      *endP = 0;
-    }
-
-    return true;
-  }
-
-  if (strcmp(geometryP->value.s, "point") == 0)
-    isPoint = true;
-
-  if (isPoint)
-  {
-    // A point is an array ( [ 1, 2 ] ) in NGSI-LD, but in APIv1 database mode it is a string ( "1,2" )
-    int    coords = 0;
-    float  coordV[3];
-    bool   floats = false;
-
-    for (KjNode* coordP = coordinatesP->value.firstChildP; coordP != NULL; coordP = coordP->next)
-    {
-      if (coordP->type == KjFloat)
-      {
-        coordV[coords] = coordP->value.f;
-        floats = true;
-      }
-      else
-        coordV[coords] = (float) coordP->value.i;
-
-      ++coords;
-    }
-
-    int bufSize = 128;
-    buf = kaAlloc(&orionldState.kalloc, bufSize);
-
-    if (floats == true)
-    {
-      if (coords == 2) snprintf(buf, bufSize, "%f,%f", coordV[0], coordV[1]);
-      else             snprintf(buf, bufSize, "%f,%f,%f", coordV[0], coordV[1], coordV[2]);
-    }
-    else
-    {
-      if (coords == 2) snprintf(buf, bufSize, "%d,%d", (int) coordV[0], (int) coordV[1]);
-      else             snprintf(buf, bufSize, "%d,%d,%d", (int) coordV[0], (int) coordV[1], (int) coordV[2]);
-    }
-  }
-  else
-  {
-    int bufSize = kjFastRenderSize(coordinatesP);
-    buf = kaAlloc(&orionldState.kalloc, bufSize);
-    kjFastRender(coordinatesP, buf);
-  }
-
-  coordinatesP->type    = KjString;
-  coordinatesP->value.s = buf;
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelFromGeometry - own module!
-//
-const char* dbModelFromGeometry(char* geometry)
-{
-  if (strcmp(geometry, "Point") == 0)
-    return "point";
-
-  return geometry;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelFromGeorel - own module!
-//
-const char* dbModelFromGeorel(char* georel)
-{
-  char* eq = strstr(georel, "==");
-
-  if (eq != NULL)
-  {
-    *eq = ':';          // Overwrite first '=' with a ':'
-    ++eq;               // Point to second '='
-    while (*eq != 0)    // Shift Left 1 the rest of the string
-    {
-      eq[0] = eq[1];
-      ++eq;
-    }
-  }
-
-  return georel;
-}
 
 
 
@@ -439,8 +294,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     // Change "coordinates" to "coord", and remove '[]'
     if (coordinatesP != NULL)  // Can't be NULL !!!
     {
-      coordinatesP->name = (char*) "coords";
-      if (dbModelFromCoordinates(coordinatesP, "geoQ::coordinates", geometryP) == false)
+      if (dbModelFromApiCoordinates(coordinatesP, "geoQ::coordinates", geometryP) == false)
         return false;
     }
 
@@ -508,7 +362,6 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
         nItemP->name = (char*) "attrs";
         kjChildRemove(notificationP, nItemP);
         kjChildAdd(apiSubscriptionP, nItemP);
-        kjTreeLog(apiSubscriptionP, "with attrs");
       }
       else if (strcmp(nItemP->name, "format") == 0)
       {
