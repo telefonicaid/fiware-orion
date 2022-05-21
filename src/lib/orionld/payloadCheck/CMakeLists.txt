@@ -48,9 +48,9 @@ SET (SOURCES
      pcheckEntityInfoArray.cpp
      pcheckGeoPropertyValue.cpp
      pcheckGeoQ.cpp
-     pCheckGeoGeometry.cpp
-     pcheckGeoqCoordinates.cpp
-     pcheckGeoqGeorel.cpp
+     pCheckGeometry.cpp
+     pCheckGeoCoordinates.cpp
+     pCheckGeorel.cpp
      pcheckInformation.cpp
      pcheckInformationItem.cpp
      pcheckLanguagePropertyValue.cpp

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOGEOMETRY_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOGEOMETRY_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOCOORDINATES_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOCOORDINATES_H_
 
 /*
 *
@@ -36,8 +36,8 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// pCheckGeoGeometry -
+// pCheckGeoCoordinates -
 //
-extern bool pCheckGeoGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription);
+extern bool pCheckGeoCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOGEOMETRY_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOCOORDINATES_H_

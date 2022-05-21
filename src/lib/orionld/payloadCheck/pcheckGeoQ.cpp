@@ -39,9 +39,9 @@ extern "C"
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
-#include "orionld/payloadCheck/pCheckGeoGeometry.h"             // pCheckGeoGeometry
-#include "orionld/payloadCheck/pcheckGeoqCoordinates.h"         // pcheckGeoqCoordinates
-#include "orionld/payloadCheck/pcheckGeoqGeorel.h"              // pcheckGeoqGeorel
+#include "orionld/payloadCheck/pCheckGeometry.h"                // pCheckGeometry
+#include "orionld/payloadCheck/pCheckGeoCoordinates.h"          // pCheckGeoCoordinates
+#include "orionld/payloadCheck/pCheckGeorel.h"                  // pCheckGeorel
 #include "orionld/payloadCheck/pcheckGeoQ.h"                    // Own interface
 
 
@@ -57,7 +57,6 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
   KjNode*                georelP      = NULL;
   KjNode*                geopropertyP = NULL;
   OrionldGeoJsonType     geoJsonType;
-  OrionldProblemDetails  pd;
 
   for (KjNode* itemP = geoqNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -79,7 +78,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     else if (strcmp(itemP->name, "geoproperty") == 0)
     {
       DUPLICATE_CHECK(geopropertyP, "geoproperty", itemP);
-      STRING_CHECK(georelP, "the 'geoproperty' field of a GeoJSON object must be a JSON String");
+      STRING_CHECK(geopropertyP, "the 'geoproperty' field of a GeoJSON object must be a JSON String");
     }
     else
     {
@@ -106,7 +105,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     return false;
   }
 
-  if (pCheckGeoGeometry(geometryP->value.s, &geoJsonType, isSubscription) == false)
+  if (pCheckGeometry(geometryP->value.s, &geoJsonType, isSubscription) == false)
   {
     // orionldError(OrionldBadRequestData, "Invalid Payload Data", detail, 400);
     return false;
@@ -122,7 +121,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     }
   }
 
-  if (pcheckGeoqCoordinates(coordinatesP, geoJsonType) == false)
+  if (pCheckGeoCoordinates(coordinatesP, geoJsonType) == false)
   {
     //
     // Not overwriting - putting the call to orionldError back once I have error stacking
@@ -134,11 +133,8 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
   if (geoCoordinatesPP != NULL)
     *geoCoordinatesPP = coordinatesP;
 
-  if (pcheckGeoqGeorel(georelP, geoJsonType, &pd) == false)
-  {
-    orionldError(OrionldBadRequestData, pd.title, pd.detail, 400);
-    return false;
-  }
+  if (pCheckGeorel(georelP, geoJsonType) == false)
+    return false;  // pCheckGeorel calls orionldError
 
   //
   // If geoproperty has been given, the name must be expanded, and any dots replaced by '='
