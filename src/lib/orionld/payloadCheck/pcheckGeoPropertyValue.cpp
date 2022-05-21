@@ -36,8 +36,8 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
-#include "orionld/payloadCheck/pCheckGeoGeometry.h"             // pCheckGeoGeometry
-#include "orionld/payloadCheck/pcheckGeoqCoordinates.h"          // pcheckGeoqCoordinates
+#include "orionld/payloadCheck/pCheckGeometry.h"                 // pCheckGeometry
+#include "orionld/payloadCheck/pCheckGeoCoordinates.h"           // pCheckGeoCoordinates
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // Own interface
 
 
@@ -67,7 +67,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
       STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object must be a JSON String");
       EMPTY_STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object cannot be an empty string");
 
-      if (pCheckGeoGeometry(typeNodeP->value.s, &geoType, false) == false)
+      if (pCheckGeometry(typeNodeP->value.s, &geoType, false) == false)
       {
         // orionldError(OrionldBadRequestData, detail, typeNodeP->value.s, 400);
         return false;
@@ -121,7 +121,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
     }
   }
 
-  if (pcheckGeoqCoordinates(coordinatesNodeP, geoType) == false)
+  if (pCheckGeoCoordinates(coordinatesNodeP, geoType) == false)
     return false;
 
   //

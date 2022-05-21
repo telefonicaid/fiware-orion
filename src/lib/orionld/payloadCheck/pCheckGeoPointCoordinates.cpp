@@ -32,6 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldBadRequestData
 #include "orionld/payloadCheck/pCheckGeoPointCoordinates.h"      // Own interface
 
 
@@ -50,7 +51,6 @@ bool pCheckGeoPointCoordinates(KjNode* coordinatesP)
       ++numbers;
     else
     {
-      LM_W(("Bad Input (member of 'coordinates' array is not a number but of type: '%s')", kjValueType(memberP->type)));
       orionldError(OrionldBadRequestData, "Invalid GeoJSON", "all members of a 'Point' in 'coordinates' must be of type 'Number'", 400);
       return false;
     }
@@ -58,7 +58,6 @@ bool pCheckGeoPointCoordinates(KjNode* coordinatesP)
 
   if ((numbers != 2) && (numbers != 3))
   {
-    LM_W(("Bad Input (invalid coordinates: %d numbers in array)", numbers));
     orionldError(OrionldBadRequestData, "Invalid GeoJSON", "The 'coordinates' member for a 'Point' must be an array with two or three Numbers", 400);
     return false;
   }

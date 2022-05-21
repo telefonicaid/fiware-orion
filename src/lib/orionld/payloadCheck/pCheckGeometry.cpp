@@ -27,15 +27,15 @@
 
 #include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/payloadCheck/pCheckGeoGeometry.h"            // Own interface
+#include "orionld/payloadCheck/pCheckGeometry.h"               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckGeoGeometry -
+// pCheckGeometry -
 //
-bool pCheckGeoGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription)
+bool pCheckGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription)
 {
   if (typeName[0] == 0)
   {

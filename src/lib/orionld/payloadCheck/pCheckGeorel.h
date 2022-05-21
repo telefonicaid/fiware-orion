@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQCOORDINATES_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQCOORDINATES_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOREL_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOREL_H_
 
 /*
 *
@@ -27,17 +27,17 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                       // KjNode
 }
 
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
+#include "orionld/types/OrionldGeoJsonType.h"                   // OrionldGeoJsonType
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pcheckGeoqCoordinates -
+// pCheckGeorel -
 //
-extern bool pcheckGeoqCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType);
+extern bool pCheckGeorel(KjNode* georelP, OrionldGeoJsonType geoType);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQCOORDINATES_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOREL_H_

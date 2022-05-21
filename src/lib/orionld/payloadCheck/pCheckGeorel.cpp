@@ -31,33 +31,33 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/types/OrionldGeoJsonType.h"                   // OrionldGeoJsonType
+#include "orionld/payloadCheck/pCheckGeorel.h"                  // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pcheckGeoqGeorel -
+// pCheckGeorel -
 //
-bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProblemDetails* pdP)
+bool pCheckGeorel(KjNode* georelP, OrionldGeoJsonType geoType)
 {
   if (georelP == NULL)
   {
-    orionldProblemDetailsFill(pdP, OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel missing", 400);
+    orionldError(OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel missing", 400);
     return false;
   }
   else if (georelP->type != KjString)
   {
-    orionldProblemDetailsFill(pdP, OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel must be a string", 400);
+    orionldError(OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel must be a string", 400);
     return false;
   }
   else if (georelP->value.s[0] == 0)
   {
-    orionldProblemDetailsFill(pdP, OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel value is empty", 400);
+    orionldError(OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel value is empty", 400);
     return false;
   }
 
@@ -80,7 +80,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
   {
     if (geoType != GeoJsonPoint)
     {
-      orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be 'Point' for georel 'near'", 400);
+      orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be 'Point' for georel 'near'", 400);
       return false;
     }
   }
@@ -88,7 +88,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
   {
     if ((geoType != GeoJsonPolygon) && (geoType != GeoJsonMultiPolygon))
     {
-      orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be either 'Polygon' or 'MultiPolygon' for georel 'within'", 400);
+      orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be either 'Polygon' or 'MultiPolygon' for georel 'within'", 400);
       return false;
     }
   }
@@ -109,7 +109,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
   }
   else if (strcmp(georel, "contains") == 0)
   {
-    orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Not Inplemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
+    orionldError(OrionldInvalidRequest,  "Not Inplemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
     return false;
   }
   else if (strcmp(georel, "equals") == 0)
@@ -118,7 +118,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
   }
   else
   {
-    orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter - invalid 'georel'", georel, 400);
+    orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter - invalid 'georel'", georel, 400);
     return false;
   }
 
@@ -139,7 +139,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
 
       if (strcmp(grel, "near") != 0)
       {
-        orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid geo-relation for Point", 400);
+        orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid geo-relation for Point", 400);
         return false;
       }
 
@@ -150,7 +150,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
 
       if (distance == NULL)
       {
-        orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
+        orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
         return false;
       }
       *distance = 0;
@@ -158,7 +158,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
 
       if ((strcmp(extra, "maxDistance") != 0) && (strcmp(extra, "minDistance") != 0))
       {
-        orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
+        orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
         return false;
       }
 
@@ -169,7 +169,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
       {
         if ((*distance < '0') || (*distance > '9'))
         {
-          orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid number for distance for georel 'near' for Point", 400);
+          orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid number for distance for georel 'near' for Point", 400);
           return false;
         }
         ++distance;
