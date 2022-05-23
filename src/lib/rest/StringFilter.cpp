@@ -88,7 +88,7 @@ bool StringFilterItem::fill(StringFilterItem* sfiP, std::string* errorStringP)
     // We don't know of a better way to copy the regex from sfiP, and have a question out on SOF:
     // http://stackoverflow.com/questions/36846426/best-way-of-cloning-compiled-regex-t-struct-in-c
     //
-    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&patternValue, stringValue.c_str(), REG_EXTENDED))
     {
       *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
       return false;
@@ -151,7 +151,7 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 
   if (op == SfopMatchPattern)
   {
-    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&patternValue, stringValue.c_str(), REG_EXTENDED))
     {
       *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
       return false;
@@ -694,7 +694,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     // Can't call valueParse here, as the forced valueType 'SfvtString' will be knocked back to its 'default'.
     // So, instead we just perform the part of SfopMatchPattern of valueParse
     //
-    if (regcomp(&patternValue, stringValue.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&patternValue, stringValue.c_str(), REG_EXTENDED))
     {
       *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
       return false;
