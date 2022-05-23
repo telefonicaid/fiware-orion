@@ -247,8 +247,8 @@ std::string tenantCheck(const std::string& tenant)
     snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
     snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
 
-    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long. Length: " + numV2;
-    alarmMgr.badInput(clientIp, details, "");
+    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long";
+    alarmMgr.badInput(clientIp, details, std::string("tenant length: ") + numV2);
 
     return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }

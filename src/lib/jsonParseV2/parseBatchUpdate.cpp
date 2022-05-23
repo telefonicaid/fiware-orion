@@ -34,6 +34,7 @@
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseStringList.h"
 #include "jsonParseV2/parseBatchUpdate.h"
+#include "jsonParseV2/utilsParse.h"
 #include "orionTypes/UpdateActionType.h"
 
 
@@ -51,7 +52,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -60,7 +61,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Object not found");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -68,7 +69,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   }
   else if (document.ObjectEmpty())
   {
-    alarmMgr.badInput(clientIp, "Empty JSON payload", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "Empty JSON payload");
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -78,7 +79,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   {
     std::string  details = "Invalid JSON payload, mandatory field /entities/ not found";
 
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", details);
     oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 

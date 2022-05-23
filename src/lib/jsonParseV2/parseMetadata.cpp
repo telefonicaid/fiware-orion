@@ -107,8 +107,8 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
       }
       else
       {
-        std::string details = std::string("ContextAttribute::Metadata::type is '") + type + "'";
-        alarmMgr.badInput(clientIp, details, "");
+        std::string extra = std::string("ContextAttribute::Metadata::type is '") + type + "'";
+        alarmMgr.badInput(clientIp, "invalid JSON type for attribute metadata value", extra);
         return "invalid JSON type for attribute metadata value";
       }
     }

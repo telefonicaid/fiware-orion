@@ -37,6 +37,7 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseEntity.h"
+#include "jsonParseV2/utilsParse.h"
 
 
 
@@ -69,7 +70,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error", "");
+    alarmMgr.badInput(clientIp, "JSON parse error", parseErrorString(document.GetParseError()));
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -80,7 +81,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Object not found");
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -93,7 +94,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     {
       OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
 
-      alarmMgr.badInput(clientIp, "No entity id specified", "");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", "No entity id specified");
       ciP->httpStatusCode = SccBadRequest;
 
       return oe.toJson();
@@ -239,7 +240,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
 
-        alarmMgr.badInput(clientIp, "max json deep reached at parsing", "");
+        alarmMgr.badInput(clientIp, "JSON Parse Error", "max json deep reached at parsing");
         ciP->httpStatusCode = SccBadRequest;
 
         return oe.toJson();
@@ -260,7 +261,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
 
-    alarmMgr.badInput(clientIp, "empty payload", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "empty payload");
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();

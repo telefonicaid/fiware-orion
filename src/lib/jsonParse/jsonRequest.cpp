@@ -146,8 +146,8 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
     }
   }
 
-  std::string details = std::string("no request found for RequestType '") + requestType(request) + "'', method '" + method + "'";
-  alarmMgr.badInput(clientIp, details, "");
+  std::string extra = std::string("RequestType '") + requestType(request) + "'', method '" + method + "'";
+  alarmMgr.badInput(clientIp, "no request found", extra);
 
   return NULL;
 }
@@ -197,8 +197,8 @@ std::string jsonTreat
     restErrorReplyGet(ciP, SccBadRequest, details, &errorReply);
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
 
-    details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
-    alarmMgr.badInput(clientIp, details, "");
+    std::string extra = std::string("RequestType ") + reqTypeV + " (" + requestType(request) + ")";
+    alarmMgr.badInput(clientIp, "no request treating object found for RequestType", extra);
 
     return errorReply;
   }
@@ -218,11 +218,9 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
-    std::string details = std::string("JSON Parse Error: ") + e.what();
     std::string errorReply;
-
     restErrorReplyGet(ciP, SccBadRequest, "JSON Parse Error", &errorReply);
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", e.what());
     return errorReply;
   }
   catch (...)
@@ -236,10 +234,8 @@ std::string jsonTreat
 
   if (res != "OK")
   {
-    std::string details = std::string("JSON parse error: ") + res;
     std::string answer;
-    
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, "JSON parse error", res);
     ciP->httpStatusCode = SccBadRequest;
     restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
     return answer;
@@ -257,8 +253,7 @@ std::string jsonTreat
   res = reqP->check(parseDataP, ciP);
   if (res != "OK")
   {
-    std::string details = reqP->keyword + ": " + res;
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, reqP->keyword, res);
   }
 
   return res;

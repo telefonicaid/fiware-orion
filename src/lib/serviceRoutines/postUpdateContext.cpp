@@ -122,7 +122,7 @@ static bool updateForward
   //
   if (parseUrl(upcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
+    std::string details = std::string("invalid providing application");
 
     alarmMgr.badInput(clientIp, details, upcrP->contextProvider);
 

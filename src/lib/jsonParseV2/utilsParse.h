@@ -103,4 +103,11 @@ Opt<int64_t> getInt64Opt(const rapidjson::Value& parent, const char* field, cons
 bool isNull(const rapidjson::Value& parent, const char* field);
 
 
+/* *****************************************************************************
+*
+* parseErrorString - return text string associated to a given parsing error
+*/
+std::string parseErrorString(rapidjson::ParseErrorCode code);
+
+
 #endif  // SRC_LIB_JSONPARSEV2_UTILSPARSE_H_

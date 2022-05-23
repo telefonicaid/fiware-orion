@@ -34,6 +34,7 @@
 
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "jsonParseV2/parseAttributeValue.h"
+#include "jsonParseV2/utilsParse.h"
 
 
 
@@ -50,7 +51,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error", "");
+    alarmMgr.badInput(clientIp, "JSON parse error", parseErrorString(document.GetParseError()));
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -59,7 +60,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject() && !document.IsArray())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error", "");
+    alarmMgr.badInput(clientIp, "JSON parse error", "Neither JSON Object nor JSON Array for attribute::value");
     oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();

@@ -125,7 +125,7 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
     answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
 
-    alarmMgr.badInput(clientIp, "not supported content type: text/plain", "");
+    alarmMgr.badInput(clientIp, "not supported content type", "text/plain");
     break;
   }
 

@@ -3972,8 +3972,7 @@ static bool contextElementPreconditionsCheck
       if ((name == eP->attributeVector[jx]->name))
       {
         ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
-        std::string details = std::string("duplicated attribute name: name=<") + name + ">";
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, "duplicated attribute name", name);
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
         responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);

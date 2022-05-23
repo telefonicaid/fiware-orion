@@ -40,6 +40,7 @@
 #include "jsonParseV2/parseMetadataVector.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "jsonParseV2/parseContextAttribute.h"
+#include "jsonParseV2/utilsParse.h"
 
 
 
@@ -366,7 +367,7 @@ std::string parseContextAttribute
 
       if (r == "max deep reached")
       {
-        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Vector", "");
+        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Vector");
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
@@ -384,7 +385,7 @@ std::string parseContextAttribute
 
       if (r == "max deep reached")
       {
-        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Object", "");
+        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
@@ -397,7 +398,7 @@ std::string parseContextAttribute
     }
     else
     {
-      alarmMgr.badInput(clientIp, "bad JSON type for ContextAttribute", "");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", "bad JSON type for ContextAttribute");
       ciP->httpStatusCode = SccBadRequest;
       return "invalid JSON type for ContextAttribute";
     }
@@ -409,7 +410,7 @@ std::string parseContextAttribute
     if (type != "Object")
     {
       std::string details = "attribute must be a JSON object, unless keyValues option is used";
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", details);
       ciP->httpStatusCode = SccBadRequest;
       return details;
     }
@@ -420,7 +421,7 @@ std::string parseContextAttribute
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r == "max deep reached")
       {
-        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Object", "");
+        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
@@ -433,7 +434,7 @@ std::string parseContextAttribute
     }
     else
     {
-      alarmMgr.badInput(clientIp, "no 'value' for ContextAttribute without keyValues", "");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", "no 'value' for ContextAttribute without keyValues");
       ciP->httpStatusCode = SccBadRequest;
       return "no 'value' for ContextAttribute without keyValues";
     }
@@ -447,7 +448,7 @@ std::string parseContextAttribute
   std::string r = caP->check(ciP->apiVersion, ciP->requestType);
   if (r != "OK")
   {
-    alarmMgr.badInput(clientIp, r, "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", r);
     ciP->httpStatusCode = SccBadRequest;
     return r;
   }
@@ -471,7 +472,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error", "");
+    alarmMgr.badInput(clientIp, "JSON parse error", parseErrorString(document.GetParseError()));
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -482,7 +483,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Object not found");
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -495,7 +496,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, r, "");
+    alarmMgr.badInput(clientIp, "max deep reached", r);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -504,7 +505,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
 
-    alarmMgr.badInput(clientIp, r, "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", r);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
