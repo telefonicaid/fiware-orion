@@ -1173,7 +1173,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
@@ -1185,20 +1185,20 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion, name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
@@ -1206,13 +1206,13 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
   if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";
   }
 
@@ -1225,7 +1225,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   {
     if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";
     }
   }

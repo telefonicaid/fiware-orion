@@ -39,6 +39,7 @@
 #include "jsonParseV2/parseEntityObject.h"
 #include "jsonParseV2/parseEntityVector.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
+#include "jsonParseV2/utilsParse.h"
 
 
 
@@ -63,7 +64,7 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
   if (document.HasParseError())
   {
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     ciP->httpStatusCode = SccBadRequest;
 
     return false;
@@ -73,7 +74,7 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
   {
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Array not found");
     ciP->httpStatusCode = SccBadRequest;
 
     return false;
@@ -87,7 +88,7 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
     if (s != "OK")
     {
       oeP->fill(SccBadRequest, s);
-      alarmMgr.badInput(clientIp, "JSON Parse Error");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", s);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }

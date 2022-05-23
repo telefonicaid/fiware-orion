@@ -500,7 +500,7 @@ std::string CompoundValueNode::check(const std::string& path)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";
     }
   }
