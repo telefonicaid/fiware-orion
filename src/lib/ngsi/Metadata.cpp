@@ -294,20 +294,20 @@ std::string Metadata::check(ApiVersion apiVersion)
   if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg, "");
+    alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (name.empty())
   {
-    alarmMgr.badInput(clientIp, "missing metadata name", "");
+    alarmMgr.badInput(clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg, "");
+    alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -320,7 +320,7 @@ std::string Metadata::check(ApiVersion apiVersion)
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg, "");
+    alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -328,7 +328,7 @@ std::string Metadata::check(ApiVersion apiVersion)
   if (apiVersion == V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg, "");
+    alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 

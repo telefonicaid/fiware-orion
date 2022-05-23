@@ -83,7 +83,7 @@ class AlarmManager
   bool forwardingError(const std::string& url, const std::string& details);
   bool forwardingErrorReset(const std::string& url);
 
-  bool badInput(const std::string& ip, const std::string& details, const std::string& extraInLog);
+  bool badInput(const std::string& ip, const std::string& details, const std::string& extraInLog = "");
   bool badInputReset(const std::string& ip);
 
   bool mqttConnectionError(const std::string& endpoint, const std::string& details);

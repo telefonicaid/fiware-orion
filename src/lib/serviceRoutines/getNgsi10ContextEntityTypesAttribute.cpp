@@ -96,7 +96,7 @@ std::string getNgsi10ContextEntityTypesAttribute
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     TIMED_RENDER(answer = parseDataP->qcrs.res.toJsonV1(asJsonObject));
     parseDataP->qcr.res.release();

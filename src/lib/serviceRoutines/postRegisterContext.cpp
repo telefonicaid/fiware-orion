@@ -73,7 +73,7 @@ std::string postRegisterContext
         std::string  details = "isPattern set to true for registrations is currently not supported";
         OrionError   oe(SccBadRequest, details);
 
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, details);
         ciP->httpStatusCode = SccBadRequest;
         return oe.toJsonV1();
       }
@@ -87,7 +87,7 @@ std::string postRegisterContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    alarmMgr.badInput(clientIp, "more than one service path for a registration", "");
+    alarmMgr.badInput(clientIp, "more than one service path for a registration");
     rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
 
     TIMED_RENDER(answer = rcr.toJsonV1());

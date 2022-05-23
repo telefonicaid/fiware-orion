@@ -1390,7 +1390,7 @@ void subNotificationErrorStatus
     cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
     const char* errorString = "intent to update error status of non-existing subscription";
 
-    alarmMgr.badInput(clientIp, errorString, "");
+    alarmMgr.badInput(clientIp, errorString);
     return;
   }
 

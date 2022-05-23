@@ -266,7 +266,7 @@ static void eatCompound
   if (deep > MAX_JSON_NESTING)
   {
     std::string details = std::string("compound attribute value has overpassed maximum nesting limit");
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
 
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = details;
@@ -413,7 +413,7 @@ static std::string jsonParse
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
     }
 
-    alarmMgr.badInput(clientIp, ciP->answer, "");
+    alarmMgr.badInput(clientIp, ciP->answer);
     return ciP->answer;
   }
 

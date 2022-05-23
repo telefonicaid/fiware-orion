@@ -61,7 +61,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
     {
       if (type != "String")
       {
-        alarmMgr.badInput(clientIp, "ContextAttribute::Metadata::type must be a String", "");
+        alarmMgr.badInput(clientIp, "ContextAttribute::Metadata::type must be a String");
         return "invalid JSON type for attribute metadata type";
       }
 

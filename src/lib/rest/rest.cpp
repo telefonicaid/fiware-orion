@@ -265,7 +265,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
     ciP->httpStatusCode = error.code;
     ciP->answer         = error.smartRender(ciP->apiVersion);
   }
@@ -1377,7 +1377,7 @@ static int connectionTreat
       char details[256];
       snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, inReqPayloadMaxSize);
 
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, details);
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;
@@ -1524,7 +1524,7 @@ static int connectionTreat
     char details[256];
 
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, inReqPayloadMaxSize);
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 
     ciP->httpStatusCode = SccRequestEntityTooLarge;
@@ -1539,7 +1539,7 @@ static int connectionTreat
     OrionError   oe(SccBadRequest, ciP->acceptHeaderError);
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, ciP->acceptHeaderError, "");
+    alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
@@ -1563,7 +1563,7 @@ static int connectionTreat
     }
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details, "");
+    alarmMgr.badInput(clientIp, oe.details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
@@ -1589,7 +1589,7 @@ static int connectionTreat
     }
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details, "");
+    alarmMgr.badInput(clientIp, oe.details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
@@ -1604,7 +1604,7 @@ static int connectionTreat
     OrionError   oe(SccBadRequest, details);
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
@@ -1625,11 +1625,11 @@ static int connectionTreat
     restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
     ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
-    alarmMgr.badInput(clientIp, errorMsg, "");
+    alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (!ciP->answer.empty())
   {
-    alarmMgr.badInput(clientIp, ciP->answer, "");
+    alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
   }
   else

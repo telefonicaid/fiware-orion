@@ -72,7 +72,7 @@ HttpStatusCode mongoUnsubscribeContext
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
     responseP->statusCode.fill(SccContextElementNotFound);
     responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-    alarmMgr.badInput(clientIp, "no subscriptionId", "");
+    alarmMgr.badInput(clientIp, "no subscriptionId");
 
     return SccOk;
   }

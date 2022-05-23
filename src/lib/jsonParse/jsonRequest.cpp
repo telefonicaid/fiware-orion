@@ -228,7 +228,7 @@ std::string jsonTreat
     std::string errorReply;
 
     restErrorReplyGet(ciP, SccBadRequest, "JSON Generic Error", &errorReply);
-    alarmMgr.badInput(clientIp, "JSON parse generic error", "");
+    alarmMgr.badInput(clientIp, "JSON parse generic error");
     return errorReply;
   }
 

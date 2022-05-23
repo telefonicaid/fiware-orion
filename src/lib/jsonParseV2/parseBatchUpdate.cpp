@@ -89,7 +89,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   {
     std::string  details = "Invalid JSON payload, mandatory field /actionType/ not found";
 
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
     oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -108,7 +108,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
       if (r == "NotImplemented")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccNotImplemented, r, "NotImplemented");
         ciP->httpStatusCode = SccNotImplemented;
         r = oe.toJson();
@@ -116,7 +116,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
       }
       else if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
         r = oe.toJson();
@@ -144,7 +144,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     {
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
-      alarmMgr.badInput(clientIp, description, "");
+      alarmMgr.badInput(clientIp, description);
       oe.fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 

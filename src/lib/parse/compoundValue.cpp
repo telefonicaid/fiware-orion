@@ -57,7 +57,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   {
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
-    alarmMgr.badInput(clientIp, ciP->answer, "");
+    alarmMgr.badInput(clientIp, ciP->answer);
   }
 
   //

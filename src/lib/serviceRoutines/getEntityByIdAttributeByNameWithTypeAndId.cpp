@@ -99,7 +99,7 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     TIMED_RENDER(answer = parseDataP->dcars.res.toJsonV1());
   }

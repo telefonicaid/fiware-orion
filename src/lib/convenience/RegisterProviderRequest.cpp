@@ -106,7 +106,7 @@ std::string RegisterProviderRequest::check
   }
 
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
-  alarmMgr.badInput(clientIp, details, "");
+  alarmMgr.badInput(clientIp, details);
 
   return response.toJsonV1();
 }

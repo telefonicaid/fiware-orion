@@ -60,7 +60,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error", "");
+    alarmMgr.badInput(clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -96,7 +96,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
@@ -110,7 +110,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
@@ -123,7 +123,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
@@ -136,7 +136,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
@@ -149,7 +149,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r, "");
+        alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
@@ -160,7 +160,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     {
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
-      alarmMgr.badInput(clientIp, description, "");
+      alarmMgr.badInput(clientIp, description);
       oe.fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 

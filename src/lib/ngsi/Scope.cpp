@@ -432,12 +432,12 @@ std::string Scope::check(void)
     {
       if (circle.radiusString() == "0")
       {
-        alarmMgr.badInput(clientIp, "radius zero for a circle area", "");
+        alarmMgr.badInput(clientIp, "radius zero for a circle area");
         return "Radius zero for a circle area";
       }
       else if (circle.radiusString().empty())
       {
-        alarmMgr.badInput(clientIp, "missing radius for circle area", "");
+        alarmMgr.badInput(clientIp, "missing radius for circle area");
         return "Missing radius for circle area";
       }
       else if (!circle.invertedString().empty())
@@ -445,18 +445,18 @@ std::string Scope::check(void)
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
         {
           std::string details = std::string("bad value for circle/inverted: '") + circle.invertedString() + "'"; 
-          alarmMgr.badInput(clientIp, details, "");
+          alarmMgr.badInput(clientIp, details);
           return "bad value for circle/inverted: /" + circle.invertedString() + "/";
         }
       }
       else if (circle.center.latitudeString().empty())
       {
-        alarmMgr.badInput(clientIp, "missing latitude for circle center", "");
+        alarmMgr.badInput(clientIp, "missing latitude for circle center");
         return "Missing latitude for circle center";
       }
       else if (circle.center.longitudeString().empty())
       {
-        alarmMgr.badInput(clientIp, "missing longitude for circle center", "");
+        alarmMgr.badInput(clientIp, "missing longitude for circle center");
         return "Missing longitude for circle center";
       }
 
@@ -468,7 +468,7 @@ std::string Scope::check(void)
       if ((ok == false) || (latitude > 90) || (latitude < -90))
       {
         std::string details = std::string("invalid value for latitude (") + circle.center.latitudeString() + ")";
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, details);
         return "invalid value for latitude";
       }
 
@@ -476,7 +476,7 @@ std::string Scope::check(void)
       if ((ok == false) || (longitude > 180) || (longitude < -180))
       {
         std::string details = std::string("invalid value for longitude: '") + circle.center.longitudeString() + "'";
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, details);
         return "invalid value for longitude";
       }
     }
@@ -488,7 +488,7 @@ std::string Scope::check(void)
 
         snprintf(noOfV, sizeof(noOfV), "%lu", polygon.vertexList.size());
         std::string details = std::string("too few vertices for a polygon (") + noOfV + " is less than three)";
-        alarmMgr.badInput(clientIp, details, "");
+        alarmMgr.badInput(clientIp, details);
 
         return "too few vertices for a polygon";
       }
@@ -497,7 +497,7 @@ std::string Scope::check(void)
         if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
         {
           std::string details = std::string("bad value for polygon/inverted: '") + polygon.invertedString() + "'";
-          alarmMgr.badInput(clientIp, details, "");
+          alarmMgr.badInput(clientIp, details);
           return "bad value for polygon/inverted: /" + polygon.invertedString() + "/";
         }
       }
@@ -506,13 +506,13 @@ std::string Scope::check(void)
       {
         if (polygon.vertexList[ix]->latitudeString().empty())
         {
-          alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex", "");
+          alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex");
           return std::string("missing latitude value for polygon vertex");
         }
 
         if (polygon.vertexList[ix]->longitudeString().empty())
         {
-          alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex", "");
+          alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex");
           return std::string("missing longitude value for polygon vertex");
         }
 
@@ -525,7 +525,7 @@ std::string Scope::check(void)
         if ((ok == false) || (latitude > 90) || (latitude < -90))
         {
           std::string details = std::string("invalid value for latitude: '") + polygon.vertexList[ix]->latitudeString() + "'";
-          alarmMgr.badInput(clientIp, details, "");
+          alarmMgr.badInput(clientIp, details);
           return "invalid value for latitude";
         }
 
@@ -533,7 +533,7 @@ std::string Scope::check(void)
         if ((ok == false) || (longitude > 180) || (longitude < -180))
         {
           std::string details = std::string("invalid value for longitude: '") + polygon.vertexList[ix]->longitudeString() + "'";
-          alarmMgr.badInput(clientIp, details, "");
+          alarmMgr.badInput(clientIp, details);
           return "invalid value for longitude";
         }
       }
@@ -544,13 +544,13 @@ std::string Scope::check(void)
   {
     if (type.empty())
     {
-      alarmMgr.badInput(clientIp, "empty type in restriction scope", "");
+      alarmMgr.badInput(clientIp, "empty type in restriction scope");
       return "Empty type in restriction scope";
     }
 
     if (value.empty())
     {
-      alarmMgr.badInput(clientIp, "empty value in restriction scope", "");
+      alarmMgr.badInput(clientIp, "empty value in restriction scope");
       return "Empty value in restriction scope";
     }
   }
@@ -559,22 +559,22 @@ std::string Scope::check(void)
   {
     if ((areaType == orion::PointType) && (georel.type == "coveredBy"))
     {
-      alarmMgr.badInput(clientIp, "Query not supported: point geometry cannot be used with coveredBy georel", "");
+      alarmMgr.badInput(clientIp, "Query not supported: point geometry cannot be used with coveredBy georel");
       return "Query not supported: point geometry cannot be used with coveredBy georel";
     }
     else if ((areaType == orion::LineType) && (georel.type == "coveredBy"))
     {
-      alarmMgr.badInput(clientIp, "Query not supported: line  geometry cannot be used with coveredBy georel", "");
+      alarmMgr.badInput(clientIp, "Query not supported: line  geometry cannot be used with coveredBy georel");
       return "Query not supported: line geometry cannot be used with coveredBy georel";
     }
     else if ((areaType == orion::LineType) && (line.pointList.size() < 2))
     {
-      alarmMgr.badInput(clientIp, "Query not supported: not enough points for a line", "");
+      alarmMgr.badInput(clientIp, "Query not supported: not enough points for a line");
       return "Query not supported: not enough points for a line";
     }
     else if ((areaType == orion::PolygonType) && (polygon.vertexList.size() < 4))
     {
-      alarmMgr.badInput(clientIp, "Query not supported: not enough vertices for a polygon", "");
+      alarmMgr.badInput(clientIp, "Query not supported: not enough vertices for a polygon");
       return "Query not supported: not enough vertices for a polygon";
     }
   }

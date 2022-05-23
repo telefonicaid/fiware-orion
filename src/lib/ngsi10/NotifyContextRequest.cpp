@@ -82,7 +82,7 @@ std::string NotifyContextRequest::toJson
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
-    alarmMgr.badInput(clientIp, "Invalid notification format", "");
+    alarmMgr.badInput(clientIp, "Invalid notification format");
 
     return oe.toJson();
   }  

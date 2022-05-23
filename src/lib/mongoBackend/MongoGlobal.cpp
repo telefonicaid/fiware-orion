@@ -420,7 +420,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
     {
       std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, details);
     }
     else
     {
@@ -661,7 +661,7 @@ static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
     std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
     return false;
   }
 
@@ -735,7 +735,7 @@ static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
   }
   else
   {
-    alarmMgr.badInput(clientIp, "unknown area type", "");
+    alarmMgr.badInput(clientIp, "unknown area type");
     return false;
   }
 
@@ -800,13 +800,13 @@ static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector
       std::string details = std::string("unknown value for '") +
         SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
 
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, details);
     }
   }
   else
   {
     std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
   }
 }
 
@@ -860,7 +860,7 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
     return false;
   }
 
@@ -1479,7 +1479,7 @@ bool entitiesQuery
       geoScopes++;
       if (geoScopes > 1)
       {
-        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored", "");
+        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
       }
       else
       {
@@ -1516,7 +1516,7 @@ bool entitiesQuery
     else
     {
       std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
-      alarmMgr.badInput(clientIp, details, "");
+      alarmMgr.badInput(clientIp, details);
     }
   }
 

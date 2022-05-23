@@ -93,7 +93,7 @@ std::string deleteAllEntitiesWithTypeAndId
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 

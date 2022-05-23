@@ -123,7 +123,7 @@ static bool queryForward
   {
     std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
 
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, details);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...

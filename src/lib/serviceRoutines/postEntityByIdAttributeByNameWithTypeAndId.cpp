@@ -98,7 +98,7 @@ std::string postEntityByIdAttributeByNameWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->rcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     TIMED_RENDER(answer = parseDataP->rcrs.res.toJsonV1());
   }

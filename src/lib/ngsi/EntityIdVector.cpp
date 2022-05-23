@@ -97,7 +97,7 @@ std::string EntityIdVector::check(RequestType requestType)
   {
     if (vec.size() == 0)
     {
-      alarmMgr.badInput(clientIp, "mandatory entity list missing", "");
+      alarmMgr.badInput(clientIp, "mandatory entity list missing");
       return "No entities";
     }
   }

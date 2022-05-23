@@ -105,7 +105,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request", "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }
   else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
