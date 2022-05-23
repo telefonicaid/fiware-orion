@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-   TEST_IMAGE_NAME: fiware/orion-ci:rpm8
+   TEST_IMAGE_NAME: fiware/orion-ci:deb
 
 jobs:
   valgrind:
