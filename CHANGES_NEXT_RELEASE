@@ -4,5 +4,6 @@
 - Fix: allow limit=0 in all paginated operations in the NGSIv2 API (entities, entity types, subscriptions and registrations) (#1492)
 - Add: conditions.alterationTypes subscription fuctionality (#1494)
 - Add: alterationType built-in atrribute in notifications (#1494)
+- Add: debug tracelevel (-t 56) to get information when regex compilation fails (#4098)
 - Fix: covered notifications in subscriptions (#3693)
 - Reference distribution changed RHEL/CentOS 8 to Debian 11

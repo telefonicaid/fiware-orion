@@ -417,7 +417,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     regex_t regex;
 
     idMatch = false;
-    if (regcomp(&regex, en2->id.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
     {
       std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
       alarmMgr.badInput(clientIp, details, "");
