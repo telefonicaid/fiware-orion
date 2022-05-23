@@ -152,8 +152,8 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   if ((s = parseDataP->scr.res.duration.check()) != "OK")
   {
-    std::string details = std::string("error parsing duration '") + parseDataP->scr.res.duration.get() + "': " + s;
-    alarmMgr.badInput(clientIp, details, "");
+    std::string extra = parseDataP->scr.res.duration.get() + "': " + s;
+    alarmMgr.badInput(clientIp, "error parsing duration", extra);
     return s;
   }
 
@@ -316,8 +316,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
 
   if (!isTrue(value) && !isFalse(value))
   {
-    std::string details = std::string("invalid string for circle/inverted: '") + value + "'";
-    alarmMgr.badInput(clientIp, details, "");
+    alarmMgr.badInput(clientIp, "invalid string for circle/inverted", value);
     parseDataP->errorString = "bad string for circle/inverted: /" + value + "/";
     return parseDataP->errorString;
   }
