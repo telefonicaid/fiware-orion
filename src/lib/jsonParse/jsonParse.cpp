@@ -291,7 +291,7 @@ static void eatCompound
     {
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
-        alarmMgr.badInput(clientIp, "details", nodeValue);
+        alarmMgr.badInput(clientIp, "found a forbidden value in compound", nodeValue);
 
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
