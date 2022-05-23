@@ -373,7 +373,7 @@ std::string parseContextAttribute
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector", r);
+        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Vector", r);
         ciP->httpStatusCode = SccBadRequest;
         return "json error in ContextAttribute::Vector";
       }
@@ -391,7 +391,7 @@ std::string parseContextAttribute
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Object", r);
+        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r);
         ciP->httpStatusCode = SccBadRequest;
         return "json error in ContextAttribute::Object";
       }
@@ -427,7 +427,7 @@ std::string parseContextAttribute
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object", r);
+        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r);
         ciP->httpStatusCode = SccBadRequest;
         return r;
       }
@@ -472,7 +472,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error", parseErrorString(document.GetParseError()));
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();

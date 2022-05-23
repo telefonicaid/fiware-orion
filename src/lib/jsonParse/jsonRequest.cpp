@@ -235,7 +235,7 @@ std::string jsonTreat
   if (res != "OK")
   {
     std::string answer;
-    alarmMgr.badInput(clientIp, "JSON parse error", res);
+    alarmMgr.badInput(clientIp, "JSON Parse Error", res);
     ciP->httpStatusCode = SccBadRequest;
     restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
     return answer;

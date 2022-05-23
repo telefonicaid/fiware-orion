@@ -428,7 +428,7 @@ static std::string jsonParse
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
     if (out != "OK")
     {
-      alarmMgr.badInput(clientIp, "JSON parse error", out);
+      alarmMgr.badInput(clientIp, "JSON Parse Error", out);
       return out;
     }
   }
@@ -551,7 +551,7 @@ std::string jsonParse
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);
     if (res != "OK")
     {
-      alarmMgr.badInput(clientIp, "JSON parse error", res);
+      alarmMgr.badInput(clientIp, "JSON Parse Error", res);
       return res;
     }
   }

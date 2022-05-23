@@ -51,7 +51,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error", parseErrorString(document.GetParseError()));
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -60,7 +60,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject() && !document.IsArray())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error", "Neither JSON Object nor JSON Array for attribute::value");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "Neither JSON Object nor JSON Array for attribute::value");
     oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
     return oe.toJson();
