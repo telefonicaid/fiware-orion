@@ -221,7 +221,7 @@ extern bool isNull(const rapidjson::Value& parent, const char* field)
 */
 std::string parseErrorString(rapidjson::ParseErrorCode code)
 {
-  switch(code)
+  switch (code)
   {
   case rapidjson::kParseErrorNone:                          return "No error";
   case rapidjson::kParseErrorDocumentEmpty:                 return "The document is empty";
