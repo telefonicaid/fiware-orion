@@ -46,7 +46,7 @@
 * Note that _ is undeffed after usage
 *
 * Our style guide forbids the use of "using" in header files (see 
-* doc/manuals/contribution_guidelines.md) and we don't want to write out 
+* doc/manuals/devel/contribution_guidelines.md) and we don't want to write out 
 * the entire string "::testing::_", as the code gets difficult to read. Thanks 
 * to this temporary macro, we can use "_" but without using "using ::testing::_"
 */
