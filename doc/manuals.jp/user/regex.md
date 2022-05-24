@@ -1,6 +1,27 @@
-# ペイロードでの正規表現の使用 (Using regular expressions in payloads)
+# 正規表現の使用 (Using regular expressions)
 
-いくつかのオペレーションでは、次のように正規表現を使用できます。サポートされている正規表現のセットは、POSIX 拡張です (詳細は [こちら](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)を参照してください)。
+## 正規表現フォーマット
+
+Orion でサポートされている正規表現のセットは POSIX Extended です (詳細は[こちら](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)をご覧ください)
+
+POSIX はルック・アラウンド (lookarounds) をサポートしていないため、このような式は使用できないことに注意してください:
+
+```
+^(?!WeatherObserved).*
+```
+
+ただし、POSIX と同等のものを見つけることができます。たとえば、上記の式はこれと同等です
+(詳細は[この投稿](https://stackoverflow.com/a/37988661/1485926)を参照):
+
+```
+^(([^\nW].{14}|.[^\ne].{13}|.{2}[^\na].{12}|.{3}[^\nt].{11}|.{4}[^\nh].{10}|.{5}[^\ne].{9}|.{6}[^\nr].{8}|.{7}[^\nO].{7}|.{8}[^\nb].{6}|.{9}[^\ns].{5}|.{10}[^\ne].{4}|.{11}[^\nr].{3}|.{12}[^\ntv].{2}|.{13}[^\ne].|.{14}[^\nd]).*|.{0,14})$
+```
+
+それらは長くて醜いかもしれませんが、機能的には同等です。
+
+## ペイロードの正規表現
+
+一部の操作では、以下に示すように、ペイロードで正規表現を使用できます。
 
 例 :
 

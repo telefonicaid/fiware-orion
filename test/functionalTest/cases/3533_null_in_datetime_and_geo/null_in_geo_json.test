@@ -148,7 +148,7 @@ echo
 echo
 
 
-echo "08. Update E2-loc, see error"
+echo "10. Update E2-loc, see error"
 echo "============================"
 payload='{
   "loc": {
@@ -327,27 +327,27 @@ Date: REGEX(.*)
 09. Update E1-loc, see error
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "error parsing location attribute for existing attribute: geo:json needs an object or null as value",
+    "description": "geo:json needs an object or null as value",
     "error": "BadRequest"
 }
 
 
-08. Update E2-loc, see error
+10. Update E2-loc, see error
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 114
+Content-Length: 80
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "error parsing location attribute: geo:json needs an object or null as value",
+    "description": "geo:json needs an object or null as value",
     "error": "BadRequest"
 }
 

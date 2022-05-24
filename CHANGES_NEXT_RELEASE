@@ -1,5 +1,10 @@
+- Add: support for Feature and FeaturesCollection GeoJSON types (normalizing geometries) in entity locations (#4114)
+- Add: support to null element in string list filters (e.g. q=A:foo,null) (#4120)
+- Add: improve BadInput logs with extra information when available (#4121)
 - Fix: allow limit=0 in all paginated operations in the NGSIv2 API (entities, entity types, subscriptions and registrations) (#1492)
 - Add: conditions.alterationTypes subscription fuctionality (#1494)
 - Add: alterationType built-in atrribute in notifications (#1494)
+- Fix: wrong log traces in update forwarding cases
+- Add: debug tracelevel (-t 56) to get information when regex compilation fails (#4098)
 - Fix: covered notifications in subscriptions (#3693)
 - Reference distribution changed RHEL/CentOS 8 to Debian 11

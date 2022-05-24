@@ -40,7 +40,129 @@
 #include "jsonParseV2/parseMetadataVector.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "jsonParseV2/parseContextAttribute.h"
+#include "jsonParseV2/utilsParse.h"
 
+
+
+/* ****************************************************************************
+*
+* checkFeatureGeoJson -
+*
+*/
+static std::string checkFeatureGeoJson(orion::CompoundValueNode* feature)
+{
+  for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
+  {
+     orion::CompoundValueNode* childP = feature->childV[ix];
+     if (childP->name == "geometry")
+     {
+       if (childP->valueType == orion::ValueTypeObject)
+       {
+         return "OK";
+       }
+       else
+       {
+         return "geometry in Feature is not an object";
+       }
+     }
+  }
+
+  return "geometry in Feature not found";
+}
+
+
+
+
+/* ****************************************************************************
+*
+* checkFeatureCollectionGeoJson -
+*
+*/
+static std::string checkFeatureCollectionGeoJson(orion::CompoundValueNode* featureCollection)
+{
+  for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
+  {
+     orion::CompoundValueNode* childP = featureCollection->childV[ix];
+     if (childP->name == "features")
+     {
+       if (childP->valueType != orion::ValueTypeVector)
+       {
+         return "features in FeatureCollection is not an array";
+       }
+       else if (childP->childV.size() == 0)
+       {
+         return "features in FeatureCollection has 0 items";
+       }
+       else if (childP->childV.size() > 1)
+       {
+         return "features in FeatureCollection has more than 1 item";
+       }
+       else
+       {
+         return checkFeatureGeoJson(childP->childV[0]);
+       }
+     }
+  }
+
+  return "features field not found in FeatureCollection";
+}
+
+
+
+/* ****************************************************************************
+*
+* checkGeoJson -
+*
+* Do checking that ensure getGeoJson() function in the mongoBackend layer will not
+* break. In particular:
+*
+* - Attribute is null or an object
+* - For Feature, that geometry field exists and it's an object
+* - For FeatureCollection:
+*   * the feature field exists
+*   * the feature field is an array with exactly one item
+*   * the feature field item has a geometry field and it's an object
+*
+*/
+static std::string checkGeoJson(ContextAttribute* caP)
+{
+  if (caP->compoundValueP == NULL)
+  {
+    // In no object or vector, only null is allowed
+    if (caP->valueType == orion::ValueTypeNull)
+    {
+      return "OK";
+    }
+    else
+    {
+      return "geo:json needs an object or null as value";
+    }
+  }
+
+  // Vector not allowed
+  if (!caP->compoundValueP->isObject())
+  {
+    return "geo:json needs an object or null as value";
+  }
+
+  for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
+  {
+     orion::CompoundValueNode* childP = caP->compoundValueP->childV[ix];
+     if ((childP->name == "type") && (childP->valueType == orion::ValueTypeString))
+     {
+       if (childP->stringValue == "Feature")
+       {
+         return checkFeatureGeoJson(caP->compoundValueP);
+       }
+       else if (childP->stringValue == "FeatureCollection")
+       {
+         return checkFeatureCollectionGeoJson(caP->compoundValueP);
+       }
+     }
+  }
+
+  return "OK";
+}
 
 
 /* ****************************************************************************
@@ -173,6 +295,16 @@ static std::string parseContextAttributeObject
     caP->valueType   = orion::ValueTypeNumber;
   }
 
+  // It is a safe GeoJSON?
+  if (caP->type == GEO_JSON)
+  {
+    std::string r = checkGeoJson(caP);
+    if (r != "OK")
+    {
+      return r;
+    }
+  }
+
   return "OK";
 }
 
@@ -235,13 +367,13 @@ std::string parseContextAttribute
 
       if (r == "max deep reached")
       {
-        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Vector");
+        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Vector");
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
+        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Vector", r);
         ciP->httpStatusCode = SccBadRequest;
         return "json error in ContextAttribute::Vector";
       }
@@ -253,20 +385,20 @@ std::string parseContextAttribute
 
       if (r == "max deep reached")
       {
-        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Object");
+        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Object");
+        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r);
         ciP->httpStatusCode = SccBadRequest;
         return "json error in ContextAttribute::Object";
       }
     }
     else
     {
-      alarmMgr.badInput(clientIp, "bad type for ContextAttribute");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", "bad JSON type for ContextAttribute");
       ciP->httpStatusCode = SccBadRequest;
       return "invalid JSON type for ContextAttribute";
     }
@@ -278,7 +410,7 @@ std::string parseContextAttribute
     if (type != "Object")
     {
       std::string details = "attribute must be a JSON object, unless keyValues option is used";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(clientIp, "JSON Parse Error", details);
       ciP->httpStatusCode = SccBadRequest;
       return details;
     }
@@ -289,20 +421,20 @@ std::string parseContextAttribute
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r == "max deep reached")
       {
-        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Object");
+        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
       else if (r != "OK")  // other error cases get a general treatment
       {
-        alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
+        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r);
         ciP->httpStatusCode = SccBadRequest;
         return r;
       }
     }
     else
     {
-      alarmMgr.badInput(clientIp, "no 'value' for ContextAttribute without keyValues");
+      alarmMgr.badInput(clientIp, "JSON Parse Error", "no 'value' for ContextAttribute without keyValues");
       ciP->httpStatusCode = SccBadRequest;
       return "no 'value' for ContextAttribute without keyValues";
     }
@@ -316,7 +448,7 @@ std::string parseContextAttribute
   std::string r = caP->check(ciP->apiVersion, ciP->requestType);
   if (r != "OK")
   {
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(clientIp, "JSON Parse Error", r);
     ciP->httpStatusCode = SccBadRequest;
     return r;
   }
@@ -340,7 +472,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -351,7 +483,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Object not found");
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -364,7 +496,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(clientIp, "max deep reached", r);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -373,7 +505,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
 
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(clientIp, "JSON Parse Error", r);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
