@@ -1,5 +1,7 @@
 name: Publish rpm from master
 
+# FIXME: rpm no longer supported. To be removed soon
+
 on:
   schedule:
     # every night at one
