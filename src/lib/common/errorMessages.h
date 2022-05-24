@@ -43,7 +43,7 @@
  *
  * In addition, by the moment we are using this constants only for error payloads, but maybe they should be
  * also used for alarm error mensajes, e.g. alarmMgr.badInput(clientIp, ERROR_DESC_PARSE) instead of
- * alarmMgr.badInput(clientIp, "JSON parse error").
+ * alarmMgr.badInput(clientIp, "JSON Parse Error").
  */
 
 #define ERROR_PARSE                                   "ParseError"

@@ -1,7 +1,27 @@
-# Using regular expressions in payloads
+# Using regular expressions
 
-In some operations regular expressions can be used, as shown below. The
-set of supported regular expressions is POSIX Extended (see details [here](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)).
+## Regular expressions format
+
+The set of supported regular expressions by Orion is POSIX Extended (see details [here](https://stackoverflow.com/questions/46888312/regular-expressions-in-orion-context-broker)).
+
+Note that POSIX doesn't support lookarounds so you cannot use expressions like this one:
+
+```
+^(?!WeatherObserved).*
+```
+
+However, you can found POSIX equivalences. For instance, the above expression is equivalent to this one
+(more info [in this post](https://stackoverflow.com/a/37988661/1485926):
+
+```
+^(([^\nW].{14}|.[^\ne].{13}|.{2}[^\na].{12}|.{3}[^\nt].{11}|.{4}[^\nh].{10}|.{5}[^\ne].{9}|.{6}[^\nr].{8}|.{7}[^\nO].{7}|.{8}[^\nb].{6}|.{9}[^\ns].{5}|.{10}[^\ne].{4}|.{11}[^\nr].{3}|.{12}[^\ntv].{2}|.{13}[^\ne].|.{14}[^\nd]).*|.{0,14})$
+```
+
+They may be longer and uglier but they are functionally equivalent.
+
+## Regular expressions in payload
+
+In some operations regular expressions can be used in payload, as shown below.
 
 Example:
 

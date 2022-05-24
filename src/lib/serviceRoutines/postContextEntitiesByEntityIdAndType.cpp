@@ -102,7 +102,7 @@ std::string postContextEntitiesByEntityIdAndType
   }
   else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.registrationId.set("000000000000000000000000");

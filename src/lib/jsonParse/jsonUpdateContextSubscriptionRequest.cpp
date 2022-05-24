@@ -55,8 +55,8 @@ static std::string duration(const std::string& path, const std::string& value, P
   // The failure is postponed until the 'check' step to not miss the subscriptionId
   if ((s = parseDataP->ucsr.res.duration.check()) != "OK")
   {
-    std::string details = std::string("error parsing duration '") + parseDataP->ucsr.res.duration.get() + "': " + s;
-    alarmMgr.badInput(clientIp, details);
+    std::string extra = std::string("'") + parseDataP->ucsr.res.duration.get() + "': " + s;
+    alarmMgr.badInput(clientIp, "error parsing duration", extra);
   }
 
   return "OK";

@@ -1488,19 +1488,19 @@ static int connectionTreat
   //
   if (urlCheck(ciP, ciP->url) == false)
   {
-    alarmMgr.badInput(clientIp, "error in URI path");
+    alarmMgr.badInput(clientIp, "error in URI path", ciP->url);
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
   else if (servicePathSplit(ciP) != 0)
   {
-    alarmMgr.badInput(clientIp, "error in ServicePath http-header");
+    alarmMgr.badInput(clientIp, "error in ServicePath http-header", ciP->httpHeaders.servicePath);
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
   else if (contentTypeCheck(ciP) != 0)
   {
-    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
+    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header", ciP->httpHeaders.contentType);
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }
@@ -1511,7 +1511,7 @@ static int connectionTreat
 
   if (ciP->httpStatusCode != SccOk)
   {
-    alarmMgr.badInput(clientIp, "error in URI parameters");
+    alarmMgr.badInput(clientIp, "error in URI parameters", ciP->uriForLogs);
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }

@@ -51,7 +51,7 @@ public:
 
   void            push_back(Metadata* item);
   unsigned int    size(void) const;
-  Metadata*       lookupByName(const std::string& _name);
+  Metadata*       lookupByName(const std::string& _name) const;
   void            release(void);
   void            fill(MetadataVector* mV);
  

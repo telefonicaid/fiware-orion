@@ -244,6 +244,8 @@ Note that actually Orion stores the full value used at `Feature` or `FeatureColl
 creation/updating time. However, from the point of view of normalization with other `geo:json` types,
 it has been decided to return only the `geometry` part. In the future, maybe a flag to return
 the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
+Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
+[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
 
 With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
 `Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.

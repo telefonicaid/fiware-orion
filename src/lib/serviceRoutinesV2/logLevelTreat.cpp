@@ -86,7 +86,7 @@ std::string changeLogLevel
   else
   {
     ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "invalid log level in URI param");
+    alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
     return "{\"error\":\"invalid log level\"}";
   }
 
