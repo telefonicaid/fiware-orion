@@ -7,4 +7,5 @@
 - Fix: wrong log traces in update forwarding cases
 - Add: debug tracelevel (-t 56) to get information when regex compilation fails (#4098)
 - Fix: covered notifications in subscriptions (#3693)
+- Fix: memory leak in MQTT connection management logic when connection to MQTT broker cannot be established
 - Reference distribution changed RHEL/CentOS 8 to Debian 11
