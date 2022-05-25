@@ -46,82 +46,11 @@
 
 /* ****************************************************************************
 *
-* checkFeatureGeoJson -
-*
-*/
-static std::string checkFeatureGeoJson(orion::CompoundValueNode* feature)
-{
-  for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
-  {
-     orion::CompoundValueNode* childP = feature->childV[ix];
-     if (childP->name == "geometry")
-     {
-       if (childP->valueType == orion::ValueTypeObject)
-       {
-         return "OK";
-       }
-       else
-       {
-         return "geometry in Feature is not an object";
-       }
-     }
-  }
-
-  return "geometry in Feature not found";
-}
-
-
-
-
-/* ****************************************************************************
-*
-* checkFeatureCollectionGeoJson -
-*
-*/
-static std::string checkFeatureCollectionGeoJson(orion::CompoundValueNode* featureCollection)
-{
-  for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
-  {
-     orion::CompoundValueNode* childP = featureCollection->childV[ix];
-     if (childP->name == "features")
-     {
-       if (childP->valueType != orion::ValueTypeVector)
-       {
-         return "features in FeatureCollection is not an array";
-       }
-       else if (childP->childV.size() == 0)
-       {
-         return "features in FeatureCollection has 0 items";
-       }
-       else if (childP->childV.size() > 1)
-       {
-         return "features in FeatureCollection has more than 1 item";
-       }
-       else
-       {
-         return checkFeatureGeoJson(childP->childV[0]);
-       }
-     }
-  }
-
-  return "features field not found in FeatureCollection";
-}
-
-
-
-/* ****************************************************************************
-*
 * checkGeoJson -
 *
-* Do checking that ensure getGeoJson() function in the mongoBackend layer will not
-* break. In particular:
-*
-* - Attribute is null or an object
-* - For Feature, that geometry field exists and it's an object
-* - For FeatureCollection:
-*   * the feature field exists
-*   * the feature field is an array with exactly one item
-*   * the feature field item has a geometry field and it's an object
+* Check that attribute is null or an object. Other checks for Feature and FeatureCollection
+* are done in location.cpp functions, as they has to be done only when ignoreType:true
+* is not in the entity
 *
 */
 static std::string checkGeoJson(ContextAttribute* caP)
@@ -143,22 +72,6 @@ static std::string checkGeoJson(ContextAttribute* caP)
   if (!caP->compoundValueP->isObject())
   {
     return "geo:json needs an object or null as value";
-  }
-
-  for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
-  {
-     orion::CompoundValueNode* childP = caP->compoundValueP->childV[ix];
-     if ((childP->name == "type") && (childP->valueType == orion::ValueTypeString))
-     {
-       if (childP->stringValue == "Feature")
-       {
-         return checkFeatureGeoJson(caP->compoundValueP);
-       }
-       else if (childP->stringValue == "FeatureCollection")
-       {
-         return checkFeatureCollectionGeoJson(caP->compoundValueP);
-       }
-     }
   }
 
   return "OK";

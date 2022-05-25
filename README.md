@@ -251,10 +251,10 @@ target.
         [(jp)](docker/docker_swarm.jp.md)
 -   Development Manual [(en)](doc/manuals/devel/README.md)
     [(jp)](doc/manuals.jp/devel/README.md)
--   Sample code contributions [(en)](doc/manuals/code_contributions.md)
-    [(jp)](doc/manuals.jp/code_contributions.md)
--   Contribution guidelines [(en)](doc/manuals/contribution_guidelines.md)
-    [(jp)](doc/manuals.jp/contribution_guidelines.md), especially important if
+-   Sample code contributions [(en)](doc/manuals/devel/code_contributions.md)
+    [(jp)](doc/manuals.jp/devel/code_contributions.md)
+-   Contribution guidelines [(en)](doc/manuals/devel/contribution_guidelines.md)
+    [(jp)](doc/manuals.jp/devel/contribution_guidelines.md), especially important if
     you plan to contribute with code to Orion Context Broker
 -   Deprecated features [(en)](doc/manuals/deprecated.md)
     [(jp)](doc/manuals.jp/deprecated.md)
