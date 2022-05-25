@@ -43,7 +43,7 @@
 #include "jsonParseV2/utilsParse.h"
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * checkFeatureGeoJson -
@@ -106,7 +106,7 @@ static std::string checkFeatureCollectionGeoJson(orion::CompoundValueNode* featu
 
   return "features field not found in FeatureCollection";
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -145,6 +145,7 @@ static std::string checkGeoJson(ContextAttribute* caP)
     return "geo:json needs an object or null as value";
   }
 
+#if 0
   for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size(); ++ix)
   {
      orion::CompoundValueNode* childP = caP->compoundValueP->childV[ix];
@@ -160,6 +161,7 @@ static std::string checkGeoJson(ContextAttribute* caP)
        }
      }
   }
+#endif
 
   return "OK";
 }
