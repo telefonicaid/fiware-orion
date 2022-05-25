@@ -48,7 +48,7 @@
 *
 * checkGeoJson -
 *
-* Check that ttribute is null or an object. Other checks for Feature and FeatureCollection
+* Check that attribute is null or an object. Other checks for Feature and FeatureCollection
 * are done in location.cpp functions, as they has to be done only when ignoreType:true
 * is not in the entity
 *
