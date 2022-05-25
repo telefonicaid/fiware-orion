@@ -1,12 +1,3 @@
-FORMAT: 1A
-HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification 
-DATE: wip
-VERSION: 2.0.1
-PREVIOUS_VERSION: 2.0
-APIARY_PROJECT: orioncontextbroker
-SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
-GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
 # FIWARE-NGSI v2 Specification
 
