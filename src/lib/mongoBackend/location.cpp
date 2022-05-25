@@ -178,20 +178,28 @@ orion::CompoundValueNode* getGeometry(orion::CompoundValueNode* compoundValueP)
 * GeoJSON Feature has an especial treatment. The geometry is extracted from
 * "geometry" field at the first level.
 *
-* Preconditions are checked by checkGeoJson() function at parsing layer.
+* Checked:
+* - geometry field exists and it's an object
 */
-static bool isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion)
+static void isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
 {
   for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
   {
     CompoundValueNode* childP = feature->childV[ix];
     if (childP->name == "geometry")
     {
+      if (childP->valueType != orion::ValueTypeObject)
+      {
+        *errP = "geometry in Feature is not an object";
+        return;
+      }
+
       compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
-      return true;
+      return;
     }
   }
-  return false;
+
+  *errP = "geometry in Feature not found";
 }
 
 
@@ -206,20 +214,42 @@ static bool isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geo
 * element in the vector has to be used to set the entity location), but not in this
 * point, but at parsing stage.
 *
-* Preconditions are checked by checkGeoJson() function at parsing layer.
+* Checked:
+*   * the feature field exists
+*   * the feature field is an array with exactly one item
+*   * the feature field item has a geometry field and it's an object
 */
-static bool isFeatureCollectionType(CompoundValueNode* featureCollection, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion)
+static void isFeatureCollectionType(CompoundValueNode* featureCollection, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
 {
   for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
   {
     CompoundValueNode* childP = featureCollection->childV[ix];
     if (childP->name == "features")
     {
-      return isFeatureType(featureCollection->childV[ix]->childV[0], geoJson, apiVersion);
+      if (childP->valueType != orion::ValueTypeVector)
+      {
+        *errP = "features in FeatureCollection is not an array";
+        return;
+      }
+      else if (childP->childV.size() == 0)
+      {
+        *errP = "features in FeatureCollection has 0 items";
+        return;
+      }
+      else if (childP->childV.size() > 1)
+      {
+        *errP = "features in FeatureCollection has more than 1 item";
+        return;
+      }
+      else
+      {
+        isFeatureType(featureCollection->childV[ix]->childV[0], geoJson, apiVersion, errP);
+        return;
+      }
     }
   }
 
-  return false;
+  *errP = "features field not found in FeatureCollection";
 }
 
 
@@ -227,9 +257,15 @@ static bool isFeatureCollectionType(CompoundValueNode* featureCollection, orion:
 *
 * isSpecialGeoJsonType -
 *
+* Return true if an special GeoJSON type was found. In this case, the errP may containt
+* an error situation (if errP is empty, then no error occurs).
+*
+* Return false if no special GeoJSON type was found
 */
-static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion)
+static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
 {
+  *errP = "";
+
   if (caP->compoundValueP == NULL)
   {
     // This is the case when geo location attribute has null value
@@ -243,11 +279,13 @@ static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuil
      {
        if (childP->stringValue == "Feature")
        {
-         return isFeatureType(caP->compoundValueP, geoJson, apiVersion);
+         isFeatureType(caP->compoundValueP, geoJson, apiVersion, errP);
+         return true;
        }
        if (childP->stringValue == "FeatureCollection")
        {
-         return isFeatureCollectionType(caP->compoundValueP, geoJson, apiVersion);
+         isFeatureCollectionType(caP->compoundValueP, geoJson, apiVersion, errP);
+         return true;
        }
      }
   }
@@ -342,7 +380,15 @@ static bool getGeoJson
 
     // Feature and FeatureCollection has an special treatment, done insise isSpecialGeoJsonType()
     // For other cases (i.e. when isSpecialGeoJsonType() returns false) do it in the "old way"
-    if (!isSpecialGeoJsonType(caP, geoJson, apiVersion))
+    if (isSpecialGeoJsonType(caP, geoJson, apiVersion, errDetail))
+    {
+      // Feature or FeatureCollection was found, but some error may happen
+      if (!errDetail->empty())
+      {
+        return false;
+      }
+    }
+    else
     {
       // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
       caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
@@ -523,7 +569,7 @@ bool processLocationAtEntityCreation
 
     if (!getGeoJson(caP, geoJson, errDetail, apiVersion))
     {
-      oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
+      oe->fill(SccBadRequest, "error parsing location attribute: " + *errDetail, ERROR_BAD_REQUEST);
       return false;
     }
 
