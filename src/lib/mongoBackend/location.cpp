@@ -181,7 +181,7 @@ orion::CompoundValueNode* getGeometry(orion::CompoundValueNode* compoundValueP)
 * Checked:
 * - geometry field exists and it's an object
 */
-static bool isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
+static void isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
 {
   for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
   {
@@ -191,16 +191,15 @@ static bool isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geo
       if (childP->valueType != orion::ValueTypeObject)
       {
         *errP = "geometry in Feature is not an object";
-        return true;
+        return;
       }
 
       compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
-      return true;
+      return;
     }
   }
 
   *errP = "geometry in Feature not found";
-  return true;
 }
 
 
@@ -220,7 +219,7 @@ static bool isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geo
 *   * the feature field is an array with exactly one item
 *   * the feature field item has a geometry field and it's an object
 */
-static bool isFeatureCollectionType(CompoundValueNode* featureCollection, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
+static void isFeatureCollectionType(CompoundValueNode* featureCollection, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
 {
   for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
   {
@@ -230,27 +229,27 @@ static bool isFeatureCollectionType(CompoundValueNode* featureCollection, orion:
       if (childP->valueType != orion::ValueTypeVector)
       {
         *errP = "features in FeatureCollection is not an array";
-        return true;
+        return;
       }
       else if (childP->childV.size() == 0)
       {
         *errP = "features in FeatureCollection has 0 items";
-        return true;
+        return;
       }
       else if (childP->childV.size() > 1)
       {
         *errP = "features in FeatureCollection has more than 1 item";
-        return true;
+        return;
       }
       else
       {
-        return isFeatureType(featureCollection->childV[ix]->childV[0], geoJson, apiVersion, errP);
+        isFeatureType(featureCollection->childV[ix]->childV[0], geoJson, apiVersion, errP);
+        return;
       }
     }
   }
 
   *errP = "features field not found in FeatureCollection";
-  return true;
 }
 
 
@@ -258,6 +257,10 @@ static bool isFeatureCollectionType(CompoundValueNode* featureCollection, orion:
 *
 * isSpecialGeoJsonType -
 *
+* Return true if an special GeoJSON type was found. In this case, the errP may containt
+* an error situation (if errP is empty, then no error occurs).
+*
+* Return false if no special GeoJSON type was found
 */
 static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
 {
@@ -276,11 +279,13 @@ static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuil
      {
        if (childP->stringValue == "Feature")
        {
-         return isFeatureType(caP->compoundValueP, geoJson, apiVersion, errP);
+         isFeatureType(caP->compoundValueP, geoJson, apiVersion, errP);
+         return true;
        }
        if (childP->stringValue == "FeatureCollection")
        {
-         return isFeatureCollectionType(caP->compoundValueP, geoJson, apiVersion, errP);
+         isFeatureCollectionType(caP->compoundValueP, geoJson, apiVersion, errP);
+         return true;
        }
      }
   }
@@ -377,6 +382,7 @@ static bool getGeoJson
     // For other cases (i.e. when isSpecialGeoJsonType() returns false) do it in the "old way"
     if (isSpecialGeoJsonType(caP, geoJson, apiVersion, errDetail))
     {
+      // Feature or FeatureCollection was found, but some error may happen
       if (!errDetail->empty())
       {
         return false;
