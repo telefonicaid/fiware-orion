@@ -171,4 +171,6 @@ RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
 USER nobody
 
 HEALTHCHECK --interval=60s --timeout=5s --start-period=10s \
-            CMD curl --fail -X GET http://localhost:1026/version || exit 1
+            # Note we cannot use GET /version for healthchecking as that operation is working even in the case
+            # the database is down. In this sense, GET /v2/entities is better, as it touches database
+            CMD curl --fail -X GET http://localhost:1026/v2/entities?limit=1 || exit 1
