@@ -41,13 +41,13 @@ brokerStart CB 0-255
 # 08. GET all entities with attrs A3 - see E2, E3, E4
 # 09. GET all entities with attrs A2 or A4 - see E1, E3 and E4
 # 10. GET all entities with attrs A7 or A8 - see no entities
-# 12. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4
-# 13. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1
-# 20. GET all entities with a 'location' GeoProperty near a Point, using GET
-# 21. GET all entities with a 'location' GeoProperty near a Point, using POST
-# 22. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET
-# 23. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST
-# 24. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2 
+# 11. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4
+# 12. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1
+# 13. GET all entities with a 'location' GeoProperty near a Point, using GET
+# 14. GET all entities with a 'location' GeoProperty near a Point, using POST
+# 15. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET
+# 16. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST
+# 17. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2 
 
 echo "01. Create entity E1, type T, with attrs A1, A2, location, and geoPoint2"
 echo "========================================================================"
@@ -272,7 +272,7 @@ echo
 echo
 
 
-echo "12. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4"
+echo "11. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4"
 echo "======================================================================"
 payload='{
   "type": "Query",
@@ -293,7 +293,7 @@ echo
 echo
 
 
-echo "13. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1"
+echo "12. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1"
 echo "=========================================================================="
 payload='{
   "type": "Query",
@@ -304,14 +304,14 @@ echo
 echo
 
 
-echo "20. GET all entities with a 'location' GeoProperty near a Point, using GET"
+echo "13. GET all entities with a 'location' GeoProperty near a Point, using GET"
 echo "=========================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=\[12,10\]&georel=near;maxDistance==100000'
 echo
 echo
 
 
-echo "21. GET all entities with a 'location' GeoProperty near a Point"
+echo "14. GET all entities with a 'location' GeoProperty near a Point"
 echo "==============================================================="
 payload='{
   "type": "Query",
@@ -327,14 +327,14 @@ echo
 echo
 
 
-echo "22. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET"
+echo "15. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET"
 echo "==========================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=\[12,10\]&georel=near;maxDistance==100000&geoproperty=geoPoint2'
 echo
 echo
 
 
-echo "23. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST"
+echo "16. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST"
 echo "============================================================================"
 payload='{
   "type": "Query",
@@ -350,7 +350,7 @@ echo
 echo
 
 
-echo "24. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2"
+echo "17. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2"
 echo "==================================================================================================================================="
 payload='{
   "type": "Query",
@@ -894,7 +894,7 @@ Date: REGEX(.*)
 
 
 
-12. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4
+11. GET all entities with an attribute A3: q: 'A3', see E2, E3, and E4
 ======================================================================
 HTTP/1.1 200 OK
 Content-Length: 1663
@@ -1007,7 +1007,7 @@ Date: REGEX(.*)
 
 
 
-13. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1
+12. GET all entities with an attribute A1=='E1:A1': q: 'A1==E1:A1', see E1
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 607
@@ -1056,7 +1056,7 @@ Date: REGEX(.*)
 
 
 
-20. GET all entities with a 'location' GeoProperty near a Point, using GET
+13. GET all entities with a 'location' GeoProperty near a Point, using GET
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 290
@@ -1100,7 +1100,7 @@ Date: REGEX(.*)
 ]
 
 
-21. GET all entities with a 'location' GeoProperty near a Point
+14. GET all entities with a 'location' GeoProperty near a Point
 ===============================================================
 HTTP/1.1 200 OK
 Content-Length: 290
@@ -1144,7 +1144,7 @@ Date: REGEX(.*)
 ]
 
 
-22. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET
+15. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET
 ===========================================================================
 HTTP/1.1 200 OK
 Content-Length: 290
@@ -1188,7 +1188,7 @@ Date: REGEX(.*)
 ]
 
 
-23. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST
+16. GET all entities with a 'geoPoint2' GeoProperty near a Point, using POST
 ============================================================================
 HTTP/1.1 200 OK
 Content-Length: 290
@@ -1232,7 +1232,7 @@ Date: REGEX(.*)
 ]
 
 
-24. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2
+17. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2
 ===================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 336

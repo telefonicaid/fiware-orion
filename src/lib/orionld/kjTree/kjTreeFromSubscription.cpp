@@ -45,8 +45,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/q/qAliasCompact.h"                             // qAliasCompact
+#include "orionld/dbModel/dbModelToApiGeorel.h"                  // dbModelToApiGeorel
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
@@ -80,7 +81,7 @@ char* coordinateTransform(OrionldGeoJsonType geometry, char* to, int toLen, char
 //
 // kjTreeFromSubscription -
 //
-KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription* cSubP)
+KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription* cSubP, OrionldContext* contextP)
 {
   KjNode*              topP = kjObject(orionldState.kjsonP, NULL);
   KjNode*              objectP;
@@ -88,7 +89,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   KjNode*              nodeP;
   unsigned int         size;
   unsigned int         ix;
-  OrionldContext*      contextP = orionldContextCacheLookup(subscriptionP->ldContext.c_str());
   char                 dateTime[128];
 
   // id
@@ -264,28 +264,23 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
       kjChildAdd(objectP, nodeP);
     }
 
-    // georel: "near;mxxDistance:NUM" => "near;mxxDistance==NUM"
-    char* georel           = (char*) subscriptionP->subject.condition.expression.georel.c_str();
-    char* distanceP        = strstr(georel, "Distance:");
-    char* adjustedGeorelP  = georel;
-    char  adjustedGeorelBuf[64];
-    if (distanceP != NULL)
-    {
-      int distance = atoi(&distanceP[9]);
+    char*   georel        = (char*) subscriptionP->subject.condition.expression.georel.c_str();
+    KjNode* georelNodeP   = dbModelToApiGeorel(georel);
 
-      distanceP[8] = 0;  // NULL out the ':'
-      snprintf(adjustedGeorelBuf, sizeof(adjustedGeorelBuf) - 1, "%s==%d", georel, distance);
-      adjustedGeorelP = adjustedGeorelBuf;
-    }
-    nodeP = kjString(orionldState.kjsonP, "georel", adjustedGeorelP);
-    kjChildAdd(objectP, nodeP);
+    if (georelNodeP == NULL)  // No change in georel was needed
+      georelNodeP = kjString(orionldState.kjsonP, "georel", georel);
+    kjChildAdd(objectP, georelNodeP);
 
     if (subscriptionP->subject.condition.expression.geoproperty != "")
     {
       char* geoproperty = (char*) subscriptionP->subject.condition.expression.geoproperty.c_str();
 
-      eqForDot(geoproperty);
-      geoproperty = orionldContextItemAliasLookup(orionldState.contextP, geoproperty, NULL, NULL);
+      // The geoproperty is encoded (dotForEq) - this needs to be reversed before Alias-lookup
+      char dotName[512];
+      strncpy(dotName, geoproperty, sizeof(dotName) - 1);
+      eqForDot(dotName);
+
+      geoproperty = orionldContextItemAliasLookup(contextP, dotName, NULL, NULL);
       nodeP       = kjString(orionldState.kjsonP, "geoproperty", geoproperty);
       kjChildAdd(objectP, nodeP);
     }

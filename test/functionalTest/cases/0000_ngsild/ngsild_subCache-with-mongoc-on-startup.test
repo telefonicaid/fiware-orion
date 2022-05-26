@@ -1,0 +1,737 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create a subscription and then kill the broker. Get the subscription from sub-cache once up again
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create an NGSI-LD subscription S1, with testFullContext
+# 02. See the subscription in mongo
+# 03. GET the subscription from cache, without context - see long names
+# 04. GET the subscription from DB, without context - see long names
+# 05. GET the subscription from cache, with testFullContext - see short names
+# 06. GET the subscription from DB, with testFullContext - see short names
+# 07. Restart the broker
+# 08. See the subscription in mongo
+# 09. GET the subscription from cache
+# 10. GET the subscription from DB
+#
+
+
+echo "01. Create an NGSI-LD subscription S1"
+echo "====================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "subscriptionName": "S1",
+  "description": "Just a test ...",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "(temp<18|temp>25)&(humidity<20|humidity>80)",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [1,2],
+    "georel": "near;maxDistance==1",
+    "geoproperty": "location2"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json",
+      "notifierInfo": [
+        {
+          "key": "MQTT-Version",
+          "value": "mqtt5.0"
+        },
+        {
+          "key": "MQTT-QoS",
+          "value": "2"
+        }
+      ],
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "header 1 value"
+        },
+        {
+          "key": "H2",
+          "value": "header 2 value"
+        }
+      ]
+    }
+  },
+  "expiresAt": "2028-12-31T10:00:00",
+  "throttling": 5
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription from cache, without context - see long names"
+echo "====================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "04. GET the subscription from DB, without context - see long names"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
+echo "05. GET the subscription from cache, with testFullContext - see short names"
+echo "==========================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>'
+echo
+echo
+
+
+echo "06. GET the subscription from DB, with testFullContext - see short names"
+echo "========================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>'
+echo
+echo
+
+
+echo "07. Restart the broker"
+echo "======================"
+brokerStop CB
+brokerStart CB 0 IPv4 -experimental
+sleep 1
+echo Orion-LD has been restarted
+echo
+echo
+
+
+echo "08. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "09. GET the subscription from cache"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "10. GET the subscription from DB"
+echo "================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an NGSI-LD subscription S1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"name" : "S1",
+	"description" : "Just a test ...",
+	"entities" : [
+		{
+			"type" : "http://example.org/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"http://example.org/P2"
+	],
+	"ldQ" : "(https://uri=etsi=org/ngsi-ld/default-context/temp.value<18|https://uri=etsi=org/ngsi-ld/default-context/temp.value>25);(https://uri=etsi=org/ngsi-ld/default-context/humidity.value<20|https://uri=etsi=org/ngsi-ld/default-context/humidity.value>80)",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:1",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/location2",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"status" : "inactive",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"attrs" : [
+		"http://example.org/P1",
+		"http://example.org/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/ld+json",
+	"headers" : {
+		"H1" : "header 1 value",
+		"H2" : "header 2 value"
+	},
+	"notifierInfo" : {
+		"MQTT-Version" : "mqtt5.0",
+		"MQTT-QoS" : "2"
+	},
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+}
+bye
+
+
+03. GET the subscription from cache, without context - see long names
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 931
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "http://example.org/T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "notification": {
+        "attributes": [
+            "http://example.org/P1",
+            "http://example.org/P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "http://example.org/P2"
+    ]
+}
+
+
+04. GET the subscription from DB, without context - see long names
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 934
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "http://example.org/T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "notification": {
+        "attributes": [
+            "http://example.org/P1",
+            "http://example.org/P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "database",
+    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "http://example.org/P2"
+    ]
+}
+
+
+05. GET the subscription from cache, with testFullContext - see short names
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 855
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P2"
+    ]
+}
+
+
+06. GET the subscription from DB, with testFullContext - see short names
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 858
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "database",
+    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P2"
+    ]
+}
+
+
+07. Restart the broker
+======================
+Orion-LD has been restarted
+
+
+08. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"name" : "S1",
+	"description" : "Just a test ...",
+	"entities" : [
+		{
+			"type" : "http://example.org/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"http://example.org/P2"
+	],
+	"ldQ" : "(https://uri=etsi=org/ngsi-ld/default-context/temp.value<18|https://uri=etsi=org/ngsi-ld/default-context/temp.value>25);(https://uri=etsi=org/ngsi-ld/default-context/humidity.value<20|https://uri=etsi=org/ngsi-ld/default-context/humidity.value>80)",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:1",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/location2",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"status" : "inactive",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"attrs" : [
+		"http://example.org/P1",
+		"http://example.org/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/ld+json",
+	"headers" : {
+		"H1" : "header 1 value",
+		"H2" : "header 2 value"
+	},
+	"notifierInfo" : {
+		"MQTT-Version" : "mqtt5.0",
+		"MQTT-QoS" : "2"
+	},
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+}
+bye
+
+
+09. GET the subscription from cache
+===================================
+HTTP/1.1 200 OK
+Content-Length: 931
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "http://example.org/T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "notification": {
+        "attributes": [
+            "http://example.org/P1",
+            "http://example.org/P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "http://example.org/P2"
+    ]
+}
+
+
+10. GET the subscription from DB
+================================
+HTTP/1.1 200 OK
+Content-Length: 934
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "http://example.org/T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "notification": {
+        "attributes": [
+            "http://example.org/P1",
+            "http://example.org/P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "database",
+    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "http://example.org/P2"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

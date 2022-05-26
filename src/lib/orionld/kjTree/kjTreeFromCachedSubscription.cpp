@@ -39,6 +39,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
 #include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
@@ -226,7 +227,12 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
 
     if (cSubP->expression.geoproperty != "")
     {
-      nodeP = kjString(orionldState.kjsonP, "geoproperty", cSubP->expression.geoproperty.c_str());
+      // The geoproperty is encoded (dotForEq) - needs to be reversed before Alias-lookup
+      char dotName[512];
+      strncpy(dotName, cSubP->expression.geoproperty.c_str(), sizeof(dotName) - 1);
+      eqForDot(dotName);
+      char* shortName = orionldContextItemAliasLookup(orionldState.contextP, dotName, NULL, NULL);
+      nodeP = kjString(orionldState.kjsonP, "geoproperty", shortName);
       NULL_CHECK(nodeP);
       kjChildAdd(geoqP, nodeP);
     }

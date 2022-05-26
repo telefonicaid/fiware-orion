@@ -68,7 +68,7 @@ static bool orionldGetSubscriptionsWithMongoBackend(void)
 
     if (cSubP != NULL)
     {
-      KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix], cSubP);
+      KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix], cSubP, orionldState.contextP);
       kjChildAdd(orionldState.responseTree, subscriptionNodeP);
     }
   }

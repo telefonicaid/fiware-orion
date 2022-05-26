@@ -33,8 +33,8 @@
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLex.h"                                    // qLex
 #include "orionld/q/qParse.h"                                  // qParse
-#include "orionld/q/qRelease.h"                                // qListRelease
-#include "orionld/q/qPresent.h"                                // qPresent, qListPresent
+#include "orionld/q/qListRelease.h"                            // qListRelease
+#include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/q/qLexListRender.h"                          // qLexListRender
 #include "orionld/q/qBuild.h"                                  // Own interface
 
@@ -74,8 +74,6 @@ QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool 
   char*       detail;
   QNode*      qList;
 
-  LM_TMP(("QQ: Got a 'q': %s", q));
-
   // qLex destroys the input string, but we need it intact
   char        buf[512];
   char*       qString   = buf;
@@ -87,25 +85,24 @@ QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool 
 
   urlDecode(qString);
   orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
-  if ((qList = qLex(qString, &title, &detail)) == NULL)
+  qList = qLex(qString, &title, &detail);
+  if (qList == NULL)
   {
     orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
     LM_RE(NULL, ("Error (qLex: %s: %s)", title, detail));
   }
   else
   {
-    qListPresent(qList, NULL, "QQ", "Q Lex List");
+    // qListPresent(qList, NULL, "LEAK", "Q Lex List");
     if (qRenderP != NULL)
     {
-      LM_TMP(("KZ: Rendering q"));
       // NOTE: qLexListRender MUST NOT destroy the qList!!!
-      *qRenderP = qLexListRender(qList, v2ValidP, isMqP);  // qLexListRender allocates the string - must be freed!
+      *qRenderP = qLexListRender(qList, v2ValidP, isMqP);
       if (*qRenderP == NULL)
       {
         // qLexListRender prepares orionldError
         return NULL;
       }
-      LM_TMP(("LL: Rendered Q for DB: '%s'", *qRenderP));
     }
 
     qP = qParse(qList, NULL, false, qToDbModel, &title, &detail);  // 3rd parameter: forDb=false
@@ -114,13 +111,13 @@ QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool 
       orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
       LM_RE(NULL, ("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
     }
-    qPresent(qP, "QQ", "Q Tree");
   }
 
   if (qString != buf)
     free(qString);
 
   orionldState.useMalloc = false;
+
   qListRelease(qList);
 
   return qP;

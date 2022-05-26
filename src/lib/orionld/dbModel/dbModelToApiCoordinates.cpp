@@ -46,8 +46,7 @@ extern "C"
 //
 KjNode* dbModelToApiCoordinates(const char* coordinatesString)
 {
-  int      coordinatesVectorLen = strlen(coordinatesString) * 4 + 10;
-  char*    coordinatesVector    = kaAlloc(&orionldState.kalloc, coordinatesVectorLen);
+  char*    coordinatesP         = (char*) coordinatesString;
   KjNode*  coordValueP;
 
   //
@@ -55,9 +54,16 @@ KjNode* dbModelToApiCoordinates(const char* coordinatesString)
   // This here is a hack to make the string an array
   // and then parse it using kjParse and get a KjNode tree
   //
-  snprintf(coordinatesVector, coordinatesVectorLen, "[%s]", coordinatesString);
-  LM_TMP(("KZ: coordinatesVector: %s", coordinatesVector));
-  coordValueP = kjParse(orionldState.kjsonP, coordinatesVector);
+  if (coordinatesString[0] != '[')
+  {
+    int      coordinatesVectorLen = strlen(coordinatesString) * 4 + 10;
+    char*    coordinatesVector    = kaAlloc(&orionldState.kalloc, coordinatesVectorLen);
+
+    snprintf(coordinatesVector, coordinatesVectorLen, "[%s]", coordinatesString);
+    coordinatesP = coordinatesVector;
+  }
+
+  coordValueP = kjParse(orionldState.kjsonP, coordinatesP);
   if (coordValueP == NULL)
     coordValueP = kjString(orionldState.kjsonP, "coordinates", "internal error parsing DB coordinates");
   else

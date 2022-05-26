@@ -40,6 +40,6 @@ extern "C"
 //
 // subCacheApiSubscriptionInsert -
 //
-extern CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP);
+extern CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP, const char* tenant);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_

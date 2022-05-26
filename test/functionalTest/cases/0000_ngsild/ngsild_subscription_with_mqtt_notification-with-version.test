@@ -75,7 +75,7 @@ echo
 
 echo "02. GET the subscripion to see the MQTT info"
 echo "============================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification -H 'Link: <https://fiware.github.io/data-models/context.jsonld>'
 echo
 echo
 
@@ -116,9 +116,9 @@ Date: REGEX(.*)
 02. GET the subscripion to see the MQTT info
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 493
+Content-Length: 455
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -147,7 +147,7 @@ Date: REGEX(.*)
         "format": "normalized",
         "status": "ok"
     },
-    "q": "https://uri.fiware.org/ns/data-models#temperature>20",
+    "q": "temperature>20",
     "status": "active",
     "type": "Subscription",
     "watchedAttributes": [

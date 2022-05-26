@@ -27,7 +27,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLexCheck.h"                               // qLexCheck
-#include "orionld/q/qRelease.h"                                // qListRelease
+#include "orionld/q/qListRelease.h"                            // qListRelease
 #include "orionld/q/qLex.h"                                    // Own interface
 
 
@@ -199,12 +199,8 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     else if (type == QNodeFloatValue)
       qNodeP->value.f = strtod(term, NULL);
     else if (type == QNodeVariable)
-    {
-      if (orionldState.useMalloc)
-        qNodeP->value.v = strdup(term);
-      else
-        qNodeP->value.v = term;
-    }
+      qNodeP->value.v = term;
+
     prev->next = qNodeP;
     return qNodeP;
   }

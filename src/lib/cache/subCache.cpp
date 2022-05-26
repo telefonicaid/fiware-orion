@@ -33,6 +33,8 @@
 extern "C"
 {
 #include "kalloc/kaStrdup.h"                         // kaStrdup
+#include "kalloc/kaBufferReset.h"                    // kaBufferReset
+#include "kjson/kjFree.h"                            // kjFree
 }
 
 #include "logMsg/logMsg.h"
@@ -46,13 +48,14 @@ extern "C"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "orionld/types/OrionldTenant.h"             // OrionldTenant
-#include "orionld/common/orionldState.h"             // orionldState
-#include "orionld/common/tenantList.h"               // tenantList
-#include "orionld/q/qBuild.h"                        // qBuild
-#include "orionld/q/qRelease.h"                      // qRelease
-#include "orionld/common/urlParse.h"                 // urlParse
-#include "orionld/context/orionldContextFromUrl.h"   // orionldContextFromUrl
+#include "orionld/types/OrionldTenant.h"                    // OrionldTenant
+#include "orionld/common/orionldState.h"                    // orionldState
+#include "orionld/common/tenantList.h"                      // tenantList
+#include "orionld/q/qBuild.h"                               // qBuild
+#include "orionld/q/qRelease.h"                             // qRelease
+#include "orionld/mongoc/mongocSubCachePopulateByTenant.h"  // mongocSubCachePopulateByTenant
+#include "orionld/common/urlParse.h"                        // urlParse
+#include "orionld/context/orionldContextFromUrl.h"          // orionldContextFromUrl
 
 #include "cache/subCache.h"
 
@@ -581,12 +584,6 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->description = NULL;
   }
 
-  if (cSubP->qText != NULL)
-  {
-    free(cSubP->qText);
-    cSubP->qText = NULL;
-  }
-
   if (cSubP->url != NULL)
   {
     free(cSubP->url);
@@ -603,6 +600,12 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
   {
     free(cSubP->servicePath);
     cSubP->servicePath = NULL;
+  }
+
+  if (cSubP->qText != NULL)
+  {
+    free(cSubP->qText);
+    cSubP->qText = NULL;
   }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
@@ -623,23 +626,26 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
   if (cSubP->qP != NULL)
   {
-    LM_TMP(("QP: Freeing a QNode Tree at %p", cSubP->qP));
     qRelease(cSubP->qP);
     cSubP->qP = NULL;
+  }
+
+  if (cSubP->geoCoordinatesP != NULL)
+  {
+    kjFree(cSubP->geoCoordinatesP);
+    cSubP->geoCoordinatesP = NULL;
   }
 
   for (int ix = 0; ix < (int) cSubP->httpInfo.notifierInfo.size(); ++ix)
   {
     if (cSubP->httpInfo.notifierInfo[ix] != NULL)
     {
-      LM_TMP(("VE: Freeing Key-Value Pair at %p (notifierInfo)", cSubP->httpInfo.notifierInfo[ix]));
       free(cSubP->httpInfo.notifierInfo[ix]);
       cSubP->httpInfo.notifierInfo[ix] = NULL;
     }
   }
 
   cSubP->next = NULL;
-  LM_TMP(("VL: All Done"));
 }
 
 
@@ -767,7 +773,6 @@ void subCacheItemInsert(CachedSubscription* cSubP)
     cSubP->triggers[ix] = true;
   }
 
-  LM_TMP(("Sub-Manipulation Done, Now inserting it in the list"));
   //
   // List Insertion Part
   //
@@ -913,8 +918,9 @@ void subCacheItemInsert
   {
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
-      LM_TMP(("QP: q == '%s'", q.c_str()));
-      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // qBuild allocates cSubP->qText
+      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // cSubP->qText needs real allocation
+      if (cSubP->qText != NULL)
+        cSubP->qText = strdup(cSubP->qText);
     }
     else
       cSubP->qText = (char*) strdup(q.c_str());
@@ -997,7 +1003,6 @@ void subCacheItemInsert
   //
   // Insert the subscription in the cache
   //
-  LM_TMP(("QP: subCacheItemInsert calls subCacheItemInsert"));
   subCacheItemInsert(cSubP);
 }
 
@@ -1144,6 +1149,10 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// debugSubCache -
+//
 static void debugSubCache(const char* prefix, const char* title)
 {
   CachedSubscription* subP = subCache.head;
@@ -1181,14 +1190,20 @@ void subCacheRefresh(void)
   subCacheDestroy();
 
   // Recreate the subCache for the default tenant
-  mongoSubCacheRefresh(dbName);
+  if (experimental)
+    mongocSubCachePopulateByTenant(&tenant0);
+  else
+    mongoSubCacheRefresh(tenant0.mongoDbName);
 
   // Recreate the subCache for each and every tenant
   OrionldTenant* tenantP = tenantList;
   while (tenantP != NULL)
   {
-    LM_TMP(("KZ: Calling mongoSubCacheRefresh for tenant '%s'", tenantP->mongoDbName));
-    mongoSubCacheRefresh(tenantP->mongoDbName);
+    if (experimental)
+      mongocSubCachePopulateByTenant(tenantP);
+    else
+      mongoSubCacheRefresh(tenantP->mongoDbName);
+
     tenantP = tenantP->next;
   }
 
@@ -1246,7 +1261,6 @@ void subCacheSync(void)
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
-  LM_TMP(("Got the sub-cache semaphore"));
   subCacheState = ScsSynchronizing;
 
 
@@ -1361,7 +1375,6 @@ void subCacheSync(void)
 
   subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
-  LM_TMP(("Gave back the sub-cache semaphore"));
 }
 
 
@@ -1374,12 +1387,13 @@ static void* subCacheRefresherThread(void* vP)
 {
   extern int subCacheInterval;
 
+  orionldStateInit(NULL);
   while (1)
   {
-    LM_TMP(("Sleeping"));
     sleep(subCacheInterval);
-    LM_TMP(("Synching"));
     subCacheSync();
+    kaBufferReset(&orionldState.kalloc, true);  // Should be inside orionldStateRelease ... Right?
+    orionldStateRelease();
   }
 
   return NULL;

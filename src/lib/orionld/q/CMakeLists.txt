@@ -29,9 +29,12 @@ SET (SOURCES
     qAliasCompact.cpp
     qPresent.cpp
     qRelease.cpp
+    qListRelease.cpp
     qBuild.cpp
     qRender.cpp
     qLexListRender.cpp
+    qClone.cpp
+    qVariableFix.cpp
 )
 
 # Include directories

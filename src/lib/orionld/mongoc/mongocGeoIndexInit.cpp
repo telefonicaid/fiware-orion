@@ -49,7 +49,6 @@ extern "C"
 //
 bool mongocGeoIndexInit(void)
 {
-  LM_TMP(("IN"));
   bson_t            mongoFilter;
   mongoc_cursor_t*  mongoCursorP;
   const bson_t*     mongoDocP;
@@ -78,8 +77,6 @@ bool mongocGeoIndexInit(void)
   {
     mongoc_collection_t* mCollectionP;
 
-    LM_TMP(("tenant '%s'", tenantP->mongoDbName));
-
     //
     // Get handle to collection
     //
@@ -91,6 +88,10 @@ bool mongocGeoIndexInit(void)
     if ((mongoCursorP = mongoc_collection_find_with_opts(mCollectionP, &mongoFilter, options, NULL)) == NULL)
     {
       LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
+      bson_destroy(options);
+      bson_destroy(&mongoFilter);
+      mongoc_collection_destroy(mCollectionP);
+      mongoc_cursor_destroy(mongoCursorP);
       return NULL;
     }
 
@@ -120,7 +121,6 @@ bool mongocGeoIndexInit(void)
       //
       for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
-        LM_TMP(("Got an attribute '%s'", attrP->name));
         KjNode* typeP = kjLookup(attrP, "type");
 
         if (typeP == NULL)
@@ -137,17 +137,19 @@ bool mongocGeoIndexInit(void)
 
         if (strcmp(typeP->value.s, "GeoProperty") == 0)
         {
-          LM_TMP(("Got a GeoProperty"));
           if (dbGeoIndexLookup(tenantP->tenant, attrP->name) == NULL)
             mongocGeoIndexCreate(tenantP, attrP->name);
-          LM_TMP(("GEO Index created"));
         }
       }
     }
 
+    mongoc_cursor_destroy(mongoCursorP);
+    mongoc_collection_destroy(mCollectionP);
     tenantP = tenantP->next;
   }
 
-  LM_TMP(("FROM"));
+  bson_destroy(options);
+  bson_destroy(&mongoFilter);
+
   return true;
 }

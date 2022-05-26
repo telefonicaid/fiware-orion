@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,16 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "apiTypesV2/Subscription.h"                             // Subscription
-#include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/q/QNode.h"                                     // QNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromSubscription -
+// dbModelToApiSubscription - modify the DB Model tree into an API Subscription
 //
-extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription*  cSubP, OrionldContext* contextP);
+extern KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* database, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_

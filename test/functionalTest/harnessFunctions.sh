@@ -286,7 +286,7 @@ function brokerStartAwait
   typeset -i loopNo
   typeset -i loops
   loopNo=0
-  loops=100
+  loops=200
 
   while [ $loopNo -lt $loops ]
   do
@@ -303,7 +303,7 @@ function brokerStartAwait
     loopNo=$loopNo+1
   done
 
-  if [ $loopNo == 100 ]
+  if [ $loopNo == 200 ]
   then
     echo "The context broker didn't start!"
     result=1

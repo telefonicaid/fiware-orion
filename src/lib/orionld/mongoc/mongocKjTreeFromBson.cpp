@@ -32,7 +32,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mongoc/mongocKjTreeFromBson.h"               // Own interface
@@ -60,6 +59,7 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
   else
   {
     treeP = kjParse(orionldState.kjsonP, json);
+
     if (treeP == NULL)
     {
       *titleP   = (char*) "Internal Error";
@@ -75,5 +75,6 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
     bson_free(json);
   }
 #endif
+
   return treeP;
 }

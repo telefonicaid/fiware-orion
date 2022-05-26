@@ -41,6 +41,8 @@ extern "C"
 
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
+#include "orionld/mqtt/mqttParse.h"                              // mqttParse
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -51,17 +53,17 @@ extern "C"
 // -----------------------------------------------------------------------------
 //
 // subCacheApiSubscriptionInsert -
-// subCacheDbSubscriptionInsert - later ...
 //
-CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP)
+CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP, const char* tenant)
 {
   CachedSubscription* cSubP = new CachedSubscription();
 
-  cSubP->tenant              = (orionldState.in.tenant == NULL)? NULL : strdup(orionldState.in.tenant);
+  cSubP->tenant              = (tenant == NULL || *tenant == 0)? NULL : strdup(tenant);
   cSubP->servicePath         = strdup("/#");
   cSubP->qP                  = qTree;
-  cSubP->contextP            = contextP;        // Right now, this is orionldState.contextP, i.e., the @context used when creating
+  cSubP->contextP            = contextP;        // Right now, this is orionldState.contextP, i.e., the @context used when creating, except if "refresh"!
   cSubP->ldContext           = contextP->url;   // the subscription. Soon, the subscription will contain a field for its context instead.
+  cSubP->geoCoordinatesP     = NULL;
 
   KjNode* subscriptionIdP    = kjLookup(apiSubscriptionP, "_id");  // "id" was changed to "_id" by orionldPostSubscriptions to accomodate the DB insertion
   KjNode* subscriptionNameP  = kjLookup(apiSubscriptionP, "subscriptionName");  // "name" is accepted too ...
@@ -80,6 +82,9 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   KjNode* createdAtP         = kjLookup(apiSubscriptionP, "createdAt");
   KjNode* modifiedAtP        = kjLookup(apiSubscriptionP, "modifiedAt");
 
+  if (subscriptionIdP == NULL)
+    subscriptionIdP = kjLookup(apiSubscriptionP, "id");
+
   if (subscriptionIdP != NULL)
     cSubP->subscriptionId = strdup(subscriptionIdP->value.s);
 
@@ -93,20 +98,13 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     cSubP->description = strdup(descriptionP->value.s);
 
   if (qP != NULL)
-  {
     cSubP->expression.q = qP->value.s;
-    LM_TMP(("KZ: q: '%s'", cSubP->expression.q.c_str()));
-  }
+
   if (mqP != NULL)
-  {
     cSubP->expression.mq = mqP->value.s;
-    LM_TMP(("KZ: mq: '%s'", cSubP->expression.mq.c_str()));
-  }
+
   if (ldqP != NULL)
-  {
     cSubP->qText = strdup(ldqP->value.s);
-    LM_TMP(("KZ: ldQ: '%s'", cSubP->qText));
-  }
 
   if (isActiveP != NULL)
   {
@@ -121,7 +119,6 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     cSubP->status   = "active";
     cSubP->isActive = true;
   }
-
 
   if (expiresAtP != NULL)
   {
@@ -164,16 +161,17 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     if (geopropertyP != NULL)
       cSubP->expression.geoproperty = geopropertyP->value.s;
 
+    if (geoCoordinatesP == NULL)
+      geoCoordinatesP = kjLookup(geoqP, "coords");
+
     if (geoCoordinatesP != NULL)
     {
-      cSubP->geoCoordinatesP = kjClone(NULL, geoCoordinatesP);
+      if (geoCoordinatesP->type == KjString)
+        geoCoordinatesP = dbModelToApiCoordinates(geoCoordinatesP->value.s);
 
-      if (geoCoordinatesP->type == KjArray)
-      {
-        char coords[1024];
-        kjFastRender(geoCoordinatesP, coords);
-        cSubP->expression.coords = coords;  // Not sure this is 100% correct format, but is it used? DB is used for Geo ...
-      }
+      char coords[1024];
+      kjFastRender(geoCoordinatesP, coords);
+      cSubP->expression.coords = coords;  // Not sure this is 100% correct format, but is it used? DB is used for Geo ...
     }
   }
 
@@ -241,8 +239,35 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
       if (uriP)  // pCheckSubscription already ensures "uri" is present !!!
       {
         cSubP->httpInfo.url = uriP->value.s;
-        cSubP->url = strdup(uriP->value.s);
+        cSubP->url = strdup(uriP->value.s);  // urlParse destroys the input
         urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+      }
+
+      if (strcmp(cSubP->protocol, "mqtt") == 0)
+      {
+        char            url[512];
+        bool            mqtts         = false;
+        char*           mqttUser      = NULL;
+        char*           mqttPassword  = NULL;
+        char*           mqttHost      = NULL;
+        unsigned short  mqttPort      = 0;
+        char*           mqttTopic     = NULL;
+        char*           detail        = NULL;
+
+        strncpy(url, uriP->value.s, sizeof(url) - 1);
+        if (mqttParse(url, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+        {
+          LM_E(("Internal Error (unable to parse mqtt URL)"));
+          return NULL;
+        }
+
+        if (mqttUser     != NULL) strncpy(cSubP->httpInfo.mqtt.username, mqttUser,     sizeof(cSubP->httpInfo.mqtt.username) - 1);
+        if (mqttPassword != NULL) strncpy(cSubP->httpInfo.mqtt.password, mqttPassword, sizeof(cSubP->httpInfo.mqtt.password) - 1);
+        if (mqttHost     != NULL) strncpy(cSubP->httpInfo.mqtt.host,     mqttHost,     sizeof(cSubP->httpInfo.mqtt.host) - 1);
+        if (mqttTopic    != NULL) strncpy(cSubP->httpInfo.mqtt.topic,    mqttTopic,    sizeof(cSubP->httpInfo.mqtt.topic) - 1);
+
+        cSubP->httpInfo.mqtt.mqtts = mqtts;
+        cSubP->httpInfo.mqtt.port  = mqttPort;
       }
 
       if (acceptP != NULL)
@@ -281,6 +306,7 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     }
   }
 
+
   //
   // For legacy operations, we also need two Scopes filled:
   // 'q'
@@ -309,6 +335,9 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
 
   if (modifiedAtP != NULL)
     cSubP->modifiedAt = modifiedAtP->value.f;
+
+  if (geoCoordinatesP != NULL)
+    cSubP->geoCoordinatesP = kjClone(NULL, geoCoordinatesP);
 
   subCacheItemInsert(cSubP);
 

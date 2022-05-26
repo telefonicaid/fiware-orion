@@ -137,7 +137,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     return false;  // pCheckGeorel calls orionldError
 
   //
-  // If geoproperty has been given, the name must be expanded, and any dots replaced by '='
+  // If geoproperty has been given, the name must be expanded
   //
   if (geopropertyP != NULL)
   {
@@ -146,6 +146,14 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     if (strcmp(pName, "location") != 0)
     {
       geopropertyP->value.s = orionldAttributeExpand(orionldState.contextP, pName, true, NULL);
+
+      //
+      // FIXME: No need, as the attr name is in the "value", not the "key".
+      //        However, I  DO  need this for geo queries as the attr name in "attrs" in BD contains = and not .
+      //        I could fix this, to only do dotForEq for queries.
+      //        For now, let's just leave it as is.
+      //        Safer, also for DB compatibilities with older versions of Orion-LD
+      //
       dotForEq(geopropertyP->value.s);
     }
   }

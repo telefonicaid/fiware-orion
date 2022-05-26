@@ -224,62 +224,6 @@ static bool orionldPostSubscriptionsWithMongoBackend(void)
 
 
 
-// -----------------------------------------------------------------------------
-//
-// qFix
-//
-// 'q' ... one for Native NGSI-LD notifications, another one for NGSIv2 notifications
-//
-// If it turns out to be an 'mq' (q=A.B... => mq) for mongoBackend then an mq node is added to subP and
-// dbModelFromApiSubscription moves it to its place.
-//
-// Either way, the NGSI-LD q will be on the toplevel as "ldQ"
-//
-bool qFix(KjNode* subP, KjNode* qNode, QNode* qTree)
-{
-  char qText[512];
-  bool mq = false;
-
-  LM_TMP(("KZ: qNode: '%s'", qNode->value.s));
-  LM_TMP(("KZ: qTree: '%s'", qTree->value.s));
-
-  //
-  // The q-text might need to be re-written for NGSIv2, might even be an mq and not a q
-  // The q-text might also be invalid for NGSIv2, in which case it is replaced by "P;!P" => no notifications
-  //
-  KjNode* qNodeForV2;
-  KjNode* mqNodeForV2;
-
-  if (qRender(qTree, V2, qText, sizeof(qText), &mq) == false)
-  {
-    qNodeForV2  = kjString(orionldState.kjsonP, "q", "P;!P");
-    mqNodeForV2 = kjString(orionldState.kjsonP, "mq", "P.P;!P.P");
-  }
-  else if (mq == false)
-  {
-    qNodeForV2  = kjString(orionldState.kjsonP, "q", qText);
-    mqNodeForV2 = kjString(orionldState.kjsonP, "mq", "P.P;!P.P");
-  }
-  else
-  {
-    qNodeForV2  = kjString(orionldState.kjsonP, "q", "P;!P");
-    mqNodeForV2 = kjString(orionldState.kjsonP, "mq", qText);
-  }
-
-  qNode->name = (char*) "ldQ";  // The original "q" is taken for NGSI-LD
-
-  // qNode (ldQ) is already in the tree - adding 'q' and 'mq'
-  kjChildAdd(subP, qNodeForV2);
-  kjChildAdd(subP, mqNodeForV2);
-
-  LM_TMP(("KZ: %s: '%s'", qNode->name,       qNode->value.s));
-  LM_TMP(("KZ: %s: '%s'", qNodeForV2->name,  qNodeForV2->value.s));
-  LM_TMP(("KZ: %s: '%s'", mqNodeForV2->name, mqNodeForV2->value.s));
-  return true;
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldPostSubscriptions -
@@ -292,7 +236,7 @@ bool orionldPostSubscriptions(void)
   KjNode*  subP            = orionldState.requestTree;
   KjNode*  subIdP          = orionldState.payloadIdNode;
   KjNode*  endpointP       = NULL;
-  KjNode*  qNode           = NULL;
+  KjNode*  ldqNodeP        = NULL;
   KjNode*  uriP            = NULL;
   KjNode*  notifierInfoP   = NULL;
   KjNode*  geoCoordinatesP = NULL;
@@ -307,7 +251,7 @@ bool orionldPostSubscriptions(void)
                          orionldState.payloadIdNode,
                          orionldState.payloadTypeNode,
                          &endpointP,
-                         &qNode,
+                         &ldqNodeP,
                          &qTree,
                          &qRenderedForDb,
                          &qValidForV2,
@@ -323,12 +267,13 @@ bool orionldPostSubscriptions(void)
     return false;
   }
 
+  // Subscription id special treats
   if (subIdP != NULL)
   {
     subId = subIdP->value.s;
 
     // 'id' needs to be '_id' - mongo stuff ...
-    subIdP->name = (char*) "_id";
+    subIdP->name = (char*) "_id";  // dbModel ...
 
     //
     // If the subscription already exists, a "409 Conflict" is returned
@@ -359,11 +304,11 @@ bool orionldPostSubscriptions(void)
   // Add subId to the tree
   kjChildPrepend(subP, subIdP);
 
-  // The three 'q's ...
-  if (qNode != NULL)
+  // The three 'q's ... that's also dbModel
+  if (ldqNodeP != NULL)
   {
-    qNode->name    = (char*) "ldQ";
-    qNode->value.s = qRenderedForDb;
+    ldqNodeP->name    = (char*) "ldQ";
+    ldqNodeP->value.s = qRenderedForDb;
 
     LM_TMP(("LL: qTree:               %p", qTree));
     LM_TMP(("LL: qRenderedForDb:      %s", qRenderedForDb));
@@ -406,7 +351,7 @@ bool orionldPostSubscriptions(void)
 
 
   //
-  // If MQTT, the connection to the NQTT broker needs to be established before the subscription is accepted
+  // If MQTT, the connection to the MQTT broker needs to be established before the subscription is accepted
   //
   bool            mqttSubscription = false;
   bool            mqtts            = false;
@@ -470,7 +415,7 @@ bool orionldPostSubscriptions(void)
   }
 
   // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
-  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, geoCoordinatesP, orionldState.contextP);
+  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, geoCoordinatesP, orionldState.contextP, orionldState.tenantP->tenant);
 
   // dbModel
   KjNode* dbSubscriptionP = subP;

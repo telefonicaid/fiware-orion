@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
-
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,16 +22,23 @@
 *
 * Author: Ken Zangelin
 */
-#include "apiTypesV2/Subscription.h"                             // Subscription
-#include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include <string.h>                                            // strcmp
+
+#include "orionld/dbModel/dbModelToApiGeometry.h"              // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromSubscription -
+// dbModelToApiGeometry -
 //
-extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription*  cSubP, OrionldContext* contextP);
+const char* dbModelToApiGeometry(char* geometry)
+{
+  if (strcmp(geometry, "point") == 0)
+    return "Point";
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+  if (strcmp(geometry, "polygon") == 0)
+    return "Polygon";
+
+  return geometry;
+}

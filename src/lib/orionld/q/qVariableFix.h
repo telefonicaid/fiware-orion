@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_Q_QVARIABLEFIX_H_
+#define SRC_LIB_ORIONLD_Q_QVARIABLEFIX_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,16 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include "apiTypesV2/Subscription.h"                             // Subscription
-#include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// kjTreeFromSubscription -
+// qVariableFix -
 //
-extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription*  cSubP, OrionldContext* contextP);
+// - If simple attribute name - all OK
+// - If attr.b.c, then 'attr' must be extracted, expanded and then '.md.b.c' appended
+// - If attr[b.c], then 'attr' must be extracted, expanded and then '.b.c' appended
+//
+// After implementing expansion in metadata names, for attr.b.c, 'b' needs expansion also
+//
+extern char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_Q_QVARIABLEFIX_H_

@@ -25,22 +25,20 @@
 #include <stdio.h>                                             // snprintf
 #include <stdlib.h>                                            // malloc
 
+extern "C"
+{
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kalloc/kaRealloc.h"                                  // kaRealloc
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qVariableFix.h"                            // qVariableFix
 #include "orionld/q/qLexListRender.h"                          // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// qVariableFix - from qParse.cpp - FIXME: new module q/qVariableFix.h/cpp
-//
-extern char* qVariableFix(char* varPath, bool forDb, bool* isMqP, char** detailsP);
 
 
 
@@ -86,7 +84,7 @@ const char* regexToString(QNode* qItemP, char* buf, int bufLen)
 char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
 {
   int    outSize = 512;
-  char*  outP    = (char*) malloc(outSize);  // realloc if needed
+  char*  outP    = kaAlloc(&orionldState.kalloc, outSize);  // kaRealloc if needed
   int    outIx   = 0;
   char*  detail;
 
@@ -127,6 +125,7 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
       *validInV2P = false;
       break;
     case QNodeVariable:
+      LM_TMP(("LEAK: Calling qVariableFix for Variable '%s' at %p", qItemP->value.v, qItemP->value.v));
       bufP = qVariableFix(qItemP->value.v, false, isMqP, &detail);
       if (bufP == NULL)
       {
@@ -142,7 +141,7 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
     int len = strlen(bufP);
     if (outIx + len >= outSize)
     {
-      char* newBuf = (char*) realloc(outP, outSize + 512);
+      char* newBuf = kaRealloc(&orionldState.kalloc, outP, outSize + 512);
 
       if (newBuf == NULL)
       {

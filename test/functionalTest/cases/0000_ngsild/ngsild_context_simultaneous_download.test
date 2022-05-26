@@ -31,7 +31,7 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# This test exercises the 'wait for context download feature', implemented in end of February 2021, by ...
+# This test exercises the 'wait for context download feature', implemented in the end of February 2021.
 # - Sending a request to create an entity E1 with context X, in the bacground, so another request can enter the broker simultaneously
 # - Sending another request, with the same context X, to create another entity (E2)
 #
@@ -76,7 +76,9 @@ orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: appl
 
 #
 # Show the output of step 01 and 02 - in order
+# Just ... wait a sec before doing it
 #
+sleep 1
 cat /tmp/headers.out
 cat /tmp/ngsild_context_simultaneous_download.01
 echo

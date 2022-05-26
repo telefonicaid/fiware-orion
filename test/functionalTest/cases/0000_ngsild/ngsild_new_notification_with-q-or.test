@@ -33,16 +33,16 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create a subscription S1 on type=T and with q='P1==5|P2==9'
-# 02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5
+# 02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S1
 # 03. Dump accumulator to see one notification
 # 04. See subscription in mongo - make sure ldQ =='P1==5|P2==9', and that q+mq are P&!P
-# 05. Create an Entity E2/T, using POST /v2/entities, matching S5
+# 05. Create an Entity E2/T, using POST /v2/entities, matching S1
 # 06. Dump accumulator to see NO notification
 #
 # 07. Kill broker and restart it - to take the sub from mongo and repopulate the sub-cache
-# 08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S5
+# 08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S1
 # 09. Dump accumulator to see one notification
-# 10. Create an Entity E4/T, using POST /v2/entities, matching S5
+# 10. Create an Entity E4/T, using POST /v2/entities, matching S1
 # 11. Dump accumulator to see NO notification
 #
 
@@ -69,7 +69,7 @@ echo
 echo
 
 
-echo "02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5"
+echo "02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S1"
 echo "======================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:T:E1",
@@ -96,7 +96,7 @@ echo
 echo
 
 
-echo "05. Create an Entity E2/T, using POST /v2/entities, matching S5"
+echo "05. Create an Entity E2/T, using POST /v2/entities, matching S1"
 echo "==============================================================="
 payload='{
   "id": "E2",
@@ -127,7 +127,7 @@ echo
 echo
 
 
-echo "08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S5"
+echo "08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S1"
 echo "======================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:T:E3",
@@ -147,7 +147,7 @@ echo
 echo
 
 
-echo "10. Create an Entity E4/T, using POST /v2/entities, matching S5"
+echo "10. Create an Entity E4/T, using POST /v2/entities, matching S1"
 echo "==============================================================="
 payload='{
   "id": "E4",
@@ -180,7 +180,7 @@ Date: REGEX(.*)
 
 
 
-02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S5
+02. Create an Entity E1/T, using POST /ngsi-ld/v1/entities, matching S1
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -256,7 +256,7 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-05. Create an Entity E2/T, using POST /v2/entities, matching S5
+05. Create an Entity E2/T, using POST /v2/entities, matching S1
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 ========================================================================================
 
 
-08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S5
+08. Create an Entity E3/T, using POST /ngsi-ld/v1/entities, matching S1
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -309,7 +309,7 @@ Ngsild-Attribute-Format: Simplified
 =======================================
 
 
-10. Create an Entity E4/T, using POST /v2/entities, matching S5
+10. Create an Entity E4/T, using POST /v2/entities, matching S1
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0

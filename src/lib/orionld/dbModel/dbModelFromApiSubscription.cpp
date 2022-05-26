@@ -34,7 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL_V1_0
 #include "orionld/context/orionldContextSimplify.h"            // orionldContextSimplify
 #include "orionld/dbModel/dbModelFromApiKeyValues.h"           // dbModelFromApiKeyValues
 #include "orionld/dbModel/dbModelFromApiCoordinates.h"         // dbModelFromApiCoordinates
@@ -475,6 +475,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
   kjChildAdd(apiSubscriptionP, servicePathNodeP);
   kjChildAdd(apiSubscriptionP, blacklistNodeP);
 
+
   // And finally, the @context
   if (orionldState.payloadContextNode != NULL)
   {
@@ -482,28 +483,35 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     int items;
     if (orionldState.payloadContextNode->type == KjArray)
     {
-      LM_TMP(("VL: Simplifying Array context at %p", orionldState.payloadContextNode));
       orionldState.payloadContextNode = orionldContextSimplify(orionldState.payloadContextNode, &items);
-      LM_TMP(("VL: Simplified Array context now at %p", orionldState.payloadContextNode));
 
       if (items == 1)
       {
-        LM_TMP(("VL: Converting an Array to a String"));
         orionldState.payloadContextNode->type  = orionldState.payloadContextNode->value.firstChildP->type;
         orionldState.payloadContextNode->value = orionldState.payloadContextNode->value.firstChildP->value;
       }
     }
 
     if (orionldState.payloadContextNode->type != KjString)
-      LM_W(("Mayday Mayday - context is not a string ..."));
+    {
+      // The NGSI-LD spec states (soon) that it MUST be a string
+      // BUT, that's for the "notification context"
+      //
+      // For now, I'll just overwrite the context with the Core Context
+      //
+      orionldState.payloadContextNode->type    = KjString;
+      orionldState.payloadContextNode->value.s = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
+      LM_W(("Warning - the context is not a string - changing it for the Core Context (API Spec v1.6)"));
+    }
 
     orionldState.payloadContextNode->name = (char*) "ldContext";
     kjChildAdd(apiSubscriptionP, orionldState.payloadContextNode);
   }
   else  // Core Context
   {
-    KjNode* contextP = kjString(orionldState.kjsonP, "ldContext", ORIONLD_CORE_CONTEXT_URL_V1_0);
-    kjChildAdd(apiSubscriptionP, contextP);
+    char*   contextUrl = (orionldState.contextP != NULL)? orionldState.contextP->url : coreContextUrl;
+    KjNode* ldContextP = kjString(orionldState.kjsonP, "ldContext", contextUrl);
+    kjChildAdd(apiSubscriptionP, ldContextP);
   }
 
   return true;

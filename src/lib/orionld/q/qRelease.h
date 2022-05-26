@@ -35,12 +35,4 @@
 //
 extern void qRelease(QNode* qP);
 
-
-
-// ----------------------------------------------------------------------------
-//
-// qListRelease -
-//
-extern void qListRelease(QNode* qP);
-
 #endif  // SRC_LIB_ORIONLD_Q_QRELEASE_H_
