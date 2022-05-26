@@ -1,3 +1,4 @@
+- Add: Docker healthcheck based on context broker API
 - Add: support for Feature and FeaturesCollection GeoJSON types (normalizing geometries) in entity locations (#4114)
 - Add: support to null element in string list filters (e.g. q=A:foo,null) (#4120)
 - Add: improve BadInput logs with extra information when available (#4121)
