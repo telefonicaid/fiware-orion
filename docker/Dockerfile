@@ -128,7 +128,6 @@ RUN \
            /opt/fiware-orion && \
     # remove the same packages we installed at the beginning to build Orion
     apt-get -y remove --purge \
-      curl \
       cmake \
       libssl-dev \
       git \
