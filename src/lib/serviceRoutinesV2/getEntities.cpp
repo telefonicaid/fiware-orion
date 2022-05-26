@@ -218,7 +218,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
-      alarmMgr.badInput(clientIp, errorString);
+      alarmMgr.badInput(clientIp, errorString, q);
       scopeP->release();
       delete scopeP;
 
@@ -247,7 +247,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
-      alarmMgr.badInput(clientIp, errorString);
+      alarmMgr.badInput(clientIp, errorString, mq);
       scopeP->release();
       delete scopeP;
 

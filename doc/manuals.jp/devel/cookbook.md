@@ -142,7 +142,7 @@ typedef struct RestService
 
 また、`orionRestServices.cpp`では、これらの` RestService` ベクトル行は実際には長く、スタイル・ガイドは長すぎる行に反していることに注意してください。 しかし、定義を使用して行を短くするだけでは、コードを理解しにくくなるので、必要ではありません。
 
-> サイドノート : [スタイル・ガイド](../contribution_guidelines.md#s9-line-length)によれば、ソースコードの行は 120文字を超えるべきではありません (**shouldn't**)
+> サイドノート : [スタイル・ガイド](contribution_guidelines.md#s9-line-length)によれば、ソースコードの行は 120文字を超えるべきではありません (**shouldn't**)
 
 サービス・ルーチン `putMetadata()` は、`src/lib/serviceRoutinesV2/putMetadata.h/cpp` に常駐し、署名は次のようにする必要があります :
 

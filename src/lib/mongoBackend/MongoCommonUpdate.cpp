@@ -2438,7 +2438,7 @@ static bool updateContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
 
-    alarmMgr.badInput(clientIp, err);
+    alarmMgr.badInput(clientIp, err, targetAttr->getName());
     return false;
   }
 
@@ -2498,7 +2498,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
 
-    alarmMgr.badInput(clientIp, err);
+    alarmMgr.badInput(clientIp, err, targetAttr->getName());
     return false;
   }
 
@@ -2550,7 +2550,7 @@ static bool deleteContextAttributeItem
       cerP->statusCode.fill(SccInvalidParameter, details);
       oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
 
-      alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
+      alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time", targetAttr->getName());
       return false;
     }
 
@@ -2584,7 +2584,7 @@ static bool deleteContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
-    alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
+    alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
 
     return false;
@@ -3571,7 +3571,7 @@ static unsigned int updateEntity
     {
       if (attrs.hasField(eP->attributeVector[ix]->name))
       {
-        alarmMgr.badInput(clientIp, "attribute already exists");
+        alarmMgr.badInput(clientIp, "attribute already exists", eP->attributeVector[ix]->name);
         *attributeAlreadyExistsError = true;
 
         //
@@ -3597,7 +3597,6 @@ static unsigned int updateEntity
     {
       if (!attrs.hasField (eP->attributeVector[ix]->name))
       {
-        alarmMgr.badInput(clientIp, "attribute not exists");
         *attributeNotExistingError = true;
 
         // Add to the list of non existing attributes - for the error response
@@ -3970,8 +3969,7 @@ static bool contextElementPreconditionsCheck
       if ((name == eP->attributeVector[jx]->name))
       {
         ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
-        std::string details = std::string("duplicated attribute name: name=<") + name + ">";
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(clientIp, "duplicated attribute name", name);
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
         responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
@@ -4012,7 +4010,7 @@ static bool contextElementPreconditionsCheck
         buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification, details);
         responseP->oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
-        alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
+        alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE", aP->name);
         return false;  // Error already in responseP
       }
     }

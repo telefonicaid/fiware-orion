@@ -217,7 +217,7 @@ void MetadataVector::fill(MetadataVector* mvP)
 *
 * MetadataVector::lookupByName - 
 */
-Metadata* MetadataVector::lookupByName(const std::string& _name)
+Metadata* MetadataVector::lookupByName(const std::string& _name) const
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

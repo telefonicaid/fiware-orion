@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# FIXME: rpm no longer supported. To be removed soon
+
 set -e
 
 secret=$1

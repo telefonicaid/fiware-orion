@@ -218,8 +218,9 @@ part in geo-queries.
 ## Supported GeoJSON types in `geo:json` attributes
 
 NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
-`geo:json` attributes. However, the current implementation in Orion (based in the MongoDB capabilities)
-introduces some limitations.
+`geo:json` attributes. However, the current implementation in Orion (based in
+the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces
+some limitations.
 
 We have successfully tested the following types:
 
@@ -230,13 +231,27 @@ We have successfully tested the following types:
 * Polygon
 * MultiPolygon
 
-On the contrary, the following types doesn't work (you will get a "Database Error" if you try to use them):
-
-* Feature
-* GeometryCollection
-* FeatureCollection
-
 More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
+
+The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
+use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
+the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
+
+* the `geometry` field, in the case of `Feature`
+* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
+
+Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
+creation/updating time. However, from the point of view of normalization with other `geo:json` types,
+it has been decided to return only the `geometry` part. In the future, maybe a flag to return
+the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
+Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
+[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
+
+With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
+`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
+
+The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
+if you try to use them.
 
 ## Legacy attribute format in notifications
 

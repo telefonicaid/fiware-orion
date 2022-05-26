@@ -42,6 +42,7 @@
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
+#include "mongoBackend/location.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundValueBson.h"
@@ -567,20 +568,9 @@ bool ContextAttribute::getLocation(orion::BSONObj* attrsP) const
   if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
   {
     // First lookup in the metadata included in the request
-    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+    if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
     {
-      // the existence of the ignoreType metadata set to true also inhibits the attribute to be used as location
-      if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
-      {
-        if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
-        {
-          return false;
-        }
-        else  // false or not a boolean
-        {
-          return true;
-        }
-      }
+      return !hasIgnoreType();
     }
 
     // If ignoreType has not yet found, second lookup in the existing metadata attributes
@@ -937,7 +927,18 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson());
+    orion::CompoundValueNode* childToRenderP = compoundValueP;
+    if ((type == GEO_JSON) && (!hasIgnoreType()))
+    {
+      childToRenderP = getGeometry(compoundValueP);
+    }
+
+    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
+    // of DB entities) may lead to NULL, so the check is needed
+    if (childToRenderP != NULL)
+    {
+      jh.addRaw("value", childToRenderP->toJson());
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -1150,7 +1151,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
@@ -1162,20 +1163,20 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion, name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
@@ -1183,13 +1184,13 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
   if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";
   }
 
@@ -1202,7 +1203,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   {
     if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";
     }
   }
@@ -1350,4 +1351,30 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
   }
 
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::hasIgnoreType -
+*/
+bool ContextAttribute::hasIgnoreType(void) const
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+  {
+    if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
+    {
+      if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
+      {
+        return true;
+      }
+      else  // false or not a boolean
+      {
+        return false;
+      }
+    }
+  }
+
+  return false;
 }

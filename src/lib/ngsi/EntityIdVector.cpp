@@ -108,7 +108,7 @@ std::string EntityIdVector::check(RequestType requestType)
 
     if ((res = vec[ix]->check(requestType)) != "OK")
     {
-      alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
+      alarmMgr.badInput(clientIp, "invalid vector of EntityIds", res);
       return res;
     }
   }

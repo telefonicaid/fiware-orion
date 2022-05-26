@@ -36,6 +36,7 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityObject.h"
 #include "jsonParseV2/parseNotification.h"
+#include "jsonParseV2/utilsParse.h"
 
 
 
@@ -136,7 +137,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -145,7 +146,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Object not found");
     oeP->fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -153,7 +154,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   }
   else if (document.ObjectEmpty())
   {
-    alarmMgr.badInput(clientIp, "Empty JSON payload");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "Empty JSON payload");
     oeP->fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -171,7 +172,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
   {
     std::string  details = "Invalid JSON payload, mandatory field /data/ not found";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, "JSON Parse Error", details);
     oeP->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 

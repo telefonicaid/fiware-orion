@@ -413,7 +413,7 @@ std::string Scope::check(void)
   //
   if (forbiddenChars(type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a scope");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a scope", type);
     return "illegal chars in scope type";
   }
 
@@ -421,7 +421,7 @@ std::string Scope::check(void)
   {
     if (forbiddenChars(value.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a scope");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a scope", value);
       return "illegal chars in scope";
     }
   }

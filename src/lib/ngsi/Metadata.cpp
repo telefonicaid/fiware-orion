@@ -313,7 +313,7 @@ std::string Metadata::check(ApiVersion apiVersion)
 
   if (forbiddenIdChars(apiVersion , name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata", name);
     return "Invalid characters in metadata name";
   }
 
@@ -334,7 +334,7 @@ std::string Metadata::check(ApiVersion apiVersion)
 
   if (forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata", type);
     return "Invalid characters in metadata type";
   }
 
@@ -342,13 +342,13 @@ std::string Metadata::check(ApiVersion apiVersion)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata", stringValue);
       return "Invalid characters in metadata value";
     }
 
     if (apiVersion == V1 && stringValue.empty())
     {
-      alarmMgr.badInput(clientIp, "missing metadata value");
+      alarmMgr.badInput(clientIp, "missing metadata value", name);
       return "missing metadata value";
     }
   }

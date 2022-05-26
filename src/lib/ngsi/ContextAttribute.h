@@ -144,6 +144,9 @@ private:
                            const std::string&      attrType,
                            bool                    autocast) const;
 
+  bool hasIgnoreType(void) const;
+
+
 } ContextAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_

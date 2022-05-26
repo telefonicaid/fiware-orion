@@ -31,7 +31,7 @@ pages:
       - 'Update action types': 'user/update_action_types.md'
       - 'Context Broker federation': 'user/federation.md'
       - 'Forbidden characters': 'user/forbidden_characters.md'
-      - 'Using regular expressions in payloads': 'user/regex_in_payload.md'
+      - 'Using regular expressions': 'user/regex.md'
       - 'Oneshot Subscription': 'user/oneshot_subscription.md'
       - 'Subscriptions based in alteration type': 'user/subscriptions_alttype.md'
       - 'Security considerations': 'user/security.md'

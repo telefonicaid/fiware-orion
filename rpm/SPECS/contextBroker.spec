@@ -193,6 +193,20 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu May 26 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.7.0-1
+- Add: conditions.alterationTypes subscription fuctionality (#1494)
+- Add: alterationType built-in atrribute in notifications (#1494)
+- Add: covered notifications in subscriptions (#3693)
+- Add: support for Feature and FeaturesCollection GeoJSON types (normalizing geometries) in entity locations (#4114)
+- Add: support to null element in string list filters (e.g. q=A:foo,null) (#4120)
+- Add: improve BadInput logs with extra information when available (#4121)
+- Add: debug tracelevel (-t 56) to get information when regex compilation fails (#4098)
+- Add: Docker healthcheck based on context broker API
+- Fix: allow limit=0 in all paginated operations in the NGSIv2 API (entities, entity types, subscriptions and registrations) (#1492)
+- Fix: wrong log traces in update forwarding cases
+- Fix: memory leak in MQTT connection management logic when connection to MQTT broker cannot be established
+- Reference distribution changed RHEL/CentOS 8 to Debian 11
+
 * Wed Mar 02 2022 Fermin Galan <fermin.galanmarquez@telefonica.com> 3.6.0-1
 - Add: ignoreType metadata so Orion ignores attribute type semantic (supported by geo-types at the present moment) (#4032)
 - Add: URL decode in header values in custom notifications (#4071)
