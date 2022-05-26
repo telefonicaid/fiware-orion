@@ -173,8 +173,7 @@ The symptoms of this problem are:
 -   The MD5SUM of /usr/bin/contextBroker binary (that can be obtained with
     "md5sum /usr/bin/contextBroker" is not the right one (check list for
     particular versions at the end of this section).
--   The prelink package is installed (this can be checked running the
-    command "rpm -qa | grep prelink")
+-   The prelink package is installed
 
 The cause of this problem is
 [prelink](http://en.wikipedia.org/wiki/Prelink), a program that modifies
@@ -187,8 +186,7 @@ The solution for this problems is:
 
 -   Disable prelink, either implementing one of the following
     alternatives:
-    -   Remove the prelink software, typically running (as root or using
-        sudo): `rpm -e prelink`
+    -   Remove the prelink software
     -   Disable the prelink processing of contextBroker binary, creating
         the /etc/prelink.conf.d/contextBroker.conf file with the
         following content (just one line)

@@ -37,11 +37,6 @@ ifndef ORION_WS
 	ORION_WS:=$(shell pwd)
 endif
 
-# Directory for the rpm stage
-ifndef TOPDIR
-	RPM_TOPDIR=$(ORION_WS)/rpm
-endif
-
 # Version for the contextBroker-* packages 
 ifndef BROKER_VERSION
 	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//' | sed -e 's/-/_/g')
@@ -54,10 +49,6 @@ endif
 
 ifndef BUILD_ARCH
     BUILD_ARCH:=$(shell uname -m)
-endif
-
-ifndef MOCK_CONFIG
-    MOCK_CONFIG=epel-6-tid
 endif
 
 ifndef MONGO_HOST
@@ -189,67 +180,6 @@ install_libs: release
 # Requires root access, i.e. use 'sudo make install_debug_libs' to install
 install_debug_libs: debug
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_DEBUG
-
-rpm-ts:
-	# This target assumes that scripts/build/timestampVersion.sh has been previously called before "make rpm-ts"
-	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	# It seems that git archive doesn't take into account changes in the local copy not commited. Thus, we need to do this "in place" .tar.gz
-	# replacement to inject the modified version.sh file
-	cd $(RPM_TOPDIR)/SOURCES && tar xfvz contextBroker-$(BROKER_VERSION).tar.gz && cd -
-	cp src/app/contextBroker/version.h $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)/src/app/contextBroker/version.h
-	rm $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	cd $(RPM_TOPDIR)/SOURCES && tar cfvz contextBroker-$(BROKER_VERSION).tar.gz contextBroker-$(BROKER_VERSION) && cd -
-	rm -rf $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)
-	# -------------
-	git checkout src/app/contextBroker/version.h
-	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
-		--define '_topdir $(RPM_TOPDIR)' \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
-
-rpm: 
-	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
-		--define '_topdir $(RPM_TOPDIR)' \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
-
-mock: 
-	mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}
-	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(HOME)/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -bs rpm/contextBroker.spec \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
-	/usr/bin/mock -r $(MOCK_CONFIG)-$(BUILD_ARCH) ~/rpmbuild/SRPMS/contextBroker-$(BROKER_VERSION)-$(BROKER_RELEASE).src.rpm -v \
-		--define='broker_version $(BROKER_VERSION)' \
-		--define='broker_release $(BROKER_RELEASE)' \
-		--define='build_arch $(BUILD_ARCH)'
-	mkdir -p packages
-	cp /var/lib/mock/$(MOCK_CONFIG)-$(BUILD_ARCH)/result/*.rpm packages
-
-mock64: /var/lib/mock/$(MOCK_CONFIG)-x86_64
-	make mock BUILD_ARCH=x86_64 MOCK_CONFIG=$(MOCK_CONFIG)
-
-mock32: /var/lib/mock/$(MOCK_CONFIG)-i386
-	make mock BUILD_ARCH=i386  MOCK_CONFIG=$(MOCK_CONFIG)
-
-/var/lib/mock/$(MOCK_CONFIG)-x86_64:
-ifeq ($(MOCK_CONFIG),epel-6-tid)
-	sudo cp rpm/epel-6-tid-x86_64.cfg /etc/mock/epel-6-tid-x86_64.cfg
-endif
-	/usr/bin/mock --init -r $(MOCK_CONFIG)-x86_64 -v
-
-/var/lib/mock/$(MOCK_CONFIG)-i386:
-ifeq ($(MOCK_CONFIG),epel-6-tid)
-	sudo cp rpm/epel-6-tid-i386.cfg /etc/mock/epel-6-tid-i386.cfg
-endif
-	/usr/bin/mock --init -r $(MOCK_CONFIG)-i386 -v
 
 deb: clean
 	rm -rf package/deb
@@ -414,4 +344,4 @@ sonar_metrics: coverage
 	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
 	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
-.PHONY: rpm mock mock32 mock64 valgrind
+.PHONY: valgrind
