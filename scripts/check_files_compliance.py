@@ -85,8 +85,8 @@ def ignore(root, file):
     if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and (file.endswith('.png') or file.endswith('.ico')):
         return True
 
-    # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
-    if 'SRPMS' in root or 'SOURCES' in root or 'RPMS' in root:
+    # Files in etc directories are not processed
+    if 'etc' in root:
         return True
 
     # Files in the test/valdring directory ending with .out are not processed
@@ -135,7 +135,7 @@ def ignore(root, file):
 
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
-                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
+                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'Changelog', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
                    'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml', 'uncrustify.cfg' ]
     if file in files_names:
@@ -159,7 +159,7 @@ def supported_extension(root, file):
     :return:
     """
     extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go']
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'conf']
     names = ['makefile', 'Makefile']
 
     # Check extensions
