@@ -131,7 +131,7 @@ echo
 
 echo "05. Get doc in DB before cache refresh and see status active changed in the past and without count and without failsCounter"
 echo "==========================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python -mjson.tool
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -146,7 +146,7 @@ echo
 
 echo "07. Get doc in DB after cache refresh and see status inactive changed in the present and count 2, failsCounter 2"
 echo "================================================================================================================"
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python -mjson.tool
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -159,7 +159,7 @@ echo
 01. GET /v2/subscriptions and see maxFailsLimit 1, status active
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 269
+Content-Length: 285
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -170,6 +170,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },
@@ -220,7 +221,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions and see status inactive (as cache data is newer), timesSent 2, failsCounter 2
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -231,6 +232,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 2,
             "http": {
                 "url": "http://localhost:9997/notify"
@@ -296,7 +298,7 @@ Date: REGEX(.*)
 06. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -307,6 +309,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "failsCounter": 2,
             "http": {
                 "url": "http://localhost:9997/notify"

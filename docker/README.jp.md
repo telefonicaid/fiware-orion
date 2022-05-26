@@ -23,17 +23,21 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 1. 作業するシステム上のディレクトリを作成します。たとえば `~/fiware` です
 2. ディレクトリ内に `docker-compose.yml` という名前の新しいファイルを次の内容で作成します :
-	
-		 mongo:
-		  image: mongo:4.4
-		  command: --nojournal
-		 orion:
-		  image: fiware/orion
-		  links:
-		    - mongo
-		  ports:
-		    - "1026:1026"
-		  command: -dbhost mongo
+
+		version: "3"
+
+		services:
+		  orion:
+		    image: fiware/orion
+		    ports:
+		      - "1026:1026"
+		    depends_on:
+		      - mongo
+		    command: -dbhost mongo
+
+		  mongo:
+		    image: mongo:4.4
+		    command: --nojournal
 
 3. コマンドラインを使用して作成したディレクトリで、`sudo docker-compose up` を実行します
 
@@ -118,7 +122,9 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 `docker build` コマンドのパラメータ `-t orion` は、イメージに名前を付けます。この名前は何でもかまいませんし、`-t org/fiware-orion` のような組織も含めています。この名前は後でイメージに基づいてコンテナを実行するために使用されます。
 
-`docker build` のパラメータ `--build-arg`i はビルド時の変数を設定できます。
+上記のステップ3には、2つの Dockerfile が用意されています: Debian ベースの公式のもの (`Dockefile` 自体) と、公式ではありませんが、Alpine をベース・ディストリビューションとして使用する場合の開始点として役立つ `Dockefile.alpine` です。
+
+`docker build` のパラメータ `--build-arg` はビルド時の変数を設定できます。
 
 | ARG             | 説明                                                           | 例                              |
 | --------------- | -------------------------------------------------------------- | ------------------------------- |

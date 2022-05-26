@@ -26,16 +26,20 @@ Follow these steps:
 1. Create a directory on your system on which to work (for example, `~/fiware`).
 2. Create a new file called `docker-compose.yml` inside your directory with the following contents:
 	
-		mongo:
-		  image: mongo:4.4
-		  command: --nojournal
-		orion:
-		  image: fiware/orion
-		  links:
-		    - mongo
-		  ports:
-		    - "1026:1026"
-		  command: -dbhost mongo
+		version: "3" 
+
+		services:
+		  orion:
+		    image: fiware/orion
+		    ports:
+		      - "1026:1026"
+		    depends_on:
+		      - mongo
+		    command: -dbhost mongo
+		
+		  mongo:
+		    image: mongo:4.4
+		    command: --nojournal
 
 3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
 
@@ -119,6 +123,8 @@ Check that everything works with
 	curl localhost:1026/version
 
 The parameter `-t orion` in the `docker build` command gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
+
+Two Dockerfiles are provided for step 3 above: the official one (`Dockefile` itself) based in Debian and `Dockefile.alpine`, which is not official but in can be useful as starting point if you want to use Alpine as base distribution.
 
 The parameter `--build-arg` in the `docker build` can be set build-time variables. 
 

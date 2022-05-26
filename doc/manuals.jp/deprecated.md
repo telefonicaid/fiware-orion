@@ -45,7 +45,6 @@
 
 常に最新の Orion バージョンを使用することをお勧めしますが、古いバージョンを使用する場合は、次の情報を考慮してください :
 
-* Orion 0.1.1 以降の古い RPMs は [FIWARE yum repository](http://repositories.lab.fiware.org/repo/rpm/6/x86_64) で利用できます
 * [Orion github repository](http://github.com/telefonicaid/fiware-orion) には、旧リリースに対応するコード(Orion 0.8.1、オープンソースとして最初に提供されたもの)が用意されています。各リリース番号 (例 : 0.23.0) には、以下が関連付けられています :
 	 * tag : 例えば `0.23.0`。ベース・バージョンを指しています
 	 * release branch : `release/0.23.0`。このブランチの HEAD は通常、前述のタグと一致します。ただし、一部の修正プログラムがベースバージョンで開発された場合、このブランチにはこのような修正プログラムが含まれています

@@ -152,7 +152,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 334
+Content-Length: 350
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,6 +165,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
@@ -202,7 +203,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/subscription_id, to check failsCounter:1
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 501
+Content-Length: 517
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,6 +216,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"

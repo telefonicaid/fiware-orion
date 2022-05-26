@@ -57,6 +57,7 @@ extern bool processLocationAtEntityCreation
 extern bool processLocationAtUpdateAttribute
 (
   std::string*             currentLocAttrName,
+  orion::BSONObj*          attrsP,
   const ContextAttribute*  targetAttr,
   orion::BSONObjBuilder*   geoJson,
   std::string*             errDetail,
@@ -73,6 +74,7 @@ extern bool processLocationAtUpdateAttribute
 extern bool processLocationAtAppendAttribute
 (
   std::string*             currentLocAttrName,
+  orion::BSONObj*          attrsP,
   const ContextAttribute*  targetAttr,
   bool                     actualAppend,
   orion::BSONObjBuilder*   geoJson,
@@ -80,5 +82,16 @@ extern bool processLocationAtAppendAttribute
   ApiVersion               apiVersion,
   OrionError*              oe
 );
+
+
+
+/* ****************************************************************************
+*
+* getGeometry -
+*
+* Get geometry compound value from attribute, taking into account special GeoJSON
+* types such as Feature and FeatureCollection
+*/
+extern orion::CompoundValueNode* getGeometry(orion::CompoundValueNode* compoundValueP);
 
 #endif  // SRC_LIB_MONGOBACKEND_LOCATION_H_

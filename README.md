@@ -6,7 +6,7 @@
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
-[![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
+[![Support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
 [![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
@@ -60,12 +60,6 @@ check the FIWARE Catalogue entry for
 You can find the User & Programmer's Manual and the Installation &
 Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
-For documentation previous to Orion 0.23.0 please check the manuals at FIWARE
-public wiki:
-
--   [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
--   [Orion Context Broker - User and Programmers Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
-
 Any feedback on this documentation is highly welcome, including bugs, typos or
 things you think should be included but aren't. You can use
 [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
@@ -99,11 +93,11 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20211209)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20211209-250813454)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220526)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220526-251860297)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20211209)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20211209-250813449)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)
 
 [Top](#top)
 
@@ -119,7 +113,7 @@ Build and Install documentation for Orion Context Broker can be found at
 ## Running
 
 How to run Orion Context Broker can be found at
-[the corresponding section of the Admin Manual](doc/manuals/admin/running.md).
+[this document](docker/README.md).
 
 [Top](#top)
 
@@ -251,10 +245,10 @@ target.
         [(jp)](docker/docker_swarm.jp.md)
 -   Development Manual [(en)](doc/manuals/devel/README.md)
     [(jp)](doc/manuals.jp/devel/README.md)
--   Sample code contributions [(en)](doc/manuals/code_contributions.md)
-    [(jp)](doc/manuals.jp/code_contributions.md)
--   Contribution guidelines [(en)](doc/manuals/contribution_guidelines.md)
-    [(jp)](doc/manuals.jp/contribution_guidelines.md), especially important if
+-   Sample code contributions [(en)](doc/manuals/devel/code_contributions.md)
+    [(jp)](doc/manuals.jp/devel/code_contributions.md)
+-   Contribution guidelines [(en)](doc/manuals/devel/contribution_guidelines.md)
+    [(jp)](doc/manuals.jp/devel/contribution_guidelines.md), especially important if
     you plan to contribute with code to Orion Context Broker
 -   Deprecated features [(en)](doc/manuals/deprecated.md)
     [(jp)](doc/manuals.jp/deprecated.md)
@@ -277,7 +271,7 @@ tag `fiware-orion`
 Orion Context Broker is licensed under [Affero General Public License (GPL)
 version 3](./LICENSE).
 
-© 2021 Telefonica Investigación y Desarrollo, S.A.U
+© 2022 Telefonica Investigación y Desarrollo, S.A.U
 
 ### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 

@@ -40,7 +40,7 @@ brokerStart CB
 # 05. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing [should be E1]
 # 06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1-user [should get no entity]
 # 07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1-user [should get no entity]
-# 08. Modify attribute A so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)
+# 08. Modify attribute A (with overrideMetadata) so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)
 # 09. GET /v2/entities/E1 and don't get dateModified or dateCreated metadata
 # 10. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic dates
 # 11. GET /v2/entities?mq=A.dateCreated>2049-01-01 and get nothing
@@ -116,15 +116,15 @@ echo
 echo
 
 
-echo "08. Modify attribute A so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)"
-echo "================================================================================================================="
+echo "08. Modify attribute A (with overrideMetadata) so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)"
+echo "========================================================================================================================================="
 payload='{
   "A": {
     "value": 42,
     "type": "Number"
   }
 }'
-orionCurl --url '/v2/entities/E1/attrs' --payload "$payload"
+orionCurl --url '/v2/entities/E1/attrs?options=overrideMetadata' --payload "$payload"
 echo
 echo
 
@@ -320,8 +320,8 @@ Date: REGEX(.*)
 ]
 
 
-08. Modify attribute A so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)
-=================================================================================================================
+08. Modify attribute A (with overrideMetadata) so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)
+=========================================================================================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

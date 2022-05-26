@@ -54,7 +54,7 @@ int QueueWorkers::start()
 
     if (rc != 0)
     {
-      LM_E(("Internal Error (pthread_create: %s)", strerror(errno)));
+      LM_E(("Runtime Error (pthread_create: %s)", strerror(errno)));
       return rc;
     }
     threadIds.push_back(tid);

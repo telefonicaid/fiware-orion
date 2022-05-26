@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -24,9 +24,8 @@
 
 # Requires paho-mqtt module:
 #
-# paho-mqtt==1.5.1
+# paho-mqtt==1.6.1
 
-from __future__ import division   # need for seconds calculation (could be removed with Python 2.7)
 __author__ = 'fermin'
 
 # This program stores everything it receives by HTTP in a given URL (pased as argument),
@@ -40,13 +39,8 @@ __author__ = 'fermin'
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
-# * This script requires at least Flask 1.0.2, which comes with Werkzeug 0.15.2. There is a bug
-#   in Werkzeug < 0.11.16 that makes empty "content-length" headers to appear for some request
-#   in the accumulator dump
-# * This script also depends on pyOpenSSL 19.0.0
+# * This script requires at least Flask 2.0.2, which comes with Werkzeug 2.0.2.
 
-
-from OpenSSL import SSL
 from flask import Flask, request, Response
 from getopt import getopt, GetoptError
 from datetime import datetime
@@ -61,6 +55,7 @@ import json
 import paho.mqtt.client as mqtt
 import threading
 
+
 def usage_and_exit(msg):
     """
     Print usage message and exit"
@@ -69,8 +64,7 @@ def usage_and_exit(msg):
     """
 
     if msg != '':
-        print msg
-        print
+        print(msg + "\n")
 
     usage()
     sys.exit(1)
@@ -81,42 +75,62 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s --host <host> --port <port> --url <server url> --pretty-print -v -u' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print "  --host <host>: host to use database to use (default is '0.0.0.0')"
-    print "  --port <port>: port to use (default is 1028)"
-    print "  --mqttHost <host>: mqtt broker host to use (if not defined MQTT listening is not enabled)"
-    print "  --mqttPort <port>: mqtt broker port to use (default is 1883)"
-    print "  --mqttTopic <topic>: mqtt topic to use (default is accumulate_mqtt)"
-    print "  --url <server url>: server URL to use (default is /accumulate)"
-    print "  --pretty-print: pretty print mode"
-    print "  --https: start in https"
-    print "  --key: key file (only used if https is enabled)"
-    print "  --cert: cert file (only used if https is enabled)"
-    print "  -v: verbose mode"
-    print "  -u: print this usage message"
+    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> --mqttHost " +
+          "<host> --mqttPort <port> --mqttTopic <topic> --url <server url> --pretty-print " +
+          "--https --key <key_file> --cert <cert_file> -v -u")
+    print("""\nParameters:
+          --host <host>: host to use database to use (default is '0.0.0.0')"
+          --port <port>: port to use (default is 1028)"
+          --mqttHost <host>: mqtt broker host to use (if not defined MQTT listening is not enabled)"
+          --mqttPort <port>: mqtt broker port to use (default is 1883)"
+          --mqttTopic <topic>: mqtt topic to use (default is accumulate_mqtt)"
+          --url <server url>: server URL to use (default is /accumulate)"
+          --pretty-print: pretty print mode"
+          --https: start in https"
+          --key <key file>: (only used if https is enabled)"
+          --cert <cert file>: (only used if https is enabled)"
+          -v: verbose mode"
+          -u: print this usage message
+          """
+          )
 
 
 # This function is registered to be called upon termination
 def all_done():
     os.unlink(pidfile)
 
+
 # Default arguments
-port       = 1028
-host       = '0.0.0.0'
-mqtt_host  = None
-mqtt_port  = 1883
+port = 1028
+host = '0.0.0.0'
+mqtt_host = None
+mqtt_port = 1883
 mqtt_topic = 'accumulate_mqtt'
 server_url = '/accumulate'
-verbose    = 0
-pretty     = False
-https      = False
-key_file   = None
-cert_file  = None
+verbose = 0
+pretty = False
+https = False
+key_file = None
+cert_file = None
 
+# TODO: Improve cli argument parsing with click
+# https://click.palletsprojects.com/en/8.0.x/
+# This will avoid the 'complex' for statement at L137
 try:
-    opts, args = getopt(sys.argv[1:], 'vu', ['host=', 'port=', 'mqttHost=', 'mqttPort=', 'mqttTopic=', 'url=', 'pretty-print', 'https', 'key=', 'cert=' ])
+    opts, args = getopt(
+        sys.argv[1:],
+        'vu', [
+            'host=', 'port=',
+            'mqttHost=',
+            'mqttPort=',
+            'mqttTopic=',
+            'url=',
+            'pretty-print',
+            'https',
+            'key=',
+            'cert='
+        ]
+    )
 except GetoptError:
     usage_and_exit('wrong parameter')
 
@@ -157,24 +171,24 @@ for opt, arg in opts:
 
 if https:
     if key_file is None or cert_file is None:
-        print "if --https is used then you have to provide --key and --cert"
+        print("if --https is used then you have to provide --key and --cert")
         sys.exit(1)
 
 if verbose:
-    print "verbose mode is on"
-    print "port: " + str(port)
-    print "host: " + str(host)
-    print "mqtt_port: " + str(mqtt_port)
-    print "mqtt_host: " + str(mqtt_host)
-    print "mqtt_topic: " + str(mqtt_topic)
-    print "server_url: " + str(server_url)
-    print "pretty: " + str(pretty)
-    print "https: " + str(https)
+    print("verbose mode is on")
+    print("port: " + str(port))
+    print("host: " + str(host))
+    print("mqtt_port: " + str(mqtt_port))
+    print("mqtt_host: " + str(mqtt_host))
+    print("mqtt_topic: " + str(mqtt_topic))
+    print("server_url: " + str(server_url))
+    print("pretty: " + str(pretty))
+    print("https: " + str(https))
     if https:
-        print "key file: " + key_file
-        print "cert file: " + cert_file
+        print("key file: " + key_file)
+        print("cert file: " + cert_file)
 
-pid     = str(os.getpid())
+pid = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
 
 #
@@ -184,27 +198,27 @@ pidfile = "/tmp/accumulator." + str(port) + ".pid"
 # a kill is issued on a non-running process ...
 #
 if os.path.isfile(pidfile):
-    oldpid = file(pidfile, 'r').read()
-    opid   = string.atoi(oldpid)
-    print "PID file %s already exists, killing the process %s" % (pidfile, oldpid)
+    oldpid = open(pidfile, 'r').read()
+    opid = int(oldpid)
+    print(f"PID file {pidfile} already exists, killing the process {oldpid}")
 
-    try: 
+    try:
         oldstderr = sys.stderr
         sys.stderr = open("/dev/null", "w")
-        os.kill(opid, signal.SIGTERM);
+        os.kill(opid, signal.SIGTERM)
         sleep(0.1)
-        os.kill(opid, signal.SIGINT);
+        os.kill(opid, signal.SIGINT)
         sleep(0.1)
-        os.kill(opid, signal.SIGKILL);
+        os.kill(opid, signal.SIGKILL)
         sys.stderr = oldstderr
-    except:
-        print "Process %d killed" % opid
+    except Exception:
+        print(f"Process {opid} killed")
 
 
 #
 # Creating the pidfile of the currently running process
 #
-file(pidfile, 'w').write(pid)
+open(pidfile, 'w').write(pid)
 
 #
 # Making the function all_done being executed on exit of this process.
@@ -215,20 +229,24 @@ atexit.register(all_done)
 
 app = Flask(__name__)
 
+
 @app.route("/noresponse", methods=['POST'])
 def noresponse():
     sleep(10)
     return Response(status=200)
+
 
 @app.route("/noresponse/updateContext", methods=['POST'])
 def unoresponse():
     sleep(10)
     return Response(status=200)
 
+
 @app.route("/noresponse/queryContext", methods=['POST'])
 def qnoresponse():
     sleep(10)
     return Response(status=200)
+
 
 # This response has been designed to test the #2360 case, but is general enough to be
 # used in other future cases (e.e. #3363)
@@ -238,6 +256,7 @@ def bad_response():
     r.data = '{"name":"ENTITY_NOT_FOUND","message":"The entity with the requested id [qa_name_01] was not found."}'
     return r
 
+
 # This response has been designed for 3068_ngsi_v2_based_forwarding/query_cpr_fail_but_local_results.test,
 # but is general enough to be used in other future cases
 @app.route("/badresponse/op/query", methods=['POST'])
@@ -246,16 +265,58 @@ def bad_response_device_not_found():
     r.data = '{"name":"DEVICE_NOT_FOUND","message":"No device was found with id:E."}'
     return r
 
-# From https://stackoverflow.com/questions/14902299/json-loads-allows-duplicate-keys-in-a-dictionary-overwriting-the-first-value
+
+# From:
+# https://stackoverflow.com/questions/14902299/json-loads-allows-duplicate-keys-in-a-dictionary-overwriting-the-first-value
 def dict_raise_on_duplicates(ordered_pairs):
     """Reject duplicate keys."""
     d = {}
     for k, v in ordered_pairs:
         if k in d:
-           raise ValueError("duplicate key: %r" % (k,))
+            raise ValueError(f"duplicate key: {(k,)}")
         else:
-           d[k] = v
+            d[k] = v
     return d
+
+
+def sort_headers(headers):
+    """
+    Sort headers in a predefined order. It seems that from the Python2 version of this
+    script (which used Flask==1.0.2) and the Python3 version (which uses Flask==2.0.2)
+    the order of the headers has changed. We sort to avoid change a lot of .test
+    expectations with no gain.
+
+    :param headers: the headers list to sort
+    """
+
+    sorted = []
+    headers_order = [
+        'Fiware-Servicepath',
+        'Content-Length',
+        'X-Auth-Token',
+        'User-Agent',
+        'Ngsiv2-Attrsformat',
+        'Host',
+        'Accept',
+        'Fiware-Service',
+        'Content-Type',
+        'Fiware-Correlator',
+    ]
+
+    # headers is a generator object, not exactly a list (i.e. it doesn't have remove method)
+    headers_list = list(headers)
+
+    for h in headers_order:
+        if h in headers_list:
+            sorted.append(h)
+            headers_list.remove(h)
+
+    # Remaining headers are added at the end of sorted array in the same order
+    for h in headers_list:
+        sorted.append(h)
+
+    return sorted
+
 
 def record_request(request):
     """
@@ -274,9 +335,7 @@ def record_request(request):
         times.append(0)
     else:
         delta = datetime.now() - t0
-        # Python 2.7 could use delta.total_seconds(), but we use this formula
-        # for backward compatibility with Python 2.6
-        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
+        t = delta.total_seconds()
         times.append(trunc(round(t)))
         # times.append(t)
 
@@ -303,14 +362,14 @@ def record_request(request):
     else:
         s += '?' + params + '\n'
 
-    # Store headers
-    for h in request.headers.keys():
+    # Store headers (according to pre-defined order)
+    for h in sort_headers(request.headers.keys()):
         s += h + ': ' + request.headers[h] + '\n'
 
     # Store payload
     if ((request.data is not None) and (len(request.data) != 0)):
         s += '\n'
-        if pretty == True:
+        if pretty:
             try:
                 raw = json.loads(request.data, object_pairs_hook=dict_raise_on_duplicates)
                 s += json.dumps(raw, indent=4, sort_keys=True)
@@ -318,7 +377,7 @@ def record_request(request):
             except ValueError as e:
                 s += str(e)
         else:
-            s += request.data
+            s += request.data.decode("utf-8")
 
     # Separator
     s += '=======================================\n'
@@ -327,7 +386,7 @@ def record_request(request):
     ac += s
 
     if verbose:
-        print s
+        print(s)
 
 
 def send_continue(request):
@@ -340,7 +399,7 @@ def send_continue(request):
 
     for h in request.headers.keys():
         if ((h == 'Expect') and (request.headers[h] == '100-continue')):
-            send_continue = True
+            return True
 
     return False
 
@@ -373,37 +432,67 @@ def record_2871():
     else:
         # Ad hoc response related with issue #2871, see https://github.com/telefonicaid/fiware-orion/issues/2871
         r = Response(status=200)
-        r.data = '{"contextResponses":[{"contextElement":{"attributes":[{"name":"turn","type":"string","value":""}],"id":"entity1","isPattern":false,"type":"device"},"statusCode":{"code":200,"reasonPhrase":"OK"}}]}'
+        r.data = '''
+            {
+              "contextResponses": [
+                {
+                  "contextElement": {
+                    "attributes": [
+                      {
+                        "name": "turn",
+                        "type": "string",
+                        "value": ""
+                      }
+                    ],
+                    "id": "entity1",
+                    "isPattern": false,
+                    "type": "device"
+                  },
+                  "statusCode": {
+                    "code": 200,
+                    "reasonPhrase": "OK"
+                  }
+                }
+              ]
+            }
+        '''
         return r
 
 # Next 6 ones are for testing subscription status and failure logic. They are used by test
 # 1126_GET_v2_subscriptions/lastsuccesscode_and_lastfailurereason.test
 
+
 @app.route("/giveme200", methods=['POST'])
 def giveme200():
     return Response(status=200)
+
 
 @app.route("/giveme400", methods=['POST'])
 def giveme400():
     return Response(status=400)
 
+
 @app.route("/giveme404", methods=['POST'])
 def giveme404():
     return Response(status=404)
 
+
 @app.route("/giveme500", methods=['POST'])
 def giveme500():
     return Response(status=500)
+
 
 @app.route("/givemeDelay", methods=['POST'])
 def givemeDelay():
     sleep(60)
     return Response(status=200)
 
+
 @app.route("/waitForever", methods=['POST'])
 def waitForever():
     sleep(6000000000)    # Arround 20 years.. close enough to "forever" :)
     return Response(status=200)
+
 
 @app.route('/dump', methods=['GET'])
 def dump():
@@ -411,8 +500,8 @@ def dump():
 
 
 @app.route('/times', methods=['GET'])
-def times():
-    return ', '.join(map(str,times)) + '\n'
+def giveTimes():
+    return ', '.join(map(str, times)) + '\n'
 
 
 @app.route('/number', methods=['GET'])
@@ -433,11 +522,13 @@ def reset():
 def getPid():
     return str(os.getpid())
 
+
 # This is the accumulation string
 ac = ''
 t0 = ''
 times = []
 lock = threading.Lock()
+
 
 # The callback for when the client receives a CONNACK response from the MQTT broker
 def on_connect(client, userdata, flags, rc):
@@ -446,6 +537,7 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(mqtt_topic)
+
 
 # The callback for when a PUBLISH message is received from the MQTT broker
 def on_message(client, userdata, msg):
@@ -464,19 +556,19 @@ def on_message(client, userdata, msg):
         times.append(0)
     else:
         delta = datetime.now() - t0
-        # Python 2.7 could use delta.total_seconds(), but we use this formula
-        # for backward compatibility with Python 2.6
-        t = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+        t = delta.total_seconds()
         times.append(trunc(round(t)))
 
     s += 'MQTT message at topic ' + msg.topic + ':'
     s += '\n'
-    if pretty == True:
-        raw = json.loads(str(msg.payload))
+
+    message = msg.payload.decode("utf-8")
+    if pretty:
+        raw = json.loads(message)
         s += json.dumps(raw, indent=4, sort_keys=True)
-        s +='\n'
+        s += '\n'
     else:
-        s += str(msg.payload)
+        s += str(message)
 
     # Separator
     s += '=======================================\n'
@@ -485,9 +577,10 @@ def on_message(client, userdata, msg):
     ac += s
 
     if verbose:
-        print s
+        print(s)
 
     lock.release()
+
 
 ac = ''
 t0 = ''
@@ -509,20 +602,11 @@ if __name__ == '__main__':
         # manual interface.
         client.loop_start()
 
-    # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
+    # Note that using debug=True breaks the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
     if (https):
-      # Commented lines correspond to the way of using context with pyOpenSSL 0.13.1 (the one that comes with system Python in CentOS 7).
-      # We are using the new way (which is simpler) as we moved to pyOpenSSL 19.0.0. Referecence: Reference: http://stackoverflow.com/questions/28579142/attributeerror-context-object-has-no-attribute-wrap-socket/28590266
-      #
-      # We need to upgrade pyOpenSSL version due to problems of installing 0.13.1 inside virtualenv. Installing the module
-      # requires to compile some parts and this causes a conflict with base openssl devel libraries in CentOS 7 (solvable by hack, but we want to avoid it)
-      
-      #context = SSL.Context(SSL.SSLv23_METHOD)
-      #context.use_privatekey_file(key_file)
-      #context.use_certificate_file(cert_file)
-      context = (cert_file, key_file)
-      app.run(host=host, port=port, debug=False, ssl_context=context)
+        context = (cert_file, key_file)
+        app.run(host=host, port=port, debug=False, ssl_context=context)
     else:
-      app.run(host=host, port=port)
+        app.run(host=host, port=port)

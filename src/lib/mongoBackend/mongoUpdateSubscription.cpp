@@ -313,6 +313,7 @@ std::string mongoUpdateSubscription
 
   if (subUp.subjectProvided)       setEntities(subUp, &setB, subUp.fromNgsiv1);
   if (subUp.subjectProvided)       setConds(subUp, &setB);
+  if (subUp.subjectProvided)       setOperations(subUp, &setB);
   if (subUp.subjectProvided)       setExpression(subUp, &setB);
   if (subUp.notificationProvided)  setNotificationInfo(subUp, &setB, &unsetB);
   if (subUp.notificationProvided)  setAttrs(subUp, &setB);
@@ -323,6 +324,7 @@ std::string mongoUpdateSubscription
   if (subUp.statusProvided)        setStatus(subUp.status, &setB, now);
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
+  if (subUp.coveredProvided)       setCovered(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
 
 

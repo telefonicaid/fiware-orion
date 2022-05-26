@@ -6,8 +6,12 @@ on:
     branches:
       - master
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  TEST_IMAGE_NAME: fiware/orion-ci:rpm8
+  TEST_IMAGE_NAME: fiware/orion-ci:deb
 
 jobs:
   unit:

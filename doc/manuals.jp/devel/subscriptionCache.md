@@ -50,32 +50,34 @@ Broker が起動すると、サブスクリプション・キャッシュには�
 (subCache.h ファイルのコード参照を確認してください):
 
 ```
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  std::vector<std::string>    metadata;
-  std::vector<std::string>    notifyConditionV;
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
-  int64_t                     failsCounter;
-  int64_t                     maxFailsLimit;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
-  std::string                 status;
-  double                      statusLastChange;
-  int64_t                     count;
-  RenderFormat                renderFormat;
-  SubscriptionExpression      expression;
-  bool                        blacklist;
-  bool                        onlyChanged;
-  ngsiv2::HttpInfo            httpInfo;
-  ngsiv2::MqttInfo            mqttInfo;
-  int64_t                     lastFailure;  // timestamp of last notification failure
-  int64_t                     lastSuccess;  // timestamp of last successful notification
-  std::string                 lastFailureReason;
-  int64_t                     lastSuccessCode;
-  struct CachedSubscription*  next;         // The cache is a linked list of CachedSubscription ...
+  std::vector<EntityInfo*>         entityIdInfos;
+  std::vector<std::string>         attributes;
+  std::vector<std::string>         metadata;
+  std::vector<std::string>         notifyConditionV;
+  std::vector<ngsiv2::SubAltType>  subAltTypeV;
+  char*                            tenant;
+  char*                            servicePath;
+  char*                            subscriptionId;
+  int64_t                          failsCounter;
+  int64_t                          maxFailsLimit;
+  int64_t                          throttling;
+  int64_t                          expirationTime;
+  int64_t                          lastNotificationTime;
+  std::string                      status;
+  double                           statusLastChange;
+  int64_t                          count;
+  RenderFormat                     renderFormat;
+  SubscriptionExpression           expression;
+  bool                             blacklist;
+  bool                             onlyChanged;
+  bool                             covered;
+  ngsiv2::HttpInfo                 httpInfo;
+  ngsiv2::MqttInfo                 mqttInfo;
+  int64_t                          lastFailure;  // timestamp of last notification failure
+  int64_t                          lastSuccess;  // timestamp of last successful notification
+  std::string                      lastFailureReason;
+  int64_t                          lastSuccessCode;
+  struct CachedSubscription*       next;        // The cache is a linked list of CachedSubscription ...
 ```
 
 <a name="special-subscription-fields"></a>
@@ -89,7 +91,7 @@ Broker が起動すると、サブスクリプション・キャッシュには�
 * `lastSuccess` (and related field `lastSuccessCode`)
 * `status`
 
-これらのフィールドは、サブスクリプション・キャッシュ内で特別な処理を行い、これらのフィールドが変更されるたびに (サブスクリプションをトリガするアップデートが発生するたびに) データベースに書き込まないようにします。これらは、次のようにキャッシュをリフレッシュする場合にのみデータベース内で更新されます :
+これらのフィールドには、サブスクリプション・キャッシュ内で特別な処理があります:
 
 * `lastNotificationTime` は、*データベースに格納されている、`lastNotificationTime`* より **遅い時間** の場合のみデータベースで更新されます。他のブローカが最新の値で更新した可能性があります。
 * サブスクリプション・キャッシュの `count` と `failsCounter` は、サブキャッシュの更新ごとにゼロに設定されるため、キャッシュにある `count` と `failsCounter` は単にアキュムレータであり、
@@ -97,6 +99,9 @@ Broker が起動すると、サブスクリプション・キャッシュには�
 * `lastFailure` (および `lastFailureReason`) は、`lastNotificationTime` のように、データベース内の *`lastFailure` より大きい場合に設定されます*
 * `lastSuccess` (および `lastSuccessCode`) は、`lastNotificationTime` のように、データベース内の *`lastSuccess` より大きい場合に設定されます*
 * `status` は、データベースに保存されている時間よりも**遅い時間**である場合にのみデータベースで更新されます。どちらが新しいかを確認するには、サイドフィールド `statusLastChange` を使用します
+
+これらは、`mongoSubUpdateOnCacheSync()` 関数によってキャッシュを更新すると、データベースで更新されます。
+それらのいくつかは通知時にも更新されます。`mongoSubUpdateOnNotif()` 関数を参照してください。
 
 すべてこれは、複数の Broker がデータベースに対して作業している場合 (つまり、[アクティブ - アクティブ構成](#active-active-configurations)と呼ばれます) に値が正しいことを保証するためです。
 
@@ -181,12 +186,12 @@ typedef struct CachedSubSaved
 
 サブスクリプションキャッシュを再生成した後、`CachedSubSaved` ベクトルに保存された情報はサブスクリプション・キャッシュにマージされ、最後に `CongSubSaved` ベクタは `mongoSubCountersUpdate` 関数を使用してデータベースにマージされます。[特殊サブスクリプションフィールド](#special-subscription-fields) を参照してください
 
-これはコストのかかる操作であり、サブスクリプション・キャッシュを保護するセマフォは、成功の結果を保証するためにプロセス全体で実行する必要があります。`subCacheSync()` がいくつかのサブスクリプション・キャッシュ関数を呼び出すため、これらの関数はセマフォを**取ってはいけません**。セマフォはよりハイ・レベルで取る必要があります。 したがって、se 関数が別々に使用される場合、呼び出し元は使用前にセマフォを確実に取得する必要があります。 基本的な機能は、セマフォを取得/提供**しない**こともあります。
+これはコストのかかる操作であり、サブスクリプション・キャッシュを保護するセマフォは、成功の結果を保証するためにプロセス全体で実行する必要があります。`subCacheSync()` がいくつかのサブスクリプション・キャッシュ関数を呼び出すため、これらの関数はセマフォを**取ってはいけません**。セマフォはよりハイ・レベルで取る必要があります。したがって、関数を個別に使用する場合、呼び出し元は、使用する前にセマフォが取得されていることを確認する必要があります。基礎となる機能は、セマフォを取得/提供**しない**場合もあります。
 
 質問の機能は次のとおりです :
 
 * `subCacheRefresh()`
-* `mongoSubCountersUpdate()`
+* `mongoSubUpdateOnCacheSync()`
 * `subCacheDestroy()` (used by `subCacheRefresh())`
 * `mongoSubCacheRefresh()` (used by `subCacheRefresh()`)
 

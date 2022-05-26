@@ -122,9 +122,9 @@ static bool updateForward
   //
   if (parseUrl(upcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
+    std::string details = std::string("invalid providing application");
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, upcrP->contextProvider);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
@@ -231,7 +231,6 @@ static bool updateForward
   if (r != 0)
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
-    LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
@@ -260,7 +259,6 @@ static bool updateForward
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
     std::string  s;
-    std::string  errorMsg;
 
     cleanPayload = jsonPayloadClean(out.c_str());
 
@@ -270,7 +268,7 @@ static bool updateForward
       // This is really an internal error in the Context Provider
       // It is not in the orion broker though, so 404 is returned
       //
-      LM_W(("Forwarding Error (context provider response to UpdateContext is empty)"));
+      alarmMgr.forwardingError(url, "context provider response to UpdateContext is empty");
       upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
@@ -295,7 +293,7 @@ static bool updateForward
 
     if (s != "OK")
     {
-      LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
       upcrsP->errorCode.fill(SccContextElementNotFound, "");
       parseData.upcr.res.release();
       parseData.upcrs.res.release();
@@ -348,7 +346,7 @@ static bool updateForward
       return true;
     }
 
-    LM_W(("Forwarding Error (unexpected response from context provider: %s)", out.c_str()));
+    alarmMgr.forwardingError(url, "unexpected response from context provider: %s" + out);
     upcrsP->errorCode.fill(SccReceiverInternalError);
     return false;
   }
@@ -546,6 +544,7 @@ std::string postUpdateContext
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
+  bool overrideMetadata = ciP->uriParamOptions[OPT_OVERRIDEMETADATA];
   bool flowControl  = ciP->uriParamOptions[OPT_FLOW_CONTROL];
   //
   // 01. Check service-path consistency
@@ -598,6 +597,7 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.correlator,
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
                                                   forcedUpdate,
+                                                  overrideMetadata,
                                                   ciP->apiVersion,
                                                   ngsiV2Flavour,
                                                   flowControl));
@@ -642,7 +642,7 @@ std::string postUpdateContext
 
       if (aP == NULL)
       {
-        LM_E(("Internal Error (attribute '%s' not found)", eP->attributeVector[aIx]->name.c_str()));
+        LM_E(("Runtime Error (attribute '%s' not found)", eP->attributeVector[aIx]->name.c_str()));
       }
       else
       {
@@ -676,71 +676,61 @@ std::string postUpdateContext
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
 
-    if (cerP->entity.attributeVector.size() == 0)
+    for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
+      ContextAttribute* aP = cerP->entity.attributeVector[aIx];
+
       //
-      // If we find a contextElement without attributes here, then something is wrong
+      // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
       //
-      LM_E(("Orion Bug (empty contextAttributeVector for ContextElementResponse %d)", cerIx));
-    }
-    else
-    {
-      for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
+      if (aP->found == false)
       {
-        ContextAttribute* aP = cerP->entity.attributeVector[aIx];
-
-        //
-        // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
-        //
-        if (aP->found == false)
-        {
-          ContextAttribute ca(aP);
-          response.notFoundPush(&cerP->entity, &ca, NULL);
-          continue;
-        }
-
-
-        //
-        // 1. If the attribute is found locally - just add the attribute to the outgoing response
-        //
-        if (aP->providingApplication.get().empty())
-        {
-          ContextAttribute ca(aP);
-          response.foundPush(&cerP->entity, &ca);
-          continue;
-        }
-
-
-        //
-        // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
-        //    If not found, add one.
-        UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
-        if (reqP == NULL)
-        {
-          reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
-          reqP->updateActionType = ActionTypeUpdate;
-          requestV.push_back(reqP);
-          regIdsV.push_back(aP->providingApplication.getRegId());
-        }
-
-        //
-        // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
-        //    If not found, add one (to the EntityVector of the UpdateContextRequest).
-        //
-        Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
-        if (eP == NULL)
-        {
-          eP = new Entity();
-          eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
-          reqP->entityVector.push_back(eP);
-        }
-
-
-        //
-        // 4. Add ContextAttribute to the correct ContextElement in the correct UpdateContextRequest
-        //
-        eP->attributeVector.push_back(new ContextAttribute(aP));
+        ContextAttribute ca(aP);
+        response.notFoundPush(&cerP->entity, &ca, NULL);
+        continue;
       }
+
+
+      //
+      // 1. If the attribute is found locally - just add the attribute to the outgoing response
+      //
+      if (aP->providingApplication.get().empty())
+      {
+        ContextAttribute ca(aP);
+        response.foundPush(&cerP->entity, &ca);
+        continue;
+      }
+
+
+      //
+      // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
+      //    If not found, add one.
+      UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
+      if (reqP == NULL)
+      {
+        reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
+        reqP->updateActionType = ActionTypeUpdate;
+        requestV.push_back(reqP);
+        regIdsV.push_back(aP->providingApplication.getRegId());
+      }
+
+      //
+      // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
+      //    If not found, add one (to the EntityVector of the UpdateContextRequest).
+      //
+      Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
+      if (eP == NULL)
+      {
+        eP = new Entity();
+        eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+        reqP->entityVector.push_back(eP);
+      }
+
+
+      //
+      // 4. Add ContextAttribute to the correct ContextElement in the correct UpdateContextRequest
+      //
+      eP->attributeVector.push_back(new ContextAttribute(aP));
     }
   }
 
@@ -773,7 +763,7 @@ std::string postUpdateContext
   {
     if (requestV[ix]->contextProvider.empty())
     {
-      LM_E(("Internal Error (empty context provider string)"));
+      LM_E(("Runtime Error (empty context provider string)"));
       continue;
     }
 

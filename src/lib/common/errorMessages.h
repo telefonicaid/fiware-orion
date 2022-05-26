@@ -43,7 +43,7 @@
  *
  * In addition, by the moment we are using this constants only for error payloads, but maybe they should be
  * also used for alarm error mensajes, e.g. alarmMgr.badInput(clientIp, ERROR_DESC_PARSE) instead of
- * alarmMgr.badInput(clientIp, "JSON parse error").
+ * alarmMgr.badInput(clientIp, "JSON Parse Error").
  */
 
 #define ERROR_PARSE                                   "ParseError"
@@ -98,6 +98,9 @@
 
 #define ERROR_UNPROCESSABLE                           "Unprocessable"
 #define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
+
+#define ERROR_NO_RESOURCES_AVAILABLE                  "NoResourcesAvailable"
+#define ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC      "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations."
 
 #define ERROR_INTERNAL_ERROR                          "InternalError"
 

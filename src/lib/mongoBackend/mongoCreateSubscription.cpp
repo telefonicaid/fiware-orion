@@ -98,6 +98,7 @@ static void insertInCache
                      sub.notification.attributes,
                      sub.notification.metadata,
                      sub.subject.condition.attributes,
+                     sub.subject.condition.altTypes,
                      subId.c_str(),
                      sub.expires,
                      sub.notification.maxFailsLimit,
@@ -117,7 +118,8 @@ static void insertInCache
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
                      sub.notification.blacklist,
-                     sub.notification.onlyChanged);
+                     sub.notification.onlyChanged,
+                     sub.notification.covered);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 }
@@ -162,6 +164,7 @@ std::string mongoCreateSubscription
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
+  setCovered(sub, &b);
 
   if (!sub.description.empty())
   {
@@ -176,6 +179,7 @@ std::string mongoCreateSubscription
   setConds(sub, &b);
 
   setExpression(sub, &b);
+  setOperations(sub, &b);
   setFormat(sub, &b);
 
   orion::BSONObj doc = b.obj();

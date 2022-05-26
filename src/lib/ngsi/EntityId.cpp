@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/string.h"
 #include "common/JsonHelper.h"
 #include "ngsi/EntityId.h"
 #include "common/tag.h"
@@ -188,7 +189,7 @@ std::string EntityId::check(RequestType requestType)
   if (isTrue(isPattern))
   {
     regex_t re;
-    if ((id.find('\0') != std::string::npos) || (regcomp(&re, id.c_str(), REG_EXTENDED) != 0))
+    if ((id.find('\0') != std::string::npos) || (!regComp(&re, id.c_str(), REG_EXTENDED)))
     {
       return "invalid regex for entity id pattern";
     }

@@ -123,7 +123,7 @@ echo
 
 echo "04. Get doc in DB before cache refresh and see lastNotification/Success in a far future and status code 211 but no count"
 echo "========================================================================================================================"
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python -mjson.tool
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -138,7 +138,7 @@ echo
 
 echo "06. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1"
 echo "======================================================================================================================"
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python -mjson.tool
+mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -151,7 +151,7 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 and without timeSent
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 360
+Content-Length: 376
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -162,6 +162,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },
@@ -199,7 +200,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 (as cache data is older), timesSent 1
 ====================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 374
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,6 +211,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },
@@ -275,7 +277,7 @@ Date: REGEX(.*)
 05. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 374
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,6 +288,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },

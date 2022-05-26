@@ -134,7 +134,7 @@ Date: REGEX(.*)
 02. Get subscription (no last* field)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 277
+Content-Length: 293
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -145,6 +145,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
@@ -178,7 +179,7 @@ Date: REGEX(.*)
 04. Get subscription see status: active, lastSuccessCode: 200
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 416
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,6 +190,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
@@ -228,7 +230,7 @@ Date: REGEX(.*)
 07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
 ==========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 507
+Content-Length: 523
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -239,6 +241,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 1,
         "http": {
             "url": "http://localhost:9997/giveme200"

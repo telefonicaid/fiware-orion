@@ -206,7 +206,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=1, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 450
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -216,6 +216,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 1,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -254,7 +255,7 @@ Date: REGEX(.*)
 05. GET /v2/subscriptions/subId, to check the status=active, timesSent=2, failsCounter=2, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 450
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -264,6 +265,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 2,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -302,7 +304,7 @@ Date: REGEX(.*)
 07. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=3, failsCounter=3, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -312,6 +314,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 3,
         "http": {
             "url": "http://localhost:9997/notify"
@@ -363,7 +366,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/subId, to check the status=active, timesSent=4, failsCounter=0 (omitted), maxFailsLimit=2
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 480
+Content-Length: 496
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -373,6 +376,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:9997/notify"
         },

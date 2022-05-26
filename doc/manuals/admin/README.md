@@ -6,9 +6,7 @@ Orion Context Broker: Installation & Administration Manual.
 ## Table of Contents
 
 * [Installing Orion](install.md)
-* [Using Yum repositories](yum.md)
 * [Building from sources](build_source.md)
-* [Running Orion as system service](running.md)
 * [Running Orion from command line](cli.md)
 * [Database administration](database_admin.md)
 * [Data model](database_model.md)

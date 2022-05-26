@@ -90,7 +90,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -100,7 +100,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "JSON Object not found");
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -928,6 +928,27 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     }
   }
 
+  // covered
+  if (notification.HasMember("covered"))
+  {
+    Opt<bool> coveredOpt = getBoolOpt(notification, "covered");
+    if (!coveredOpt.ok())
+    {
+      return badInput(ciP, coveredOpt.error);
+    }
+    else if (coveredOpt.given)
+    {
+      bool coveredBool = coveredOpt.value;
+      subsP->coveredProvided = true;
+      subsP->notification.covered = coveredBool;
+
+      if ((subsP->notification.covered) && (subsP->notification.attributes.size() == 0))
+      {
+        return badInput(ciP, "covered true cannot be used if notification attributes list is empty");
+      }
+    }
+  }
+
   // metadata
   if (notification.HasMember("metadata"))
   {
@@ -1022,6 +1043,7 @@ static std::string parseNotifyConditionVector
     }
   }
 
+  // Expression
   if (condition.HasMember("expression"))
   {
     std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
@@ -1029,6 +1051,36 @@ static std::string parseNotifyConditionVector
     if (r != "OK")
     {
       return badInput(ciP, r);
+    }
+  }
+
+  // Operations
+  if (condition.HasMember("alterationTypes"))
+  {
+    std::string errorString;
+    std::vector<std::string> altTypeStrings;
+    bool        b = parseStringVector(&altTypeStrings,
+                                      condition["alterationTypes"],
+                                      "alterationTypes",
+                                      true,
+                                      true,
+                                      &errorString);
+    if (b == false)
+    {
+      return badInput(ciP, errorString);
+    }
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        return badInput(ciP, "unknown subscription alterationType: " + altTypeStrings[ix]);
+      }
+      else
+      {
+        subsP->subject.condition.altTypes.push_back(altType);
+      }
     }
   }
 

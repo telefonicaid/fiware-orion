@@ -214,7 +214,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 368
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -227,6 +227,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
@@ -265,7 +266,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 535
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -278,6 +279,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
@@ -317,7 +319,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 535
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -330,6 +332,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "failsCounter": 2,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
@@ -374,7 +377,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 565
+Content-Length: 581
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -387,6 +390,7 @@ Date: REGEX(.*)
             "temperature"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },

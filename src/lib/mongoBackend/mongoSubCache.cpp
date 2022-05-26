@@ -120,6 +120,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->count                 = 0;
   cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
+  cSubP->covered               = sub.hasField(CSUB_COVERED)?          getBoolFieldF(sub, CSUB_COVERED)                     : false;
   cSubP->next                  = NULL;
 
 
@@ -200,7 +201,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
-      LM_W(("Runtime Error (got a subscription without id)"));
+      LM_E(("Runtime Error (got a subscription without id)"));
       continue;
     }
 
@@ -240,6 +241,27 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
+  //
+  // 09. Fill in cSubP->subAltTypeV from alteration types
+  //
+  if (sub.hasField(CSUB_ALTTYPES))
+  {
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
+      }
+      else
+      {
+        cSubP->subAltTypeV.push_back(altType);
+      }
+    }
+  }
 
   subCacheItemInsert(cSubP);
 
@@ -332,7 +354,7 @@ int mongoSubCacheItemInsert
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
-      LM_W(("Runtime Error (got a subscription without id)"));
+      LM_E(("Runtime Error (got a subscription without id)"));
       continue;
     }
 
@@ -371,6 +393,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+  cSubP->covered               = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
 
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastFailure;
@@ -436,6 +459,28 @@ int mongoSubCacheItemInsert
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
+  //
+  // 09. Fill in cSubP->subAltTypeV from alterationTypes
+  //
+  if (sub.hasField(CSUB_ALTTYPES))
+  {
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
+      }
+      else
+      {
+        cSubP->subAltTypeV.push_back(altType);
+      }
+    }
+  }
+
   subCacheItemInsert(cSubP);
 
   return 0;
@@ -491,14 +536,13 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateCount -
+* mongoSubCountersUpdateFailsAndStatus -
 */
-static void mongoSubCountersUpdateCount
+static void mongoSubCountersUpdateFailsAndStatus
 (
   const std::string&  db,
   const std::string&  collection,
   const std::string&  subId,
-  long long           count,
   long long           fails,
   const std::string&  status,
   double              statusLastChange
@@ -512,21 +556,16 @@ static void mongoSubCountersUpdateCount
   std::string  err;
 
   condition.append("_id", orion::OID(subId));
-  if (count > 0)
-  {
-    incB.append(CSUB_COUNT, count);
-  }
 
   if (fails > 0)
   {
     incB.append(CSUB_FAILSCOUNTER, fails);
   }
-  else if ((noCache) || (count > 0))
+  else if (noCache)
   {
     // no fails mean notification ok, thus reseting the counter
-    // in noCache case, this is always done. In cache case, the the count > 0 check is needed
-    // to ensure that at least one notification has been sent in since last cache refresh
-    // see cases/3541_subscription_max_fails_limit/failsCounter_keeps_after_cache_refresh_cycles.test
+    // in noCache case, this is always done. In cache case, it will be done
+    // at cache refresh time (check mongoSubUpdateOnCacheSync())
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
@@ -553,7 +592,7 @@ static void mongoSubCountersUpdateCount
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
   }
 }
 
@@ -587,7 +626,7 @@ static void mongoSubCountersUpdateLastNotificationTime
 
   if (orion::collectionUpdate(db, collection, id.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'lastNotification' for a subscription)"));
   }
 }
 
@@ -644,7 +683,7 @@ static void mongoSubCountersUpdateLastFailure
 
   if (orion::collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'lastFailure' for a subscription)"));
   }
 }
 
@@ -701,7 +740,7 @@ static void mongoSubCountersUpdateLastSuccess
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Internal Error (error updating 'lastSuccess' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'lastSuccess' for a subscription)"));
   }
 }
 
@@ -709,14 +748,21 @@ static void mongoSubCountersUpdateLastSuccess
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdate - update subscription counters and timestamps in mongo
+* mongoSubUpdateOnNotif - update subscription doc in mongo due to a notification
 *
+* Used in notification logic
+*
+* Although we are updating basically the same things (lastNotificationTime, lastSuccess, etc.),
+* we cannot use mongoSubUpdateOnCacheSync(). Note that in mongoSubUpdateOnCacheSync()
+* we start from a reference status in DB so we can decide what to update in a
+* single shot. However, in the notification case we don't know the status of the
+* DB so we need updates with a query part adapted to a possibly newer data in DB
+* (e.g. we use $max for lastNotificationTime).
 */
-void mongoSubCountersUpdate
+void mongoSubUpdateOnNotif
 (
   const std::string&  tenant,
   const std::string&  subId,
-  long long           count,
   long long           failsCounter,
   long long           lastNotificationTime,
   long long           lastFailure,
@@ -735,7 +781,7 @@ void mongoSubCountersUpdate
 
   std::string db = composeDatabaseName(tenant);
 
-  mongoSubCountersUpdateCount(db, COL_CSUBS, subId, count, failsCounter, status, statusLastChange);
+  mongoSubCountersUpdateFailsAndStatus(db, COL_CSUBS, subId, failsCounter, status, statusLastChange);
 
   if (lastNotificationTime > 0)
   {
@@ -750,5 +796,101 @@ void mongoSubCountersUpdate
   if (lastSuccess > 0)
   {
     mongoSubCountersUpdateLastSuccess(db, COL_CSUBS, subId, lastSuccess, statusCode);
+  }
+}
+
+
+/* ****************************************************************************
+*
+* mongoSubUpdateOnCacheSync -
+*
+* Used in cache sync logic
+*/
+void mongoSubUpdateOnCacheSync
+(
+  const std::string&  tenant,
+  const std::string&  subId,
+  long long           count,
+  long long           failsCounter,
+  int64_t*            lastNotificationTimeP,
+  int64_t*            lastFailureP,
+  int64_t*            lastSuccessP,
+  std::string*        failureReasonP,
+  int64_t*            statusCodeP,
+  std::string*        statusP,
+  double*             statusLastChangeP
+)
+{
+  orion::BSONObjBuilder  condition;
+  orion::BSONObjBuilder  update;
+  orion::BSONObjBuilder  setB;
+  orion::BSONObjBuilder  incB;
+
+  if (count > 0)
+  {
+    incB.append(CSUB_COUNT, count);
+  }
+  if (failsCounter > 0)
+  {
+    incB.append(CSUB_FAILSCOUNTER, failsCounter);
+  }
+  else if (count > 0)
+  {
+    // no fails mean notification ok, thus reseting the counter. The count > 0 check is needed to
+    // ensure that at least one notification has been sent in since last cache refresh
+    // see cases/3541_subscription_max_fails_limit/failsCounter_keeps_after_cache_refresh_cycles.test
+    setB.append(CSUB_FAILSCOUNTER, 0);
+  }
+
+  if ((lastNotificationTimeP != NULL) && (*lastNotificationTimeP > 0))
+  {
+    setB.append(CSUB_LASTNOTIFICATION, (long long) *lastNotificationTimeP);
+  }
+  if ((lastFailureP != NULL) && (*lastFailureP > 0))
+  {
+    setB.append(CSUB_LASTFAILURE, (long long) *lastFailureP);
+  }
+  if ((lastSuccessP != NULL) && (*lastSuccessP > 0))
+  {
+    setB.append(CSUB_LASTSUCCESS, (long long) *lastSuccessP);
+  }
+  if (failureReasonP != NULL)
+  {
+    setB.append(CSUB_LASTFAILUREASON, *failureReasonP);
+  }
+  if (statusCodeP != NULL)
+  {
+    setB.append(CSUB_LASTSUCCESSCODE, (long long) *statusCodeP);
+  }
+  if (statusP != NULL)
+  {
+    setB.append(CSUB_STATUS, *statusP);
+  }
+  if (statusLastChangeP != NULL)
+  {
+    setB.append(CSUB_STATUS_LAST_CHANGE, *statusLastChangeP);
+  }
+
+  if ((incB.nFields() == 0) && (setB.nFields() == 0))
+  {
+    // Nothing to update, return
+    return;
+  }
+
+  if (incB.nFields() > 0)
+  {
+    update.append("$inc", incB.obj());
+  }
+  if (setB.nFields() > 0)
+  {
+    update.append("$set", setB.obj());
+  }
+
+  condition.append("_id", orion::OID(subId));
+
+  std::string  err;
+  if (collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, condition.obj(), update.obj(), false, &err) != true)
+  {
+    LM_E(("Runtime Error (error updating subs during cache sync: %s)", err.c_str()));
   }
 }

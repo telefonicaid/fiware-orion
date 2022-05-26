@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0|1] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0|1|2] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -106,7 +106,7 @@ def ignore(root, file):
         return True
 
     # Some files in docker/ directory are not processed
-    if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
+    if 'docker' in root and file in ['Dockerfile', 'Dockerfile.alpine', 'docker-compose.yml']:
         return True
     if 'hooks' in root and file in ['build']:
         return True
@@ -143,7 +143,9 @@ def ignore(root, file):
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
                                       or file == 'cmake2junit.xsl'):
         return True
-    if 'acceptance' in root and (file.endswith('.txt') or file.endswith('.json')):
+    
+    # For several requirements.txt files we have in this repo
+    if ('acceptance' in root or 'doc' in root) and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False

@@ -94,6 +94,7 @@
 #define DATE_CREATED    "dateCreated"
 #define DATE_MODIFIED   "dateModified"
 #define DATE_EXPIRES    "dateExpires"
+#define ALTERATION_TYPE "alterationType"
 #define ALL_ATTRS       "*"
 
 
@@ -126,6 +127,7 @@
 #define OPT_UPSERT                      "upsert"
 #define OPT_SKIPINITALNOTIFICATION      "skipInitialNotification"
 #define OPT_FORCEDUPDATE                "forcedUpdate"
+#define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
 
 

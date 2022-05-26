@@ -1,16 +1,16 @@
 # Building from sources
 
-Orion Context Broker reference distribution is CentOS 8.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 8.x; the others are provided "as is" and can get obsolete from time to time.
+Orion Context Broker reference distribution is Debian 11. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 11; the others are provided "as is" and can get obsolete from time to time.
 
-## CentOS 8.x (officially supported)
+## Debian 11 (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
 
-* boost: 1.66
+* boost: 1.74
 * libmicrohttpd: 0.9.70 (from source)
-* libcurl: 7.61.1
-* openssl: 1.1.1g
-* libuuid: 2.32.1
+* libcurl: 7.74.0
+* openssl: 1.1.1k
+* libuuid: 2.36.1
 * libmosquitto: 2.0.12 (from source)
 * Mongo C driver: 1.17.4 (from source)
 * rapidjson: 1.1.0 (from source)
@@ -22,11 +22,11 @@ commands that require root privilege):
 
 * Install the needed building tools (compiler, etc.).
 
-        sudo yum install make cmake gcc-c++
+        sudo apt-get install make cmake g++
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel cyrus-sasl-devel
+        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev
 
 * Install the Mongo Driver from source.
 
@@ -69,7 +69,7 @@ commands that require root privilege):
 
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
-        sudo yum install git
+        sudo apt-get install git
         git clone https://github.com/telefonicaid/fiware-orion
 
 * Build the source:
@@ -87,23 +87,23 @@ commands that require root privilege):
 
         contextBroker --version
 
-### Testing, coverage and RPM
+### Testing and coverage
 
 The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tests that you can also run, following the following procedure (optional but highly recommended):
 
-* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
+* Install Google Test/Mock from sources. Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        sudo yum install python2
+        sudo apt-get install python2
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on CentOS 8
+        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on Debian 11
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-In the case of the aarch64 architecture, install libxslt using yum, and run `./configure` with `--build=arm-linux` option.
+In the case of the aarch64 architecture, install libxslt using apt-get, and run `./configure` with `--build=arm-linux` option.
 
 * Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/) for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
 
@@ -113,20 +113,18 @@ In the case of the aarch64 architecture, install libxslt using yum, and run `./c
 
 * Install additional required tools for functional and valgrind tests:
 
-        sudo yum install curl nc valgrind bc
-        sudo pip2 install virtualenv
+        sudo apt-get install curl nc valgrind bc python3 python3-pip
+        sudo pip3 install virtualenv
 
-In the case of the aarch64 architecture, additionally install python2-devel, rpm-build and libffi-devel using yum. It is needed when building pyOpenSSL.
-
-* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
+* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an other programs, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        virtualenv /opt/ft_env --python=/usr/bin/python2
+        virtualenv /opt/ft_env --python=/usr/bin/python3
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1
 
 * Run test harness in this environment (it takes some time, please be patient).
 
@@ -140,26 +138,13 @@ You can generate coverage reports for the Orion Context Broker using the followi
 
 * Install the lcov tool
 
-        # Download .rpm file from http://downloads.sourceforge.net/ltp/lcov-1.14-1.noarch.rpm
-        sudo yum install lcov-1.14-1.noarch.rpm
+        sudo apt-get install lcov
 
 * Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
 
 * Run coverage
 
         make coverage INSTALL_DIR=~
-
-You can generate the RPM for the source code (optional):
-
-* Install the required tools
-
-        sudo yum install rpm-build
-
-* Generate the RPM
-
-        make rpm
-
-* The generated RPMs are placed in directory `~/rpmbuild/RPMS/x86_64`.
 
 ## Ubuntu 20.04 LTS
 
@@ -253,7 +238,7 @@ commands that require root privilege):
 
 The Orion Context Broker comes with a suite of functional, valgrind and end-to-end tests that you can also run, following the following procedure (optional):
 
-* Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
+* Install Google Test/Mock from sources. Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
         apt install python-is-python2 xsltproc
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
@@ -280,9 +265,7 @@ In the case of the aarch64 architecture, run `./configure` with `--build=arm-lin
         sudo pip install --upgrade pip 
         pip install virtualenv
 
-In the case of the aarch64 architecture, additionally install `python2-dev` and `libffi-dev` using apt. It is needed when building pyOpenSSL.
-
-* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment to use Flask version 1.0.2 instead of default Flask in Ubuntu. Run test harness in this environment.
+* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with other programs, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment to use Flask version 1.0.2 instead of default Flask in Ubuntu. Run test harness in this environment.
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
@@ -290,7 +273,7 @@ In the case of the aarch64 architecture, additionally install `python2-dev` and 
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt==1.5.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1
 
 * Run test harness (it takes some time, please be patient). Before starting test by make command, apply the following patch to avoid test failing.
 

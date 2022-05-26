@@ -29,7 +29,7 @@ The `-logLevel` option allows to choose which error messages are printed in the 
 
 When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces on the standard output.
 
-The log level can be changed (and retrieved) in run-time, using the [admin API](management_api.md) exposed by Orion.
+Note that `-logLevel` sets the *initial* log level. The log level can be changed (and retrieved) in run-time, using the [admin API](management_api.md) exposed by Orion.
 
 [Top](#top)
 
@@ -307,9 +307,9 @@ time=... | lvl=SUMMARY | ... Bad input active alarms: 5, raised: (total: 12, new
 
 ## Log rotation
 
-Logrotate is installed as an RPM dependency along with the contextBroker.
-The system is configured to rotate once a day, or more, in case the log file size
-exceeds 100MB (checked very 30 minutes by default):
+Log rotate recommendations is to rotate once a day, or more, in case the log file size
+exceeds 100MB (checked very 30 minutes by default). You have some sample files in
+`rpm/SOURCES/` directory:
 
 -   For daily rotation: `/etc/logrotate.d/logrotate-contextBroker-daily`:
     which enables daily log rotation

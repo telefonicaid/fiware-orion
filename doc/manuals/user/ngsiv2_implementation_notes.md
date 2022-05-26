@@ -2,23 +2,29 @@
 
 * [Forbidden characters](#forbidden-characters)
 * [Update operators for attribute values](#update-operators-for-attribute-values)
+* [Metadata update semantics](#metadata-update-semantics)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
+* [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
+* [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
+* [`ignoreType` metadata](#ignoretype-metadata)
 * [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
-* [Oneshot Subscription](#oneshot-subscriptions)
+* [Oneshot subscriptions](#oneshot-subscriptions)
+* [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
+* [Covered subscriptions](#covered-subscriptions)
 * [`timeout` subscriptions option](#timeout-subscriptions-option)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
@@ -73,6 +79,28 @@ context. More detail in [specific documentation](update_operators.md).
 
 [Top](#top)
 
+## Metadata update semantics
+
+The metadata update semantics used by Orion Context Broker (and the
+related `overrideMetadata` option are detailed in
+[this section of the documentation](metadata.md#updating-metadata).
+
+Moreover, from NGSIv2 specification section "Partial Representations":
+
+> Attribute `metadata` may be omitted in requests, meaning that there are no metadata
+> elements associated to the attribute.
+
+Depending if `overrideMetadata` is used or not, this sentence has two interpretations:
+
+* If `overrideMetadata` is not used (default behaviour) it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **which need to be updated**"
+* If `overrideMetadata` is used it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **as a result of the the attribute update**"
+
+[Top](#top)
+
 ## Custom payload decoding on notifications
 
 Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
@@ -104,6 +132,30 @@ ignored.
 
 [Top](#top)
 
+## Header removal in custom notifications
+
+It is not explicilty said in NGSIv2 specification ("Custom Notifications" section) but an empty
+string value for a header key in the `headers` object will remove that header from notifications.
+For instance the following configuration:
+
+```
+"httpCustom": { 
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+will remove the `x-auth-token` header in notifications associated to the subscription.
+
+This can be useful to remove headers that Orion will include automatically in notifications.
+For instance:
+
+* To avoid headers included by default in notifications (e.g. `Accept`)
+* To cut the propagation of headers (from updates to notifications), such the
+  aforementioned `x-auth-token`
+
+[Top](#top)
+
 ## Limit to attributes for entity location
 
 From "Geospatial properties of entities" section at NGSIv2 specification:
@@ -119,13 +171,56 @@ From "Geospatial properties of entities" section at NGSIv2 specification:
 
 In the case of Orion, that limit is one (1) attribute.
 
+However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
+location (more detail in [this section of the documentation](#ignoretype-metadata)). This disables Orion
+interpretation of that attribute as a location, so it doesn't count towards the limit.
+
+For instance:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType":{
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}
+```
+
+Both attributes are of type `geo:json`, but `serviceArea` uses `ignoreType` metadata to `true` so the limit 
+of one non-informative location is not overpassed.
+
+If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
+is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
+the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
+part in geo-queries.
+
 [Top](#top)
 
 ## Supported GeoJSON types in `geo:json` attributes
 
 NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
-`geo:json` attributes. However, the current implementation in Orion (based in the MongoDB capabilities)
-introduces some limitations.
+`geo:json` attributes. However, the current implementation in Orion (based in
+the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces
+some limitations.
 
 We have successfully tested the following types:
 
@@ -136,13 +231,27 @@ We have successfully tested the following types:
 * Polygon
 * MultiPolygon
 
-On the contrary, the following types doesn't work (you will get a "Database Error" if you try to use them):
-
-* Feature
-* GeometryCollection
-* FeatureCollection
-
 More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
+
+The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
+use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
+the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
+
+* the `geometry` field, in the case of `Feature`
+* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
+
+Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
+creation/updating time. However, from the point of view of normalization with other `geo:json` types,
+it has been decided to return only the `geometry` part. In the future, maybe a flag to return
+the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
+Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
+[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
+
+With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
+`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
+
+The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
+if you try to use them.
 
 ## Legacy attribute format in notifications
 
@@ -269,6 +378,25 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 [Top](#top)
 
+## `alterationType` attribute
+
+Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Orion implements the `alterationType` attribute.
+
+This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
+is ignored) and can take the following values:
+
+* `entityCreate` if the update that triggers the notification is a entity creation operation
+* `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+* `entityChange` if the update that triggers the notification was an update with an actual change
+* `entityDelete` if the update that triggers the notification was a entity delete operation
+
+The type of this attribute is `Text`
+
+This builtin attribute is related with the [subscriptions based in alteration type](subscriptions_alttype.md) feature.
+
+[Top](#top)
+
 ## `actionType` metadata
 
 From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
@@ -278,6 +406,26 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
+
+[Top](#top)
+
+## `ignoreType` metadata
+
+Appart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
+Orion implements the `ignoreType` metadata.
+
+When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+semantics associated to the attribute type. Note that Orion ignored attribute type in general so
+this metadata is not needed most of the cases, but there are two cases in which attribute
+type has an special semantic for Orion (check NGSIv2 specification for details):
+
+* `DateTime`
+* Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+
+At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
+mechanism to overcome the limit of only one geo-location per entity (more details
+in [this section of the documentation](#limit-to-attributes-for-entity-location). Support
+for `ignoreType` in `DateTime` may come in the future.
 
 [Top](#top)
 
@@ -338,6 +486,14 @@ Apart from the `status` values defined for subscription in the NGSIv2 specificat
 
 [Top](#top)
 
+## Subscriptions based in alteration type
+
+Apart from the sub-fields allowed in subscriptions `conditions` field according to NGSIv2 specifiction,
+Orion supports the `alterationTypes` field to specify under which alterations (entity creation, entity
+modification, etc.) the subscription is triggered.
+
+Please find details in [this specific documentation](subscriptions_alttype.md)
+
 ## Custom notifications without payload
 
 If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
@@ -368,6 +524,73 @@ update modified only A, then A, B and C are notified (in other words, the trigge
 if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
 
 [Top](#top)
+
+## Covered subscriptions
+
+The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
+notification when subscription is triggered. By default Orion only notifies attributes that exist
+in the entity. For instance, if subscription is this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+but the entity only has `temperature` and `humidity` attributes, then `brightness` attribute is not included
+in notifications.
+
+This default behaviour can be changed using the `covered` field set to `true` this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+in which case all attributes are included in the notification, no matter if they exist or not in the
+entity. For these attributes that don't exist (`brightness` in this example) the `null`
+value (of type `"None"`) is used.
+
+We use the term "covered" in the sense the notification "covers" completely all the attributes
+in the `notification.attrs` field. It can be useful for those notification endpoints that are
+not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
+in every received notification.
+
+Note that covered subscriptions need an explicit list of `attrs` in `notification`. Thus, the following
+case is not valid:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+And if you try to create/update a subscription with that you will get a 400 Bad Request error like this:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
+
+
+[Top](#top)
+
 
 ## `timeout` subscriptions option
 
@@ -486,6 +709,9 @@ The following requests can use the forcedUpdate URI param option:
 * `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
 * `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
 * `PATCH /v2/entities/E/attrs?options=forcedUpdate`
+
+Check also the `entityChange` [alteration type](subscriptions_alttype.md) for the same effect,
+but applyed to the subscription, not matter if the update request included the `forcedUpdate` option or not.
 
 [Top](#top)
 

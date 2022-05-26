@@ -42,10 +42,13 @@
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
+#include "mongoBackend/location.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/dbFieldEncoding.h"
+
+#include "mongoDriver/safeMongo.h"
 
 
 
@@ -500,6 +503,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
@@ -534,6 +538,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
   typeGiven             = false;
+  onlyValue             = false;
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
@@ -549,8 +554,15 @@ ContextAttribute::ContextAttribute
 /* ****************************************************************************
 *
 * ContextAttribute::getLocation() -
+*
+* First argument in the attrs object from the DB, in order to search for ignoreType
+* attribute. Note this parameter is NULL is some of the following situations:
+*
+* - At entity creation time (as there is not attrs object in that case)
+* - If overrideMetadata option is used (as in this case existing medatada are goint to be deleted and
+*   doesn't count for looking ignoreTYpe)
 */
-std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
+std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const
 {
   if (apiVersion == V1)
   {
@@ -576,6 +588,50 @@ std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
     // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
     if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
     {
+      // First lookup in the metadata included in the request
+      if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
+      {
+        return hasIgnoreType() ? "" : LOCATION_WGS84;
+      }
+
+      // If ignoreType has not yet found, second lookup in the existing metadata attributes
+      // (if attrP is not NULL and metadata array exists)
+      if (attrsP != NULL)
+      {
+        std::string effectiveName = dbEncode(name);
+        if (attrsP->hasField(effectiveName))
+        {
+          orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
+          if (attr.hasField(ENT_ATTRS_MD))
+          {
+            // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+            // or can be simplified
+            orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+            std::set<std::string>  mdsSet;
+
+            md.getFieldNames(&mdsSet);
+
+            for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
+            {
+              std::string  mdName = *i;
+              if (mdName == NGSI_MD_IGNORE_TYPE)
+              {
+                orion::BSONObj mdItem = getObjectFieldF(md, mdName);
+                orion::BSONElement mdValue = getFieldF(mdItem, ENT_ATTRS_MD_VALUE);
+                if ((mdValue.type() == orion::Bool) && (mdValue.Bool() == true))
+                {
+                  return "";
+                }
+                else  // false or not a boolean
+                {
+                  return LOCATION_WGS84;
+                }
+              }
+            }
+          }
+        }
+      }
+
       return LOCATION_WGS84;
     }
   }
@@ -893,7 +949,18 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   if (compoundValueP != NULL)
   {
-    jh.addRaw("value", compoundValueP->toJson());
+    orion::CompoundValueNode* childToRenderP = compoundValueP;
+    if ((type == GEO_JSON) && (!hasIgnoreType()))
+    {
+      childToRenderP = getGeometry(compoundValueP);
+    }
+
+    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
+    // of DB entities) may lead to NULL, so the check is needed
+    if (childToRenderP != NULL)
+    {
+      jh.addRaw("value", childToRenderP->toJson());
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -1106,7 +1173,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
@@ -1118,20 +1185,20 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion, name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
@@ -1139,13 +1206,13 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
   if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";
   }
 
@@ -1158,7 +1225,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   {
     if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";
     }
   }
@@ -1306,4 +1373,30 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
   }
 
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::hasIgnoreType -
+*/
+bool ContextAttribute::hasIgnoreType(void) const
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+  {
+    if (metadataVector[ix]->name == NGSI_MD_IGNORE_TYPE)
+    {
+      if ((metadataVector[ix]->valueType == orion::ValueTypeBoolean) && (metadataVector[ix]->boolValue == true))
+      {
+        return true;
+      }
+      else  // false or not a boolean
+      {
+        return false;
+      }
+    }
+  }
+
+  return false;
 }

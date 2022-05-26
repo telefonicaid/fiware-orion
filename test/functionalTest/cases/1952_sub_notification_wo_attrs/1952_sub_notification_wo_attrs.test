@@ -90,7 +90,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 428
+Content-Length: 444
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -101,6 +101,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },

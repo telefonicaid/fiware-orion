@@ -75,6 +75,7 @@ void Notifier::sendNotifyContextRequest
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsFilter,
     bool                             blacklist,
+    bool                             covered,
     const std::vector<std::string>&  metadataFilter
 )
 {
@@ -90,6 +91,7 @@ void Notifier::sendNotifyContextRequest
                                                                           renderFormat,
                                                                           attrsFilter,
                                                                           blacklist,
+                                                                          covered,
                                                                           metadataFilter);
 
   if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
@@ -163,7 +165,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else  // MqttNotification
     {
-      // Verb/methodd is irrelevant in this case
+      // Verb/method is irrelevant in this case
       method = verbName(NOVERB);
     }
 
@@ -276,6 +278,11 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
           continue;
         }
 
+        // Decode header value
+        char* pvalue = curl_unescape(value.c_str(), value.length());
+        value        = std::string(pvalue);
+        curl_free(pvalue);
+
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         headers[key] = value;
       }
@@ -386,6 +393,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
+  bool                             covered,
   const std::vector<std::string>&  metadataFilter
 )
 {

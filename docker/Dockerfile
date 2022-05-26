@@ -1,4 +1,4 @@
-# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -19,8 +19,8 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=centos8.4.2105
-FROM centos:${IMAGE_TAG}
+ARG  IMAGE_TAG=11.2-slim
+FROM debian:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
 ARG GITHUB_REPOSITORY=fiware-orion
@@ -29,7 +29,7 @@ ARG GIT_NAME
 ARG GIT_REV_ORION
 ARG CLEAN_DEV_TOOLS
 
-ENV ORION_USER orion
+ENV ORION_USER ${ORION_USER:-orion}
 ENV GIT_NAME ${GIT_NAME:-telefonicaid}
 ENV GIT_REV_ORION ${GIT_REV_ORION:-master}
 ENV CLEAN_DEV_TOOLS ${CLEAN_DEV_TOOLS:-1}
@@ -39,25 +39,25 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /opt
 
 RUN \
-    adduser --comment "${ORION_USER}" ${ORION_USER} && \
+    # Install security updates
+    apt-get -y update && \
+    apt-get -y upgrade && \
     # Install dependencies
-    yum -y install epel-release && \
-    yum -y install \
-      boost-devel \
-      bzip2 \
+    apt-get -y install \
+      curl \
       cmake \
-      gnutls-devel \
-      libgcrypt-devel \
-      libcurl-devel \
-      openssl-devel \
-      libuuid-devel \
-      make \
-      nc \
+      libssl-dev \
       git \
-      gcc-c++ \
-      tar \
-      which \
-      cyrus-sasl-devel && \
+      g++ \
+      libcurl4-openssl-dev \
+      libboost-dev \
+      libboost-regex-dev \
+      libboost-filesystem-dev \
+      libboost-thread-dev \
+      uuid-dev \
+      libgnutls28-dev \
+      libsasl2-dev \
+      libgcrypt-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
@@ -94,6 +94,7 @@ RUN \
     tar xfz v1.1.0.tar.gz && \
     mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include && \
     # Install orion from source
+    adduser ${ORION_USER} && \
     cd /opt && \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
@@ -106,8 +107,11 @@ RUN \
     mkdir -p /var/run/contextBroker && \
     chown ${ORION_USER} /var/run/contextBroker && \
     cd /opt && \
-    if [ ${CLEAN_DEV_TOOLS} -eq 0 ] ; then yum clean all && exit 0 ; fi && \
-    # cleanup sources, dev tools, locales and yum cache to reduce the final image size
+    apt-get clean && \
+    if [ ${CLEAN_DEV_TOOLS} -eq 0 ] ; then exit 0 ; fi && \
+    # cleanup sources, dev tools and locales to reduce the final image size
+    # FIXME: this could need more tunning. Have a look to old CentOS Docerkile and try to
+    # reproduce the same steps
     rm -rf /opt/libmicrohttpd-0.9.70.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
@@ -121,52 +125,28 @@ RUN \
            /opt/rapidjson-1.1.0 \
            /opt/v1.1.0.tar.gz \
            /usr/local/include/rapidjson \
-           /opt/fiware-orion \
-           # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.
-           # This cannot be removed using yum as yum uses hard dependencies and doing so will 
-           # uninstall essential packages
-           /usr/share/cracklib \
-           # We don't need glibc locale data. This cannot be removed using yum as yum uses hard 
-           # dependencies and doing so will uninstall essential packages
-           /usr/share/i18n /usr/{lib,lib64}/gconv \
-           && \
-    # FIXME: this yum erase probably needs more tunning. It is based in a CentOS 7 version,
-    # removing libarchive and mpfr from the list, as they were causing problems
-    # (removal of protected packages dnf and systemd) and many others resulting in
-    # "No match for argument". See Dockerfile for 2.6.0 if needed to see how this was before
-    yum -y erase git perl* \
-        cmake \
-        gcc-c++ cpp gcc glibc-devel glibc-headers \
-        kernel-headers libgomp libstdc++-devel \
-        boost-devel libcurl-devel gnutls-devel libgcrypt-devel \
-        boost-wave boost-serialization \
-        boost-iostreams boost boost-date-time \
-        boost-test boost-graph boost-signals \
-        boost-program-options boost-math \
-        openssh openssh-clients libedit *devel \
-        && \
-    # FIXME: the above yum erase is removing 3 dependencies needed by contextBroker. Probably
-    # some of the boost-* is indirectly removing it, but I don't know which one so I'm reinstalling here
-    yum -y install \
-        boost-thread \
-        boost-filesystem \
-        boost-regex \
-        && \
-    # Erase without dependencies of the document formatting system (man). This cannot be removed using yum 
-    # as yum uses hard dependencies and doing so will uninstall essential packages
-    rpm -qa groff | xargs -r rpm -e --nodeps && \
-    # Clean yum data
-    yum clean all && rm -rf /var/lib/yum/yumdb && rm -rf /var/lib/yum/history && \
-    # Rebuild rpm data files. FIXME: disabled step, doesn't work in CentOS8 ?
-    # check https://github.com/telefonicaid/fiware-cygnus/issues/2113 (seems to be the same problem)
-    #rm -f /var/lib/rpm/__db* && rpm -vv --rebuilddb && \
-    # Delete unused locales. Only preserve en_US and the locale aliases
-    find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US' ! -name 'locale.alias' | xargs -r rm -r && \
-    bash -c 'localedef --list-archive | grep -v -e "en_US" | xargs localedef --delete-from-archive' && \
-    # We use cp instead of mv as to refresh locale changes for ssh connections. We use /bin/cp instead of 
-    # cp to avoid any alias substitution, which in some cases has been problematic
-    /bin/cp -f /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl && \
-    build-locale-archive && \
+           /opt/fiware-orion && \
+    # remove the same packages we installed at the beginning to build Orion
+    apt-get -y remove --purge \
+      cmake \
+      libssl-dev \
+      git \
+      g++ \
+      libcurl4-openssl-dev \
+      libboost-dev \
+      libboost-regex-dev \
+      libboost-filesystem-dev \
+      libboost-thread-dev \
+      uuid-dev \
+      libgnutls28-dev \
+      libsasl2-dev \
+      libgcrypt-dev && \
+    apt-get -y autoremove --purge && \
+    # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
+    apt-get -y install \
+        libicu67 \
+        libcurl4 \
+        libboost-thread1.74.0 && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log
 
@@ -189,3 +169,8 @@ LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${G
 RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
     && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
 USER nobody
+
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s \
+            # Note we cannot use GET /version for healthchecking as that operation is working even in the case
+            # the database is down. In this sense, GET /v2/entities is better, as it touches database
+            CMD curl --fail -X GET http://localhost:1026/v2/entities?limit=1 || exit 1

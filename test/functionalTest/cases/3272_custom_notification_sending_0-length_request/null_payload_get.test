@@ -186,7 +186,7 @@ Date: REGEX(.*)
 05. GET /v2/subscription and see the 3 subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1016
+Content-Length: 1080
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,6 +197,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "payload": "abc",
                 "url": "http://localhost:9997/notify"
@@ -220,6 +221,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "url": "http://localhost:9997/notify"
             },
@@ -242,6 +244,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "payload": null,
                 "url": "http://localhost:9997/notify"
@@ -265,6 +268,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "url": "http://localhost:9997/notify"
             },
