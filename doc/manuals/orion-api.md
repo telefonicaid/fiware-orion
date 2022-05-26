@@ -32,50 +32,48 @@
     - [Custom Notifications](#custom-notifications)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
-- [Group Entities](#group-entities)
-        - [List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]](#list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby)
-        - [Create Entity [POST /v2/entities{?options}]](#create-entity-post-v2entitiesoptions)
-    - [Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]](#entity-by-id-v2entitiesentityidtypeattrsoptions)
-        - [Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]](#retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions)
-        - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]](#retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions)
-        - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]](#update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions)
-        - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]](#update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions)
-        - [Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]](#replace-all-entity-attributes-put-v2entitiesentityidattrstypeoptions)
-        - [Remove Entity [DELETE /v2/entities/{entityId}{?type}]](#remove-entity-delete-v2entitiesentityidtype)
-- [Group Attributes](#group-attributes)
-    - [Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]](#attribute-by-entity-id-v2entitiesentityidattrsattrnametype)
-        - [Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]](#get-attribute-data-get-v2entitiesentityidattrsattrnametypemetadata)
-        - [Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]](#update-attribute-data-put-v2entitiesentityidattrsattrnametype)
-        - [Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrnametype)
-- [Group Attribute Value](#group-attribute-value)
-    - [By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]](#by-entity-id-v2entitiesentityidattrsattrnamevaluetype)
-        - [Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevaluetype)
-        - [Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevaluetype)
-- [Group Types](#group-types)
-    - [Entity types [/v2/types{?limit,offset,options}]](#entity-types-v2typeslimitoffsetoptions)
-        - [List Entity Types [GET /v2/types/{?limit,offset,options}]](#list-entity-types-get-v2typeslimitoffsetoptions)
-    - [Entity type [/v2/types/{entityType}]](#entity-type-v2typesentitytype)
-        - [Retrieve entity type [GET /v2/types/{entityType}]](#retrieve-entity-type-get-v2typesentitytype)
-- [Group Subscriptions](#group-subscriptions)
-    - [Subscription List [/v2/subscriptions]](#subscription-list-v2subscriptions)
-        - [List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]](#list-subscriptions-get-v2subscriptionslimitoffsetoptions)
-        - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
-    - [Subscription By ID [/v2/subscriptions/{subscriptionId}]](#subscription-by-id-v2subscriptionssubscriptionid)
-        - [Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
-        - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
-        - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
-- [Group Registrations](#group-registrations)
-    - [Registration list [/v2/registrations]](#registration-list-v2registrations)
-        - [List Registrations [GET /v2/registrations{?limit,offset,options}]](#list-registrations-get-v2registrationslimitoffsetoptions)
-        - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
-    - [Registration By ID [/v2/registrations/{registrationId}]](#registration-by-id-v2registrationsregistrationid)
-        - [Retrieve Registration [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
-        - [Update Registration [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
-        - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
-- [Group Batch Operations](#group-batch-operations)
-        - [Update [POST /v2/op/update]](#update-post-v2opupdate)
-        - [Query [POST /v2/op/query{?limit,offset,options}]](#query-post-v2opquerylimitoffsetoptions)
-        - [Notify [POST /v2/op/notify{?options}]](#notify-post-v2opnotifyoptions)
+- [API Routes](#api-routes)
+    - [Entities Operations](#entities-operations)
+        - [Entities List](#entities-list)
+            - [List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]](#list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby)
+            - [Create Entity [POST /v2/entities{?options}]](#create-entity-post-v2entitiesoptions)
+        - [Entity by ID](#entity-by-id)
+            - [Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]](#retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions)
+            - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]](#retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions)
+            - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]](#update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions)
+            - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]](#update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions)
+            - [Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]](#replace-all-entity-attributes-put-v2entitiesentityidattrstypeoptions)
+            - [Remove Entity [DELETE /v2/entities/{entityId}{?type}]](#remove-entity-delete-v2entitiesentityidtype)
+        - [Attributes](#attributes)
+            - [Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]](#get-attribute-data-get-v2entitiesentityidattrsattrnametypemetadata)
+            - [Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]](#update-attribute-data-put-v2entitiesentityidattrsattrnametype)
+            - [Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrnametype)
+        - [Attribute Value](#attribute-value)
+            - [Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevaluetype)
+            - [Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevaluetype)
+        - [Types](#types)
+            - [List Entity Types [GET /v2/types/{?limit,offset,options}]](#list-entity-types-get-v2typeslimitoffsetoptions)
+            - [Retrieve entity information for a given type [GET /v2/types/{entityType}]](#retrieve-entity-information-for-a-given-type-get-v2typesentitytype)
+    - [Subscriptions Operations](#subscriptions-operations)
+        - [Subscription List](#subscription-list)
+            - [List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]](#list-subscriptions-get-v2subscriptionslimitoffsetoptions)
+            - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
+        - [Subscription By ID](#subscription-by-id)
+            - [Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
+            - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
+            - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
+    - [Registration Operations](#registration-operations)
+        - [Registration list](#registration-list)
+            - [List Registrations [GET /v2/registrations{?limit,offset,options}]](#list-registrations-get-v2registrationslimitoffsetoptions)
+            - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
+        - [Registration By ID](#registration-by-id)
+            - [Retrieve Registration [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
+            - [Update Registration [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
+            - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
+    - [Batch Operations](#batch-operations)
+            - [Update [POST /v2/op/update]](#update-post-v2opupdate)
+            - [Query [POST /v2/op/query{?limit,offset,options}]](#query-post-v2opquerylimitoffsetoptions)
+            - [Notify [POST /v2/op/notify{?options}]](#notify-post-v2opnotifyoptions)
 
 <!-- /TOC -->
 
@@ -977,9 +975,13 @@ to keep your client decoupled from implementation details.
         + registrations_url: /v2/registrations (required, string) - URL which points to the
           registrations resource
 
-# Group Entities
+# API Routes
 
-### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+## Entities Operations
+
+### Entities List
+
+#### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
@@ -1099,7 +1101,7 @@ Response code:
          }
         ]
 
-### Create Entity [POST /v2/entities{?options}]
+#### Create Entity [POST /v2/entities{?options}]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
@@ -1155,9 +1157,9 @@ Response:
             Location: /v2/entities/Bcn-Welt?type=Room
 
 
-## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
+### Entity by ID
 
-### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+#### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1217,7 +1219,7 @@ Response:
           }
         }
 
-### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+#### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1278,7 +1280,7 @@ Response:
           }
         }
 
-### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
+#### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1321,7 +1323,7 @@ Response:
 
 + Response 204
 
-### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+#### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1358,7 +1360,7 @@ Response:
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
+#### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" above), except
@@ -1395,7 +1397,7 @@ Response:
 
 + Response 204
 
-### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
+#### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
 
 Delete the entity.
 
@@ -1413,11 +1415,9 @@ Response:
 + Response 204
 
 
-# Group Attributes
+### Attributes
 
-## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
-
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
+#### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
@@ -1444,7 +1444,7 @@ Response:
           "metadata": {}
         }
 
-### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+#### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -1476,7 +1476,7 @@ Response:
 + Response 200
 
 
-### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Removes an entity attribute.
 
@@ -1495,11 +1495,9 @@ Response:
 + Response 204
 
 
-# Group Attribute Value
+### Attribute Value
 
-## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
-
-### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+#### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -1534,7 +1532,7 @@ Response:
           "country": "Spain"
         }
 
-### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+#### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 The request payload is the new attribute value.
 
@@ -1575,11 +1573,9 @@ Response:
 
 + Response 200
 
-# Group Types
+### Types
 
-## Entity types [/v2/types{?limit,offset,options}]
-
-### List Entity Types [GET /v2/types/{?limit,offset,options}]
+#### List Entity Types [GET /v2/types/{?limit,offset,options}]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1646,9 +1642,7 @@ Response code:
           }
         ]
 
-## Entity type [/v2/types/{entityType}]
-
-### Retrieve entity type [GET /v2/types/{entityType}]
+#### Retrieve entity information for a given type [GET /v2/types/{entityType}]
 
 This operation returns a JSON object with information about the type:
 
@@ -1684,7 +1678,7 @@ Response code:
             "count": 7
           }
 
-# Group Subscriptions
+## Subscriptions Operations
 
 A subscription is represented by a JSON object with the following fields:
 
@@ -1773,9 +1767,9 @@ Notification rules are as follow:
 * If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
   attributes of the entity changes.
 
-## Subscription List [/v2/subscriptions]
+### Subscription List
 
-### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
+#### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1836,7 +1830,7 @@ Response:
         ]
 
 
-### Create Subscription [POST /v2/subscriptions]
+#### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
@@ -1882,9 +1876,9 @@ Response:
             Location: /v2/subscriptions/abcde98765
 
 
-## Subscription By ID [/v2/subscriptions/{subscriptionId}]
+### Subscription By ID
 
-### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
+#### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
@@ -1932,7 +1926,7 @@ Response:
         }
 
 
-### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
+#### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
 
@@ -1953,7 +1947,7 @@ Response:
 
 + Response 204
 
-### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
+#### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
 
 Cancels subscription.
 
@@ -1968,7 +1962,7 @@ Response:
 
 + Response 204
 
-# Group Registrations
+## Registration Operations
 
 A Context Registration allows to bind external context information sources so that they can
 play the role of providers
@@ -2036,9 +2030,9 @@ Not present if registration has never had a problem with forwarding.
 + `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
 Not present if registration has never had a successful notification.
 
-## Registration list [/v2/registrations]
+### Registration list
 
-### List Registrations [GET /v2/registrations{?limit,offset,options}]
+#### List Registrations [GET /v2/registrations{?limit,offset,options}]
 
 Lists all the context provider registrations present in the system.
 
@@ -2090,7 +2084,7 @@ Response:
           }
         ]
 
-### Create Registration [POST /v2/registrations]
+#### Create Registration [POST /v2/registrations]
 
 Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
@@ -2130,9 +2124,9 @@ Response:
 
             Location: /v2/registrations/abcde98765
 
-## Registration By ID [/v2/registrations/{registrationId}]
+### Registration By ID
 
-### Retrieve Registration [GET /v2/registrations/{registrationId}]
+#### Retrieve Registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
@@ -2178,7 +2172,7 @@ Response:
             }
       }      
 
-### Update Registration [PATCH /v2/registrations/{registrationId}]
+#### Update Registration [PATCH /v2/registrations/{registrationId}]
 
 Only the fields included in the request are updated in the registration.
 
@@ -2199,7 +2193,7 @@ Response:
 
 + Response 204
 
-### Delete Registration [DELETE /v2/registrations/{registrationId}]
+#### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
 Cancels a context provider registration.
 
@@ -2214,9 +2208,9 @@ Response:
 
 + Response 204
 
-# Group Batch Operations
+## Batch Operations
 
-### Update [POST /v2/op/update]
+#### Update [POST /v2/op/update]
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
 The payload is an object with two properties:
@@ -2283,7 +2277,7 @@ Response:
 + Response 204
 
 
-### Query [POST /v2/op/query{?limit,offset,options}]
+#### Query [POST /v2/op/query{?limit,offset,options}]
 
 The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
 no entities are found. The entities follow the JSON entity representation format
@@ -2387,7 +2381,7 @@ Response code:
         ]
 
 
-### Notify [POST /v2/op/notify{?options}]
+#### Notify [POST /v2/op/notify{?options}]
 
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
 This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
