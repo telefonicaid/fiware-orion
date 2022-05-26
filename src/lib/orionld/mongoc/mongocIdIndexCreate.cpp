@@ -77,5 +77,11 @@ bool mongocIdIndexCreate(OrionldTenant* tenantP)
     return false;
   }
 
+  bson_destroy(&key);
+  bson_free(indexName);
+  bson_destroy(createIndexCommand);
+  mongoc_database_destroy(dbP);
+  bson_destroy(&reply);
+
   return true;
 }

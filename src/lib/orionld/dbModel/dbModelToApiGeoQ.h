@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIGEOQ_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIGEOQ_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,16 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "apiTypesV2/Subscription.h"                             // Subscription
-#include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromSubscription -
+// dbModelToApiGeoQ -
 //
-extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription*  cSubP, OrionldContext* contextP);
+extern bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIGEOQ_H_

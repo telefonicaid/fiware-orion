@@ -86,6 +86,7 @@ echo
 
 echo "03. Query CP1 for Ei - see the same entity as in CB"
 echo "==================================================="
+valgrindSleep 3
 orionCurl --url /ngsi-ld/v1/entities?type=T1 --port $CP1_PORT
 echo
 echo
@@ -103,6 +104,7 @@ echo
 
 echo "05. Query CP1 for Ei - see the change propagated"
 echo "================================================"
+valgrindSleep 3
 orionCurl --url /ngsi-ld/v1/entities?type=T1 --port $CP1_PORT
 echo
 echo

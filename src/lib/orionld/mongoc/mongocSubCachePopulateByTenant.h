@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCSUBCACHEPOPULATEBYTENANT_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCSUBCACHEPOPULATEBYTENANT_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,16 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "apiTypesV2/Subscription.h"                             // Subscription
-#include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromSubscription -
+// mongocSubCachePopulateByTenant -
 //
-extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscription*  cSubP, OrionldContext* contextP);
+extern bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCSUBCACHEPOPULATEBYTENANT_H_

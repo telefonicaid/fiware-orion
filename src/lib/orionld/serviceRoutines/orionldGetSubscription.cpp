@@ -68,10 +68,10 @@ bool orionldGetSubscription(void)
     orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
     return false;
   }
-  LM_TMP(("KZ: sub ldQ: '%s'", subscription.ldQ));
+
   // Transform to KjNode tree
   orionldState.httpStatusCode = SccOk;
-  orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP);
+  orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP, orionldState.contextP);
 
   return true;
 }

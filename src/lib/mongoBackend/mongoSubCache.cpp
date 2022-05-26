@@ -45,11 +45,6 @@ extern "C"
 #include "cache/subCache.h"
 
 #include "orionld/common/orionldState.h"                       // orionldState
-
-#include "orionld/q/qLex.h"                                    // qLex
-#include "orionld/q/qParse.h"                                  // qParse
-#include "orionld/q/qPresent.h"                                // qPresent
-#include "orionld/q/qRelease.h"                                // qListRelease
 #include "orionld/common/urlDecode.h"                          // urlDecode
 #include "orionld/common/urlParse.h"                           // urlParse
 

@@ -193,7 +193,6 @@ SET (ORION_LIBS
     orionld_contextCache
     orionld_notifications
     orionld_db
-    orionld_dbModel
     orionld_mongoc
     orionld_mongoCppLegacy
     orionld_db
@@ -201,6 +200,7 @@ SET (ORION_LIBS
     orionld_mongoCppLegacy
     orionld_socketService
     orionld_troe
+    orionld_dbModel
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
@@ -223,6 +223,8 @@ SET (ORION_LIBS
     orionld_types
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     orionld_q
+    orionld_mongoc       # subCache needs mongoc
+    orionld_dbModel
     parse
     apiTypesV2
     orionTypes

@@ -76,14 +76,21 @@ bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
   bson_error_t  mcError;
   bson_t        reply;
 
+  bson_init(&reply);
+
   mongocConnectionGet();
-  if (mongoc_database_write_command_with_opts(dbP, createIndexCommand, NULL, &reply, &mcError) == false)
-  {
+  bool r = mongoc_database_write_command_with_opts(dbP, createIndexCommand, NULL, &reply, &mcError);
+
+  if (r == true)
+    dbGeoIndexAdd(tenantP->tenant, eqName);
+  else
     LM_E(("Database Error (error creating 2dsphere index for attribute '%s' for db '%s': %s)", eqName, tenantP->mongoDbName, mcError.message));
-    return false;
-  }
 
-  dbGeoIndexAdd(tenantP->tenant, eqName);
+  bson_destroy(&key);
+  bson_free(indexName);
+  bson_destroy(createIndexCommand);
+  mongoc_database_destroy(dbP);
+  bson_destroy(&reply);
 
-  return true;
+  return r;
 }

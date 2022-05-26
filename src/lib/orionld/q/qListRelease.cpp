@@ -27,44 +27,33 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/q/qRelease.h"                                // Own interface
+#include "orionld/q/qListRelease.h"                            // Own interface
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// qRelease -
+// qListRelease -
 //
-void qRelease(QNode* qP)
+void qListRelease(QNode* qP)
 {
-  if ((qP->type == QNodeAnd)        ||
-      (qP->type == QNodeOr)         ||
-      (qP->type == QNodeExists)     ||
-      (qP->type == QNodeNotExists)  ||
-      (qP->type == QNodeEQ)         ||
-      (qP->type == QNodeNE)         ||
-      (qP->type == QNodeGE)         ||
-      (qP->type == QNodeGT)         ||
-      (qP->type == QNodeLE)         ||
-      (qP->type == QNodeLT))
+  while (qP != NULL)
   {
-    QNode* childP = qP->value.children;
-    while (childP != NULL)
+    QNode* next = qP->next;
+
+    if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
     {
-      QNode* next = childP->next;
-      qRelease(childP);
-      childP = next;
+      LM_TMP(("LEAK: NOT Releasing Variable '%s' at %p", qP->value.v, qP->value.v));
+      // free(qP->value.v);
     }
-  }
-  else if ((qP->type == QNodeMatch) || (qP->type == QNodeNoMatch))
-  {
-    // regfree(qP->value.regex);
-  }
+    else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
+    {
+      LM_TMP(("LEAK: Releasing String value '%s' at %p", qP->value.s, qP->value.s));
+      free(qP->value.s);
+    }
 
-  if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
-    free(qP->value.v);
-  else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
-    free(qP->value.v);
+    free(qP);
 
-  free(qP);
+    qP = next;
+  }
 }

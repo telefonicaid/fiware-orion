@@ -229,10 +229,10 @@ static bool patchApply
     }
     else if (tree->type == KjObject)
     {
-      bson_init(&compound);
       LM_TMP(("LEAK: Creating an object at %p", &compound));
       mongocKjTreeToBson(tree, &compound);
       bson_append_document(setP, path, -1, &compound);
+      bson_destroy(&compound);
     }
   }
 
