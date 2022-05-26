@@ -170,3 +170,6 @@ LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${G
 RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
     && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
 USER nobody
+
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s \
+            CMD curl --fail -X GET http://localhost:1026/version || exit 1
