@@ -476,9 +476,9 @@ bye
 
 13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
 ==========================================================================================================================
-MongoDB shell version v4.4.14
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.14
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subs:S3",
 	"entities" : [
