@@ -90,7 +90,7 @@ void mongocSubCountersUpdate
   else
   {
     bson_oid_t oid;
-    bson_oid_init_from_string (&oid, cSubP->subscriptionId);
+    bson_oid_init_from_string(&oid, cSubP->subscriptionId);
     bson_append_oid(&selector, "_id", 3, &oid);
   }
 
