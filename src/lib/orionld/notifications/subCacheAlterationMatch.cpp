@@ -211,6 +211,12 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
   if (altP->alteredAttributes == 0)  // E.g. complete replace of an entity - treating it as EntityModified (for now)
   {
+    //
+    // FIXME: what if an Entity is created with a single attribute P1, and there is a subscription with a "watchedAttributes": [ "P2" ]
+    //        should a notification be sent or not?
+    //        I just brouight this doubt to ETSI ISG CIM (2022-05-27)
+    //
+    LM_TMP(("SC: Altered Attributes == 0"));
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[EntityModified] == true)
     {

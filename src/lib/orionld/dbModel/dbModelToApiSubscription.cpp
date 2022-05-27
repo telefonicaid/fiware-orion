@@ -165,6 +165,24 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   dbSubIdP->name = (char*) "id";
   kjChildAdd(apiSubP, dbSubIdP);
 
+  //
+  // If dbSubIdP is a JSON Object, it's an NGSIv2 subscription and its "id" looks like this:
+  //   "id": { "$oid": "6290eafec8112b5716a931a7" }
+  //
+  // We need to extract "6290eafec8112b5716a931a7" and make dbSubIdP a KjString
+  //
+  if (dbSubIdP->type == KjObject)
+  {
+    KjNode* oidP = kjLookup(dbSubIdP, "$oid");
+
+    if ((oidP == NULL) || (oidP->type != KjString))
+      LM_RE(NULL, ("Un able to retrieve the subscription ID from what seems to be an NGSIv2 subscription"));
+
+    dbSubIdP->type      = KjString;
+    dbSubIdP->lastChild = NULL;
+    dbSubIdP->value.s   = oidP->value.s;
+  }
+
   // tenant?
   KjNode* tenantP = kjString(orionldState.kjsonP, "tenant", tenant);
   kjChildAdd(apiSubP, tenantP);

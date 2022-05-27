@@ -33,4 +33,5 @@
 * Issue #280   Using the tenant list when populating the subscription cache instead of querying the database (less Mongo C++ Legacy driver usage)
 * Issue #280   GET /subscriptions/{subId} now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
 * Issue #280   GET /subscriptions now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
-* Issue #280   Subscription Cache now uses mongoc and not the old legacy driver
+* Issue #280   Subscription Cache now uses mongoc and not the old legacy driver (-experimental)
+* Issue #280   Subscription Cache Counters are now updated using mongoc and not the old legacy driver (-experimental)

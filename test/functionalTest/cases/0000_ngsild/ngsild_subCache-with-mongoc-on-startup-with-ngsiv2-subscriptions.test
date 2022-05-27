@@ -1,0 +1,290 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create an MHSIv2 subscription and then kill the broker. Get the subscription from sub-cache once up again
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create an NGSIv2 subscription S1
+# 02. See the subscription in mongo
+# 03. Restart the broker
+# 04. See the subscription in mongo
+# 05. GET ALL subscriptions - from cache
+# 06. GET ALL subscriptions - from DB
+#
+
+
+echo "01. Create an NGSIv2 subscription S1"
+echo "===================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ "A" ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+        "attrs": [ ]
+    },
+    "description": "S1",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. Restart the broker"
+echo "======================"
+brokerStop CB
+brokerStart CB 0 IPv4 -experimental
+sleep 1
+echo Orion-LD has been restarted
+echo
+echo
+
+
+echo "04. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "05. GET ALL subscriptions - from cache"
+echo "======================================"
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "06. GET ALL subscriptions - from DB"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions?options=fromDb
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an NGSIv2 subscription S1
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : REGEX(.*),
+	"expiration" : REGEX(.*),
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"A"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+03. Restart the broker
+======================
+Orion-LD has been restarted
+
+
+04. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : REGEX(.*),
+	"expiration" : REGEX(.*),
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"A"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+05. GET ALL subscriptions - from cache
+======================================
+HTTP/1.1 200 OK
+Content-Length: 359
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "description": "S1",
+        "entities": [
+            {
+                "id": ".*",
+                "type": "T"
+            }
+        ],
+        "expiresAt": "2050-04-05T14:00:00.000Z",
+        "id": "REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "A"
+        ]
+    }
+]
+
+
+06. GET ALL subscriptions - from DB
+===================================
+HTTP/1.1 200 OK
+Content-Length: 352
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "description": "S1",
+        "entities": [
+            {
+                "type": "T"
+            }
+        ],
+        "expiresAt": "2050-04-05T14:00:00.000Z",
+        "id": "REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "database",
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "A"
+        ]
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,0 +1,524 @@
+z# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sub Cache with mongoc - testing counters for 3 subscriptions after a sub-cache refresh
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -subCacheIval 5
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 - for the accumulator
+# 02. Create a subscription S2 - for nowhere
+# 03. Create a subscription S3 - for the accumulator
+# 04. See S1 in the database
+# 05. See S2 in the database
+# 06. See S3 in the database
+# 07. Create an entity matching S1 and S2 but not S3
+# 08. Dump accumulator to see notification for S1
+# 09. Wait 5 seconds, to give the broker time to refresh its sub cache
+# 10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }
+# 11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }
+# 13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+#
+
+echo "01. Create a subscription S1 - for the accumulator"
+echo "=================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": [ "P1", "P2" ],
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription S2 - for nowhere"
+echo "=========================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": [ "P1", "P2" ],
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://noip:5151/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a subscription S3 - for the accumulator"
+echo "=================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S3",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T2"
+    }
+  ],
+  "watchedAttributes": [ "P2", "P3" ],
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. See S1 in the database"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S1"})'
+echo
+echo
+
+
+echo "05. See S2 in the database"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S2"})'
+echo
+echo
+
+
+echo "06. See S3 in the database"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S3"})'
+echo
+echo
+
+
+echo "07. Create an entity matching S1 and S2 but not S3"
+echo "=================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P1": 7
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator to see notification for S1"
+echo "==============================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "09. Wait 5 seconds, to give the broker time to refresh its sub cache"
+echo "===================================================================="
+sleep 5
+echo slept 5
+echo
+echo
+
+
+echo "10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }"
+echo "===================================================================================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S1"})'
+echo
+echo
+
+
+echo "11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }"
+echo "===================================================================================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S2"})'
+echo
+echo
+
+
+echo "13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }"
+echo "=========================================================================================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S3"})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 - for the accumulator
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. Create a subscription S2 - for nowhere
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S2
+Date: REGEX(.*)
+
+
+
+03. Create a subscription S3 - for the accumulator
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S3
+Date: REGEX(.*)
+
+
+
+04. See S1 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+05. See S2 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S2",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "simplified",
+	"reference" : "http://noip:5151/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+06. See S3 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S3",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+07. Create an entity matching S1 and S2 but not S3
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+08. Dump accumulator to see notification for S1
+===============================================
+POST REGEX(.*)
+Content-Length: 224
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "P1": 7,
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+09. Wait 5 seconds, to give the broker time to refresh its sub cache
+====================================================================
+slept 5
+
+
+10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }
+====================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"count" : NumberLong(1),
+	"lastNotification" : REGEX(.*),
+	"lastSuccess" : REGEX(.*)
+}
+bye
+
+
+11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }
+====================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S2",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "simplified",
+	"reference" : "http://noip:5151/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"count" : NumberLong(1),
+	"lastFailure" : REGEX(.*),
+	"lastNotification" : REGEX(.*)
+}
+bye
+
+
+13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+==========================================================================================================================
+MongoDB shell version v4.4.14
+connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
+MongoDB server version: 4.4.14
+{
+	"_id" : "urn:ngsi-ld:subs:S3",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "simplified",
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"count" : NumberLong(0)
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
