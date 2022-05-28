@@ -368,9 +368,9 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::timesSent
   //
-  if (cSubP->count > 0)
+  if (cSubP->count + cSubP->dbCount > 0)
   {
-    nodeP = kjInteger(orionldState.kjsonP, "timesSent", cSubP->count);
+    nodeP = kjInteger(orionldState.kjsonP, "timesSent", cSubP->count + cSubP->dbCount);
     NULL_CHECK(nodeP);
     kjChildAdd(notificationNodeP, nodeP);
   }

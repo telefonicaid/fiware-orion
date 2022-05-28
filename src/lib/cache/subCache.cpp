@@ -1286,12 +1286,13 @@ void subCacheSync(void)
     CachedSubSaved* cssP       = new CachedSubSaved();
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
-    cssP->count                = cSubP->count;
+    cssP->count                = cSubP->count;       // This count is later pushed ($inc) to DB - needs to go to cache as well
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->ngsild               = (cSubP->ldContext != "")? true : false;
 
     savedSubV[cSubP->subscriptionId] = cssP;
+
     cSubP = cSubP->next;
   }
 
@@ -1361,9 +1362,13 @@ void subCacheSync(void)
                                cssP->ngsild);
       }
 
-      // Keeping lastFailure and lastSuccess in sub cache
-      cSubP->lastFailure = cssP->lastFailure;
-      cSubP->lastSuccess = cssP->lastSuccess;
+      // Timestamps are put back into sub cache
+      if (cssP->lastFailure          != 0) cSubP->lastFailure           = cssP->lastFailure;
+      if (cssP->lastSuccess          != 0) cSubP->lastSuccess           = cssP->lastSuccess;
+      if (cssP->lastNotificationTime != 0) cSubP->lastNotificationTime  = cssP->lastNotificationTime;
+
+      // Here the delta (just $inc'ed to DB) is also inc'ed to subCache
+      cSubP->dbCount += cssP->count;
     }
 
     cSubP = cSubP->next;

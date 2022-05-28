@@ -1,0 +1,302 @@
+z# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sub Cache with mongoc - testing timesSent for a subscription after a sub-cache refresh
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -subCacheIval 5
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription S1
+# 02. Create an entity matching S1 - notification
+# 03. Update the entity 5 times - 5 notifications => timesSent == 6 for S1
+# 04. GET S1 - see timesSent == 6
+# 05. Wait 5 seconds, to give the broker time to refresh its sub cache
+# 06. GET S1 - see timesSent == 6
+# 07. Update the entity 5 times - 5 notifications => timesSent == 11 for S1
+# 08. GET S1 - see timesSent == 11
+#
+
+echo "01. Create a subscription S1"
+echo "============================"
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity matching S1 - notification"
+echo "==============================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P1": 7
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update the entity 5 times - 5 notifications => timesSent == 6 for S1"
+echo "========================================================================"
+typeset -i loop
+loop=0
+while [ $loop -lt 5 ]
+do
+  payload='{
+    "P1": '$loop'
+  }'
+  orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+  loop=$loop+1
+done
+echo
+echo
+
+
+echo "04. GET S1 - see timesSent == 6"
+echo "==============================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "05. Wait 5 seconds, to give the broker time to refresh its sub cache"
+echo "===================================================================="
+sleep 5
+echo slept 5
+echo
+echo
+
+
+echo "06. GET S1 - see timesSent == 6"
+echo "==============================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "07. Update the entity 5 times - 5 notifications => timesSent == 11 for S1"
+echo "========================================================================="
+loop=7
+while [ $loop -lt 12 ]
+do
+  payload='{
+    "P1": '$loop'
+  }'
+  orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -X PATCH --payload "$payload"
+  loop=$loop+1
+done
+echo
+echo
+
+
+echo "08. GET S1 - see timesSent == 11"
+echo "================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. Create an entity matching S1 - notification
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+03. Update the entity 5 times - 5 notifications => timesSent == 6 for S1
+========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. GET S1 - see timesSent == 6
+===============================
+HTTP/1.1 200 OK
+Content-Length: 359
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 6
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+05. Wait 5 seconds, to give the broker time to refresh its sub cache
+====================================================================
+slept 5
+
+
+06. GET S1 - see timesSent == 6
+===============================
+HTTP/1.1 200 OK
+Content-Length: 359
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 6
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+07. Update the entity 5 times - 5 notifications => timesSent == 11 for S1
+=========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. GET S1 - see timesSent == 11
+================================
+HTTP/1.1 200 OK
+Content-Length: 360
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 11
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
