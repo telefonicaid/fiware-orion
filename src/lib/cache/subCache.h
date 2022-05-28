@@ -128,7 +128,8 @@ struct CachedSubscription
 
   bool                        isActive;
   std::string                 status;
-  int64_t                     count;
+  int64_t                     count;                 // delta count - since last sub cache refresh
+  int64_t                     dbCount;               // count taken from the database
   double                      lastNotificationTime;  // timestamp of last notification attempt
   double                      lastFailure;           // timestamp of last notification failure
   double                      lastSuccess;           // timestamp of last successful notification

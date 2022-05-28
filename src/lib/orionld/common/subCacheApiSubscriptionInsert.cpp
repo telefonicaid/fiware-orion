@@ -81,6 +81,7 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   KjNode* langP              = kjLookup(apiSubscriptionP, "lang");
   KjNode* createdAtP         = kjLookup(apiSubscriptionP, "createdAt");
   KjNode* modifiedAtP        = kjLookup(apiSubscriptionP, "modifiedAt");
+  KjNode* dbCountP           = kjLookup(apiSubscriptionP, "count");
 
   if (subscriptionIdP == NULL)
     subscriptionIdP = kjLookup(apiSubscriptionP, "id");
@@ -93,6 +94,11 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
 
   if (subscriptionNameP != NULL)
     cSubP->name = subscriptionNameP->value.s;
+
+  if (dbCountP != NULL)
+    cSubP->dbCount = dbCountP->value.i;
+  else
+    cSubP->dbCount = 0;
 
   if (descriptionP != NULL)
     cSubP->description = strdup(descriptionP->value.s);
