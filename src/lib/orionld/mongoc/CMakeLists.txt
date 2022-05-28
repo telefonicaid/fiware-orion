@@ -44,6 +44,7 @@ SET (SOURCES
     mongocGeoIndexCreate.cpp
     mongocIdIndexCreate.cpp
     mongocSubCachePopulateByTenant.cpp
+    mongocSubCountersUpdate.cpp
 )
 
 # Include directories

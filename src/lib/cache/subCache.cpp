@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/q/qBuild.h"                               // qBuild
 #include "orionld/q/qRelease.h"                             // qRelease
 #include "orionld/mongoc/mongocSubCachePopulateByTenant.h"  // mongocSubCachePopulateByTenant
+#include "orionld/mongoc/mongocSubCountersUpdate.h"         // mongocSubCountersUpdate
 #include "orionld/common/urlParse.h"                        // urlParse
 #include "orionld/context/orionldContextFromUrl.h"          // orionldContextFromUrl
 
@@ -1269,6 +1270,7 @@ void subCacheSync(void)
   //
   CachedSubscription* cSubP = subCache.head;
 
+  LM_TMP(("SC: Synchronizing the subscription cache"));
   while (cSubP != NULL)
   {
     //
@@ -1344,15 +1346,20 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
+      if (experimental == true)
+        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, cssP->ngsild);
+      else
+      {
+        std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
 
-      mongoSubCountersUpdate(tenant,
-                             cSubP->subscriptionId,
-                             cssP->count,
-                             cssP->lastNotificationTime,
-                             cssP->lastFailure,
-                             cssP->lastSuccess,
-                             cssP->ngsild);
+        mongoSubCountersUpdate(tenant,
+                               cSubP->subscriptionId,
+                               cssP->count,
+                               cssP->lastNotificationTime,
+                               cssP->lastFailure,
+                               cssP->lastSuccess,
+                               cssP->ngsild);
+      }
 
       // Keeping lastFailure and lastSuccess in sub cache
       cSubP->lastFailure = cssP->lastFailure;
@@ -1436,12 +1443,15 @@ extern bool noCache;
 * the consecutive number of notification errors for the subscription is incremented.
 *
 * If 'errors' == 0, then the subscription is marked as non-erroneous.
+*
+* This function is not used if "experimental" as it is only called from "old legacy code"
 */
 void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors, bool ngsild)
 {
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
+
     if (errors == 0)
       mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime, ngsild);  // lastFailure == -1
     else
@@ -1479,6 +1489,7 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
 */
 void subscriptionFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
 {
+  LM_TMP(("SC: Updating counters and timestamps after failed notification"));
   subP->lastNotificationTime  = timestamp;
   subP->lastFailure           = timestamp;
   subP->consecutiveErrors    += 1;
@@ -1491,6 +1502,7 @@ void subscriptionFailure(CachedSubscription* subP, const char* errorReason, doub
   {
     subP->isActive = false;
     subP->status   = "paused";
+    // FIXME: Write to DB !!!
   }
 
   // Write to DB ... ?
@@ -1504,6 +1516,7 @@ void subscriptionFailure(CachedSubscription* subP, const char* errorReason, doub
 */
 void subscriptionSuccess(CachedSubscription* subP, double timestamp)
 {
+  LM_TMP(("SC: Updating counters and timestamps after successful notification"));
   subP->lastSuccess           = timestamp;
   subP->lastNotificationTime  = timestamp;
   subP->consecutiveErrors     = 0;

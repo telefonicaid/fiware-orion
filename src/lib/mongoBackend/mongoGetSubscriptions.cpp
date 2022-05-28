@@ -251,7 +251,23 @@ static void setStatus(Subscription* s, const BSONObj& r)
 */
 static void setSubscriptionId(Subscription* s, const BSONObj* rP)
 {
-  s->id = getStringFieldF(rP, "_id");
+  //
+  // NGSI-LD sub ids are Strings
+  // NGSIv2 subs are OID
+  //
+  if (rP->hasField("_id") == false)
+  {
+    LM_E(("Runtime Error (field '_id' is missing in subscription"));
+    return;
+  }
+
+  mongo::BSONElement  bsonElement = rP->getField("_id");
+  mongo::BSONType     bsonType    = bsonElement.type();
+
+  if (bsonType == mongo::jstOID)
+    s->id = bsonElement.OID().toString();
+  else
+    s->id = bsonElement.String();
 }
 
 

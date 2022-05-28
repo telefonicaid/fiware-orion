@@ -1,0 +1,574 @@
+z# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sub Cache with mongoc - testing counters for 3 subscriptions after a sub-cache refresh
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -subCacheIval 5
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 - for the accumulator
+# 02. Create a subscription S2 - for nowhere
+# 03. Create a subscription S3- for the accumulator
+# 04. See S1 in the database
+# 05. See S2 in the database
+# 06. See S3 in the database
+# 07. Create an entity matching S1 and S2 but not S3
+# 08. Dump accumulator to see notification for S1
+# 09. Wait 5 seconds, to give the broker time to refresh its sub cache
+# 09. Send a ping, just to see the the broker is still alive
+# 10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }
+# 11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }
+# 13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+#
+
+echo "01. Create a subscription S1 - for the accumulator"
+echo "=================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ "A" ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+        "attrs": [ ]
+    },
+    "description": "S1",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription S2 - for nowhere"
+echo "=========================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ "A" ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://nowhere:1/notify"},
+        "attrs": [ ]
+    },
+    "description": "S2",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a subscription S3 - for the accumulator"
+echo "=================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ "B" ]
+         }
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+        "attrs": [ ]
+    },
+    "description": "S3",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. See S1 in the database"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.findOne({"description": "S1"})'
+echo
+echo
+
+
+echo "05. See S2 in the database"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.findOne({"description": "S2"})'
+echo
+echo
+
+
+echo "06. See S3 in the database"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.findOne({"description": "S3"})'
+echo
+echo
+
+
+echo "07. Create an entity matching S1 and S2 but not S3"
+echo "=================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": 7
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator to see notification for S1"
+echo "==============================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "09. Wait 5 seconds, to give the broker time to refresh its sub cache"
+echo "===================================================================="
+sleep 5
+echo slept 5
+echo
+echo
+
+
+echo "09. Send a ping, just to see the the broker is still alive"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/ex/v1/ping
+echo
+echo
+
+
+echo "10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }"
+echo "===================================================================================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"description": "S1"})'
+echo
+echo
+
+
+echo "11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }"
+echo "===================================================================================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"description": "S2"})'
+echo
+echo
+
+
+echo "13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }"
+echo "=========================================================================================================================="
+mongoCmd2 ftest 'db.csubs.findOne({"description": "S3"})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 - for the accumulator
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. Create a subscription S2 - for nowhere
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+03. Create a subscription S3 - for the accumulator
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+04. See S1 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : REGEX(.*),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"A"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+05. See S2 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : REGEX(.*),
+	"reference" : "http://nowhere:1/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S2",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"A"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+06. See S3 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : REGEX(.*),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S3",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"B"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+07. Create an entity matching S1 and S2 but not S3
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX(.*)
+Date: REGEX(.*)
+
+
+
+08. Dump accumulator to see notification for S1
+===============================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 123
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX(.*)
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 7
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX(.*)"
+}
+=======================================
+
+
+09. Wait 5 seconds, to give the broker time to refresh its sub cache
+====================================================================
+slept 5
+
+
+09. Send a ping, just to see the the broker is still alive
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 19
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "response": "pong"
+}
+
+
+10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }
+====================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : REGEX(.*),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"A"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized",
+	"count" : NumberLong(1),
+	"lastNotification" : REGEX(.*),
+	"lastSuccess" : REGEX(.*)
+}
+bye
+
+
+11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }
+====================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : REGEX(.*),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S2",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"A"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized",
+	"count" : NumberLong(1),
+	"lastFailure" : REGEX(.*),
+	"lastNotification" : REGEX(.*)
+}
+bye
+
+
+13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+==========================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : REGEX(.*),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "S3",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"B"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized",
+	"count" : NumberLong(0)
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

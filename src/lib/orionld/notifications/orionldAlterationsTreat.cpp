@@ -295,9 +295,12 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       {
         if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
         {
-          LM_TMP(("Detected a notification response on fd %d", npP->fd));
+          LM_TMP(("SC: Detected a notification response on fd %d", npP->fd));
           if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
+          {
+            LM_TMP(("SC: Calling subscriptionSuccess for subscription '%s'", npP->subP->subscriptionId));
             subscriptionSuccess(npP->subP, notificationTimeAsFloat);
+          }
 
           close(npP->fd);  // OR: close socket inside responseTreat?
           npP->fd = -1;
@@ -323,6 +326,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     if (npP->fd != -1)
     {
       // No response
+      LM_TMP(("SC: Calling subscriptionFailure for subscription '%s'", npP->subP->subscriptionId));
       subscriptionFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
       close(npP->fd);
       npP->fd = -1;

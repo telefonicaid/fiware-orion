@@ -27,7 +27,6 @@ Create a subscription and then kill the broker. Get the subscription from sub-ca
 export BROKER=orionld
 dbInit CB
 brokerStart CB 0 IPv4 -experimental
-accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
 
@@ -218,7 +217,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"format" : "simplified",
-	"reference" : "http://127.0.0.1:9997/notify",
+	"reference" : "http://REGEX(.*)/notify",
 	"mimeType" : "application/ld+json",
 	"headers" : {
 		"H1" : "header 1 value",
@@ -569,7 +568,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"format" : "simplified",
-	"reference" : "http://127.0.0.1:9997/notify",
+	"reference" : "http://REGEX(.*)/notify",
 	"mimeType" : "application/ld+json",
 	"headers" : {
 		"H1" : "header 1 value",
@@ -733,5 +732,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
 dbDrop CB

@@ -67,8 +67,6 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
   char*             title;
   char*             details;
 
-  LM_TMP(("XY: In mongocSubCachePopulateByTenant for tenant '%s'", tenantP->tenant));
-
   //
   // Empty filter for the query - we want ALL subscriptions
   //
@@ -89,6 +87,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
     KjNode* dbSubP = mongocKjTreeFromBson(mongoDocP, &title, &details);
+
     if (dbSubP == NULL)
     {
       LM_E(("Database Error (unable to create tree of subscriptions for tenant '%s')", tenantP->tenant));
@@ -103,9 +102,10 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (apiSubP == NULL)
       continue;
 
-    OrionldContext* contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
+    OrionldContext* contextP = NULL;
+    if (contextNodeP != NULL)
+      contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
 
-    LM_TMP(("KZ: Got a subscription from DB. ldContext: %s", (contextNodeP != NULL)? contextNodeP->value.s : "None"));
     subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant);
   }
 
