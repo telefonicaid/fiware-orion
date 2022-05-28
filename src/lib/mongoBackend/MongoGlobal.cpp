@@ -228,10 +228,6 @@ void mongoInit
   bool         mutexTimeStat
 )
 {
-  extern bool experimental2;
-  if (experimental2 == true)
-    LM_X(1, ("In mongoInit with -experimental2 set"));
-
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
   if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
@@ -412,9 +408,6 @@ DBClientBase* getMongoConnection(void)
 #ifdef UNIT_TEST
   return connection;
 #else
-  extern bool experimental2;
-  if (experimental2 == true)
-    LM_X(1, ("In getMongoConnection with -experimental2 set"));
 
 #ifdef REQUEST_PERFORMANCE
   DBClientBase*     connectionP;

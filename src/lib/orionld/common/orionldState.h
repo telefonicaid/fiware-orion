@@ -556,6 +556,7 @@ extern bool              idIndex;                  // From orionld.cpp
 extern bool              noNotifyFalseUpdate;      // From orionld.cpp
 extern char              mongoServerVersion[32];
 extern bool              experimental;             // From orionld.cpp
+extern bool              mongocOnly;               // From orionld.cpp
 extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
 extern int               maxAge;                   // From orionld.cpp (CORS)
 extern char              userAgentHeader[64];      // From notificationSend.cpp
