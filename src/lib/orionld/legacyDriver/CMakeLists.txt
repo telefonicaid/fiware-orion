@@ -21,31 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    mongocInit.cpp
-    mongocConnectionGet.cpp
-    mongocConnectionRelease.cpp
-    mongocEntityLookup.cpp
-    mongocEntityUpdate.cpp
-    mongocEntityReplace.cpp
-    mongocEntityRetrieve.cpp
-    mongocEntityInsert.cpp
-    mongocKjTreeFromBson.cpp
-    mongocKjTreeToBson.cpp
-    mongocContextCacheGet.cpp
-    mongocContextCachePersist.cpp
-    mongocContextCacheDelete.cpp
-    mongocRegistrationLookup.cpp
-    mongocSubscriptionLookup.cpp
-    mongocSubscriptionExists.cpp
-    mongocSubscriptionInsert.cpp
-    mongocTenantExists.cpp
-    mongocTenantsGet.cpp
-    mongocGeoIndexInit.cpp
-    mongocGeoIndexCreate.cpp
-    mongocIdIndexCreate.cpp
-    mongocSubCachePopulateByTenant.cpp
-    mongocSubCountersUpdate.cpp
-    mongocSubscriptionDelete.cpp
+    legacyDeleteSubscription.cpp
 )
 
 # Include directories
@@ -55,4 +31,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_mongoc STATIC ${SOURCES})
+ADD_LIBRARY(orionld_legacyDriver STATIC ${SOURCES})

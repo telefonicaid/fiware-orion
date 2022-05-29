@@ -225,6 +225,7 @@ SET (ORION_LIBS
     orionld_q
     orionld_mongoc       # subCache needs mongoc
     orionld_dbModel
+    orionld_legacyDriver
     parse
     apiTypesV2
     orionTypes
@@ -366,6 +367,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/orionld/payloadCheck)
   ADD_SUBDIRECTORY(src/lib/orionld/mqtt)
+  ADD_SUBDIRECTORY(src/lib/orionld/legacyDriver)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)

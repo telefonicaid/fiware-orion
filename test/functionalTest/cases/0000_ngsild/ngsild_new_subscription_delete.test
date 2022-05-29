@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Deletion
+Subscription Deletion with mongoc
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 02. GET subscription 'http://a.b.c/subs/sub01' and see it
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 768
+Content-Length: 789
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -196,7 +196,8 @@ Date: REGEX(.*)
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.123Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -208,57 +209,57 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "http://a.b.c/subs/sub01",
-	"expiration" : 1861869600.123,
-	"reference" : "http://valid.url/url",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "Test subscription 01",
 	"description" : "Description of Test subscription 01",
-	"status" : "paused",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:E01",
-			"isPattern" : "false",
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isPattern" : "false",
 			"isTypePattern" : false
 		},
 		{
 			"id" : "http://a.b.c/E02",
-			"isPattern" : "false",
 			"type" : "http://example.org/T2",
+			"isPattern" : "false",
 			"isTypePattern" : false
 		},
 		{
 			"id" : ".*E03.*",
-			"isPattern" : "true",
 			"type" : "http://example.org/T3",
+			"isPattern" : "true",
 			"isTypePattern" : false
 		}
 	],
+	"conditions" : [
+		"http://example.org/P2"
+	],
+	"ldQ" : "http://example=org/P2.value>10",
+	"status" : "inactive",
+	"expiration" : 1861869600.123,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "http://example=org/P2.value>10",
+		"mq" : ""
+	},
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
-	"metadata" : [ ],
+	"format" : "keyValues",
+	"reference" : "http://valid.url/url",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
 	"blacklist" : false,
-	"name" : "Test subscription 01",
-	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
-	"conditions" : [
-		"http://example.org/P2"
-	],
-	"expression" : {
-		"q" : "http://example=org/P2>10",
-		"mq" : "",
-		"geometry" : "",
-		"coords" : "",
-		"georel" : "",
-		"geoproperty" : ""
-	},
-	"format" : "keyValues"
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 bye
 

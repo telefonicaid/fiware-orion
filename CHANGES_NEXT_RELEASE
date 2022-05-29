@@ -35,3 +35,4 @@
 * Issue #280   GET /subscriptions now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
 * Issue #280   Subscription Cache now uses mongoc and not the old legacy driver (-experimental)
 * Issue #280   Subscription Cache Counters are now updated using mongoc and not the old legacy driver (-experimental)
+* Issue #280   DELETE subscriptions/{subId} now uses the new mongoc driver (if experimental is set)

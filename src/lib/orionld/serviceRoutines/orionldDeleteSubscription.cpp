@@ -31,7 +31,11 @@
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
-#include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
+#include "orionld/mqtt/mqttDisconnect.h"                         // mqttDisconnect
+#include "orionld/mongoc/mongocSubscriptionLookup.h"             // mongocSubscriptionLookup
+#include "orionld/mongoc/mongocSubscriptionDelete.h"             // mongocSubscriptionDelete
+#include "orionld/legacyDriver/legacyDeleteSubscription.h"       // legacyDeleteSubscription
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
 
 
@@ -42,27 +46,44 @@
 //
 bool orionldDeleteSubscription(void)
 {
+  if (experimental == false)
+    return legacyDeleteSubscription();
+
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);
 
-  if (dbSubscriptionGet(orionldState.wildcard[0]) == NULL)
+  KjNode* subP = mongocSubscriptionLookup(orionldState.wildcard[0]);
+  if (subP == NULL)
   {
     orionldError(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0], 404);
     return false;
   }
 
-  if (dbSubscriptionDelete(orionldState.wildcard[0]) == false)
-  {
-    orionldError(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0], 404);
-    return false;
-  }
+  if (mongocSubscriptionDelete(orionldState.wildcard[0]) == false)
+    return false;  // mongocSubscriptionDelete calls orionldError, setting status code to 500
 
-  if (noCache == false)
+  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
+
+  if (cSubP == NULL)
   {
-    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
-    if (cSubP != NULL)
-      subCacheItemRemove(cSubP);
-    else
+    if (noCache == false)
       LM_W(("The subscription '%s' was successfully removed from DB but does not exist in sub-cache ... (sub-cache is enabled)"));
+
+    //
+    // FIXME: If mqtt, we need to disconnect from MQTT broker
+    //        BUT, not until Orion-LD is able to run without sub-cache
+    //
+    // kjTreeLog(subP, "MQTT Subscription?");
+    //
+  }
+  else
+  {
+    // If MQTT subscription - disconnect from mqtt broker
+    if (strcmp(cSubP->protocol, "mqtt") == 0)
+    {
+      MqttInfo* mqttP = &cSubP->httpInfo.mqtt;
+      mqttDisconnect(mqttP->host, mqttP->port, mqttP->username, mqttP->password, mqttP->version);
+    }
+    subCacheItemRemove(cSubP);
   }
 
   orionldState.httpStatusCode = SccNoContent;

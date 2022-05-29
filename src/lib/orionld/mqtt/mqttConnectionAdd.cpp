@@ -36,15 +36,44 @@
 //
 // mqttConnectionAdd -
 //
-MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port, const char* version)
+MqttConnection* mqttConnectionAdd
+(
+  bool           mqtts,
+  const char*    username,
+  const char*    password,
+  const char*    host,
+  unsigned short port,
+  const char*    version
+)
 {
-  if (mqttConnectionListIx >= mqttConnectionListSize)
+  MqttConnection* mqP = NULL;
+
+  // Any empty slots?
+  for (int ix = 0; ix < mqttConnectionListIx; ix++)
   {
-    mqttConnectionListSize += 20;
-    mqttConnectionList      = (MqttConnection*) realloc(mqttConnectionList, sizeof(MqttConnection) * mqttConnectionListSize);
+    if (mqttConnectionList[ix].host == NULL)
+    {
+      mqP = &mqttConnectionList[ix];
+      break;
+    }
   }
 
-  MqttConnection* mqP = &mqttConnectionList[mqttConnectionListIx];
+  if (mqP == NULL)
+  {
+    if (mqttConnectionListIx >= mqttConnectionListSize)
+    {
+      mqttConnectionListSize += 20;
+      mqttConnectionList      = (MqttConnection*) realloc(mqttConnectionList, sizeof(MqttConnection) * mqttConnectionListSize);
+    }
+
+    mqP = &mqttConnectionList[mqttConnectionListIx];
+  }
+
+  if (mqP == NULL)
+  {
+    LM_E(("Internal Error (no MQTT connection available)"));
+    return NULL;
+  }
 
   mqP->host     = strdup(host);
   mqP->port     = port;

@@ -1,4 +1,4 @@
-# Copyright 2022 FIWARE Foundation e.V.
+ Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -35,12 +35,15 @@ mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROK
 # 01. Create subscription with MQTT broker as endpoint
 # 02. See the subscription in mongo
 # 03. GET the subscription
+# 03. GET ngsi-ld version and make sure there is ONE mqtt connection
 # 04. Create an entity matching the subscription
 # 05. Dump and Reset the MQTT test client and see one notification
 # 06. Restart the broker
 # 07. GET the subscription, without context => AirQualityObserved as longname
 # 08. Create another entity matching the subscription
 # 09. Dump the MQTT test client and see one notification
+# 10. Delete the subscription
+# 11. GET ngsi-ld version and make sure there are no mqtt connections
 #
 
 echo "01. Create subscription with MQTT broker as endpoint"
@@ -96,6 +99,13 @@ echo
 echo "03. GET the subscription"
 echo "========================"
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+echo
+echo
+
+
+echo "03. GET ngsi-ld version and make sure there is ONE mqtt connection"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/ex/v1/version | grep MQTT
 echo
 echo
 
@@ -167,6 +177,20 @@ echo "09. Dump the MQTT test client and see one notification"
 echo "======================================================"
 valgrindSleep 5
 mqttTestClientDump entities
+echo
+echo
+
+
+echo "10. Delete the subscription"
+echo "==========================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification -X DELETE
+echo
+echo
+
+
+echo "11. GET ngsi-ld version and make sure there are no mqtt connections"
+echo "==================================================================="
+orionCurl --url /ngsi-ld/ex/v1/version | grep MQTT
 echo
 echo
 
@@ -281,6 +305,11 @@ Date: REGEX(.*)
     "status": "active",
     "type": "Subscription"
 }
+
+
+03. GET ngsi-ld version and make sure there is ONE mqtt connection
+==================================================================
+    "MQTT Connections": 1,
 
 
 04. Create an entity matching the subscription
@@ -470,6 +499,17 @@ Notifications: 1
 }
 =======================================
 
+
+
+10. Delete the subscription
+===========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11. GET ngsi-ld version and make sure there are no mqtt connections
+===================================================================
 
 
 --TEARDOWN--
