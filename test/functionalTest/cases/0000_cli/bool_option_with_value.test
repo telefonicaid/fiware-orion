@@ -100,5 +100,6 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-troePoolSize' <size of the connection pool for TRoE Postgres database connections>]
                 [option '-forwarding' (turn on forwarding)]
                 [option '-noNotifyFalseUpdate' (turn off notifications on non-updates)]
+                [option '-mongocOnly' (enable experimental implementation + turn off mongo legacy driver)]
 
 --TEARDOWN--

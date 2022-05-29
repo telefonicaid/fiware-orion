@@ -224,7 +224,7 @@ bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
 bool            experimental    = false;
-bool            experimental2   = false;
+bool            mongocOnly   = false;
 
 
 
@@ -300,7 +300,7 @@ bool            experimental2   = false;
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
 #define EXPERIMENTAL_DESC      "enable experimental implementation"
-#define EXPERIMENTAL2_DESC     "enable experimental implementation + turn off mongo legacy driver"
+#define MONGOCONLY_DESC        "enable experimental implementation + turn off mongo legacy driver"
 
 
 
@@ -376,7 +376,7 @@ PaArgument paArgs[] =
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
-  { "-experimental2",         &experimental2,           "EXPERIMENTAL2",             PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL2_DESC       },
+  { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC       },
 
   PA_END_OF_ARGS
 };
@@ -952,12 +952,8 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-  bool noLegacyDriver = false;
-  if (experimental2 == true)
-  {
+  if (mongocOnly == true)
     experimental   = true;
-    noLegacyDriver = true;
-  }
 
   if (noswap == true)
   {
@@ -1079,7 +1075,7 @@ int main(int argC, char* argV[])
   mongocInit(dbHost, "orionld");
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
-  if (noLegacyDriver == false)
+  if (mongocOnly == false)
   {
     // Initialize Mongo Legacy C++ driver
     mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
@@ -1105,18 +1101,15 @@ int main(int argC, char* argV[])
     orionldStartup = true;
     subCacheInit(multitenancy);
 
-    if (noLegacyDriver == false)
+    if (subCacheInterval == 0)
     {
-      if (subCacheInterval == 0)
-      {
-        // Populate subscription cache from database
-        subCacheRefresh();
-      }
-      else
-      {
-        // Populate subscription cache AND start sub-cache-refresh-thread
-        subCacheStart();
-      }
+      // Populate subscription cache from database
+      subCacheRefresh();
+    }
+    else
+    {
+      // Populate subscription cache AND start sub-cache-refresh-thread
+      subCacheStart();
     }
     orionldStartup = false;
   }
@@ -1133,7 +1126,7 @@ int main(int argC, char* argV[])
   // use that conext during the test.
   //
 
-  if (noLegacyDriver == false)
+  if (mongocOnly == false)
     dbInit(dbHost, dbName);
 
   //
@@ -1200,13 +1193,11 @@ int main(int argC, char* argV[])
   orionldPhase = OrionldPhaseServing;
 
   if (simulatedNotification)
-  {
-    LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
-  }
+    LM_W(("simulatedNotification is 'true', outgoing notifications NGSIv2 won't be sent"));
 
   LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
 
-  if (noLegacyDriver == true)
+  if (mongocOnly == true)
     LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only 5 requests work in this mode"));
 
   if (socketService == true)

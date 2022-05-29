@@ -62,7 +62,7 @@ void orionldContextCachePersist(OrionldContext* contextP)
   KjNode*  urlP         = kjString(orionldState.kjsonP, "url",       contextP->url);
   KjNode*  parentP;
   KjNode*  originP      = kjString(orionldState.kjsonP, "origin",    originName(contextP->origin));
-  KjNode*  createdAtP   = kjFloat(orionldState.kjsonP,  "createdAt", orionldState.requestTime);  // FIXME: make sure it's not overwritten if already existss
+  KjNode*  createdAtP   = kjFloat(orionldState.kjsonP,  "createdAt", orionldState.requestTime);  // FIXME: make sure it's not overwritten if already exists
   KjNode*  valueP       = contextP->tree;
 
   if (contextP->tree == NULL)

@@ -970,6 +970,15 @@ MHD_Result orionldMhdConnectionInit
 
 
   //
+  // Is only mongoc supporting operations allowed?
+  //
+  if ((mongocOnly) && ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT) == 0))
+  {
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
+    return MHD_YES;
+  }
+
+  //
   // NGSI-LD only accepts the verbs POST, GET, DELETE, PATCH, PUT, and OPTIONS (if CORS is enabled)
   // If any other verb is used, even if a valid REST Verb, like HEAD, a generic error will be returned
   //

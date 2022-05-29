@@ -103,7 +103,7 @@ bool            noNotifyFalseUpdate     = false;
 char            dbUser[64]              = { 0 };
 char            dbPwd[64]               = { 0 };
 bool            experimental            = false;
-bool            experimental2           = false;
+bool            mongocOnly              = false;
 
 
 

@@ -46,6 +46,7 @@
 #include "orionld/serviceRoutines/orionldGetEntity.h"                // orionldGetEntity
 #include "orionld/serviceRoutines/orionldPatchEntity.h"              // orionldPatchEntity
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"             // orionldPatchEntity2
+#include "orionld/serviceRoutines/orionldPutEntity.h"                // orionldPutEntity
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"             // orionldDeleteEntity
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"           // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"          // orionldDeleteAttribute
@@ -193,6 +194,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_DATASET_SUPPORT;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostNotify)
   {
@@ -223,6 +225,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
     serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
+
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteEntity)
   {
@@ -245,8 +249,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_OBSERVEDAT;
+  }
+  else if (serviceP->serviceRoutine == orionldPutEntity)
+  {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
@@ -299,10 +309,12 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetSubscriptions)
   {
-    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
@@ -311,7 +323,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetSubscription)
   {
-    serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
@@ -368,6 +381,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
@@ -375,6 +389,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetTenants)
   {
@@ -382,6 +397,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetDbIndexes)
   {
@@ -389,6 +405,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetContexts)
   {
@@ -399,12 +416,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_URL;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetContext)
   {
     serviceP->options  = 0;  // Tenant is Ignored
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostContexts)
   {
@@ -413,6 +432,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteContext)
   {
@@ -421,6 +441,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_RELOAD;
   }
