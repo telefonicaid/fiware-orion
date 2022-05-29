@@ -47,6 +47,7 @@ function style_check
 
 
 style_check src/lib/orionld/q
+style_check src/lib/orionld/legacyDriver
 style_check src/lib/orionld/notifications
 style_check src/lib/orionld/db
 style_check src/lib/orionld/dbModel

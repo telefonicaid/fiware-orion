@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
+#include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
 
@@ -228,6 +229,19 @@ bool orionldGetVersion(void)
   nodeP = kjInteger(orionldState.kjsonP, "Next File Descriptor", fd);
   kjChildAdd(orionldState.responseTree, nodeP);
   close(fd);
+
+  int mqttConnections = 0;
+  for (int ix = 0; ix < mqttConnectionListIx; ix++)
+  {
+    if (mqttConnectionList[ix].host != NULL)
+      ++mqttConnections;
+  }
+
+  if (mqttConnections > 0)
+  {
+    nodeP = kjInteger(orionldState.kjsonP, "MQTT Connections", mqttConnections);
+    kjChildAdd(orionldState.responseTree, nodeP);
+  }
 
   // This request is ALWAYS returned with pretty-print
   orionldState.uriParams.prettyPrint     = true;

@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdlib.h>                                            // free
+#include <strings.h>                                           // bzero
 #include <MQTTClient.h>                                        // MQTT Client header
 
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
@@ -53,6 +54,8 @@ void mqttDisconnect(const char* host, unsigned short port, const char* username,
   if (mcP->username != NULL)      free(mcP->username);
   if (mcP->password != NULL)      free(mcP->password);
   if (mcP->version  != NULL)      free(mcP->version);
+
+  bzero(mcP, sizeof(MqttConnection));
 
   MQTTClient_disconnect(&mcP->client, 10000);
   MQTTClient_destroy(&mcP->client);
