@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,51 +23,44 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "mongoBackend/mongoGetSubscriptions.h"                  // mongoGetLdSubscription
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/legacyDriver/legacyGetSubscription.h"          // legacyGetSubscription
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
-#include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
-#include "orionld/serviceRoutines/orionldGetSubscription.h"      // Own Interface
+#include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
+#include "orionld/legacyDriver/legacyGetSubscription.h"          // Own Interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetSubscription -
+// legacyGetSubscription -
 //
-bool orionldGetSubscription(void)
+bool legacyGetSubscription(void)
 {
-  if (experimental == false)
-    return legacyGetSubscription();
-
-  if (orionldState.uriParamOptions.fromDb == true)
-  {
-    //
-    // GET Subscription with mongoc is yet to be implemented, so, we'll have to use the old Legacy function ...
-    // BUT, not if mongocOnly is set
-    //
-    if (mongocOnly == true)
-    {
-      orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
-      return false;
-    }
-
-    return legacyGetSubscription();
-  }
-
   char*                 subscriptionId = orionldState.wildcard[0];
   CachedSubscription*   cSubP          = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+  ngsiv2::Subscription  subscription;
+  char*                 details = (char*) "subscription not found";
 
-  if (cSubP != NULL)
+  subscription.descriptionProvided = false;
+  subscription.expires             = -1;  // 0?
+  subscription.throttling          = -1;  // 0?
+  subscription.timeInterval        = -1;  // 0?
+
+  if (mongoGetLdSubscription(&subscription, subscriptionId, orionldState.tenantP, &orionldState.httpStatusCode, &details) == false)
   {
-    orionldState.httpStatusCode = 200;
-    orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
-
-    return true;
+    LM_E(("mongoGetLdSubscription error: %s", details));
+    orionldError(OrionldResourceNotFound, details, subscriptionId, 404);
+    return false;
   }
 
-  orionldError(OrionldResourceNotFound, "subscription not found", subscriptionId, 404);
-  return false;
+  // Transform to KjNode tree
+  orionldState.httpStatusCode = SccOk;
+  orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP, orionldState.contextP);
+
+  return true;
 }

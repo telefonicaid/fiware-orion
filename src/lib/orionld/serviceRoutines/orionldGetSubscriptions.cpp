@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <vector>
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -32,49 +30,14 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/string.h"                                       // toString
-#include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheHeadGet, subCacheItemLookup
-#include "mongoBackend/mongoGetSubscriptions.h"                  // mongoListSubscriptions
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
+#include "orionld/legacyDriver/legacyGetSubscriptions.h"         // legacyGetSubscriptions
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
-#include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldGetSubscriptionsWithMongoBackend -
-//
-static bool orionldGetSubscriptionsWithMongoBackend(void)
-{
-  std::vector<ngsiv2::Subscription> subVec;
-  OrionError                        oe;
-  int64_t                           count  = 0;
-
-  mongoGetLdSubscriptions("/#", &subVec, orionldState.tenantP, (long long*) &count, &oe);
-
-  if (orionldState.uriParams.count == true)
-    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
-
-  orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
-
-  for (unsigned int ix = 0; ix < subVec.size(); ix++)
-  {
-    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subVec[ix].id.c_str());
-
-    if (cSubP != NULL)
-    {
-      KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix], cSubP, orionldState.contextP);
-      kjChildAdd(orionldState.responseTree, subscriptionNodeP);
-    }
-  }
-
-  return true;
-}
 
 
 
@@ -84,8 +47,23 @@ static bool orionldGetSubscriptionsWithMongoBackend(void)
 //
 bool orionldGetSubscriptions(void)
 {
-  if ((experimental == false) || (orionldState.uriParamOptions.fromDb == true))
-    return orionldGetSubscriptionsWithMongoBackend();
+  if (experimental == false)
+    return legacyGetSubscriptions();
+
+  if (orionldState.uriParamOptions.fromDb == true)
+  {
+    //
+    // GET Subscriptions with mongoc is yet to be implemented, so, we'll have to use the old Legacy function ...
+    // BUT, not if mongocOnly is set
+    //
+    if (mongocOnly == true)
+    {
+      orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
+      return false;
+    }
+
+    return legacyGetSubscriptions();
+  }
 
   int      offset    = orionldState.uriParams.offset;
   int      limit     = orionldState.uriParams.limit;
