@@ -330,10 +330,12 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPatchSubscription)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteSubscription)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
