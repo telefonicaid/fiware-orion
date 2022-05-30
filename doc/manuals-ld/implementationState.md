@@ -246,13 +246,16 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 #### Done
   * Uses the new mongoc driver (only if -experimental is set)
+  * Disconnects from MQTT broker if need be
 
------- TBI --------------------------------------------------------
 
 ### PATCH /ngsi-ld/v1/subscriptions/*
-* Not using mongoBackend, but using the the mongo C++ legacy driver:
-  * dbSubscriptionGet (mongocSubscriptionLookup is already implemented)
-  * dbSubscriptionReplace (mongocSubscriptionReplace ... should be quite easy to implement)
+
+#### Done
+  * Uses the new mongoc driver (-experimental not needed)
+  * Disconnects/Reconnects from/to MQTT broker if needed
+
+------ TBI --------------------------------------------------------
 
 ### DELETE /ngsi-ld/v1/entities/*
 * Not using mongoBackend, but using the the mongo C++ legacy driver:

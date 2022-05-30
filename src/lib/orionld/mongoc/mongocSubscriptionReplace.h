@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCSUBSCRIPTIONREPLACE_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCSUBSCRIPTIONREPLACE_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -22,41 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
 
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjLookup.h"                                      // kjLookup
 }
-
-#include "orionld/kjTree/kjNavigate.h"                           // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjNavigate -
+// mongocSubscriptionReplace -
 //
-// FIXME: move to kjson library
-//
-KjNode* kjNavigate(KjNode* treeP, const char** pathCompV, KjNode** parentPP, bool* onlyLastMissingP)
-{
-  KjNode* hitP = kjLookup(treeP, pathCompV[0]);
+extern bool mongocSubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptionP);
 
-  if (parentPP != NULL)
-    *parentPP = treeP;
-
-  if (hitP == NULL)  // No hit - we're done
-  {
-    if (onlyLastMissingP != NULL)
-      *onlyLastMissingP = (pathCompV[1] == NULL)? true : false;
-
-    return NULL;
-  }
-
-  if (pathCompV[1] == NULL)  // Found it - we're done
-    return hitP;
-
-  return kjNavigate(hitP, &pathCompV[1], parentPP, onlyLastMissingP);  // Recursive call, one level down
-}
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCSUBSCRIPTIONREPLACE_H_

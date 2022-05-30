@@ -57,7 +57,8 @@ bool pcheckSubscription
   KjNode**         qPP,
   KjNode**         geoqPP,
   KjNode**         geoCoordinatesPP,
-  bool             patch
+  bool             patch,
+  bool*            mqttChangeP
 )
 {
   KjNode* idP                     = NULL;
@@ -220,7 +221,7 @@ bool pcheckSubscription
   KjNode* uriP;
   KjNode* notifierInfoP;
 
-  if ((notificationP != NULL) && (pCheckNotification(notificationP, patch, &uriP, &notifierInfoP) == false))
+  if ((notificationP != NULL) && (pCheckNotification(notificationP, patch, &uriP, &notifierInfoP, mqttChangeP) == false))
       return false;
 
   return true;

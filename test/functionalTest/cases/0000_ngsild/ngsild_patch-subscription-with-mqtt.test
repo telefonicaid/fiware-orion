@@ -1,0 +1,281 @@
+ Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New Notifications via MQTT
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 IPv4 -experimental
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities
+
+--SHELL--
+
+#
+# 01. Create subscription with MQTT broker as endpoint
+# 02. Create an entity matching the subscription
+# 03. Dump and Reset the MQTT test client and see one notification
+# 04. PATCH the subscription, changing the topic to entities2 (broker diconnects and reconnects to MQTT broker)
+# 05. Restart the MQTT Test Client, with topic entities2
+# 06. Create an entity matching the patched subscription
+# 07. Dump the MQTT test client and see one notification
+# 08. GET ngsi-ld version and make sure there is ONE mqtt connection
+#
+
+echo "01. Create subscription with MQTT broker as endpoint"
+echo "===================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:mqttNotification",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "AirQualityObserved"
+    },
+    {
+      "type": "AirQualityObserved2"
+    }
+  ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "accept": "application/json",
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "123"
+        },
+        {
+          "key": "H2",
+          "value": "456"
+        }
+      ],
+      "notifierInfo": [
+        {
+          "key": "MQTT-QoS",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Create an entity matching the subscription"
+echo "=============================================="
+payload='{
+  "id": "urn:ngsi-ld:Test:Mqtt1",
+  "type": "AirQualityObserved",
+  "temperature": {
+    "type": "Property",
+    "value": 21
+  },
+  "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Dump and Reset the MQTT test client and see one notification"
+echo "================================================================"
+mqttTestClientDump entities
+mqttTestClientReset entities
+echo
+echo
+
+
+echo "04. PATCH the subscription, changing the topic to entities2 (broker diconnects and reconnects to MQTT broker)"
+echo "============================================================================================================="
+payload='{
+  "notification": {
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Restart the MQTT Test Client, with topic entities2"
+echo "======================================================"
+mqttTestClientStop entities
+mv /tmp/mqttTestClient.log  /tmp/mqttTestClient.log.old
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities2
+echo
+echo
+
+
+echo "06. Create an entity matching the patched subscription"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Test:Mqtt2",
+  "type": "AirQualityObserved2",
+  "temperature": {
+    "type": "Property",
+    "value": 21
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'X-Auth-Token: x-auth-token-is-not-verified'
+echo
+echo
+
+
+echo "07. Dump the MQTT test client and see one notification"
+echo "======================================================"
+valgrindSleep 5
+mqttTestClientDump entities2
+echo
+echo
+
+
+echo "08. GET ngsi-ld version and make sure there is ONE mqtt connection"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/ex/v1/version | grep MQTT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with MQTT broker as endpoint
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mqttNotification
+Date: REGEX(.*)
+
+
+
+02. Create an entity matching the subscription
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:Mqtt1
+Date: REGEX(.*)
+
+
+
+03. Dump and Reset the MQTT test client and see one notification
+================================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "id": "urn:ngsi-ld:Test:Mqtt1",
+        "temperature": {
+          "type": "Property",
+          "value": 21
+        },
+        "type": "AirQualityObserved"
+      }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification",
+    "type": "Notification"
+  },
+  "metadata": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "H1": "123",
+    "H2": "456",
+    "Link": "REGEX(.*)",
+    "Ngsild-Attribute-Format": "Normalized",
+    "User-Agent": "orionld/REGEX(.*)"
+  }
+}
+=======================================
+
+
+
+04. PATCH the subscription, changing the topic to entities2 (broker diconnects and reconnects to MQTT broker)
+=============================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Restart the MQTT Test Client, with topic entities2
+======================================================
+
+
+06. Create an entity matching the patched subscription
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:Mqtt2
+Date: REGEX(.*)
+
+
+
+07. Dump the MQTT test client and see one notification
+======================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "id": "urn:ngsi-ld:Test:Mqtt2",
+        "temperature": {
+          "type": "Property",
+          "value": 21
+        },
+        "type": "AirQualityObserved2"
+      }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:mqttNotification",
+    "type": "Notification"
+  },
+  "metadata": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "H1": "123",
+    "H2": "456",
+    "Link": "REGEX(.*)",
+    "Ngsild-Attribute-Format": "Normalized",
+    "User-Agent": "orionld/REGEX(.*)",
+    "X-Auth-Token": "x-auth-token-is-not-verified"
+  }
+}
+=======================================
+
+
+
+08. GET ngsi-ld version and make sure there is ONE mqtt connection
+==================================================================
+    "MQTT Connections": 1,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+mqttTestClientStop entities2

@@ -69,7 +69,7 @@ payload='{
     "attributes": [ "P1", "P2", "A3" ],
     "format": "simplified",
     "endpoint": {
-      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
       "accept": "application/ld+json",
       "notifierInfo": [
         {
@@ -217,7 +217,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"format" : "simplified",
-	"reference" : "http://REGEX(.*)/notify",
+	"reference" : "mqtt://localhost:1883/entities",
 	"mimeType" : "application/ld+json",
 	"headers" : {
 		"H1" : "header 1 value",
@@ -238,7 +238,7 @@ bye
 03. GET the subscription from cache, without context - see long names
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 931
+Content-Length: 933
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -290,7 +290,7 @@ Date: REGEX(.*)
                     "value": "header 2 value"
                 }
             ],
-            "uri": "http://127.0.0.1:9997/notify"
+            "uri": "mqtt://localhost:1883/entities"
         },
         "format": "keyValues",
         "status": "ok"
@@ -310,7 +310,7 @@ Date: REGEX(.*)
 04. GET the subscription from DB, without context - see long names
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 934
+Content-Length: 936
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -362,7 +362,7 @@ Date: REGEX(.*)
                     "value": "header 2 value"
                 }
             ],
-            "uri": "http://127.0.0.1:9997/notify"
+            "uri": "mqtt://localhost:1883/entities"
         },
         "format": "keyValues",
         "status": "ok"
@@ -382,7 +382,7 @@ Date: REGEX(.*)
 05. GET the subscription from cache, with testFullContext - see short names
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 855
+Content-Length: 857
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -434,7 +434,7 @@ Date: REGEX(.*)
                     "value": "header 2 value"
                 }
             ],
-            "uri": "http://127.0.0.1:9997/notify"
+            "uri": "mqtt://localhost:1883/entities"
         },
         "format": "keyValues",
         "status": "ok"
@@ -454,7 +454,7 @@ Date: REGEX(.*)
 06. GET the subscription from DB, with testFullContext - see short names
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 858
+Content-Length: 860
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -506,7 +506,7 @@ Date: REGEX(.*)
                     "value": "header 2 value"
                 }
             ],
-            "uri": "http://127.0.0.1:9997/notify"
+            "uri": "mqtt://localhost:1883/entities"
         },
         "format": "keyValues",
         "status": "ok"
@@ -568,7 +568,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"format" : "simplified",
-	"reference" : "http://REGEX(.*)/notify",
+	"reference" : "mqtt://REGEX(.*)/entities",
 	"mimeType" : "application/ld+json",
 	"headers" : {
 		"H1" : "header 1 value",
@@ -589,7 +589,7 @@ bye
 09. GET the subscription from cache
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 931
+Content-Length: 933
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -641,7 +641,7 @@ Date: REGEX(.*)
                     "value": "header 2 value"
                 }
             ],
-            "uri": "http://127.0.0.1:9997/notify"
+            "uri": "mqtt://localhost:1883/entities"
         },
         "format": "keyValues",
         "status": "ok"
@@ -661,7 +661,7 @@ Date: REGEX(.*)
 10. GET the subscription from DB
 ================================
 HTTP/1.1 200 OK
-Content-Length: 934
+Content-Length: 936
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -713,7 +713,7 @@ Date: REGEX(.*)
                     "value": "header 2 value"
                 }
             ],
-            "uri": "http://127.0.0.1:9997/notify"
+            "uri": "mqtt://localhost:1883/entities"
         },
         "format": "keyValues",
         "status": "ok"

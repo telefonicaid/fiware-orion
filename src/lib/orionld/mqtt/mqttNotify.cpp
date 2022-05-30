@@ -178,6 +178,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   mqttMsg.qos        = mqttP->qos;
   mqttMsg.retained   = 0;
 
+  LM_TMP(("Publishing MQTT message on topic '%s'", mqttP->topic));
   MQTTClient_publishMessage(mqttConnectionP->client, mqttP->topic, &mqttMsg, &mqttToken);
 
   extern int  mqttTimeout;  // From mqttNotification.cpp - should be a CLI

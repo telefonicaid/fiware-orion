@@ -38,6 +38,6 @@ extern "C"
 //
 // FIXME: move to kjson library
 //
-extern KjNode* kjNavigate(KjNode* treeP, char** pathCompV, KjNode** parentPP, bool* onlyLastMissingP);
+extern KjNode* kjNavigate(KjNode* treeP, const char** pathCompV, KjNode** parentPP, bool* onlyLastMissingP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJNAVIGATE_H_

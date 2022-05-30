@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
 #include "kjson/kjClone.h"                                     // kjClone
@@ -46,12 +47,18 @@ extern "C"
 #include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
 #include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
+#include "orionld/types/MqttInfo.h"                            // MqttInfo
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
-#include "orionld/db/dbConfiguration.h"                        // dbSubscriptionGet
+#include "orionld/mongoc/mongocSubscriptionLookup.h"           // mongocSubscriptionLookup
+#include "orionld/mongoc/mongocSubscriptionReplace.h"          // mongocSubscriptionReplace
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
+#include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
+#include "orionld/mqtt/mqttDisconnect.h"                       // mqttDisconnect
+#include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
+#include "orionld/kjTree/kjNavigate.h"                         // kjNavigate
 #include "orionld/kjTree/kjChildAddOrReplace.h"                // kjChildAddOrReplace
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"  // Own Interface
 
@@ -121,7 +128,7 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
       {
         if (okToRemove(fragmentP->name) == false)
         {
-          orionldError(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name, 500);
+          orionldError(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name, 400);
           return false;
         }
 
@@ -339,24 +346,57 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
 
   if (uriP != NULL)
   {
-    char*           url;
     char*           protocol;
     char*           ip;
     unsigned short  port;
     char*           rest;
+    char*           url = strdup(uriP->value.s);
 
-    url = strdup(uriP->value.s);
-    if (urlParse(cSubP->url, &protocol, &ip, &port, &rest) == true)
+    if (strncmp(uriP->value.s, "mqtt", 4) == 0)
     {
-      free(cSubP->url);
-      cSubP->url      = url;
-      cSubP->protocol = protocol;
-      cSubP->ip       = ip;
-      cSubP->port     = port;
-      cSubP->rest     = rest;
+      char*           url           = strdup(uriP->value.s);
+      bool            mqtts         = false;
+      char*           mqttUser      = NULL;
+      char*           mqttPassword  = NULL;
+      char*           mqttHost      = NULL;
+      unsigned short  mqttPort      = 0;
+      char*           mqttTopic     = NULL;
+      char*           detail        = NULL;
+
+      if (mqttParse(url, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+      {
+        free(url);
+        LM_E(("Internal Error (unable to parse mqtt URL)"));
+        return false;
+      }
+
+      if (mqttUser     != NULL) strncpy(cSubP->httpInfo.mqtt.username, mqttUser,     sizeof(cSubP->httpInfo.mqtt.username) - 1);
+      if (mqttPassword != NULL) strncpy(cSubP->httpInfo.mqtt.password, mqttPassword, sizeof(cSubP->httpInfo.mqtt.password) - 1);
+      if (mqttHost     != NULL) strncpy(cSubP->httpInfo.mqtt.host,     mqttHost,     sizeof(cSubP->httpInfo.mqtt.host) - 1);
+      if (mqttTopic    != NULL) strncpy(cSubP->httpInfo.mqtt.topic,    mqttTopic,    sizeof(cSubP->httpInfo.mqtt.topic) - 1);
+
+      cSubP->httpInfo.mqtt.mqtts = mqtts;
+      cSubP->httpInfo.mqtt.port  = mqttPort;
+
+      free(url);
     }
     else
-      LM_W(("Invalid url '%s'", uriP->value.s));
+    {
+      if (urlParse(url, &protocol, &ip, &port, &rest) == true)
+      {
+        free(cSubP->url);
+        cSubP->url      = url;  // Only ... it's destroyed :)
+        cSubP->protocol = protocol;
+        cSubP->ip       = ip;
+        cSubP->port     = port;
+        cSubP->rest     = rest;
+      }
+      else
+      {
+        LM_W(("Invalid url '%s'", uriP->value.s));
+        return false;
+      }
+    }
   }
 
   if (acceptP != NULL)
@@ -553,6 +593,78 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
 
 
 
+// -----------------------------------------------------------------------------
+//
+// mqttInfoFromDbTree -
+//
+static bool mqttInfoFromDbTree(KjNode* dbSubscriptionP, KjNode* uriP, MqttInfo* miP)
+{
+  char* uri = kaStrdup(&orionldState.kalloc, uriP->value.s);
+  char* detail;
+  char* usernameP;
+  char* passwordP;
+  char* hostP;
+  char* topicP;
+
+  if (mqttParse(uri, &miP->mqtts, &usernameP, &passwordP, &hostP, &miP->port, &topicP, &detail) == false)
+  {
+    orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
+    return false;
+  }
+
+  strncpy(miP->username, usernameP, sizeof(miP->username) - 1);
+  strncpy(miP->password, passwordP, sizeof(miP->password) - 1);
+  strncpy(miP->host,     hostP,     sizeof(miP->host)     - 1);
+  strncpy(miP->topic,    topicP,    sizeof(miP->topic)    - 1);
+
+  LM_TMP(("Topic: '%s'", miP->topic));
+
+  KjNode* notifierInfoP = kjLookup(dbSubscriptionP, "notifierInfo");
+  if (notifierInfoP)
+  {
+    for (KjNode* kvPairP = notifierInfoP->value.firstChildP; kvPairP != NULL; kvPairP = kvPairP->next)
+    {
+      if      (strcmp(kvPairP->name, "MQTT-Version") == 0)  strncpy(miP->version, kvPairP->value.s, sizeof(miP->version) - 1);
+      else if (strcmp(kvPairP->name, "MQTT-QoS")     == 0)  miP->qos = atoi(kvPairP->value.s);
+    }
+  }
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// mqttConnectFromInfo -
+//
+static bool mqttConnectFromInfo(MqttInfo* miP)
+{
+  bool b;
+
+  b = mqttConnectionEstablish(miP->mqtts, miP->username, miP->password, miP->host, miP->port, miP->version);
+  LM_TMP(("Connected to MQTT broker at %s:%d", miP->host, miP->port));
+
+  if (b == false)
+    LM_RE(false, ("Unable to connect to MQTT broker %s:%s", miP->host, miP->port));
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// mqttDisconnectFromInfo -
+//
+static void mqttDisconnectFromInfo(MqttInfo* miP)
+{
+  mqttDisconnect(miP->host, miP->port, miP->username, miP->password, miP->version);
+  LM_TMP(("Disconnected from MQTT broker at %s:%d", miP->host, miP->port));
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPatchSubscription -
@@ -583,14 +695,15 @@ bool orionldPatchSubscription(void)
   KjNode* qP                     = NULL;
   KjNode* geoqP                  = NULL;
   KjNode* geoCoordinatesP        = NULL;
+  bool    mqttChange             = false;
 
-  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP, &geoCoordinatesP, true) == false)
+  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP, &geoCoordinatesP, true, &mqttChange) == false)
   {
     LM_E(("pcheckSubscription FAILED"));
     return false;
   }
 
-  KjNode* dbSubscriptionP = dbSubscriptionGet(subscriptionId);
+  KjNode* dbSubscriptionP = mongocSubscriptionLookup(subscriptionId);
 
   if (dbSubscriptionP == NULL)
   {
@@ -641,6 +754,37 @@ bool orionldPatchSubscription(void)
     }
   }
 
+  //
+  // If the subscription used to be an MQTT subscription, the MQTT connection might need closing
+  // Only if MQTT data is modified though (or it stops being an MQTT subscription)
+  //
+  kjTreeLog(dbSubscriptionP, "DB Subscription");
+  KjNode*      oldUriP    = kjLookup(dbSubscriptionP, "reference");
+  bool         oldWasMqtt = false;
+  const char*  uriPath[4] = { "notification", "endpoint", "uri", NULL };
+  KjNode*      newUriP    = kjNavigate(orionldState.requestTree, uriPath, NULL, NULL);
+  bool         newIsMqtt  = true;
+  MqttInfo     oldMqttInfo;
+  MqttInfo     newMqttInfo;
+
+  if (oldUriP != NULL)  // Can't really be NULL ...
+  {
+    if (strncmp(oldUriP->value.s, "mqtt", 4) == 0)
+    {
+      oldWasMqtt = true;
+      mqttInfoFromDbTree(dbSubscriptionP, oldUriP, &oldMqttInfo);
+    }
+  }
+
+  if (newUriP != NULL)
+    newIsMqtt = (strncmp(newUriP->value.s, "mqtt", 4) == 0)? true : false;  // Because the URL has been modified
+  else
+    newIsMqtt = oldWasMqtt;  // Because the URL has NOT been modified
+
+  if ((oldWasMqtt == true) && (newIsMqtt == false))
+    mqttChange = true;  // Because it used to be MQTT but is no more
+
+
 
   //
   // Remove Occurrences of $numberLong, i.e. "expiration"
@@ -676,11 +820,29 @@ bool orionldPatchSubscription(void)
     kjChildAdd(dbSubscriptionP, modifiedAtP);
   }
 
+  // Connect to MQTT broker, if needed
+  if ((newIsMqtt == true) && (mqttChange == true))
+  {
+    // GET mix of new and old MQTT info from patched dbSubscriptionP
+    mqttInfoFromDbTree(dbSubscriptionP, newUriP, &newMqttInfo);
+    if (mqttConnectFromInfo(&newMqttInfo) == false)
+    {
+      orionldError(OrionldInternalError, "MQTT Error", "unable to connect to MQTT broker", 500);
+      return false;
+    }
+  }
+
+  // Close the old MQTT connection
+  if ((oldWasMqtt == true) && (mqttChange == true))
+  {
+    // We got the old MQTT connection info from dbSubscriptionP BEFORE it was patched
+    mqttDisconnectFromInfo(&oldMqttInfo);
+  }
 
   //
   // Overwrite the current Subscription in the database
   //
-  if (dbSubscriptionReplace(subscriptionId, dbSubscriptionP) == false)
+  if (mongocSubscriptionReplace(subscriptionId, dbSubscriptionP) == false)
   {
     orionldError(OrionldInternalError, "Database Error", "patching a subscription", 500);
     return false;

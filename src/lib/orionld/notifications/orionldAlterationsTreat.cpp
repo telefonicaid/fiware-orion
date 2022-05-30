@@ -326,10 +326,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     if (npP->fd != -1)
     {
       // No response
-      LM_TMP(("SC: Calling subscriptionFailure for subscription '%s'", npP->subP->subscriptionId));
-      subscriptionFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
-      close(npP->fd);
-      npP->fd = -1;
+      if (strncmp(npP->subP->protocol, "mqtt", 4) != 0)
+      {
+        LM_TMP(("SC: Calling subscriptionFailure for subscription '%s'", npP->subP->subscriptionId));
+        subscriptionFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
+        close(npP->fd);
+        npP->fd = -1;
+      }
     }
 
     npP = npP->next;

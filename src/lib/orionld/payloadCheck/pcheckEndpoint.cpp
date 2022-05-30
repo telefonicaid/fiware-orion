@@ -42,7 +42,7 @@ extern "C"
 //
 // pcheckEndpoint -
 //
-bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP)
+bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP)
 {
   KjNode* uriP           = NULL;
   KjNode* acceptP        = NULL;
@@ -56,6 +56,8 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** noti
       DUPLICATE_CHECK(uriP, "endpoint::uri", epItemP);
       STRING_CHECK(uriP, "endpoint::uri");
       URI_CHECK(uriP->value.s, "endpoint::uri", true);
+      if (strncmp(uriP->value.s, "mqtt", 4) == 0)
+        *mqttChangeP = true;
     }
     else if (strcmp(epItemP->name, "accept") == 0)
     {
@@ -81,7 +83,7 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** noti
       DUPLICATE_CHECK(notifierInfoP, "notifierInfo", epItemP);
       ARRAY_CHECK(notifierInfoP, "notifierInfo");
       EMPTY_ARRAY_CHECK(notifierInfoP, "notifierInfo");
-      if (pcheckNotifierInfo(notifierInfoP) == false)
+      if (pcheckNotifierInfo(notifierInfoP, mqttChangeP) == false)
         return false;
     }
     else
