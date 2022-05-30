@@ -24,7 +24,7 @@ function usage()
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
   echo "$empty [-m <files|commit|tag|push>"
-  echo "$empty [-c <changelog file to flush into .spec, default is CHANGES_NEXT_RELEASE>"
+  echo "$empty [-c <changelog file to flush into Changelog, default is CHANGES_NEXT_RELEASE>"
   echo
   echo "Modes:"
   echo "* 'files', only modify files (but don't commit changes)"
@@ -34,6 +34,18 @@ function usage()
   echo
   exit $1
 }
+
+
+# from https://stackoverflow.com/a/21370675/1485926
+function daySuffix() {
+  case `date +%d` in
+    1|21|31) echo "st";;
+    2|22)    echo "nd";;
+    3|23)    echo "rd";;
+    *)       echo "th";;
+  esac
+}
+
 
 function checkValidInteger()
 {
@@ -49,65 +61,22 @@ function checkValidInteger()
 }
 
 #
-# Modify rpm/SPECS/contextBroker.spec only when step to a non-dev release
+# Modify Changelog file only when step to a non-dev release
 # 
 # FIXME: unify this code with the same one in resease.sh into a commmon lib
 #
-function flushCNRToSpec()
+function flushCNRToChangelog()
 {
-  SPEC_FILE=rpm/SPECS/contextBroker.spec
+  CHANGELOG_FILE=Changelog
+  TEMP_FILE=$(mktemp)
 
-  #
-  # Edit rpm/SPECS/contextBroker.spec, adding the new changes from CHANGELOG_FILE
-  #
-  # 1. Find the line in rpm/SPECS/contextBroker.spec, where to add the content of CHANGELOG_FILE plus the info-line for the changes.
-  #    o LINES:       number of lines before the insertion
-  # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
-  # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
-  #    o LAST_LINES:  number of lines after the insertion
-  # 4. To a temporal file, add the four 'chunks':
-  #    1. LINES
-  #    2. the info-line for the changes
-  #    3. the content of CHANGELOG_FILE
-  #    4. LAST_LINES
-  # 5. Replace using the temporal file
-
-  #
-  # 1. Find the line in rpm/SPECS/contextBroker.spec, where to add the content of CHANGELOG_FILE
-  #    The for is because these is more than one oceuurence of '%changelog'. We are only
-  #    interested in the last one.
-  #
-  for line in $(grep -n '%changelog' $SPEC_FILE | awk -F: '{ print $1 }')
-  do
-    LINE=$line
-  done
-
-  #
-  # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
-  #
-  LINES=$(wc -l $SPEC_FILE | awk '{ print $1 }')
-
-  #
-  # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
-  #
-  typeset -i LAST_LINES
-  LAST_LINES=$LINES-$LINE
-
-  #
-  # 4. To a temporal file, add the four 'chunks'
-  #
-  head -$LINE $SPEC_FILE >  /tmp/contextBroker.spec
-
-  echo -n '* '           >> /tmp/contextBroker.spec
-  echo $dateLine         >> /tmp/contextBroker.spec
-
-  cat $changelog         >> /tmp/contextBroker.spec
-  echo                   >> /tmp/contextBroker.spec
-
-  tail -$LAST_LINES $SPEC_FILE  >> /tmp/contextBroker.spec
+  echo $dateLine       >  $TEMP_FILE
+  echo                 >> $TEMP_FILE
+  cat $changelog       >> $TEMP_FILE
+  echo                 >> $TEMP_FILE
+  cat $CHANGELOG_FILE  >> $TEMP_FILE
     
-  # 5. Replace using the temporal file
-  mv /tmp/contextBroker.spec $SPEC_FILE
+  mv $TEMP_FILE $CHANGELOG_FILE
 
   rm $changelog; touch $changelog
 }
@@ -224,9 +193,9 @@ sed "s/$currentTag/$nextTag/" src/app/contextBroker/version.h > /tmp/version.h
 mv /tmp/version.h src/app/contextBroker/version.h
 
 # Flush CNR into .spec
-DATE=$(LANG=C date +"%a %b %d %Y")
-export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${nextTag}-1"
-flushCNRToSpec
+DATE=$(LANG=C date +"(%B %-d`daySuffix`, %Y)")
+export dateLine="${nextTag} $DATE"
+flushCNRToChangelog
 
 # Modify ENV GIT_REV_ORION at docker/Dockerfile
 sed "s/ENV GIT_REV_ORION $currentTag/ENV GIT_REV_ORION $nextTag/" docker/Dockerfile > /tmp/Dockerfile
@@ -234,7 +203,7 @@ mv /tmp/Dockerfile docker/Dockerfile
 
 # Commit all files
 if [ "$commit" == "on" ]; then
-  git add src/app/contextBroker/version.h $changelog docker/Dockerfile rpm/SPECS/contextBroker.spec
+  git add src/app/contextBroker/version.h $changelog docker/Dockerfile Changelog
   git commit -m "Step: $currentTag -> $nextTag"
 fi
 
