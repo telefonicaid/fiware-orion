@@ -37,6 +37,18 @@ function usage
 
 
 
+# from https://stackoverflow.com/a/21370675/1485926
+function daySuffix() {
+  case `date +%d` in
+    1|21|31) echo "st";;
+    2|22)    echo "nd";;
+    3|23)    echo "rd";;
+    *)       echo "th";;
+  esac
+}
+
+
+
 #
 # Checking command line parameters
 #
@@ -72,75 +84,33 @@ fi
 #
 export NEW_VERSION=$1
 export BROKER_RELEASE=$2
-export CHANGELOG_FILE=$3
+export CNR_FILE=$3
 
 
 
 #
 # correct date format
 #
-DATE=$(LANG=C date +"%a %b %d %Y")
-export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${NEW_VERSION}-${BROKER_RELEASE}"
+DATE=$(LANG=C date +"(%B %-d`daySuffix`, %Y)")
+export dateLine="${nextTag} $DATE"
 
 
-# Modify rpm/SPECS/contextBroker.spec only when step to a non-dev release
+# Modify Changelog only when step to a non-dev release
 if [ "$BROKER_RELEASE" != "dev" ]
 then
     #
-    # Edit rpm/SPECS/contextBroker.spec, adding the new changes from CHANGELOG_FILE
+    # Edit Changelog file, adding the new changes from CNR_FILE
     #
-    # 1. Find the line in rpm/SPECS/contextBroker.spec, where to add the content of CHANGELOG_FILE plus the info-line for the changes.
-    #    o LINES:       number of lines before the insertion
-    # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
-    # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
-    #    o LAST_LINES:  number of lines after the insertion
-    # 4. To a temporal file, add the four 'chunks':
-    #    1. LINES
-    #    2. the info-line for the changes
-    #    3. the content of CHANGELOG_FILE
-    #    4. LAST_LINES
-    # 5. Replace using the temporal file
+    CHANGELOG_FILE=Changelog
+    TEMP_FILE=$(mktemp)
 
-    #
-    # 1. Find the line in rpm/SPECS/contextBroker.spec, where to add the content of CHANGELOG_FILE
-    #    The for is because these is more than one oceuurence of '%changelog'. We are only
-    #    interested in the last one.
-    #
-    for line in $(grep -n '%changelog' rpm/SPECS/contextBroker.spec | awk -F: '{ print $1 }')
-    do
-      LINE=$line
-    done
-
-
-    #
-    # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
-    #
-    LINES=$(wc -l rpm/SPECS/contextBroker.spec | awk '{ print $1 }')
-
-
-    #
-    # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
-    #
-    typeset -i LAST_LINES
-    LAST_LINES=$LINES-$LINE
-
-
-    #
-    # 4. To a temporal file, add the four 'chunks'
-    #
-    head -$LINE rpm/SPECS/contextBroker.spec        >  /tmp/contextBroker.spec
-
-    echo -n '* '                                    >> /tmp/contextBroker.spec
-    echo $dateLine                                  >> /tmp/contextBroker.spec
-
-    cat $CHANGELOG_FILE                             >> /tmp/contextBroker.spec
-    echo                                            >> /tmp/contextBroker.spec
-
-    tail -$LAST_LINES rpm/SPECS/contextBroker.spec  >> /tmp/contextBroker.spec
+    echo $dateLine       >  $TEMP_FILE
+    echo                 >> $TEMP_FILE
+    cat $changelog       >> $TEMP_FILE
+    echo                 >> $TEMP_FILE
+    cat $CHANGELOG_FILE  >> $TEMP_FILE
     
-    # 5. Replace using the temporal file
-    mv /tmp/contextBroker.spec rpm/SPECS/contextBroker.spec 
-
+    mv $TEMP_FILE $CHANGELOG_FILE
 fi
 
 
@@ -201,7 +171,7 @@ mv /tmp/Dockerfile docker/Dockerfile
 CURRENT_BRANCH=$(git branch | grep '^*' | cut -c 3-10)
 if [ "$CURRENT_BRANCH" == "master" ]
 then
-    git add rpm/SPECS/contextBroker.spec
+    git add Changelog
     git add src/app/contextBroker/version.h
     git add src/lib/common/defaultValues.h
     git add CHANGES_NEXT_RELEASE
@@ -216,10 +186,6 @@ then
        git tag $NEW_VERSION
        git push --tags origin release/$NEW_VERSION
        git push origin release/$NEW_VERSION
-
-       # Build release only when step to a non-dev release. Note that, taking into account
-       # how the "make rpm" target works, it has to be done after commit has been done
-       make rpm
 
        git checkout $CURRENT_BRANCH
     fi

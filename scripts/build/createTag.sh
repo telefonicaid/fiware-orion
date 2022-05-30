@@ -192,7 +192,7 @@ echo $0: next tag is: "'"${nextTag}"'"
 sed "s/$currentTag/$nextTag/" src/app/contextBroker/version.h > /tmp/version.h
 mv /tmp/version.h src/app/contextBroker/version.h
 
-# Flush CNR into .spec
+# Flush CNR into Changelog
 DATE=$(LANG=C date +"(%B %-d`daySuffix`, %Y)")
 export dateLine="${nextTag} $DATE"
 flushCNRToChangelog
