@@ -77,11 +77,11 @@ bool orionldPostSubscriptions(void)
   KjNode*  geoCoordinatesP = NULL;
   QNode*   qTree           = NULL;
   char*    qRenderedForDb  = NULL;
-  char*    subId;
-  bool     b;
-  bool     qValidForV2;
-  bool     qIsMq;
-  bool     mqtt;
+  bool     mqtt            = false;
+  char*    subId           = NULL;
+  bool     b               = false;
+  bool     qValidForV2     = false;
+  bool     qIsMq           = false;
 
   b = pCheckSubscription(subP,
                          orionldState.payloadIdNode,
