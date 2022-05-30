@@ -19,7 +19,6 @@
 # iot_support at tid dot es
 
 # Default prefix for installation
-# Used by RPM generation
 ifndef DESTDIR
 	DESTDIR=/
 endif
