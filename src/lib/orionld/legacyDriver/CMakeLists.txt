@@ -21,7 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    legacyPostSubscriptions.cpp
+    legacyGetSubscription.cpp
+    legacyGetSubscriptions.cpp
     legacyDeleteSubscription.cpp
+    legacyPostEntities.cpp
 )
 
 # Include directories

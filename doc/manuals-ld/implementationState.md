@@ -229,9 +229,20 @@ This service is experimental and is only in place when Orion-LD is started with 
 ### GET /ngsi-ld/v1/subscriptions
 
 #### Done
-  * Uses the new mongoc driver (only if -experimental is set)
+  * Uses the subscription cache - no need for the legacy driver (only if -experimental is set)
+
+#### Missing
+  * Must implement also GET from database with mopngoc - if not, the broker can't run without sub-cache
 
 ### GET /ngsi-ld/v1/subscriptions/*
+
+#### Done
+  * Uses the subscription cache - no need for the legacy driver (only if -experimental is set)
+
+#### Missing
+  * Must implement also GET from database with mopngoc - if not, the broker can't run without sub-cache
+
+### DELETE /ngsi-ld/v1/subscriptions/*
 
 #### Done
   * Uses the new mongoc driver (only if -experimental is set)
@@ -240,13 +251,8 @@ This service is experimental and is only in place when Orion-LD is started with 
 
 ### PATCH /ngsi-ld/v1/subscriptions/*
 * Not using mongoBackend, but using the the mongo C++ legacy driver:
-  * dbSubscriptionGet
-  * dbSubscriptionReplace
-
-### DELETE /ngsi-ld/v1/subscriptions/*
-* Not using mongoBackend, but using the the mongo C++ legacy driver:
-  * dbSubscriptionGet
-  * dbSubscriptionDelete
+  * dbSubscriptionGet (mongocSubscriptionLookup is already implemented)
+  * dbSubscriptionReplace (mongocSubscriptionReplace ... should be quite easy to implement)
 
 ### DELETE /ngsi-ld/v1/entities/*
 * Not using mongoBackend, but using the the mongo C++ legacy driver:

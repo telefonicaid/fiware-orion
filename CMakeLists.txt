@@ -182,11 +182,12 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
 SET (ORION_LIBS
     common
-    rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
+    rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o
     orionld_rest
     orionld_serviceRoutines
     orionld_troe
     orionld_kjTree
+    orionld_mqtt
     orionld_context
     orionld_common
     orionld_context
@@ -219,13 +220,13 @@ SET (ORION_LIBS
     orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_payloadCheck
     orionld_common
-    orionld_mqtt
     orionld_types
+    orionld_legacyDriver
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
+    orionld_mqtt
     orionld_q
     orionld_mongoc       # subCache needs mongoc
     orionld_dbModel
-    orionld_legacyDriver
     parse
     apiTypesV2
     orionTypes
