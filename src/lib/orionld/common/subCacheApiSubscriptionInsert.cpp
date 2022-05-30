@@ -36,7 +36,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "cache/subCache.h"                                      // CachedSubscription, subCacheItemInsert
+#include "cache/CachedSubscription.h"                            // CachedSubscription
+#include "cache/subCache.h"                                      // subCacheItemInsert
 #include "common/RenderFormat.h"                                 // stringToRenderFormat
 
 #include "orionld/q/QNode.h"                                     // QNode
