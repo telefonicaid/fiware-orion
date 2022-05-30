@@ -25,22 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <regex.h>
 #include <string>
 #include <vector>
 
 #include "mongo/client/dbclient.h"
 
 #include "common/RenderFormat.h"
-#include "ngsi/NotifyConditionVector.h"
-#include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
-#include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
-#include "orionld/context/OrionldContext.h"                  // OrionldContext
+#include "apiTypesV2/EntID.h"                                // EndID
 #include "apiTypesV2/HttpInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
-#include "apiTypesV2/Subscription.h"
-#include "orionld/q/QNode.h"                                 // QNode
+#include "cache/CachedSubscription.h"                        // CachedSubscription
 
 
 
@@ -53,94 +47,6 @@ typedef enum SubCacheState
   ScsIdle,
   ScsSynchronizing
 } SubCacheState;
-
-
-
-/* ****************************************************************************
-*
-* EntityInfo -
-*
-* The struct fields:
-* -------------------------------------------------------------------------------
-* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
-* o entityType           string containing the type of the Entity
-*
-*/
-struct EntityInfo
-{
-  std::string   entityId;
-  bool          isPattern;
-  regex_t       entityIdPattern;
-  bool          entityIdPatternToBeFreed;
-
-  std::string   entityType;
-  bool          isTypePattern;
-  regex_t       entityTypePattern;
-  bool          entityTypePatternToBeFreed;
-
-
-  EntityInfo() {}
-  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
-             bool _isTypePattern);
-  ~EntityInfo() { release(); }
-
-  bool          match(const std::string& idPattern, const std::string& type);
-  void          release(void);
-};
-
-
-
-/* ****************************************************************************
-*
-* CachedSubscription - move to cache/CachedSubscription.h
-*/
-struct CachedSubscription
-{
-  char*                       subscriptionId;
-  char*                       description;
-  std::string                 name;
-
-  char*                       url;       // Copy of httpInfo.url (parsed and destroyed) - allocated and must be freed
-  char*                       protocol;  // pointing to 'protocol' part of 'url'
-  char*                       ip;        // pointing to 'ip' part of 'url'
-  unsigned short              port;      // port, as parsed from 'url'
-  char*                       rest;      // pointing to 'rest' part of 'url'
-
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  std::vector<std::string>    metadata;
-  std::vector<std::string>    notifyConditionV;
-  char*                       tenant;
-  char*                       servicePath;
-  bool                        triggers[OrionldAlterationTypes];
-  double                      throttling;
-  double                      expirationTime;
-  std::string                 ldContext;
-  OrionldContext*             contextP;
-  std::string                 lang;
-  RenderFormat                renderFormat;
-  SubscriptionExpression      expression;
-  bool                        blacklist;
-  ngsiv2::HttpInfo            httpInfo;
-  QNode*                      qP;
-  char*                       qText;  // Note that NGSIv2/mongoBackend q/mq are inside SubscriptionExpression
-  KjNode*                     geoCoordinatesP;
-
-  bool                        isActive;
-  std::string                 status;
-  int64_t                     count;                 // delta count - since last sub cache refresh
-  int64_t                     dbCount;               // count taken from the database
-  double                      lastNotificationTime;  // timestamp of last notification attempt
-  double                      lastFailure;           // timestamp of last notification failure
-  double                      lastSuccess;           // timestamp of last successful notification
-  int                         consecutiveErrors;     // Not in DB
-  char                        lastErrorReason[128];  // Not in DB
-
-  double                      createdAt;
-  double                      modifiedAt;
-
-  struct CachedSubscription*  next;
-};
 
 
 
