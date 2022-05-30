@@ -81,7 +81,7 @@ payload='{
     "attributes": [ "P1", "P2", "A3" ],
     "format": "keyValues",
     "endpoint": {
-      "uri": "http://valid.url/url",
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
       "accept": "application/ld+json",
       "notifierInfo": [
         {
@@ -440,7 +440,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"format" : "keyValues",
-	"reference" : "http://valid.url/url",
+	"reference" : "mqtt://localhost:1883/entities",
 	"mimeType" : "application/ld+json",
 	"headers" : {
 		"H1" : "header 1"
@@ -459,7 +459,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1250
+Content-Length: 1260
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -506,7 +506,7 @@ Date: REGEX(.*)
     ],
     "format": "keyValues",
     "endpoint": {
-      "uri": "http://valid.url/url",
+      "uri": "mqtt://localhost:1883/entities",
       "accept": "application/ld+json",
       "receiverInfo": [
         {
@@ -535,7 +535,7 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1252
+Content-Length: 1262
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -581,7 +581,7 @@ Date: REGEX(.*)
     ],
     "format": "keyValues",
     "endpoint": {
-      "uri": "http://valid.url/url",
+      "uri": "mqtt://localhost:1883/entities",
       "accept": "application/ld+json",
       "receiverInfo": [
         {

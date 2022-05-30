@@ -49,7 +49,8 @@ extern bool pCheckSubscription
   bool*     qIsMqP,
   KjNode**  uriPP,
   KjNode**  notifierInfoPP,
-  KjNode**  geoCoordinatesPP
+  KjNode**  geoCoordinatesPP,
+  bool*     mqttChangeP
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_

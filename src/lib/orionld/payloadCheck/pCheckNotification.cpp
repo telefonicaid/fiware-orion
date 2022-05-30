@@ -44,7 +44,7 @@ extern "C"
 //
 // pCheckNotification -
 //
-bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP)
+bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP)
 {
   KjNode* attributesP = NULL;
   KjNode* formatP     = NULL;
@@ -85,7 +85,7 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
       PCHECK_DUPLICATE(endpointP, nItemP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       PCHECK_OBJECT(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       PCHECK_OBJECT_EMPTY(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
-      if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP) == false)
+      if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP, mqttChangeP) == false)
         return false;
     }
     else if (strcmp(nItemP->name, "status")           == 0) {}  // Ignored

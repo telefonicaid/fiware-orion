@@ -23,7 +23,6 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttConnectionAdd.h"                    // mqttConnectionAdd
@@ -43,6 +42,7 @@ bool mqttConnectionEstablish(bool mqtts, const char* username, const char* passw
   {
     // Already connected
     mqP->connections += 1;
+    LM_TMP(("Already connected. Connections: %d", mqP->connections));
     return true;
   }
 

@@ -26,6 +26,8 @@
 #include <strings.h>                                           // bzero
 #include <MQTTClient.h>                                        // MQTT Client header
 
+#include "logMsg/logMsg.h"                                     // LM_*
+
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttDisconnect.h"                       // Own Interface
@@ -48,7 +50,10 @@ void mqttDisconnect(const char* host, unsigned short port, const char* username,
 
   mcP->connections -= 1;
   if (mcP->connections > 0)
+  {
+    LM_TMP(("Can't really disconnect - there are other connections (%d)", mcP->connections));
     return;
+  }
 
   if (mcP->host     != NULL)      free(mcP->host);
   if (mcP->username != NULL)      free(mcP->username);

@@ -77,10 +77,11 @@ bool orionldPostSubscriptions(void)
   KjNode*  geoCoordinatesP = NULL;
   QNode*   qTree           = NULL;
   char*    qRenderedForDb  = NULL;
-  char*    subId;
-  bool     b;
-  bool     qValidForV2;
-  bool     qIsMq;
+  bool     mqtt            = false;
+  char*    subId           = NULL;
+  bool     b               = false;
+  bool     qValidForV2     = false;
+  bool     qIsMq           = false;
 
   b = pCheckSubscription(subP,
                          orionldState.payloadIdNode,
@@ -93,7 +94,8 @@ bool orionldPostSubscriptions(void)
                          &qIsMq,
                          &uriP,
                          &notifierInfoP,
-                         &geoCoordinatesP);
+                         &geoCoordinatesP,
+                         &mqtt);
   if (b == false)
   {
     if (qTree != NULL)
@@ -198,10 +200,10 @@ bool orionldPostSubscriptions(void)
   char*           mqttVersion      = NULL;  // NOTE, my (KZ) local mosquitto seems to only support "mqtt3.1.1"
   int             mqttQoS          = 0;
 
-  if (strncmp(uriP->value.s, "mqtt://", 7) == 0)  // pCheckSubscription guarantees uriP is non-NULL and a KjString
+  if (mqtt == true)
   {
-    char*           detail        = NULL;
-    char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
+    char*  detail = NULL;
+    char*  uri    = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
 
     if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
     {

@@ -42,7 +42,7 @@ extern "C"
 //
 // pcheckNotifierInfo -
 //
-bool pcheckNotifierInfo(KjNode* niP)
+bool pcheckNotifierInfo(KjNode* niP, bool* mqttChangeP)
 {
   for (KjNode* niItemP = niP->value.firstChildP; niItemP != NULL; niItemP = niItemP->next)
   {
@@ -103,6 +103,8 @@ bool pcheckNotifierInfo(KjNode* niP)
         orionldError(OrionldBadRequestData, "Invalid value for notifierInfo item /MQTT-Version/", valueP->value.s, 400);
         return false;
       }
+
+      *mqttChangeP = true;
     }
     else if (strcmp(keyP->value.s, "MQTT-QoS") == 0)
     {
@@ -122,6 +124,8 @@ bool pcheckNotifierInfo(KjNode* niP)
         orionldError(OrionldBadRequestData, "Invalid value for notifierInfo item /MQTT-OoS/ - only 0, 1, and 2 are allowed", valueP->value.s, 400);
         return false;
       }
+
+      *mqttChangeP = true;
     }
     else
     {

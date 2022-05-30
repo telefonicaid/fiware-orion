@@ -135,6 +135,10 @@ except GetoptError:
     exit(1)
 
 
+logFile.write("Parsed Command Line Arguments\n")
+logFile.flush()
+
+
 # -----------------------------------------------------------------------------
 #
 #
@@ -222,6 +226,9 @@ def on_message(client, userdata, msg):
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
+
+logFile.write("MQTT Test Client connecting to " + mqttBrokerIp + ":" + str(mqttBrokerPort) + "\n")
+logFile.flush()
 
 client.connect(mqttBrokerIp, mqttBrokerPort, 60)
 logFile.write("MQTT Test Client connected to " + mqttBrokerIp + ":" + str(mqttBrokerPort) + "\n")

@@ -156,7 +156,7 @@ void orionldPatchApply(KjNode* patchBase, KjNode* patchP)
 
   KjNode*  parentP         = NULL;
   bool     onlyLastMissing = false;
-  KjNode*  nodeP           = kjNavigate(patchBase, compV, &parentP, &onlyLastMissing);
+  KjNode*  nodeP           = kjNavigate(patchBase, (const char**) compV, &parentP, &onlyLastMissing);
 
   // Remove non-wanted parts of objects
   if (treeNode->type == KjObject)
