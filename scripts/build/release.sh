@@ -92,7 +92,7 @@ export CNR_FILE=$3
 # correct date format
 #
 DATE=$(LANG=C date +"(%B %-d`daySuffix`, %Y)")
-export dateLine="${nextTag} $DATE"
+export dateLine="${NEW_VERSION} $DATE"
 
 
 # Modify Changelog only when step to a non-dev release
@@ -106,7 +106,7 @@ then
 
     echo $dateLine       >  $TEMP_FILE
     echo                 >> $TEMP_FILE
-    cat $changelog       >> $TEMP_FILE
+    cat $CNR_FILE        >> $TEMP_FILE
     echo                 >> $TEMP_FILE
     cat $CHANGELOG_FILE  >> $TEMP_FILE
     
