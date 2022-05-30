@@ -599,23 +599,26 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
 //
 static bool mqttInfoFromDbTree(KjNode* dbSubscriptionP, KjNode* uriP, MqttInfo* miP)
 {
+  LM_TMP(("URI: '%s'", uriP->value.s));
   char* uri = kaStrdup(&orionldState.kalloc, uriP->value.s);
-  char* detail;
-  char* usernameP;
-  char* passwordP;
-  char* hostP;
-  char* topicP;
+  char* detail     = NULL;
+  char* usernameP  = NULL;
+  char* passwordP  = NULL;
+  char* hostP      = NULL;
+  char* topicP     = NULL;
 
+  LM_TMP(("Calling mqttParse"));
   if (mqttParse(uri, &miP->mqtts, &usernameP, &passwordP, &hostP, &miP->port, &topicP, &detail) == false)
   {
     orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
     return false;
   }
+  LM_TMP(("After mqttParse"));
 
-  strncpy(miP->username, usernameP, sizeof(miP->username) - 1);
-  strncpy(miP->password, passwordP, sizeof(miP->password) - 1);
-  strncpy(miP->host,     hostP,     sizeof(miP->host)     - 1);
-  strncpy(miP->topic,    topicP,    sizeof(miP->topic)    - 1);
+  if (usernameP != NULL) strncpy(miP->username, usernameP, sizeof(miP->username) - 1);
+  if (passwordP != NULL) strncpy(miP->password, passwordP, sizeof(miP->password) - 1);
+  if (hostP     != NULL) strncpy(miP->host,     hostP,     sizeof(miP->host)     - 1);
+  if (topicP    != NULL) strncpy(miP->topic,    topicP,    sizeof(miP->topic)    - 1);
 
   LM_TMP(("Topic: '%s'", miP->topic));
 
@@ -772,6 +775,7 @@ bool orionldPatchSubscription(void)
     if (strncmp(oldUriP->value.s, "mqtt", 4) == 0)
     {
       oldWasMqtt = true;
+      bzero(&oldMqttInfo, sizeof(oldMqttInfo));
       mqttInfoFromDbTree(dbSubscriptionP, oldUriP, &oldMqttInfo);
     }
   }
@@ -824,6 +828,7 @@ bool orionldPatchSubscription(void)
   if ((newIsMqtt == true) && (mqttChange == true))
   {
     // GET mix of new and old MQTT info from patched dbSubscriptionP
+    bzero(&newMqttInfo, sizeof(newMqttInfo));
     mqttInfoFromDbTree(dbSubscriptionP, newUriP, &newMqttInfo);
     if (mqttConnectFromInfo(&newMqttInfo) == false)
     {
