@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_FT
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
@@ -368,6 +369,23 @@ bool qRangeCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool is
   LM_TMP(("QM: LHS        is of type '%s'", kjValueType(lhsNode->type)));
   LM_TMP(("QM: Low  range is of type '%s'", qNodeType(low->type)));
   LM_TMP(("QM: High range is of type '%s'", qNodeType(high->type)));
+  LM_TMP(("QM: Is it a Timestamp?     %s",  K_FT(isTimestamp)));
+
+  if (isTimestamp)
+  {
+    double lhsTimestamp  = parse8601Time(lhsNode->value.s);
+    double lowTimestamp  = (low->type == QNodeFloatValue)? low->value.f :  parse8601Time(low->value.s);
+    double highTimestamp = parse8601Time(high->value.s);
+
+    LM_TMP(("QM: LHS  timestamp:  %f", lhsTimestamp));
+    LM_TMP(("QM: Low  timestamp:  %f", lowTimestamp));
+    LM_TMP(("QM: High timestamp:  %f", highTimestamp));
+
+    if ((lhsTimestamp >= lowTimestamp) && (lhsTimestamp <= highTimestamp))
+      return true;
+
+    return false;
+  }
 
   if (lhsNode->type == KjInt)
   {
@@ -833,7 +851,12 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
       else if (rhs->type == QNodeComma)   return  qCommaListCompare(altP, lhsNode, rhs, isTimestamp);
       else                                return  qEqCompare(altP, lhsNode, rhs, isTimestamp);
     }
-    else if (qP->type == QNodeNE)         return !qEqCompare(altP, lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeNE)
+    {
+      if      (rhs->type == QNodeRange)   return !qRangeCompare(altP, lhsNode, rhs, isTimestamp);
+      else if (rhs->type == QNodeComma)   return !qCommaListCompare(altP, lhsNode, rhs, isTimestamp);
+      else                                return !qEqCompare(altP, lhsNode, rhs, isTimestamp);
+    }
     else if (qP->type == QNodeGT)         return  qGtCompare(altP, lhsNode, rhs, isTimestamp);
     else if (qP->type == QNodeLT)         return  qLtCompare(altP, lhsNode, rhs, isTimestamp);
     else if (qP->type == QNodeGE)         return !qLtCompare(altP, lhsNode, rhs, isTimestamp);

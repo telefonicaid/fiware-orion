@@ -56,11 +56,13 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 //
 // qDateTimePush -
 //
-static QNode* qDateTimePush(QNode* prev, int64_t dateTime)
+static QNode* qDateTimePush(QNode* prev, double dateTime)
 {
-  QNode* qNodeP = qNode(QNodeIntegerValue);
+  LM_TMP(("Modifying a String to a DateTime (QNode of type QNodeFloatValue)"));
 
-  qNodeP->value.i = dateTime;
+  QNode* qNodeP = qNode(QNodeFloatValue);
+
+  qNodeP->value.f = dateTime;
 
   prev->next = qNodeP;
 
@@ -401,7 +403,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
       *sP = 0;
       ++sP;
-      int64_t   dateTime;
+      double    dateTime;
       uint64_t  sLen = (uint64_t) (sP - start - 2);
 
       if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
