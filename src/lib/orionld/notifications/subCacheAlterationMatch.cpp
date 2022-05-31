@@ -351,6 +351,121 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
 
 // -----------------------------------------------------------------------------
 //
+// qRangeCompare -
+//
+bool qRangeCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+{
+  QNode* low  = rhs->value.children;
+
+  if (low == NULL)
+    return false;
+
+  QNode* high = low->next;
+
+  if (high == NULL)
+    return false;
+
+  LM_TMP(("QM: LHS        is of type '%s'", kjValueType(lhsNode->type)));
+  LM_TMP(("QM: Low  range is of type '%s'", qNodeType(low->type)));
+  LM_TMP(("QM: High range is of type '%s'", qNodeType(high->type)));
+
+  if (lhsNode->type == KjInt)
+  {
+    if (low->type == QNodeIntegerValue)
+    {
+      if (lhsNode->value.i < low->value.i)
+        return false;
+    }
+    else if (low->type == QNodeFloatValue)
+    {
+      if ((double) lhsNode->value.i < low->value.f)
+        return false;
+    }
+    else
+      return false;  // type mismatch
+
+    if (high->type == QNodeIntegerValue)
+    {
+      if (lhsNode->value.i > high->value.i)
+        return false;
+    }
+    else if (high->type == QNodeFloatValue)
+    {
+      if ((double) lhsNode->value.i > high->value.f)
+        return false;
+    }
+    else
+      return false;  // type mismatch
+
+    return true;
+  }
+
+  if (lhsNode->type == KjFloat)
+  {
+    if (low->type == QNodeFloatValue)
+    {
+      if (lhsNode->value.f < low->value.f)
+        return false;
+    }
+    else if (low->type == QNodeIntegerValue)
+    {
+      if (lhsNode->value.f < (double) low->value.i)
+        return false;
+    }
+    else
+      return false;  // type mismatch
+
+    if (high->type == QNodeFloatValue)
+    {
+      if (lhsNode->value.f > high->value.f)
+        return false;
+    }
+    else if (high->type == QNodeIntegerValue)
+    {
+      if (lhsNode->value.f > (double) high->value.i)
+        return false;
+    }
+    else
+      return false;  // type mismatch
+
+    return true;
+  }
+
+  if (lhsNode->type == KjString)
+  {
+    if (low->type == QNodeStringValue)
+    {
+      if (strcmp(lhsNode->value.s, low->value.s)  < 0)
+        return false;
+      if (strcmp(lhsNode->value.s, high->value.s) > 0)
+        return false;
+
+      return true;
+    }
+
+    return false;  // type mismatch
+  }
+
+  // Timestamp!
+
+  return false;  // RANGES operate only on Numbers, Strings and Timestamps
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qCommaListCompare -
+//
+bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+{
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // qEqCompare -
 //
 bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
@@ -707,12 +822,17 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     //
     // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
     //
-    if (lhsNode  == NULL)
+    if (lhsNode == NULL)
       return (qP->type == QNodeNotExists)? true : false;
 
     if      (qP->type == QNodeNotExists)  return false;
     else if (qP->type == QNodeExists)     return true;
-    else if (qP->type == QNodeEQ)         return  qEqCompare(altP, lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeEQ)
+    {
+      if      (rhs->type == QNodeRange)   return  qRangeCompare(altP, lhsNode, rhs, isTimestamp);
+      else if (rhs->type == QNodeComma)   return  qCommaListCompare(altP, lhsNode, rhs, isTimestamp);
+      else                                return  qEqCompare(altP, lhsNode, rhs, isTimestamp);
+    }
     else if (qP->type == QNodeNE)         return !qEqCompare(altP, lhsNode, rhs, isTimestamp);
     else if (qP->type == QNodeGT)         return  qGtCompare(altP, lhsNode, rhs, isTimestamp);
     else if (qP->type == QNodeLT)         return  qLtCompare(altP, lhsNode, rhs, isTimestamp);
