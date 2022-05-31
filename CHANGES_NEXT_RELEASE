@@ -37,3 +37,5 @@
 * Issue #280   Subscription Cache Counters are now updated using mongoc and not the old legacy driver (-experimental)
 * Issue #280   DELETE subscriptions/{subId} now uses the new mongoc driver (if experimental is set)
 * Issue #280   PATCH subscriptions/{subId} now uses the new mongoc driver
+* Issue #280   Timestamp support in RANGE in 'q' for subscriptions
+* Issue #280   Support for NOT EQ for range in 'q' for subscriptions
