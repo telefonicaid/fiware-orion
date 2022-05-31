@@ -35,10 +35,10 @@
 - [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
-            - [List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]](#list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby)
-            - [Create Entity [POST /v2/entities{?options}]](#create-entity-post-v2entitiesoptions)
+            - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
+            - [Create Entity [POST /v2/entities]](#create-entity-post-v2entities)
         - [Entity by ID](#entity-by-id)
-            - [Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]](#retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions)
+            - [Retrieve Entity [GET /v2/entities/{entityId}]](#retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions)
             - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]](#retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions)
             - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]](#update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions)
             - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]](#update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions)
@@ -981,7 +981,7 @@ to keep your client decoupled from implementation details.
 
 ### Entities List
 
-#### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+#### List Entities [GET /v2/entities]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
@@ -1101,7 +1101,7 @@ Response code:
          }
         ]
 
-#### Create Entity [POST /v2/entities{?options}]
+#### Create Entity [POST /v2/entities]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
@@ -1159,7 +1159,7 @@ Response:
 
 ### Entity by ID
 
-#### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+#### Retrieve Entity [GET /v2/entities/]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1219,7 +1219,7 @@ Response:
           }
         }
 
-#### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+#### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
 
 This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1280,7 +1280,7 @@ Response:
           }
         }
 
-#### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
+#### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1323,7 +1323,7 @@ Response:
 
 + Response 204
 
-#### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+#### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1360,7 +1360,7 @@ Response:
 
 + Response 204
 
-#### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
+#### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" above), except
@@ -1397,7 +1397,7 @@ Response:
 
 + Response 204
 
-#### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
+#### Remove Entity [DELETE /v2/entities/{entityId}]
 
 Delete the entity.
 
@@ -1417,7 +1417,7 @@ Response:
 
 ### Attributes
 
-#### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
+#### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
@@ -1444,7 +1444,7 @@ Response:
           "metadata": {}
         }
 
-#### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+#### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -1476,7 +1476,7 @@ Response:
 + Response 200
 
 
-#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
 Removes an entity attribute.
 
@@ -1497,7 +1497,7 @@ Response:
 
 ### Attribute Value
 
-#### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+#### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -1532,7 +1532,7 @@ Response:
           "country": "Spain"
         }
 
-#### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+#### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
 The request payload is the new attribute value.
 
@@ -1575,7 +1575,7 @@ Response:
 
 ### Types
 
-#### List Entity Types [GET /v2/types/{?limit,offset,options}]
+#### List Entity Types [GET /v2/types/]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1642,7 +1642,7 @@ Response code:
           }
         ]
 
-#### Retrieve entity information for a given type [GET /v2/types/{entityType}]
+#### Retrieve entity information for a given type [GET /v2/types/]
 
 This operation returns a JSON object with information about the type:
 
@@ -1769,7 +1769,7 @@ Notification rules are as follow:
 
 ### Subscription List
 
-#### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
+#### List Subscriptions [GET /v2/subscriptions]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -2032,7 +2032,7 @@ Not present if registration has never had a successful notification.
 
 ### Registration list
 
-#### List Registrations [GET /v2/registrations{?limit,offset,options}]
+#### List Registrations [GET /v2/registrations]
 
 Lists all the context provider registrations present in the system.
 
@@ -2381,7 +2381,7 @@ Response code:
         ]
 
 
-#### Notify [POST /v2/op/notify{?options}]
+#### Notify [POST /v2/op/notify]
 
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
 This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
