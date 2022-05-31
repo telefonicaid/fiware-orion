@@ -54,7 +54,6 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
   char  varPath[1024];  // Can't destroy varPathIn - need to copy it
 
   strncpy(varPath, varPathIn, sizeof(varPath) - 1);
-  LM_TMP(("LEAK: In varFix for varPath '%s' at %p", varPath, varPath));
 
   char* cP            = varPath;
   char* attrNameP     = varPath;
@@ -297,15 +296,5 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
       snprintf(fullPath, sizeof(fullPath) - 1, "%s.%s", longName, mdNameP);
   }
 
-  if (orionldState.useMalloc == true)
-  {
-    // free(varPath);
-    // char* fp = strndup(fullPath, sizeof(fullPath) - 1);
-    // LM_TMP(("LEAK: returning strdupped '%s' at %p", fp, fp));
-    // return fp;
-    return kaStrdup(&orionldState.kalloc, fullPath);
-  }
-
-  LM_TMP(("LEAK: returning kaStrdupped '%s' at %p", fullPath, fullPath));
   return kaStrdup(&orionldState.kalloc, fullPath);
 }

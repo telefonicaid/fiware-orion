@@ -196,9 +196,20 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, cha
 
           if (lowerLimit->type != upperLimit->type)
           {
-            *titleP   = (char*) "ngsi-ld query language: mixed types in range";
-            *detailsP = (char*) qNodeType(upperLimit->type);
-            return NULL;
+            //
+            // If timestamp, the lower limit has been converted into a FLOAT
+            // FIXME: convert the upper limit to FLOAT also !  (qLex)
+            // Meanwhile, we accept FLOAT .. STRING
+            //
+            LM_TMP(("lowerLimit is of type '%s'", qNodeType(lowerLimit->type)));
+            LM_TMP(("upperLimit is of type '%s'", qNodeType(upperLimit->type)));
+
+            if ((lowerLimit->type != QNodeFloatValue) || (upperLimit->type != QNodeStringValue))
+            {
+              *titleP   = (char*) "ngsi-ld query language: mixed types in range";
+              *detailsP = (char*) qNodeType(upperLimit->type);
+              return NULL;
+            }
           }
 
           qNodeAppend(rangeP, lowerLimit);

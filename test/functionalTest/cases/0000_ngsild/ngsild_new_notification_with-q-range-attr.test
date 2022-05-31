@@ -53,6 +53,12 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 14. Create an Entity E6, NOT matching S3
 # 15. Dump accumulator to see NO notification
 #
+# TIMESTAMP
+# 16. Create a subscription S4 with q=P1.observedAt=="2022-05-31T08:59:00.001Z".."2022-05-31T08:59:00.005Z"
+# 17. Create an Entity E7, matching S4
+# 18. Dump accumulator to see one notification
+# 19. Create an Entity E8, NOT matching S4
+# 20. Dump accumulator to see NO notification
 #
 
 echo "01. Create a subscription S1 with q=P1==5..10"
@@ -244,6 +250,76 @@ echo
 echo
 
 
+echo '16. Create a subscription S4 with q=P1.observedAt=="2022-05-31T08:59:00.001Z".."2022-05-31T08:59:00.005Z"'
+echo '========================================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:subs:S4",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "P1.observedAt==%222022-05-31T08:59:00.001Z%22..%222022-05-31T08:59:00.005Z%22",
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "17. Create an Entity E7, matching S4"
+echo "===================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E7",
+  "type": "T",
+  "P1": {
+    "value": 1,
+    "observedAt": "2022-05-31T08:59:00.001Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+
+echo "18. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "19. Create an Entity E8, NOT matching S4"
+echo "========================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E8",
+  "type": "T",
+  "P1": {
+    "value": 1,
+    "observedAt": "2022-05-31T08:59:00.000Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "20. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
 --REGEXPECT--
 01. Create a subscription S1 with q=P1==5..10
 =============================================
@@ -413,6 +489,67 @@ Date: REGEX(.*)
 
 
 15. Dump accumulator to see NO notification
+===========================================
+
+
+16. Create a subscription S4 with q=P1.observedAt=="2022-05-31T08:59:00.001Z".."2022-05-31T08:59:00.005Z"
+=========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S4
+Date: REGEX(.*)
+
+
+
+17. Create an Entity E7, matching S4
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E7
+Date: REGEX(.*)
+
+
+
+18. Dump accumulator to see one notification
+============================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subs:S4
+Content-Length: 301
+User-Agent: orionld/post-v1.0.1
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "observedAt": "2022-05-31T08:59:00.001Z",
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:entities:T:E7",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S4",
+    "type": "Notification"
+}
+=======================================
+
+
+19. Create an Entity E8, NOT matching S4
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E8
+Date: REGEX(.*)
+
+
+
+20. Dump accumulator to see NO notification
 ===========================================
 
 
