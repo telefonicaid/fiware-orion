@@ -75,7 +75,7 @@
             - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
     - [Batch Operations](#batch-operations)
             - [Update [POST /v2/op/update]](#update-post-v2opupdate)
-            - [Query [POST /v2/op/query{?limit,offset,options}]](#query-post-v2opquerylimitoffsetoptions)
+            - [Query [POST /v2/op/query]](#query-post-v2opquery)
             - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
 
 <!-- /TOC -->
@@ -2285,7 +2285,7 @@ Response:
 + Response 204
 
 
-#### Query [POST /v2/op/query{?limit,offset,options}]
+#### Query [POST /v2/op/query]
 
 The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
 no entities are found. The entities follow the JSON entity representation format
