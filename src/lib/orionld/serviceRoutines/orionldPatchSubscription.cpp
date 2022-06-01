@@ -354,7 +354,7 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
 
     if (strncmp(uriP->value.s, "mqtt", 4) == 0)
     {
-      char*           url           = strdup(uriP->value.s);
+      char            mqttUrl[512];
       bool            mqtts         = false;
       char*           mqttUser      = NULL;
       char*           mqttPassword  = NULL;
@@ -363,7 +363,8 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
       char*           mqttTopic     = NULL;
       char*           detail        = NULL;
 
-      if (mqttParse(url, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+      strncpy(mqttUrl, uriP->value.s, sizeof(mqttUrl) - 1);
+      if (mqttParse(mqttUrl, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
       {
         free(url);
         LM_E(("Internal Error (unable to parse mqtt URL)"));
@@ -377,25 +378,27 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
 
       cSubP->httpInfo.mqtt.mqtts = mqtts;
       cSubP->httpInfo.mqtt.port  = mqttPort;
+    }
 
-      free(url);
+    //
+    // FIXME: if mqtt, I parse the URL twice, and save IP, port + rest (topic) twice as well
+    //        I should remove the MQTT info from HttpInfo and save directly in CachedSubscription - next to protocol, ip, port, rest
+    //
+    if (urlParse(url, &protocol, &ip, &port, &rest) == true)
+    {
+      if (cSubP->url != NULL)
+        free(cSubP->url);
+      cSubP->url      = url;  // Only ... it's already destroyed by 'urlParse' - need it to free up later
+      cSubP->protocol = protocol;
+      cSubP->ip       = ip;
+      cSubP->port     = port;
+      cSubP->rest     = rest;
     }
     else
     {
-      if (urlParse(url, &protocol, &ip, &port, &rest) == true)
-      {
-        free(cSubP->url);
-        cSubP->url      = url;  // Only ... it's destroyed :)
-        cSubP->protocol = protocol;
-        cSubP->ip       = ip;
-        cSubP->port     = port;
-        cSubP->rest     = rest;
-      }
-      else
-      {
-        LM_W(("Invalid url '%s'", uriP->value.s));
-        return false;
-      }
+      LM_W(("Invalid url '%s'", uriP->value.s));
+      free(url);
+      return false;
     }
   }
 

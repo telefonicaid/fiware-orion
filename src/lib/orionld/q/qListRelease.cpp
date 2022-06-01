@@ -41,16 +41,8 @@ void qListRelease(QNode* qP)
   {
     QNode* next = qP->next;
 
-    if ((qP->type == QNodeVariable) && (qP->value.v != NULL))
-    {
-      LM_TMP(("LEAK: NOT Releasing Variable '%s' at %p", qP->value.v, qP->value.v));
-      // free(qP->value.v);
-    }
-    else if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
-    {
-      LM_TMP(("LEAK: Releasing String value '%s' at %p", qP->value.s, qP->value.s));
+    if ((qP->type == QNodeStringValue) && (qP->value.s != NULL))
       free(qP->value.s);
-    }
 
     free(qP);
 

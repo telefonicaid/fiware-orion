@@ -166,7 +166,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   if (mqttConnectionP == NULL)
   {
     mqttConnectionP = mqttConnectionAdd(false, mqttP->username, mqttP->password, mqttP->host, mqttP->port, mqttP->version);
-    if (mqttP == NULL)
+    if (mqttConnectionP == NULL)
     {
       orionldError(OrionldInternalError, "MQTT Broker Problem", "unable to connect to the MQTT broker", 500);
       return 3;

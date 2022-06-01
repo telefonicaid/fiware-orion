@@ -50,18 +50,14 @@ void mqttDisconnect(const char* host, unsigned short port, const char* username,
 
   mcP->connections -= 1;
   if (mcP->connections > 0)
-  {
-    LM_TMP(("Can't really disconnect - there are other connections (%d)", mcP->connections));
     return;
-  }
 
   if (mcP->host     != NULL)      free(mcP->host);
   if (mcP->username != NULL)      free(mcP->username);
   if (mcP->password != NULL)      free(mcP->password);
   if (mcP->version  != NULL)      free(mcP->version);
 
-  bzero(mcP, sizeof(MqttConnection));
-
   MQTTClient_disconnect(&mcP->client, 10000);
   MQTTClient_destroy(&mcP->client);
+  bzero(mcP, sizeof(MqttConnection));
 }

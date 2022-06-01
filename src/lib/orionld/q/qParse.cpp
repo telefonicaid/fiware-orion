@@ -230,9 +230,13 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, cha
 
             if (qLexP->type != commaValueType)
             {
-              *titleP   = (char*) "ngsi-ld query language: mixed types in comma-list";
-              *detailsP = (char*) qNodeType(qLexP->type);
-              return NULL;
+              // Exception - was a String but is now a Float
+              if ((commaValueType != QNodeFloatValue) || (qLexP->type != QNodeStringValue))
+              {
+                *titleP   = (char*) "ngsi-ld query language: mixed types in comma-list";
+                *detailsP = (char*) qNodeType(qLexP->type);
+                return NULL;
+              }
             }
 
             qNodeAppend(commaP, valueP);  // OK to enlist commaP and valueP as qLexP point to after valueP

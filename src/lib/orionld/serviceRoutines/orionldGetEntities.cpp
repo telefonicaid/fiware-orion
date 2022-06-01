@@ -404,7 +404,7 @@ bool orionldGetEntities(void)
     QNode* lexList;
     QNode* qTree;
 
-    if ((lexList = qLex(q, &title, &detail)) == NULL)
+    if ((lexList = qLex(q, true, &title, &detail)) == NULL)
     {
       LM_W(("Bad Input (qLex: %s: %s)", title, detail));
       orionldError(OrionldBadRequestData, title, detail, 400);

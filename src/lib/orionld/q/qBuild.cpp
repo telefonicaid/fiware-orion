@@ -85,7 +85,7 @@ QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool 
 
   urlDecode(qString);
   orionldState.useMalloc = true;  // the Q-Tree needs real alloction for the sub-cache
-  qList = qLex(qString, &title, &detail);
+  qList = qLex(qString, false, &title, &detail);
   if (qList == NULL)
   {
     orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
@@ -93,7 +93,6 @@ QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool 
   }
   else
   {
-    // qListPresent(qList, NULL, "LEAK", "Q Lex List");
     if (qRenderP != NULL)
     {
       // NOTE: qLexListRender MUST NOT destroy the qList!!!

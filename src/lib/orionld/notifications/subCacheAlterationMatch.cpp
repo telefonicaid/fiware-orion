@@ -473,10 +473,160 @@ bool qRangeCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool is
 
 // -----------------------------------------------------------------------------
 //
+// intComparison
+//
+bool intComparison(long long lhs, QNode* rhs)
+{
+  if      (rhs->type == QNodeIntegerValue)  return lhs == rhs->value.i;
+  else if (rhs->type == QNodeFloatValue)    return ((double) lhs) == rhs->value.f;
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// floatComparison
+//
+bool floatComparison(KjNode* lhsP, QNode* rhs, bool isTimestamp)
+{
+  if (isTimestamp == false)
+  {
+    double lhs = lhsP->value.f;
+
+    if      (rhs->type == QNodeFloatValue)    return lhs == rhs->value.f;  // precision for float comparison??
+    else if (rhs->type == QNodeIntegerValue)  return lhs == (double) rhs->value.i;
+    else                                      return false;
+  }
+
+  if (rhs->type == QNodeStringValue)
+  {
+    double rhsTimestamp = parse8601Time(rhs->value.s);
+
+    if (lhsP->value.f == rhsTimestamp)
+      return true;
+  }
+
+  return false;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// boolComparison
+//
+bool boolComparison(bool lhs, QNode* rhs)
+{
+  if ((lhs == true) && (rhs->type == QNodeTrueValue))
+    return true;
+
+  if ((lhs == false) && (rhs->type == QNodeFalseValue))
+    return true;
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// stringComparison
+//
+bool stringComparison(KjNode* lhsP, QNode* rhs, bool isTimestamp)
+{
+  if (rhs->type != QNodeStringValue)
+    return false;
+
+  if (isTimestamp)  // Then LHS is a Float?
+  {
+    double rhsTimestamp = parse8601Time(rhs->value.s);
+
+    return (lhsP->value.f == rhsTimestamp);
+  }
+
+  if (rhs->type != QNodeStringValue)
+    return false;
+
+  return (strcmp(lhsP->value.s, rhs->value.s) == 0);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // qCommaListCompare -
 //
 bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
+  LM_TMP(("CLIST: Comma-List comparison for '%s' that is %s timestamp", lhsNode->name, (isTimestamp == true)? "a" : "NOT a"));
+
+  if (isTimestamp == true)  // The first in the list id a FLOAT, the rest need to be converted to float
+  {
+    double timestamp;
+
+    LM_TMP(("CLIST: '%s' is of type '%s'", lhsNode->name, kjValueType(lhsNode->type)));
+
+    if (lhsNode->type == KjFloat)
+      timestamp = lhsNode->value.f;
+    else if (lhsNode->type == KjString)
+      timestamp = parse8601Time(lhsNode->value.s);
+    else
+      return false;
+
+    LM_TMP(("CLIST: LHS FLOAT == %f", timestamp));
+
+    QNode* child1 = rhs->value.children;
+
+    if (child1->type != QNodeFloatValue)
+      LM_E(("CLIST: Internal Error (LHS is a timestamp but the first in the RHS list is not a FLOAT ..."));
+    else if (child1->value.f == timestamp)
+    {
+      LM_TMP(("CLIST: The first of the list was a match!"));
+      return true;
+    }
+
+    LM_TMP(("CLIST: The first of the list was NOT a match"));
+    // Compare the rest of the children in the comma list (converting them to FLOAT)
+    for (QNode* rhP = child1->next; rhP != NULL; rhP = rhP->next)
+    {
+      LM_TMP(("CLIST: Comparing with a '%s'", qNodeType(rhP->type)));
+      if (rhP->type == QNodeFloatValue)
+      {
+        if (rhP->value.f == timestamp)
+          return true;
+      }
+      else if (rhP->type == QNodeStringValue)
+      {
+        LM_TMP(("CLIST: Comparing with a String '%s' at %p", rhP->value.s, rhP->value.s));
+        double rhsTimestamp = parse8601Time(rhP->value.s);
+        LM_TMP(("CLIST: Converted to FLOAT %f", rhsTimestamp));
+
+        if (rhsTimestamp == timestamp)
+          return true;
+        LM_TMP(("CLIST: %f != %f", rhsTimestamp, timestamp));
+      }
+    }
+
+    LM_TMP(("CLIST: No Match"));
+    return false;
+  }
+
+  for (QNode* rhP = rhs->value.children; rhP != NULL; rhP = rhP->next)
+  {
+    LM_TMP(("CLIST: Comparing '%s' with '%s'", kjValueType(lhsNode->type), qNodeType(rhP->type)));
+    switch (lhsNode->type)
+    {
+    case KjInt:     if (intComparison(lhsNode->value.i,    rhP)              == true) return true; break;
+    case KjFloat:   if (floatComparison(lhsNode,           rhP, isTimestamp) == true) return true; break;  // isTimestamp - then LHS is turned into a Float ... Right?
+    case KjString:  if (stringComparison(lhsNode,          rhP, isTimestamp) == true) return true; break;  //               Can't be both - need to test empirically
+    case KjBoolean: if (boolComparison(lhsNode->value.b,   rhP)              == true) return true; break;
+    default:
+      break;
+    }
+  }
+
+  LM_TMP(("CLIST: No hit"));
   return false;
 }
 
