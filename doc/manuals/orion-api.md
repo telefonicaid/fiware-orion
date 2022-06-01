@@ -33,9 +33,9 @@
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
+- [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
-- [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
             - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
@@ -960,6 +960,8 @@ Note that if a custom payload is used for the notification (the field `payload` 
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
 
+# API Routes
+
 ## Group API Entry Point
 
 ### Retrieve API Resources [GET /v2]
@@ -982,8 +984,6 @@ to keep your client decoupled from implementation details.
           subscriptions resource
         + registrations_url: /v2/registrations (required, string) - URL which points to the
           registrations resource
-
-# API Routes
 
 ## Entities Operations
 
