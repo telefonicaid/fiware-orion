@@ -74,8 +74,11 @@
             - [Update Registration [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
             - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
     - [Batch Operations](#batch-operations)
+        - [Update operation](#update-operation)
             - [Update [POST /v2/op/update]](#update-post-v2opupdate)
+        - [Query operation](#query-operation)
             - [Query [POST /v2/op/query]](#query-post-v2opquery)
+        - [Notify operation](#notify-operation)
             - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
 
 <!-- /TOC -->
@@ -2218,6 +2221,8 @@ Response:
 
 ## Batch Operations
 
+### Update operation
+
 #### Update [POST /v2/op/update]
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
@@ -2284,6 +2289,7 @@ Response:
 
 + Response 204
 
+### Query operation
 
 #### Query [POST /v2/op/query]
 
@@ -2388,6 +2394,7 @@ Response code:
           }
         ]
 
+### Notify operation
 
 #### Notify [POST /v2/op/notify]
 
