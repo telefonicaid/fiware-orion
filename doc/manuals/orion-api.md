@@ -1,5 +1,8 @@
+ # FIWARE-NGSI v2 (release 2.1) Specification
+ 
 <!-- TOC -->
 
+- [Preface](#preface)
 - [Specification](#specification)
     - [Introduction](#introduction)
     - [Terminology](#terminology)
@@ -76,6 +79,11 @@
             - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
 
 <!-- /TOC -->
+
+# Preface
+ 
+This is the release 2.1 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable),
+fully backward compatible with the original NGSIv2 released at September 15th, 2018.
 
 # Specification
 
