@@ -46,7 +46,9 @@ void qRelease(QNode* qP)
       (qP->type == QNodeGE)         ||
       (qP->type == QNodeGT)         ||
       (qP->type == QNodeLE)         ||
-      (qP->type == QNodeLT))
+      (qP->type == QNodeLT)         ||
+      (qP->type == QNodeRange)      ||
+      (qP->type == QNodeComma))
   {
     QNode* childP = qP->value.children;
     while (childP != NULL)

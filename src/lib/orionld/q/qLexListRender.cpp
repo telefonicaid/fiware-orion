@@ -125,7 +125,6 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
       *validInV2P = false;
       break;
     case QNodeVariable:
-      LM_TMP(("LEAK: Calling qVariableFix for Variable '%s' at %p", qItemP->value.v, qItemP->value.v));
       bufP = qVariableFix(qItemP->value.v, false, isMqP, &detail);
       if (bufP == NULL)
       {
@@ -138,8 +137,10 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
     if (bufP == NULL)
       continue;
 
-    int len = strlen(bufP);
-    if (outIx + len >= outSize)
+    // If it's a QNodeStringValue we need to add %22 before and after => 6 extra bytes
+    int extra = (qItemP->type == QNodeStringValue)? 6 : 0;
+    int len   = strlen(bufP);
+    if (outIx + len + extra >= outSize)
     {
       char* newBuf = kaRealloc(&orionldState.kalloc, outP, outSize + 512);
 
@@ -152,8 +153,27 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
       outP = newBuf;
       outSize += 512;
     }
+
+    if (qItemP->type == QNodeStringValue)
+    {
+      outP[outIx++] = '%';
+      outP[outIx++] = '2';
+      outP[outIx++] = '2';
+    }
+
     strncpy(&outP[outIx], bufP, len);
+
     outIx += len;
+
+    if (qItemP->type == QNodeStringValue)
+    {
+      outP[outIx++] = '%';
+      outP[outIx++] = '2';
+      outP[outIx++] = '2';
+    }
+
+    outP[outIx] = 0;
+    LM_TMP(("So far: '%s'", outP));
   }
 
   outP[outIx] = 0;

@@ -1,0 +1,601 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification for subscriptions with q: comma-list for attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# INTEGER
+# 01. Create a subscription S1 with q=P1==5,7,9
+# 02. Create an Entity E1, matching S1
+# 03. Dump accumulator to see one notification
+# 04. Create an Entity E2, NOT matching S1
+# 05. Dump accumulator to see NO notification
+#
+# FLOAT
+# 06. Create a subscription S2 with q=P1==3.14,3.19,3.21
+# 07. Create an Entity E3, matching S2
+# 08. Dump accumulator to see one notification
+# 09. Create an Entity E4, NOT matching S2
+# 10. Dump accumulator to see NO notification
+#
+# STRING
+# 11. Create a subscription S3 with q=P1=="a".."c"
+# 12. Create an Entity E5, matching S3
+# 13. Dump accumulator to see one notification
+# 14. Create an Entity E6, NOT matching S3
+# 15. Dump accumulator to see NO notification
+#
+# TIMESTAMP
+# 16. Create a subscription S4 with q=P1.observedAt=="2022-05-31T08:59:00.001Z","2022-05-31T08:59:00.005Z","2022-05-31T08:59:00.008Z"
+# 17. Create an Entity E7, matching S4
+# 18. Dump accumulator to see one notification
+# 19. Create an Entity E8, NOT matching S4
+# 20. Dump accumulator to see NO notification
+# 21. GET the subscription S4 to see the 'q'
+#
+
+echo "01. Create a subscription S1 with q=P1==5,7,9"
+echo "============================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "P1==5,7,9",
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an Entity E1, matching S1"
+echo "===================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E1",
+  "type": "T",
+  "P1": 7
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Create an Entity E2, NOT matching S1"
+echo "========================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E2",
+  "type": "T",
+  "P1": 8
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Create a subscription S2 with q=P1==3.14,3.19,3.21"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:subs:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "P1==3.14,3.19,3.21",
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create an Entity E3, matching S2"
+echo "===================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E3",
+  "type": "T",
+  "P1": 3.21
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "09. Create an Entity E4, NOT matching S2"
+echo "========================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E4",
+  "type": "T",
+  "P1": 3.2
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "10. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '11. Create a subscription S3 with q=P1=="a","c","F"'
+echo '==================================================='
+payload='{
+  "id": "urn:ngsi-ld:subs:S3",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "P1==%22a%22,%22c%22,%22F%22",
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "12. Create an Entity E5, matching S3"
+echo "===================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E5",
+  "type": "T",
+  "P1": "c"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "13. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "14. Create an Entity E6, NOT matching S3"
+echo "========================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E6",
+  "type": "T",
+  "P1": "f"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "15. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '16. Create a subscription S4 with q=P1.observedAt=="2022-05-31T08:59:00.001Z","2022-05-31T08:59:00.005Z","2022-05-31T08:59:00.008Z"'
+echo '==================================================================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:subs:S4",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "P1.observedAt==%222022-05-31T08:59:00.001Z%22,%222022-05-31T08:59:00.005Z%22,%222022-05-31T08:59:00.008Z%22",
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "17. Create an Entity E7, matching S4"
+echo "===================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E7",
+  "type": "T",
+  "P1": {
+    "value": 1,
+    "observedAt": "2022-05-31T08:59:00.005Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+
+echo "18. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "19. Create an Entity E8, NOT matching S4"
+echo "========================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E8",
+  "type": "T",
+  "P1": {
+    "value": 1,
+    "observedAt": "2022-05-31T08:59:00.007Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "20. Dump accumulator to see NO notification"
+echo "==========================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "21. GET the subscription S4 to see the 'q'"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S4
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 with q=P1==5,7,9
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+Date: REGEX(.*)
+
+
+
+02. Create an Entity E1, matching S1
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see one notification
+============================================
+POST REGEX(.*)
+Content-Length: 233
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "P1": 7,
+            "id": "urn:ngsi-ld:entities:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+04. Create an Entity E2, NOT matching S1
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E2
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator to see NO notification
+===========================================
+
+
+06. Create a subscription S2 with q=P1==3.14,3.19,3.21
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S2
+Date: REGEX(.*)
+
+
+
+07. Create an Entity E3, matching S2
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
+Date: REGEX(.*)
+
+
+
+08. Dump accumulator to see one notification
+============================================
+POST REGEX(.*)
+Content-Length: 236
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "P1": 3.21,
+            "id": "urn:ngsi-ld:entities:T:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S2",
+    "type": "Notification"
+}
+=======================================
+
+
+09. Create an Entity E4, NOT matching S2
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E4
+Date: REGEX(.*)
+
+
+
+10. Dump accumulator to see NO notification
+===========================================
+
+
+11. Create a subscription S3 with q=P1=="a","c","F"
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S3
+Date: REGEX(.*)
+
+
+
+12. Create an Entity E5, matching S3
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E5
+Date: REGEX(.*)
+
+
+
+13. Dump accumulator to see one notification
+============================================
+POST REGEX(.*)
+Content-Length: 235
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "P1": "c",
+            "id": "urn:ngsi-ld:entities:T:E5",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S3",
+    "type": "Notification"
+}
+=======================================
+
+
+14. Create an Entity E6, NOT matching S3
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E6
+Date: REGEX(.*)
+
+
+
+15. Dump accumulator to see NO notification
+===========================================
+
+
+16. Create a subscription S4 with q=P1.observedAt=="2022-05-31T08:59:00.001Z","2022-05-31T08:59:00.005Z","2022-05-31T08:59:00.008Z"
+===================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S4
+Date: REGEX(.*)
+
+
+
+17. Create an Entity E7, matching S4
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E7
+Date: REGEX(.*)
+
+
+
+18. Dump accumulator to see one notification
+============================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subs:S4
+Content-Length: 301
+User-Agent: orionld/post-v1.0.1
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "observedAt": "2022-05-31T08:59:00.005Z",
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:entities:T:E7",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S4",
+    "type": "Notification"
+}
+=======================================
+
+
+19. Create an Entity E8, NOT matching S4
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E8
+Date: REGEX(.*)
+
+
+
+20. Dump accumulator to see NO notification
+===========================================
+
+
+21. GET the subscription S4 to see the 'q'
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 473
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S4",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "q": "P1.observedAt==%222022-05-31T08:59:00.001Z%22,%222022-05-31T08:59:00.005Z%22,%222022-05-31T08:59:00.008Z%22",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

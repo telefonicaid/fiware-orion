@@ -513,6 +513,7 @@ double parse8601Time(char* ss)
   //  3 * 3 (hour/minute/second with ":" or ".") + 9 (nanosecs) + 6 (worst case timezone: "+01:00" = 41
   if (strlen(ss) > 41)
   {
+    LM_E(("Internal Error (the time string is too long - 41 characters is the max length)"));
     return -1;
   }
 
@@ -540,7 +541,7 @@ double parse8601Time(char* ss)
 
   if (!validDate)
   {
-    LM_E(("Not a valid date: %s", ss));
+    LM_E(("Not a valid date: '%s'", ss));
     return -1;
   }
 

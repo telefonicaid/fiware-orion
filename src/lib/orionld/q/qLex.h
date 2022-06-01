@@ -33,6 +33,6 @@
 //
 // qLex - lexical analysis of an ngsi-ld Q-filter
 //
-extern QNode* qLex(char* s, char** titleP, char** detailsP);
+extern QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_Q_QLEX_H_

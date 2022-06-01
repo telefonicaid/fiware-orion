@@ -230,7 +230,7 @@ static QNode* qOpPush(QNode* prev, QNodeType type)
 //
 // qLex - lexical analysis of an ngsi-ld Q-filter
 //
-QNode* qLex(char* s, char** titleP, char** detailsP)
+QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP)
 {
   QNode  dummy;              // this 'dummy is only used to not lose the pointer to the first QNode in the list
   char*  sP                  = s;
@@ -403,13 +403,19 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
       *sP = 0;
       ++sP;
-      double    dateTime;
-      uint64_t  sLen = (uint64_t) (sP - start - 2);
 
-      if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
+      if (timestampToFloat == true)
       {
-        if (lastTermIsTimestamp)
-          current = qDateTimePush(current, dateTime);
+        double    dateTime;
+        uint64_t  sLen = (uint64_t) (sP - start - 2);
+
+        if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
+        {
+          if (lastTermIsTimestamp)
+            current = qDateTimePush(current, dateTime);
+          else
+            current = qStringPush(current, start);
+        }
         else
           current = qStringPush(current, start);
       }

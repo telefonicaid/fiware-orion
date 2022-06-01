@@ -53,7 +53,7 @@ QNode* pcheckQ(char* qString)
 
   urlDecode(qString);
 
-  if ((lexList = qLex(qString, &title, &detail)) == NULL)
+  if ((lexList = qLex(qString, true, &title, &detail)) == NULL)
   {
     orionldError(OrionldBadRequestData, title, detail, 400);
     return NULL;

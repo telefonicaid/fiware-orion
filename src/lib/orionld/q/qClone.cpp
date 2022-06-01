@@ -35,7 +35,7 @@
 
 // -----------------------------------------------------------------------------
 //
-// qClone - clone QNode tree
+// qClone - clone QNode
 //
 QNode* qClone(QNode* original)
 {
@@ -43,19 +43,9 @@ QNode* qClone(QNode* original)
 
   if (orionldState.useMalloc == true)
   {
-    if (original->type == QNodeVariable)
-    {
-      LM_TMP(("LEAK: cloning Vatiable '%s' at %p", original->value.v, original->value.v));
-      cloneP->value.v = strdup(original->value.v);
-      LM_TMP(("LEAK: cloned VariablePath '%s' at %p for qNode at %p", cloneP->value.v, cloneP->value.v, cloneP));
-    }
-    else if (original->type == QNodeStringValue)
-    {
-      cloneP->value.s = strdup(original->value.s);
-      LM_TMP(("strdupped String '%s' at %p for qNode at %p", cloneP->value.s, cloneP->value.s, cloneP));
-    }
-    else
-      cloneP->value = original->value;
+    if      (original->type == QNodeVariable)      cloneP->value.v = strdup(original->value.v);
+    else if (original->type == QNodeStringValue)   cloneP->value.s = strdup(original->value.s);
+    else                                           cloneP->value   = original->value;
   }
   else
     cloneP->value = original->value;
