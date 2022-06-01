@@ -41,7 +41,7 @@
             - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
             - [Create Entity [POST /v2/entities]](#create-entity-post-v2entities)
         - [Entity by ID](#entity-by-id)
-            - [Retrieve Entity [GET /v2/entities/]](#retrieve-entity-get-v2entities)
+            - [Retrieve Entity [GET /v2/entities]](#retrieve-entity-get-v2entities)
             - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
             - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
             - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
@@ -55,8 +55,8 @@
             - [Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
             - [Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
-            - [List Entity Types [GET /v2/types/]](#list-entity-types-get-v2types)
-            - [Retrieve entity information for a given type [GET /v2/types/]](#retrieve-entity-information-for-a-given-type-get-v2types)
+            - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
+            - [Retrieve entity information for a given type [GET /v2/types]](#retrieve-entity-information-for-a-given-type-get-v2types)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
@@ -1167,7 +1167,7 @@ Response:
 
 ### Entity by ID
 
-#### Retrieve Entity [GET /v2/entities/]
+#### Retrieve Entity [GET /v2/entities]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1583,7 +1583,7 @@ Response:
 
 ### Types
 
-#### List Entity Types [GET /v2/types/]
+#### List Entity Types [GET /v2/type]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1650,7 +1650,7 @@ Response code:
           }
         ]
 
-#### Retrieve entity information for a given type [GET /v2/types/]
+#### Retrieve entity information for a given type [GET /v2/types]
 
 This operation returns a JSON object with information about the type:
 
