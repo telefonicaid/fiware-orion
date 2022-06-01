@@ -1,127 +1,92 @@
-FORMAT: 1A
-HOST: http://orion.lab.fiware.org
-TITLE: FIWARE-NGSI v2 Specification 
-DATE: wip
-VERSION: 2.0.1
-PREVIOUS_VERSION: 2.0
-APIARY_PROJECT: orioncontextbroker
-SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
-GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
+ # FIWARE-NGSI v2 (release 2.1) Specification
+ 
+<!-- TOC -->
 
-# FIWARE-NGSI v2 Specification
+- [Preface](#preface)
+- [Specification](#specification)
+    - [Introduction](#introduction)
+    - [Terminology](#terminology)
+        - [Context data modelling and exchange](#context-data-modelling-and-exchange)
+            - [Context Entities](#context-entities)
+            - [Context Attributes](#context-attributes)
+            - [Context Metadata](#context-metadata)
+    - [MIME Types](#mime-types)
+    - [JSON Entity Representation](#json-entity-representation)
+    - [JSON Attribute Representation](#json-attribute-representation)
+    - [Simplified Entity Representation](#simplified-entity-representation)
+    - [Partial Representations](#partial-representations)
+    - [Special Attribute Types](#special-attribute-types)
+    - [Builtin Attributes](#builtin-attributes)
+    - [Special Metadata Types](#special-metadata-types)
+    - [Builtin Metadata](#builtin-metadata)
+    - [Field syntax restrictions](#field-syntax-restrictions)
+    - [Attribute names restrictions](#attribute-names-restrictions)
+    - [Metadata names restrictions](#metadata-names-restrictions)
+    - [Ordering Results](#ordering-results)
+    - [Error Responses](#error-responses)
+    - [Geospatial properties of entities](#geospatial-properties-of-entities)
+        - [Simple Location Format](#simple-location-format)
+        - [GeoJSON](#geojson)
+    - [Simple Query Language](#simple-query-language)
+    - [Geographical Queries](#geographical-queries)
+        - [Query Resolution](#query-resolution)
+    - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
+    - [Notification Messages](#notification-messages)
+    - [Custom Notifications](#custom-notifications)
+- [API Routes](#api-routes)
+    - [Group API Entry Point](#group-api-entry-point)
+        - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
+    - [Entities Operations](#entities-operations)
+        - [Entities List](#entities-list)
+            - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
+            - [Create Entity [POST /v2/entities]](#create-entity-post-v2entities)
+        - [Entity by ID](#entity-by-id)
+            - [Retrieve Entity [GET /v2/entities]](#retrieve-entity-get-v2entities)
+            - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
+            - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
+            - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
+            - [Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
+            - [Remove Entity [DELETE /v2/entities/{entityId}]](#remove-entity-delete-v2entitiesentityid)
+        - [Attributes](#attributes)
+            - [Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]](#get-attribute-data-get-v2entitiesentityidattrsattrname)
+            - [Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]](#update-attribute-data-put-v2entitiesentityidattrsattrname)
+            - [Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
+        - [Attribute Value](#attribute-value)
+            - [Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
+            - [Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
+        - [Types](#types)
+            - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
+            - [Retrieve entity information for a given type [GET /v2/types]](#retrieve-entity-information-for-a-given-type-get-v2types)
+    - [Subscriptions Operations](#subscriptions-operations)
+        - [Subscription List](#subscription-list)
+            - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
+            - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
+        - [Subscription By ID](#subscription-by-id)
+            - [Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
+            - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
+            - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
+    - [Registration Operations](#registration-operations)
+        - [Registration list](#registration-list)
+            - [List Registrations [GET /v2/registrations]](#list-registrations-get-v2registrations)
+            - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
+        - [Registration By ID](#registration-by-id)
+            - [Retrieve Registration [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
+            - [Update Registration [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
+            - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
+    - [Batch Operations](#batch-operations)
+        - [Update operation](#update-operation)
+            - [Update [POST /v2/op/update]](#update-post-v2opupdate)
+        - [Query operation](#query-operation)
+            - [Query [POST /v2/op/query]](#query-post-v2opquery)
+        - [Notify operation](#notify-operation)
+            - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
 
-This specification defines the FIWARE-NGSI version 2 API. FIWARE-NGSI v2 is intended to manage
-the entire lifecycle of context information, including updates, queries, registrations,
-and subscriptions.
+<!-- /TOC -->
 
 # Preface
-
-## Editors
-
-José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica I+D), 
-Fermín Galán Márquez (Telefónica España, formerly with Telefónica I+D),
-Tobias Jacobs (NEC).
-  
-## Acknowledgements
-
-The editors would like to express their gratitude to the following people who actively
-contributed to this specification:
-Juan José Hierro (FIWARE Foundation e.V., formerly with Telefónica I+D), 
-Marcos Reyes (Telefónica España, formerly with Telefónica I+D), 
-Ken Zangelin (APInf, formerly with Telefónica I+D),
-Iván Arias León (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
-Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
-Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
-  
-## Status
-
-This specification is the final and stable version of NGSIv2 API specification (v2.0).
-
-# Changelog
-
-Changes since v2.0:
-
-* Add "Special Metadata Types" section
-* Typo fixing
-
-Changes since RC-2018.07:
-
-* None
-
-Changes since RC-2018.04:
-
-* Section "System/builtin Attributes" renamed to "Builtin Attributes"
-* Section "System/builtin Metadata" renamed to "Builtin Metadata"
-* Added new builtin attribute: `dateExpires`
-* Improved description in "Error Response" section
-* Added new option for `POST /v2/entities` operation: `upsert`
-* Clarification about forwarding compliance in "Group Registrations"
-* `actionType` values for `POST /v2/op/update` operation are now in camelCase
-* Renamed field `attributes` to `attrs` in `POST /v2/op/query` operation
-* Added new field in `POST /v2/op/query` operation: `expression` (old `scope` field has been removed)
-* Added new operation `POST /v2/op/notify`
-
-Changes since RC-2017.11:
-
-* `orderBy` may include also `id` and `type` as ordering fields
-* Included `registrations_url` in `GET /v2` response
-* Added registration management operations
-   * `GET /v2/registrations`
-   * `POST /v2/registrations`
-   * `GET /v2/registrations/{id}`
-   * `PATCH /v2/registrations/{id}`
-   * `DELETE /v2/registrations/{id}`
-
-Changes since RC-2016.10:
-
-* New "System/builtin Metadata" section (using partially former "Special metadata in notifications" section)
-* New "Filtering out attributes and metadata" section
-* Section "Virtual Attributes" renamed to "System/builtin Attributes"
-* New system/builtin metadata: `dateCreated` and `dateModified`
-* Added `*` in "Attribute names restrictions" section
-* Added `lastFailure` and `lastSuccess` to subscription information
-* Added `failed` value for subscription `status` field
-* Added `REPLACE` as `actionType` for `POST /v2/op/update` operation, along with a clearer explanation
-  of the different action types
-* Added `metadata` field to `POST /v2/op/query` operation
-* Added `metadata` URI parameter to the following operations:
-   * `GET /v2/entities`
-   * `GET /v2/entities/{entityId}`
-   * `GET /v2/entities/{entityId}/attrs`
-   * `GET /v2/entities/{entityId}/attrs/{attrName}`
-
-Changes since RC-2016.05:
-
-* Default typing for entities, attributes and metadata aligned with schema.org
-* `typePattern` (similar to `idPattern`)
-* Simple Query Language: metadata filters (`mq`)
-* Simple Query Language: Sub-key filtering (both attribute and metadata values, i.e. `q` and `mq`)
-* Notification metadata filtering
-* System/builtin metadata in notifications: `previousValue` and `actionType`
-
-## Copyright
-
-Copyright (c) 2011-2018 Telecom Italia, Telefónica I+D and NEC.
-
-## License
-
-This specification is licensed under the
-[FIWARE Open Specification License (implicit patent license)](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Implicit_Patents_License).
-
-## Conformance
-
-This specification describes the "full" compliance level.
-
-## Conventions
-
-NGSI version 2 uses camel case (camelCase) syntax for naming properties and related artifacts used
-by the API. When referring to URIs, as part of HATEOAS patterns, and to mark them appropriately,
-the suffix `_url` is added.
-
-## Reference Implementations
-
-* NGISv2 Context Brokers
-  * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html)
+ 
+This is the release 2.1 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable),
+fully backward compatible with the original NGSIv2 released at September 15th, 2018.
 
 # Specification
 
@@ -998,6 +963,8 @@ Note that if a custom payload is used for the notification (the field `payload` 
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
 
+# API Routes
+
 ## Group API Entry Point
 
 ### Retrieve API Resources [GET /v2]
@@ -1021,9 +988,11 @@ to keep your client decoupled from implementation details.
         + registrations_url: /v2/registrations (required, string) - URL which points to the
           registrations resource
 
-# Group Entities
+## Entities Operations
 
-### List Entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+### Entities List
+
+#### List Entities [GET /v2/entities]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
@@ -1143,7 +1112,7 @@ Response code:
          }
         ]
 
-### Create Entity [POST /v2/entities{?options}]
+#### Create Entity [POST /v2/entities]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
@@ -1199,9 +1168,9 @@ Response:
             Location: /v2/entities/Bcn-Welt?type=Room
 
 
-## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
+### Entity by ID
 
-### Retrieve Entity [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+#### Retrieve Entity [GET /v2/entities]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
@@ -1261,7 +1230,7 @@ Response:
           }
         }
 
-### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+#### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
 
 This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -1322,7 +1291,7 @@ Response:
           }
         }
 
-### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs{?type,options}]
+#### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1365,7 +1334,7 @@ Response:
 
 + Response 204
 
-### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+#### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section), except
@@ -1402,7 +1371,7 @@ Response:
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs{?type,options}]
+#### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" above), except
@@ -1439,7 +1408,7 @@ Response:
 
 + Response 204
 
-### Remove Entity [DELETE /v2/entities/{entityId}{?type}]
+#### Remove Entity [DELETE /v2/entities/{entityId}]
 
 Delete the entity.
 
@@ -1457,11 +1426,9 @@ Response:
 + Response 204
 
 
-# Group Attributes
+### Attributes
 
-## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
-
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
+#### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
@@ -1488,7 +1455,7 @@ Response:
           "metadata": {}
         }
 
-### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+#### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -1520,7 +1487,7 @@ Response:
 + Response 200
 
 
-### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
 Removes an entity attribute.
 
@@ -1539,11 +1506,9 @@ Response:
 + Response 204
 
 
-# Group Attribute Value
+### Attribute Value
 
-## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
-
-### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+#### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -1578,7 +1543,7 @@ Response:
           "country": "Spain"
         }
 
-### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+#### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
 The request payload is the new attribute value.
 
@@ -1619,11 +1584,9 @@ Response:
 
 + Response 200
 
-# Group Types
+### Types
 
-## Entity types [/v2/types{?limit,offset,options}]
-
-### List Entity Types [GET /v2/types/{?limit,offset,options}]
+#### List Entity Types [GET /v2/type]
 
 If the `values` option is not in use, this operation returns a JSON array with the entity types.
 Each element is a JSON object with information about the type:
@@ -1690,9 +1653,7 @@ Response code:
           }
         ]
 
-## Entity type [/v2/types/{entityType}]
-
-### Retrieve entity type [GET /v2/types/{entityType}]
+#### Retrieve entity information for a given type [GET /v2/types]
 
 This operation returns a JSON object with information about the type:
 
@@ -1728,7 +1689,7 @@ Response code:
             "count": 7
           }
 
-# Group Subscriptions
+## Subscriptions Operations
 
 A subscription is represented by a JSON object with the following fields:
 
@@ -1817,9 +1778,9 @@ Notification rules are as follow:
 * If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
   attributes of the entity changes.
 
-## Subscription List [/v2/subscriptions]
+### Subscription List
 
-### List Subscriptions [GET /v2/subscriptions{?limit,offset,options}]
+#### List Subscriptions [GET /v2/subscriptions]
 
 Returns a list of all the subscriptions present in the system.
 
@@ -1880,7 +1841,7 @@ Response:
         ]
 
 
-### Create Subscription [POST /v2/subscriptions]
+#### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
@@ -1926,9 +1887,9 @@ Response:
             Location: /v2/subscriptions/abcde98765
 
 
-## Subscription By ID [/v2/subscriptions/{subscriptionId}]
+### Subscription By ID
 
-### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
+#### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
@@ -1976,7 +1937,7 @@ Response:
         }
 
 
-### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
+#### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
 
@@ -1997,7 +1958,7 @@ Response:
 
 + Response 204
 
-### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
+#### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
 
 Cancels subscription.
 
@@ -2012,7 +1973,7 @@ Response:
 
 + Response 204
 
-# Group Registrations
+## Registration Operations
 
 A Context Registration allows to bind external context information sources so that they can
 play the role of providers
@@ -2080,9 +2041,9 @@ Not present if registration has never had a problem with forwarding.
 + `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
 Not present if registration has never had a successful notification.
 
-## Registration list [/v2/registrations]
+### Registration list
 
-### List Registrations [GET /v2/registrations{?limit,offset,options}]
+#### List Registrations [GET /v2/registrations]
 
 Lists all the context provider registrations present in the system.
 
@@ -2134,7 +2095,7 @@ Response:
           }
         ]
 
-### Create Registration [POST /v2/registrations]
+#### Create Registration [POST /v2/registrations]
 
 Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
@@ -2174,9 +2135,9 @@ Response:
 
             Location: /v2/registrations/abcde98765
 
-## Registration By ID [/v2/registrations/{registrationId}]
+### Registration By ID
 
-### Retrieve Registration [GET /v2/registrations/{registrationId}]
+#### Retrieve Registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
@@ -2222,7 +2183,7 @@ Response:
             }
       }      
 
-### Update Registration [PATCH /v2/registrations/{registrationId}]
+#### Update Registration [PATCH /v2/registrations/{registrationId}]
 
 Only the fields included in the request are updated in the registration.
 
@@ -2243,7 +2204,7 @@ Response:
 
 + Response 204
 
-### Delete Registration [DELETE /v2/registrations/{registrationId}]
+#### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
 Cancels a context provider registration.
 
@@ -2258,9 +2219,11 @@ Response:
 
 + Response 204
 
-# Group Batch Operations
+## Batch Operations
 
-### Update [POST /v2/op/update]
+### Update operation
+
+#### Update [POST /v2/op/update]
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
 The payload is an object with two properties:
@@ -2326,8 +2289,9 @@ Response:
 
 + Response 204
 
+### Query operation
 
-### Query [POST /v2/op/query{?limit,offset,options}]
+#### Query [POST /v2/op/query]
 
 The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
 no entities are found. The entities follow the JSON entity representation format
@@ -2430,8 +2394,9 @@ Response code:
           }
         ]
 
+### Notify operation
 
-### Notify [POST /v2/op/notify{?options}]
+#### Notify [POST /v2/op/notify]
 
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
 This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
