@@ -76,7 +76,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         cd fiware-orion
         make
 
-* (オプションですが強く推奨されます) 単体テストと機能テストを実行します。 これについては、[以下の特定のセクション](#testing-coverage-and-rpm)で詳しく説明します。
+* (オプションですが強く推奨されます) 単体テストと機能テストを実行します。 これについては、[以下の特定のセクション](#testing-and-coverage)で詳しく説明します。
 
 * バイナリをインストールします。INSTALL_DIR を使用して、インストール・プレフィックス・パス (デフォルトは /usr) を設定することができます。したがって、broker は `$INSTALL_DIR/bin` ディレクトリにインストールされます
 
@@ -85,6 +85,8 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * broker のバージョン・メッセージを呼び出す、すべてが正常であることを確認してください :
 
         contextBroker --version
+
+<a name="testing-and-coverage"></a>
 
 ### テストとカバレッジ
 
@@ -314,8 +316,8 @@ aarch64 アーキテクチャの場合、`.-configure` を `--build=arm-linux` �
         sudo cp /opt/fiware-orion/etc/config/contextBroker /etc/sysconfig/
         sudo touch /var/log/contextBroker/contextBroker.log
         sudo chown orion /var/log/contextBroker/contextBroker.log
-        sudo cp /opt/fiware-orion/rpm/SOURCES/etc/logrotate.d/logrotate-contextBroker-daily /etc/logrotate.d/
-        sudo cp /opt/fiware-orion/rpm/SOURCES/etc/sysconfig/logrotate-contextBroker-size /etc/sysconfig/
-        sudo cp /opt/fiware-orion/rpm/SOURCES/etc/cron.d/cron-logrotate-contextBroker-size /etc/cron.d/
+        sudo cp /opt/fiware-orion/etc/logrotate.d/logrotate-contextBroker-daily /etc/logrotate.d/
+        sudo cp /opt/fiware-orion/etc/sysconfig/logrotate-contextBroker-size /etc/sysconfig/
+        sudo cp /opt/fiware-orion/etc/cron.d/cron-logrotate-contextBroker-size /etc/cron.d/
         sudo systemctl daemon-reload
         sudo systemctl start contextBroker.service 
