@@ -43,7 +43,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 09. Wait 5 seconds, to give the broker time to refresh its sub cache
 # 10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }
 # 11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }
-# 13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+# 13. See S3 in the database - pay attention to { count:absent, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
 #
 
 echo "01. Create a subscription S1 - for the accumulator"
@@ -178,8 +178,8 @@ echo
 echo
 
 
-echo "13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }"
-echo "=========================================================================================================================="
+echo "13. See S3 in the database - pay attention to { count:absent, lastNotification:absent, lastSuccess:absent, lastFailure:absent }"
+echo "==============================================================================================================================="
 mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:S3"})'
 echo
 echo
@@ -474,8 +474,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
-==========================================================================================================================
+13. See S3 in the database - pay attention to { count:absent, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+===============================================================================================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -512,8 +512,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"count" : NumberLong(0)
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 

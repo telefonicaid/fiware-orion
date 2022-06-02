@@ -95,14 +95,16 @@ void mongocSubCountersUpdate
   }
 
   // Count
-  bson_append_int64(&count, "count", 5, deltaCount);
+  if (deltaCount > 0)
+    bson_append_int64(&count, "count", 5, deltaCount);
 
   // Timestamps
   if (lastNotificationTime > 0) bson_append_double(&max, "lastNotification", 16, lastNotificationTime);
   if (lastSuccess          > 0) bson_append_double(&max, "lastSuccess",      11, lastSuccess);
   if (lastFailure          > 0) bson_append_double(&max, "lastFailure",      11, lastFailure);
 
-  bson_append_document(&request, "$inc", 4, &count);
+  if (deltaCount > 0)
+    bson_append_document(&request, "$inc", 4, &count);
   bson_append_document(&request, "$max", 4, &max);
 
   LM_TMP(("Sending count+timestamps"));

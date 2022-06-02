@@ -219,14 +219,14 @@ SET (ORION_LIBS
     orionld_context      # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
     orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_payloadCheck
-    orionld_common
-    orionld_types
     orionld_legacyDriver
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     orionld_mqtt
     orionld_q
     orionld_mongoc       # subCache needs mongoc
     orionld_dbModel
+    orionld_common
+    orionld_types
     parse
     apiTypesV2
     orionTypes

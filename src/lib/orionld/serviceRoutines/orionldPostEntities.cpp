@@ -36,7 +36,6 @@ extern "C"
 
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, NoAttributeType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE

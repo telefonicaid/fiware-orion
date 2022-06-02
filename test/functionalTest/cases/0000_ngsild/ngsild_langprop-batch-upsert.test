@@ -85,7 +85,7 @@ echo
 
 echo "03. GET both entities"
 echo "====================="
-orionCurl --url /ngsi-ld/v1/entities?type=T
+orionCurl --url /ngsi-ld/v1/entities?type=T -H "Orionld-Legacy: true"
 echo
 echo
 
@@ -170,7 +170,7 @@ echo
 
 echo "08. GET both entities"
 echo "====================="
-orionCurl --url /ngsi-ld/v1/entities?type=T
+orionCurl --url /ngsi-ld/v1/entities?type=T -H "Orionld-Legacy: true"
 echo
 echo
 
