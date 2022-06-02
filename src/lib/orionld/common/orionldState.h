@@ -56,6 +56,7 @@ extern "C"
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
+#include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
@@ -216,18 +217,6 @@ typedef struct OrionldStateOut
 
 // -----------------------------------------------------------------------------
 //
-// UriParamList -
-//
-typedef struct UriParamList
-{
-  int     items;
-  char**  array;
-} UriParamList;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // OrionldStateIn - data of the request
 //
 typedef struct OrionldStateIn
@@ -259,9 +248,9 @@ typedef struct OrionldStateIn
   char*     geometryPropertyExpanded;
 
   // Processed URI params
-  UriParamList  idList;
-  UriParamList  typeList;
-  UriParamList  attrsList;
+  StringArray  idList;
+  StringArray  typeList;
+  StringArray  attrsList;
 
   // Processed wildcards
   char*         pathAttrExpanded;

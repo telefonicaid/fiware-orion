@@ -1,0 +1,809 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET /entities with mongoc
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 00. Create 100 Entities
+# 01. Type filter - query with type T0 - see entity E01
+# 02. type filter - query with type T0,T1 - see entities E01-E03
+# 03. Type filter - query with type T1,T2,T3 - see entities E02-E07
+# 04. Default Limit of 20 - query with type T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20 - see E02-E21 due to limit defaults to 20
+# 05. Offset - query with type T1-T20 and offset=10 - see E12-E31
+# 06. Limit - query with type T1-T20 and offset=10 and limit=4 - see E12-E15
+# 07. Sysattrs - query with type T1 and options=sysAttrs - see timestamps
+# 08. Context - query with type T1 and Accept ld+json - see @context in payload body
+#
+
+echo "00. Create 100 Entities"
+echo "======================="
+typeset -i eNo
+eNo=1
+
+while [ $eNo -le 100 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%02d" $eNo)
+  eType="T"$(echo $eNo / 2 | bc)  
+  payload='{
+    "id": "'$eId'",
+    "type": "'$eType'",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:'
+  eNo=$eNo+1
+done
+echo
+echo
+
+
+echo "01. Type filter - query with type T1 - see entity E01"
+echo "====================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T0&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "02. Type filter - query with type T0,T1 - see entities E01-E03"
+echo "=============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T0,T1&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "03. Type filter - query with type T1,T2,T3 - see entities E02-E07"
+echo "================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1,T2,T3&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Default Limit of 20 - query with type T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20 - see E02-E21 due to limit defaults to 20"
+echo "=========================================================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "05. Offset - query with type T1-T20 and offset=10 - see E12-E31"
+echo "==============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20&prettyPrint=yes&spaces=2&offset=10' --noPayloadCheck
+echo
+echo
+
+
+echo "06. Limit - query with type T1-T20 and offset=10 and limit=4 - see E12-E15"
+echo "=========================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20&prettyPrint=yes&spaces=2&offset=10&limit=4' --noPayloadCheck
+echo
+echo
+
+
+echo "07. Sysattrs - query with type T1 and options=sysAttrs - see timestamps"
+echo "======================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1&options=sysAttrs&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "08. Context - query with type T1 and Accept ld+json - see @context in payload body"
+echo "=================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1&prettyPrint=yes&spaces=2' --noPayloadCheck --out application/ld+json
+echo
+echo
+
+
+--REGEXPECT--
+00. Create 100 Entities
+=======================
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E01
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E02
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E03
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E04
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E05
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E06
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E07
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E08
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E09
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E10
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E11
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E12
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E13
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E14
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E15
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E16
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E17
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E18
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E19
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E20
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E21
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E22
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E23
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E24
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E25
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E26
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E27
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E28
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E29
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E30
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E31
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E32
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E33
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E34
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E35
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E36
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E37
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E38
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E39
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E40
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E41
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E42
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E43
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E44
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E45
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E46
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E47
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E48
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E49
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E50
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E51
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E52
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E53
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E54
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E55
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E56
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E57
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E58
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E59
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E60
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E61
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E62
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E63
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E64
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E65
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E66
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E67
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E68
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E69
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E70
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E71
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E72
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E73
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E74
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E75
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E76
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E77
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E78
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E79
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E80
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E81
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E82
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E83
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E84
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E85
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E86
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E87
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E88
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E89
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E90
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E91
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E92
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E93
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E94
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E95
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E96
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E97
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E98
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E99
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E100
+
+
+01. Type filter - query with type T1 - see entity E01
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": {
+      "type": "Property",
+      "value": "E1:A1"
+    }
+  }
+]
+
+
+
+02. Type filter - query with type T0,T1 - see entities E01-E03
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 399
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": {
+      "type": "Property",
+      "value": "E1:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E03",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E3:A1"
+    }
+  }
+]
+
+
+
+03. Type filter - query with type T1,T2,T3 - see entities E02-E07
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 795
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E03",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E3:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E04",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E4:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E05",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E5:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E06",
+    "type": "T3",
+    "A1": {
+      "type": "Property",
+      "value": "E6:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E07",
+    "type": "T3",
+    "A1": {
+      "type": "Property",
+      "value": "E7:A1"
+    }
+  }
+]
+
+
+
+04. Default Limit of 20 - query with type T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20 - see E02-E21 due to limit defaults to 20
+==========================================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2657
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E03",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E3:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E04",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E4:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E05",
+    "type": "T2",
+    "A1": {
+      "type": "Property",
+      "value": "E5:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E06",
+    "type": "T3",
+    "A1": {
+      "type": "Property",
+      "value": "E6:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E07",
+    "type": "T3",
+    "A1": {
+      "type": "Property",
+      "value": "E7:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E08",
+    "type": "T4",
+    "A1": {
+      "type": "Property",
+      "value": "E8:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E09",
+    "type": "T4",
+    "A1": {
+      "type": "Property",
+      "value": "E9:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E10",
+    "type": "T5",
+    "A1": {
+      "type": "Property",
+      "value": "E10:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E11",
+    "type": "T5",
+    "A1": {
+      "type": "Property",
+      "value": "E11:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E12",
+    "type": "T6",
+    "A1": {
+      "type": "Property",
+      "value": "E12:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E13",
+    "type": "T6",
+    "A1": {
+      "type": "Property",
+      "value": "E13:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E14",
+    "type": "T7",
+    "A1": {
+      "type": "Property",
+      "value": "E14:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E15",
+    "type": "T7",
+    "A1": {
+      "type": "Property",
+      "value": "E15:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E16",
+    "type": "T8",
+    "A1": {
+      "type": "Property",
+      "value": "E16:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E17",
+    "type": "T8",
+    "A1": {
+      "type": "Property",
+      "value": "E17:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E18",
+    "type": "T9",
+    "A1": {
+      "type": "Property",
+      "value": "E18:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E19",
+    "type": "T9",
+    "A1": {
+      "type": "Property",
+      "value": "E19:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E20",
+    "type": "T10",
+    "A1": {
+      "type": "Property",
+      "value": "E20:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E21",
+    "type": "T10",
+    "A1": {
+      "type": "Property",
+      "value": "E21:A1"
+    }
+  }
+]
+
+
+
+05. Offset - query with type T1-T20 and offset=10 - see E12-E31
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 2675
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E12",
+    "type": "T6",
+    "A1": {
+      "type": "Property",
+      "value": "E12:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E13",
+    "type": "T6",
+    "A1": {
+      "type": "Property",
+      "value": "E13:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E14",
+    "type": "T7",
+    "A1": {
+      "type": "Property",
+      "value": "E14:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E15",
+    "type": "T7",
+    "A1": {
+      "type": "Property",
+      "value": "E15:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E16",
+    "type": "T8",
+    "A1": {
+      "type": "Property",
+      "value": "E16:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E17",
+    "type": "T8",
+    "A1": {
+      "type": "Property",
+      "value": "E17:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E18",
+    "type": "T9",
+    "A1": {
+      "type": "Property",
+      "value": "E18:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E19",
+    "type": "T9",
+    "A1": {
+      "type": "Property",
+      "value": "E19:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E20",
+    "type": "T10",
+    "A1": {
+      "type": "Property",
+      "value": "E20:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E21",
+    "type": "T10",
+    "A1": {
+      "type": "Property",
+      "value": "E21:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E22",
+    "type": "T11",
+    "A1": {
+      "type": "Property",
+      "value": "E22:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E23",
+    "type": "T11",
+    "A1": {
+      "type": "Property",
+      "value": "E23:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E24",
+    "type": "T12",
+    "A1": {
+      "type": "Property",
+      "value": "E24:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E25",
+    "type": "T12",
+    "A1": {
+      "type": "Property",
+      "value": "E25:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E26",
+    "type": "T13",
+    "A1": {
+      "type": "Property",
+      "value": "E26:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E27",
+    "type": "T13",
+    "A1": {
+      "type": "Property",
+      "value": "E27:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E28",
+    "type": "T14",
+    "A1": {
+      "type": "Property",
+      "value": "E28:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E29",
+    "type": "T14",
+    "A1": {
+      "type": "Property",
+      "value": "E29:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E30",
+    "type": "T15",
+    "A1": {
+      "type": "Property",
+      "value": "E30:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E31",
+    "type": "T15",
+    "A1": {
+      "type": "Property",
+      "value": "E31:A1"
+    }
+  }
+]
+
+
+
+06. Limit - query with type T1-T20 and offset=10 and limit=4 - see E12-E15
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 535
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E12",
+    "type": "T6",
+    "A1": {
+      "type": "Property",
+      "value": "E12:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E13",
+    "type": "T6",
+    "A1": {
+      "type": "Property",
+      "value": "E13:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E14",
+    "type": "T7",
+    "A1": {
+      "type": "Property",
+      "value": "E14:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E15",
+    "type": "T7",
+    "A1": {
+      "type": "Property",
+      "value": "E15:A1"
+    }
+  }
+]
+
+
+
+07. Sysattrs - query with type T1 and options=sysAttrs - see timestamps
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 551
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "A1": {
+      "type": "Property",
+      "createdAt": REGEX(.*),
+      "modifiedAt": REGEX(.*),
+      "value": "E2:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E03",
+    "type": "T1",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "A1": {
+      "type": "Property",
+      "createdAt": REGEX(.*),
+      "modifiedAt": REGEX(.*),
+      "value": "E3:A1"
+    }
+  }
+]
+
+
+
+08. Context - query with type T1 and Accept ld+json - see @context in payload body
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 425
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1"
+    }
+  },
+  {
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "urn:ngsi-ld:entities:E03",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E3:A1"
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

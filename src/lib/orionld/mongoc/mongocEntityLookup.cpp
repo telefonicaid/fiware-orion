@@ -42,6 +42,14 @@ extern "C"
 //
 // mongocEntityLookup -
 //
+// This function, that seems quite similar to mongocEntityRetrieve is used by:
+//   * orionldPutEntity    - uses creDate + attrs to make sure no attr types are modified
+//   * orionldPatchEntity  - Like PUT but also using entity type, entire attributes, etc.
+//   * orionldPostEntities - only to make sure the entity does not already exists (mongocEntityExists should be implemented and used instead)
+//
+// So, this function is quite needed, just as it is.
+// I could merge the two though, moving the dbModel stuff from mongocEntityRetrieve
+//
 KjNode* mongocEntityLookup(const char* entityId)
 {
   bson_t            mongoFilter;

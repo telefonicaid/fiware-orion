@@ -33,6 +33,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/legacyDriver/legacyGetEntities.h"              // legacyGetEntities
+#include "orionld/mongoc/mongocEntitiesQuery.h"                  // mongocEntitiesQuery
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity2
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // Own interface
 
 
@@ -46,7 +49,16 @@ bool orionldGetEntities(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntities();
 
-  KjNode* entityV = kjArray(orionldState.kjsonP, NULL);
-  orionldState.requestTree = entityV;
+  KjNode* dbEntityArray  = mongocEntitiesQuery(&orionldState.in.typeList);
+  KjNode* apiEntityArray = kjArray(orionldState.kjsonP, NULL);
+
+  for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
+  {
+    KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, RF_NORMALIZED, NULL, &orionldState.pd);
+    kjChildAdd(apiEntityArray, apiEntityP);
+  }
+
+  orionldState.responseTree = apiEntityArray;
+
   return true;
 }
