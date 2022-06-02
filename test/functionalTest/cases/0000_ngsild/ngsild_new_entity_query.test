@@ -40,6 +40,9 @@ brokerStart CB 0 IPv4 -experimental
 # 06. Limit - query with type T1-T20 and offset=10 and limit=4 - see E12-E15
 # 07. Sysattrs - query with type T1 and options=sysAttrs - see timestamps
 # 08. Context - query with type T1 and Accept ld+json - see @context in payload body
+# 09. Count - query with type T1, limit=1 and set count - see 2 entities in header, one in payload body
+# 10. Count - query with type T0,T1,T2,T9, limit=0 and set count - see 7 entities in header, none in payload body
+# 11. Count - query with type T0, limit=0, and without count - see error
 #
 
 echo "00. Create 100 Entities"
@@ -118,6 +121,27 @@ echo
 echo "08. Context - query with type T1 and Accept ld+json - see @context in payload body"
 echo "=================================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T1&prettyPrint=yes&spaces=2' --noPayloadCheck --out application/ld+json
+echo
+echo
+
+
+echo "09. Count - query with type T1, limit=1 and set count - see 2 entities in header, one in payload body"
+echo "====================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T1&prettyPrint=yes&spaces=2&limit=1&count=true' --noPayloadCheck
+echo
+echo
+
+
+echo "10. Count - query with type T0,T1,T2,T9, limit=0 and set count - see 7 entities in header, none in payload body"
+echo "==============================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T0,T1,T2,T9&prettyPrint=yes&spaces=2&limit=0&count=true' --noPayloadCheck
+echo
+echo
+
+
+echo "11. Count - query with type T0, limit=0, and without count - see error"
+echo "======================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T0&prettyPrint=yes&spaces=2&limit=0' --noPayloadCheck
 echo
 echo
 
@@ -801,6 +825,56 @@ Date: REGEX(.*)
     }
   }
 ]
+
+
+
+09. Count - query with type T1, limit=1 and set count - see 2 entities in header, one in payload body
+=====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 2
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "A1": {
+      "type": "Property",
+      "value": "E2:A1"
+    }
+  }
+]
+
+
+
+10. Count - query with type T0,T1,T2,T9, limit=0 and set count - see 7 entities in header, none in payload body
+===============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 7
+Date: REGEX(.*)
+
+[]
+
+
+
+11. Count - query with type T0, limit=0, and without count - see error
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 189
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Invalid value for URI parameter /limit/",
+  "detail": "must be an integer value >= 1, if /count/ is not set"
+}
 
 
 

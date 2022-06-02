@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
 #include "orionld/legacyDriver/legacyGetEntities.h"              // legacyGetEntities
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // mongocEntitiesQuery
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
@@ -49,8 +50,10 @@ bool orionldGetEntities(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntities();
 
-  KjNode* dbEntityArray  = mongocEntitiesQuery(&orionldState.in.typeList);
-  KjNode* apiEntityArray = kjArray(orionldState.kjsonP, NULL);
+  int64_t  count;
+  KjNode*  dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &count);
+  KjNode*  apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+
 
   for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
   {
@@ -59,6 +62,9 @@ bool orionldGetEntities(void)
   }
 
   orionldState.responseTree = apiEntityArray;
+
+  if (orionldState.uriParams.count == true)
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   return true;
 }

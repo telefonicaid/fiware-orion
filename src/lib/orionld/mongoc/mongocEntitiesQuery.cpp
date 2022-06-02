@@ -94,9 +94,15 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 //
 // mongocEntitiesQuery -
 //
+// Parameters passed via orionldState:
+// - limit
+// - offset
+// - count
+//
 KjNode* mongocEntitiesQuery
 (
-  StringArray* entityTypes
+  StringArray* entityTypes,
+  int64_t*     countP
 )
 {
   bson_t                mongoFilter;
@@ -141,28 +147,46 @@ KjNode* mongocEntitiesQuery
   if (orionldState.mongoc.entitiesP == NULL)
     orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
 
+  // semTake(&mongoEntitiesSem);
+
+  // count?
+  if (orionldState.uriParams.count == true)
+  {
+    bson_error_t error;
+
+    *countP = mongoc_collection_count_documents(orionldState.mongoc.entitiesP, &mongoFilter, NULL, readPrefs, NULL, &error);
+    if (*countP == -1)
+    {
+      *countP = 0;
+      LM_E(("Database Error (error counting entities: %d.%d: %s)", error.domain, error.code, error.message));
+    }
+  }
+
   //
   // Run the query
   //
-  // semTake(&mongoEntitiesSem);
-  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs)) == NULL)
-  {
-    LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
-    mongoc_read_prefs_destroy(readPrefs);
-    return NULL;
-  }
-
   KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
-  while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
-  {
-    entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
-    if (entityNodeP != NULL)
-      kjChildAdd(entityArray, entityNodeP);
-    else
-      LM_E(("Database Error (%s: %s)", title, detail));
-  }
 
-  mongoc_cursor_destroy(mongoCursorP);
+  if (limit != 0)
+  {
+    if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs)) == NULL)
+    {
+      LM_E(("Database Error (mongoc_collection_find_with_opts ERROR)"));
+      mongoc_read_prefs_destroy(readPrefs);
+      return NULL;
+    }
+
+    while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
+    {
+      entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
+      if (entityNodeP != NULL)
+        kjChildAdd(entityArray, entityNodeP);
+      else
+        LM_E(("Database Error (%s: %s)", title, detail));
+    }
+
+    mongoc_cursor_destroy(mongoCursorP);
+  }
 
   // semGive(&mongoEntitiesSem);
   bson_destroy(&mongoFilter);

@@ -40,7 +40,8 @@ extern "C"
 //
 extern KjNode* mongocEntitiesQuery
 (
-  StringArray* entityTypes
+  StringArray* entityTypes,
+  int64_t*     countP
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
