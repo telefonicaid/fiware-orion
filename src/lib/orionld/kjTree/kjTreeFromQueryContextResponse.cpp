@@ -255,9 +255,9 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
       //
       // If URI param 'attrs' has been used, only matching attributes should be included in the response
       //
-      if (orionldState.in.attrsList.items > 0)
+      if (orionldState.in.attrList.items > 0)
       {
-        if (inAttrList(attrLongName, orionldState.in.attrsList.array, orionldState.in.attrsList.items) == false)
+        if (inAttrList(attrLongName, orionldState.in.attrList.array, orionldState.in.attrList.items) == false)
           continue;
       }
 

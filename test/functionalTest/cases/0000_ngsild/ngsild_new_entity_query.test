@@ -48,15 +48,7 @@ brokerStart CB 0 IPv4 -experimental
 # 14. Simplified Representation
 # 15. keyValues Representation
 #
-# lang
-# attrs
-# entityId
-# idPattern
-# datasetId
-# q
-# GEO
-# scope (later)
-#
+
 echo "00. Create 100 Entities"
 echo "======================="
 typeset -i eNo

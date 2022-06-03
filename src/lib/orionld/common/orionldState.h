@@ -250,7 +250,7 @@ typedef struct OrionldStateIn
   // Processed URI params
   StringArray  idList;
   StringArray  typeList;
-  StringArray  attrsList;
+  StringArray  attrList;
 
   // Processed wildcards
   char*         pathAttrExpanded;

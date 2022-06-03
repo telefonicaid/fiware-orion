@@ -41,6 +41,7 @@ extern "C"
 extern KjNode* mongocEntitiesQuery
 (
   StringArray* entityTypes,
+  StringArray* attributes,
   int64_t*     countP
 );
 

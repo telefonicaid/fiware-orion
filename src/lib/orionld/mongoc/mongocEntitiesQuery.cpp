@@ -34,6 +34,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
@@ -92,6 +94,66 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 
 // -----------------------------------------------------------------------------
 //
+// attributesFilter -
+//
+static void attributesFilter(bson_t* mongoFilterP, StringArray* attributes)
+{
+  char   path[512];
+  bson_t exists;
+
+  bson_init(&exists);
+  bson_append_int32(&exists, "$exists", 7, 1);
+
+  if (attributes->items == 1)  // Just a single attribute?
+  {
+    // { "attrs.<eq-attr-name>": { "$exists": 1 } }
+
+    int len = snprintf(path, sizeof(path) - 1, "attrs.%s", attributes->array[0]);
+    dotForEq(&path[6]);
+    LM_TMP(("path: %s", path));
+    bson_append_document(mongoFilterP, path, len, &exists);
+  }
+  else
+  {
+    // { $or: [ { attrs.A1: {$exists: 1} }, { attrs.A2: {$exists: 1} }, { attrs.A3: {$exists: 1} } ] }
+    bson_t array;
+    bson_init(&array);
+
+    char num[3] = { '0', '0', 0 };
+    int  numLen = 1;
+
+    for (int ix = 0; ix < attributes->items; ix++)
+    {
+      int    len = snprintf(path, sizeof(path) - 1, "attrs.%s", attributes->array[ix]);
+      bson_t attrExists;
+
+      bson_init(&attrExists);
+      dotForEq(&path[6]);
+      LM_TMP(("path: %s", path));
+      bson_append_document(&attrExists, path, len, &exists);
+
+      LM_TMP(("KZ: Adding attr '%s' at index '%s', indexLen: %d", path, &num[2-numLen], numLen));
+      bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
+
+      num[1] += 1;
+      if (((ix + 1) % 10) == 0)
+      {
+        num[1] = '0';
+        num[0] += 1;
+        numLen = 2;
+      }
+
+      bson_destroy(&attrExists);
+    }
+
+    bson_append_array(mongoFilterP, "$or", 3, &array);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongocEntitiesQuery -
 //
 // Parameters passed via orionldState:
@@ -102,9 +164,16 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 KjNode* mongocEntitiesQuery
 (
   StringArray* entityTypes,
+  StringArray* attributes,
   int64_t*     countP
 )
 {
+  if (attributes->items > 99)
+  {
+    orionldError(OrionldBadRequestData, "Too many attributes", "maximum is 99", 400);
+    return NULL;
+  }
+
   bson_t                mongoFilter;
   const bson_t*         mongoDocP;
   mongoc_cursor_t*      mongoCursorP;
@@ -133,6 +202,7 @@ KjNode* mongocEntitiesQuery
 
   LM_TMP(("LIMIT:  %d", limit));
   LM_TMP(("OFFSET: %d", offset));
+
   //
   // Create the filter for the query
   //
@@ -141,6 +211,9 @@ KjNode* mongocEntitiesQuery
   // Entity Types
   if ((entityTypes != NULL) && (entityTypes->items > 0))
     entityTypeFilter(&mongoFilter, entityTypes);
+
+  if ((attributes != NULL) && (attributes->items > 0))
+    attributesFilter(&mongoFilter, attributes);
 
   mongocConnectionGet();
 

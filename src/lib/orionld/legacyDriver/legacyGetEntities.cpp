@@ -389,11 +389,11 @@ bool legacyGetEntities(void)
   }
 
 
-  if (orionldState.in.attrsList.items > 0)
+  if (orionldState.in.attrList.items > 0)
   {
-    for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
+    for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
     {
-      mongoRequest.attributeList.push_back(orionldState.in.attrsList.array[ix]);
+      mongoRequest.attributeList.push_back(orionldState.in.attrList.array[ix]);
     }
   }
 
@@ -489,15 +489,15 @@ bool legacyGetEntities(void)
   //     "geometry": null
   //   with whatever was found in this second query to mongo
   //
-  if ((orionldState.out.contentType == GEOJSON) && (orionldState.in.attrsList.items > 0) && (orionldState.responseTree->type == KjArray))
+  if ((orionldState.out.contentType == GEOJSON) && (orionldState.in.attrList.items > 0) && (orionldState.responseTree->type == KjArray))
   {
     const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
-    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(orionldState.in.attrsList.array, orionldState.in.attrsList.items, geoPropertyName);
+    bool        geoPropertyNameInAttrs = geoPropertyInAttrs(orionldState.in.attrList.array, orionldState.in.attrList.items, geoPropertyName);
 
     int ix = 0;
-    while (ix < orionldState.in.attrsList.items)
+    while (ix < orionldState.in.attrList.items)
     {
-      if (strcmp(geoPropertyName, orionldState.in.attrsList.array[ix]) == 0)
+      if (strcmp(geoPropertyName, orionldState.in.attrList.array[ix]) == 0)
         geoPropertyNameInAttrs = true;
 
       ++ix;

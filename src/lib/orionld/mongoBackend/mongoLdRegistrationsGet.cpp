@@ -122,16 +122,16 @@ static void uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char** ty
 //
 // uriParamAttrsToFilter - List of Attributes (Properties or Relationships) to be retrieved
 //
-// It is the responsibility of the caller to make sure that 'attrsList' is non-NULL
+// It is the responsibility of the caller to make sure that 'attrList' is non-NULL
 //
 static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, std::string* detailsP)
 {
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
 
-  for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
+  for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
   {
-    bsonArray.append(orionldState.in.attrsList.array[ix]);
+    bsonArray.append(orionldState.in.attrList.array[ix]);
   }
 
   bsonInExpression.append("$in", bsonArray.arr());
@@ -165,7 +165,7 @@ bool mongoLdRegistrationsGet
   if ((orionldState.uriParams.idPattern != NULL) && (uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern, &oeP->details) == false))
     return false;
 
-  if ((orionldState.in.attrsList.items > 0) && (uriParamAttrsToFilter(&queryBuilder, &oeP->details) == false))
+  if ((orionldState.in.attrList.items > 0) && (uriParamAttrsToFilter(&queryBuilder, &oeP->details) == false))
     return false;
 
 

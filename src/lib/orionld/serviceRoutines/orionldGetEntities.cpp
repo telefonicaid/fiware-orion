@@ -51,7 +51,7 @@ bool orionldGetEntities(void)
     return legacyGetEntities();
 
   int64_t      count;
-  KjNode*      dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &count);
+  KjNode*      dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.attrList, &count);
   KjNode*      apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
   RenderFormat rf              = RF_NORMALIZED;
 

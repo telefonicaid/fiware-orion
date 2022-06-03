@@ -611,17 +611,17 @@ static bool pCheckUriParamAttrs(void)
   int   items     = commaCount(orionldState.uriParams.attrs) + 1;
   char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
 
-  orionldState.in.attrsList.items = items;
-  orionldState.in.attrsList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+  orionldState.in.attrList.items = items;
+  orionldState.in.attrList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
 
-  if (orionldState.in.attrsList.array == NULL)
+  if (orionldState.in.attrList.array == NULL)
   {
     LM_E(("Out of memory (allocating an /attrs/ array of %d char pointers)", items));
     orionldError(OrionldInternalError, "Out of memory", "allocating the array for /attrs/ URI param", 500);
     return false;
   }
 
-  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.attrsList.array, items);
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.attrList.array, items);
 
   if (splitItems != items)
   {
@@ -632,7 +632,7 @@ static bool pCheckUriParamAttrs(void)
 
   for (int item = 0; item < items; item++)
   {
-    orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);  // Expand-function
+    orionldState.in.attrList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrList.array[item], true, NULL);  // Expand-function
   }
 
   return true;
