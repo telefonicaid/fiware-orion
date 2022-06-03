@@ -50,14 +50,17 @@ bool orionldGetEntities(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntities();
 
-  int64_t  count;
-  KjNode*  dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &count);
-  KjNode*  apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+  int64_t      count;
+  KjNode*      dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &count);
+  KjNode*      apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+  RenderFormat rf              = RF_NORMALIZED;
 
+  if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
+  else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
 
   for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
   {
-    KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, RF_NORMALIZED, NULL, &orionldState.pd);
+    KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, &orionldState.pd);
     kjChildAdd(apiEntityArray, apiEntityP);
   }
 

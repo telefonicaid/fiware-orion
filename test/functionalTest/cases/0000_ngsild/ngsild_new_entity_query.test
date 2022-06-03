@@ -43,8 +43,20 @@ brokerStart CB 0 IPv4 -experimental
 # 09. Count - query with type T1, limit=1 and set count - see 2 entities in header, one in payload body
 # 10. Count - query with type T0,T1,T2,T9, limit=0 and set count - see 7 entities in header, none in payload body
 # 11. Count - query with type T0, limit=0, and without count - see error
+# 12. Concise Representation
+# 13. Normalized Representation
+# 14. Simplified Representation
+# 15. keyValues Representation
 #
-
+# lang
+# attrs
+# entityId
+# idPattern
+# datasetId
+# q
+# GEO
+# scope (later)
+#
 echo "00. Create 100 Entities"
 echo "======================="
 typeset -i eNo
@@ -142,6 +154,34 @@ echo
 echo "11. Count - query with type T0, limit=0, and without count - see error"
 echo "======================================================================"
 orionCurl --url '/ngsi-ld/v1/entities?type=T0&prettyPrint=yes&spaces=2&limit=0' --noPayloadCheck
+echo
+echo
+
+
+echo "12. Concise Representation"
+echo "=========================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T0,T9&prettyPrint=yes&spaces=2&options=concise' --noPayloadCheck
+echo
+echo
+
+
+echo "13. Normalized Representation"
+echo "============================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T0,T9&prettyPrint=yes&spaces=2&options=normalized' --noPayloadCheck
+echo
+echo
+
+
+echo "14. Simplified Representation"
+echo "============================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T0,T9&prettyPrint=yes&spaces=2&options=simplified' --noPayloadCheck
+echo
+echo
+
+
+echo "15. keyValues Representation"
+echo "============================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T0,T9&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
 echo
 echo
 
@@ -764,7 +804,7 @@ Date: REGEX(.*)
 07. Sysattrs - query with type T1 and options=sysAttrs - see timestamps
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 551
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -875,6 +915,127 @@ Date: REGEX(.*)
   "title": "Invalid value for URI parameter /limit/",
   "detail": "must be an integer value >= 1, if /count/ is not set"
 }
+
+
+
+12. Concise Representation
+==========================
+HTTP/1.1 200 OK
+Content-Length: 254
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": "E1:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E18",
+    "type": "T9",
+    "A1": "E18:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E19",
+    "type": "T9",
+    "A1": "E19:A1"
+  }
+]
+
+
+
+13. Normalized Representation
+=============================
+HTTP/1.1 200 OK
+Content-Length: 401
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": {
+      "type": "Property",
+      "value": "E1:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E18",
+    "type": "T9",
+    "A1": {
+      "type": "Property",
+      "value": "E18:A1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E19",
+    "type": "T9",
+    "A1": {
+      "type": "Property",
+      "value": "E19:A1"
+    }
+  }
+]
+
+
+
+14. Simplified Representation
+=============================
+HTTP/1.1 200 OK
+Content-Length: 254
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": "E1:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E18",
+    "type": "T9",
+    "A1": "E18:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E19",
+    "type": "T9",
+    "A1": "E19:A1"
+  }
+]
+
+
+
+15. keyValues Representation
+============================
+HTTP/1.1 200 OK
+Content-Length: 254
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": "E1:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E18",
+    "type": "T9",
+    "A1": "E18:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E19",
+    "type": "T9",
+    "A1": "E19:A1"
+  }
+]
 
 
 

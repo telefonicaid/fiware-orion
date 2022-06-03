@@ -81,7 +81,7 @@ static bool geoPropertyInAttrs(char** attrsV, int attrsCount, const char* geoPro
 //
 // apiEntityLanguageProps -
 //
-void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
+static void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
 {
   // Loop over attributes, if "languageMap" is present . pick the language and convert to Property
   for (KjNode* attrP = apiEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)

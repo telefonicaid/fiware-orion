@@ -160,70 +160,179 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
 //
 KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
+  LM_TMP(("Attribute '%s'", dbAttrP->name));
   char*   longName = kaStrdup(&orionldState.kalloc, dbAttrP->name);
-
   eqForDot(longName);
-
   char*   shortName = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
-  KjNode* attrP     = kjObject(orionldState.kjsonP, shortName);
-  KjNode* mdsP      = NULL;
-  KjNode* typeP     = kjLookup(dbAttrP, "type");
+  KjNode* attrP     = NULL;
 
-  if (typeP == NULL)
+  //
+  // If CONCISE:
+  //   - and Property/GeoProperty
+  //   - and No metadata
+  // => KeyValues
+  //
+  // Else, just remove the attribute type, keep value/object/languageMap
+  // And call dbModelToApiSubAttribute2 with Concise
+  //
+  bool    conciseAsKeyValues = false;
+  KjNode* attrTypeNodeP      = NULL;
+
+  if ((renderFormat == RF_CONCISE) && (sysAttrs == false))
   {
-    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbAttrP->name, 500);
-    return NULL;
-  }
-
-  OrionldAttributeType attrType = orionldAttributeType(typeP->value.s);
-  kjChildRemove(dbAttrP, typeP);
-  kjChildAdd(attrP, typeP);
-
-  KjNode* nodeP = dbAttrP->value.firstChildP;
-  KjNode* next;
-  while (nodeP != NULL)
-  {
-    next = nodeP->next;
-
-    if (strcmp(nodeP->name, "value") == 0)
+    attrTypeNodeP = kjLookup(dbAttrP, "type");
+    if ((strcmp(attrTypeNodeP->value.s, "Property") == 0) || (strcmp(attrTypeNodeP->value.s, "GeoProperty") == 0))
     {
-      if      (attrType == Relationship)      nodeP->name = (char*) "object";
-      else if (attrType == LanguageProperty)  nodeP->name = (char*) "languageMap";
-
-      kjChildAdd(attrP, nodeP);
+      KjNode* mdP = kjLookup(dbAttrP, "md");
+      if ((mdP == NULL) || (mdP->value.firstChildP == NULL))  // No sub-attributes
+        conciseAsKeyValues = true;
     }
-    else if (sysAttrs == true)
+  }
+  LM_TMP(("conciseAsKeyValues: %s", (conciseAsKeyValues == true)? "true" : "false"));
+
+  if ((renderFormat == RF_KEYVALUES) || (conciseAsKeyValues == true))
+  {
+    // "Steal" the value node and rename it to have the attribute's name instead - that's all that's needed for SIMPLIFIED FORMAT
+    attrP = kjLookup(dbAttrP, "value");
+
+    if (attrTypeNodeP == NULL)
+      attrTypeNodeP = kjLookup(dbAttrP, "type");
+
+    if ((lang != NULL) && (strcmp(attrTypeNodeP->value.s, "LanguageProperty") == 0))
     {
-      if (strcmp(nodeP->name, "creDate") == 0)
+      KjNode* langP = kjLookup(attrP, lang);
+      if (langP == NULL)
+        langP = kjLookup(attrP, "en");
+      if (langP == NULL)
+        langP = attrP->value.firstChildP;
+
+      attrP->type = KjString;
+      attrP->value.s = (langP != NULL)? langP->value.s : (char*) "empty languageMap";
+    }
+
+    attrP->name = shortName;
+  }
+  else  // RF_NORMALIZED  or  RF_CONCISE
+  {
+    KjNode* mdsP    = NULL;
+    KjNode* typeP   = (attrTypeNodeP == NULL)? kjLookup(dbAttrP, "type") : attrTypeNodeP;
+
+    attrP = kjObject(orionldState.kjsonP, shortName);
+    if (typeP == NULL)
+    {
+      orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbAttrP->name, 500);
+      return NULL;
+    }
+
+    OrionldAttributeType attrType = orionldAttributeType(typeP->value.s);
+    kjChildRemove(dbAttrP, typeP);
+
+    if (renderFormat == RF_NORMALIZED)  // For CONCISE we don't want the attribute type
+      kjChildAdd(attrP, typeP);
+    else
+      LM_TMP(("Not adding attr type as CONCISE format"));
+
+    KjNode* nodeP = dbAttrP->value.firstChildP;
+    KjNode* next;
+    LM_TMP(("Looping over attribute parts"));
+    while (nodeP != NULL)
+    {
+      LM_TMP(("Attribute part '%s'", nodeP->name));
+      next = nodeP->next;
+
+      if (strcmp(nodeP->name, "value") == 0)
       {
-        nodeP->name = (char*) "createdAt";
+        if (attrType == Relationship)
+          nodeP->name = (char*) "object";
+        else if (attrType == LanguageProperty)
+        {
+          LM_TMP(("LANG: Got a languageMap"));
+          LM_TMP(("LANG: lang: %s", lang));
+
+          if (lang != NULL)
+          {
+            LM_TMP(("LANG: Need to look up '%s' in the languageMap", lang));
+            KjNode* langNodeP = kjLookup(nodeP, lang);
+
+            if (renderFormat == RF_NORMALIZED)  // For CONCISE the attribute type is not present
+              typeP->value.s = (char*) "Property";
+
+            if (langNodeP != NULL)
+              LM_TMP(("Found wanted language '%s'. Value: '%s'", langNodeP->name, langNodeP->value.s));
+
+            if (langNodeP == NULL)
+            {
+              LM_TMP(("wanted language '%s' not found - looking up English instead", lang));
+              langNodeP = kjLookup(nodeP, "en");  // Try English if not found
+            }
+
+            if (langNodeP == NULL)
+            {
+              LM_TMP(("Nor wanted language '%s' nor English found - taking first child", lang));
+              langNodeP = nodeP->value.firstChildP;  // Take the first one if English is also not found
+            }
+
+            if (langNodeP != NULL)
+            {
+              LM_TMP(("Time to change type of the languageMap, and add 'lang': '%s'", langNodeP->name));
+              KjNode* langP = kjString(orionldState.kjsonP, "lang", langNodeP->name);
+              kjChildAdd(attrP, langP);
+
+              nodeP->type    = KjString;
+              nodeP->value.s = langNodeP->value.s;
+            }
+            else
+            {
+              LM_TMP(("empty languageMap"));
+              nodeP->type    = KjString;
+              nodeP->value.s = (char*) "empty languageMap";
+            }
+          }
+          else
+            nodeP->name = (char*) "languageMap";
+        }
+
         kjChildAdd(attrP, nodeP);
       }
-      else if (strcmp(nodeP->name, "modDate") == 0)
+      else if ((strcmp(nodeP->name, "creDate") == 0) || (strcmp(nodeP->name, "modDate") == 0))
       {
-        nodeP->name = (char*) "modifiedAt";
-        kjChildAdd(attrP, nodeP);
+        if (sysAttrs == true)
+        {
+          nodeP->name = (nodeP->name[0] == 'c')? (char*) "createdAt" : (char*) "modifiedAt";
+
+          char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+          numberToDate(nodeP->value.f, dateTimeBuf, 32);
+          nodeP->type      = KjString;
+          nodeP->value.s   = dateTimeBuf;
+
+          kjChildAdd(attrP, nodeP);
+        }
       }
+      else if (strcmp(nodeP->name, "md") == 0)
+      {
+        mdsP = nodeP;
+        LM_TMP(("Found 'md' (%p) - there are sub-attrs", mdsP));
+      }
+
+      nodeP = next;
     }
-    else if (strcmp(nodeP->name, "md") == 0)
-      mdsP = nodeP;
 
-    nodeP = next;
-  }
-
-  if (mdsP != NULL)
-  {
-    for (KjNode* mdP = mdsP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+    if (mdsP != NULL)
     {
-      KjNode* subAttributeP;
-
-      if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, renderFormat, lang, pdP)) == NULL)
+      LM_TMP(("Looping over sub-attributes"));
+      for (KjNode* mdP = mdsP->value.firstChildP; mdP != NULL; mdP = mdP->next)
       {
-        LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
-        return NULL;
-      }
+        LM_TMP(("Sub-Attribute '%s' (sysAttrs: %s)", mdP->name, (sysAttrs == true)? "true" : "false"));
+        KjNode* subAttributeP;
 
-      kjChildAdd(attrP, subAttributeP);
+        if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, renderFormat, lang, pdP)) == NULL)
+        {
+          LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
+          return NULL;
+        }
+
+        kjChildAdd(attrP, subAttributeP);
+      }
     }
   }
 
