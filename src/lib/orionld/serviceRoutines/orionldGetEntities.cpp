@@ -92,5 +92,9 @@ bool orionldGetEntities(void)
   if (orionldState.uriParams.count == true)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
+  // If empty result array, no Link header is needed
+  if (orionldState.responseTree->value.firstChildP == NULL)
+    orionldState. noLinkHeader = true;
+
   return true;
 }

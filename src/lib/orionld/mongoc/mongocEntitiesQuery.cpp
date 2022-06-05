@@ -83,7 +83,6 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
       numLen = 2;
     }
 
-    LM_TMP(("Appending type '%s' ix:%s", entityTypes->array[ix], num));
     bson_append_utf8(&entityTypeArray, num, numLen, entityTypes->array[ix], -1);
   }
   bson_append_array(&in, "$in", 3, &entityTypeArray);
@@ -113,7 +112,7 @@ static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 
     int len = snprintf(path, sizeof(path) - 1, "attrs.%s", attrList->array[0]);
     dotForEq(&path[6]);
-    LM_TMP(("path: %s", path));
+
     bson_append_document(mongoFilterP, path, len, &exists);
     bson_append_bool(projectionP, path, len, true);
   }
@@ -133,11 +132,10 @@ static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 
       bson_init(&attrExists);
       dotForEq(&path[6]);
-      LM_TMP(("path: %s", path));
+
       bson_append_document(&attrExists, path, len, &exists);
       bson_append_bool(projectionP, path, len, true);
 
-      LM_TMP(("KZ: Adding attr '%s' at index '%s', indexLen: %d", path, &num[2-numLen], numLen));
       bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
 
       num[1] += 1;
@@ -175,7 +173,6 @@ bool qFilter(bson_t* mongoFilterP, QNode* qNode)
     return false;
   }
 
-  LM_TMP(("mongoFilter after 'q': %s", bson_as_canonical_extended_json(mongoFilterP, NULL)));
   return true;
 }
 
@@ -293,6 +290,8 @@ KjNode* mongocEntitiesQuery
 
   if (limit != 0)
   {
+    LM_TMP(("Running the query with filter '%s'", bson_as_json(&mongoFilter, NULL)));
+    LM_TMP(("Running the query with options '%s'", bson_as_json(&options, NULL)));
     mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);
     bson_destroy(&options);
 
@@ -304,15 +303,30 @@ KjNode* mongocEntitiesQuery
       return NULL;
     }
 
+#if 0
+    // <DEBUG>
+    const bson_t* lastError = mongoc_collection_get_last_error(orionldState.mongoc.entitiesP);
+    if (lastError != NULL)
+      LM_E(("MongoC Error: %s", bson_as_canonical_extended_json(lastError, NULL)));
+    // </DEBUG>
+#endif
+
     while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
     {
       entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
-      kjTreeLog(entityNodeP, "entity");
+
       if (entityNodeP != NULL)
+      {
+        kjTreeLog(entityNodeP, "entity to add to array");
         kjChildAdd(entityArray, entityNodeP);
+      }
       else
         LM_E(("Database Error (%s: %s)", title, detail));
     }
+
+    bson_error_t error;
+    if (mongoc_cursor_error(mongoCursorP, &error) == true)
+      LM_TMP(("mongoc_cursor_error: %d.%d.%s", error.domain, error.code, error.message));
 
     mongoc_cursor_destroy(mongoCursorP);
   }
