@@ -40,7 +40,7 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
 {
   if (treeP->type == QNodeOr)
   {
-    // { "%or": [ { }, { }, ... { } ] }
+    // { "$or": [ { }, { }, ... { } ] }
     bson_t orArrayBson;
 
     bson_append_array_begin(bsonP, "$or", 3, &orArrayBson);

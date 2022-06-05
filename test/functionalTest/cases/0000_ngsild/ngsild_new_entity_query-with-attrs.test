@@ -125,7 +125,7 @@ Date: REGEX(.*)
 04. Query with attrs=P1,P2 - see E1 and E2
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 191
+Content-Length: 152
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -135,15 +135,12 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:T:E1",
     "type": "T",
     "P1": 1,
-    "P2": 2,
-    "P3": 3
+    "P2": 2
   },
   {
     "id": "urn:ngsi-ld:T:E2",
     "type": "T",
-    "P2": 2,
-    "P3": 3,
-    "P4": 4
+    "P2": 2
   }
 ]
 
@@ -152,7 +149,7 @@ Date: REGEX(.*)
 05. Query with attrs=P1,P5 - see E1 and E3
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 191
+Content-Length: 139
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -161,15 +158,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:T:E1",
     "type": "T",
-    "P1": 1,
-    "P2": 2,
-    "P3": 3
+    "P1": 1
   },
   {
     "id": "urn:ngsi-ld:T:E3",
     "type": "T",
-    "P3": 3,
-    "P4": 4,
     "P5": 5
   }
 ]
