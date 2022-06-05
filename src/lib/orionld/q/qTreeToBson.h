@@ -33,7 +33,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// qTreeToBson -
+// qTreeToBson - this function need sto move to the mongoc library ... OR ?
 //
 extern bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP);
 

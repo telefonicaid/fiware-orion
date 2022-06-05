@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/q/QNode.h"                                     // QNode
 
 
 
@@ -40,9 +41,10 @@ extern "C"
 //
 extern KjNode* mongocEntitiesQuery
 (
-  StringArray* entityTypes,
-  StringArray* attributes,
-  int64_t*     countP
+  StringArray*  entityTypeList,
+  StringArray*  attrList,
+  QNode*        qNode,
+  int64_t*      countP
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_

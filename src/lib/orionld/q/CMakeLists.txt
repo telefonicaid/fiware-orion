@@ -26,6 +26,7 @@ SET (SOURCES
     qLexCheck.cpp
     qParse.cpp
     qTreeToBsonObj.cpp
+    qTreeToBson.cpp
     qAliasCompact.cpp
     qPresent.cpp
     qRelease.cpp

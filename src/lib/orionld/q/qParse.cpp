@@ -157,6 +157,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, cha
     case QNodeVariable:
       if (qToDbModel == true)
         qLexP->value.v = qVariableFix(qLexP->value.v, forDb, &isMd, detailsP);
+
       if ((qLexP->next == NULL) || (qLexP->next->type == QNodeOr) || (qLexP->next->type == QNodeAnd) || (qLexP->next->type == QNodeClose))
       {
         if (compOpP == NULL)

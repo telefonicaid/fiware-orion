@@ -38,6 +38,8 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/q/qTreeToBson.h"                               // qTreeToBson
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // Own interface
@@ -160,6 +162,27 @@ static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 
 // -----------------------------------------------------------------------------
 //
+// qFilter -
+//
+bool qFilter(bson_t* mongoFilterP, QNode* qNode)
+{
+  char* title;
+  char* detail;
+
+  if (qTreeToBson(qNode, mongoFilterP, &title, &detail) == false)
+  {
+    orionldError(OrionldInternalError, title, detail, 500);
+    return false;
+  }
+
+  LM_TMP(("mongoFilter after 'q': %s", bson_as_canonical_extended_json(mongoFilterP, NULL)));
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongocEntitiesQuery -
 //
 // Parameters passed via orionldState:
@@ -169,9 +192,10 @@ static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 //
 KjNode* mongocEntitiesQuery
 (
-  StringArray* entityTypes,
-  StringArray* attrList,
-  int64_t*     countP
+  StringArray*  entityTypeList,
+  StringArray*  attrList,
+  QNode*        qNode,
+  int64_t*      countP
 )
 {
   if (attrList->items > 99)
@@ -207,22 +231,27 @@ KjNode* mongocEntitiesQuery
   if (offset != 0)
     bson_append_int32(&options, "skip", 4, offset);
 
-  //
-  // Create the filter for the query
-  //
-  bson_init(&mongoFilter);
 
-  // Entity Types
-  if ((entityTypes != NULL) && (entityTypes->items > 0))
-    entityTypeFilter(&mongoFilter, entityTypes);
-
-  // Projection
+  //
+  // Projection (will be added to if attrList != NULL)
+  //
   bson_t projection;
   bson_init(&projection);
   bson_append_bool(&projection, "_id.id",    6, true);
   bson_append_bool(&projection, "_id.type",  8, true);
   bson_append_bool(&projection, "creDate",   7, true);
   bson_append_bool(&projection, "modDate",   7, true);
+  bson_append_bool(&projection, "@datasets", 9, true);
+
+
+  //
+  // Create the filter for the query
+  //
+  bson_init(&mongoFilter);
+
+  // Entity Types
+  if ((entityTypeList != NULL) && (entityTypeList->items > 0))
+    entityTypeFilter(&mongoFilter, entityTypeList);
 
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))
@@ -230,7 +259,9 @@ KjNode* mongocEntitiesQuery
   else
     bson_append_bool(&projection, "attrs", 5, true);
 
-  bson_append_bool(&projection, "@datasets", 9, true);
+  // Query Language
+  if (qNode != NULL)
+    qFilter(&mongoFilter, qNode);
 
   bson_append_document(&options, "projection", 10, &projection);
   bson_destroy(&projection);

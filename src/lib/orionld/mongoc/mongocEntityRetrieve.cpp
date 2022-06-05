@@ -406,7 +406,7 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 //
 // mongoCppLegacyEntityRetrieve -
 //
-// FIXME: Move database model relevant code to some other function (for reusal)
+// FIXME: Only do DB stuff - for dbModrel stuff use dbModelToApiEntity()
 //
 // PARAMETERS
 //   entityId        ID of the entity to be retrieved

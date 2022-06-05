@@ -318,9 +318,9 @@ typedef struct OrionldConnectionState
   KjNode**                geoAttrV;                    // Array of GeoProperty attributes
   int                     geoAttrs;
   int                     geoAttrMax;
-
   char*                   geoType;
   KjNode*                 geoCoordsP;
+
   char*                   entityId;
   OrionldUriParamOptions  uriParamOptions;
   OrionldUriParams        uriParams;

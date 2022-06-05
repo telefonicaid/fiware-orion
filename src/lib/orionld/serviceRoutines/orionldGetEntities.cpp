@@ -36,6 +36,8 @@ extern "C"
 #include "orionld/legacyDriver/legacyGetEntities.h"              // legacyGetEntities
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // mongocEntitiesQuery
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/q/qLex.h"                                      // qLex
+#include "orionld/q/qParse.h"                                    // qParse
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity2
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // Own interface
 
@@ -50,8 +52,30 @@ bool orionldGetEntities(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntities();
 
+  QNode* qNode = NULL;
+  if (orionldState.uriParams.q != NULL)
+  {
+    QNode* qList;
+    char*  title;
+    char*  detail;
+
+    qList = qLex(orionldState.uriParams.q, true, &title, &detail);
+    if (qList == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
+      LM_RE(false, ("Error (qLex: %s: %s)", title, detail));
+    }
+
+    qNode = qParse(qList, NULL, true, true, &title, &detail);  // 3rd parameter: forDb=true
+    if (qNode == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
+      LM_RE(NULL, ("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
+    }
+  }
+
   int64_t      count;
-  KjNode*      dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.attrList, &count);
+  KjNode*      dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.attrList, qNode, &count);
   KjNode*      apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
   RenderFormat rf              = RF_NORMALIZED;
 
@@ -63,7 +87,6 @@ bool orionldGetEntities(void)
     KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, &orionldState.pd);
     kjChildAdd(apiEntityArray, apiEntityP);
   }
-
   orionldState.responseTree = apiEntityArray;
 
   if (orionldState.uriParams.count == true)
