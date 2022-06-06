@@ -93,8 +93,13 @@ bool orionldGetEntities(void)
   //   So, perhaps we should play it safe way and NOT EVER "redirect" to GET /entities/{entityId}
   //
 
+  // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
+  char* idPattern = orionldState.uriParams.idPattern;
+  if ((orionldState.in.idList.items > 0) && (idPattern != NULL))
+    idPattern = NULL;
+
   int64_t       count;
-  KjNode*       dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.idList, &orionldState.in.attrList, qNode, &count);
+  KjNode*       dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.idList, idPattern, &orionldState.in.attrList, qNode, &count);
   KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
   RenderFormat  rf              = RF_NORMALIZED;
 

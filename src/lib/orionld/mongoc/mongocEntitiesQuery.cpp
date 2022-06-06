@@ -144,6 +144,18 @@ static void entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
 
 // -----------------------------------------------------------------------------
 //
+// entityIdPatternFilter -
+//
+static void entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
+{
+  bson_append_regex(mongoFilterP, "_id.id", 6, idPattern, "m");
+  LM_TMP(("Added REGEX for entity ID: '%s'", idPattern));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributesFilter -
 //
 static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP)
@@ -239,6 +251,7 @@ KjNode* mongocEntitiesQuery
 (
   StringArray*  entityTypeList,
   StringArray*  entityIdList,
+  const char*   entityIdPattern,
   StringArray*  attrList,
   QNode*        qNode,
   int64_t*      countP
@@ -302,6 +315,10 @@ KjNode* mongocEntitiesQuery
   // Entity IDs
   if ((entityIdList != NULL) && (entityIdList->items > 0))
     entityIdFilter(&mongoFilter, entityIdList);
+
+  // Entity ID-Pattern
+  if (entityIdPattern != NULL)
+    entityIdPatternFilter(&mongoFilter, entityIdPattern);
 
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))

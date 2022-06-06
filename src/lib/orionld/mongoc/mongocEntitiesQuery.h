@@ -43,6 +43,7 @@ extern KjNode* mongocEntitiesQuery
 (
   StringArray*  entityTypeList,
   StringArray*  entityIdList,
+  const char*   entityIdPattern,
   StringArray*  attrList,
   QNode*        qNode,
   int64_t*      countP
