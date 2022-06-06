@@ -96,6 +96,54 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 
 // -----------------------------------------------------------------------------
 //
+// entityIdFilter -
+//
+static void entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
+{
+  if (entityIds->items == 1)  // Just a single id?
+  {
+    bson_append_utf8(mongoFilterP, "_id.id", 6, entityIds->array[0], -1);
+    return;
+  }
+
+  bson_t in;
+  bson_t entityIdArray;
+
+  bson_init(&in);
+  bson_init(&entityIdArray);
+
+  for (int ix = 0; ix < entityIds->items; ix++)
+  {
+    char num[32];
+    int  numLen;
+
+    if (ix < 10)
+    {
+      num[0] = '0' + ix;
+      num[1] = 0;
+      numLen = 1;
+    }
+    else
+    {
+      num[0] = '0' + ix % 10;
+      num[1] = '0' + ix / 10;
+      num[2] = 0;
+      numLen = 2;
+    }
+
+    bson_append_utf8(&entityIdArray, num, numLen, entityIds->array[ix], -1);
+  }
+  bson_append_array(&in, "$in", 3, &entityIdArray);
+  bson_append_document(mongoFilterP, "_id.id", 6, &in);
+
+  bson_destroy(&in);                // It's safe to destroy once incorporated into mongoFilterP
+  bson_destroy(&entityIdArray);     // It's safe to destroy once incorporated into mongoFilterP
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributesFilter -
 //
 static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP)
@@ -190,6 +238,7 @@ bool qFilter(bson_t* mongoFilterP, QNode* qNode)
 KjNode* mongocEntitiesQuery
 (
   StringArray*  entityTypeList,
+  StringArray*  entityIdList,
   StringArray*  attrList,
   QNode*        qNode,
   int64_t*      countP
@@ -249,6 +298,10 @@ KjNode* mongocEntitiesQuery
   // Entity Types
   if ((entityTypeList != NULL) && (entityTypeList->items > 0))
     entityTypeFilter(&mongoFilter, entityTypeList);
+
+  // Entity IDs
+  if ((entityIdList != NULL) && (entityIdList->items > 0))
+    entityIdFilter(&mongoFilter, entityIdList);
 
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))

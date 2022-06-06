@@ -42,6 +42,7 @@ extern "C"
 extern KjNode* mongocEntitiesQuery
 (
   StringArray*  entityTypeList,
+  StringArray*  entityIdList,
   StringArray*  attrList,
   QNode*        qNode,
   int64_t*      countP
