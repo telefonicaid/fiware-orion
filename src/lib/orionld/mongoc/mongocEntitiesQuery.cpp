@@ -290,8 +290,14 @@ KjNode* mongocEntitiesQuery
 
   if (limit != 0)
   {
-    LM_TMP(("Running the query with filter '%s'", bson_as_json(&mongoFilter, NULL)));
-    LM_TMP(("Running the query with options '%s'", bson_as_json(&options, NULL)));
+#if 1
+    char* filterString  = bson_as_json(&mongoFilter, NULL);
+    char* optionsString = bson_as_json(&options, NULL);
+    LM_TMP(("Running the query with filter '%s'", filterString));
+    LM_TMP(("Running the query with options '%s'", optionsString));
+    bson_free(filterString);
+    bson_free(optionsString);
+#endif
     mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);
     bson_destroy(&options);
 
