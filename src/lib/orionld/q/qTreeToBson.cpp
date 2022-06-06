@@ -208,6 +208,18 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
 
     bson_init(&neBson);
 
+    // From the mongo manual:
+    //   $ne selects the documents where the value of the field is not equal to the specified value.
+    //   This includes documents that do not contain the field.
+    //
+    // So, we'll have to add an "$exists" as well :(
+    //
+    bson_t existsBson;
+    bson_init(&existsBson);
+    bson_append_bool(&existsBson, "$exists", 7, true);
+    bson_append_document(bsonP, leftP->value.v, -1, &existsBson);
+    bson_destroy(&existsBson);
+
     if      (rightP->type == QNodeStringValue)   bson_append_utf8(&neBson,   "$ne", 3, rightP->value.s, -1);
     else if (rightP->type == QNodeIntegerValue)  bson_append_int32(&neBson,  "$ne", 3, rightP->value.i);
     else if (rightP->type == QNodeFloatValue)    bson_append_double(&neBson, "$ne", 3, rightP->value.f);
