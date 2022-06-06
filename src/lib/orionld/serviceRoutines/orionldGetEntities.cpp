@@ -74,10 +74,29 @@ bool orionldGetEntities(void)
     }
   }
 
-  int64_t      count;
-  KjNode*      dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.attrList, qNode, &count);
-  KjNode*      apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
-  RenderFormat rf              = RF_NORMALIZED;
+  //
+  // NOTE:
+  //   What if an entity id list is given, but with one single entity id?
+  //   In general these two requests should be equivalent:
+  //     - GET /entities?id=urn:ngsi-ld:T:E1
+  //     - GET /entities/urn:ngsi-ld:T:E1
+  //
+  //   However, if more URI params are given, the similarities aren't that big anymore.
+  //   E.g., if attrs is given:
+  //     - GET /entities?id=urn:ngsi-ld:T:E1&attrs=P1  [1]
+  //     - GET /entities/urn:ngsi-ld:T:E1&attrs=P1     [2]
+  //
+  //   Imagine that the entity urn:ngsi-ld:T:E1 doesn't have an attribute P1.
+  //     - The query (1) would give back an empty arry - no match
+  //     - The retrieval (2) would give back the entity withoput any attributes
+  //
+  //   So, perhaps we should play it safe way and NOT EVER "redirect" to GET /entities/{entityId}
+  //
+
+  int64_t       count;
+  KjNode*       dbEntityArray   = mongocEntitiesQuery(&orionldState.in.typeList, &orionldState.in.idList, &orionldState.in.attrList, qNode, &count);
+  KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+  RenderFormat  rf              = RF_NORMALIZED;
 
   if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
   else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
