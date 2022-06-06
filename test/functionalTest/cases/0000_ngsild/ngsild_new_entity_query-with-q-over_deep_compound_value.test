@@ -1,0 +1,132 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Query condition over Deep Compound value
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create Entity with an attribute P having a compound value of 5 levels
+# 02. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for correct value 12, see the entity
+# 03. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for incorrect value 13, see empty array
+#
+
+echo "01. Create Entity with an attribute P having a compound value of 5 levels"
+echo "========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
+  "type": "T_Query",
+  "P": {
+    "type": "Property",
+    "value": {
+      "L1": {
+        "L2": {
+          "L3": {
+            "L4": {
+              "val": 12
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+
+echo "02. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for correct value 12, see the entity"
+echo "====================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=P\[L1.L2.L3.L4.val\]==12&prettyPrint=yes&type=T_Query' --noPayloadCheck
+echo
+echo
+
+echo "03. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for incorrect value 13, see empty array"
+echo "========================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?q=P\[L1.L2.L3.L4.val\]==13&prettyPrint=yes&type=T_Query' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity with an attribute P having a compound value of 5 levels
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T_Query:EntityForQuery2345
+Date: REGEX(.*)
+
+
+
+02. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for correct value 12, see the entity
+=====================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 309
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
+    "type": "T_Query",
+    "P": {
+      "type": "Property",
+      "value": {
+        "L1": {
+          "L2": {
+            "L3": {
+              "L4": {
+                "val": 12
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]
+
+
+
+03. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for incorrect value 13, see empty array
+========================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

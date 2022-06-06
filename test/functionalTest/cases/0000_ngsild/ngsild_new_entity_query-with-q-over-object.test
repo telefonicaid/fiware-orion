@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Canteras Test contextConsumption/query_entities_test.js
+Entity Creation and Retrieval
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,50 +31,47 @@ brokerStart CB 0 IPv4 -experimental
 --SHELL--
 
 #
-# 01. Create the entity 'EntityForQuery2345' from the test 'Query Entity. JSON. Default @context' of contextConsumption/query_entities_test.js
-# 02. NGSI-LD Test Suite Case 042: Query by condition over observedAt - with double-quotes
-# 03. NGSI-LD Test Suite Case 042: Query by condition over observedAt - without quotes
+# 01. Create entity urn:ngsi-ld:T_Query:EntityForQuery2345 with attrs P100, R100, and location
+# 02. Query with q=R100=="urn:ngsi-ld:T2:6789"
+# 03. Same query, but with id=urn:ngsi-ld:T_Query:EntityForQuery2345 also
 #
 
-echo "01. Create the entity 'EntityForQuery2345' from the test 'Query Entity. JSON. Default @context' of contextConsumption/query_entities_test.js"
-echo "============================================================================================================================================"
+
+echo "01. Create entity urn:ngsi-ld:T_Query:EntityForQuery2345 with attrs P100, R100, and location"
+echo "============================================================================================"
 payload='{
   "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
   "type": "T_Query",
   "P100": {
-	  "type": "Property",
+    "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:05:06.789Z",
+    "observedAt": "2018-12-04T12:00:00Z",
     "P1_R1": {
-		  "type": "Relationship",
+      "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
     "P1_P1": {
-	    "type": "Property",
+      "type": "Property",
       "value": 0.79
     }
-  },
-  "P1": {
-    "type": "Property",
-    "value": 45
   },
   "R100": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789",
     "R1_R1": {
-	    "type": "Relationship",
+      "type": "Relationship",
       "object": "urn:ngsi-ld:T3:A2345"
     },
     "R1_P1": {
       "type": "Property",
       "value": false
     }
-	},
+  },
   "location": {
     "type": "GeoProperty",
     "value": {
       "type": "Point",
-      "coordinates": [-30.01,75.01]
+      "coordinates": [-30.01, 75.01]
     }
   }
 }'
@@ -83,23 +80,23 @@ echo
 echo
 
 
-echo "02. NGSI-LD Test Suite Case 042: Query by condition over observedAt"
-echo "==================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>\"2018-12-03T12:05:06.000Z\"'
+echo '02. Query with q=R100=="urn:ngsi-ld:T2:6789"'
+echo '============================================'
+orionCurl --url '/ngsi-ld/v1/entities?q=R100==%22urn:ngsi-ld:T2:6789%22&type=T_Query'
 echo
 echo
 
 
-echo "03. NGSI-LD Test Suite Case 042: Query by condition over observedAt - without quotes"
-echo "===================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>2018-12-03T12:05:06.000Z'
+echo "03. Same query, but with id=urn:ngsi-ld:T_Query:EntityForQuery2345 also"
+echo "======================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:T_Query:EntityForQuery2345&type=T_Query&q=R100==%22urn:ngsi-ld:T2:6789%22'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create the entity 'EntityForQuery2345' from the test 'Query Entity. JSON. Default @context' of contextConsumption/query_entities_test.js
-============================================================================================================================================
+01. Create entity urn:ngsi-ld:T_Query:EntityForQuery2345 with attrs P100, R100, and location
+============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T_Query:EntityForQuery2345
@@ -107,20 +104,16 @@ Date: REGEX(.*)
 
 
 
-02. NGSI-LD Test Suite Case 042: Query by condition over observedAt
-===================================================================
+02. Query with q=R100=="urn:ngsi-ld:T2:6789"
+============================================
 HTTP/1.1 200 OK
-Content-Length: 540
+Content-Length: 504
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
-        "P1": {
-            "type": "Property",
-            "value": 45
-        },
         "P100": {
             "P1_P1": {
                 "type": "Property",
@@ -130,7 +123,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:05:06.789Z",
+            "observedAt": "2018-12-04T12:00:00.000Z",
             "type": "Property",
             "value": 12
         },
@@ -162,20 +155,16 @@ Date: REGEX(.*)
 ]
 
 
-03. NGSI-LD Test Suite Case 042: Query by condition over observedAt - without quotes
-====================================================================================
+03. Same query, but with id=urn:ngsi-ld:T_Query:EntityForQuery2345 also
+=======================================================================
 HTTP/1.1 200 OK
-Content-Length: 540
+Content-Length: 504
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
-        "P1": {
-            "type": "Property",
-            "value": 45
-        },
         "P100": {
             "P1_P1": {
                 "type": "Property",
@@ -185,7 +174,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:05:06.789Z",
+            "observedAt": "2018-12-04T12:00:00.000Z",
             "type": "Property",
             "value": 12
         },
