@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -22,24 +25,23 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                               // strcmp
-
-#include "orionld/types/OrionldGeoJsonType.h"     // Own Interface
+#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
+#include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldGeoJsonTypeFromString -
+// OrionldGeoInfo -
 //
-OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type)
+typedef struct OrionldGeoInfo
 {
-  if      (strcmp(type, "Point")           == 0)  return GeoJsonPoint;
-  else if (strcmp(type, "Polygon")         == 0)  return GeoJsonPolygon;
-  else if (strcmp(type, "LineString")      == 0)  return GeoJsonLineString;
-  else if (strcmp(type, "MultiPoint")      == 0)  return GeoJsonMultiPoint;
-  else if (strcmp(type, "MultiPolygon")    == 0)  return GeoJsonMultiPolygon;
-  else if (strcmp(type, "MultiLineString") == 0)  return GeoJsonMultiLineString;
+  OrionldGeometry  geometry;
+  OrionldGeorel    georel;
+  KjNode*          coordinates;
+  int              minDistance;
+  int              maxDistance;
+  char*            geoProperty;
+} OrionldGeoInfo;
 
-  return GeoJsonNoType;
-}
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_

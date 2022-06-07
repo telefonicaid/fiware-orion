@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOREL_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOREL_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,25 +30,33 @@
 
 // -----------------------------------------------------------------------------
 //
-// OrionldGeoJsonType - change name as this is the "geometry"
+// OrionldGeorel -
 //
-typedef enum OrionldGeoJsonType
+typedef enum OrionldGeorel
 {
-  GeoJsonNoType,
-  GeoJsonPoint,
-  GeoJsonMultiPoint,
-  GeoJsonLineString,
-  GeoJsonMultiLineString,
-  GeoJsonPolygon,
-  GeoJsonMultiPolygon
-} GeoJsonType;
+  GeorelNone,
+  GeorelNear,
+  GeorelWithin,
+  GeorelIntersects,
+  GeorelEquals,
+  GeorelDisjoint,
+  GeorelOverlaps,
+} OrionldGeorel;
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldGeoJsonTypeFromString -
+// orionldGeorelFromString -
 //
-extern OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type);
+extern OrionldGeorel orionldGeorelFromString(const char* georelString);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldGeorelFromString -
+//
+extern const char* orionldGeorelToString(OrionldGeorel georel);
+
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOREL_H_

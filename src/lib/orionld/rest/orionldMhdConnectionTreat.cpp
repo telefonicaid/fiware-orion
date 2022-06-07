@@ -543,7 +543,11 @@ static void dbGeoIndexes(void)
   // sem_take
   for (int ix = 0; ix < orionldState.geoAttrs; ix++)
   {
-    if (dbGeoIndexLookup(orionldState.tenantP->tenant, orionldState.geoAttrV[ix]->name) == NULL)
+    char eqName[512];
+
+    strncpy(eqName, orionldState.geoAttrV[ix]->name, sizeof(eqName) - 1);
+    dotForEq(eqName);
+    if (dbGeoIndexLookup(orionldState.tenantP->tenant, eqName) == NULL)
       dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
   }
   // sem_give

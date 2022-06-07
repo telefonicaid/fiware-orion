@@ -59,7 +59,10 @@ extern "C"
 bool orionldPostEntities(void)
 {
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+  {
+    LM_TMP(("********** Running Legacy version of orionldPostEntities"));
     return legacyPostEntities();
+  }
 
   char*    entityId;
   char*    entityType;

@@ -31,10 +31,10 @@ extern "C"
 }
 
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
+#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
 #include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
 #include "orionld/payloadCheck/pCheckGeoPropertyType.h"          // pCheckGeoPropertyType
-#include "orionld/payloadCheck/pCheckGeoPropertyCoordinates.h"   // pCheckGeoPropertyCoordinates
+#include "orionld/payloadCheck/pCheckGeoCoordinates.h"           // pCheckGeoCoordinates
 #include "orionld/payloadCheck/pCheckGeoPropertyValue.h"         // Own interface
 
 
@@ -57,15 +57,15 @@ bool pCheckGeoPropertyValue(KjNode* attrP, KjNode* typeP)
   }
 
   // Is the type a valid GeoJSON type? (Point, Polygon, ...)
-  OrionldGeoJsonType geoType;
-  if (pCheckGeoPropertyType(typeP, &geoType, attrP->name) == false)  // pCheckGeoPropertyType sets ProblemDetails
+  OrionldGeometry geometry;
+  if (pCheckGeoPropertyType(typeP, &geometry, attrP->name) == false)  // pCheckGeoPropertyType sets ProblemDetails
     return false;
 
   KjNode* coordinatesP = kjLookup(attrP, "coordinates");
 
   if (coordinatesP != NULL)
   {
-    if (pCheckGeoPropertyCoordinates(coordinatesP, geoType) == true)  // pCheckGeoPropertyCoordinates sets ProblemDetails
+    if (pCheckGeoCoordinates(coordinatesP, geometry) == true)  // pCheckGeoCoordinates sets ProblemDetails
     {
       // Convert to Normalized
       KjNode* valueP = kjObject(orionldState.kjsonP,  "value");

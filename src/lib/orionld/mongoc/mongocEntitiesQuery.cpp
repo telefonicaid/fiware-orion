@@ -37,10 +37,12 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qTreeToBson.h"                               // qTreeToBson
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
+#include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // Own interface
 
@@ -50,12 +52,12 @@ extern "C"
 //
 // entityTypeFilter -
 //
-static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
+static bool entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 {
   if (entityTypes->items == 1)  // Just a single type?
   {
     bson_append_utf8(mongoFilterP, "_id.type", 8, entityTypes->array[0], -1);
-    return;
+    return true;
   }
 
   bson_t in;
@@ -90,6 +92,8 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 
   bson_destroy(&in);                // It's safe to destroy once incorporated into mongoFilterP
   bson_destroy(&entityTypeArray);   // It's safe to destroy once incorporated into mongoFilterP
+
+  return true;
 }
 
 
@@ -98,12 +102,12 @@ static void entityTypeFilter(bson_t* mongoFilterP, StringArray* entityTypes)
 //
 // entityIdFilter -
 //
-static void entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
+static bool entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
 {
   if (entityIds->items == 1)  // Just a single id?
   {
     bson_append_utf8(mongoFilterP, "_id.id", 6, entityIds->array[0], -1);
-    return;
+    return true;
   }
 
   bson_t in;
@@ -138,6 +142,8 @@ static void entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
 
   bson_destroy(&in);                // It's safe to destroy once incorporated into mongoFilterP
   bson_destroy(&entityIdArray);     // It's safe to destroy once incorporated into mongoFilterP
+
+  return true;
 }
 
 
@@ -146,10 +152,11 @@ static void entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
 //
 // entityIdPatternFilter -
 //
-static void entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
+static bool entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
 {
   bson_append_regex(mongoFilterP, "_id.id", 6, idPattern, "m");
   LM_TMP(("Added REGEX for entity ID: '%s'", idPattern));
+  return true;
 }
 
 
@@ -158,7 +165,7 @@ static void entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
 //
 // attributesFilter -
 //
-static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP)
+static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP)
 {
   char   path[512];
   bson_t exists;
@@ -214,6 +221,7 @@ static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
   }
 
   bson_destroy(&exists);
+  return true;
 }
 
 
@@ -222,7 +230,7 @@ static void attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 //
 // qFilter -
 //
-bool qFilter(bson_t* mongoFilterP, QNode* qNode)
+static bool qFilter(bson_t* mongoFilterP, QNode* qNode)
 {
   char* title;
   char* detail;
@@ -240,21 +248,123 @@ bool qFilter(bson_t* mongoFilterP, QNode* qNode)
 
 // -----------------------------------------------------------------------------
 //
+// geoNearFilter -
+//
+// Example Filter: location and { Point, near, and maxDistance }:
+// {
+//   "location": {
+//     "$near": {
+//       "$geometry": {
+//         "type": "Point",
+//         "coordinates": [ -73.9667, 40.78 ]
+//        },
+//        "$maxDistance": 5000
+//      }
+//   }
+// }
+//
+//
+static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
+{
+  bson_t location;
+  bson_t near;
+  bson_t geometry;
+  bson_t coordinates;
+
+  bson_init(&location);
+  bson_init(&near);
+  bson_init(&geometry);
+  bson_init(&coordinates);
+
+  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
+
+  bson_append_utf8(&geometry,  "type",         4, "Point", 5);
+  bson_append_array(&geometry, "coordinates", 11, &coordinates);
+  bson_append_document(&near,  "$geometry",    9, &geometry);
+
+  if (geoInfoP->minDistance > 0)    bson_append_int32(&near, "$minDistance", 12, geoInfoP->minDistance);
+  if (geoInfoP->maxDistance > 0)    bson_append_int32(&near, "$maxDistance", 12, geoInfoP->maxDistance);
+
+  LM_TMP(("GEO: $nearSphere"));
+  bson_append_document(&location, "$nearSphere", 11, &near);
+
+
+  char          geoPropertyPath[512];
+  unsigned int  len = snprintf(geoPropertyPath, sizeof(geoPropertyPath) - 1, "attrs.%s", geoInfoP->geoProperty);
+
+  if (len + 7 > sizeof(geoPropertyPath))
+  {
+    orionldError(OrionldInternalError, "Recompilation needed", "geoPropertyPath vhar array is too small", 500);
+    return false;
+  }
+
+  dotForEq(&geoPropertyPath[6]);
+  strncpy(&geoPropertyPath[len], ".value", sizeof(geoPropertyPath) - len - 1);
+
+  bson_append_document(mongoFilterP, geoPropertyPath, len + 6, &location);
+
+  bson_destroy(&location);
+  bson_destroy(&near);
+  bson_destroy(&geometry);
+  bson_destroy(&coordinates);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// geoFilter -
+//
+static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
+{
+  LM_TMP(("GEO: geometry:    '%s'", orionldGeometryToString(geoInfoP->geometry)));
+  LM_TMP(("GEO: georel:      '%s'", orionldGeorelToString(geoInfoP->georel)));
+  LM_TMP(("GEO: maxDistance:  %d",  geoInfoP->maxDistance));
+  LM_TMP(("GEO: minDistance:  %d",  geoInfoP->minDistance));
+  LM_TMP(("GEO: geoProperty: '%s'", geoInfoP->geoProperty));
+
+  kjTreeLog(geoInfoP->coordinates, "GEO: coordinates");
+
+  switch (geoInfoP->geometry)
+  {
+  case GeorelNear:      return geoNearFilter(mongoFilterP, geoInfoP);
+
+  default:
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Only near implemented as of right now", 501);
+    return false;
+  }
+
+  orionldError(OrionldBadRequestData, "Invalid Georel", orionldGeorelToString(geoInfoP->georel), 400);
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongocEntitiesQuery -
 //
 // Parameters passed via orionldState:
+// - tenant
 // - limit
 // - offset
 // - count
+// - geometry
+// - georel
+// - coordinates
+// - geoproperty
 //
 KjNode* mongocEntitiesQuery
 (
-  StringArray*  entityTypeList,
-  StringArray*  entityIdList,
-  const char*   entityIdPattern,
-  StringArray*  attrList,
-  QNode*        qNode,
-  int64_t*      countP
+  StringArray*     entityTypeList,
+  StringArray*     entityIdList,
+  const char*      entityIdPattern,
+  StringArray*     attrList,
+  QNode*           qNode,
+  OrionldGeoInfo*  geoInfoP,
+  int64_t*         countP
 )
 {
   if (attrList->items > 99)
@@ -310,25 +420,47 @@ KjNode* mongocEntitiesQuery
 
   // Entity Types
   if ((entityTypeList != NULL) && (entityTypeList->items > 0))
-    entityTypeFilter(&mongoFilter, entityTypeList);
+  {
+    if (entityTypeFilter(&mongoFilter, entityTypeList) == false)
+      return NULL;
+  }
 
   // Entity IDs
   if ((entityIdList != NULL) && (entityIdList->items > 0))
-    entityIdFilter(&mongoFilter, entityIdList);
+  {
+    if (entityIdFilter(&mongoFilter, entityIdList) == false)
+      return NULL;
+  }
 
   // Entity ID-Pattern
   if (entityIdPattern != NULL)
-    entityIdPatternFilter(&mongoFilter, entityIdPattern);
+  {
+    if (entityIdPatternFilter(&mongoFilter, entityIdPattern) == false)
+      return NULL;
+  }
 
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))
-    attributesFilter(&mongoFilter, attrList, &projection);
+  {
+    if (attributesFilter(&mongoFilter, attrList, &projection) == false)
+      return NULL;
+  }
   else
     bson_append_bool(&projection, "attrs", 5, true);
 
   // Query Language
   if (qNode != NULL)
-    qFilter(&mongoFilter, qNode);
+  {
+    if (qFilter(&mongoFilter, qNode) == false)
+      return NULL;
+  }
+
+  // GEO Query
+  if (geoInfoP->geometry != GeoNoGeometry)
+  {
+    if (geoFilter(&mongoFilter, geoInfoP) == false)
+      return NULL;
+  }
 
   bson_append_document(&options, "projection", 10, &projection);
   bson_destroy(&projection);
@@ -363,8 +495,8 @@ KjNode* mongocEntitiesQuery
 #if 1
     char* filterString  = bson_as_json(&mongoFilter, NULL);
     char* optionsString = bson_as_json(&options, NULL);
-    LM_TMP(("Running the query with filter '%s'", filterString));
-    LM_TMP(("Running the query with options '%s'", optionsString));
+    LM_TMP(("GEO: Running the query with filter '%s'", filterString));
+    LM_TMP(("GEO: Running the query with options '%s'", optionsString));
     bson_free(filterString);
     bson_free(optionsString);
 #endif
@@ -373,9 +505,10 @@ KjNode* mongocEntitiesQuery
 
     if (mongoCursorP == NULL)
     {
-      LM_E(("Database Error (mongoc_collection_find_with_opts ERROR)"));
+      LM_E(("GEO: Database Error (mongoc_collection_find_with_opts ERROR)"));
       bson_destroy(&mongoFilter);
       mongoc_read_prefs_destroy(readPrefs);
+      orionldError(OrionldInternalError, "Database Error", "mongoc_collection_find_with_opts failed", 500);
       return NULL;
     }
 
@@ -383,7 +516,7 @@ KjNode* mongocEntitiesQuery
     // <DEBUG>
     const bson_t* lastError = mongoc_collection_get_last_error(orionldState.mongoc.entitiesP);
     if (lastError != NULL)
-      LM_E(("MongoC Error: %s", bson_as_canonical_extended_json(lastError, NULL)));
+      LM_E(("GEO: MongoC Error: %s", bson_as_canonical_extended_json(lastError, NULL)));
     // </DEBUG>
 #endif
 
@@ -397,12 +530,12 @@ KjNode* mongocEntitiesQuery
         kjChildAdd(entityArray, entityNodeP);
       }
       else
-        LM_E(("Database Error (%s: %s)", title, detail));
+        LM_E(("GEO: Database Error (%s: %s)", title, detail));
     }
 
     bson_error_t error;
     if (mongoc_cursor_error(mongoCursorP, &error) == true)
-      LM_TMP(("mongoc_cursor_error: %d.%d.%s", error.domain, error.code, error.message));
+      LM_E(("GEO: mongoc_cursor_error: %d.%d: '%s'", error.domain, error.code, error.message));
 
     mongoc_cursor_destroy(mongoCursorP);
   }

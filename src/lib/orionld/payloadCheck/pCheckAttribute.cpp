@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldBadRequestData
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeTypeName
+#include "orionld/types/OrionldGeometry.h"                       // orionldGeometryFromString, GeoNoGeometry
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
@@ -574,7 +575,7 @@ static bool isGeoJsonValue(KjNode* valueP)
 
     if (strcmp(nodeP->name, "type") == 0)
     {
-      if (orionldGeoJsonTypeFromString(nodeP->value.s) != GeoJsonNoType)
+      if (orionldGeometryFromString(nodeP->value.s) != GeoNoGeometry)
         typePresent = true;
     }
     else if (strcmp(nodeP->name, "coordinates") == 0)
@@ -883,6 +884,29 @@ static bool pCheckAttributeObject
     {
       typeP = kjString(orionldState.kjsonP, "type", orionldAttributeTypeName(attributeType));
       kjChildAdd(attrP, typeP);
+    }
+
+    if (attributeType == GeoProperty)
+    {
+      LM_TMP(("GEO: %s is a geo property - making sure it has an index!", attrP->name));
+
+      if (orionldState.geoAttrs >= orionldState.geoAttrMax)
+      {
+        orionldState.geoAttrMax += 100;
+
+        KjNode** tmp = (KjNode**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * orionldState.geoAttrMax);
+
+        if (tmp == NULL)
+        {
+          orionldError(OrionldBadRequestData, "Internal Error", "Unable to allocate memory", 500);
+          return false;
+        }
+
+        memcpy(tmp, orionldState.geoAttrV, sizeof(KjNode*) * orionldState.geoAttrs);
+        orionldState.geoAttrV = tmp;
+      }
+
+      orionldState.geoAttrV[orionldState.geoAttrs++] = attrP;
     }
 
     fieldP = next;

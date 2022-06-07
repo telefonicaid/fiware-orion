@@ -30,8 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
-
 
 
 // -----------------------------------------------------------------------------

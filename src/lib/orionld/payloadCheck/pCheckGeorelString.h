@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYCOORDINATES_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYCOORDINATES_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEORELSTRING_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEORELSTRING_H_
 
 /*
 *
@@ -25,19 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
+#include "orionld/types/OrionldGeoInfo.h"                       // OrionldGeoInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// pCheckGeoPropertyCoordinates -
+// pCheckGeorelString -
 //
-extern bool pCheckGeoPropertyCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType);
+extern bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYCOORDINATES_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEORELSTRING_H_

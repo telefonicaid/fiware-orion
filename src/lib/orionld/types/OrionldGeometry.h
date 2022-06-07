@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOREL_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOREL_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOMETRY_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOMETRY_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,19 +25,38 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldGeometry -
+//
+typedef enum OrionldGeometry
 {
-#include "kjson/KjNode.h"                                       // KjNode
-}
+  GeoNoGeometry,
+  GeoPoint,
+  GeoMultiPoint,
+  GeoLineString,
+  GeoMultiLineString,
+  GeoPolygon,
+  GeoMultiPolygon
+} OrionldGeometry;
 
-#include "orionld/types/OrionldGeoInfo.h"                       // OrionldGeoInfo
 
 
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// pCheckGeorel -
+// orionldGeometryFromString -
 //
-extern bool pCheckGeorel(KjNode* georelP, OrionldGeoInfo* geoInfoP);
+extern OrionldGeometry orionldGeometryFromString(const char* geoString);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOREL_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldGeometryFromString -
+//
+extern const char* orionldGeometryToString(OrionldGeometry geometry);
+
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOMETRY_H_

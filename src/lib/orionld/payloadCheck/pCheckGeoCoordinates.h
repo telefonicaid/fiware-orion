@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
+#include "orionld/types/OrionldGeometry.h"                     // OrionldGeometry
 
 
 
@@ -38,6 +38,6 @@ extern "C"
 //
 // pCheckGeoCoordinates -
 //
-extern bool pCheckGeoCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType);
+extern bool pCheckGeoCoordinates(KjNode* coordinatesP, OrionldGeometry geometry);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOCOORDINATES_H_

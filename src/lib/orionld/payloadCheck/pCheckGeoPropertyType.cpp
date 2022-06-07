@@ -30,7 +30,7 @@ extern "C"
 }
 
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType, orionldGeoJsonTypeFromString, GeoJsonNoType
+#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry, orionldGeometryFromString, GeoNoGeometry
 #include "orionld/payloadCheck/pCheckGeoPropertyType.h"          // Own interface
 
 
@@ -39,7 +39,7 @@ extern "C"
 //
 // pCheckGeoPropertyType -
 //
-bool pCheckGeoPropertyType(KjNode* typeP, OrionldGeoJsonType* geoTypeP, const char* attrName)
+bool pCheckGeoPropertyType(KjNode* typeP, OrionldGeometry* geometryP, const char* attrName)
 {
   if (typeP->type != KjString)
   {
@@ -51,8 +51,8 @@ bool pCheckGeoPropertyType(KjNode* typeP, OrionldGeoJsonType* geoTypeP, const ch
     return false;
   }
 
-  *geoTypeP = orionldGeoJsonTypeFromString(typeP->value.s);
-  if (*geoTypeP == GeoJsonNoType)
+  *geometryP = orionldGeometryFromString(typeP->value.s);
+  if (*geometryP == GeoNoGeometry)
     return false;  // Not an error, simply not a GeoProperty
 
   return true;

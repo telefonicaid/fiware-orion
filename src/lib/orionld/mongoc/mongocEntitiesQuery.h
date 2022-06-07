@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                     // QNode
 
 
@@ -41,12 +42,13 @@ extern "C"
 //
 extern KjNode* mongocEntitiesQuery
 (
-  StringArray*  entityTypeList,
-  StringArray*  entityIdList,
-  const char*   entityIdPattern,
-  StringArray*  attrList,
-  QNode*        qNode,
-  int64_t*      countP
+  StringArray*     entityTypeList,
+  StringArray*     entityIdList,
+  const char*      entityIdPattern,
+  StringArray*     attrList,
+  QNode*           qNode,
+  OrionldGeoInfo*  geoInfoP,
+  int64_t*         countP
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
