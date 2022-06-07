@@ -74,6 +74,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
       orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be either 'Polygon' or 'MultiPolygon' for georel 'within'", 400);
       return false;
     }
+    geoInfoP->georel = GeorelWithin;
   }
   else if (strcmp(georel, "overlaps") == 0)
   {

@@ -315,6 +315,67 @@ static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
 
 // -----------------------------------------------------------------------------
 //
+// geoWithinFilter -
+//
+// Example Filter: location and { Polygon and $within }
+// {
+//   "location": {
+//     $geoWithin: {
+//       $geometry: {
+//         type: <"Polygon" or "MultiPolygon"> ,
+//         coordinates: [ <coordinates> ]
+//       }
+//     }
+//   }
+// }
+//
+static bool geoWithinFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
+{
+  bson_t location;
+  bson_t within;
+  bson_t geometry;
+  bson_t coordinates;
+
+  bson_init(&location);
+  bson_init(&within);
+  bson_init(&geometry);
+  bson_init(&coordinates);
+
+  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
+
+  if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
+  else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
+
+  bson_append_array(&geometry,    "coordinates", 11, &coordinates);
+  bson_append_document(&within,   "$geometry",    9, &geometry);
+  bson_append_document(&location, "$within",      7,  &within);
+
+  char          geoPropertyPath[512];
+  unsigned int  len = snprintf(geoPropertyPath, sizeof(geoPropertyPath) - 1, "attrs.%s", geoInfoP->geoProperty);
+
+  if (len + 7 > sizeof(geoPropertyPath))
+  {
+    orionldError(OrionldInternalError, "Recompilation needed", "geoPropertyPath char array is too small", 500);
+    return false;
+  }
+
+  dotForEq(&geoPropertyPath[6]);
+  strncpy(&geoPropertyPath[len], ".value", sizeof(geoPropertyPath) - len - 1);
+
+  bson_append_document(mongoFilterP, geoPropertyPath, len + 6, &location);
+
+  bson_destroy(&location);
+  bson_destroy(&within);
+  bson_destroy(&geometry);
+  bson_destroy(&coordinates);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // geoFilter -
 //
 static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
@@ -327,12 +388,13 @@ static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
 
   kjTreeLog(geoInfoP->coordinates, "GEO: coordinates");
 
-  switch (geoInfoP->geometry)
+  switch (geoInfoP->georel)
   {
   case GeorelNear:      return geoNearFilter(mongoFilterP, geoInfoP);
+  case GeorelWithin:    return geoWithinFilter(mongoFilterP, geoInfoP);
 
   default:
-    orionldError(OrionldOperationNotSupported, "Not Implemented", "Only near implemented as of right now", 501);
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Only $near and $within implemented as of right now", 501);
     return false;
   }
 

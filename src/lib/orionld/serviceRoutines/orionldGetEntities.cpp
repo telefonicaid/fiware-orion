@@ -66,6 +66,11 @@ static bool geoCheck(OrionldGeoInfo* geoInfoP)
       (orionldState.uriParams.coordinates != NULL) ||
       (orionldState.uriParams.geoproperty != NULL))
   {
+    LM_TMP(("GEO: geometry:    '%s'", orionldState.uriParams.geometry));
+    LM_TMP(("GEO: georel:      '%s'", orionldState.uriParams.georel));
+    LM_TMP(("GEO: coordinates:  %s",  orionldState.uriParams.coordinates));
+    LM_TMP(("GEO: geoProperty: '%s'", orionldState.uriParams.geoproperty));
+
     //
     // geometry
     //
