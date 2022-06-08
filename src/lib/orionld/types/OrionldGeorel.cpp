@@ -40,6 +40,7 @@ OrionldGeorel orionldGeorelFromString(const char* georelString)
   else if (strcmp(georelString, "equals")     == 0) return GeorelEquals;
   else if (strcmp(georelString, "disjoint")   == 0) return GeorelDisjoint;
   else if (strcmp(georelString, "overlaps")   == 0) return GeorelOverlaps;
+  else if (strcmp(georelString, "contains")   == 0) return GeorelContains;
 
   return GeorelNone;
 }
@@ -61,6 +62,7 @@ const char* orionldGeorelToString(OrionldGeorel georel)
   case GeorelEquals:      return "equals";
   case GeorelDisjoint:    return "disjoint";
   case GeorelOverlaps:    return "overlaps";
+  case GeorelContains:    return "contains";
   }
 
   return "no georel";

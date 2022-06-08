@@ -41,6 +41,7 @@ typedef enum OrionldGeorel
   GeorelEquals,
   GeorelDisjoint,
   GeorelOverlaps,
+  GeorelContains
 } OrionldGeorel;
 
 

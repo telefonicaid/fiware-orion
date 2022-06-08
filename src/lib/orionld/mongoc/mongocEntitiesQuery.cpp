@@ -456,12 +456,48 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 
 
 
-// geoFilterEquals       - just compare that they're equal
-// geoFilterDisjoint     - { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}
-// geoFilterOverlaps     - intersects AND is of the same GEO-Type
-// geoFilterContains     - Returns TRUE if no point of geography_2 is outside geography_1, and the interiors intersect
-//                         within AND NOT
+// -----------------------------------------------------------------------------
+//
+// geoEqualsFilter - just compare that they're equal
+//
+static bool geoEqualsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
+{
+  orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo Equals Query", 501);
+  return false;
+}
 
+
+// -----------------------------------------------------------------------------
+//
+// geoDisjointFilter - { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}
+//
+static bool geoDisjointFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
+{
+  orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo Disjoint Query", 501);
+  return false;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// geoOverlapsFilter - intersects AND is of the same GEO-Type
+//
+static bool geoOverlapsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
+{
+  orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo Overlaps Query", 501);
+  return false;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// geoContainsFilter - Returns TRUE if no point of geography_2 is outside geography_1, and the interiors intersect
+//
+static bool geoContainsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
+{
+  orionldError(OrionldInvalidRequest,  "Not Implemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
+  return false;
+}
 
 
 // -----------------------------------------------------------------------------
@@ -476,13 +512,15 @@ static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
   LM_TMP(("GEO: minDistance:  %d",  geoInfoP->minDistance));
   LM_TMP(("GEO: geoProperty: '%s'", geoInfoP->geoProperty));
 
-  kjTreeLog(geoInfoP->coordinates, "GEO: coordinates");
-
   switch (geoInfoP->georel)
   {
-  case GeorelNear:        return geoNearFilter(mongoFilterP, geoInfoP);
-  case GeorelWithin:      return geoWithinFilter(mongoFilterP, geoInfoP);
+  case GeorelNear:        return geoNearFilter(mongoFilterP,       geoInfoP);
+  case GeorelWithin:      return geoWithinFilter(mongoFilterP,     geoInfoP);
   case GeorelIntersects:  return geoIntersectsFilter(mongoFilterP, geoInfoP);
+  case GeorelEquals:      return geoEqualsFilter(mongoFilterP,     geoInfoP);
+  case GeorelDisjoint:    return geoDisjointFilter(mongoFilterP,   geoInfoP);
+  case GeorelOverlaps:    return geoOverlapsFilter(mongoFilterP,   geoInfoP);
+  case GeorelContains:    return geoContainsFilter(mongoFilterP,   geoInfoP);
 
   default:
     orionldError(OrionldOperationNotSupported, "Not Implemented", "Only near, within, and intersect implemented as of right now", 501);

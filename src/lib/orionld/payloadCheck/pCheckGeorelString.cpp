@@ -79,6 +79,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
   else if (strcmp(georel, "overlaps") == 0)
   {
     // FIXME: Can be any Geometry ... Right?
+    geoInfoP->georel = GeorelOverlaps;
   }
   else if (strcmp(georel, "intersects") == 0)
   {
@@ -95,8 +96,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
   }
   else if (strcmp(georel, "contains") == 0)
   {
-    orionldError(OrionldInvalidRequest,  "Not Implemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
-    return false;
+    geoInfoP->georel = GeorelContains;
   }
   else if (strcmp(georel, "equals") == 0)
   {
