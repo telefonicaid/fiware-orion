@@ -2,7 +2,6 @@
  
 <!-- TOC -->
 
-- [FIWARE-NGSI v2 release 2.1 Specification](#fiware-ngsi-v2-release-21-specification)
 - [Preface](#preface)
 - [Specification](#specification)
     - [Introduction](#introduction)
