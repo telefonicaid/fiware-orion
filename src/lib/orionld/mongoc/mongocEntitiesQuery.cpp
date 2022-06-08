@@ -460,7 +460,7 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 // geoFilterDisjoint     - { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}
 // geoFilterOverlaps     - intersects AND is of the same GEO-Type
 // geoFilterContains     - Returns TRUE if no point of geography_2 is outside geography_1, and the interiors intersect
-//                         within AND NOT 
+//                         within AND NOT
 
 
 
