@@ -86,19 +86,22 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
     //        But, the mongodb docs talk about Polygon or MultiPolygon:
     //          https://docs.mongodb.com/manual/reference/operator/query/geoIntersects/
     //        For now, I'll allow any Geometry
+    geoInfoP->georel = GeorelIntersects;
   }
   else if (strcmp(georel, "disjoint") == 0)
   {
     // Uses $not { 'intersects-expression' }, so, if 'intersects' is only Polygons, then 'disjoint' also
+    geoInfoP->georel = GeorelDisjoint;
   }
   else if (strcmp(georel, "contains") == 0)
   {
-    orionldError(OrionldInvalidRequest,  "Not Inplemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
+    orionldError(OrionldInvalidRequest,  "Not Implemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
     return false;
   }
   else if (strcmp(georel, "equals") == 0)
   {
     // Valid for all geometry types
+    geoInfoP->georel = GeorelEquals;
   }
   else
   {

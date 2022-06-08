@@ -248,6 +248,29 @@ static bool qFilter(bson_t* mongoFilterP, QNode* qNode)
 
 // -----------------------------------------------------------------------------
 //
+// geoPropertyDbPath -
+//
+static bool geoPropertyDbPath(char* geoPropertyPath, int geoPropertyPathSize, const char* geoPropertyName, int* actualLen)
+{
+  int  len = snprintf(geoPropertyPath, geoPropertyPathSize - 7, "attrs.%s", geoPropertyName);  // 7 chars needed for ".value" and zero termination
+
+  if (len + 7 > geoPropertyPathSize)
+  {
+    orionldError(OrionldInternalError, "Recompilation needed", "geoPropertyPath char array is too small", 500);
+    return false;
+  }
+
+  dotForEq(&geoPropertyPath[6]);
+  strncpy(&geoPropertyPath[len], ".value", geoPropertyPathSize - len - 1);
+
+  *actualLen = len + 6;
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // geoNearFilter -
 //
 // Example Filter: location and { Point, near, and maxDistance }:
@@ -271,6 +294,12 @@ static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
   bson_t geometry;
   bson_t coordinates;
 
+  if (geoInfoP->geometry != GeoPoint)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Geometry for Near Query (must be a Point)", orionldGeometryToString(geoInfoP->geometry), 400);
+    return false;
+  }
+
   bson_init(&location);
   bson_init(&near);
   bson_init(&geometry);
@@ -288,20 +317,12 @@ static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
   LM_TMP(("GEO: $nearSphere"));
   bson_append_document(&location, "$nearSphere", 11, &near);
 
-
-  char          geoPropertyPath[512];
-  unsigned int  len = snprintf(geoPropertyPath, sizeof(geoPropertyPath) - 1, "attrs.%s", geoInfoP->geoProperty);
-
-  if (len + 7 > sizeof(geoPropertyPath))
-  {
-    orionldError(OrionldInternalError, "Recompilation needed", "geoPropertyPath vhar array is too small", 500);
+  char geoPropertyPath[512];
+  int  geoPropertyPathLen;
+  if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
     return false;
-  }
 
-  dotForEq(&geoPropertyPath[6]);
-  strncpy(&geoPropertyPath[len], ".value", sizeof(geoPropertyPath) - len - 1);
-
-  bson_append_document(mongoFilterP, geoPropertyPath, len + 6, &location);
+  bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
 
   bson_destroy(&location);
   bson_destroy(&near);
@@ -336,33 +357,33 @@ static bool geoWithinFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
   bson_t geometry;
   bson_t coordinates;
 
-  bson_init(&location);
-  bson_init(&within);
   bson_init(&geometry);
-  bson_init(&coordinates);
-
-  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
 
   if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
   else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
+  else
+  {
+    bson_destroy(&geometry);
+    orionldError(OrionldBadRequestData, "Invalid Geometry for Within Query", orionldGeometryToString(geoInfoP->geometry), 400);
+    return false;
+  }
+
+  bson_init(&location);
+  bson_init(&within);
+  bson_init(&coordinates);
+
+  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
 
   bson_append_array(&geometry,    "coordinates", 11, &coordinates);
   bson_append_document(&within,   "$geometry",    9, &geometry);
   bson_append_document(&location, "$within",      7,  &within);
 
-  char          geoPropertyPath[512];
-  unsigned int  len = snprintf(geoPropertyPath, sizeof(geoPropertyPath) - 1, "attrs.%s", geoInfoP->geoProperty);
-
-  if (len + 7 > sizeof(geoPropertyPath))
-  {
-    orionldError(OrionldInternalError, "Recompilation needed", "geoPropertyPath char array is too small", 500);
+  char geoPropertyPath[512];
+  int  geoPropertyPathLen;
+  if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
     return false;
-  }
 
-  dotForEq(&geoPropertyPath[6]);
-  strncpy(&geoPropertyPath[len], ".value", sizeof(geoPropertyPath) - len - 1);
-
-  bson_append_document(mongoFilterP, geoPropertyPath, len + 6, &location);
+  bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
 
   bson_destroy(&location);
   bson_destroy(&within);
@@ -371,6 +392,75 @@ static bool geoWithinFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 
   return true;
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// geoFilterIntersects - $geoIntersects
+//
+// {
+//   <location field>: {
+//      $geoIntersects: {
+//         $geometry: {
+//            type: "<GeoJSON object type>" ,
+//            coordinates: [ <coordinates> ]
+//         }
+//      }
+//   }
+// }
+//
+static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
+{
+  bson_t location;
+  bson_t intersects;
+  bson_t geometry;
+  bson_t coordinates;
+
+  bson_init(&geometry);
+
+  if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
+  else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
+  else
+  {
+    bson_destroy(&geometry);
+    orionldError(OrionldBadRequestData, "Invalid Geometry for Intersect Query", orionldGeometryToString(geoInfoP->geometry), 400);
+    return false;
+  }
+
+  bson_init(&location);
+  bson_init(&intersects);
+  bson_init(&coordinates);
+
+  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
+
+  bson_append_array(&geometry,      "coordinates",    11, &coordinates);
+  bson_append_document(&intersects, "$geometry",       9, &geometry);
+  bson_append_document(&location,   "$geoIntersects", 14, &intersects);
+
+  char geoPropertyPath[512];
+  int  geoPropertyPathLen;
+  if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
+    return false;
+
+  bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
+
+  bson_destroy(&location);
+  bson_destroy(&intersects);
+  bson_destroy(&geometry);
+  bson_destroy(&coordinates);
+
+  return true;
+  return true;
+}
+
+
+
+// geoFilterEquals       - just compare that they're equal
+// geoFilterDisjoint     - { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}
+// geoFilterOverlaps     - intersects AND is of the same GEO-Type
+// geoFilterContains     - Returns TRUE if no point of geography_2 is outside geography_1, and the interiors intersect
+//                         within AND NOT 
 
 
 
@@ -390,11 +480,12 @@ static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
 
   switch (geoInfoP->georel)
   {
-  case GeorelNear:      return geoNearFilter(mongoFilterP, geoInfoP);
-  case GeorelWithin:    return geoWithinFilter(mongoFilterP, geoInfoP);
+  case GeorelNear:        return geoNearFilter(mongoFilterP, geoInfoP);
+  case GeorelWithin:      return geoWithinFilter(mongoFilterP, geoInfoP);
+  case GeorelIntersects:  return geoIntersectsFilter(mongoFilterP, geoInfoP);
 
   default:
-    orionldError(OrionldOperationNotSupported, "Not Implemented", "Only $near and $within implemented as of right now", 501);
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Only near, within, and intersect implemented as of right now", 501);
     return false;
   }
 

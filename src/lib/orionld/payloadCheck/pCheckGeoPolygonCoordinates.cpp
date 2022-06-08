@@ -103,6 +103,12 @@ bool pCheckGeoPolygonCoordinates(KjNode* coordinatesP)
 
     //
     // The first position and the last position must be identical
+    // However, comparing this, especially if floating points ... not so easy
+    // So, let's:
+    // * make sure they're of the same JSON type
+    // * If KjInteger - exact match
+    // * If KjFloat   - measure the diff between the two is less than 0.000001
+    //   - Perhaps a CLI option to turn this behaviour off (just in case)
     //
     KjNode* firstItemNodeP = firstPosP->value.firstChildP;
     KjNode* lastItemNodeP  = lastPosP->value.firstChildP;
@@ -110,7 +116,23 @@ bool pCheckGeoPolygonCoordinates(KjNode* coordinatesP)
 
     while (firstItemNodeP != NULL)
     {
-      if ((lastItemNodeP == NULL) || (firstItemNodeP->value.f != lastItemNodeP->value.f))
+      bool error = false;
+      if (firstItemNodeP->type != lastItemNodeP->type)
+        error = true;
+      else if ((firstItemNodeP->type == KjInt) && (firstItemNodeP->value.i != lastItemNodeP->value.i))
+        error = true;
+      else if (firstItemNodeP->type == KjFloat)
+      {
+        double diff = firstItemNodeP->value.f - lastItemNodeP->value.f;
+
+        if (diff < 0)
+          diff = -diff;
+
+        if (diff > 0.000000001)
+          error = true;
+      }
+
+      if (error == true)
       {
         LM_W(("Bad Input (In a Polygon, the first and the last position must be identical)"));
         orionldError(OrionldBadRequestData, "Invalid GeoJSON", "In a Polygon, the first and the last position must be identical", 400);
