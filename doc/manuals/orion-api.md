@@ -2,6 +2,7 @@
  
 <!-- TOC -->
 
+- [FIWARE-NGSI v2 release 2.1 Specification](#fiware-ngsi-v2-release-21-specification)
 - [Preface](#preface)
 - [Specification](#specification)
     - [Introduction](#introduction)
@@ -1004,72 +1005,46 @@ and/or those which match a query or geographical query (see [Simple Query Langua
 The response payload is an array containing one object per matching entity. Each entity follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
 
-Response code:
+**Response code**
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + id: Boe_Idearium (optional, string) - A comma-separated list of elements.
-      Retrieve entities whose ID matches one of the elements in the list.
-      Incompatible with `idPattern`.
-    
-    + type: Room (optional, string) -  comma-separated list of elements.
-      Retrieve entities whose type matches one of the elements in the list.
-      Incompatible with `typePattern`.
+**Parameters**
 
-    + idPattern: Bode_.* (optional, string) - A correctly formatted regular expression.
-      Retrieve entities whose ID matches the regular expression. Incompatible with `id`.
+This requests accepts the following URL parameters to customize the request response.
 
-    + typePattern: Room_.* (optional, string) - A correctly formatted regular expression.
-      Retrieve entities whose type matches the regular expression. Incompatible with `type`.
-    
-    + q: temperature>40 (optional, string) - A query expression, composed of a list of statements
-      separated by `;`, i.e., q=statement1;statement2;statement3.
-      See [Simple Query Language specification](#simple_query_language). 
+<!-- Use this tool to prettify the table: http://markdowntable.com/ -->
+| Parameter     | Optional | Type   | Description                                                                                                                                                                                                            | Example                           |
+|---------------|----------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| `id`          | ✓        | string | A comma-separated list of elements. Retrieve entities whose ID matches one of the elements in the list. Incompatible with `idPattern`.                                                                                 | Boe_Idearium                      |
+| `type`        | ✓        | string | comma-separated list of elements. Retrieve entities whose type matches one of the elements in the list. Incompatible with `typePattern`.                                                                               | Room                              |
+| `idPattern`   | ✓        | string | idPattern: Bode_.* (optional, string) - A correctly formatted regular expression. Retrieve entities whose ID matches the regular expression. Incompatible with `id`.                                                   | Bode_.*                           |
+| `typePattern` | ✓        | string | A correctly formatted regular expression. Retrieve entities whose type matches the regular expression. Incompatible with `type`.                                                                                       | Room_.*                           |
+| `q`           | ✓        | string | temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`, i.e., q=statement1;statement2;statement3. See [Simple Query Language specification](#simple_query_language) | temperature>40                    |
+| `mq`          | ✓        | string | A query expression for attribute metadata, composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3. See [Simple Query Language specification](#simple_query_language)             | temperature.accuracy<0.9          |
+| `georel`      | ✓        | string | Spatial relationship between matching entities and a reference shape. See [Geographical Queries](#geographical_queries).                                                                                               | near                              |
+| `geometry`    | ✓        | string | Geographical area to which the query is restricted.See [Geographical Queries](#geographical_queries).                                                                                                                  | point                             |
+| `limit`       | ✓        | number | Limits the number of entities to be retrieved                                                                                                                                                                          | 20                                |
+| `offset`      | ✓        | number | Establishes the offset from where entities are retrieved                                                                                                                                                               | 20                                |
+| `coords`      | ✓        | string | List of latitude-longitude pairs of coordinates separated by ';'. See [Geographical Queries](#geographical_queries)                                                                                                    | 41.390205,2.154007;48.8566,2.3522 |
+| `attrs`       | ✓        | string | Comma-separated list of attribute names whose data are to be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                            | seatNumber                        |
+| `metadata`    | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                              | accuracy                          |
+| `orderBy`     | ✓        | string | Criteria for ordering results. See "Ordering Results" section for details.                                                                                                                                             | temperature,!speed                |
+| `options`     | ✓        | string | Additional options for the query. See the following table                                                                                                                                                              | options=count                     |
 
-    + mq: temperature.accuracy<0.9 (optional, string) - A query expression for attribute metadata,
-      composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3.
-      See [Simple Query Language specification](#simple_query_language).
-    
-    + georel: near (optional, string) - Spatial relationship between matching entities and a
-      reference shape. See [Geographical Queries](#geographical_queries).
+The values that `options` parameter can have for this specific request are:
 
-    + geometry: point (optional, string) - Geographical area to which the query is restricted.
-      See [Geographical Queries](#geographical_queries).
-    
-    + coords: 41.390205,2.154007;48.8566,2.3522 (optional, string) - List of latitude-longitude
-      pairs of coordinates separated by ';'. See [Geographical Queries](#geographical_queries).
-    
-    + limit: 20 (optional, number) - Limits the number of entities to be retrieved
-    
-    + offset: 20 (optional, number) - Establishes the offset from where entities are retrieved
-    
-    + attrs: seatNumber (optional, string) - Comma-separated list of attribute names whose data
-      are to be included in the response.
-      The attributes are retrieved in the order specified by this parameter. If this parameter is
-      not included, the attributes are retrieved in arbitrary order.
-      See "Filtering out attributes and metadata" section for more detail.
+| Option      | Description                                                                                                                                                                    |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `count`     | when used, the total number of entities is returned in the response as an HTTP header named `Fiware-Total-Count`.                                                              |
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
+| `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
+| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
 
-    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      See "Filtering out attributes and metadata" section for more detail.
 
-    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
-      See "Ordering Results" section for details.
-    
-    + options (optional, string) - Options dictionary
-      + Members
-          + count - when used, the total number of entities is returned in the response as an 
-            HTTP header named `Fiware-Total-Count`.
-          + keyValues - when used, the response payload uses the `keyValues` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + values - when used, the response payload uses the `values` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + unique - when used, the response payload uses the `values` simplified entity
-            representation.
-            Recurring values are left out.
-            See "Simplified Entity Representation" section for details.
+**Response** 
 
 + Response 200 (application/json)
 
