@@ -63,6 +63,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
+#include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
@@ -548,7 +549,12 @@ static void dbGeoIndexes(void)
     strncpy(eqName, orionldState.geoAttrV[ix]->name, sizeof(eqName) - 1);
     dotForEq(eqName);
     if (dbGeoIndexLookup(orionldState.tenantP->tenant, eqName) == NULL)
-      dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+    {
+      if (experimental)
+        mongocGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+      else
+        dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+    }
   }
   // sem_give
 }

@@ -467,6 +467,7 @@ static bool geoEqualsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
 // geoDisjointFilter - { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}
@@ -476,6 +477,7 @@ static bool geoDisjointFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
   orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo Disjoint Query", 501);
   return false;
 }
+
 
 
 // -----------------------------------------------------------------------------
@@ -489,6 +491,7 @@ static bool geoOverlapsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
 // geoContainsFilter - Returns TRUE if no point of geography_2 is outside geography_1, and the interiors intersect
@@ -498,6 +501,7 @@ static bool geoContainsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
   orionldError(OrionldInvalidRequest,  "Not Implemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
   return false;
 }
+
 
 
 // -----------------------------------------------------------------------------
