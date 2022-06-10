@@ -421,6 +421,10 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 
   bson_init(&geometry);
 
+#if 0
+  //
+  // intersect ... should be valid for any geometry ...  Right?
+  //
   if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
   else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
   else
@@ -429,6 +433,7 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
     orionldError(OrionldBadRequestData, "Invalid Geometry for Intersect Query", orionldGeometryToString(geoInfoP->geometry), 400);
     return false;
   }
+#endif
 
   bson_init(&location);
   bson_init(&intersects);
@@ -436,6 +441,7 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 
   mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
 
+  bson_append_utf8(&geometry,       "type",            4, orionldGeometryToString(geoInfoP->geometry), -1);
   bson_append_array(&geometry,      "coordinates",    11, &coordinates);
   bson_append_document(&intersects, "$geometry",       9, &geometry);
   bson_append_document(&location,   "$geoIntersects", 14, &intersects);
@@ -508,12 +514,59 @@ static bool geoEqualsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 
 // -----------------------------------------------------------------------------
 //
-// geoDisjointFilter - { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}
+// geoDisjointFilter - { "location":  { $not: { $geoIntersects: { $geometry: { type, coordinates }}}}}
 //
 static bool geoDisjointFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 {
-  orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo Disjoint Query", 501);
-  return false;
+  bson_t location;
+  bson_t notIntersects;
+  bson_t intersects;
+  bson_t geometry;
+  bson_t coordinates;
+
+  bson_init(&geometry);
+
+#if 0
+  //
+  // disjoint ... should be valid for any geometry ...  Right?
+  //
+  if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
+  else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
+  else
+  {
+    bson_destroy(&geometry);
+    orionldError(OrionldBadRequestData, "Invalid Geometry for Disjoint Query", orionldGeometryToString(geoInfoP->geometry), 400);
+    return false;
+  }
+#endif
+
+  bson_init(&location);
+  bson_init(&notIntersects);
+  bson_init(&intersects);
+  bson_init(&coordinates);
+
+  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
+
+  bson_append_utf8(&geometry,          "type",            4, orionldGeometryToString(geoInfoP->geometry), -1);
+  bson_append_array(&geometry,         "coordinates",    11, &coordinates);
+  bson_append_document(&intersects,    "$geometry",       9, &geometry);
+  bson_append_document(&notIntersects, "$geoIntersects", 14, &intersects);
+  bson_append_document(&location,      "$not",            4, &notIntersects);
+
+  char geoPropertyPath[512];
+  int  geoPropertyPathLen;
+  if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
+    return false;
+
+  bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
+
+  bson_destroy(&location);
+  bson_destroy(&notIntersects);
+  bson_destroy(&intersects);
+  bson_destroy(&geometry);
+  bson_destroy(&coordinates);
+
+  return true;
 }
 
 
