@@ -1650,6 +1650,21 @@ function cServerCurl
 }
 
 
+
+# -----------------------------------------------------------------------------
+#
+# urlencode - very basic urlencode, just converting [ and ]
+#
+function urlencode
+{
+  in="$1"
+  out1=$(echo $in   | sed 's/\[/\%5B/g')
+  out=$(echo  $out1 | sed 's/\]/\%5D/g')
+  echo $out
+}
+
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1688,3 +1703,4 @@ export -f pgCreate
 export -f cServerStart
 export -f cServerStop
 export -f cServerCurl
+export -f urlencode
