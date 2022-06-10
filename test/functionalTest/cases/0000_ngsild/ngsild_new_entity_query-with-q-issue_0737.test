@@ -86,7 +86,7 @@ Date: REGEX(.*)
 {
     "id": "urn:ngsi-ld:entities:E1",
     "type": "T",
-    "\uff4e\uff41\uff4d\uff45": {
+    "REGEX(.*)": {
         "type": "Property",
         "value": 1
     }
