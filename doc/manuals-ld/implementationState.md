@@ -102,32 +102,45 @@ The NGSIv2 matach is done via Scope, while NGSI-LD match is done with qLex/qPars
 been taken advantage of to distinguish between the two.
 
 ### Support of the new mongoc driver
-The following API endpoint use "mongoc" - the new Mongo C driver:
+All generic features now use "mongoc" - the new Mongo C driver:
+* Creation of database indices (only if started with '-experimental')
+* Persisting Contexts
+* Tenants
+* Subscription Cache
+
+The following API endpoints use "mongoc" - the new Mongo C driver:
 * PATCH /entities/{entityId}
 * PUT /entities/{entityId}
+* POST /jsonldContexts
+* GET /jsonldContexts
+* GET /jsonldContexts/{contextId}
+* DELETE /jsonldContexts/{contextId}
 
-The following API endpoint use "mongoc" if Orion-LD is started with the `-experimental` CLI parameter:
+The following API endpoints use "mongoc" if Orion-LD is started with the `-experimental` CLI parameter:
 * POST /entities
+* GET /entities
 * GET /entities/{entityId}
 * POST /subscriptions
+* PATCH /subscriptions/{subscriptionId}
+* DELETE /subscriptions/{subscriptionId}
+
+The following API endpoints use no database access at all, just the subscription cache:
+* GET /subscriptions
+* GET /subscriptions/{subscriptionId}
 
 So, without using the old Mongo C++ Legacy driver, it is now possible to:
 * Create entities
-* Update create (PATCH+P(UT)
-* Create subscription
-* Retrieve entity
+* Update entities (PATCH+PUT)
+* Query entities
+* Retrieve individual entity
+* Create subscriptions
 * Retrieve subscription (is uses the subscription cache, no DB request is performed)
 * List subscriptions (is uses the subscription cache, no DB request is performed)
+* Modify subscriptions
+* Delete subscriptions
 * Create JSONLD Contexts
-* Retrieve JSONLD Contexts
+* Retrieve individual JSONLD Context
 * List JSONLD Contexts
-
-Also, the following common features use "mongoc":
-* Tenants
-* Creation of Geo-indexes
-
-Still missing (quite important) is to make the subscription cache use "mongoc"
-
 
 ## 6. Implementation state of Services (API Endpoints)
 
@@ -170,8 +183,6 @@ To test it, Orion-LD must be started with the CLI parameter `-experimental`.
 #### Missing
   * Multi-attributes
   * Forwarding - the old NGSIv2 style forwarding has been disabled
-
-###
 
 
 ### GET /ngsi-ld/v1/entities/*
@@ -217,6 +228,7 @@ This service is experimental and is only in place when Orion-LD is started with 
   * TRoE
   * Notifications - using the Legacy driver
   * datasetId (using the Legacy driver)
+
 #### Missing
   * Still uses the MongoDB C++ Legacy Driver (mongoBackend)
   * Multi-attributes
