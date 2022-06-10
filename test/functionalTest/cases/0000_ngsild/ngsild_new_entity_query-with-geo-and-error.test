@@ -67,7 +67,7 @@ payload='{
   "address": {
     "type": "Property",
     "value": {
-      "streetAddress": "Friedrichstraße 44",
+      "streetAddress": "Friedrichstrasse 44",
       "addressRegion": "Berlin",
       "addressLocality": "Kreuzberg",
       "postalCode": "10969"
@@ -149,7 +149,7 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : {
-				"streetAddress" : "Friedrichstraße 44",
+				"streetAddress" : "Friedrichstrasse 44",
 				"addressRegion" : "Berlin",
 				"addressLocality" : "Kreuzberg",
 				"postalCode" : "10969"
@@ -215,7 +215,7 @@ Date: REGEX(.*)
             "addressLocality": "Kreuzberg",
             "addressRegion": "Berlin",
             "postalCode": "10969",
-            "streetAddress": "Friedrichstra\u00dfe 44"
+            "streetAddress": "Friedrichstrasse 44"
         },
         "category": "commercial",
         "id": "urn:ngsi-ld:Building:store002",
