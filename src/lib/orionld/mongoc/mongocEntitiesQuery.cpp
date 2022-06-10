@@ -361,6 +361,9 @@ static bool geoWithinFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 
   bson_init(&geometry);
 
+  //
+  // "within" definitely needs a polygon - can't be "within" a point nor a LineString, can you?
+  //
   if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
   else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
   else
@@ -424,6 +427,10 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 #if 0
   //
   // intersect ... should be valid for any geometry ...  Right?
+  //
+  // According to https://stackoverflow.com/questions/35656520/find-overlapping-trajectories,
+  // geoIntersects requires polygons or multipolygons in the query,
+  // But, I haven't found this piece of info still in the mongo documentation, and it kind of seems to be working ...
   //
   if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
   else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
@@ -530,6 +537,12 @@ static bool geoDisjointFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
   //
   // disjoint ... should be valid for any geometry ...  Right?
   //
+  // 'disjoint' queries use $geoIntersects" and ...
+  // according to https://stackoverflow.com/questions/35656520/find-overlapping-trajectories,
+  // geoIntersects requires polygons or multipolygons in the query,
+  //
+  // But, I haven't found this piece of info still in the mongo documentation, and it kind of seems to be working ...
+  //
   if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
   else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
   else
@@ -575,10 +588,76 @@ static bool geoDisjointFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 //
 // geoOverlapsFilter - intersects AND is of the same GEO-Type
 //
+// {
+//   "location": {
+//      $geoIntersects: {
+//         $geometry: {
+//            type: "<GeoJSON object type>" ,
+//            coordinates: [ <coordinates> ]
+//         }
+//      }
+//   }
+// },
+// {
+//   "location.value.type": <geoType>
+// }
+//
 static bool geoOverlapsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 {
-  orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo Overlaps Query", 501);
-  return false;
+  bson_t coordinates;
+  bson_t geometry;
+  bson_t intersects;
+  bson_t location;
+
+  bson_init(&geometry);
+
+#if 0
+  //
+  // overlaps ... should be valid for any geometry ...  Right?
+  //
+  // 'overlaps' queries use $geoIntersects" and ...
+  // according to https://stackoverflow.com/questions/35656520/find-overlapping-trajectories,
+  // geoIntersects requires polygons or multipolygons in the query,
+  //
+  // But, I haven't found this piece of info still in the mongo documentation, and it kind of seems to be working ...
+  //
+  if      (geoInfoP->geometry == GeoPolygon)       bson_append_utf8(&geometry,  "type", 4, "Polygon", 7);
+  else if (geoInfoP->geometry == GeoMultiPolygon)  bson_append_utf8(&geometry,  "type", 4, "MultiPolygon", 12);
+  else
+  {
+    bson_destroy(&geometry);
+    orionldError(OrionldBadRequestData, "Invalid Geometry for Overlaps Query", orionldGeometryToString(geoInfoP->geometry), 400);
+    return false;
+  }
+#endif
+
+  bson_init(&location);
+  bson_init(&intersects);
+  bson_init(&coordinates);
+
+  mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
+
+  bson_append_utf8(&geometry,          "type",            4, orionldGeometryToString(geoInfoP->geometry), -1);
+  bson_append_array(&geometry,         "coordinates",    11, &coordinates);
+  bson_append_document(&intersects,    "$geometry",       9, &geometry);
+  bson_append_document(&location,      "$geoIntersects", 14, &intersects);
+
+  char geoPropertyPath[512];
+  int  geoPropertyPathLen;
+  if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
+    return false;
+
+  bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
+
+  strcat(geoPropertyPath, ".type");
+  bson_append_utf8(mongoFilterP, geoPropertyPath, geoPropertyPathLen + 5, orionldGeometryToString(geoInfoP->geometry), -1);
+
+  bson_destroy(&location);
+  bson_destroy(&intersects);
+  bson_destroy(&geometry);
+  bson_destroy(&coordinates);
+
+  return true;
 }
 
 
