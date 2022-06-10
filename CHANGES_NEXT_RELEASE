@@ -39,3 +39,4 @@
 * Issue #280   PATCH subscriptions/{subId} now uses the new mongoc driver
 * Issue #280   Timestamp support in RANGE in 'q' for subscriptions
 * Issue #280   Support for NOT EQ for range in 'q' for subscriptions
+* Issue #280   Complete new implementation of GET /entities, using mongoc and no mongoBackend

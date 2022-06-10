@@ -36,7 +36,6 @@ extern "C"
 
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, NoAttributeType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
@@ -60,7 +59,10 @@ extern "C"
 bool orionldPostEntities(void)
 {
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+  {
+    LM_TMP(("********** Running Legacy version of orionldPostEntities"));
     return legacyPostEntities();
+  }
 
   char*    entityId;
   char*    entityType;

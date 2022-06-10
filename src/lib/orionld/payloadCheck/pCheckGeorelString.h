@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEORELSTRING_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEORELSTRING_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,30 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldGeoInfo.h"                       // OrionldGeoInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// OrionldGeoJsonType - change name as this is the "geometry"
+// pCheckGeorelString -
 //
-typedef enum OrionldGeoJsonType
-{
-  GeoJsonNoType,
-  GeoJsonPoint,
-  GeoJsonMultiPoint,
-  GeoJsonLineString,
-  GeoJsonMultiLineString,
-  GeoJsonPolygon,
-  GeoJsonMultiPolygon
-} GeoJsonType;
+extern bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldGeoJsonTypeFromString -
-//
-extern OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type);
-
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOJSONTYPE_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEORELSTRING_H_

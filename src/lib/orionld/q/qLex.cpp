@@ -27,6 +27,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLexCheck.h"                               // qLexCheck
+#include "orionld/q/qPresent.h"                                // qListPresent
 #include "orionld/q/qListRelease.h"                            // qListRelease
 #include "orionld/q/qLex.h"                                    // Own interface
 
@@ -58,28 +59,11 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 //
 static QNode* qDateTimePush(QNode* prev, double dateTime)
 {
-  LM_TMP(("Modifying a String to a DateTime (QNode of type QNodeFloatValue)"));
+  // LM_TMP(("Modifying a String to a DateTime (QNode of type QNodeFloatValue)"));
 
   QNode* qNodeP = qNode(QNodeFloatValue);
 
   qNodeP->value.f = dateTime;
-
-  prev->next = qNodeP;
-
-  return qNodeP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// qRegexpPush -
-//
-static QNode* qRegexpPush(QNode* prev, char* regexpValue)
-{
-  QNode* qNodeP = qNode(QNodeRegexpValue);
-
-  qNodeP->value.re = regexpValue;
 
   prev->next = qNodeP;
 
@@ -133,9 +117,7 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     bool       dateTime = false;
     QNodeType  type;
 
-    if (strncmp(sP, "RE(", 3) == 0)
-      return qRegexpPush(prev, &sP[3]);
-    else if (strcmp(sP, "true") == 0)
+    if (strcmp(sP, "true") == 0)
       type = QNodeTrueValue;
     else if (strcmp(sP, "false") == 0)
       type = QNodeFalseValue;
@@ -181,6 +163,9 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
         type = QNodeVariable;
     }
 
+    if ((prev->type == QNodeMatch) || (prev->type == QNodeNoMatch))
+      type = QNodeRegexpValue;
+
     QNode* qNodeP = qNode(type);
 
     if (type == QNodeIntegerValue)
@@ -202,6 +187,9 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
       qNodeP->value.f = strtod(term, NULL);
     else if (type == QNodeVariable)
       qNodeP->value.v = term;
+    else if (type == QNodeRegexpValue)
+      qNodeP->value.re = term;
+    // else ERROR ?
 
     prev->next = qNodeP;
     return qNodeP;
@@ -297,7 +285,7 @@ QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP)
       current = qOpPush(current, QNodeComma);
       stringStart = sP;
     }
-    else if ((*sP == '.') && (sP[1] == '.'))
+    else if ((*sP == '.') && (sP[1] == '.') && (current->type != QNodeMatch) && (current->type != QNodeNoMatch))
     {
       *sP = 0;
       ++sP;
@@ -483,6 +471,7 @@ QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP)
     }
   }
 
+  // qListPresent(dummy.next, NULL, "LL", "Lex List sent to qLexCheck");
   if (qLexCheck(dummy.next, titleP, detailsP) == false)
   {
     if (orionldState.useMalloc == true)

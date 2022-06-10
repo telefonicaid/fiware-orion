@@ -25,7 +25,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
+#include "orionld/types/OrionldGeometry.h"                     // OrionldGeometry, GeoPoint, GeoLineString, ...
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/payloadCheck/pCheckGeometry.h"               // Own interface
 
@@ -35,26 +35,27 @@
 //
 // pCheckGeometry -
 //
-bool pCheckGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription)
+bool pCheckGeometry(char* geometryString, OrionldGeometry* geometryP, bool isSubscription)
 {
-  if (typeName[0] == 0)
+  if (geometryString[0] == 0)
   {
     orionldError(OrionldBadRequestData, "Invalid geometry", "empty string", 400);
     return false;
   }
-  if      (strcmp(typeName, "Point")           == 0) *typeP = GeoJsonPoint;
-  else if (strcmp(typeName, "MultiPoint")      == 0) *typeP = GeoJsonMultiPoint;
-  else if (strcmp(typeName, "LineString")      == 0) *typeP = GeoJsonLineString;
-  else if (strcmp(typeName, "MultiLineString") == 0) *typeP = GeoJsonMultiLineString;
-  else if (strcmp(typeName, "Polygon")         == 0) *typeP = GeoJsonPolygon;
-  else if (strcmp(typeName, "MultiPolygon")    == 0) *typeP = GeoJsonMultiPolygon;
+
+  if      (strcmp(geometryString, "Point")           == 0) *geometryP = GeoPoint;
+  else if (strcmp(geometryString, "MultiPoint")      == 0) *geometryP = GeoMultiPoint;
+  else if (strcmp(geometryString, "LineString")      == 0) *geometryP = GeoLineString;
+  else if (strcmp(geometryString, "MultiLineString") == 0) *geometryP = GeoMultiLineString;
+  else if (strcmp(geometryString, "Polygon")         == 0) *geometryP = GeoPolygon;
+  else if (strcmp(geometryString, "MultiPolygon")    == 0) *geometryP = GeoMultiPolygon;
   else
   {
-    orionldError(OrionldBadRequestData, "Invalid geometry", typeName, 400);
+    orionldError(OrionldBadRequestData, "Invalid geometry", geometryString, 400);
     return false;
   }
 
-  if ((isSubscription == true) && (*typeP != GeoJsonPoint))
+  if ((isSubscription == true) && (*geometryP != GeoPoint))
   {
     orionldError(OrionldOperationNotSupported, "Not Implemented", "Subscriptions only support Point for geometry (right now)", 501);
     return false;

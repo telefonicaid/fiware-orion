@@ -1,0 +1,405 @@
+<# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geoquery with Disjoint georel
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# Polygons:
+#   A linear ring MUST follow the right-hand rule with respect to the area it bounds,
+#   i.e., exterior rings are counterclockwise,
+#   and holes are clockwise.
+#
+# NOTE:
+#   A Point intersects if on the border of a Polygon (test case 4) => No match for Disjoint
+#   A LineString does not                            (test case 7) => match for Disjoint
+#
+#   I find this somewhat weird ...
+#
+# 01. Create entity E1 with a R1 GeoProperty - a Rectangle with coords 0,0 -> 4,0 -> 4,4 -> 0,4 -> 0,0
+# 02. Entity Query with Disjoint for a Point outside R1, at 5,5 - see R1
+# 03. Entity Query with Disjoint for a Point inside R1, at 3,3 - see nothing
+# 04. Entity Query with Disjoint for a Point on the border of R1, at 4,4 - see nothing
+# 05. Entity Query with Disjoint for a LineString outside R1: 5,5 -> 6,6 - see R1
+# 06. Entity Query with Disjoint for a LineString inside R1: 2,2 -> 3,3 - see nothing
+# 07. Entity Query with Disjoint for a LineString touching R1: 0,0 -> 0,1 - see E1 (weird - see NOTE)
+# 08. Entity Query with Disjoint for a LineString inside and outside R1: -1,-1 -> 1,1 - see nothing
+# 09. Entity Query with Disjoint for a Polygon inside R1 - see nothing
+# 10. Entity Query with Disjoint for a Polygon outside R1 - see E1
+# 11. Entity Query with Disjoint for a Polygon partially inside R1 - see nothing
+#
+
+echo "01. Create entity E1 with a R1 GeoProperty - a Rectangle with coords 0,0 -> 4,0 -> 4,4 -> 0,4 -> 0,0"
+echo "===================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:geo:E1",
+  "type": "Geo",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [0,0], [4,0], [4,4], [0,4], [0,0] ]]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Entity Query with Disjoint for a Point outside R1, at 5,5 - see R1"
+echo "======================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[5,5\]&georel=disjoint'
+echo
+echo
+
+
+echo "03. Entity Query with Disjoint for a Point inside R1, at 3,3 - see nothing"
+echo "=========================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[3,3\]&georel=disjoint'
+echo
+echo
+
+
+echo "04. Entity Query with Disjoint for a Point on the border of R1, at 4,4 - see nothing"
+echo "===================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[4,4\]&georel=disjoint'
+echo
+echo
+
+
+echo "05. Entity Query with Disjoint for a LineString outside R1: 5,5 -> 6,6 - see R1"
+echo "==============================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=LineString&coordinates=\[\[5,5\],\[6,6\]\]&georel=disjoint'
+echo
+echo
+
+
+echo "06. Entity Query with Disjoint for a LineString inside R1: 2,2 -> 3,3 - see nothing"
+echo "==================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=LineString&coordinates=\[\[2,2\],\[3,3\]\]&georel=disjoint'
+echo
+echo
+
+
+echo "07. Entity Query with Disjoint for a LineString touching R1: 0,0 -> 0,1 - see E1 (weird - see NOTE)"
+echo "==================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=LineString&coordinates=\[\[0,0\],\[0,1\]\]&georel=disjoint'
+echo
+echo
+
+
+echo "08. Entity Query with Disjoint for a LineString inside and outside R1: -1,-1 -> 1,1 - see nothing"
+echo "================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=LineString&coordinates=\[\[-1,-1\],\[1,1\]\]&georel=disjoint'
+echo
+echo
+
+
+echo "09. Entity Query with Disjoint for a Polygon inside R1 - see nothing"
+echo "===================================================================="
+coords=$(urlencode "[[[1,1],[2,1],[2,2],[1,2],[1,1]]]")
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&georel=disjoint&coordinates='$coords
+echo
+echo
+
+
+echo "10. Entity Query with Disjoint for a Polygon outside R1 - see E1"
+echo "================================================================"
+coords=$(urlencode "[[[11.1,11.1],[12.1,11.1],[12.1,12.1],[11.1,12.1],[11.1,11.1]]]")
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&georel=disjoint&coordinates='$coords
+echo
+echo
+
+
+echo "11. Entity Query with Disjoint for a Polygon partially inside R1 - see nothing"
+echo "=============================================================================="
+coords=$(urlencode "[[[1,1],[5,1],[5,5],[1,5],[1,1]]]")
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&georel=disjoint&coordinates='$coords
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with a R1 GeoProperty - a Rectangle with coords 0,0 -> 4,0 -> 4,4 -> 0,4 -> 0,0
+====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:geo:E1
+Date: REGEX(.*)
+
+
+
+02. Entity Query with Disjoint for a Point outside R1, at 5,5 - see R1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:geo:E1",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            0,
+                            4
+                        ],
+                        [
+                            0,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "Geo"
+    }
+]
+
+
+03. Entity Query with Disjoint for a Point inside R1, at 3,3 - see nothing
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+04. Entity Query with Disjoint for a Point on the border of R1, at 4,4 - see nothing
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+05. Entity Query with Disjoint for a LineString outside R1: 5,5 -> 6,6 - see R1
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:geo:E1",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            0,
+                            4
+                        ],
+                        [
+                            0,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "Geo"
+    }
+]
+
+
+06. Entity Query with Disjoint for a LineString inside R1: 2,2 -> 3,3 - see nothing
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+07. Entity Query with Disjoint for a LineString touching R1: 0,0 -> 0,1 - see E1 (weird - see NOTE)
+===================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:geo:E1",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            0,
+                            4
+                        ],
+                        [
+                            0,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "Geo"
+    }
+]
+
+
+08. Entity Query with Disjoint for a LineString inside and outside R1: -1,-1 -> 1,1 - see nothing
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+09. Entity Query with Disjoint for a Polygon inside R1 - see nothing
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+10. Entity Query with Disjoint for a Polygon outside R1 - see E1
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:geo:E1",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            0,
+                            4
+                        ],
+                        [
+                            0,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "Geo"
+    }
+]
+
+
+11. Entity Query with Disjoint for a Polygon partially inside R1 - see nothing
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

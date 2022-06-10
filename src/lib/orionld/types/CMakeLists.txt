@@ -24,7 +24,8 @@ SET (SOURCES
     OrionldProblemDetails.cpp
     OrionldHeader.cpp
     OrionldAttributeType.cpp
-    OrionldGeoJsonType.cpp
+    OrionldGeometry.cpp
+    OrionldGeorel.cpp
     OrionldAlteration.cpp
     KeyValue.cpp
     OrionldResponseErrorType.cpp

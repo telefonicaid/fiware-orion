@@ -112,7 +112,7 @@ echo
 
 echo "04. GET both entities"
 echo "====================="
-orionCurl --url /ngsi-ld/v1/entities?type=T
+orionCurl --url /ngsi-ld/v1/entities?type=T -H "Orionld-Legacy: true"
 echo
 echo
 

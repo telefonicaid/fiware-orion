@@ -76,70 +76,70 @@ echo
 
 echo "03. GET entities in Normalized form"
 echo "==================================="
-orionCurl --url /ngsi-ld/v1/entities?type=T
+orionCurl --url /ngsi-ld/v1/entities?type=T -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "04. GET entities in Concise form"
 echo "================================"
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "05. GET entities in Simplified form"
 echo "==================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "06. GET entities in Normalized form with URL parameter lang=en"
 echo "=============================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&lang=en'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&lang=en' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "07. GET entities in Concise form with URL parameter lang=en"
 echo "==========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise&lang=en'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise&lang=en' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "08. GET entities in Simplified form with URL parameter lang=en"
 echo "=============================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified&lang=en'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified&lang=en' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "09. GET entities in Normalized form with URL parameter lang=ex - get en"
 echo "======================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&lang=ex'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&lang=ex' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "10. GET entities in Simplified form with URL parameter lang=sv"
 echo "=============================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified&lang=sv'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=simplified&lang=sv' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "11. GET entities with q=L[es]==ele - see E1"
 echo "==========================================="
-orionCurl --url '/ngsi-ld/v1/entities?q=L\[es\]==\"ele\"'
+orionCurl --url '/ngsi-ld/v1/entities?q=L\[es\]==\"ele\"' -H "Orionld-Legacy: true"
 echo
 echo
 
 
 echo "12. GET entities with q=L[es]==elk - see nothing"
 echo "================================================"
-orionCurl --url '/ngsi-ld/v1/entities?q=L\[es\]==\"elk\"'
+orionCurl --url '/ngsi-ld/v1/entities?q=L\[es\]==\"elk\"' -H "Orionld-Legacy: true"
 echo
 echo
 

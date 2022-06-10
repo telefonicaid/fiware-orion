@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYCOORDINATES_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYCOORDINATES_H_
+#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOUNITCODE_H_
+#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOUNITCODE_H_
 
 /*
 *
@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
-
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckGeoPropertyCoordinates -
+// dbModelToUnitCode -
 //
-extern bool pCheckGeoPropertyCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType);
+extern KjNode* dbModelToUnitCode(KjNode* dbUnitCodeP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYCOORDINATES_H_
+#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOUNITCODE_H_

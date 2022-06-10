@@ -33,7 +33,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create a subscription S1 with q=A==0|B==0 - q-tree created by postSubscriptions
-# 02. 01. See the subscription in the database
+# 02. See the subscription in the database
 # 03. GET the subscription - from the sub-cache
 # 04. Wait 2.1 seconds, to give the broker time to refresh its sub cache
 # 05. GET the subscription - from the sub-cache

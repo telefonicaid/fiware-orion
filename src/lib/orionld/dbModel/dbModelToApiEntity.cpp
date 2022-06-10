@@ -215,33 +215,38 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   kjChildAdd(entityP, typeP);
 
   //
-  // Second loop over dbEntityP if sysAttrs == true (normally it's not - this saves time when sysAttrs is not used)
+  // Second "loop" over dbEntityP if sysAttrs == true (normally it's not - this saves time when sysAttrs is not used)
   //
   if (sysAttrs == true)
   {
-    KjNode* creDateP = NULL;
-    KjNode* modDateP = NULL;
+    KjNode* creDateP = kjLookup(dbEntityP, "creDate");
+    KjNode* modDateP = kjLookup(dbEntityP, "modDate");
 
-    for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    if (creDateP != NULL)
     {
-      if (strcmp(nodeP->name, "creDate") == 0)
-      {
-        creDateP = nodeP;
-        creDateP->name = (char*) "createdAt";
-        if (modDateP != NULL)
-          break;
-      }
-      else if (strcmp(nodeP->name, "modDate") == 0)
-      {
-        modDateP = nodeP;
-        modDateP->name = (char*) "modifiedAt";
-        if (creDateP != NULL)
-          break;
-      }
+      kjChildRemove(dbEntityP, creDateP);
+      creDateP->name = (char*) "createdAt";
+
+      char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+      numberToDate(creDateP->value.f, dateTimeBuf, 32);
+      creDateP->value.s    = dateTimeBuf;
+      creDateP->type       = KjString;
+
+      kjChildAdd(entityP, creDateP);
     }
 
-    kjChildAdd(entityP, creDateP);
-    kjChildAdd(entityP, modDateP);
+    if (modDateP != NULL)
+    {
+      kjChildRemove(dbEntityP, modDateP);
+      modDateP->name = (char*) "modifiedAt";
+
+      char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+      numberToDate(modDateP->value.f, dateTimeBuf, 32);
+      modDateP->value.s    = dateTimeBuf;
+      modDateP->type       = KjString;
+
+     kjChildAdd(entityP, modDateP);
+    }
   }
 
 

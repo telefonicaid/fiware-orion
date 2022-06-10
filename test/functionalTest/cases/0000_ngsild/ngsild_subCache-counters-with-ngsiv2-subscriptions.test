@@ -44,7 +44,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 09. Send a ping, just to see the the broker is still alive
 # 10. See S1 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:now, lastFailure:absent }
 # 11. See S2 in the database - pay attention to { count:1, lastNotification:now, lastSuccess:absent, lastFailure:now }
-# 13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+# 13. See S3 in the database - pay attention to { count:absent, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
 #
 
 echo "01. Create a subscription S1 - for the accumulator"
@@ -203,8 +203,8 @@ echo
 echo
 
 
-echo "13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }"
-echo "=========================================================================================================================="
+echo "13. See S3 in the database - pay attention to { count:absent, lastNotification:absent, lastSuccess:absent, lastFailure:absent }"
+echo "==============================================================================================================================="
 mongoCmd2 ftest 'db.csubs.findOne({"description": "S3"})'
 echo
 echo
@@ -523,8 +523,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-13. See S3 in the database - pay attention to { count:0, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
-==========================================================================================================================
+13. See S3 in the database - pay attention to { count:absent, lastNotification:absent, lastSuccess:absent, lastFailure:absent }
+===============================================================================================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -562,8 +562,7 @@ MongoDB server version: REGEX(.*)
 		"georel" : "",
 		"geoproperty" : ""
 	},
-	"format" : "normalized",
-	"count" : NumberLong(0)
+	"format" : "normalized"
 }
 bye
 

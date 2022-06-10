@@ -33,7 +33,6 @@ SET (SOURCES
      pCheckGeoMultiPolygonCoordinates.cpp
      pCheckGeoPointCoordinates.cpp
      pCheckGeoPolygonCoordinates.cpp
-     pCheckGeoPropertyCoordinates.cpp
      pCheckGeoPropertyType.cpp
      pCheckGeoPropertyValue.cpp
      pCheckNotification.cpp
@@ -51,6 +50,7 @@ SET (SOURCES
      pCheckGeometry.cpp
      pCheckGeoCoordinates.cpp
      pCheckGeorel.cpp
+     pCheckGeorelString.cpp
      pcheckInformation.cpp
      pcheckInformationItem.cpp
      pcheckLanguagePropertyValue.cpp

@@ -46,8 +46,10 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/dbModel/dbModelToApiGeorel.h"                  // dbModelToApiGeorel
+#include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
@@ -55,15 +57,14 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromSubscription.h"               // Own interface
 
 
-extern void dbModelValueStrip(KjNode* nodeP);  // FIXME: to its own modult under dbModel library
 
 // -----------------------------------------------------------------------------
 //
 // coordinateTransform -
 //
-char* coordinateTransform(OrionldGeoJsonType geometry, char* to, int toLen, char* from)
+char* coordinateTransform(OrionldGeometry geometry, char* to, int toLen, char* from)
 {
-  if (geometry == GeoJsonPoint)
+  if (geometry == GeoPoint)
   {
     if (from[0] != '[')
     {
@@ -216,7 +217,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   {
     char*               geometryStringV2 = (char*) subscriptionP->subject.condition.expression.geometry.c_str();
     char*               geometryStringLD = (char*) "NoGeometry";
-    OrionldGeoJsonType  geometry         = GeoJsonNoType;
+    OrionldGeometry     geometry         = GeoNoGeometry;
 
     //
     // The geometry can only be "point" - which is translated from v2 to LD to "Point"
@@ -224,7 +225,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     //
     if (strcmp(geometryStringV2, "point") == 0)
     {
-      geometry = GeoJsonPoint;
+      geometry = GeoPoint;
       geometryStringLD = (char*) "Point";
     }
 
@@ -232,7 +233,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     nodeP   = kjString(orionldState.kjsonP, "geometry", geometryStringLD);
     kjChildAdd(objectP, nodeP);
 
-    if (geometry == GeoJsonPoint)
+    if (geometry == GeoPoint)
     {
       //
       // The "coordinates" have been saved as a string but should be a json array.

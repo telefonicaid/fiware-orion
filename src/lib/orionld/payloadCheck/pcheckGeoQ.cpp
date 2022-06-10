@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/dotForEq.h"                            // dotForEq
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/types/OrionldGeometry.h"                      // OrionldGeometry
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pCheckGeometry.h"                // pCheckGeometry
@@ -52,11 +53,11 @@ extern "C"
 //
 bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscription)
 {
-  KjNode*                geometryP    = NULL;
-  KjNode*                coordinatesP = NULL;
-  KjNode*                georelP      = NULL;
-  KjNode*                geopropertyP = NULL;
-  OrionldGeoJsonType     geoJsonType;
+  KjNode*          geometryP    = NULL;
+  KjNode*          coordinatesP = NULL;
+  KjNode*          georelP      = NULL;
+  KjNode*          geopropertyP = NULL;
+  OrionldGeometry  geometry;
 
   for (KjNode* itemP = geoqNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -105,7 +106,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     return false;
   }
 
-  if (pCheckGeometry(geometryP->value.s, &geoJsonType, isSubscription) == false)
+  if (pCheckGeometry(geometryP->value.s, &geometry, isSubscription) == false)
   {
     // orionldError(OrionldBadRequestData, "Invalid Payload Data", detail, 400);
     return false;
@@ -121,7 +122,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
     }
   }
 
-  if (pCheckGeoCoordinates(coordinatesP, geoJsonType) == false)
+  if (pCheckGeoCoordinates(coordinatesP, geometry) == false)
   {
     //
     // Not overwriting - putting the call to orionldError back once I have error stacking
@@ -133,7 +134,10 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
   if (geoCoordinatesPP != NULL)
     *geoCoordinatesPP = coordinatesP;
 
-  if (pCheckGeorel(georelP, geoJsonType) == false)
+  OrionldGeoInfo geoInfo;
+
+  geoInfo.geometry = geometry;
+  if (pCheckGeorel(georelP, &geoInfo) == false)
     return false;  // pCheckGeorel calls orionldError
 
   //

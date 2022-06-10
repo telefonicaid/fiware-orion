@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
-#include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
+#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
 #include "orionld/payloadCheck/pCheckGeometry.h"                 // pCheckGeometry
 #include "orionld/payloadCheck/pCheckGeoCoordinates.h"           // pCheckGeoCoordinates
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // Own interface
@@ -46,12 +46,12 @@ extern "C"
 //
 // pcheckGeoPropertyValue -
 //
-bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP, const char* attrName)
+bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geometryPP, KjNode** geoCoordsPP, const char* attrName)
 {
   KjNode*             typeNodeP         = NULL;
   KjNode*             coordinatesNodeP  = NULL;
-  OrionldGeoJsonType  geoType           = GeoJsonNoType;
-  char*               geoTypeString     = (char*) "NoGeometry";
+  OrionldGeometry     geometry          = GeoNoGeometry;
+  char*               geometryString    = (char*) "NoGeometry";
 
   if (geoPropertyP->type != KjObject)
   {
@@ -67,12 +67,12 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
       STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object must be a JSON String");
       EMPTY_STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object cannot be an empty string");
 
-      if (pCheckGeometry(typeNodeP->value.s, &geoType, false) == false)
+      if (pCheckGeometry(typeNodeP->value.s, &geometry, false) == false)
       {
         // orionldError(OrionldBadRequestData, detail, typeNodeP->value.s, 400);
         return false;
       }
-      geoTypeString = typeNodeP->value.s;
+      geometryString = typeNodeP->value.s;
     }
     else if (SCOMPARE12(nodeP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
     {
@@ -110,7 +110,7 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
     return false;
   }
 
-  // Check that the coordinates (coordinatesNodeP) JSON Array coincides with the type 'geoType'
+  // Check that the coordinates (coordinatesNodeP) JSON Array coincides with the type 'geometry'
   if (coordinatesNodeP->type == KjString)
   {
     coordinatesNodeP = kjParse(orionldState.kjsonP, coordinatesNodeP->value.s);
@@ -121,14 +121,14 @@ bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geo
     }
   }
 
-  if (pCheckGeoCoordinates(coordinatesNodeP, geoType) == false)
+  if (pCheckGeoCoordinates(coordinatesNodeP, geometry) == false)
     return false;
 
   //
   // Keep coordsP and typeP for later use (in mongoBackend)
   //
-  if (geoTypePP != NULL)
-    *geoTypePP   = geoTypeString;
+  if (geometryPP != NULL)
+    *geometryPP   = geometryString;
   if (geoCoordsPP != NULL)
     *geoCoordsPP = coordinatesNodeP;
 

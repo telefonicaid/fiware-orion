@@ -391,20 +391,20 @@ bool orionldGetEntity(void)
   bool attrsMandatory = false;
 
   //
-  // Need a copy of orionldState.in.attrsList, replacing dots for eqs, for mongocEntityRetrieve
+  // Need a copy of orionldState.in.attrList, replacing dots for eqs, for mongocEntityRetrieve
   // Slightly modified as mongocEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
   //
-  char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrsList.items + 1));
+  char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrList.items + 1));
 
-  eqAttrV[orionldState.in.attrsList.items] = NULL;  // NULL-terminate the array
+  eqAttrV[orionldState.in.attrList.items] = NULL;  // NULL-terminate the array
 
-  for (int ix = 0; ix < orionldState.in.attrsList.items; ix++)
+  for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
   {
-    eqAttrV[ix] = kaStrdup(&orionldState.kalloc, orionldState.in.attrsList.array[ix]);
+    eqAttrV[ix] = kaStrdup(&orionldState.kalloc, orionldState.in.attrList.array[ix]);
     dotForEq(eqAttrV[ix]);
   }
 
-  if ((orionldState.in.attrsList.items > 0) && (regArray == NULL))  // attrs given, no matching registrations => no hit unless some attr present
+  if ((orionldState.in.attrList.items > 0) && (regArray == NULL))  // attrs given, no matching registrations => no hit unless some attr present
     attrsMandatory = true;
 
   char* geometryProperty = NULL;
@@ -419,6 +419,10 @@ bool orionldGetEntity(void)
       geometryProperty = (char*) "location";
   }
 
+  //
+  // FIXME: mongocEntityRetrieve DOES TOO MUCH+
+  //        Split into DB-retrieval + dbModel-stuff
+  //
   orionldState.responseTree = mongocEntityRetrieve(eId,
                                                    eqAttrV,
                                                    attrsMandatory,
@@ -466,7 +470,7 @@ bool orionldGetEntity(void)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrsList.array, orionldState.in.attrsList.items);
+    orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrList.array, orionldState.in.attrList.items);
   }
 
   return true;

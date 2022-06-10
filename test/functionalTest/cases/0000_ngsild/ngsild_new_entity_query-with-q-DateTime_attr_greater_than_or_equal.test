@@ -1,0 +1,181 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with string filter >= DateTime value
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create E1, with test context, type T and attr A="2018-11-21T08:00:00.00Z"
+# 02. Create E2, with test context, type T2 and attr A2="2018-11-22T08:00:00.00Z"
+# 03. Create E3, with test context, type T and attr A="2018-11-23T08:00:00.00Z"
+# 04. Create E4, with test context, type T2 and attr A2="2018-11-24T08:00:00.00Z"
+# 05. GET all entities that has an attribute A >= 2018-11-21T08:00:00.00Z - see E1 and E3
+#
+
+echo '01. Create E1, with test context, type T and attr A="2018-11-21T08:00:00.00Z"'
+echo '============================================================================='
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": "2018-11-21T08:00:00.00Z"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo '02. Create E2, with test context, type T2 and attr A2="2018-11-22T08:00:00.00Z"'
+echo '==============================================================================='
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T2",
+  "A2": {
+    "type": "Property",
+    "value": "2018-11-22T08:00:00.00Z"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo '03. Create E3, with test context, type T and attr A="2018-11-23T08:00:00.00Z"'
+echo '============================================================================='
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": "2018-11-23T08:00:00.00Z"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo '04. Create E4, with test context, type T2 and attr A2="2018-11-24T08:00:00.00Z"'
+echo '==============================================================================='
+payload='{
+  "id": "http://a.b.c/entity/E4",
+  "type": "T2",
+  "A2": {
+    "type": "Property",
+    "value": "2018-11-24T08:00:00.00Z"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo '05. GET all entities that has an attribute A >= 2018-11-21T08:00:00.00Z - see E1 and E3'
+echo '======================================================================================='
+orionCurl --url "/ngsi-ld/v1/entities?q=A>=%222018-11-21T08:00:00.00Z%22&prettyPrint=yes&type=T" --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1, with test context, type T and attr A="2018-11-21T08:00:00.00Z"
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Create E2, with test context, type T2 and attr A2="2018-11-22T08:00:00.00Z"
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+Date: REGEX(.*)
+
+
+
+03. Create E3, with test context, type T and attr A="2018-11-23T08:00:00.00Z"
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
+Date: REGEX(.*)
+
+
+
+04. Create E4, with test context, type T2 and attr A2="2018-11-24T08:00:00.00Z"
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
+Date: REGEX(.*)
+
+
+
+05. GET all entities that has an attribute A >= 2018-11-21T08:00:00.00Z - see E1 and E3
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 477
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "2018-11-21T08:00:00.00Z"
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "2018-11-23T08:00:00.00Z"
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

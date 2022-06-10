@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETENTITIES_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETENTITIES_H_
+
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,24 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                               // strcmp
-
-#include "orionld/types/OrionldGeoJsonType.h"     // Own Interface
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldGeoJsonTypeFromString -
+// legacyGetEntities -
 //
-OrionldGeoJsonType orionldGeoJsonTypeFromString(const char* type)
-{
-  if      (strcmp(type, "Point")           == 0)  return GeoJsonPoint;
-  else if (strcmp(type, "Polygon")         == 0)  return GeoJsonPolygon;
-  else if (strcmp(type, "LineString")      == 0)  return GeoJsonLineString;
-  else if (strcmp(type, "MultiPoint")      == 0)  return GeoJsonMultiPoint;
-  else if (strcmp(type, "MultiPolygon")    == 0)  return GeoJsonMultiPolygon;
-  else if (strcmp(type, "MultiLineString") == 0)  return GeoJsonMultiLineString;
+extern bool legacyGetEntities(void);
 
-  return GeoJsonNoType;
-}
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETENTITIES_H_

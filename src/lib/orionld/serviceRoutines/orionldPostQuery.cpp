@@ -47,10 +47,6 @@ extern "C"
 
 
 
-extern void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang);  // From orionldGetEntities.cpp
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldPostQuery -
@@ -110,14 +106,6 @@ bool orionldPostQuery(void)
         orionldState.httpStatusCode = 500;
         return false;
       }
-
-      // FIXME: dbModelToApiEntity2/dbModelToApiAttribute2/dbModelToApiSubAttribute2 should take care of this ...
-      if (orionldState.uriParamOptions.concise == true)
-        kjEntityNormalizedToConcise(entityP, lang);
-      else if (orionldState.uriParamOptions.keyValues == true)
-        kjEntityNormalizedToSimplified(entityP, lang);
-      else if (lang != NULL)
-        apiEntityLanguageProps(entityP, lang);
 
       kjChildAdd(orionldState.responseTree, entityP);
     }

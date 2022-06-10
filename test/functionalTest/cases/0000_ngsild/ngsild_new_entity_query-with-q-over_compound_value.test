@@ -1,0 +1,227 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Query condition over Property of a Property
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1
+# 02. Get mongo content
+# 03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound value item P1)
+# 04. Query the compound value P100[P1]==1, see the entity as P1 inside compound value == 1
+# 05. Now try q=P100.P1==1, see empty array
+# 06. And finally q=P100[P1]==2, see empty array
+#
+
+echo "01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1"
+echo "======================================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
+  "type": "T_Query",
+  "P100": {
+    "type": "Property",
+    "value": { "P1": 1, "P2": 2 },
+    "P1": {
+      "type": "Property",
+      "value": 2
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+
+echo "02. Get mongo content"
+echo "====================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound value item P1)"
+echo "====================================================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1==2&prettyPrint=yes&type=T_Query' --noPayloadCheck
+echo
+echo
+
+echo "04. Query the compound value P100[P1]==1, see the entity as P1 inside compound value == 1"
+echo "========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=P100\[P1\]==1&prettyPrint=yes&type=T_Query' --noPayloadCheck
+echo
+echo
+
+echo "05. Now try q=P100.P1==1, see empty array"
+echo "========================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=P100.P1==1&prettyPrint=yes&type=T_Query' --noPayloadCheck
+echo
+echo
+
+echo "06. And finally q=P100[P1]==2, see empty array"
+echo "=============================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=P100\[P1\]==2&prettyPrint=yes&type=T_Query' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity with an attribute P100 having a property P1=2 and a compound value containing a top level field P1=1
+======================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T_Query:EntityForQuery2345
+Date: REGEX(.*)
+
+
+
+02. Get mongo content
+=====================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T_Query:EntityForQuery2345",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T_Query",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P100"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P100" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"P1" : 1,
+				"P2" : 2
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/P1"
+			],
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+					"type" : "Property",
+					"value" : 2,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Query the property P100 over its property 'P1' using q=P100.P1==2, see the entity as P100.P1==2 (the property P!, not the compound value item P1)
+=====================================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 261
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
+    "type": "T_Query",
+    "P100": {
+      "type": "Property",
+      "value": {
+        "P1": 1,
+        "P2": 2
+      },
+      "P1": {
+        "type": "Property",
+        "value": 2
+      }
+    }
+  }
+]
+
+
+
+04. Query the compound value P100[P1]==1, see the entity as P1 inside compound value == 1
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 261
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:T_Query:EntityForQuery2345",
+    "type": "T_Query",
+    "P100": {
+      "type": "Property",
+      "value": {
+        "P1": 1,
+        "P2": 2
+      },
+      "P1": {
+        "type": "Property",
+        "value": 2
+      }
+    }
+  }
+]
+
+
+
+05. Now try q=P100.P1==1, see empty array
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+06. And finally q=P100[P1]==2, see empty array
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

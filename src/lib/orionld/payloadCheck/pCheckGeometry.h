@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
+#include "orionld/types/OrionldGeometry.h"                     // OrionldGeometry
 
 
 
@@ -38,6 +38,6 @@ extern "C"
 //
 // pCheckGeometry -
 //
-extern bool pCheckGeometry(char* typeName, OrionldGeoJsonType* typeP, bool isSubscription);
+extern bool pCheckGeometry(char* typeName, OrionldGeometry* geometryP, bool isSubscription);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOMETRY_H_

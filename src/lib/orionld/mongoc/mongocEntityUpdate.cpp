@@ -182,7 +182,7 @@ static bool patchApply
 
         for (KjNode* itemNameP = tree->value.firstChildP; itemNameP != NULL; itemNameP = itemNameP->next)
         {
-          bson_append_utf8(&commaArrayBson, "0", 1, itemNameP->value.s, -1);
+          bson_append_utf8(&commaArrayBson, "0", 1, itemNameP->value.s, -1);  // Always index "0" ... seems to work !
           *pullsP += 1;
         }
         bson_append_array_end(&inBson, &commaArrayBson);

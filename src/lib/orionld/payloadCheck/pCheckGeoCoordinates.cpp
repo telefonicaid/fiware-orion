@@ -33,7 +33,8 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                               // orionldState
 #include "orionld/common/orionldError.h"                               // orionldError
-#include "orionld/types/OrionldGeoJsonType.h"                          // OrionldGeoJsonType
+#include "orionld/types/OrionldGeometry.h"                             // OrionldGeometry
+#include "orionld/payloadCheck/PCHECK.h"                               // PCHECK_ARRAY
 #include "orionld/payloadCheck/pCheckGeoPointCoordinates.h"            // pCheckGeoPointCoordinates
 #include "orionld/payloadCheck/pCheckGeoMultiPointCoordinates.h"       // pCheckGeoMultiPointCoordinates
 #include "orionld/payloadCheck/pCheckGeoLineStringCoordinates.h"       // pCheckGeoLineStringCoordinates
@@ -48,25 +49,21 @@ extern "C"
 //
 // pCheckGeoCoordinates -
 //
-bool pCheckGeoCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType)
+bool pCheckGeoCoordinates(KjNode* coordinatesP, OrionldGeometry geometry)
 {
   //
   // It's either an Array OR A STRING !!!
   //
-  if (coordinatesP->type != KjArray)
-  {
-    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be an Array", 400);
-    return false;
-  }
+  PCHECK_ARRAY(coordinatesP, 0, "Invalid JSON type for /coordinates/ field (not a JSON Array)", kjValueType(coordinatesP->type), 400);
 
-  switch (geoType)
+  switch (geometry)
   {
-  case GeoJsonPoint:            return pCheckGeoPointCoordinates(coordinatesP);           break;
-  case GeoJsonMultiPoint:       return pCheckGeoMultiPointCoordinates(coordinatesP);      break;
-  case GeoJsonLineString:       return pCheckGeoLineStringCoordinates(coordinatesP);      break;
-  case GeoJsonMultiLineString:  return pCheckGeoMultiLineStringCoordinates(coordinatesP); break;
-  case GeoJsonPolygon:          return pCheckGeoPolygonCoordinates(coordinatesP);         break;
-  case GeoJsonMultiPolygon:     return pCheckGeoMultiPolygonCoordinates(coordinatesP);    break;
+  case GeoPoint:            return pCheckGeoPointCoordinates(coordinatesP);
+  case GeoMultiPoint:       return pCheckGeoMultiPointCoordinates(coordinatesP);
+  case GeoLineString:       return pCheckGeoLineStringCoordinates(coordinatesP);
+  case GeoMultiLineString:  return pCheckGeoMultiLineStringCoordinates(coordinatesP);
+  case GeoPolygon:          return pCheckGeoPolygonCoordinates(coordinatesP);
+  case GeoMultiPolygon:     return pCheckGeoMultiPolygonCoordinates(coordinatesP);
 
   default:
     //
@@ -74,7 +71,6 @@ bool pCheckGeoCoordinates(KjNode* coordinatesP, OrionldGeoJsonType geoType)
     //
     orionldError(OrionldBadRequestData, "Invalid geometry for GeoJSON", "This can't happen", 400);
     return false;
-    break;
   }
 
   return true;

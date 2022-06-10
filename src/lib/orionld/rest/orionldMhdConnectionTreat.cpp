@@ -63,6 +63,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
+#include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
@@ -543,8 +544,17 @@ static void dbGeoIndexes(void)
   // sem_take
   for (int ix = 0; ix < orionldState.geoAttrs; ix++)
   {
-    if (dbGeoIndexLookup(orionldState.tenantP->tenant, orionldState.geoAttrV[ix]->name) == NULL)
-      dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+    char eqName[512];
+
+    strncpy(eqName, orionldState.geoAttrV[ix]->name, sizeof(eqName) - 1);
+    dotForEq(eqName);
+    if (dbGeoIndexLookup(orionldState.tenantP->tenant, eqName) == NULL)
+    {
+      if (experimental)
+        mongocGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+      else
+        dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+    }
   }
   // sem_give
 }
@@ -611,17 +621,17 @@ static bool pCheckUriParamAttrs(void)
   int   items     = commaCount(orionldState.uriParams.attrs) + 1;
   char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.attrs);  // Keep original value of 'attrs'
 
-  orionldState.in.attrsList.items = items;
-  orionldState.in.attrsList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+  orionldState.in.attrList.items = items;
+  orionldState.in.attrList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
 
-  if (orionldState.in.attrsList.array == NULL)
+  if (orionldState.in.attrList.array == NULL)
   {
     LM_E(("Out of memory (allocating an /attrs/ array of %d char pointers)", items));
     orionldError(OrionldInternalError, "Out of memory", "allocating the array for /attrs/ URI param", 500);
     return false;
   }
 
-  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.attrsList.array, items);
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.attrList.array, items);
 
   if (splitItems != items)
   {
@@ -632,7 +642,7 @@ static bool pCheckUriParamAttrs(void)
 
   for (int item = 0; item < items; item++)
   {
-    orionldState.in.attrsList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrsList.array[item], true, NULL);  // Expand-function
+    orionldState.in.attrList.array[item] = orionldAttributeExpand(orionldState.contextP, orionldState.in.attrList.array[item], true, NULL);  // Expand-function
   }
 
   return true;

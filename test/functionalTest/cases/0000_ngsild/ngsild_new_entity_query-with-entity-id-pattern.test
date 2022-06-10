@@ -1,0 +1,375 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with Entity-ID-Pattern
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create E1 with type T and attr A=1
+# 02. Create E2 with type T and attr A=2
+# 03. Create E3 with type T and attr A="String 1"
+# 04. Create E4 with type T and attr A="String 2"
+# 05. Create E5 with type T and attr A=1.01
+# 06. Create E6 with type T and attr A=1.02
+#
+# 07. GET all entities with idPattern= (no value) - see error
+# 08. GET all entities with idPattern=.*E? - see all 6 entities
+# 09. GET all entities with idPattern=.*E$ - see NO entities
+# 10. GET all entities with idPattern=urn:.*E1 AND id=urn:ngsi-ld:T:E2 - see E2 as id takes precedence over idPattern
+# 11. GET all entities with idPattern=urn.*E[1359] - see E1, E3, and E5
+#
+
+echo '01. Create E1 with type T and attr A=1'
+echo '======================================'
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '02. Create E2 with type T and attr A=2'
+echo '======================================'
+payload='{
+  "id": "urn:ngsi-ld:T:E2",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '03. Create E3 with type T and attr A="String 1"'
+echo '==============================================='
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": "String 1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '04. Create E4 with type T and attr A="String 2"'
+echo '==============================================='
+payload='{
+  "id": "urn:ngsi-ld:T:E4",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": "String 2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '05. Create E5 with type T and attr A=1.01'
+echo '========================================='
+payload='{
+  "id": "urn:ngsi-ld:T:E5",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1.01
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '06. Create E6 with type T and attr A=1.02'
+echo '========================================='
+payload='{
+  "id": "urn:ngsi-ld:T:E6",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1.02
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "07. GET all entities with idPattern= (no value) - see error"
+echo "==========================================================="
+orionCurl --url "/ngsi-ld/v1/entities?idPattern=&prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "08. GET all entities with idPattern=.*E? - see all 6 entities"
+echo "============================================================="
+orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E?&prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo '09. GET all entities with idPattern=.*E$ - see NO entities'
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?idPattern=.*E$&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "10. GET all entities with idPattern=urn:.*E1 AND id=urn:ngsi-ld:T:E2 - see E2 as id takes precedence over idPattern"
+echo "==================================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E1&id=urn:ngsi-ld:T:E2&prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "11. GET all entities with idPattern=urn.*E[1359] - see E1, E3, and E5"
+echo "====================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E[1359]&prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with type T and attr A=1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+Date: REGEX(.*)
+
+
+
+02. Create E2 with type T and attr A=2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2
+Date: REGEX(.*)
+
+
+
+03. Create E3 with type T and attr A="String 1"
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E3
+Date: REGEX(.*)
+
+
+
+04. Create E4 with type T and attr A="String 2"
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E4
+Date: REGEX(.*)
+
+
+
+05. Create E5 with type T and attr A=1.01
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E5
+Date: REGEX(.*)
+
+
+
+06. Create E6 with type T and attr A=1.02
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E6
+Date: REGEX(.*)
+
+
+
+07. GET all entities with idPattern= (no value) - see error
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Empty right-hand-side for a URI parameter",
+  "detail": "idPattern"
+}
+
+
+
+08. GET all entities with idPattern=.*E? - see all 6 entities
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 723
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E2",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 2
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E4",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E6",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.02
+    }
+  }
+]
+
+
+
+09. GET all entities with idPattern=.*E$ - see NO entities
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+10. GET all entities with idPattern=urn:.*E1 AND id=urn:ngsi-ld:T:E2 - see E2 as id takes precedence over idPattern
+===================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:T:E2",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 2
+    }
+  }
+]
+
+
+
+11. GET all entities with idPattern=urn.*E[1359] - see E1, E3, and E5
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 363
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

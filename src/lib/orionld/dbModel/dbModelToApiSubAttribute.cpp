@@ -38,9 +38,11 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/dbModel/dbModelToObservedAt.h"                 // dbModelToObservedAt
+#include "orionld/dbModel/dbModelToUnitCode.h"                   // dbModelToUnitCode
 #include "orionld/dbModel/dbModelToApiSubAttribute.h"            // Own interface
 
 
@@ -95,8 +97,11 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
 KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
   LM_TMP(("Treating sub-attribute '%s'", dbSubAttributeP->name));
+
   if (strcmp(dbSubAttributeP->name, "observedAt") == 0)
     return dbModelToObservedAt(dbSubAttributeP);
+  else if (strcmp(dbSubAttributeP->name, "unitCode") == 0)
+    return dbModelToUnitCode(dbSubAttributeP);
 
   char*   longName = kaStrdup(&orionldState.kalloc, dbSubAttributeP->name);
   eqForDot(longName);
@@ -105,9 +110,31 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Render
   KjNode* subAttrP = kjObject(orionldState.kjsonP, alias);
   KjNode* typeP    = kjLookup(dbSubAttributeP, "type");
 
+  if (typeP == NULL)
+  {
+    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbSubAttributeP->name, 500);
+    return NULL;
+  }
+
   OrionldAttributeType subAttrType = orionldAttributeType(typeP->value.s);
   kjChildRemove(dbSubAttributeP, typeP);
-  kjChildAdd(subAttrP, typeP);
+
+
+  if (renderFormat == RF_CONCISE)
+  {
+    // Might be key-values
+    if ((sysAttrs == false) && ((subAttrType == Property) || (subAttrType == GeoProperty)))
+    {
+      LM_TMP(("CONCISE + NOT sysAttrs + [Geo]Property => SIMPLIFIED"));
+      KjNode* valueP = kjLookup(dbSubAttributeP, "value");
+
+      kjChildRemove(dbSubAttributeP, valueP);
+      valueP->name = alias;
+      return valueP;
+    }
+  }
+  else
+    kjChildAdd(subAttrP, typeP);  // No "type" if CONCISE
 
   KjNode* nodeP = dbSubAttributeP->value.firstChildP;
   KjNode* next;
@@ -122,18 +149,19 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Render
 
       kjChildAdd(subAttrP, nodeP);
     }
-    else if (strcmp(nodeP->name, "unitCode")   == 0) kjChildAdd(subAttrP, nodeP);
-    else if (strcmp(nodeP->name, "observedAt") == 0) kjChildAdd(subAttrP, nodeP);
+    else if (strcmp(nodeP->name, "observedAt") == 0)
+      kjChildAdd(subAttrP, nodeP);
+    else if (strcmp(nodeP->name, "unitCode") == 0)
+      kjChildAdd(subAttrP, nodeP);
     else if (sysAttrs == true)
     {
-      if (strcmp(nodeP->name, "creDate") == 0)
+      if ((strcmp(nodeP->name, "createdAt") == 0) || (strcmp(nodeP->name, "modifiedAt") == 0))
       {
-        nodeP->name = (char*) "createdAt";
-        kjChildAdd(subAttrP, nodeP);
-      }
-      else if (strcmp(nodeP->name, "modDate") == 0)
-      {
-        nodeP->name = (char*) "modifiedAt";
+        char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+        numberToDate(nodeP->value.f, dateTimeBuf, 32);
+        nodeP->value.s    = dateTimeBuf;
+        nodeP->type       = KjString;
+
         kjChildAdd(subAttrP, nodeP);
       }
     }
