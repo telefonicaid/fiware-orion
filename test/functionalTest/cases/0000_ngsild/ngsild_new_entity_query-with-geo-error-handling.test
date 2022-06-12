@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -26,7 +26,7 @@ Geoquery error handling
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
@@ -161,7 +161,7 @@ payload='{
   "location": {
     "type": "GeoProperty",
     "value": {
-      "type": "invalid string for geo type",
+      "type": "not-a-valid-geo-type",
       "coordinates": [1,2]
     }
   }
@@ -287,12 +287,12 @@ Date: REGEX(.*)
 07. Invalid value for 'type' in payload for creation - see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 187
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid string for geo type",
+    "detail": "not-a-valid-geo-type",
     "title": "Invalid value for the /type/ field of a GeoProperty value (invalid geometry)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -301,13 +301,13 @@ Date: REGEX(.*)
 11. 'coordinates' missing in URI param for query - see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 156
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geometry, georel, and coordinates must all be present",
-    "title": "Incomplete geometry",
+    "detail": "missing: coordinates",
+    "title": "Invalid Geo-Filter",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -315,42 +315,42 @@ Date: REGEX(.*)
 12. Non array 'coordinate' in URI param for query - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 128
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid coordinates for point",
-    "title": "Invalid Geometry",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "detail": "Int",
+    "title": "Invalid JSON type for /coordinates/ field (not a JSON Array)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 13. Only one coordinate in URI param for query - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 128
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid coordinates for point",
-    "title": "Invalid Geometry",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 14. Zero 'coordinates' in URI param for query - see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "no coordinates for geometry",
-    "title": "Invalid Geometry",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

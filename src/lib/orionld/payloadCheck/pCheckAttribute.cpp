@@ -45,13 +45,14 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
-#include "orionld/payloadCheck/pCheckGeoPropertyValue.h"         // pCheckGeoPropertyValue
+#include "orionld/payloadCheck/pCheckGeoProperty.h"              // pCheckGeoProperty
 #include "orionld/payloadCheck/pCheckAttributeType.h"            // pCheckAttributeType
 #include "orionld/payloadCheck/pCheckAttribute.h"                // Own interface
 
@@ -698,7 +699,7 @@ static bool pCheckAttributeObject
       }
       else
       {
-        orionldError(OrionldBadRequestData, "Invalid value for /type/", typeP->value.s, 400);
+        orionldError(OrionldBadRequestData, "Invalid value for attribute /type/", typeP->value.s, 400);
         return false;
       }
     }
@@ -712,18 +713,20 @@ static bool pCheckAttributeObject
 
     if (geoJsonValue == true)
     {
-      if (pCheckGeoPropertyValue(attrP, typeP) == false)
-      {
-        LM_W(("pCheckGeoPropertyValue flagged an error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
-        return false;
-      }
+      // It's a GeoProperty in key-values format - need to convert to Normalized
+      KjNode* valueP = kjObject(orionldState.kjsonP,  "value");
 
-      return true;
+      valueP->value.firstChildP = attrP->value.firstChildP;
+      valueP->lastChild         = attrP->lastChild;
+
+      pCheckAttributeTransform(attrP, "GeoProperty", valueP);
     }
-
-    // As "type" is present - is it coherent? (Property has "value", Relationship has "object", etc)
-    if (valueAndTypeCheck(attrP, attributeType, attrTypeFromDb != NoAttributeType) == false)
-      LM_RE(false, ("valueAndTypeCheck failed"));
+    else
+    {
+      // As "type" is present - is it coherent? (Property has "value", Relationship has "object", etc)
+      if (valueAndTypeCheck(attrP, attributeType, attrTypeFromDb != NoAttributeType) == false)
+        LM_RE(false, ("valueAndTypeCheck failed"));
+    }
   }
   else  // Attribute Type is not there - try to guess the type, if not already known from the DB
   {
@@ -766,11 +769,12 @@ static bool pCheckAttributeObject
   KjNode* fieldP = attrP->value.firstChildP;
   KjNode* next;
 
+  kjTreeLog(attrP, "GEO: Looping over all attribute fields");
   while (fieldP != NULL)
   {
     next = fieldP->next;
 
-    if (fieldP->type == KjNull)  // Pure JSON null ... ?   OR, was it a JDON-LD null object that has been translated already?
+    if (fieldP->type == KjNull)  // Pure JSON null ... ?   OR, was it a JSON-LD null object that has been translated already?
     {
       if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
       {
@@ -781,7 +785,6 @@ static bool pCheckAttributeObject
       continue;
     }
 
-    // JSON-LD null ?
     if (fieldP->type == KjObject)
     {
       KjNode* typeP = kjLookup(fieldP, "@type");
@@ -886,30 +889,37 @@ static bool pCheckAttributeObject
       kjChildAdd(attrP, typeP);
     }
 
-    if (attributeType == GeoProperty)
+    fieldP = next;
+  }
+
+  kjTreeLog(attrP, "GEO: attr after");
+  if (attributeType == GeoProperty)
+  {
+    LM_TMP(("GEO: %s is a geo property", attrP->name));
+
+    if (pCheckGeoProperty(attrP) == false)
     {
-      LM_TMP(("GEO: %s is a geo property - making sure it has an index!", attrP->name));
-
-      if (orionldState.geoAttrs >= orionldState.geoAttrMax)
-      {
-        orionldState.geoAttrMax += 100;
-
-        KjNode** tmp = (KjNode**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * orionldState.geoAttrMax);
-
-        if (tmp == NULL)
-        {
-          orionldError(OrionldBadRequestData, "Internal Error", "Unable to allocate memory", 500);
-          return false;
-        }
-
-        memcpy(tmp, orionldState.geoAttrV, sizeof(KjNode*) * orionldState.geoAttrs);
-        orionldState.geoAttrV = tmp;
-      }
-
-      orionldState.geoAttrV[orionldState.geoAttrs++] = attrP;
+      LM_W(("pCheckGeoProperty flagged an error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+      return false;
     }
 
-    fieldP = next;
+    if (orionldState.geoAttrs >= orionldState.geoAttrMax)
+    {
+      orionldState.geoAttrMax += 100;
+
+      KjNode** tmp = (KjNode**) kaAlloc(&orionldState.kalloc, sizeof(KjNode*) * orionldState.geoAttrMax);
+
+      if (tmp == NULL)
+      {
+        orionldError(OrionldBadRequestData, "Internal Error", "Unable to allocate memory", 500);
+        return false;
+      }
+
+      memcpy(tmp, orionldState.geoAttrV, sizeof(KjNode*) * orionldState.geoAttrs);
+      orionldState.geoAttrV = tmp;
+    }
+
+    orionldState.geoAttrV[orionldState.geoAttrs++] = attrP;
   }
 
   return true;

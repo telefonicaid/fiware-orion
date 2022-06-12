@@ -123,13 +123,13 @@ Date: REGEX(.*)
 02. PATCH the entity setting 'category' to JSON literal { @type: @json, @value: 2 }
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "@json",
-    "title": "Invalid value for /type/",
+    "title": "Invalid value for attribute /type/",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

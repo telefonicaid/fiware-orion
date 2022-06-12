@@ -52,8 +52,15 @@ bool pCheckGeoPropertyType(KjNode* typeP, OrionldGeometry* geometryP, const char
   }
 
   *geometryP = orionldGeometryFromString(typeP->value.s);
+
   if (*geometryP == GeoNoGeometry)
-    return false;  // Not an error, simply not a GeoProperty
+  {
+    orionldError(OrionldBadRequestData,
+                 "Invalid value for the /type/ field of a GeoProperty value (invalid geometry)",
+                 typeP->value.s,
+                 400);
+    return false;
+  }
 
   return true;
 }

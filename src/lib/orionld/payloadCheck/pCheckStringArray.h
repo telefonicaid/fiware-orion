@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSTRINGARRAY_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSTRINGARRAY_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -34,3 +37,5 @@ extern "C"
 // pCheckStringArray -
 //
 extern bool pCheckStringArray(KjNode* stringArrayP, const char* fieldName, bool expand);
+
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSTRINGARRAY_H_

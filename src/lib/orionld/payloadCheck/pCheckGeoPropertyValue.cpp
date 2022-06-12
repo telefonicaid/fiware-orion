@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_DUPLICATE
 #include "orionld/payloadCheck/pCheckGeoPropertyType.h"          // pCheckGeoPropertyType
 #include "orionld/payloadCheck/pCheckGeoCoordinates.h"           // pCheckGeoCoordinates
 #include "orionld/payloadCheck/pCheckGeoPropertyValue.h"         // Own interface
@@ -43,43 +43,51 @@ extern "C"
 //
 // pCheckGeoPropertyValue -
 //
-bool pCheckGeoPropertyValue(KjNode* attrP, KjNode* typeP)
+bool pCheckGeoPropertyValue(KjNode* valueP, const char* attrLongName)
 {
-  if (typeP == NULL)
-  {
-    typeP = kjLookup(attrP, "type");
+  KjNode* typeP        = NULL;
+  KjNode* coordinatesP = NULL;
 
-    if (typeP == NULL)
+  if (valueP->type != KjObject)
+  {
+    orionldError(OrionldBadRequestData, "The value of a GeoProperty must be a JSON Object", attrLongName, 400);
+    return false;
+  }
+
+  for (KjNode* itemP = valueP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    if (strcmp(itemP->name, "type") == 0)
+      PCHECK_DUPLICATE(typeP, itemP, 0, NULL, "type field in value of GeoProperty", 400);
+    else if (strcmp(itemP->name, "coordinates") == 0)
+      PCHECK_DUPLICATE(coordinatesP, itemP, 0, NULL, "coordinates field in value of GeoProperty", 400);
+    else
     {
-      orionldError(OrionldBadRequestData, "Mandatory Field /type/ missing for a GeoProperty value", attrP->name, 400);
+      orionldError(OrionldBadRequestData, "Unexpected Field in value of GeoProperty", itemP->name, 400);
       return false;
     }
+  }
+
+  if (typeP == NULL)
+  {
+    orionldError(OrionldBadRequestData, "Mandatory Field /type/ missing for a GeoProperty value", attrLongName, 400);
+    return false;
+  }
+
+  if (coordinatesP == NULL)
+  {
+    orionldError(OrionldBadRequestData, "Mandatory Field /coordinates/ missing for a GeoProperty value", attrLongName, 400);
+    return false;
   }
 
   // Is the type a valid GeoJSON type? (Point, Polygon, ...)
   OrionldGeometry geometry;
-  if (pCheckGeoPropertyType(typeP, &geometry, attrP->name) == false)  // pCheckGeoPropertyType sets ProblemDetails
+  // FIXME: Rename to pCheckGeoPropertyValueType?
+  if (pCheckGeoPropertyType(typeP, &geometry, attrLongName) == false)  // pCheckGeoPropertyType sets ProblemDetails
     return false;
 
-  KjNode* coordinatesP = kjLookup(attrP, "coordinates");
+  // FIXME: Rename to pCheckGeoPropertyValueCoordinates?
+  if (pCheckGeoCoordinates(coordinatesP, geometry) == false)  // pCheckGeoCoordinates sets ProblemDetails
+    return false;
 
-  if (coordinatesP != NULL)
-  {
-    if (pCheckGeoCoordinates(coordinatesP, geometry) == true)  // pCheckGeoCoordinates sets ProblemDetails
-    {
-      // Convert to Normalized
-      KjNode* valueP = kjObject(orionldState.kjsonP,  "value");
-
-      valueP->value.firstChildP = attrP->value.firstChildP;
-      valueP->lastChild         = attrP->lastChild;
-
-      pCheckAttributeTransform(attrP, "GeoProperty", valueP);
-      return true;
-    }
-    else
-      return false;
-  }
-
-  orionldError(OrionldBadRequestData, "Mandatory Field /coordinates/ missing for a GeoProperty value", attrP->name, 400);
-  return false;
+  return true;
 }

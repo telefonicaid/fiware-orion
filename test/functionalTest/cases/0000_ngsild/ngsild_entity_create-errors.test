@@ -414,13 +414,13 @@ Date: REGEX(.*)
 10. POST /ngsi-ld/v1/entities, with an attribute with invalid type 'Propperty' - see error
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 117
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Propperty",
-    "title": "Invalid value for /type/",
+    "title": "Invalid value for attribute /type/",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

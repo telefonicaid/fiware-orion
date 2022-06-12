@@ -36,7 +36,7 @@ brokerStart CB 0 IPv4 -experimental
 # 03. GET the entity - see it unaffected of step 02
 #
 
-echo "01. Create an	Entity TemperatureSensor:001"
+echo "01. Create an Entity TemperatureSensor:001"
 echo "=========================================="
 payload='{
   "id": "urn:ngsi-ld:TemperatureSensor:001",
@@ -73,7 +73,7 @@ echo
 
 
 --REGEXPECT--
-01. Create an	Entity TemperatureSensor:001
+01. Create an Entity TemperatureSensor:001
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -85,13 +85,13 @@ Date: REGEX(.*)
 02. PATCH the entity, attempting to add a GeoProperty but with erroneous type 'Poinxt'
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 114
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Poinxt",
-    "title": "Invalid value for /type/",
+    "title": "Invalid value for attribute /type/",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -444,13 +444,13 @@ echo
 01. Attempt to create an Entity with a GeoProperty that is not a JSON Object - see failure
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 146
+Content-Length: 179
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Int",
-    "title": "the value of a geo-location attribute must be a JSON Object",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/G1",
+    "title": "The value of a GeoProperty must be a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -472,13 +472,13 @@ Date: REGEX(.*)
 03. Attempt to create an Entity with a GeoProperty that contains no 'type' field - see failure
 ==============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 182
+Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/G1",
-    "title": "Mandatory 'type' field missing for GeoJSON Property",
+    "title": "Mandatory Field /type/ missing for a GeoProperty value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -486,13 +486,13 @@ Date: REGEX(.*)
 04. Attempt to create an Entity with a GeoProperty with a 'type' that is not a string  - see failure
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 159
+Content-Length: 208
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "the 'type' field of a GeoJSON object must be a JSON String",
-    "title": "Not a JSON String",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/G1",
+    "title": "Invalid JSON type for /type/ field of a GeoProperty value (not a JSON String)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -500,13 +500,13 @@ Date: REGEX(.*)
 05. Attempt to create an Entity with a GeoProperty with a 'type' whose string is not a valid geometry name - see failure
 ========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 105
+Content-Length: 165
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "punto",
-    "title": "Invalid geometry",
+    "title": "Invalid value for the /type/ field of a GeoProperty value (invalid geometry)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -514,13 +514,13 @@ Date: REGEX(.*)
 06. Attempt to create an Entity with a GeoProperty that has a duplicated 'type' - see failure
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Point",
-    "title": "Invalid value for /type/",
+    "title": "Invalid value for attribute /type/",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -528,13 +528,13 @@ Date: REGEX(.*)
 07. Attempt to create an Entity with a GeoProperty that contains no 'coordinates' field - see failure
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 228
+Content-Length: 192
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/G1",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson - 'coordinates' field missing",
+    "title": "Mandatory Field /coordinates/ missing for a GeoProperty value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -542,12 +542,12 @@ Date: REGEX(.*)
 08. Attempt to create an Entity with a GeoProperty that has a duplicated	'coordinates' - see failure
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geo-location::coordinates",
+    "detail": "coordinates field in value of GeoProperty",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -556,13 +556,13 @@ Date: REGEX(.*)
 09. Attempt to create an Entity with a GeoProperty that has a 'coordinates' field that is not an Array - see failure
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 177
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)",
-    "title": "Invalid Data Type",
+    "detail": "Bool",
+    "title": "Invalid JSON type for /coordinates/ field (not a JSON Array)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
