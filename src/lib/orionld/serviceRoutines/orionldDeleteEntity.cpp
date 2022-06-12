@@ -31,7 +31,8 @@
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
-#include "orionld/db/dbConfiguration.h"                          // dbEntityDelete, dbEntityLookup
+#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
+#include "orionld/mongoc/mongocEntityDelete.h"                   // mongocEntityDelete
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
 
@@ -47,15 +48,15 @@ bool orionldDeleteEntity(void)
   // Make sure the Entity ID is a valid URI
   PCHECK_URI(entityId, true, 0, "Invalid Entity ID", "Must be a valid URI", 400);
 
-  if (dbEntityLookup(entityId) == NULL)
+  if (mongocEntityLookup(entityId) == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
     return false;
   }
 
-  if (dbEntityDelete(entityId) == false)
+  if (mongocEntityDelete(entityId) == false)
   {
-    orionldError(OrionldInternalError, "Database Error", "dbEntityDelete failed", 500);
+    orionldError(OrionldInternalError, "Database Error", "mongocEntityDelete failed", 500);
     return false;
   }
 
