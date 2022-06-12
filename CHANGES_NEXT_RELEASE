@@ -40,3 +40,4 @@
 * Issue #280   Timestamp support in RANGE in 'q' for subscriptions
 * Issue #280   Support for NOT EQ for range in 'q' for subscriptions
 * Issue #280   Complete new implementation of GET /entities, using mongoc and no mongoBackend
+* Issue #280   Reimplemented /entities/{entityId} to use mongoc and no mongoBackend

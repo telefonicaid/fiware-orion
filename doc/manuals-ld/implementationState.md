@@ -267,13 +267,15 @@ This service is experimental and is only in place when Orion-LD is started with 
   * Uses the new mongoc driver (-experimental not needed)
   * Disconnects/Reconnects from/to MQTT broker if needed
 
------- TBI --------------------------------------------------------
-
 ### DELETE /ngsi-ld/v1/entities/*
-* Not using mongoBackend, but using the the mongo C++ legacy driver:
-  * dbEntityLookup
-  * dbEntityDelete
-* No Notifications (notifications on DELETE is not yet part of the NGSI-LD API - hopefully for 1.6.1)
+
+#### Done
+  * Uses the new mongoc driver (-experimental not needed)
+
+#### Missing
+  * Notifications
+
+------ TBI --------------------------------------------------------
 
 ### POST /ngsi-ld/v1/entities/*/attrs
 ### PATCH /ngsi-ld/v1/entities/*/attrs
