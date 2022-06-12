@@ -1,0 +1,721 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity creation - error handling
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. GeoProperty Point that is a double array - normalized
+# 02. GeoProperty Point that is a double array - concise
+# 03. GeoProperty Point that is a double array - simplified
+# 04. GeoProperty Point with an extra field in the value (type+coordinates+x)
+# 05. GeoProperty Point without type field in the value
+# 06. GeoProperty Point with duplicated type field in the value
+# 07. GeoProperty Point without coordinates field in the value
+# 08. GeoProperty Point with duplicated coordinates field in the value
+#
+# 11. LangProperty whose languageMap is not an object - normalized
+# 12. LangProperty whose languageMap is not an object - concise
+#
+# 21. Relationship whose object is not a string - normalized
+# 22. Relationship whose object is not a string - concise
+# 23. Relationship whose object is not a valid URI - normalized
+# 24. Relationship whose object is not a valid URI - concise
+#
+# 30. Attribute with just a unitCode, nothing else :)
+# 31. Property without a value
+# 32. Property with unitCode that is not a string - normalized
+# 33. Property with unitCode that is not a string - concise
+# 34. Property with observedAt that is not a string - normalized
+# 35. Property with observedAt that is not a string - concise
+# 36. Property with observedAt that is a string but not a valid ISO8601 - normalized
+# 37. Property with observedAt that is a string but not a valid ISO8601 - concise
+#
+
+echo "01. GeoProperty Point that is a double array - normalized"
+echo "========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [[1,2]]
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GeoProperty Point that is a double array - concise"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E2",
+  "type": "T",
+  "P1": {
+    "value": {
+      "type": "Point",
+      "coordinates": [[1,2]]
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GeoProperty Point that is a double array - simplified"
+echo "========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Point",
+    "coordinates": [[1,2]]
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. GeoProperty Point with an extra field in the value (type+coordinates+x)"
+echo "==========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [1,2],
+      "x": 12
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GeoProperty Point without type field in the value"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "GeoProperty",
+    "value": {
+      "coordinates": [1,2]
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GeoProperty Point with duplicated type field in the value"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [1,2],
+      "type": "Point"
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. GeoProperty Point without coordinates field in the value"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point"
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GeoProperty Point with duplicated coordinates field in the value"
+echo "===================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [1,2],
+      "coordinates": [1,2]
+    }
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. LangProperty whose languageMap is not an object - normalized"
+echo "================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "LanguageProperty",
+    "languageMap": 14
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. LangProperty whose languageMap is not an object - concise"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "languageMap": 14
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "21. Relationship whose object is not a string - normalized"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Relationship",
+    "object": 14
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "22. Relationship whose object is not a string - concise"
+echo "======================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "object": 14
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "23. Relationship whose object is not a valid URI - normalized"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Relationship",
+    "object": "jeje"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "24. Relationship whose object is not a valid URI - concise"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "object": "jeje"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "30. Attribute with just a unitCode, nothing else :)"
+echo "==================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "unitCode": "cm"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "31. Property without a value"
+echo "============================"
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Property"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "32. Property with unitCode that is not a string - normalized"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 33,
+    "unitCode": 1
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "33. Property with unitCode that is not a string - concise"
+echo "========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "value": 33,
+    "unitCode": 1
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "34. Property with observedAt that is not a string - normalized"
+echo "=============================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 33,
+    "observedAt": 1
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "35. Property with observedAt that is not a string - concise"
+echo "==========================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "value": 33,
+    "observedAt": 1
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "36. Property with observedAt that is a string but not a valid ISO8601 - normalized"
+echo "=================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 33,
+    "observedAt": "abc"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "37. Property with observedAt that is a string but not a valid ISO8601 - concise"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P1": {
+    "value": 33,
+    "observedAt": "abc"
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. GeoProperty Point that is a double array - normalized
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. GeoProperty Point that is a double array - concise
+======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GeoProperty Point that is a double array - simplified
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. GeoProperty Point with an extra field in the value (type+coordinates+x)
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "x",
+    "title": "Unexpected Field in value of GeoProperty",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. GeoProperty Point without type field in the value
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 185
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Mandatory Field /type/ missing for a GeoProperty value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. GeoProperty Point with duplicated type field in the value
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type field in value of GeoProperty",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. GeoProperty Point without coordinates field in the value
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 192
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Mandatory Field /coordinates/ missing for a GeoProperty value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. GeoProperty Point with duplicated coordinates field in the value
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "coordinates field in value of GeoProperty",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. LangProperty whose languageMap is not an object - normalized
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. LangProperty whose languageMap is not an object - concise
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+21. Relationship whose object is not a string - normalized
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 123
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "object",
+    "title": "Invalid JSON type - not a string",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+22. Relationship whose object is not a string - concise
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 123
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "object",
+    "title": "Invalid JSON type - not a string",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+23. Relationship whose object is not a valid URI - normalized
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "object",
+    "title": "Invalid URI - no colon found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+24. Relationship whose object is not a valid URI - concise
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "object",
+    "title": "Invalid URI - no colon found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+30. Attribute with just a unitCode, nothing else :)
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Missing value/object/languageMap field for Attribute at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+31. Property without a value
+============================
+HTTP/1.1 400 Bad Request
+Content-Length: 182
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Missing /value/ field for Property at creation time",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+32. Property with unitCode that is not a string - normalized
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "unitCode",
+    "title": "Invalid JSON type - not a string",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+33. Property with unitCode that is not a string - concise
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "unitCode",
+    "title": "Invalid JSON type - not a string",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+34. Property with observedAt that is not a string - normalized
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "Invalid JSON type - not a string (so, not a valid timestamp)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+35. Property with observedAt that is not a string - concise
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "Invalid JSON type - not a string (so, not a valid timestamp)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+36. Property with observedAt that is a string but not a valid ISO8601 - normalized
+==================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "Not a valid ISO8601 DateTime",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+37. Property with observedAt that is a string but not a valid ISO8601 - concise
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observedAt",
+    "title": "Not a valid ISO8601 DateTime",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

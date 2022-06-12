@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,17 +22,33 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                              // NULL
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
+
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/payloadCheck/pCheckGeoPropertyValue.h"         // pCheckGeoPropertyValue
+#include "orionld/payloadCheck/pCheckGeoProperty.h"              // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckGeoPropertyValue -
+// pCheckGeoProperty -
 //
-extern bool pCheckGeoPropertyValue(KjNode* attrP, const char* attrLongName);
+bool pCheckGeoProperty(KjNode* attrP)
+{
+  KjNode* valueP = kjLookup(attrP, "value");
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_
+  if (valueP != NULL)
+  {
+    if (pCheckGeoPropertyValue(valueP, attrP->name) == false)
+      return false;
+  }
+
+  return true;
+}
