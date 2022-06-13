@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
+#include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
 
 
@@ -472,6 +473,9 @@ bool orionldGetEntity(void)
 
     orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrList.array, orionldState.in.attrList.items);
   }
+
+  if (orionldState.out.contentType == GEOJSON)
+    orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
 
   return true;
 }

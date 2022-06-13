@@ -45,7 +45,10 @@ extern "C"
 void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo)
 {
   if (tree == NULL)
+  {
     LM_TMP(("%s[%d]: %s: NULL Tree", fileName, lineNo, msg));
+    return;
+  }
 
   int bufSize = kjFastRenderSize(tree);
 

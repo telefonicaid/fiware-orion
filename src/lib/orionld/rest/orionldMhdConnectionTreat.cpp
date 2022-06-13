@@ -66,8 +66,6 @@ extern "C"
 #include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
-#include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
-#include "orionld/kjTree/kjGeojsonEntitiesTransform.h"           // kjGeojsonEntitiesTransform
 #include "orionld/kjTree/kjNodeDecouple.h"                       // kjNodeDecouple
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -468,7 +466,7 @@ static bool linkGet(const char* link)
 //
 static void contextToPayload(void)
 {
-  // If no contest node exists, create it with the default context
+  // If no context node exists, create it with the default context
   if (orionldState.payloadContextNode == NULL)
   {
     if (orionldState.link == NULL)
@@ -1132,7 +1130,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   // * Accept: appplication/json
   // * No Error
   //
-  // Need to discuss any exceptions with NEC.
+  // Need to discuss any exceptions with ISG CIM.
   // E.g.
   //   What if "Accept: application/ld+json" in a creation request?
   //   Creation requests have no payload data in the response so the context can't be put in the payload ...
@@ -1141,29 +1139,12 @@ MHD_Result orionldMhdConnectionTreat(void)
   // Also, if there is no payload data in the response, no need for @context
   // Also, GET /.../contexts/{context-id} should NOT give back the link header
   //
-  bool linkHeader = false;
-
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false) && (orionldState.responseTree != NULL))
   {
-    if (orionldState.out.contentType == GEOJSON)
-    {
-      //
-      // Default is: @context in payload body
-      // Overridden only if "Prefer: body=json"
-      //
-      if ((orionldState.preferHeader != NULL) && (strcasecmp(orionldState.preferHeader, "body=json") == 0))
-        linkHeader = true;
-      else
-        orionldState.linkHeaderAdded = false;  // To indicate @context in payload body for geojsonEntityTransform
-    }
-    else if (orionldState.out.contentType != JSONLD)
-      linkHeader = true;
-    else if (orionldState.responseTree == NULL)
-      linkHeader = true;
+    if ((orionldState.out.contentType != JSONLD) && (orionldState.httpStatusCode != 204))
+      httpHeaderLinkAdd(orionldState.link);
   }
 
-  if ((linkHeader == true) && (orionldState.httpStatusCode != 204))
-    httpHeaderLinkAdd(orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
 
   //
   // Is there a KJSON response tree to render?
@@ -1185,29 +1166,15 @@ MHD_Result orionldMhdConnectionTreat(void)
     //
     // Render the payload to get a string for restReply to send the response
     //
-    // FIXME: Smarter allocation !!!
-    //
-    PERFORMANCE(renderStart);
-
-    if ((orionldState.out.contentType == GEOJSON) && (serviceRoutineResult == true))
-    {
-      if (orionldState.serviceP->serviceRoutine == orionldGetEntity)
-        orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
-      else if (orionldState.serviceP->serviceRoutine == orionldGetEntities)
-        orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree);
-      else
-        LM_W(("Bad Input (Accept: application/geo+json for non-compatible request)"));
-    }
-
-
-    //
     // Smart allocation of the response buffer
     //
-    // If there is room in the current kalloc biffer (no extra malloc needed), then use it.
+    // If there is room in the current kalloc buffer (no extra malloc needed), then use it.
     // If not, then it's better to do a separate call to malloc, as:
     //   - the rest of the kalloc buffer isn't thrown away
     //   - the entire logic of kalloc is avoided (not much, but still ...)
     //
+    PERFORMANCE(renderStart);
+
     unsigned int responsePayloadSize;
 
     if (orionldState.uriParams.prettyPrint == false)

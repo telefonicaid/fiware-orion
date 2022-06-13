@@ -417,10 +417,10 @@ typedef struct OrionldConnectionState
   // - URI param 'attrs' used
   // - The geometryproperty is not part of 'attrs' URI param
   //
-  KjNode*                 geoPropertyNode;     // Must point to the "value" of the GeoProperty (for Retrieve Entity only)
-  bool                    geoPropertyMissing;  // The gro-property is really not present in the DB - must be NULL is the response (for Retrieve Entity only)
-  KjNode*                 geoPropertyNodes;    // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
-
+  KjNode*                 geoPropertyNode;            // Must point to the "value" of the GeoProperty (for Retrieve Entity only)
+  bool                    geoPropertyMissing;         // The gro-property is really not present in the DB - must be NULL is the response (for Retrieve Entity only)
+  KjNode*                 geoPropertyNodes;           // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
+  bool                    geoPropertyFromProjection;  // It was added to the projection but needs to be removed
 
   OrionldStateOut out;
   OrionldStateIn  in;

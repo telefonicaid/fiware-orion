@@ -32,7 +32,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
@@ -62,7 +61,6 @@ bool mongocTenantsGet(void)
   if (b == false)
     LM_RE(false, ("Database Error ()", mcError.message));
 
-  LM_TMP(("mongoc_client_read_command_with_opts worked"));
   char*   title;
   char*   detail;
   KjNode* responseP = mongocKjTreeFromBson(&reply, &title, &detail);
@@ -72,8 +70,6 @@ bool mongocTenantsGet(void)
 
   if (responseP == NULL)
     return false;
-
-  kjTreeLog(responseP, "Response from listDatabases");
 
   KjNode* databasesP = kjLookup(responseP, "databases");
   if (databasesP == NULL)
@@ -97,7 +93,6 @@ bool mongocTenantsGet(void)
 
         if (orionldTenantLookup(tenantName) == NULL)
           orionldTenantCreate(tenantName);
-        LM_TMP(("Tenant: '%s'", tenantName));
       }
     }
   }

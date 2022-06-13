@@ -125,7 +125,7 @@ static DBClientBase* mongoConnect
   std::string   err;
   DBClientBase* connection = NULL;
 
-  LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
+  // LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
 
   bool connected     = false;
   int  retries       = RECONNECT_RETRIES;
@@ -163,7 +163,7 @@ static DBClientBase* mongoConnect
   }
   else
   {
-    LM_T(LmtMongo, ("Using replica set %s", rplSet));
+    // LM_T(LmtMongo, ("Using replica set %s", rplSet));
 
     // autoReconnect is always on for DBClientReplicaSet connections.
     std::vector<std::string>  hostTokens;
@@ -232,7 +232,7 @@ static DBClientBase* mongoConnect
   }
   alarmMgr.dbErrorReset();
 
-  LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
+  // LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
 
   /* Authentication is different depending if multiservice is used or not. In the case of not
    * using multiservice, we authenticate in the single-service database. In the case of using
@@ -272,11 +272,7 @@ static DBClientBase* mongoConnect
     LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
     return NULL;
   }
-  LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)",
-                  versionString.c_str(),
-                  mongoVersionMayor,
-                  mongoVersionMinor,
-                  extra.c_str()));
+  // LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
 
   return connection;
 }

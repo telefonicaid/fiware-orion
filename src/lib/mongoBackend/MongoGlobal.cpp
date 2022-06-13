@@ -487,7 +487,7 @@ void setNotifier(Notifier* n)
 void setDbPrefix(const std::string& _dbPrefix)
 {
   dbPrefix = _dbPrefix;
-  LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
+  // LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
 }
 
 
@@ -593,7 +593,7 @@ void ensureLocationIndex(OrionldTenant* tenantP)
     std::string err;
 
     collectionCreateIndex(tenantP->entities, BSON(index << "2dsphere"), false, &err);
-    LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenantP->tenant));
+    // LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -612,7 +612,7 @@ void ensureDateExpirationIndex(OrionldTenant* tenantP)
     std::string err;
 
     collectionCreateIndex(tenantP->entities, BSON(index << 1), true, &err);
-    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenantP->tenant));
+    // LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -737,8 +737,6 @@ static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
 
   BSONObj entObj = ent.obj();
   baP->append(entObj);
-
-  LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
 }
 
 
@@ -773,7 +771,6 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
   //
   if ((servicePath.size() == 0) || (servicePath[0] == ""))
   {
-    LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
     return fromjson("{$in: [ /^\\/.*/, null] }");
   }
 
@@ -816,7 +813,6 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
   }
 
   servicePathValue += " ] }";
-  LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
 
   return fromjson(servicePathValue);
 }
@@ -1250,7 +1246,6 @@ bool entitiesQuery
     if (!isCustomAttr(attrName))
     {
       attrs.append(attrName);
-      LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
     }
   }
 
@@ -1353,8 +1348,6 @@ bool entitiesQuery
   {
     finalQuery.appendElements(filters[ix]);
   }
-
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 
   PERFORMANCE_END(1, NULL);
   PERFORMANCE_BEGIN(2, "entitiesQuery, part 2");
@@ -1513,7 +1506,7 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
 
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    // LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     PERFORMANCE_BEGIN(8, "entitiesQuery, part 8");
     ContextElementResponse*  cer = new ContextElementResponse(&r, attrL, includeEmpty, apiVersion);
@@ -1568,7 +1561,7 @@ bool entitiesQuery
     *limitReached = (cerV->size() >= (unsigned int) limit);
     if (*limitReached)
     {
-      LM_T(LmtMongo, ("entities limit reached"));
+      LM_W(("entities limit reached"));
       PERFORMANCE_END(7, "entitiesQuery, limits");
       return true;
     }
@@ -1850,7 +1843,6 @@ bool registrationsQuery
       if (en->type == "")
       {
         entitiesWithoutType.append(en->id);
-        LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
       }
       else
       {
@@ -1859,7 +1851,6 @@ bool registrationsQuery
         */
         entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
         entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
-        LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
       }
     }
   }
@@ -1871,7 +1862,6 @@ bool registrationsQuery
     std::string attrName = attrL[ix];
 
     attrs.append(attrName);
-    LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
 
   entityOr.append(BSON(contextRegistrationEntities << BSON("$in" << entitiesWithType.arr())));
@@ -1911,8 +1901,6 @@ bool registrationsQuery
 
   query.sort(BSON("_id" << 1));
 
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
@@ -1937,7 +1925,7 @@ bool registrationsQuery
       continue;
     }
     docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    // LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(&r, REG_CONTEXT_REGISTRATION).Array();
@@ -2434,8 +2422,6 @@ BSONArray processConditionVector
 */
 static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, OrionldTenant* tenantP)
 {
-  LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
-
   /* Update the document */
   BSONObj     query  = BSON("_id" << OID(subId));
   BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << orionldState.requestTime) <<

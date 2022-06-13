@@ -108,7 +108,7 @@ OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origi
     if (tree->type != KjString)
       ++cloned;
     contextP->tree = (tree->type != KjString)? kjClone(NULL, tree) : tree;
-    LM_TMP(("VL: Cloned tree %d of context '%s' to %p", cloned, contextP->url, contextP->tree));
+    // LM_TMP(("VL: Cloned tree %d of context '%s' to %p", cloned, contextP->url, contextP->tree));
   }
   else
   {

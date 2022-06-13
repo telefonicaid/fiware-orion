@@ -165,10 +165,11 @@ static bool entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
 //
 // attributesFilter -
 //
-static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP)
+static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry)
 {
   char   path[512];
   bson_t exists;
+  bool   geojsonGeometryToProjection = (geojsonGeometry == NULL)? false : true;  // if GEOJSON, the "geometry" must be present
 
   bson_init(&exists);
   bson_append_int32(&exists, "$exists", 7, 1);
@@ -182,6 +183,9 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 
     bson_append_document(mongoFilterP, path, len, &exists);
     bson_append_bool(projectionP, path, len, true);
+
+    if ((geojsonGeometry != NULL) && (strcmp(attrList->array[0], geojsonGeometry) == 0))
+      geojsonGeometryToProjection = false;  // Already present - no need to add to projection
   }
   else
   {
@@ -214,10 +218,22 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
       }
 
       bson_destroy(&attrExists);
+
+      if ((geojsonGeometry != NULL) && (strcmp(attrList->array[ix], geojsonGeometry) == 0))
+        geojsonGeometryToProjection = false;  // Already present - no need to add to projection
     }
 
     bson_append_array(mongoFilterP, "$or", 3, &array);
     bson_destroy(&array);
+  }
+
+  if (geojsonGeometryToProjection == true)
+  {
+    int len = snprintf(path, sizeof(path) - 1, "attrs.%s", attrList->array[0]);
+    dotForEq(&path[6]);
+    bson_append_bool(projectionP, path, len, true);
+    LM_TMP(("GEOJSON: Added '%s' to projection - needs to be excluded from 'properties' later!", path));
+    orionldState.geoPropertyFromProjection = true;
   }
 
   bson_destroy(&exists);
@@ -729,7 +745,8 @@ KjNode* mongocEntitiesQuery
   StringArray*     attrList,
   QNode*           qNode,
   OrionldGeoInfo*  geoInfoP,
-  int64_t*         countP
+  int64_t*         countP,
+  const char*      geojsonGeometry
 )
 {
   if (attrList->items > 99)
@@ -807,7 +824,7 @@ KjNode* mongocEntitiesQuery
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))
   {
-    if (attributesFilter(&mongoFilter, attrList, &projection) == false)
+    if (attributesFilter(&mongoFilter, attrList, &projection, geojsonGeometry) == false)
       return NULL;
   }
   else
@@ -860,8 +877,8 @@ KjNode* mongocEntitiesQuery
 #if 1
     char* filterString  = bson_as_json(&mongoFilter, NULL);
     char* optionsString = bson_as_json(&options, NULL);
-    LM_TMP(("GEO: Running the query with filter '%s'", filterString));
-    LM_TMP(("GEO: Running the query with options '%s'", optionsString));
+    LM_TMP(("GEOJSON: Running the query with filter '%s'", filterString));
+    LM_TMP(("GEOJSON: Running the query with options '%s'", optionsString));
     bson_free(filterString);
     bson_free(optionsString);
 #endif
