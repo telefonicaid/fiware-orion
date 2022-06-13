@@ -323,9 +323,6 @@ HttpStatusCode mongoQueryContext
   int   limit    = orionldState.uriParams.limit;
   char* orderBy  = orionldState.uriParams.orderBy;
 
-  LM_T(LmtMongo, ("QueryContext Request"));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (countP != NULL)? "true" : "false"));
-
   /* FIXME: restriction not supported for the moment */
   if (!requestP->restriction.attributeExpression.isEmpty())
   {

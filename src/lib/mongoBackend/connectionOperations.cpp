@@ -90,7 +90,7 @@ bool collectionQuery
     return false;
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col, q.toString().c_str()));
+  // LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col, q.toString().c_str()));
 
   try
   {
@@ -165,11 +165,7 @@ bool collectionRangedQuery
     return false;
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
-                  col,
-                  limit,
-                  offset,
-                  q.toString().c_str()));
+  // LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'", col, limit, offset, q.toString().c_str()));
 
   try
   {
@@ -251,8 +247,6 @@ bool collectionCount
     return false;
   }
 
-  LM_T(LmtMongo, ("count() in '%s' collection: '%s'", col, q.toString().c_str()));
-
   try
   {
     *c = connection->count(col, q);
@@ -320,7 +314,6 @@ bool collectionFindOne
     return false;
   }
 
-  LM_T(LmtMongo, ("findOne() in '%s' collection: '%s'", col, q.toString().c_str()));
   try
   {
     *doc = connection->findOne(col, q);
@@ -387,8 +380,7 @@ bool collectionInsert
     return false;
   }
 
-  LM_T(LmtMongo, ("insert() in collection '%s'", col));
-  LM_T(LmtMongo, ("insert() document '%s'", doc.toString().c_str()));
+  // LM_T(LmtMongo, ("insert in '%s': '%s'", col, doc.toString().c_str()));
 
   try
   {
@@ -458,11 +450,7 @@ bool collectionUpdate
     return false;
   }
 
-  LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s",
-                  col,
-                  q.toString().c_str(),
-                  doc.toString().c_str(),
-                  FT(upsert)));
+  // LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s", col, q.toString().c_str(), doc.toString().c_str(), FT(upsert)));
 
   try
   {
@@ -531,7 +519,7 @@ bool collectionRemove
     return false;
   }
 
-  LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col, q.toString().c_str()));
+  // LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col, q.toString().c_str()));
 
   try
   {
@@ -598,7 +586,7 @@ bool collectionCreateIndex
     return false;
   }
 
-  LM_T(LmtMongo, ("createIndex() in '%s' collection: '%s'", col, indexes.toString().c_str()));
+  // LM_T(LmtMongo, ("createIndex() in '%s' collection: '%s'", col, indexes.toString().c_str()));
 
   try
   {
@@ -712,7 +700,7 @@ bool runCollectionCommand
     }
   }
 
-  LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col, command.toString().c_str()));
+  // LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col, command.toString().c_str()));
 
   try
   {
@@ -776,7 +764,7 @@ bool setWriteConcern
   std::string*         err
 )
 {
-  LM_T(LmtMongo, ("setWriteConcern(): '%d'", wc.nodes()));
+  // LM_T(LmtMongo, ("setWriteConcern(): '%d'", wc.nodes()));
 
   try
   {
@@ -822,7 +810,7 @@ bool getWriteConcern
   std::string*   err
 )
 {
-  LM_T(LmtMongo, ("getWriteConcern()"));
+  // LM_T(LmtMongo, ("getWriteConcern()"));
 
   try
   {

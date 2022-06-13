@@ -106,14 +106,19 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
   //
   if (orionldState.linkHeaderAdded == false)
   {
-    KjNode* contextP;
+    // Only if Prefer is not set to body=json
+    if ((orionldState.preferHeader == NULL) || (strcasecmp(orionldState.preferHeader, "body=json") != 0))
+    {
+      KjNode* contextP;
 
-    if (orionldState.link == NULL)
-      contextP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
-    else
-      contextP = kjString(orionldState.kjsonP, "@context", orionldState.link);
+      if (orionldState.link == NULL)
+        contextP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
+      else
+        contextP = kjString(orionldState.kjsonP, "@context", orionldState.link);
 
-    kjChildAdd(geojsonTreeP, contextP);
+      kjChildAdd(geojsonTreeP, contextP);
+      orionldState.noLinkHeader = true;
+    }
   }
 
   //

@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
+#include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/legacyDriver/legacyGetEntities.h"            // Own Interface
@@ -197,6 +198,8 @@ bool legacyGetEntities(void)
   EntityId*             entityIdP;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
+
+  LM_TMP(("Legacy Function"));
 
   //
   // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
@@ -577,6 +580,9 @@ bool legacyGetEntities(void)
     kjEntityNormalizedToConcise(orionldState.responseTree, NULL);  // lang already taken care of by apiEntityLanguageProps
 
   mongoRequest.release();
+
+  if (orionldState.out.contentType == GEOJSON)
+    orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree);
 
   return true;
 }
