@@ -48,7 +48,8 @@ extern KjNode* mongocEntitiesQuery
   StringArray*     attrList,
   QNode*           qNode,
   OrionldGeoInfo*  geoInfoP,
-  int64_t*         countP
+  int64_t*         countP,
+  const char*      geojsonGeometry
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_

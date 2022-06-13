@@ -99,8 +99,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
     return dbModelFromApiAttributeDatasetArray(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP);
   }
-  else
-    LM_TMP(("DS: Attribute '%s' is NOT an array", attrP->name));
 
   // Can also be datasetId without the attribute to be an array - just one instance BUT with a datasetId !
   KjNode* datasetIdP = kjLookup(attrP, "datasetId");
