@@ -65,7 +65,7 @@ If so, please use the original unforked [Orion](https://github.com/telefonicaid/
 
 Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples). See
 also the
-[OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=[https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json](https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/-/blob/master/spec/updated/generated/full_api.json))
+[OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/-/raw/master/spec/updated/generated/full_api.json)
 
 Documentation:
 
