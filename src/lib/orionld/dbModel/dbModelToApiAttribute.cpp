@@ -42,6 +42,8 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjAttributeNormalizedToSimplified.h"    // kjAttributeNormalizedToSimplified
+#include "orionld/kjTree/kjAttributeNormalizedToConcise.h"       // kjAttributeNormalizedToConcise
 #include "orionld/dbModel/dbModelToApiSubAttribute.h"            // dbModelToApiSubAttribute
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // Own interface
 
@@ -156,11 +158,132 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
 
 // -----------------------------------------------------------------------------
 //
+// sysAttrsStrip -
+//
+static void sysAttrsStrip(KjNode* attrP)
+{
+  KjNode* createdAtP  = kjLookup(attrP, "createdAt");
+  KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
+
+  if (createdAtP != NULL)
+    kjChildRemove(attrP, createdAtP);
+  if (modifiedAtP != NULL)
+    kjChildRemove(attrP, modifiedAtP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// sysAttrsToTimestamps -
+//
+static void sysAttrsToTimestamps(KjNode* attrP)
+{
+  KjNode* createdAtP  = kjLookup(attrP, "createdAt");
+  KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
+
+  if (createdAtP != NULL)
+  {
+    char* createdAtBuf = kaAlloc(&orionldState.kalloc, 32);
+    numberToDate(createdAtP->value.f, createdAtBuf, 32);
+    createdAtP->type       = KjString;
+    createdAtP->value.s    = createdAtBuf;
+  }
+
+  if (modifiedAtP != NULL)
+  {
+    char* modifiedAtBuf = kaAlloc(&orionldState.kalloc, 32);
+    numberToDate(modifiedAtP->value.f, modifiedAtBuf, 32);
+    modifiedAtP->type       = KjString;
+    modifiedAtP->value.s    = modifiedAtBuf;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbModelToApiAttribute2 -
 //
-KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
-  LM_TMP(("Attribute '%s'", dbAttrP->name));
+  if (datasetP != NULL)
+  {
+    char*   longName            = kaStrdup(&orionldState.kalloc, datasetP->name);
+    eqForDot(longName);
+
+    char*   shortName           = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+    KjNode* attrArray           = kjArray(orionldState.kjsonP, shortName);
+
+    // 1. First the Default attribute
+    if (dbAttrP != NULL)
+    {
+      LM_TMP(("DS: The attribute '%s' has a default", dbAttrP->name));
+      KjNode* apiAttrP = dbModelToApiAttribute2(dbAttrP, NULL, sysAttrs, renderFormat, lang, pdP);
+
+      if (apiAttrP == NULL)
+        return NULL;
+      kjChildAdd(attrArray, apiAttrP);
+    }
+
+    // 2. datasets
+    //    - The datasets are not stored in the NGSIv1 database model.
+    //      As this is new, I could pick any database model and I picked a model identical to the API datamodel, of course!
+    //      No transformation is needed, just add the attr to its array.l
+    //
+    if (datasetP->type == KjObject)  // just one
+    {
+      LM_TMP(("DS: The attribute '%s' has one single dataset", datasetP->name));
+
+      if (renderFormat == RF_CONCISE)
+        kjAttributeNormalizedToConcise(datasetP, orionldState.uriParams.lang);
+      else if (renderFormat == RF_KEYVALUES)
+        kjAttributeNormalizedToSimplified(datasetP, orionldState.uriParams.lang);
+
+      kjChildAdd(attrArray, datasetP);  // Was removed from @datasets by caller (
+
+      if (sysAttrs == false)
+        sysAttrsStrip(datasetP);
+      else
+        sysAttrsToTimestamps(datasetP);
+    }
+    else if (datasetP->type == KjArray)  // Many
+    {
+      LM_TMP(("DS: The attribute '%s' has an array of datasets", datasetP->name));
+      dbAttrP = datasetP->value.firstChildP;
+      KjNode* next;
+      while (dbAttrP != NULL)
+      {
+        next = dbAttrP->next;
+        dbAttrP->name = datasetP->name;
+        kjChildRemove(datasetP, dbAttrP);
+
+        kjChildAdd(attrArray, dbAttrP);
+
+        if (sysAttrs == false)
+          sysAttrsStrip(dbAttrP);
+        else
+          sysAttrsToTimestamps(dbAttrP);
+
+        if (renderFormat == RF_CONCISE)
+          kjAttributeNormalizedToConcise(dbAttrP, orionldState.uriParams.lang);
+        else if (renderFormat == RF_KEYVALUES)
+          kjAttributeNormalizedToSimplified(dbAttrP, orionldState.uriParams.lang);
+
+        dbAttrP = next;
+      }
+    }
+
+    if ((attrArray->value.firstChildP != NULL) && (attrArray->value.firstChildP->next == NULL))  // One single item in the array
+    {
+      attrArray->value.firstChildP->name = shortName;
+      return attrArray->value.firstChildP;
+    }
+
+    return attrArray;
+  }
+
+  LM_TMP(("DS: Treating Attribute '%s'", dbAttrP->name));
   char*   longName = kaStrdup(&orionldState.kalloc, dbAttrP->name);
   eqForDot(longName);
   char*   shortName = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
@@ -234,10 +357,10 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat rend
 
     KjNode* nodeP = dbAttrP->value.firstChildP;
     KjNode* next;
-    LM_TMP(("Looping over attribute parts"));
+    LM_TMP(("DS: Looping over attribute parts"));
     while (nodeP != NULL)
     {
-      LM_TMP(("Attribute part '%s'", nodeP->name));
+      LM_TMP(("DS: Attribute part '%s'", nodeP->name));
       next = nodeP->next;
 
       if (strcmp(nodeP->name, "value") == 0)
@@ -319,10 +442,10 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, bool sysAttrs, RenderFormat rend
 
     if (mdsP != NULL)
     {
-      LM_TMP(("Looping over sub-attributes"));
+      LM_TMP(("DS: Looping over sub-attributes"));
       for (KjNode* mdP = mdsP->value.firstChildP; mdP != NULL; mdP = mdP->next)
       {
-        LM_TMP(("Sub-Attribute '%s' (sysAttrs: %s)", mdP->name, (sysAttrs == true)? "true" : "false"));
+        LM_TMP(("DS: Sub-Attribute '%s' (sysAttrs: %s)", mdP->name, (sysAttrs == true)? "true" : "false"));
         KjNode* subAttributeP;
 
         if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, renderFormat, lang, pdP)) == NULL)

@@ -231,30 +231,37 @@ static KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, boo
 
   // 8. Create the "geometry" (key-values) top-level item
   KjNode* geometryP = NULL;
-  if (geometryNodeP != NULL)
+  if ((geometryNodeP != NULL) && (geometryNodeP->type == KjObject))
   {
     geometryP = kjLookup(geometryNodeP, "value");
+    LM_TMP(("GEO: geometry value at %p", geometryP));
     if (geometryP == NULL)
     {
       // "value" not found ... can it be Simplified format?
+      LM_TMP(("GEO: 'value' not found - using geometryNodeP"));
       geometryP = geometryNodeP;
     }
 
-    if (geometryP)
+    if (geometryP != NULL)
     {
-      geometryP = kjClone(orionldState.kjsonP, geometryP);
-      geometryP->name = (char*) "geometry";
+      if (geometryP->type == KjObject)  // && hasChildren type+coordinates ...
+      {
+        geometryP = kjClone(orionldState.kjsonP, geometryP);
+        geometryP->name = (char*) "geometry";
+      }
+      else
+        geometryP = NULL;
     }
   }
   if (geometryP == NULL)
     geometryP = kjNull(orionldState.kjsonP, "geometry");
+
   kjChildAdd(apiEntityP, geometryP);
 
-
   // 9. Adding all the properties to top-level
+  propertiesP->next = NULL;
   kjChildAdd(apiEntityP, propertiesP);
 
-  kjTreeLog(apiEntityP, "Converted to GEOJSON");
   return apiEntityP;
 }
 
@@ -342,7 +349,7 @@ bool orionldGetEntities(void)
     kjChildAdd(geojsonToplevelP, featuresP);
 
     orionldState.responseTree = geojsonToplevelP;
-    kjTreeLog(orionldState.responseTree, "orionldState.responseTree I");
+
     KjNode* dbEntityP = dbEntityArray->value.firstChildP;
     KjNode* next;
 
@@ -352,11 +359,13 @@ bool orionldGetEntities(void)
 
       kjChildRemove(dbEntityArray, dbEntityP);
 
-      KjNode* apiEntityP    = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, &orionldState.pd);
-      KjNode* geometryNodeP = kjLookup(apiEntityP, geojsonGeometryLongName);
+      KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, &orionldState.pd);
+      const char* geometryPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+      KjNode*     geometryNodeP        = kjLookup(apiEntityP, geometryPropertyName);
 
       apiEntityP = apiEntityToGeoJson(apiEntityP, geometryNodeP, orionldState.geoPropertyFromProjection);
       kjChildAdd(featuresP, apiEntityP);
+
       dbEntityP = next;
     }
   }

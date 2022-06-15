@@ -44,6 +44,8 @@ extern "C"
 //
 // kjEntityNormalizedToSimplified -
 //
+// FIXME: Fix kjAttributeNormalizedToSimplified (from here) and call that function
+//
 void kjEntityNormalizedToSimplified(KjNode* treeP, const char* lang)
 {
   for (KjNode* attrP = treeP->value.firstChildP; attrP != NULL; attrP = attrP->next)

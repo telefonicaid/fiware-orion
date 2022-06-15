@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJATTRIBUTENORMALIZEDTOSIMPLIFIED_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJATTRIBUTENORMALIZEDTOSIMPLIFIED_H_
 
 /*
 *
@@ -30,23 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
-
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
+// kjAttributeNormalizedToSimplified -
 //
-extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
+extern void kjAttributeNormalizedToSimplified(KjNode* attrP, const char* lang);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelToApiAttribute2 -
-//
-extern KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
-
-#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJATTRIBUTENORMALIZEDTOSIMPLIFIED_H_

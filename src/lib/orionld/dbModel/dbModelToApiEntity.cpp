@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // Own interface
 
@@ -126,6 +127,25 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
 
 // -----------------------------------------------------------------------------
 //
+// datasetExtract -
+//
+KjNode* datasetExtract(KjNode* datasetsP, const char* attrName)
+{
+  if (datasetsP == NULL)
+    return NULL;
+
+  KjNode* datasetP = kjLookup(datasetsP, attrName);
+
+  if (datasetP != NULL)
+    kjChildRemove(datasetsP, datasetP);
+
+  return datasetP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbModelToApiEntity2 -
 //
 // USED BY
@@ -146,21 +166,29 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
 //
 KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
-  KjNode* _idP            = NULL;
-  KjNode* attrsP          = NULL;
+  KjNode* _idP      = NULL;
+  KjNode* attrsP    = NULL;
+  KjNode* datasetsP = kjLookup(dbEntityP, "@datasets");
+
+  if (datasetsP != NULL)
+    kjChildRemove(dbEntityP, datasetsP);
+
+  kjTreeLog(dbEntityP, "Entity from DB - without $datasets");
+  if (datasetsP != NULL)
+    kjTreeLog(datasetsP, "datasets from DB");
 
   for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
     if (strcmp(nodeP->name, "_id") == 0)
     {
       _idP = nodeP;
-      if (attrsP != NULL)
+      if (attrsP != NULL)  // Both found - we're done!
         break;
     }
     else if (strcmp(nodeP->name, "attrs") == 0)
     {
       attrsP = nodeP;
-      if (_idP != NULL)
+      if (_idP != NULL)  // Both found - we're done!
         break;
     }
   }
@@ -186,10 +214,18 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
 
   for (KjNode* nodeP = _idP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
+    if (strcmp(nodeP->name, "id") == 0)
+    {
       idP = nodeP;
-    else if ((strcmp(nodeP->name, "type") == 0) || (strcmp(nodeP->name, "@type") == 0))
+      if (typeP != NULL)  // Both found - we're done!
+        break;
+    }
+    else if (strcmp(nodeP->name, "type") == 0)
+    {
       typeP = nodeP;
+      if (idP != NULL)  // Both found - we're done!
+        break;
+    }
   }
 
   if (idP == NULL)
@@ -253,13 +289,31 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   //
   // Now the attributes
   //
-  if (attrsP != NULL)
+  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    KjNode* attributeP;
+    KjNode* datasetP = datasetExtract(datasetsP, attrP->name);  // datasetExtract removes the dataset from @datasets
+
+    if ((attributeP = dbModelToApiAttribute2(attrP, datasetP, sysAttrs, renderFormat, lang, pdP)) == NULL)
+    {
+      LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
+      return NULL;
+    }
+
+    kjChildAdd(entityP, attributeP);
+  }
+
+  //
+  // And if any datasets still present, they need to be handled as well
+  //
+  if (datasetsP != NULL)
+  {
+    for (KjNode* datasetP = datasetsP->value.firstChildP; datasetP != NULL; datasetP = datasetP->next)
     {
       KjNode* attributeP;
 
-      if ((attributeP = dbModelToApiAttribute2(attrP, sysAttrs, renderFormat, lang, pdP)) == NULL)
+      kjChildRemove(datasetsP, datasetP);
+      if ((attributeP = dbModelToApiAttribute2(NULL, datasetP, sysAttrs, renderFormat, lang, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
         return NULL;
