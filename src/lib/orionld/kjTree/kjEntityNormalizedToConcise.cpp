@@ -45,6 +45,8 @@ extern "C"
 //
 // kjEntityNormalizedToConcise -
 //
+// FIXME: Fix kjAttributeNormalizedToConcise (from here) and call that function
+//
 void kjEntityNormalizedToConcise(KjNode* treeP, const char* lang)
 {
   for (KjNode* attrP = treeP->value.firstChildP; attrP != NULL; attrP = attrP->next)

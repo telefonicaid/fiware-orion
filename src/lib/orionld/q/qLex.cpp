@@ -163,7 +163,7 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
         type = QNodeVariable;
     }
 
-    if ((prev->type == QNodeMatch) || (prev->type == QNodeNoMatch))
+    if ((prev != NULL) && ((prev->type == QNodeMatch) || (prev->type == QNodeNoMatch)))
       type = QNodeRegexpValue;
 
     QNode* qNodeP = qNode(type);
@@ -226,6 +226,11 @@ QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP)
   char*  stringStart         = s;
   int    level               = 0;
   bool   lastTermIsTimestamp = false;
+
+  // Initialize the dummy
+  dummy.next           = NULL;
+  dummy.type           = QNodeVoid;
+  dummy.value.children = NULL;
 
   *titleP = NULL;
 

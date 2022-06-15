@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -28,25 +25,37 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "logMsg/logMsg.h"                                       // LM_*
+
+#include "orionld/kjTree/kjAttributeNormalizedToSimplified.h"    // Own interface
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
+// kjAttributeNormalizedToSimplified -
 //
-extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
-
-
-
-// -----------------------------------------------------------------------------
+// FIXME - steal stuff from kjEntityNormalizedToSimplified
 //
-// dbModelToApiAttribute2 -
-//
-extern KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP);
+void kjAttributeNormalizedToSimplified(KjNode* attrP, const char* lang)
+{
+  KjNode* valueP       = kjLookup(attrP, "value");
+  KjNode* objectP      = kjLookup(attrP, "object");
+  KjNode* languageMapP = kjLookup(attrP, "languageMap");
 
-#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_
+  if (valueP == NULL) valueP = objectP;
+  if (valueP == NULL) valueP = languageMapP;
+
+  LM_TMP(("In kjAttributeNormalizedToSimplified"));
+
+  if (valueP != NULL)
+  {
+    attrP->type  = valueP->type;
+    attrP->value = valueP->value;
+  }
+  else
+    LM_TMP(("Nothing done - no value field found"));
+}

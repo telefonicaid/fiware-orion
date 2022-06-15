@@ -61,6 +61,8 @@ SET (SOURCES
     kjNodeDecouple.cpp
     kjNavigate.cpp
     kjTreeFromCachedSubscription.cpp
+    kjAttributeNormalizedToSimplified.cpp
+    kjAttributeNormalizedToConcise.cpp
 )
 
 # Include directories
