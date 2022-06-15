@@ -417,7 +417,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     regex_t regex;
 
     idMatch = false;
-    if (regcomp(&regex, en2->id.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
     {
       std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
       alarmMgr.badInput(clientIp, details);
@@ -1098,7 +1098,7 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
 
 /* ****************************************************************************
 *
-* addIfNotPresentAttr -
+* addIfNotPresentAttr (for numbers) -
 *
 * If the attribute doesn't exist in the entity, then add it (shadowed, render will depend on filter)
 */
@@ -1108,6 +1108,30 @@ static void addIfNotPresentAttr
   const std::string&  name,
   const std::string&  type,
   double              value
+)
+{
+  if (eP->attributeVector.get(name) == -1)
+  {
+    ContextAttribute* caP = new ContextAttribute(name, type, value);
+    caP->shadowed = true;
+    eP->attributeVector.push_back(caP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* addIfNotPresentAttr (for strings) -
+*
+* If the attribute doesn't exist in the entity, then add it (shadowed, render will depend on filter)
+*/
+static void addIfNotPresentAttr
+(
+  Entity*             eP,
+  const std::string&  name,
+  const std::string&  type,
+  const std::string&  value
 )
 {
   if (eP->attributeVector.get(name) == -1)
@@ -1242,6 +1266,7 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
 * Attributes:
 * - dateCreated
 * - dateModified
+* - alterationType
 *
 * Metadata:
 * - dateModified
@@ -1252,7 +1277,7 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
 * Note that dateExpires it not added by this function, as it is implemented
 * as regular attribute, recoved from the DB in the "attrs" key-map.
 */
-void addBuiltins(ContextElementResponse* cerP)
+void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType)
 {
   // dateCreated attribute
   if (cerP->entity.creDate != 0)
@@ -1265,6 +1290,13 @@ void addBuiltins(ContextElementResponse* cerP)
   {
     addIfNotPresentAttr(&cerP->entity, DATE_MODIFIED, DATE_TYPE, cerP->entity.modDate);
   }
+
+  // alterationType
+  if (!alterationType.empty())
+  {
+    addIfNotPresentAttr(&cerP->entity, ALTERATION_TYPE, DEFAULT_ATTR_STRING_TYPE, alterationType);
+  }
+
 
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ix++)
   {
@@ -1557,10 +1589,11 @@ bool entitiesQuery
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  int             errType;
+  int             errType = ON_NEXT_NO_ERROR;
   std::string     nextErr;
 
-  while (cursor.next(&r, &errType, &nextErr))
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
+  while ((limit != 0) && (cursor.next(&r, &errType, &nextErr)))
   {
     alarmMgr.dbErrorReset();
 
@@ -1572,7 +1605,7 @@ bool entitiesQuery
     // Add builtin attributes and metadata (only in NGSIv2)
     if (apiVersion == V2)
     {
-      addBuiltins(cer);
+      addBuiltins(cer, "");
     }
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */

@@ -518,6 +518,39 @@ void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
 }
 
 
+/* ****************************************************************************
+*
+* setCovered -
+*/
+void setCovered(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  bool bl = sub.notification.covered;
+
+  b->append(CSUB_COVERED, bl);
+  LM_T(LmtMongo, ("Subscription covered: %s", bl ? "true" : "false"));
+}
+
+
+/* ****************************************************************************
+*
+* setOperations -
+*/
+void setOperations(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  orion::BSONArrayBuilder operations;
+
+  for (unsigned int ix = 0; ix < sub.subject.condition.altTypes.size(); ++ix)
+  {
+    operations.append(subAltType2string(sub.subject.condition.altTypes[ix]));
+  }
+
+  orion::BSONArray operationsArr = operations.arr();
+
+  b->append(CSUB_ALTTYPES, operationsArr);
+  LM_T(LmtMongo, ("Subscription operations: %s", operationsArr.toString().c_str()));
+}
+
+
 
 /* ****************************************************************************
 *

@@ -135,6 +135,7 @@ void QueueNotifier::sendNotifyContextRequest
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
+  bool                             covered,
   const std::vector<std::string>&  metadataFilter
 )
 {
@@ -149,6 +150,7 @@ void QueueNotifier::sendNotifyContextRequest
                                                                           renderFormat,
                                                                           attrsFilter,
                                                                           blacklist,
+                                                                          covered,
                                                                           metadataFilter);
 
   size_t notificationsNum = paramsV->size();

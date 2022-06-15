@@ -138,7 +138,7 @@ NOTE:
 
 Note also that in `orionRestServices.cpp`, these `RestService` vector lines are really long, and our style guide is against too long lines. However, making the lines shorter by using definitions just make the code more difficult to understand and we don't want that.
 
-> Side-note: The [style guide](../contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars.
+> Side-note: The [style guide](contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars.
 
 The service routine `putMetadata()` should reside in `src/lib/serviceRoutinesV2/putMetadata.h/cpp` and its signature must be as follows:  
 ```

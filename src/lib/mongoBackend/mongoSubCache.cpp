@@ -120,6 +120,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->count                 = 0;
   cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
+  cSubP->covered               = sub.hasField(CSUB_COVERED)?          getBoolFieldF(sub, CSUB_COVERED)                     : false;
   cSubP->next                  = NULL;
 
 
@@ -240,6 +241,27 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
+  //
+  // 09. Fill in cSubP->subAltTypeV from alteration types
+  //
+  if (sub.hasField(CSUB_ALTTYPES))
+  {
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
+      }
+      else
+      {
+        cSubP->subAltTypeV.push_back(altType);
+      }
+    }
+  }
 
   subCacheItemInsert(cSubP);
 
@@ -371,6 +393,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+  cSubP->covered               = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
 
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastFailure;
@@ -435,6 +458,28 @@ int mongoSubCacheItemInsert
   // 08. Fill in cSubP->notifyConditionV from condVec
   //
   setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+
+  //
+  // 09. Fill in cSubP->subAltTypeV from alterationTypes
+  //
+  if (sub.hasField(CSUB_ALTTYPES))
+  {
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
+      }
+      else
+      {
+        cSubP->subAltTypeV.push_back(altType);
+      }
+    }
+  }
 
   subCacheItemInsert(cSubP);
 

@@ -43,10 +43,19 @@ orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
-
+# After fixing issue #1492 this has become a not-bad request case, but we keep
+# in this file for simplicity (NGSIv1 is a deprecated API)
 echo "+++++ 3. URI param 'limit' == 0"
 url="/v1/queryContext?limit=000000"
-payload='NO PAYLOAD NECESSARY'
+payload='{
+    "entities": [
+        {
+            "type": "",
+            "isPattern": "false",
+            "id": "EVector"
+        }
+    ]
+}'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -62,7 +71,7 @@ echo
 --REGEXPECT--
 +++++ 1. bad characters in URI param 'limit'
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 134
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -70,7 +79,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "Bad pagination limit: /abc/ [must be a decimal number]",
+        "details": "Bad pagination limit: /abc/ [must be a positive integer number]",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -93,17 +102,16 @@ Date: REGEX(.*)
 
 
 +++++ 3. URI param 'limit' == 0
-HTTP/1.1 400 Bad Request
-Content-Length: 135
+HTTP/1.1 200 OK
+Content-Length: 70
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "Bad pagination limit: /000000/ [a value of ZERO is unacceptable]",
-        "reasonPhrase": "Bad Request"
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
     }
 }
 

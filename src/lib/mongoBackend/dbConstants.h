@@ -92,6 +92,7 @@
 #define CSUB_EXPR_GEOM               "geometry"
 #define CSUB_EXPR_COORDS             "coords"
 #define CSUB_EXPR_GEOREL             "georel"
+#define CSUB_ALTTYPES                "altTypes"
 
 #define CSUB_THROTTLING              "throttling"
 #define CSUB_MAXFAILSLIMIT           "maxFailsLimit"
@@ -116,6 +117,7 @@
 #define CSUB_PAYLOAD                 "payload"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_ONLYCHANGED             "onlyChanged"
+#define CSUB_COVERED                 "covered"
 #define CSUB_LASTFAILURE             "lastFailure"
 #define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_LASTSUCCESS             "lastSuccess"

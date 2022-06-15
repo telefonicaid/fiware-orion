@@ -458,7 +458,7 @@ bool AlarmManager::mqttConnectionReset(const std::string& endpoint)
 * To do so, we'd need another counter as well, to not forget the accumulated 
 * number each time the badInputs are reset.
 */
-bool AlarmManager::badInput(const std::string& ip, const std::string& details)
+bool AlarmManager::badInput(const std::string& ip, const std::string& details, const std::string& extraInLog)
 {
   if (badInputSeen == true)
   {
@@ -477,7 +477,14 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 
     if (badInputLogAlways)
     {
-      LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
+      if (extraInLog.empty())
+      {
+        LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
+      }
+      else
+      {
+        LM_W(("Repeated BadInput %s: %s (%s)", ip.c_str(), details.c_str(), extraInLog.c_str()));
+      }
     }
     else
     {
@@ -493,7 +500,14 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   badInputV[ip] = 1;
   semGive();
 
-  LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
+  if (extraInLog.empty())
+  {
+    LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
+  }
+  else
+  {
+    LM_W(("Raising alarm BadInput %s: %s (%s)", ip.c_str(), details.c_str(), extraInLog.c_str()));
+  }
 
   return true;
 }

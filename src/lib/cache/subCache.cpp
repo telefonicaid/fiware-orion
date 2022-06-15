@@ -92,11 +92,9 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isPattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED))
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
+      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern", _entityId);
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityIdPatternToBeFreed = false;
@@ -113,11 +111,9 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isTypePattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED))
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
+      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern", _entityType);
       isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityTypePatternToBeFreed = false;
@@ -393,6 +389,48 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 
 /* ****************************************************************************
 *
+* matchAltType -
+*
+*/
+static bool matchAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAltType)
+{
+  // If subAltTypeV size == 0 default alteration types are update with change and create
+  if (cSubP->subAltTypeV.size() == 0)
+  {
+    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  for (unsigned int ix = 0; ix < cSubP->subAltTypeV.size(); ix++)
+  {
+    ngsiv2::SubAltType altType = cSubP->subAltTypeV[ix];
+
+    // EntityUpdate is special, it is a "sub-type" of EntityChange
+    if (targetAltType == ngsiv2::SubAltType::EntityChange)
+    {
+      if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+      {
+        return true;
+      }
+    }
+    else if (altType == targetAltType)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * subMatch -
 */
 static bool subMatch
@@ -402,9 +440,16 @@ static bool subMatch
   const char*                      servicePath,
   const char*                      entityId,
   const char*                      entityType,
-  const std::vector<std::string>&  attrV
+  const std::vector<std::string>&  attrV,
+  ngsiv2::SubAltType               targetAltType
 )
 {
+  // Check alteration type
+  if (!matchAltType(cSubP, targetAltType))
+  {
+    return false;
+  }
+
   //
   // Check to filter out due to tenant - only valid if Broker has started with -multiservice option
   //
@@ -477,6 +522,7 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
 {
@@ -488,7 +534,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -512,6 +558,7 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attrV,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
 {
@@ -519,7 +566,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -735,34 +782,36 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 */
 void subCacheItemInsert
 (
-  const char*                        tenant,
-  const char*                        servicePath,
-  const ngsiv2::HttpInfo&            httpInfo,
-  const ngsiv2::MqttInfo&            mqttInfo,
-  const std::vector<ngsiv2::EntID>&  entIdVector,
-  const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    metadata,
-  const std::vector<std::string>&    conditionAttrs,
-  const char*                        subscriptionId,
-  int64_t                            expirationTime,
-  int64_t                            maxFailsLimit,
-  int64_t                            throttling,
-  RenderFormat                       renderFormat,
-  int64_t                            lastNotificationTime,
-  int64_t                            lastNotificationSuccessTime,
-  int64_t                            lastNotificationFailureTime,
-  int64_t                            lastSuccessCode,
-  const std::string&                 lastFailureReason,
-  StringFilter*                      stringFilterP,
-  StringFilter*                      mdStringFilterP,
-  const std::string&                 status,
-  double                             statusLastChange,
-  const std::string&                 q,
-  const std::string&                 geometry,
-  const std::string&                 coords,
-  const std::string&                 georel,
-  bool                               blacklist,
-  bool                               onlyChanged
+  const char*                             tenant,
+  const char*                             servicePath,
+  const ngsiv2::HttpInfo&                 httpInfo,
+  const ngsiv2::MqttInfo&                 mqttInfo,
+  const std::vector<ngsiv2::EntID>&       entIdVector,
+  const std::vector<std::string>&         attributes,
+  const std::vector<std::string>&         metadata,
+  const std::vector<std::string>&         conditionAttrs,
+  const std::vector<ngsiv2::SubAltType>&  altTypes,
+  const char*                             subscriptionId,
+  int64_t                                 expirationTime,
+  int64_t                                 maxFailsLimit,
+  int64_t                                 throttling,
+  RenderFormat                            renderFormat,
+  int64_t                                 lastNotificationTime,
+  int64_t                                 lastNotificationSuccessTime,
+  int64_t                                 lastNotificationFailureTime,
+  int64_t                                 lastSuccessCode,
+  const std::string&                      lastFailureReason,
+  StringFilter*                           stringFilterP,
+  StringFilter*                           mdStringFilterP,
+  const std::string&                      status,
+  double                                  statusLastChange,
+  const std::string&                      q,
+  const std::string&                      geometry,
+  const std::string&                      coords,
+  const std::string&                      georel,
+  bool                                    blacklist,
+  bool                                    onlyChanged,
+  bool                                    covered
 )
 {
   //
@@ -799,9 +848,11 @@ void subCacheItemInsert
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
+  cSubP->covered               = covered;
   cSubP->httpInfo              = httpInfo;
   cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
+  cSubP->subAltTypeV           = altTypes;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 

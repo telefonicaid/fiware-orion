@@ -170,7 +170,7 @@ Date: REGEX(.*)
 02. GET sub
 ===========
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 465
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -181,6 +181,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "headers": {
                     "Content-Type": "application/json",
@@ -226,7 +227,7 @@ Date: REGEX(.*)
 04. GET sub - shows only that sub is OK in mongo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 467
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,6 +238,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "headers": {
                     "Content-Type": "application/json",

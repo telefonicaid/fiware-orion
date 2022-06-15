@@ -36,6 +36,7 @@
 #include "serviceRoutinesV2/putEntityAttribute.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -88,6 +89,7 @@ std::string putEntityAttribute
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    alarmMgr.badInput(clientIp, parseDataP->upcrs.res.oe.details);
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else
