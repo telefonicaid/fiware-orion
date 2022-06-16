@@ -563,11 +563,6 @@ void exitFunc(void)
   mqttRelease();
 
   //
-  // Free the kalloc buffer - the buffer that should not be used!
-  //
-  kaBufferReset(&kalloc, false);
-
-  //
   // Freeing the postgres connection pools
   //
   if (troe)
@@ -575,6 +570,8 @@ void exitFunc(void)
     pgConnectionPoolsPresent();
     pgConnectionPoolsFree();
   }
+
+  kaBufferReset(&kalloc, KFALSE);
 }
 
 
@@ -1198,7 +1195,10 @@ int main(int argC, char* argV[])
   LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
 
   if (mongocOnly == true)
-    LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only 5 requests work in this mode"));
+    LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only a subset of the requests work in this mode"));
+
+  // Startup is done - we can free up the allocated kalloc buffers - assuming socketService doesn't use kalloc ...
+  kaBufferReset(&orionldState.kalloc, KFALSE);
 
   if (socketService == true)
   {
