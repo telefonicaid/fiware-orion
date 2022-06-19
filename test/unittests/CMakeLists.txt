@@ -182,6 +182,8 @@ link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
 link_directories("${PROJECT_SOURCE_DIR}/../khash")
 link_directories("${PROJECT_SOURCE_DIR}/../klog")
+link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/build")
+link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/build")
 
 
 
