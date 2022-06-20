@@ -27,7 +27,7 @@ echo
 echo -e "\e[1;32m Builder: installing prometheus client library\e[0m"
 git clone https://github.com/digitalocean/prometheus-client-c.git
 cd prometheus-client-c
-git co release-0.1.3
+git checkout release-0.1.3
 sed 's/\&promhttp_handler,/(MHD_AccessHandlerCallback) \&promhttp_handler,/' promhttp/src/promhttp.c > XXX
 mv XXX promhttp/src/promhttp.c
 ./auto build && ./auto package
