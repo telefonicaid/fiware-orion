@@ -20,7 +20,8 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-curl -O https://centos.pkgs.org/7/springdale-computational-x86_64/armadillo-9.700.2-1.el8.x86_64.rpm -L
+
+curl -v -L -O http://yum.stanford.edu/mrepo/epel-EL8-x86_64/RPMS.all/armadillo-9.700.2-1.el8.x86_64.rpm
 if [ -f armadillo-9.700.2-1.el8.x86_64.rpm ]
 then
   rpm -i armadillo-9.700.2-1.el8.x86_64.rpm
