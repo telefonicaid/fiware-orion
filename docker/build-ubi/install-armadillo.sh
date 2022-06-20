@@ -20,17 +20,23 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+curl -L -v -O ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/Packages/s/SuperLU-5.2.0-5.el7.x86_64.rpm
+if [ -f SuperLU-5.2.0-5.el7.x86_64.rpm ]
+then
+    yum localinstall SuperLU-5.2.0-5.el7.x86_64.rpm
+else
+    echo Error downloading SuperLU-5.2.0-5.el7.x86_64.rpm
+fi
 
-#curl -v -L -O http://yum.stanford.edu/mrepo/epel-EL8-x86_64/RPMS.all/armadillo-9.700.2-1.el8.x86_64.rpm
-#if [ -f armadillo-9.700.2-1.el8.x86_64.rpm ]
-#then
-    # yum install -y arpack
-    # yum install -y hdf5-devel
-    # yum install -y lapack-devel
-    # yum install -y SuperLU
-    # yum localinstall armadillo-9.700.2-1.el8.x86_64.rpm
-    yum makecache --refresh
-    yum install -y armadillo
-#else
-#    echo Error downloading armadillo-9.700.2-1.el8.x86_64.rpm
-#fi
+
+#yum install -y arpack
+#yum install -y hdf5-devel
+#yum install -y lapack-devel
+
+curl -v -L -O http://yum.stanford.edu/mrepo/epel-EL8-x86_64/RPMS.all/armadillo-9.700.2-1.el8.x86_64.rpm
+if [ -f armadillo-9.700.2-1.el8.x86_64.rpm ]
+then
+    yum localinstall armadillo-9.700.2-1.el8.x86_64.rpm
+else
+    echo Error downloading armadillo-9.700.2-1.el8.x86_64.rpm
+fi
