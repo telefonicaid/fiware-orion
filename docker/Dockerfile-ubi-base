@@ -29,9 +29,6 @@ RUN /tmp/build/install-mongo-driver.sh
 COPY ./docker/build-ubi/install-mongoc-driver.sh /tmp/build/install-mongoc-driver.sh
 RUN /tmp/build/install-mongoc-driver.sh
 
-#COPY ./docker/build-ubi/install-armadillo.sh /tmp/build/install-armadillo.sh
-#RUN /tmp/build/install-armadillo.sh
-
 COPY ./docker/build-ubi/install-postgres-client.sh /tmp/build/install-postgres-client.sh
 RUN /tmp/build/install-postgres-client.sh
 
