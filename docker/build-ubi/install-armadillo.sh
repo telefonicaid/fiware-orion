@@ -24,6 +24,7 @@
 curl -v -L -O http://yum.stanford.edu/mrepo/epel-EL8-x86_64/RPMS.all/armadillo-9.700.2-1.el8.x86_64.rpm
 if [ -f armadillo-9.700.2-1.el8.x86_64.rpm ]
 then
+  yum deplist armadillo-9.700.2-1.el8.x86_64.rpm | awk '/provider:/ {print $2}' | sort -u | xargs yum -y install
   yum localinstall armadillo-9.700.2-1.el8.x86_64.rpm
 else
   echo Error downloading armadillo-9.700.2-1.el8.x86_64.rpm
