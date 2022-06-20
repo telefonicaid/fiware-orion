@@ -31,5 +31,4 @@ git co release-0.1.3
 sed 's/\&promhttp_handler,/(MHD_AccessHandlerCallback) \&promhttp_handler,/' promhttp/src/promhttp.c > XXX
 mv XXX promhttp/src/promhttp.c
 ./auto build && ./auto package
-mkdir lib
-cp promhttp/build/libpromhttp.so prom/build/libprom.so lib/
+cp promhttp/build/libpromhttp.so prom/build/libprom.so /usr/lib/
