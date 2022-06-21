@@ -35,6 +35,3 @@ mv XXX promhttp/src/promhttp.c
 
 cp promhttp/build/libpromhttp.so prom/build/libprom.so /usr/local/lib/
 ls -l /usr/local/lib/libprom*.so
-
-cp promhttp/build/libpromhttp.so prom/build/libprom.so /usr/lib/x86_64-linux-gnu/
-ls -l /usr/lib/x86_64-linux-gnu/libprom*.so
