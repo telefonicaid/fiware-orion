@@ -35,3 +35,5 @@ RUN /tmp/build/install-postgres-client.sh
 COPY ./docker/build-ubi/install-rapid-json.sh /tmp/build/install-rapid-json.sh
 RUN /tmp/build/install-rapid-json.sh
 
+COPY ./docker/build-ubi/install-prometheus-client.sh /tmp/build/install-prometheus-client.sh
+RUN /tmp/build/install-prometheus-client.sh
