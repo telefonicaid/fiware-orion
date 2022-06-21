@@ -25,9 +25,9 @@ set -e
 
 yum install --nogpgcheck -y openssl-devel
 
-wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz
+wget https://cmake.org/files/v3.14/cmake-3.14.5.tar.gz
 tar zxvf cmake-3.*
-cd cmake-3.12.3
+cd cmake-3.14.5
 ./bootstrap --prefix=/usr/local
 make -j$(nproc)
 make install
