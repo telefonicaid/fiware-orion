@@ -9,6 +9,9 @@ COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
 
+RUN pwd
+RUN ls -l ../
+
 RUN make release install
 
 RUN strip /usr/bin/orionld
