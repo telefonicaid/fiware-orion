@@ -1149,12 +1149,12 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 }
 
 
-
+#if 0
 // -----------------------------------------------------------------------------
 //
 // debugSubCache -
 //
-static void debugSubCache(const char* prefix, const char* title)
+void debugSubCache(const char* prefix, const char* title)
 {
   CachedSubscription* subP = subCache.head;
 
@@ -1171,7 +1171,7 @@ static void debugSubCache(const char* prefix, const char* title)
     subP = subP->next;
   }
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -1185,7 +1185,7 @@ static void debugSubCache(const char* prefix, const char* title)
 */
 void subCacheRefresh(void)
 {
-  debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
+  // debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
 
   // Empty the cache
   subCacheDestroy();
@@ -1210,7 +1210,7 @@ void subCacheRefresh(void)
 
   ++subCache.noOfRefreshes;
 
-  debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
+  // debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
 }
 
 

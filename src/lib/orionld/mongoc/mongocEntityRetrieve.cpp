@@ -458,6 +458,7 @@ KjNode* mongocEntityRetrieve
   if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
+    bson_destroy(&mongoFilter);
     return NULL;
   }
 
@@ -485,6 +486,8 @@ KjNode* mongocEntityRetrieve
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
   {
     LM_E(("Internal Error (DB Error '%s')", mongoError.message));
+    bson_destroy(&mongoFilter);
+    mongoc_cursor_destroy(mongoCursorP);
     return NULL;
   }
 

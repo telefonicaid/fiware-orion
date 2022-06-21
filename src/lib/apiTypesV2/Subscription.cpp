@@ -63,7 +63,6 @@ Subscription::~Subscription()
     {
       if (notification.httpInfo.notifierInfo[ix] != NULL)
       {
-        LM_TMP(("VE: Freeing Key-Value Pair at %p (notifierInfo)", notification.httpInfo.notifierInfo[ix]));
         free(notification.httpInfo.notifierInfo[ix]);
         notification.httpInfo.notifierInfo[ix] = NULL;
       }
