@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -23,21 +23,12 @@
 
 set -e
 
-yum install --nogpgcheck -y openssl-devel
-
-wget https://cmake.org/files/v3.14/cmake-3.14.5.tar.gz
-tar zxvf cmake-3.*
-cd cmake-3.14.5
-./bootstrap --prefix=/usr/local
-make -j$(nproc)
-make install
-
 echo
-echo -e "\e[1;32m Builder: installing mongo c driver \e[0m"
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
-tar xzf mongo-c-driver-1.21.1.tar.gz
-cd mongo-c-driver-1.21.1
-mkdir cmake-build
-cd cmake-build
-cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
-make install
+echo -e "\e[1;32m Builder: installing prometheus client library\e[0m"
+git clone https://github.com/digitalocean/prometheus-client-c.git
+cd prometheus-client-c
+git checkout release-0.1.3
+sed 's/\&promhttp_handler,/(MHD_AccessHandlerCallback) \&promhttp_handler,/' promhttp/src/promhttp.c > XXX
+mv XXX promhttp/src/promhttp.c
+./auto build && ./auto package
+cp promhttp/build/libpromhttp.so prom/build/libprom.so /usr/lib/
