@@ -26,7 +26,7 @@ LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan
       name="FIWARE Orion-LD" \
       summary="Contains Orion-LD context broker."
 
-ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build
 RUN mkdir -p /var/{log,run}/orionld
 
 RUN mkdir /licenses

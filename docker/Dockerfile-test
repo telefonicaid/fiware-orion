@@ -1,7 +1,7 @@
 FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='/opt/orion/'
-ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build
 
 RUN  wget http://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
 RUN tar -xf lcov-1.14.tar.gz
