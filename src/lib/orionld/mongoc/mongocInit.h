@@ -32,6 +32,17 @@
 //
 // mongocInit -
 //
-extern void mongocInit(const char* dbHost, const char* dbName);
+extern void mongocInit
+(
+  char* dbURI,
+  char* dbHost,
+  char* dbUser,
+  char* dbPwd,
+  char* dbAuthDb,
+  char* dbReplicaSet,
+  char* dbAuthMechanism,
+  bool  dbSSL,
+  char* tlsCertificateFilePath
+);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCINIT_H_

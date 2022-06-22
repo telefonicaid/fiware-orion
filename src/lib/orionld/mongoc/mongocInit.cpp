@@ -39,19 +39,240 @@
 
 // -----------------------------------------------------------------------------
 //
+// mongocLog -
+//
+static void mongocLog
+(
+  mongoc_log_level_t  level,
+  const char*         domain,
+  const char*         msg,
+  void*               userData
+)
+{
+  if (level == MONGOC_LOG_LEVEL_CRITICAL)
+    LM_E(("MONGOC[%s]: %s", domain, msg));  // Perhaps even LM_X ?
+  else if (level == MONGOC_LOG_LEVEL_ERROR)
+    LM_E(("MONGOC[%s]: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_WARNING)
+    LM_W(("MONGOC[%s]: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_MESSAGE)
+    LM_M(("MONGOC[%s]: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_INFO)
+    LM_I(("MONGOC[%s]: %s", domain, msg));
+  else if ((level == MONGOC_LOG_LEVEL_DEBUG) || (level ==  MONGOC_LOG_LEVEL_TRACE))
+  {
+    // if (mongo log is on)
+    //   LM_M(("MONGOC[%s]: %s", domain, msg));
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriCompose -
+//
+// All options for connection to the built-in mongoc connection pool are CLI options for Orion-LD
+// and thus global variables in orionldState.h/cpp:
+// - dbHost
+// - dbUser
+// - dbPwd
+// - dbAuthDb
+// - rplSet
+// - dbAuthMech
+// - dbSSL
+//
+// The URI for the connection looks like this:
+//   mongodb://[dbUser:dbPwd@]dbHost/[dbAuthDb]? [replicaSet=dbReplicaSet] [&authMechanism=dbAuthMech] [&tls=true&tlsAllowInvalidCertificates=true]
+//
+// Note that dbHost can be a comma-separated list of hostnames (and ports)
+//
+//
+// About Connecting to a server over TLS
+//
+// Orion does this:
+//   if (dbSSL)
+//     uri += optionPrefix + "tls=true&tlsAllowInvalidCertificates=true";
+//
+// So, no certificate is used.
+// Not sure that's the best idea though ...
+//
+// http://mongoc.org/libmongoc/current/advanced-connections.html:
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+//   MongoDB requires client certificates by default, unless the --tlsAllowConnectionsWithoutCertificates is provided.
+//
+//   The C Driver can be configured to present a client certificate using the URI option tlsCertificateKeyFile,
+//   which may be referenced through the constant MONGOC_URI_TLSCERTIFICATEKEYFILE:
+//
+//     mongoc_client_t*  client = NULL;
+//     mongoc_uri_t*     uri    = mongoc_uri_new("mongodb://localhost:27017/?tls=true");
+//     mongoc_uri_set_option_as_utf8(uri, MONGOC_URI_TLSCERTIFICATEKEYFILE, "client.pem");  // "client.pem" would be a CLI for Orion-LD
+//     client = mongoc_client_new_from_uri(uri);
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+//
+//
+// Apart from what I've implemented so far:
+// * Connecting to a UNIX Domain Socket:    mongoc_uri_new("mongodb://%2Ftmp%2Fmongodb-27017.sock");
+// * Compressing data to and from MongoDB:  mongoc_client_new("mongodb://localhost:27017/?compressors=snappy,zlib,zstd");
+// * Disable Retry Writes                   mongodb://localhost/?retryWrites=false
+// * Connection timeout                     mongodb://localhost/?connectTimeoutMS=<millisecs>
+// * SRV record:                            mongodb+srv://localhost ...
+// * And another 100 options or so:         See complete list here: http://mongoc.org/libmongoc/current/mongoc_uri_t.html
+//
+// So, perhaps I should just NOT try to fix the URI myself, just use it as is and let the users define the URI ...
+// Makes no sense to implement that myself, and check for everything - will just add bugs, for nothing
+// Default would be "mongodb://localhost" (port 27017 is already default) and if a user wants something else,
+// just pass the URI when starting the broker.
+//
+// BTW, Orion's tlsallowinvalidcertificates is DEPRECATED.
+//
+static char* uriCompose
+(
+  char* dbURI,
+  char* dbHost,
+  char* dbUser,
+  char* dbPwd,
+  char* dbAuthDb,
+  char* dbReplicaSet,
+  char* dbAuthMechanism,
+  bool  dbSSL,
+  char* tlsCertificateFilePath
+)
+{
+  char* compV[50];
+  int   compNo = 0;
+
+  LM_TMP(("dbURI:           '%s'", dbURI));
+  LM_TMP(("dbHost:          '%s'", dbHost));
+  LM_TMP(("dbUser:          '%s'", dbUser));
+  LM_TMP(("dbPwd:           '%s'", dbPwd));
+  LM_TMP(("dbAuthDb:        '%s'", dbAuthDb));
+  LM_TMP(("dbReplicaSet:    '%s'", dbReplicaSet));
+  LM_TMP(("dbAuthMechanism: '%s'", dbAuthMechanism));
+  LM_TMP(("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
+  LM_TMP(("tlsCertificate:  '%s'", tlsCertificateFilePath));
+
+
+  if (dbURI[0] != 0)
+  {
+    //
+    // OK, the complete URI comes in dbURI
+    //
+    // Is "${PWD}" present?
+    // If so, split dbURI into two parts - before and after "${PWD}" and add dbPwd in between
+    //
+    char* pwdP = strstr(dbURI, "${PWD}");
+    if (pwdP != NULL)
+    {
+      if (dbPwd[0] == 0)
+        LM_X(1, ("Invalid Command Line Options: -dbURI is used with a password substitution, but no password (-dbPwd) is supplied"));
+
+      compV[compNo++] = dbURI;
+      *pwdP = 0;
+      compV[compNo++] = dbPwd;
+      compV[compNo++] = &pwdP[6];
+    }
+    else
+      compV[compNo++] = dbURI;
+
+    compV[compNo++] = (char*) "&";
+  }
+  else
+  {
+    compV[compNo++] = (char*) "mongodb://";
+
+    if ((dbUser != NULL) && (dbUser[0] != 0))
+    {
+      compV[compNo++] = dbUser;
+      compV[compNo++] = (char*) ":";
+      compV[compNo++] = dbPwd;
+      compV[compNo++] = (char*) "@";
+    }
+
+    compV[compNo++] = dbHost;
+    compV[compNo++] = (char*) "/";
+
+    if ((dbAuthDb != NULL) && (dbAuthDb[0] != 0))
+      compV[compNo++] = dbAuthDb;
+
+    compV[compNo++] = (char*) "?";
+
+    if ((dbReplicaSet != NULL) && (dbReplicaSet[0] != 0))
+    {
+      compV[compNo++] = (char*) "replicaSet=";
+      compV[compNo++] = dbReplicaSet;
+      compV[compNo++] = (char*) "&";
+    }
+
+    if ((dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0))
+    {
+      compV[compNo++] = (char*) "authMechanism=";
+      compV[compNo++] = dbAuthMechanism;
+      compV[compNo++] = (char*) "&";
+    }
+
+    if (dbSSL == true)
+    {
+      if (tlsCertificateFilePath == NULL)
+        compV[compNo++] = (char*) "&tls=true&tlsAllowConnectionsWithoutCertificates=true&";
+      else
+      {
+        compV[compNo++] = (char*) "&tls=true&tlsCertificateKeyFile=";
+        compV[compNo++] = tlsCertificateFilePath;
+      }
+    }
+  }
+
+  compV[compNo++] = (char*) "appname=orionld";
+
+  //
+  // Count all string length and get the total length of the URI
+  //
+  int uriLen = 0;
+
+  for (int ix = 0; ix < compNo; ix++)
+  {
+    uriLen += strlen(compV[ix]);
+  }
+
+  char* uri = (char*) calloc(1, uriLen + 1);
+  if (uri == NULL)
+    LM_X(1, ("Out of memory allocating a mongo connection URI of length %d", uriLen + 1));
+
+  int len = 0;
+  for (int ix = 0; ix < compNo; ix++)
+  {
+    strncpy(&uri[len], compV[ix], uriLen - len);
+    len += strlen(compV[ix]);
+  }
+
+  LM_TMP(("mongo uri: %s", uri));
+  return uri;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongocInit -
 //
-void mongocInit(const char* dbHost, const char* dbName)
+void mongocInit
+(
+  char* dbURI,
+  char* dbHost,
+  char* dbUser,
+  char* dbPwd,
+  char* dbAuthDb,
+  char* dbReplicaSet,
+  char* dbAuthMechanism,
+  bool  dbSSL,
+  char* tlsCertificateFilePath
+)
 {
-  bson_error_t mongoError;
-  char         mongoUri[512];
-
-  if ((dbUser[0] != 0) && (dbPwd[0] != 0))
-    snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s:%s@%s", dbUser, dbPwd, dbHost);
-  else
-    snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s", dbHost);
-
-  LM_K(("Connecting to mongo for the C driver, with URI '%s'", mongoUri));
+  //
+  // Redirect mongoc log messages from stdout to OrionLD's own log file
+  //
+  mongoc_log_set_handler(mongocLog, NULL);
 
   //
   // Initialize libmongoc's internals
@@ -59,17 +280,15 @@ void mongocInit(const char* dbHost, const char* dbName)
   mongoc_init();
 
   //
-  // Safely create a MongoDB URI object from the given string
+  // Create a MongoDB URI object from the given connection parameters
   //
+  char*         mongoUri = uriCompose(dbURI, dbHost, dbUser, dbPwd, dbAuthDb, dbReplicaSet, dbAuthMechanism, dbSSL, tlsCertificateFilePath);
+  bson_error_t  mongoError;
+
+  LM_K(("Connecting to mongo for the C driver, with URI '%s'", mongoUri));
   mongocUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
   if (mongocUri == NULL)
-  {
-    if      ((dbUser[0] != 0) && (dbPwd[0] != 0))      LM_W(("Database username: '%s', password: '%s'", dbUser, dbPwd));
-    else if  (dbUser[0] != 0)                          LM_W(("Database username given but no database password"));
-    else if  (dbPwd[0]  != 0)                          LM_W(("Database password given but no database username"));
-
     LM_X(1, ("Unable to connect to mongo(URI: %s): %s", mongoUri, mongoError.message));
-  }
 
   //
   // Initialize the connection pool
@@ -94,5 +313,5 @@ void mongocInit(const char* dbHost, const char* dbName)
     LM_X(1, ("Unable to initialize geo indices in database - fatal error"));
 
   if (mongocIdIndexCreate(&tenant0) == false)
-    LM_W(("Unable to create the index on Entity ID in the default database (%s)", dbName));
+    LM_W(("Unable to create the index on Entity ID on the default database"));
 }

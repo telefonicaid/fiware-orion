@@ -150,6 +150,7 @@ echo
 
 echo "08. Dump accumulator to see notification for S1"
 echo "==============================================="
+sleep .5  # Sometimes the notification isn't there, so, let's sleep a little
 accumulatorDump
 accumulatorReset
 echo

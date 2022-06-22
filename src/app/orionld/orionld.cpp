@@ -169,6 +169,11 @@ char            rplSet[64];
 char            dbName[64];
 char            dbUser[64];
 char            dbPwd[64];
+char            dbAuthDb[64];
+char            dbAuthMechanism[64];
+bool            dbSSL;
+char            dbCertFile[256];
+char            dbURI[1024];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -301,6 +306,11 @@ bool            mongocOnly   = false;
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
 #define EXPERIMENTAL_DESC      "enable experimental implementation"
 #define MONGOCONLY_DESC        "enable experimental implementation + turn off mongo legacy driver"
+#define DBAUTHDB_DESC          "database used for authentication"
+#define DBAUTHMECHANISM_DESC   "database authentication mechanism (either SCRAM-SHA-1 or SCRAM-SHA-256)"
+#define DBSSL_DESC             "enable SSL connection to DB"
+#define DBCERTFILE_DESC        "path to TLS certificate file"
+#define DBURI_DESC             "complete URI for database connection"
 
 
 
@@ -324,6 +334,11 @@ PaArgument paArgs[] =
   { "-rplSet",                rplSet,                   "MONGO_REPLICA_SET",         PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RPLSET_DESC              },
   { "-dbuser",                dbUser,                   "MONGO_USER",                PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBUSER_DESC              },
   { "-dbpwd",                 dbPwd,                    "MONGO_PASSWORD",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBPASSWORD_DESC          },
+  { "-dbAuthMech",            dbAuthMechanism,          "MONGO_AUTH_MECH",           PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBAUTHMECHANISM_DESC     },
+  { "-dbAuthDb",              dbAuthDb,                 "MONGO_AUTH_SOURCE",         PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBAUTHDB_DESC            },
+  { "-dbSSL",                 &dbSSL,                   "MONGO_SSL",                 PaBool,    PaOpt,  false,           false,  true,             DBSSL_DESC               },
+  { "-dbCertFile",            &dbCertFile,              "MONGO_CERT_FILE",           PaBool,    PaOpt,  _i "",           PaNL,   PaNL,             DBCERTFILE_DESC          },
+  { "-dbURI",                 &dbURI,                   "MONGO_URI",                 PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBURI_DESC               },
   { "-db",                    dbName,                   "MONGO_DB",                  PaString,  PaOpt,  _i "orion",      PaNL,   PaNL,             DB_DESC                  },
   { "-dbTimeout",             &dbTimeout,               "MONGO_TIMEOUT",             PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC              },
   { "-dbPoolSize",            &dbPoolSize,              "MONGO_POOL_SIZE",           PaInt,     PaOpt,  10,              1,      10000,            DBPS_DESC                },
@@ -1069,7 +1084,7 @@ int main(int argC, char* argV[])
   orionldHostNameLen = strlen(orionldHostName);
 
   orionldStateInit(NULL);  // This is the "global instance" of orionldState
-  mongocInit(dbHost, "orionld");
+  mongocInit(dbURI, dbHost, dbUser, dbPwd, dbAuthDb, rplSet, dbAuthMechanism, dbSSL, dbCertFile);
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
   if (mongocOnly == false)
