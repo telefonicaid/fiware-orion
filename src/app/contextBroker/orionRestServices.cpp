@@ -154,6 +154,27 @@
 
 /* ****************************************************************************
 *
+* xxxServiceV - vectors of REST services for the context broker
+*
+* These vectors match an incoming REST service, using the path of the URL, to a function
+* to treat the incoming request.
+*
+* The URL path is divided into components (Using '/' as field separator) so that the URL
+* "/ngsi9/registerContext" becomes a component vector of the two components
+* "ngsi9" and "registerContext".
+*
+* Each line contains the necessary information for ONE service:
+*   RequestType   request     - The type of the request
+*   int           components  - Number of components in the following URL component vector
+*   std::string   compV       - Component vector of the URL
+*   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
+*
+*/
+
+
+
+/* ****************************************************************************
+*
 * getServiceV - 
 */
 static RestService getServiceV[] =

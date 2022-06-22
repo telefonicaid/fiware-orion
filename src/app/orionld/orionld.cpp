@@ -55,9 +55,9 @@
 * CLI option '--insecure'.
 */
 #include <stdio.h>
-#include <unistd.h>                             // getppid, fork, setuid, sleep, etc.
+#include <unistd.h>                                         // getppid, fork, setuid, sleep, etc.
 #include <string.h>
-#include <fcntl.h>                              // open
+#include <fcntl.h>                                          // open
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
@@ -66,7 +66,7 @@
 #include <string>
 #include <vector>
 #include <limits.h>
-#include <sys/mman.h>                    // mlockall
+#include <sys/mman.h>                                       // mlockall
 
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
@@ -87,7 +87,6 @@ extern "C"
 #include "parseArgs/paIsSet.h"
 #include "parseArgs/paUsage.h"
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
@@ -117,6 +116,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                      // orionldStateRelease, kalloc, ...
 #include "orionld/common/tenantList.h"                        // tenantList, tenant0
 #include "orionld/common/branchName.h"                        // ORIONLD_BRANCH
+#include "orionld/prometheus/promInit.h"                      // promInit
 #include "orionld/mongoc/mongocInit.h"                        // mongocInit
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
@@ -415,31 +415,10 @@ static const char* validLogLevels[] =
 
 
 
-/* ****************************************************************************
-*
-* restService* - vectors of REST services for the context broker
-*
-* This vector matches an incoming REST service, using the path of the URL, to a function
-* to treat the incoming request.
-*
-* The URL path is divided into components (Using '/' as field separator) so that the URL
-* "/ngsi9/registerContext" becomes a component vector of the two components
-* "ngsi9" and "registerContext".
-*
-* Each line contains the necessary information for ONE service:
-*   RequestType   request     - The type of the request
-*   int           components  - Number of components in the following URL component vector
-*   std::string   compV       - Component vector of the URL
-*   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
-*
-*/
-
-
-
-/* ****************************************************************************
-*
-* daemonize -
-*/
+// -----------------------------------------------------------------------------
+//
+// daemonize -
+//
 void daemonize(void)
 {
   pid_t  pid;
@@ -1015,9 +994,10 @@ int main(int argC, char* argV[])
   versionInfo();
 
   if (fg == false)
-  {
     daemonize();
-  }
+
+  if (promInit(8000) != 0)
+    LM_W(("Error initializing Prometheus Metrics library"));
 
   IpVersion ipVersion = IPDUAL;
 
