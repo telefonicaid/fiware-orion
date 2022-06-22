@@ -64,7 +64,6 @@ KeyValue* keyValueAdd(std::vector<KeyValue*>* array, const char* key, const char
     strncpy(kvP->key,   key,   sizeof(kvP->key) - 1);
     strncpy(kvP->value, value, sizeof(kvP->value) - 1);
 
-    LM_TMP(("VE: Adding Key-Value Pair %p: %s:%s", kvP->key, kvP->value));
     array->push_back(kvP);
   }
 

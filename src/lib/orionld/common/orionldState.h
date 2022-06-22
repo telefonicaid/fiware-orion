@@ -526,6 +526,12 @@ extern char              dbName[];                 // From orionld.cpp
 extern int               dbNameLen;
 extern char              dbUser[];                 // From orionld.cpp
 extern char              dbPwd[];                  // From orionld.cpp
+extern char              dbAuthDb[];               // From orionld.cpp
+extern char              dbAuthMechanism[];        // From orionld.cpp
+extern char              rplSet[];                 // From orionld.cpp
+extern bool              dbSSL;                    // From orionld.cpp
+extern char              dbCertFile[];             // From orionld.cpp
+extern char              dbURI[];                  // From orionld.cpp
 extern bool              multitenancy;             // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
