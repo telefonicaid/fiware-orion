@@ -62,6 +62,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/prometheus/promCounterIncrease.h"              // promCounterIncrease
 #include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
 #include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
@@ -905,6 +906,8 @@ MHD_Result orionldMhdConnectionTreat(void)
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
+  promCounterIncrease(promNgsildRequests);
+
   // If OPTIONS verb, we skip all checks, go straight to the service routine
   if (orionldState.verb == OPTIONS)
     goto serviceRoutine;
@@ -1120,6 +1123,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if (orionldState.httpStatusCode >= 400)
   {
+    promCounterIncrease(promNgsildRequestsFailed);
     orionldState.noLinkHeader  = true;   // We don't want the Link header for erroneous requests
     serviceRoutineResult       = false;  // Just in case ...
     // MimeType handled in restReply()
@@ -1264,4 +1268,4 @@ MHD_Result orionldMhdConnectionTreat(void)
   PERFORMANCE(requestPartEnd);
 
   return MHD_YES;
-  }
+}

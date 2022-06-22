@@ -2,14 +2,23 @@ FROM fiware/orion-ld-base AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
 
-RUN ls /usr/local/lib/*.so
+RUN echo "=================== /usr/local/lib/ =================================="
+RUN ls /usr/local/lib/*.so*
+RUN echo "======================================================================"
 
 RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
 RUN rm -r /usr/local/lib/
 
+RUN echo "=================== /usr/lib/x86_64-linux-gnu/=================================="
+RUN ls /usr/lib/x86_64-linux-gnu/*.so*
+RUN echo "================================================================================"
+
 COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
+
+RUN pwd
+RUN ls -l ../
 
 RUN make release install
 
@@ -25,7 +34,8 @@ LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan
       name="FIWARE Orion-LD" \
       summary="Contains Orion-LD context broker."
 
-ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/lib/x86_64-linux-gnu
+RUN echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
 RUN mkdir -p /var/{log,run}/orionld
 
 RUN mkdir /licenses

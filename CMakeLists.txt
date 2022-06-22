@@ -234,6 +234,7 @@ SET (ORION_LIBS
     alarmMgr
     metricsMgr
     logSummary
+    orionld_prometheus
     lm
     pa
 )
@@ -263,6 +264,8 @@ SET (COMMON_STATIC_LIBS
 )
 
 SET (DYNAMIC_LIBS
+    prom
+    promhttp
     curl
     gnutls
     pthread
@@ -301,6 +304,8 @@ include_directories("/usr/include")
 include_directories("/usr/local/include/libbson-1.0")
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("${PROJECT_SOURCE_DIR}/..")
+include_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/include")
+include_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/include")
 
 #
 # Library directories
@@ -317,6 +322,8 @@ link_directories("${PROJECT_SOURCE_DIR}/../kjson")
 link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
 link_directories("${PROJECT_SOURCE_DIR}/../khash")
+link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/build")
+link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/build")
 
 #
 # Enabling test harness
@@ -368,6 +375,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/orionld/payloadCheck)
   ADD_SUBDIRECTORY(src/lib/orionld/mqtt)
+  ADD_SUBDIRECTORY(src/lib/orionld/prometheus)
   ADD_SUBDIRECTORY(src/lib/orionld/legacyDriver)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)

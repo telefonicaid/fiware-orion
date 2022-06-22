@@ -36,6 +36,7 @@
 
 extern "C"
 {
+#include "prometheus-client-c/prom/include/prom.h"               // prom_counter_t
 #include "kjson/kjson.h"                                         // Kjson
 #include "kjson/KjNode.h"                                        // KjNode
 }
@@ -549,6 +550,15 @@ extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
 extern int               maxAge;                   // From orionld.cpp (CORS)
 extern char              userAgentHeader[64];      // From notificationSend.cpp
 extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
+
+
+
+// -----------------------------------------------------------------------------
+//
+// Global variables for Prometheus
+//
+extern prom_counter_t*     promNgsildRequests;
+extern prom_counter_t*     promNgsildRequestsFailed;
 
 
 
