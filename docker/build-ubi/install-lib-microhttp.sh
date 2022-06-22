@@ -31,3 +31,4 @@ cd ${ROOT_FOLDER}/libmicrohttpd-0.9.72
 make
 make install
 cd ${ROOT_FOLDER} && rm -Rf libmicrohttpd-0.9.72
+ls -l /usr/local/lib/libmicrohttpd*

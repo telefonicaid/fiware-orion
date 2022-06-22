@@ -1,5 +1,7 @@
 FROM fiware/orion-ld-base
 
+RUN ls /usr/local/lib/*.so
+
 ARG PATH_TO_SRC='/opt/orion/'
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64
 
