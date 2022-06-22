@@ -338,7 +338,7 @@ bool legacyPostEntities(void)
   }
   else if ((mongoResponse.oe.code != 200) && (mongoResponse.oe.code != 0))
   {
-    LM_E(("mongoUpdateContext: mongo responds with error %d: '%s'", mongoResponse.oe.code, mongoResponse.oe.details));
+    LM_E(("mongoUpdateContext: mongo responds with error %d: '%s'", mongoResponse.oe.code, mongoResponse.oe.details.c_str()));
     orionldError(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", 400);  // 400 ... really?
     return false;
   }
