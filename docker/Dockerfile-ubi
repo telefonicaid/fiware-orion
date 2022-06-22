@@ -2,7 +2,9 @@ FROM fiware/orion-ld-base AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
 
-RUN ls /usr/local/lib/*.so
+RUN echo "=================== /usr/local/lib/ =================================="
+RUN ls /usr/local/lib/*.so*
+RUN echo "======================================================================"
 
 RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
 RUN rm -r /usr/local/lib/
