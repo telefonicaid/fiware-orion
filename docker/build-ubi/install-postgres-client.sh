@@ -24,9 +24,6 @@ set -e
 echo "Yum utils"
 yum -y install yum-utils
 
-echo "Attempt to fix yum error for Deploy Baseimage: deplay-quay"
-rpm -qa python3
-
 echo "Add repo rpms"
 yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
