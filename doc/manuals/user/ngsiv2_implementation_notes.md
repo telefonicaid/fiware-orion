@@ -564,8 +564,8 @@ entity. For these attributes that don't exist (`brightness` in this example) the
 value (of type `"None"`) is used.
 
 In the case of custom notifications, if `covered` if set to `true` then `null` will be use to replace `${...}`
-of non existing attributes (the default behaviour when `covered` if not to `true` is to replace by the
-empty string).
+for non existing attributes (the default behaviour when `covered` if not to `true` is to replace by the
+empty string the non existing attributes).
 
 We use the term "covered" in the sense the notification "covers" completely all the attributes
 in the `notification.attrs` field. It can be useful for those notification endpoints that are
