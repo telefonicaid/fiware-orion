@@ -41,7 +41,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"
 
-#include "cache/subCache.h"                                      // CachedSubscription
+#include "cache/CachedSubscription.h"                            // CachedSubscription
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
+#include "orionld/notifications/notificationFailure.h"           // notificationFailure
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -711,7 +712,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   if (fd == -1)
   {
     LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
-    subscriptionFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
+    notificationFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
     return -1;
   }
   LM_TMP(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
@@ -723,7 +724,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     close(fd);
 
     LM_E(("Internal Error (unable to send to server for notification for subscription '%s' (fd: %d): %s", mAltP->subP->subscriptionId, fd, strerror(errno)));
-    subscriptionFailure(mAltP->subP, "Unable to write to notification endpoint", timestamp);
+    notificationFailure(mAltP->subP, "Unable to write to notification endpoint", timestamp);
     return -1;
   }
 

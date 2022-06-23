@@ -36,6 +36,8 @@ extern "C"
 //
 prom_counter_t*     promNgsildRequests;
 prom_counter_t*     promNgsildRequestsFailed;
+prom_counter_t*     promNotifications;
+prom_counter_t*     promNotificationsFailed;
 prom_gauge_t*       promTestGauge;
 prom_histogram_t*   promTestHistogram;
 
@@ -51,7 +53,8 @@ int promInit(unsigned short promPort)
 
   promNgsildRequests       = prom_collector_registry_must_register_metric(prom_counter_new("ngsildRequests",       "# NGSILD Requests",        0, NULL));
   promNgsildRequestsFailed = prom_collector_registry_must_register_metric(prom_counter_new("ngsildRequestsFailed", "# Failed NGSILD Requests", 0, NULL));
-
+  promNotifications        = prom_collector_registry_must_register_metric(prom_counter_new("notifications",        "# Notifications",          0, NULL));
+  promNotificationsFailed  = prom_collector_registry_must_register_metric(prom_counter_new("notificationsFailed",  "# Failed Notifications",   0, NULL));
 
   promTestHistogram = prom_collector_registry_must_register_metric(prom_histogram_new(
                                                                      "promTestHistogram",

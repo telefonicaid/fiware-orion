@@ -18,7 +18,7 @@
 * Issue #280   Implemented support for the OPTIONS method for all NGSI-LD API endpoints
 * Issue #1045  Fixed bug related to TRoE and creation of entity without attributes
 * Issue #280   TRoE support for PATCH /entities/{entityId} - quite untested
-* Issue #1064  Can't forbid '#' in attribute names as it often expands with a hash and we support already expanded attribute names in the payload body
+* Issue #1064  Can't forbid '#' in attribute names as it often expands with a hash and we support already expanded attribute names in the payload body
 * Issue #280   Fixed 'notifierInfo' and 'receiverInfo' for subscriptions
 * Issue #280   Notifications for PATCH /entities/{entityId} - quite untested
 * Issue #280   Implemented the new PUT /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
@@ -44,4 +44,4 @@
 * Issue #903   SSL connection, etc for mongoc - NOTE: not for legacy driver - only the new, experimental API endpoints
 * Issue #280   Support for Prometheus metrics
 * Issue #1151  GET /entities?id=X is NO LONGER translated to GET /entities/X - that was a BAD IDEA
-
+* Issue #280   Prometheus counters for notification (total+failed)

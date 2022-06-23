@@ -565,6 +565,8 @@ extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
 //
 extern prom_counter_t*     promNgsildRequests;
 extern prom_counter_t*     promNgsildRequestsFailed;
+extern prom_counter_t*     promNotifications;
+extern prom_counter_t*     promNotificationsFailed;
 
 
 

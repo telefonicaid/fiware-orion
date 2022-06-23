@@ -1665,6 +1665,22 @@ function urlencode
 
 
 
+# -----------------------------------------------------------------------------
+#
+# orionldMetrics -
+#
+# NOTE
+#   I need to sleep a little, before asking for metrics - give some time for the notifications.
+#   Remember - the broker responds to the create/update request before notifications are actually sent
+#
+function orionldMetrics
+{
+  sleep .5
+  curl localhost:8000/metrics --silent | egrep -v '^#' | egrep -v '^process_' | egrep -v '^$'
+}
+
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1704,3 +1720,4 @@ export -f cServerStart
 export -f cServerStop
 export -f cServerCurl
 export -f urlencode
+export -f orionldMetrics
