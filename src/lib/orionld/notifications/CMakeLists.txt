@@ -25,6 +25,8 @@ SET (SOURCES
     subCacheAlterationMatch.cpp
     notificationSend.cpp
     notificationDataToGeoJson.cpp
+    notificationSuccess.cpp
+    notificationFailure.cpp
 )
 
 # Include directories

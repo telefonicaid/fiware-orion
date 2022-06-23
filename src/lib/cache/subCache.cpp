@@ -51,11 +51,11 @@ extern "C"
 #include "orionld/types/OrionldTenant.h"                    // OrionldTenant
 #include "orionld/common/orionldState.h"                    // orionldState
 #include "orionld/common/tenantList.h"                      // tenantList
+#include "orionld/common/urlParse.h"                        // urlParse
 #include "orionld/q/qBuild.h"                               // qBuild
 #include "orionld/q/qRelease.h"                             // qRelease
 #include "orionld/mongoc/mongocSubCachePopulateByTenant.h"  // mongocSubCachePopulateByTenant
 #include "orionld/mongoc/mongocSubCountersUpdate.h"         // mongocSubCountersUpdate
-#include "orionld/common/urlParse.h"                        // urlParse
 #include "orionld/context/orionldContextFromUrl.h"          // orionldContextFromUrl
 
 #include "cache/subCache.h"
@@ -1484,48 +1484,4 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     subP->lastFailure  = orionldState.requestTime;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
-}
-
-
-
-/* ****************************************************************************
-*
-* subscriptionFailure -
-*/
-void subscriptionFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
-{
-  LM_TMP(("SC: Updating counters and timestamps after failed notification"));
-  subP->lastNotificationTime  = timestamp;
-  subP->lastFailure           = timestamp;
-  subP->consecutiveErrors    += 1;
-  subP->count                += 1;
-
-  strncpy(subP->lastErrorReason, errorReason, sizeof(subP->lastErrorReason) - 1);
-
-  // Force the subscription into "paused" due to too many consecutive errors
-  if (subP->consecutiveErrors >= 3)
-  {
-    subP->isActive = false;
-    subP->status   = "paused";
-    // FIXME: Write to DB !!!
-  }
-
-  // Write to DB ... ?
-}
-
-
-
-/* ****************************************************************************
-*
-* subscriptionSuccess -
-*/
-void subscriptionSuccess(CachedSubscription* subP, double timestamp)
-{
-  LM_TMP(("SC: Updating counters and timestamps after successful notification"));
-  subP->lastSuccess           = timestamp;
-  subP->lastNotificationTime  = timestamp;
-  subP->consecutiveErrors     = 0;
-  subP->count                += 1;
-
-  // Write to DB ... ?
 }

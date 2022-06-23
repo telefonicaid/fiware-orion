@@ -288,20 +288,4 @@ extern void subCacheItemNotificationErrorStatus
 */
 extern bool tenantMatch(const char* tenant1, const char* tenant2);
 
-
-
-/* ****************************************************************************
-*
-* subscriptionFailure -
-*/
-extern void subscriptionFailure(CachedSubscription* subP, const char* errorReason, double timestamp);
-
-
-
-/* ****************************************************************************
-*
-* subscriptionSuccess -
-*/
-extern void subscriptionSuccess(CachedSubscription* subP, double timestamp);
-
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

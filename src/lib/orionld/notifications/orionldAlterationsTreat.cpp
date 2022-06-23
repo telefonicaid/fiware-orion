@@ -30,7 +30,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "cache/subCache.h"                                      // CachedSubscription, subCacheMatch, subscriptionFailure, subscriptionSuccess
+#include "cache/CachedSubscription.h"                            // CachedSubscription
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
@@ -39,6 +39,8 @@ extern "C"
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
+#include "orionld/notifications/notificationSuccess.h"           // notificationSuccess
+#include "orionld/notifications/notificationFailure.h"           // notificationFailure
 #include "orionld/notifications/orionldAlterationsTreat.h"       // Own interface
 
 
@@ -67,7 +69,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 
   if (nb == -1)
   {
-    subscriptionFailure(npP->subP, "Unable to read from notification endpoint", timestamp);
+    notificationFailure(npP->subP, "Unable to read from notification endpoint", timestamp);
     LM_E(("Internal Error (unable to read response for notification)"));
     return -1;
   }
@@ -78,7 +80,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 
   if (endOfFirstLine == NULL)
   {
-    subscriptionFailure(npP->subP, "Invalid response from notification endpoint", timestamp);
+    notificationFailure(npP->subP, "Invalid response from notification endpoint", timestamp);
     LM_E(("Internal Error (unable to find end of first line from notification endpoint: %s)", strerror(errno)));
     return -1;
   }
@@ -297,10 +299,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         {
           LM_TMP(("SC: Detected a notification response on fd %d", npP->fd));
           if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
-          {
-            LM_TMP(("SC: Calling subscriptionSuccess for subscription '%s'", npP->subP->subscriptionId));
-            subscriptionSuccess(npP->subP, notificationTimeAsFloat);
-          }
+            notificationSuccess(npP->subP, notificationTimeAsFloat);
 
           close(npP->fd);  // OR: close socket inside responseTreat?
           npP->fd = -1;
@@ -328,8 +327,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       // No response
       if (strncmp(npP->subP->protocol, "mqtt", 4) != 0)
       {
-        LM_TMP(("SC: Calling subscriptionFailure for subscription '%s'", npP->subP->subscriptionId));
-        subscriptionFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
+        notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
         close(npP->fd);
         npP->fd = -1;
       }

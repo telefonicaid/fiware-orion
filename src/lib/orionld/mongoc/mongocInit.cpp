@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdlib.h>                                              // calloc, free
 #include <semaphore.h>                                           // sem_init
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
@@ -314,4 +315,7 @@ void mongocInit
 
   if (mongocIdIndexCreate(&tenant0) == false)
     LM_W(("Unable to create the index on Entity ID on the default database"));
+
+  // Free the uri, allocated by uriCompose
+  free(mongoUri);
 }
