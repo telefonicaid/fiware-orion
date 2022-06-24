@@ -563,8 +563,8 @@ in which case all attributes are included in the notification, no matter if they
 entity. For these attributes that don't exist (`brightness` in this example) the `null`
 value (of type `"None"`) is used.
 
-In the case of custom notifications, if `covered` if set to `true` then `null` will be use to replace `${...}`
-for non existing attributes (the default behaviour when `covered` if not set to `true` is to replace by the
+In the case of custom notifications, if `covered` is set to `true` then `null` will be use to replace `${...}`
+for non existing attributes (the default behaviour when `covered` is not set to `true` is to replace by the
 empty string the non existing attributes).
 
 We use the term "covered" in the sense the notification "covers" completely all the attributes
