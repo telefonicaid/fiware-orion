@@ -63,7 +63,7 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
   char* endBracketP   = NULL;
   char* mdNameP       = NULL;
   char* rest          = NULL;
-  char  fullPath[1024];
+  char  fullPath[1500];
 
   //
   // Cases (for forDb==true):
