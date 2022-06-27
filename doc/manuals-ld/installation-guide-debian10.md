@@ -3,6 +3,12 @@
 In order to write this guide, Debian 10.6 (netinst image) was downloaded from [here](https://www.debian.org/distrib/netinst) (Small CDs or USB sticks - amd64),
 and installed as a virtual machine under VMWare.
 
+## This Guide is out of date
+What's missing is stuff about postgres and prometheus-client-c.
+Well, and a general cleanup to follow the nes "design" of the Ubuntu guides.
+For now, no further work on this installation guide is planned - unless we receive complaints. If so, time will be allocated for an update.
+Anyway, Ubuntu and Debian are related, so, is shouldn't be too hard to use an Ubuntu guide and some googling to finish the installation.
+
 ## Distro Installation
 During OS installation, when asked for "Software selection", I ticked:
 * Debian desktop environment

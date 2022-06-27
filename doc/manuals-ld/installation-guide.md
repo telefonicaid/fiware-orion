@@ -19,9 +19,10 @@ For installation of Orion-LD, alpha version 0.x, you can:
 * build Orion-LD from source code:
   * [Ubuntu 18.04.3 LTS](installation-guide-ubuntu-18.04.3.md) - the Official Distribution
   * [Ubuntu 20.04.1 LTS](installation-guide-ubuntu-20.04.1.md)
-  * [CentOS 7](installation-guide-centos7.md)
-  * [Debian 9](installation-guide-debian9.md)
-  * [Debian 10](installation-guide-debian10.md)
+  * [Ubuntu 22.04 LTS](installation-guide-ubuntu-22.04.md) -  no official instruction from MongoDb on how to install their DB
+  * [CentOS 7](installation-guide-centos7.md) - discontinued (at least for now)
+  * [Debian 9](installation-guide-debian9.md) - discontinued (at least for now)
+  * [Debian 10](installation-guide-debian10.md) - discontinued (at least for now)
 
 
 ### Sanity check

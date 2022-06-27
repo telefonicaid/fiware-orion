@@ -75,9 +75,9 @@ bool dbModelFromApiCoordinates(KjNode* coordinatesP, const char* fieldName, KjNo
   if (isPoint)
   {
     // A point is an array ( [ 1, 2 ] ) in NGSI-LD, but in APIv1 database mode it is a string ( "1,2" )
-    int    coords = 0;
-    float  coordV[3];
-    bool   floats = false;
+    int    coords    = 0;
+    float  coordV[3] = { 0, 0, 0 };
+    bool   floats    = false;
 
     for (KjNode* coordP = coordinatesP->value.firstChildP; coordP != NULL; coordP = coordP->next)
     {
@@ -97,12 +97,12 @@ bool dbModelFromApiCoordinates(KjNode* coordinatesP, const char* fieldName, KjNo
 
     if (floats == true)
     {
-      if (coords == 2) snprintf(buf, bufSize, "%f,%f", coordV[0], coordV[1]);
+      if (coords == 2) snprintf(buf, bufSize, "%f,%f",    coordV[0], coordV[1]);
       else             snprintf(buf, bufSize, "%f,%f,%f", coordV[0], coordV[1], coordV[2]);
     }
     else
     {
-      if (coords == 2) snprintf(buf, bufSize, "%d,%d", (int) coordV[0], (int) coordV[1]);
+      if (coords == 2) snprintf(buf, bufSize, "%d,%d",    (int) coordV[0], (int) coordV[1]);
       else             snprintf(buf, bufSize, "%d,%d,%d", (int) coordV[0], (int) coordV[1], (int) coordV[2]);
     }
   }

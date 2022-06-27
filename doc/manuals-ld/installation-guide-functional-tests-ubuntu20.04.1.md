@@ -72,10 +72,15 @@ The output of the `which` command should be:
 ./scripts/accumulator-server.py
 ```
 
-Also, the test script uses `nc` to verify that the broker has started, and `bc` for simple calculations.
+The test script uses `nc` to verify that the broker has started, and `bc` for simple calculations.
 These two commands are part of the base in Ubuntu 20.04, so, no installtion should be needed.
 
-We're ready to launch the functional test suite:
+Some python scripts use the shebang `#/usr/bin/python`, so, we'll need to put python3 there:
+```
+sudo ln -s /usr/bin/python3 /usr/bin/python
+```
+
+And with that, we're ready to launch the functional test suite:
 ```bash
 test/functionalTest/testHarness.sh
 ```

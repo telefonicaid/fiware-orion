@@ -32,6 +32,7 @@
 //  In this case it will also be required to link against Boost.Threads
 //
 #define BOOST_SPIRIT_THREADSAFE
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>

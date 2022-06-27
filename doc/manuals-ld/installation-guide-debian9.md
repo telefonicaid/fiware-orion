@@ -2,6 +2,12 @@
 
 In order to write this guide, Debian 9 (Desktop image) was downloaded from [here](https://cdimage.debian.org/mirror/cdimage/archive/9.4.0/amd64/iso-cd/debian-9.4.0-amd64-netinst.iso), and installed as a virtual machine under VMWare.
 
+## This Guide is out of date
+What's missing is stuff about postgres and prometheus-client-c.
+Well, and a general cleanup to follow the nes "design" of the Ubuntu guides.
+For now, no further work on this installation guide is planned - unless we receive complaints. If so, time will be allocated for an update.
+Anyway, Ubuntu and Debian are related, so, is shouldn't be too hard to use an Ubuntu guide and some googling to finish the installation.
+
 ## Sudo user installation
 
 In many of the following steps, commands need to be executed as superuser (root).

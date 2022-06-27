@@ -22,7 +22,6 @@ sudo aptitude install -y build-essential scons curl python-pip
 ```
 
 ### Dependency libraries that aren't built from source code:
-
 ```bash
 sudo aptitude install -y libssl1.0-dev libcurl4-gnutls-dev libsasl2-dev libgnutls28-dev \
                          libgcrypt-dev uuid-dev libboost-dev libboost-regex-dev libboost-thread-dev \
@@ -71,7 +70,6 @@ Please don't blindly use 'kz' - use the group that `id` gave you!
 After this we have both USER and GROUP env vars for changing owners of any file - and those lines can be copy 'n pasted from this document.
 
 Now, let's create the git directory for cloned repositories:
-
 ```bash
 mkdir ~/git
 ```
@@ -197,7 +195,7 @@ make install
 *kalloc* is a library that provides faster allocation by avoiding calls to `malloc`.
 The library allocates *big* buffers by calling `malloc` and then gives out portions of this big allocated buffer.
 The portions cannot be freed, only the *big* buffers allocated via `malloc` and that is done when the kalloc instance dies.
-For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view. 
+For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view.
 
 To download, build and install:
 ```bash
@@ -264,7 +262,7 @@ pip install paho-mqtt
 
 ### Prometheus C Client Library
 For Orion-LD to support Prometheus metrics, a library called prometheus-client-c is used.
-{ It seems to be abandoned and some day Orion-LD might stop using it and implement native Prometheus metrics support. ]
+[ It seems to be abandoned and some day Orion-LD might stop using it and implement native Prometheus metrics support. ]
 
 Install prometheus-client-c like this:
 ```
@@ -316,7 +314,7 @@ export LD_LIBRARY_PATH=~/git/prometheus-client-c/prom/build:~/git/prometheus-cli
 ```
 [If you don't want to do this, you could just as easily copy the libs to a standard location]
 
-With this, Orion-LD itself is ready to run, however, to actually do anything, Orion-LD needs its database (MongoDB),
+With this, Orion-LD itself is ready to run, however, to actually do something, Orion-LD needs its database (MongoDB),
 and Postgres as well if you plan on using the temporal feature,
 If you plan on using MQTT for notifications, then you also need an MQTT broker/server.
 For development on Orion-LD you need the works - as if anything is missing, the functional test suite will fail.
@@ -352,7 +350,7 @@ sudo apt install -y postgis postgresql-12-postgis-3
 sudo apt-get install -y postgresql-12-postgis-3-scripts
 ```
 
-#### Add timescale db and posgis
+#### Add timescale db and postgis
 ```bash
 sudo add-apt-repository ppa:timescale/timescaledb-ppa
 sudo apt-get update
@@ -419,7 +417,7 @@ sudo systemctl start mongod
 sudo systemctl enable mongod
 ```
 
-For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+For more details on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
 
 ## Done, now what?
 You now have *orionld*, the NGSI-LD Context Broker compiled, and all its 3rd party enablers installed and ready to work :)
