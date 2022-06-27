@@ -16,7 +16,7 @@ make
 sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
 ```
 
-After this, the broker must be compiled, as the unit test is an executable that links to the broker code:
+After this, the unit tests of the broker must be compiled, and as the unit test is an executable that links to the broker code:
 
 ```bash
 cd ~/git/context.Orion-LD

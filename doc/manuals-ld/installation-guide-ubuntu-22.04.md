@@ -1,42 +1,18 @@
-# Orion-LD Installation Guide for Ubuntu 20.04.1
+# Orion-LD Installation Guide for Ubuntu 22.04.1
 
-In order to write this guide, Ubuntu 20.04.01 LTS (Desktop image) was downloaded from [here](https://releases.ubuntu.com/20.04/), and installed as a virtual machine under VMWare.
-As 20.04 is not the latest LTS, you might be asked to upgrade to Ubuntu 22.04.
-Well, it goes without saying, DON'T - this guide is for 20.04.
+In order to write this guide, Ubuntu 22.04.01 LTS (Desktop image) was downloaded from [here](https://releases.ubuntu.com/22.04/), and installed as a virtual machine under VMWare.
+
+## Warning
+MongoDB still doesn't support installation on Ubuntu 22.04.
+Scroll down to the end (last 10 lines) and read more about it.
+Hint: if you really want to install on Ubuntu 22.04, there's a workaround for it.
 
 ## Disclaimer
-Running Orion-LD in Ubuntu 20.04 is experimental. 18.04 is the official distribution.
-While the Orion-LD development team has checked that it is possible to compile and run Orion-LD under Ubuntu 20.04,
+Running Orion-LD in Ubuntu 22.04 is experimental. 18.04 is the official distribution.
+While the Orion-LD development team has checked that it is possible to compile and run Orion-LD under Ubuntu 22.04,
 it has yet not been thoroughly tested and its use is not recommended until all tests have been performed.
-Once we are satisfied with the test results, this disclaimer will be removed and 20.04 will push out 18.04 as
+Once we are satisfied with the test results, this disclaimer will be removed and 22.04 will push out 18.04 as
 official distribution.
-
-## Unattended Updater
-If you're having problems (I had) launching apt-get, because of "unattended-upgr in progress - lock file taken",
-check out the following [issue on StackExchange](https://unix.stackexchange.com/questions/374748/ubuntu-update-error-waiting-for-unattended-upgr-to-exit).
-I followed the answer with most "upvotes" and it worked out just fine:
-
-1. Stop the automatic updater.
-```
-sudo dpkg-reconfigure -plow unattended-upgrades
-```
-At the first prompt, choose not to download and install updates.
-Do a reboot.
-
-2. Make sure any packages in an unclean state are installed correctly.
-```
-sudo dpkg --configure -a
-```
-
-3. Get your system up-to-date.
-```
-sudo apt update && sudo apt -f install && sudo apt full-upgrade
-```
-4. Turn the automatic updater back on, now that the blockage is cleared.
-```
-sudo dpkg-reconfigure -plow unattended-upgrades
-```
-Select the package unattended-upgrades again.
 
 ## Installation of dependency packages
 
@@ -115,9 +91,9 @@ Install the driver like this:
 sudo mkdir /opt/mongoc
 sudo chown $USER:$GROUP /opt/mongoc
 cd /opt/mongoc
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
-tar xzf mongo-c-driver-1.21.1.tar.gz
-cd mongo-c-driver-1.21.1
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz
+tar xzf mongo-c-driver-1.21.2.tar.gz
+cd mongo-c-driver-1.21.2
 mkdir cmake-build
 cd cmake-build
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
@@ -134,9 +110,9 @@ This is how you install libmicrohttpd from source code:
 sudo mkdir /opt/libmicrohttpd
 sudo chown $USER:$GROUP /opt/libmicrohttpd
 cd /opt/libmicrohttpd
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
-tar xvf libmicrohttpd-0.9.72.tar.gz
-cd libmicrohttpd-0.9.72
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
+tar xvf libmicrohttpd-0.9.75.tar.gz
+cd libmicrohttpd-0.9.75
 ./configure --disable-messages --disable-postprocessor --disable-dauth
 make
 sudo make install
@@ -158,74 +134,41 @@ tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
 
-### kbase
+### k-libs
 
-*kbase* is a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
-To download, build and install:
+A number of generic libraries are being implemented while implementing Orion-LD.
+Well, the job started when I implemented my JSON parser - kjson - back in ... 2018?
+As Orion-LD makes use of these libraries and sometimes stuff is added (seldom changed), they "live beside" the broker
+
+* kbase      a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
+* klog       logging - used by the rest of the "K-libs"
+* kalloc     a library that provides faster allocation by avoiding calls to `malloc`.
+             The library allocates *big* buffers by calling `malloc` and then gives out portions of this big allocated buffer.
+             The portions cannot be freed, only the *big* buffers allocated via `malloc` and that is done when the kalloc instance dies.
+             For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view.
+* kjson      a JSON parser that builds a simple-to-use KjNode tree from the textual JSON input.
+             It is very easy to use (linked lists) and it is A LOT faster than rapidjson, which APIv2 uses.
+             The new NGSI-LD requests uses `kjson` instead of rapidjson.
+* khash      a library that provides a hash table implementation. This hash table is used for the Context Cache of Orion-LD.
+
 
 ```bash
 cd ~/git
-git clone https://gitlab.com/kzangeli/kbase.git
-cd kbase
-git checkout release/0.8
-make install
-```
+for k in kbase klog kalloc kjson khash
+do
+  git clone https://gitlab.com/kzangeli/$k.git
+done
 
-### klog
+for k in kbase klog kalloc khash
+do
+  cd $k
+  git checkout release/0.8
+  make install
+  cd ..
+done
 
-*klog* is a library for logging, used by the rest of the "K-libs".
-To download, build and install:
-
-```bash
-cd ~/git
-git clone https://gitlab.com/kzangeli/klog.git
-cd klog
-git checkout release/0.8
-make install
-```
-
-
-### kalloc
-
-*kalloc* is a library that provides faster allocation by avoiding calls to `malloc`.
-The library allocates *big* buffers by calling `malloc` and then gives out portions of this big allocated buffer.
-The portions cannot be freed, only the *big* buffers allocated via `malloc` and that is done when the kalloc instance dies.
-For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view.
-
-To download, build and install:
-```bash
-cd ~/git
-git clone https://gitlab.com/kzangeli/kalloc.git
-cd kalloc
-git checkout release/0.8
-make install
-```
-
-### kjson
-
-*kjson* is a JSON parser that builds a simple-to-use KjNode tree from the textual JSON input.
-It is very easy to use (linked lists) and many times faster than rapidjson, which APIv2 uses.
-The new implementation for NGSI-LD uses `kjson` instead of rapidjson.
-
-To download, build and install:
-```bash
-cd ~/git
-git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
 git checkout release/0.8.2
-make install
-```
-
-### khash
-
-*khash* is a library that provides a hash table implementation. This hash table is used for the Context Cache of Orion-LD.
-
-To download, build and install:
-```bash
-cd ~/git
-git clone https://gitlab.com/kzangeli/khash.git
-cd khash
-git checkout release/0.8
 make install
 ```
 
@@ -268,6 +211,8 @@ cd prometheus-client-c
 git checkout release-0.1.3
 sed 's/\&promhttp_handler,/(MHD_AccessHandlerCallback) \&promhttp_handler,/' promhttp/src/promhttp.c > XXX
 mv XXX promhttp/src/promhttp.c
+sed 's/build_test cmake -v/build_test cmake/' autolib/build.sh > XXX
+mv XXX autolib/build.sh
 ./auto build
 ```
 
@@ -337,7 +282,7 @@ Postgres is used as database for the Temporal Evolution of entities
 
 #### Install Postgres 12
 ```bash
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc|sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
 echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | sudo tee  /etc/apt/sources.list.d/pgdg.list
 
 sudo apt update
@@ -346,11 +291,15 @@ sudo apt install -y postgis postgresql-12-postgis-3
 sudo apt-get install -y postgresql-12-postgis-3-scripts
 ```
 
+
 #### Add timescale db and postgis
 ```bash
-sudo add-apt-repository ppa:timescale/timescaledb-ppa
-sudo apt-get update
-sudo apt install -y timescaledb-postgresql-12
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 55EE6BF7698E3D58D72C0DD9ECB3980CC59E610B
+sudo tee /etc/apt/sources.list.d/timescale-ubuntu-timescaledb-ppa-jammy.list<<EOF
+deb https://ppa.launchpadcontent.net/timescale/timescaledb-ppa/ubuntu/ focal main
+EOF
+sudo apt install timescaledb-postgresql-12
+
 ```
 
 #### Enable postgres
@@ -368,7 +317,7 @@ shared_preload_libraries = 'timescaledb'
 ```
 #### Restart Postgres
 ```bash
-sudo /etc/init.d/postgresql restart
+sudo systemctl restart postgresql@12-main.service
 ```
 
 #### Create the Postgres user for Orion-LD
@@ -388,37 +337,12 @@ logout
 
 ### MongoDB
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-As a reference, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
-The version 4.4 is recommended for Ubuntu 20.04 (by Mongo), but both older and newer should work just fine, however, MongoDB v5.x has not been tested.
 
-This is what the MongoDB documentation tells us to do to install MongoDB server 4.4 under Ubuntu 20.04:
+Ubuntu 22.04 is still more or less new and the good people from MongoDB are still to provide installation instructions.
+Here's the issue in [MongoDB's Jira](https://jira.mongodb.org/browse/SERVER-62300).
 
-```bash
-# Import the MongoDB public GPG Key
-sudo aptitude install -y gnupg
-wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-# Should respond with "OK"
+If you really want to run on 22.04, some people have to sort it themselves - this issue [here]() gives you the info on how to make it work.
 
-# Create the list file /etc/apt/sources.list.d/mongodb-org-4.4.list
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+The official position of the Orion-LD team is:
 
-# Reload local package database
-sudo aptitude update
-
-# Install the MongoDB packages
-sudo aptitude install -y mongodb-org
-
-# Once the installation is done, start MongoDB, and ensure it starts on reboot
-sudo systemctl start mongod
-sudo systemctl enable mongod
-```
-
-For more details on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
-
-## Done, now what?
-You now have *orionld*, the NGSI-LD Context Broker compiled, and all its 3rd party enablers installed and ready to work :)
-
-A good idea would be to also prepare for [unit tests](installation-guide-for-unit-tests.md) and [functional tests](installation-guide-functional-tests-ubuntu20.04.1.md),
-and make sure the broker is fully functional.
-If you plan on developing anything for Orion-LD, then this is an absolute must!
-No Pull Request should ever be sent to Orion-LD's github before all unit tests and all functional tests are working
+  "Wait until MongoDB releases instructions on how to install MongoDB on Ubuntu 22.04"

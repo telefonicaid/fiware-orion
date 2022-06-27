@@ -2,10 +2,10 @@
 
 In order to write this guide, CentOS 7 (Desktop image) was downloaded from [here](http://isoredirect.centos.org/centos/8/isos/x86_64/CentOS-8-x86_64-1905-dvd1.iso), and installed as a virtual machine under VMWare.
 
-*Obs.: If you don't have internet access execute this command:*
-```bash
-dhclient
-```
+## This Guide is out of date and as CentOS is discontinued ...
+What's missing is stuff about postgres and prometheus-client-c.
+The guides for are up-to-date and if you "translate" from those (apt -> yum), it shouldn't be too hard to still make it work.
+For now, no further work on this installation guide is planned.
 
 ## Installation of dependency packages
 

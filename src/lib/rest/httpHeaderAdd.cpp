@@ -89,9 +89,9 @@ void httpHeaderLinkAdd(const char* _url)
   }
 
   urlLen = strlen(url);
-  if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)
+  if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 5)
   {
-    linkP = (char*) malloc(sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3);
+    linkP = (char*) malloc(urlLen + LINK_REL_AND_TYPE_SIZE + 5);
     if (linkP == NULL)
     {
       LM_E(("Out-of-memory allocating roome for HTTP Link Header"));

@@ -6,27 +6,25 @@ First of all, there is a python script (`scripts/accumulator-server.py`) that is
 
 This python script needs a few packages to be installed:
 
-1. Install **pip**
-```bash
-sudo aptitude install python-pip
-```
-
-2. Install **OpenSSL** for Python:
+1. Install **OpenSSL** for Python:
 ```bash
 sudo aptitude install python-openssl
 ```
 
-3. Install **Flask**:
+2. Install **Flask**:
 ```bash
 sudo aptitude install python3-venv
 pip install Flask
 ```
 
-That should be all for the accumulator python script.
-
-The test script (`test/functionalTest/testHarness.sh`) needs to *find* the accumulator, to be able to start it:
+3. Install **virtualenv**:
 ```bash
-cd <orion-ld repository base directory>
+sudo aptitude install virtualenv
+```
+
+The test script (`test/functionalTest/testHarness.sh`) needs to *find* the accumulator, in order to start it:
+```bash
+cd ~/git/context.Orion-LD
 export PATH=$PATH:$PWD/scripts
 which accumulator-server.py
 ```
@@ -37,10 +35,10 @@ The output of the `which` command should be:
 ~/git/context.Orion-LD/scripts/accumulator-server.py
 ```
 
-Also, the test script uses `nc` to verify that the broker has started, and `bc` for simple calculations.
+Also, the test script uses `nc` (netcat) to verify that the broker has started, and `bc` for simple calculations.
 Install both of them:
 ```bash
-sudo aptitude install nc
+sudo aptitude install netcat
 sudo aptitude install bc
 ```
 
@@ -49,8 +47,15 @@ Test it by launching:
 test/functionalTest/testHarness.sh
 ```
 
-There are over 1250 test cases (each with a number of steps), so, it will take a while.
-Orion-LD has inherited the functional test suite from `orion` and added some 250 test cases only for NGSI-LD.
+Lastly, some of the functional tests uses a Context Server, developed also by the FIWARE Foundation (Stefan Wiedemann).
+It runs in a docker container:
+```
+docker run --rm -d --name context-server -p 7080:8080  -e MEMORY_ENABLED=true wistefan/context-server
+timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:7080/health)" != "200" ]]; do sleep 5; done' || false
+```
+
+There are over 1700 test cases (each with a number of steps), so, it will take a while (90+ minutes, depending on your hardware).
+Orion-LD has inherited the functional test suite from `orion` and added some 600 test cases only for NGSI-LD.
 If you want to run only the NGSi-LD test cases, run the suite with the `-ld` option:
 
 ```bash
