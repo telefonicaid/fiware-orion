@@ -92,8 +92,8 @@ echo
 01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND
 ===========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -102,8 +102,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": {
@@ -119,8 +119,8 @@ Date: REGEX(.*)
 03. Modify E1 to have an attribute A2=3 instead using POST /v2/op/update with REPLACE
 =====================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -129,8 +129,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A2": {

@@ -63,8 +63,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 86
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "max one service-path allowed for subscriptions", 

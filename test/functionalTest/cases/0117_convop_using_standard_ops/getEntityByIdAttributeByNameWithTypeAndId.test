@@ -196,12 +196,12 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
@@ -212,11 +212,11 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -226,8 +226,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 234
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -235,18 +235,18 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
         }
@@ -259,8 +259,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 234
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -268,18 +268,18 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
         }
@@ -292,8 +292,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 234
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -301,18 +301,18 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
         }
@@ -325,13 +325,13 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 115
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "entity::type cannot be empty for this request", 
+        "code": "400",
+        "details": "entity::type cannot be empty for this request",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -342,13 +342,13 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 103
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "non-matching entity::types in URL", 
+        "code": "400",
+        "details": "non-matching entity::types in URL",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -359,8 +359,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 234
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -368,18 +368,18 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
         }
@@ -392,11 +392,11 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "duration": "P1M", 
+    "duration": "P1M",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
@@ -406,8 +406,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 432
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -415,37 +415,37 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-s1"
             }
         }
@@ -458,8 +458,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 432
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -467,37 +467,37 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
-        }, 
+        },
         {
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-s1"
             }
         }
@@ -510,8 +510,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 234
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -519,18 +519,18 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-none"
             }
         }
@@ -543,8 +543,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 232
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -552,18 +552,18 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false", 
-                        "name": "A1", 
+                        "isDomain": "false",
+                        "name": "A1",
                         "type": "string"
                     }
-                ], 
+                ],
                 "entities": [
                     {
-                        "id": "E1", 
-                        "isPattern": "false", 
+                        "id": "E1",
+                        "isPattern": "false",
                         "type": "T1"
                     }
-                ], 
+                ],
                 "providingApplication": "http://kz.tid.es/spath-s1"
             }
         }
@@ -576,12 +576,12 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }

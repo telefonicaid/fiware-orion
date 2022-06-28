@@ -61,9 +61,9 @@ echo
 01. Creating entity POST /v2/entities?options=upsert E with attribute A=1
 =========================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
@@ -72,8 +72,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 67
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A": {

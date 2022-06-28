@@ -134,9 +134,9 @@ echo
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Barcelona?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Barcelona?type=City
 
 
 
@@ -144,9 +144,9 @@ Date: REGEX(.*)
 =============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Guadalajara?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Guadalajara?type=City
 
 
 
@@ -154,9 +154,9 @@ Date: REGEX(.*)
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Lleida?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Lleida?type=City
 
 
 
@@ -164,9 +164,9 @@ Date: REGEX(.*)
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Madrid?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Madrid?type=City
 
 
 
@@ -174,9 +174,9 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Zaragoza?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Zaragoza?type=City
 
 
 
@@ -185,8 +185,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 538
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {

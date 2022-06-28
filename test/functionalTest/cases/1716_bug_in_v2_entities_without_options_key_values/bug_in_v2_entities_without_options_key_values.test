@@ -60,8 +60,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 103
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "attribute must be a JSON object, unless keyValues option is used",
@@ -74,8 +74,8 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",

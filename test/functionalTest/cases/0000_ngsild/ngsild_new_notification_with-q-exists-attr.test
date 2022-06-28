@@ -223,8 +223,8 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 
 
 
@@ -232,8 +232,8 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 
 
 
@@ -241,8 +241,8 @@ Date: REGEX(.*)
 ========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E2
 
 
 
@@ -276,8 +276,8 @@ Ngsild-Attribute-Format: Simplified
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S2
 
 
 
@@ -285,8 +285,8 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
 
 
 
@@ -294,8 +294,8 @@ Date: REGEX(.*)
 ========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E4
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E4
 
 
 
@@ -329,8 +329,8 @@ Ngsild-Attribute-Format: Simplified
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S3
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S3
 
 
 
@@ -338,8 +338,8 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E5
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E5
 
 
 
@@ -347,8 +347,8 @@ Date: REGEX(.*)
 ========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E6
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E6
 
 
 

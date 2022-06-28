@@ -82,8 +82,8 @@ orionCurl --url "/v1/contextSubscriptions/$SUB_ID" -X "DELETE2"
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -95,8 +95,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -109,8 +109,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -121,10 +121,10 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 --TEARDOWN--
 brokerStop CB

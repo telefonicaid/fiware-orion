@@ -261,8 +261,8 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E20
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: application/json
-NGSILD-Results-Count: 21
 Date: REGEX(.*)
+NGSILD-Results-Count: 21
 
 []
 

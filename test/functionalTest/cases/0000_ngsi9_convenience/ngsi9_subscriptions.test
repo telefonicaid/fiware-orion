@@ -89,8 +89,8 @@ echo "5: ++++++++++++++++++++"
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1M",
@@ -100,8 +100,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "P1Y",
@@ -111,8 +111,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -123,10 +123,10 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 5: ++++++++++++++++++++
 --TEARDOWN--

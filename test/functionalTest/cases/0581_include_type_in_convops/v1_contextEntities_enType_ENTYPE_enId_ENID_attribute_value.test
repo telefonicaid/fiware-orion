@@ -184,8 +184,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 127
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -201,8 +201,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200", 
@@ -215,8 +215,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 157
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attributes": [
@@ -245,8 +245,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200", 
@@ -259,8 +259,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 127
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -276,8 +276,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 166
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "472", 
@@ -291,8 +291,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 144
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "472", 
@@ -306,8 +306,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200", 
@@ -320,8 +320,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 157
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attributes": [
@@ -350,8 +350,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200", 
@@ -364,8 +364,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 158
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attributes": [
@@ -392,10 +392,10 @@ Date: REGEX(.*)
 12. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 ==========================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET, PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

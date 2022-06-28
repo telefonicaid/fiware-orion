@@ -86,9 +86,9 @@ echo
 ============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/100?type=Person
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/100?type=Person
 
 
 
@@ -96,9 +96,9 @@ Date: REGEX(.*)
 ============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/101?type=Person
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/101?type=Person
 
 
 
@@ -107,8 +107,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 59
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {

@@ -83,9 +83,9 @@ echo
 ================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
@@ -94,8 +94,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 13
 Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 442.123456786
 
@@ -105,8 +105,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 200
 
@@ -116,8 +116,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 107
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A": {

@@ -170,8 +170,8 @@ echo
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -184,8 +184,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 83
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -197,9 +197,9 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -208,8 +208,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -222,8 +222,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 52
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "empty payload",
@@ -236,8 +236,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -250,8 +250,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 52
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "empty payload",
@@ -264,8 +264,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -278,8 +278,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 52
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "empty payload",
@@ -292,8 +292,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -306,8 +306,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 41
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "metadata": {},
@@ -319,8 +319,8 @@ Date: REGEX(.*)
 12. PUT /v2/entities/E1/attrs/A1 (empty payload)
 =================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -329,8 +329,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "metadata": {},
@@ -344,8 +344,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -356,11 +356,11 @@ Date: REGEX(.*)
 15. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 ==================================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, PUT, DELETE
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",

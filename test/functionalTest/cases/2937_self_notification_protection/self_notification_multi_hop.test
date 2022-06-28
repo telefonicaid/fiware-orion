@@ -279,9 +279,9 @@ echo
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -289,9 +289,9 @@ Date: REGEX(.*)
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -299,9 +299,9 @@ Date: REGEX(.*)
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -309,9 +309,9 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
 
 
 
@@ -319,9 +319,9 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
 
 
 
@@ -329,41 +329,41 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
 
 
 
 07. Activate sub1 at CB1
 ========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Activate sub2 at CB2
 ========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. Activate sub3 at CB3
 ========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Update entity at CB1, thus triggering CB1->CB2->CB3 notifications
 =====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -372,8 +372,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 471
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -410,8 +410,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 471
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -448,8 +448,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 471
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -488,8 +488,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 77
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A": {
@@ -507,8 +507,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A": {
@@ -526,8 +526,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 76
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A": {

@@ -126,9 +126,9 @@ echo
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -136,17 +136,17 @@ Date: REGEX(.*)
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T2
 
 
 
 03. PUT /v2/entities/E1/attrs T2 (replace all attributes)
 =========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -155,8 +155,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 163
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {
@@ -183,8 +183,8 @@ Date: REGEX(.*)
 05. PUT/v2/entities/E1/A1 T1 (replace attr A1)
 ==============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -193,8 +193,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 163
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {
@@ -221,8 +221,8 @@ Date: REGEX(.*)
 07. PUT /v2/entities/E1 T2 (replace value attr for A-PUT)
 =========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -231,8 +231,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 169
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {

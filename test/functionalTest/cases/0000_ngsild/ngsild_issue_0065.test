@@ -88,8 +88,8 @@ Date: REGEX(.*)
     "kjson version": "REGEX(.*)"
     "libcurl version": "REGEX(.*)",
     "libuuid version": "UNKNOWN",
-    "microhttpd version": "0.9.72-0",
-    "mongoc version": "REGEX((1.17.5|1.21.1))",
+    "microhttpd version": "0.9.75-0",
+    "mongoc version": "1.21.2",
     "mongocpp version": "REGEX((1.1.2|1.1.3))",
     "mongodb server version": "REGEX(.*)",
     "openssl version": "REGEX(.*)",
@@ -101,8 +101,8 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Room:Room1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Room:Room1
 
 
 

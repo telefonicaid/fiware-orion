@@ -183,8 +183,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 74
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "duplicated tag-name: /a/ in path: /",
@@ -196,9 +196,9 @@ Date: REGEX(.*)
 =============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
 
 
 
@@ -206,9 +206,9 @@ Date: REGEX(.*)
 ====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
 
 
 
@@ -217,8 +217,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 127
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -234,8 +234,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 181
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -266,8 +266,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 181
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -298,8 +298,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "duplicated tag-name: /a/ in path: /b/",
@@ -312,8 +312,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 128
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {

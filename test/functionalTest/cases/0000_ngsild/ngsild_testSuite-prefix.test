@@ -91,8 +91,8 @@ echo
 =============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context
 
 
 
@@ -139,8 +139,8 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 261
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
   "id": "urn:ngsi-ld:T:I123k467:Context",
@@ -162,8 +162,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 204
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
   "id": "urn:ngsi-ld:T:I123k467:Context",
@@ -185,8 +185,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 232
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
   {

@@ -162,8 +162,8 @@ echo
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 
 
 
@@ -171,8 +171,8 @@ Date: REGEX(.*)
 =====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 
 
 
@@ -226,8 +226,8 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 179
 Content-Type: application/json
-Link: REGEX(.*)
 Date: REGEX(.*)
+Link: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:entity:E1",
@@ -284,8 +284,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 HTTP/1.1 207 Multi-Status
 Content-Length: 136
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "notUpdated": [
@@ -303,8 +303,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 179
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
   "id": "urn:ngsi-ld:entity:E1",

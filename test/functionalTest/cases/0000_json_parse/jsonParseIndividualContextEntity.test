@@ -113,8 +113,8 @@ orionCurl --url "/v1/contextEntities/ENTITY_ID" -X "DELETE"
 HTTP/1.1 200 OK
 Content-Length: 172
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -132,8 +132,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 78
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "404", 
@@ -144,8 +144,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 180
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -171,8 +171,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 172
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -185,8 +185,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1H",
@@ -196,8 +196,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 179
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -221,8 +221,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 133
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -245,8 +245,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200",

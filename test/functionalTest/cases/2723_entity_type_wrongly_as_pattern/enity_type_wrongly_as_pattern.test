@@ -132,9 +132,9 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=JuridicaParams
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=JuridicaParams
 
 
 
@@ -142,9 +142,9 @@ Date: REGEX(.*)
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=Juridica
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Juridica
 
 
 
@@ -152,9 +152,9 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3?type=JuridicaParams
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=JuridicaParams
 
 
 
@@ -162,9 +162,9 @@ Date: REGEX(.*)
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4?type=Juridica
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Juridica
 
 
 
@@ -172,9 +172,9 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5?type=JuridicaParams
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=JuridicaParams
 
 
 
@@ -182,9 +182,9 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E6?type=XXX
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=XXX
 
 
 
@@ -193,8 +193,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 366
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [

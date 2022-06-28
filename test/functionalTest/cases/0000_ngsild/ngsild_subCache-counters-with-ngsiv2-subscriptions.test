@@ -215,9 +215,9 @@ echo
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX(.*)
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/subscriptions/REGEX(.*)
 
 
 
@@ -225,9 +225,9 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX(.*)
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/subscriptions/REGEX(.*)
 
 
 
@@ -235,9 +235,9 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX(.*)
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/subscriptions/REGEX(.*)
 
 
 
@@ -377,9 +377,9 @@ bye
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/entities/E1?type=T
 
 
 

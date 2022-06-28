@@ -276,8 +276,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 189
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -308,8 +308,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 189
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -340,8 +340,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 189
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -372,8 +372,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "P1M",
@@ -386,8 +386,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "P1M",
@@ -400,8 +400,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "P1M",
@@ -413,9 +413,9 @@ Date: REGEX(.*)
 ================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -424,8 +424,8 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 104
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Attributes that were not updated: { E1-T1 : [A8, A2, A4, A6] }",
@@ -438,8 +438,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {

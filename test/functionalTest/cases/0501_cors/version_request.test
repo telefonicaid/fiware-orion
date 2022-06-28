@@ -75,8 +75,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "orionld version": "REGEX(.*)",
@@ -95,12 +95,12 @@ Date: REGEX(.*)
 02. GET Version with arrakis origin (Access-Control-Allow-Origin header included)
 =================================================================================
 HTTP/1.1 200 OK
+Access-Control-Allow-Origin: arrakis
+Access-Control-Expose-Headers: REGEX(.*)
 Content-Length: REGEX(\d+)
 Content-Type: application/json
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "orionld version": "REGEX(.*)",
@@ -121,8 +121,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "orionld version": "REGEX(.*)",
@@ -142,8 +142,8 @@ Date: REGEX(.*)
 =====================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -151,14 +151,14 @@ Date: REGEX(.*)
 05. OPTIONS Version with arrakis origin (Access-Control-Allow-Origin header included)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Methods: REGEX(.*)
 Access-Control-Allow-Origin: arrakis
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Max-Age: REGEX([0-9]+)
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -167,8 +167,8 @@ Date: REGEX(.*)
 =========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

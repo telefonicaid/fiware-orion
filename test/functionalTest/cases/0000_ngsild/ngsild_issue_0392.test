@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+ Copyright 2019 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -87,8 +87,8 @@ echo
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:GtfsShape:900000470000-900000445316:MS
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:GtfsShape:900000470000-900000445316:MS
 
 
 
@@ -146,8 +146,8 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 276
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "id": "urn:ngsi-ld:GtfsShape:900000470000-900000445316:MS",

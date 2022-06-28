@@ -162,8 +162,8 @@ Fiware-Total-Count: 5
 HTTP/1.1 400 Bad Request
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
 
 {
     "description": "empty right-hand-side in q-item",

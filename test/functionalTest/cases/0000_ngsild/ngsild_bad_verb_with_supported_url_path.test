@@ -54,8 +54,8 @@ echo
 01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET
 ===========================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: GET,POST
+Content-Length: 0
 Date: REGEX(.*)
 
 

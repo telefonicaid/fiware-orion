@@ -117,8 +117,8 @@ echo
 ============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription:20-09-2019:13:13:00
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription:20-09-2019:13:13:00
 
 
 
@@ -126,8 +126,8 @@ Date: REGEX(.*)
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
 
 
 

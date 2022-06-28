@@ -115,11 +115,11 @@ echo
 01. POST /admin/log and see error 'method not allowed'
 ======================================================
 HTTP/1.1 405 Method Not Allowed
+Allow: PUT
 Content-Length: 63
 Content-Type: application/json
-Allow: PUT
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -132,8 +132,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 29
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "error": "log level missing"
@@ -145,8 +145,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 80
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Empty right-hand-side for a URI parameter",
@@ -159,8 +159,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 29
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "error": "invalid log level"
@@ -171,8 +171,8 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -180,8 +180,8 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -189,8 +189,8 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -198,8 +198,8 @@ Date: REGEX(.*)
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -207,8 +207,8 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -216,8 +216,8 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

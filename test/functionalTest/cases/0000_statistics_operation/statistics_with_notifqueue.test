@@ -38,8 +38,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "measuring_interval_in_secs": REGEX(\d+),

@@ -103,8 +103,8 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid
 
 
 
@@ -112,8 +112,8 @@ Date: REGEX(.*)
 =========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Leganes
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Leganes
 
 
 
@@ -121,8 +121,8 @@ Date: REGEX(.*)
 ============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Alcobendas
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Alcobendas
 
 
 
@@ -131,8 +131,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 434
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
     {

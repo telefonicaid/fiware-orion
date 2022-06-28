@@ -274,8 +274,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -289,8 +289,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 253
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -325,8 +325,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 257
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -361,8 +361,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 87
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -376,8 +376,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 253
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -412,8 +412,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 253
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -448,8 +448,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -479,8 +479,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 204
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -510,8 +510,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -526,8 +526,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [

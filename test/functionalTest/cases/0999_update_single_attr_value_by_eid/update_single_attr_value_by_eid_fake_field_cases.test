@@ -88,11 +88,11 @@ echo
 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT
 ===========================================================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, PUT
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, PUT
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -104,17 +104,17 @@ Date: REGEX(.*)
 ================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
 
 
 
 03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -123,8 +123,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 82
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": {
@@ -142,8 +142,8 @@ Date: REGEX(.*)
 05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
 =========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -152,8 +152,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 92
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": {

@@ -175,8 +175,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "status is not a string",
@@ -189,8 +189,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "status is not valid: it has to be either active or inactive",
@@ -202,9 +202,9 @@ Date: REGEX(.*)
 ===============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -213,8 +213,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "status is not a string",
@@ -227,8 +227,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "status is not valid: it has to be either active or inactive",

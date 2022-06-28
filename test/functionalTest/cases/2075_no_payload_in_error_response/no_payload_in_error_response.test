@@ -78,11 +78,11 @@ echo
 01. PATCH /v2/entities/E1, see 405 with payload
 ===============================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, DELETE
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -93,11 +93,11 @@ Date: REGEX(.*)
 02. POST /v2/entities/E1, see 405 with payload
 ==============================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, DELETE
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -108,11 +108,11 @@ Date: REGEX(.*)
 03. PUT /v2/entities/E1, see 405 with payload
 =============================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, DELETE
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",

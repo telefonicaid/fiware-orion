@@ -46,8 +46,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "entities_url": "/v2/entities",
@@ -60,11 +60,11 @@ Date: REGEX(.*)
 02. OPTIONS Entry Points
 ========================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET
 Content-Length: 63
 Content-Type: application/json
-Allow: GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",

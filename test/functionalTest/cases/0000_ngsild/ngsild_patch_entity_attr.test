@@ -139,8 +139,8 @@ echo
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 
 
 
@@ -156,8 +156,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 219
 Content-Type: application/json
-Link: REGEX(.*)
 Date: REGEX(.*)
+Link: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:entity:E1",
@@ -178,8 +178,8 @@ Date: REGEX(.*)
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
 
 
 
@@ -195,8 +195,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 164
 Content-Type: application/json
-Link: REGEX(.*)
 Date: REGEX(.*)
+Link: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:entity:E2",

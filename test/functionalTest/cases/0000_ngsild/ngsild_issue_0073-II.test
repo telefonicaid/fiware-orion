@@ -96,8 +96,8 @@ echo
 ==================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:EntityWithPrefixExpansion
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:EntityWithPrefixExpansion
 
 
 
@@ -140,8 +140,8 @@ bye
 ===================================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity2WithPrefixExpansion
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity2WithPrefixExpansion
 
 
 

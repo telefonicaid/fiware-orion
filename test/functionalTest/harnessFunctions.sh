@@ -1370,8 +1370,23 @@ function orionCurl()
     # Remove "Connection: Keep-Alive" and "Connection: close" headers
     #
     sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
-    sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
-    sed '/Connection: Close/d'      /tmp/httpHeaders.out
+    sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders3.out
+    sed '/Connection: Close/d'      /tmp/httpHeaders3.out > /tmp/httpHeaders.out
+
+    #
+    # First we want to see the HTTP line
+    #
+    egrep ^HTTP/ /tmp/httpHeaders.out
+
+    #
+    # Then the rest, but ordered alphabetically (also skipping the empty line)
+    #
+    cat /tmp/httpHeaders.out | egrep -v ^HTTP/ | grep -v '^$' | sort
+
+    #
+    # And in the end, the empty line (between HTTP headers and the payload body)
+    #
+    echo
   fi
 
   #

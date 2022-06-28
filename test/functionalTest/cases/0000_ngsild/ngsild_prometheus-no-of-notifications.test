@@ -161,8 +161,8 @@ echo
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
 
 
 
@@ -170,8 +170,8 @@ Date: REGEX(.*)
 ======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S2
 
 
 
@@ -184,8 +184,8 @@ ngsildRequests 2
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
 
 
 

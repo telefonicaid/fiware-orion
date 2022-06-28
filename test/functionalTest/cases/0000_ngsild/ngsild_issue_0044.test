@@ -126,8 +126,8 @@ echo
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4
 
 
 
@@ -136,8 +136,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "compile_time": "REGEX(.*)",

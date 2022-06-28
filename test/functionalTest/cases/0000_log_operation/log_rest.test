@@ -95,8 +95,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 25
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "200-255"
@@ -107,8 +107,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 22
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "5-10"
@@ -119,8 +119,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 22
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "5-10"
@@ -129,10 +129,10 @@ Date: REGEX(.*)
 
 === 4. POST trace level
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -141,8 +141,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 26
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "19,21-25"
@@ -153,8 +153,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 27
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "19, 21-25"
@@ -165,8 +165,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 28
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels_removed": "23"
@@ -177,8 +177,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "19, 21-22, 24-25"
@@ -189,8 +189,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 38
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "all trace levels off"
@@ -201,8 +201,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 23
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "tracelevels": "empty"

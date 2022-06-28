@@ -127,8 +127,8 @@ echo
 ==================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: http://REGEX(.*)
 Date: REGEX(.*)
+Location: http://REGEX(.*)
 
 URL of context A: REGEX(.*)
 
@@ -137,8 +137,8 @@ URL of context A: REGEX(.*)
 ==================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: http://REGEX(.*)
 Date: REGEX(.*)
+Location: http://REGEX(.*)
 
 URL of context B: REGEX(.*)
 
@@ -147,8 +147,8 @@ URL of context B: REGEX(.*)
 ==================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: http://REGEX(.*)
 Date: REGEX(.*)
+Location: http://REGEX(.*)
 
 URL of context C: REGEX(.*)
 

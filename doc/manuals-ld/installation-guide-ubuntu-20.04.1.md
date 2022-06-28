@@ -60,8 +60,8 @@ sudo aptitude install -y libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev 
 
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
-* Mongo C driver:      1.21.1
-* libmicrohttpd:       0.9.72
+* Mongo C driver:      1.21.2
+* libmicrohttpd:       0.9.75
 * rapidjson:           1.0.2
 * kbase:               0.8
 * klog:                0.8
@@ -115,9 +115,9 @@ Install the driver like this:
 sudo mkdir /opt/mongoc
 sudo chown $USER:$GROUP /opt/mongoc
 cd /opt/mongoc
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
-tar xzf mongo-c-driver-1.21.1.tar.gz
-cd mongo-c-driver-1.21.1
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz
+tar xzf mongo-c-driver-1.21.2.tar.gz
+cd mongo-c-driver-1.21.2
 mkdir cmake-build
 cd cmake-build
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
@@ -134,9 +134,9 @@ This is how you install libmicrohttpd from source code:
 sudo mkdir /opt/libmicrohttpd
 sudo chown $USER:$GROUP /opt/libmicrohttpd
 cd /opt/libmicrohttpd
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
-tar xvf libmicrohttpd-0.9.72.tar.gz
-cd libmicrohttpd-0.9.72
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
+tar xvf libmicrohttpd-0.9.75.tar.gz
+cd libmicrohttpd-0.9.75
 ./configure --disable-messages --disable-postprocessor --disable-dauth
 make
 sudo make install

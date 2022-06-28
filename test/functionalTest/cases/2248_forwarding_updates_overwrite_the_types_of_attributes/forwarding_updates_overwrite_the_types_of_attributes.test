@@ -120,9 +120,9 @@ echo
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -131,8 +131,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "P1M",
@@ -146,8 +146,8 @@ Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn'
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -160,8 +160,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 78
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {
@@ -182,8 +182,8 @@ Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn'
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -196,8 +196,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 82
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {

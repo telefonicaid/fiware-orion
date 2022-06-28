@@ -113,8 +113,8 @@ echo
 01. POST /v2/op/update to create Room1, Room2, and Room3 entity in Batch operation.
 ===================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -123,8 +123,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 125
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "Room1",
@@ -147,8 +147,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 121
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "Room2",
@@ -171,8 +171,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 125
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "Room3",

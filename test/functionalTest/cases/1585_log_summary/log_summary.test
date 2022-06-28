@@ -145,8 +145,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 56
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "service not found",
@@ -159,8 +159,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -171,11 +171,11 @@ Date: REGEX(.*)
 03. GETT /v2/entities - bad verb
 ================================
 HTTP/1.1 405 Method Not Allowed
+Allow: POST, GET
 Content-Length: 63
 Content-Type: application/json
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -188,8 +188,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -214,8 +214,8 @@ Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 []
 
@@ -241,8 +241,8 @@ Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new
 HTTP/1.1 400 Bad Request
 Content-Length: 56
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "service not found",

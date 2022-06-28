@@ -366,8 +366,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 64
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT24H",
@@ -378,10 +378,10 @@ Date: REGEX(.*)
 1. NOP /ngsi9/registerContext
 =============================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -390,8 +390,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 168
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -414,10 +414,10 @@ Date: REGEX(.*)
 2. NOP /ngsi9/discoverContextAvailability
 =========================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -426,8 +426,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT5H",
@@ -438,10 +438,10 @@ Date: REGEX(.*)
 3. NOP /ngsi9/subscribeContextAvailability
 ==========================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -450,8 +450,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT5H",
@@ -462,10 +462,10 @@ Date: REGEX(.*)
 4. NOP /ngsi9/updateContextAvailabilitySubscription
 ===================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -474,8 +474,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -489,10 +489,10 @@ Date: REGEX(.*)
 5. NOP /ngsi9/unsubscribeContextAvailability
 ============================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -501,8 +501,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1H",
@@ -515,8 +515,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -539,10 +539,10 @@ Date: REGEX(.*)
 6. NOP /ngsi9/contextEntities/E
 ===============================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -551,8 +551,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1H",
@@ -565,8 +565,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -589,10 +589,10 @@ Date: REGEX(.*)
 7. NOP /ngsi9/contextEntities/F/attributes
 ==========================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -601,8 +601,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1H",
@@ -615,8 +615,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 217
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -646,10 +646,10 @@ Date: REGEX(.*)
 8. NOP /ngsi9/contextEntities/G/attributes/A
 ============================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -658,8 +658,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 64
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT24H",
@@ -672,8 +672,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -696,10 +696,10 @@ Date: REGEX(.*)
 9. NOP /ngsi9/contextEntityTypes/S
 ==================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -708,8 +708,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 64
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT24H",
@@ -722,8 +722,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -746,10 +746,10 @@ Date: REGEX(.*)
 10. NOP /ngsi9/contextEntityTypes/U/attributes
 ==============================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -758,8 +758,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1H",
@@ -772,8 +772,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 217
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -803,10 +803,10 @@ Date: REGEX(.*)
 11. NOP /ngsi9/contextEntityTypes/V/attributes/A
 ================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -815,8 +815,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1M",
@@ -827,10 +827,10 @@ Date: REGEX(.*)
 12. NOP /ngsi9/contextAvailabilitySubscriptions
 ===============================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -839,8 +839,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "P1Y",
@@ -853,8 +853,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -868,10 +868,10 @@ Date: REGEX(.*)
 13. NOP /ngsi9/contextAvailabilitySubscriptions/SUB_ID
 ======================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

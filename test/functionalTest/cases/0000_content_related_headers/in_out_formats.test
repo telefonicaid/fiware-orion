@@ -135,8 +135,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -167,8 +167,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 187
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -195,8 +195,8 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 119
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -212,8 +212,8 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 119
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -229,8 +229,8 @@ Date: REGEX(.*)
 HTTP/1.1 406 Not Acceptable
 Content-Length: 91
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "orionError": {
@@ -246,8 +246,8 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 119
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -263,8 +263,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -295,8 +295,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -327,8 +327,8 @@ Date: REGEX(.*)
 HTTP/1.1 406 Not Acceptable
 Content-Length: 91
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "orionError": {
@@ -344,8 +344,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 208
 Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [

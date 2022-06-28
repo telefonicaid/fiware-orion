@@ -36,8 +36,8 @@ sudo aptitude install -y libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev 
 
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
-* Mongo C driver:      1.21.1
-* libmicrohttpd:       0.9.72
+* Mongo C driver:      1.21.2
+* libmicrohttpd:       0.9.75
 * rapidjson:           1.0.2
 * kbase:               0.8
 * klog:                0.8
@@ -341,7 +341,10 @@ If using a docker image, the MongoDB server comes as part of the docker, but if 
 Ubuntu 22.04 is still more or less new and the good people from MongoDB are still to provide installation instructions.
 Here's the issue in [MongoDB's Jira](https://jira.mongodb.org/browse/SERVER-62300).
 
-If you really want to run on 22.04, some people have to sort it themselves - this issue [here]() gives you the info on how to make it work.
+If you really want to run on 22.04, this guide from [cloudbooklet](https://www.cloudbooklet.com/how-to-install-mongodb-on-ubuntu-22-04/)
+gives you info on how to make it work.
+They install MongoDB 5.0, which probably works just fine with Orion-LD.
+However, if you want to go safe, install 4.4 instead - 5.x is untested.
 
 The official position of the Orion-LD team is:
 

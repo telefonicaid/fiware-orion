@@ -111,9 +111,9 @@ echo
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX(.*)
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/subscriptions/REGEX(.*)
 
 
 
@@ -215,8 +215,8 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 359
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
     {
@@ -253,8 +253,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 352
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
     {
