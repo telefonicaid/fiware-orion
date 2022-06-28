@@ -204,10 +204,10 @@ function mongocDriver()
   sudo chown $USER:$GROUP mongoc
   cd /opt/mongoc
 
-  wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz
-  tar xzf mongo-c-driver-1.17.5.tar.gz
+  wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz
+  tar xzf mongo-c-driver-1.21.2.tar.gz
 
-  cd mongo-c-driver-1.17.5
+  cd mongo-c-driver-1.21.2
   mkdir -p cmake-build
 
   cd cmake-build
@@ -227,9 +227,9 @@ function libmicrohttpd()
   sudo mkdir -p /opt/libmicrohttpd
   sudo chown $USER:$GROUP /opt/libmicrohttpd
   cd /opt/libmicrohttpd
-  wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
-  tar xvf libmicrohttpd-0.9.72.tar.gz
-  cd libmicrohttpd-0.9.72
+  wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
+  tar xvf libmicrohttpd-0.9.75.tar.gz
+  cd libmicrohttpd-0.9.75
   ./configure --disable-messages --disable-postprocessor --disable-dauth
   make
   sudo make install

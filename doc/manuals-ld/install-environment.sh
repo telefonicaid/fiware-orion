@@ -56,9 +56,9 @@ function Ubuntu20.04() {
     sudo mkdir /opt/mongoc >/dev/null 2>>$filename
     sudo chown $USER:$GROUP mongoc >/dev/null 2>>$filename
     cd /opt/mongoc >/dev/null 2>>$filename
-    wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.5/mongo-c-driver-1.17.5.tar.gz >/dev/null 2>>$filename
-    tar xzf mongo-c-driver-1.17.5.tar.gz >/dev/null 2>>$filename
-    cd mongo-c-driver-1.17.5 >/dev/null 2>>$filename
+    wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz >/dev/null 2>>$filename
+    tar xzf mongo-c-driver-1.21.2.tar.gz >/dev/null 2>>$filename
+    cd mongo-c-driver-1.21.2 >/dev/null 2>>$filename
     mkdir cmake-build >/dev/null 2>>$filename
     cd cmake-build >/dev/null 2>>$filename
     cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. >/dev/null 2>>$filename
@@ -70,9 +70,9 @@ function Ubuntu20.04() {
     sudo mkdir /opt/libmicrohttpd >/dev/null 2>>$filename
     sudo chown $USER:$GROUP /opt/libmicrohttpd >/dev/null 2>>$filename
     cd /opt/libmicrohttpd >/dev/null 2>>$filename
-    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz >/dev/null 2>>$filename
-    tar xvf libmicrohttpd-0.9.72.tar.gz >/dev/null 2>>$filename
-    cd libmicrohttpd-0.9.72 >/dev/null 2>>$filename
+    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz >/dev/null 2>>$filename
+    tar xvf libmicrohttpd-0.9.75.tar.gz >/dev/null 2>>$filename
+    cd libmicrohttpd-0.9.75 >/dev/null 2>>$filename
     ./configure --disable-messages --disable-postprocessor --disable-dauth >/dev/null 2>>$filename
     make >/dev/null 2>>$filename
     sudo make install >/dev/null 2>>$filename
