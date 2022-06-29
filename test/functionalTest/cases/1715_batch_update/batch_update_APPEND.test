@@ -198,7 +198,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error
 ================================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)

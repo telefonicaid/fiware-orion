@@ -164,6 +164,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 05. Entity Attribute Value - Allowed methods: GET PUT OPTIONS
 =============================================================
+HTTP/1.1 200 OK
 Access-Control-Allow-Headers: REGEX(.*)
 Access-Control-Allow-Methods: GET, PUT, OPTIONS
 Access-Control-Allow-Origin: *
@@ -172,7 +173,6 @@ Access-Control-Max-Age: REGEX([0-9]+)
 Content-Length: 0
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-HTTP/1.1 200 OK
 
 
 

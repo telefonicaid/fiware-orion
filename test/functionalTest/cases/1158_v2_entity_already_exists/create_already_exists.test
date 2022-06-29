@@ -95,7 +95,7 @@ Location: /v2/entities/Room1?type=Room
 
 02. POST /v2/entities (Room1-Room)
 ==================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Content-Length: 56
 Content-Type: application/json
 Date: REGEX(.*)
