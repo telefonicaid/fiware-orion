@@ -1121,13 +1121,18 @@ Response:
           }
         }
 
-+ Parameters
-    + options (optional, string) - Options dictionary
-      + Members
-          + keyValues - when used, the request payload uses the `keyValues` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + upsert - when used, entity is updated if already exits. If upsert is not used and
-            the entity already exist a `422 Unprocessable Entity` error is returned.
+**Parameters**
+
+| Parameter | Optional | Type   | Description                                                              | Example |
+|-----------|----------|--------|--------------------------------------------------------------------------|---------|
+| `options` | ✓        | string | A comma-separated list of options for the query. See the following table | upsert  |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                        |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
 
 + Response 201
 
@@ -1589,14 +1594,20 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of types to be retrieved.
-    + offset: 20 (optional, number) - Skip a number of records.
-    + options (optional, string) - Options dictionary.
-      + Members
-          + count - when used, the total number of types is returned in the HTTP header
-            `Fiware-Total-Count`
-          + values - when used, the response payload is a JSON array with a list of entity types
+**Parameters**
+
+| Parameter | Optional | Type   | Description                                | Example |
+|-----------|----------|--------|--------------------------------------------|---------|
+| `limit`   | ✓        | number | Limit the number of types to be retrieved. | `10`    |
+| `offset`  | ✓        | number | Skip a number of records.                  | `20`    |
+| `options` | ✓        | string | Options dictionary.                        | `count` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                              |
+|----------|------------------------------------------------------------------------------------------|
+| `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
+| `values` | When used, the response payload is a JSON array with a list of entity types              |
 
 + Response 200 (application/json)
 
@@ -1649,8 +1660,11 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityType: Room (required, string) - Entity Type
+**Parameters**
+
+| Parameter    | Optional | Type   | Description  | Example |
+|--------------|----------|--------|--------------|---------|
+| `entityType` |          | string | Entity Type. | `Room`  |
 
 + Response 200 (application/json)
 
@@ -1672,6 +1686,18 @@ Response code:
 ## Subscriptions Operations
 
 A subscription is represented by a JSON object with the following fields:
+
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `id`           |          | string | Subscription unique identifier. Automatically created at creation time.                       |
+| `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
+| `subject`      |          | object | An object that describes the subject of the subscription.                                     |
+| `notification` |          | object | An object that describes the notification to send when the subscription is triggered.         |
+| `expires`      | ✓        | string | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
+| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
+
+
 
 + `id`: Subscription unique identifier. Automatically created at creation time.
 + `description` (optional): A free text used by the client to describe the subscription.
