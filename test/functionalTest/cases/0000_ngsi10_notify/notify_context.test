@@ -78,8 +78,8 @@ orionCurl --url "$url" --payload "$payload"
 HTTP/1.1 200 OK
 Content-Length: 51
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "responseCode": {
@@ -91,8 +91,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 214
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [

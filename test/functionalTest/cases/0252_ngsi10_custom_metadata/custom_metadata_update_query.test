@@ -182,8 +182,8 @@ orionCurl --url "/v1/contextEntities/Room1"
 HTTP/1.1 200 OK
 Content-Length: 476
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -240,8 +240,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 462
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -294,8 +294,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 320
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -335,8 +335,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 511
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -394,8 +394,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 318
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -435,8 +435,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 680
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -511,8 +511,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 207
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -540,8 +540,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 460
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {

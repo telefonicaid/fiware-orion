@@ -151,8 +151,8 @@ Date: REGEX(.*)
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
 
 
 
@@ -161,8 +161,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 163
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "attributeCount": 1,
@@ -182,8 +182,8 @@ Date: REGEX(.*)
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 
 
 
@@ -192,8 +192,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 183
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "attributeCount": 2,
@@ -215,8 +215,8 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 
 
 
@@ -225,8 +225,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 167
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "attributeCount": 2,

@@ -191,8 +191,8 @@ echo
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 
 
 
@@ -200,8 +200,8 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S2
 
 
 
@@ -209,8 +209,8 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S3
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S3
 
 
 
@@ -347,8 +347,8 @@ bye
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 
 
 

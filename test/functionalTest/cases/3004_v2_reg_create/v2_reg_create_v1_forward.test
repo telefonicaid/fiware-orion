@@ -112,9 +112,9 @@ echo
 ===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 
 
 
@@ -122,9 +122,9 @@ Date: REGEX(.*)
 =======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -133,8 +133,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 78
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": {
@@ -150,8 +150,8 @@ Date: REGEX(.*)
 04. UPDATE E1/A1 in main broker (forward made to CP1)
 =====================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -160,8 +160,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 76
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": {

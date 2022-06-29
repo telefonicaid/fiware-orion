@@ -70,8 +70,8 @@ echo
 01. Update using empty entity type
 ==================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -80,8 +80,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 122
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {

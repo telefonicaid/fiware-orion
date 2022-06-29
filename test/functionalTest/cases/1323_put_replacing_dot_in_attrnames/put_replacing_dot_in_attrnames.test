@@ -127,9 +127,9 @@ echo
 ===================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
 
 
 
@@ -138,8 +138,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 125
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1.X": {
@@ -162,8 +162,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 45
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1.X": 1,
@@ -176,8 +176,8 @@ Date: REGEX(.*)
 03. Modify E1 to E1/A2+A3
 =========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -186,8 +186,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 125
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A2..y": {
@@ -210,8 +210,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 45
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A2..y": 2,
@@ -226,8 +226,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 41
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "metadata": {},
@@ -241,8 +241,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 11
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A2..y": 2
@@ -254,8 +254,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 41
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "metadata": {},
@@ -269,8 +269,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 10
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A3.Z": 3

@@ -68,8 +68,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 189
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -98,12 +98,12 @@ Date: REGEX(.*)
 02. Query E1-T1 With Origin Header (Access-Control-Allow-Origin included)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
+Access-Control-Expose-Headers: REGEX(.*)
+Content-Length: 167
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {
@@ -130,8 +130,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 167
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {

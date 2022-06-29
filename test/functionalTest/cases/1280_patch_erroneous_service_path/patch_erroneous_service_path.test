@@ -73,8 +73,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "invalid character in URI",
@@ -87,8 +87,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "a component of ServicePath contains an illegal character",
@@ -101,8 +101,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 111
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
@@ -115,8 +115,8 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 87
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "not supported content type: text/plain",

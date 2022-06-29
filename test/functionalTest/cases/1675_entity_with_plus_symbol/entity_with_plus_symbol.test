@@ -77,8 +77,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 258
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -114,8 +114,8 @@ Get entity +34666666666
 HTTP/1.1 200 OK
 Content-Length: 240
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextElement": {

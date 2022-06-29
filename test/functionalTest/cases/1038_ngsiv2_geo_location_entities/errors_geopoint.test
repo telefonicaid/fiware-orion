@@ -226,11 +226,11 @@ echo
 --REGEXPECT--
 01. Create entity with two geo:point -> fail
 ============================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
@@ -243,8 +243,8 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -256,9 +256,9 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
 
 
 
@@ -267,8 +267,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 86
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr1": {
@@ -284,8 +284,8 @@ Date: REGEX(.*)
 03. Update attr1 geo:point attribute -> OK
 ==========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -294,8 +294,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 86
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr1": {
@@ -310,11 +310,11 @@ Date: REGEX(.*)
 
 04. Append a new geo:point attribute (attr2) -> fail
 ====================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
@@ -327,8 +327,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 86
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr1": {
@@ -344,8 +344,8 @@ Date: REGEX(.*)
 05. Remove the geo:point attribute (attr1) -> OK
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -354,8 +354,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 26
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "E1",
@@ -366,8 +366,8 @@ Date: REGEX(.*)
 06. Append a new geo:point attribute (attr2) -> OK
 ==================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -376,8 +376,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 86
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {
@@ -393,8 +393,8 @@ Date: REGEX(.*)
 07. Change attribute type to no-geo:point (attr2) -> OK
 =======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -403,8 +403,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 88
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {
@@ -420,8 +420,8 @@ Date: REGEX(.*)
 08. Append new geo:point attribute (attr3) -> OK
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -430,8 +430,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {
@@ -451,11 +451,11 @@ Date: REGEX(.*)
 
 09. Change attr2 type to geo:point again -> fail
 ================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
@@ -468,8 +468,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {

@@ -229,8 +229,8 @@ echo
 01. OPTIONS request for /entities
 =================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -238,8 +238,8 @@ Date: REGEX(.*)
 02. OPTIONS request for /entities/{entityId}
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,DELETE,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -247,9 +247,9 @@ Date: REGEX(.*)
 03. OPTIONS request for /entities/{entityId}/attrs
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Allow: POST,PATCH,OPTIONS
 Accept-Patch: application/json, application/ld+json
+Allow: POST,PATCH,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -257,9 +257,9 @@ Date: REGEX(.*)
 04. OPTIONS request for /entities/{entityId}/attrs/{attrName}
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Allow: DELETE,PATCH,OPTIONS
 Accept-Patch: application/json, application/ld+json
+Allow: DELETE,PATCH,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -267,8 +267,8 @@ Date: REGEX(.*)
 05. OPTIONS request for /entityOperations/create
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -276,8 +276,8 @@ Date: REGEX(.*)
 06. OPTIONS request for /entityOperations/upsert
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -285,8 +285,8 @@ Date: REGEX(.*)
 07. OPTIONS request for /entityOperations/update
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -294,8 +294,8 @@ Date: REGEX(.*)
 08. OPTIONS request for /entityOperations/delete
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -303,8 +303,8 @@ Date: REGEX(.*)
 09. OPTIONS request for /entityOperations/query
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -312,8 +312,8 @@ Date: REGEX(.*)
 10. OPTIONS request for /types
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -321,8 +321,8 @@ Date: REGEX(.*)
 11. OPTIONS request for /types/{typeName}
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -330,8 +330,8 @@ Date: REGEX(.*)
 12. OPTIONS request for /attributes
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -339,8 +339,8 @@ Date: REGEX(.*)
 13. OPTIONS request for /attributes/{attrName}
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -348,8 +348,8 @@ Date: REGEX(.*)
 14. OPTIONS request for /subscriptions/
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -357,9 +357,9 @@ Date: REGEX(.*)
 15. OPTIONS request for /subscriptions/{subscriptionId}
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Allow: GET,DELETE,PATCH,OPTIONS
 Accept-Patch: application/json, application/ld+json
+Allow: GET,DELETE,PATCH,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -367,8 +367,8 @@ Date: REGEX(.*)
 16. OPTIONS request for /csourceRegistrations/
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -376,9 +376,9 @@ Date: REGEX(.*)
 17. OPTIONS request for /csourceRegistrations/{registrationId}
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Allow: GET,DELETE,PATCH,OPTIONS
 Accept-Patch: application/json, application/ld+json
+Allow: GET,DELETE,PATCH,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -386,8 +386,8 @@ Date: REGEX(.*)
 18. OPTIONS request for /jsonldContexts
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -395,8 +395,8 @@ Date: REGEX(.*)
 19. OPTIONS request for /jsonldContexts/{contextId}
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,DELETE,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -404,8 +404,8 @@ Date: REGEX(.*)
 20. OPTIONS request for /temporal/entities
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -413,8 +413,8 @@ Date: REGEX(.*)
 21. OPTIONS request for /temporal/entities/{entityId}
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: GET,DELETE,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -422,8 +422,8 @@ Date: REGEX(.*)
 22. OPTIONS request for /temporal/entities/{entityId}/attrs
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -431,8 +431,8 @@ Date: REGEX(.*)
 23. OPTIONS request for /temporal/entities/{entityId}/attrs/{attrName}
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: DELETE,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -440,8 +440,8 @@ Date: REGEX(.*)
 24. OPTIONS request for /temporal/entityOperations/query
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 0
 Allow: POST,OPTIONS
+Content-Length: 0
 Date: REGEX(.*)
 
 

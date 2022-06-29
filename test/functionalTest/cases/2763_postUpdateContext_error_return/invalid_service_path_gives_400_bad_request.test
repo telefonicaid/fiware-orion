@@ -42,8 +42,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 111
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",

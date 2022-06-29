@@ -183,8 +183,8 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -200,8 +200,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -217,8 +217,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 104
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "subscribeResponse": {
@@ -240,8 +240,8 @@ Broker Restarted
 HTTP/1.1 200 OK
 Content-Length: 144
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "ids": "REGEX([0-9a-f, ]{76})",

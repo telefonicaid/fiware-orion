@@ -233,9 +233,9 @@ echo
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -244,8 +244,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 403
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",
@@ -284,8 +284,8 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/ID1 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -294,8 +294,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 405
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",
@@ -335,9 +335,9 @@ Date: REGEX(.*)
 =====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -346,8 +346,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 428
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",
@@ -389,8 +389,8 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions/ID2 to change status to "active"
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -399,8 +399,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 426
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",
@@ -442,8 +442,8 @@ Date: REGEX(.*)
 09. PATCH /v2/subscriptions/ID2 to change expiration time to make it to expire
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -452,8 +452,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 427
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",
@@ -495,8 +495,8 @@ Date: REGEX(.*)
 11. PATCH /v2/subscriptions/ID2 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -505,8 +505,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 427
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",
@@ -548,8 +548,8 @@ Date: REGEX(.*)
 13. PATCH /v2/subscriptions/ID2 to change expiration time to make it to un-expire
 =================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -558,8 +558,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 428
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "REGEX(.*)",

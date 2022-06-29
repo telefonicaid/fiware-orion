@@ -74,8 +74,8 @@ echo
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
 
 
 

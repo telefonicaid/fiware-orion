@@ -88,8 +88,8 @@ orionCurl --url "$url" --payload "$payload" -X "PUT"
 HTTP/1.1 200 OK
 Content-Length: 91
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -102,8 +102,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 229
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -134,8 +134,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 183
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [

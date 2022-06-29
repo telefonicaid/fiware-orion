@@ -116,8 +116,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid JSON type for entity id",
@@ -130,8 +130,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 72
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid JSON type for entity type",
@@ -144,8 +144,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "invalid JSON type for attribute type",
@@ -158,8 +158,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "invalid JSON type for attribute metadata type",
@@ -172,8 +172,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 80
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "invalid JSON field for attribute metadata",
@@ -186,8 +186,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "metadata must be a JSON object",

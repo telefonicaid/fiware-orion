@@ -297,8 +297,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 72
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "geo:json needs an object as value",
@@ -311,8 +311,8 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -325,8 +325,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 72
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "geo:json needs an object as value",
@@ -339,8 +339,8 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -350,11 +350,11 @@ Date: REGEX(.*)
 
 03. Create entity with two geo:json -> fail
 ===========================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
@@ -367,8 +367,8 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -380,9 +380,9 @@ Date: REGEX(.*)
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
 
 
 
@@ -391,8 +391,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 138
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr1": {
@@ -430,8 +430,8 @@ Date: REGEX(.*)
 05. Update attr1 geo:json attribute -> OK
 =========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -440,8 +440,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 126
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr1": {
@@ -468,11 +468,11 @@ Date: REGEX(.*)
 
 06. Append a new geo:json attribute (attr2) -> fail
 ===================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
@@ -485,8 +485,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 126
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr1": {
@@ -514,8 +514,8 @@ Date: REGEX(.*)
 07. Remove the geo:json attribute (attr1) -> OK
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -524,8 +524,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 26
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "E1",
@@ -536,8 +536,8 @@ Date: REGEX(.*)
 08. Append a new geo:json attribute (attr2) -> OK
 =================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -546,8 +546,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 128
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {
@@ -575,8 +575,8 @@ Date: REGEX(.*)
 09. Change attribute type to no-geo:json (attr2) -> OK
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -585,8 +585,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {
@@ -602,8 +602,8 @@ Date: REGEX(.*)
 10. Append new geo:json attribute (attr3) -> OK
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -612,8 +612,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 172
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {
@@ -639,11 +639,11 @@ Date: REGEX(.*)
 
 11. Change attr2 type to geo:json again -> fail
 ===============================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Content-Length: 148
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity [see Orion user manual]",
@@ -656,8 +656,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 172
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attr2": {

@@ -88,9 +88,9 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 1601
 Content-Type: application/json
+Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 NGSILD-Results-Count: 200
-Date: REGEX(.*)
 
 [
     {
@@ -261,9 +261,9 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1121
 Content-Type: application/json
+Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 NGSILD-Results-Count: 200
-Date: REGEX(.*)
 
 [
     {

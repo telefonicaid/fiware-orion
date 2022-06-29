@@ -210,9 +210,9 @@ echo
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -221,8 +221,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 427
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -265,9 +265,9 @@ Date: REGEX(.*)
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -276,8 +276,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 456
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "1991-04-05T14:00:00.000Z",
@@ -322,9 +322,9 @@ Date: REGEX(.*)
 ===============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -333,8 +333,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 447
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "1991-04-05T14:00:00.000Z",
@@ -379,9 +379,9 @@ Date: REGEX(.*)
 ===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -390,8 +390,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 373
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "1991-04-05T14:00:00.000Z",

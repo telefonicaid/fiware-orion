@@ -87,19 +87,19 @@ echo
 ==================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
 
 
 
 02. POST /v2/entities (Room1-Room)
 ==================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Content-Length: 56
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Already Exists",
@@ -112,8 +112,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 78
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "Room1",
@@ -131,8 +131,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 40
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "id": "Room1",
@@ -146,8 +146,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 6
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     "29"

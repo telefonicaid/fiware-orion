@@ -108,8 +108,8 @@ echo
 ========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 
 
 

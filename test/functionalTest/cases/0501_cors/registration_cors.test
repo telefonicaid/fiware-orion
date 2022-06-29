@@ -95,9 +95,9 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
 
 
 
@@ -105,22 +105,22 @@ Date: REGEX(.*)
 ===========================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. OPTIONS Registrations with arrakis origin (Access-Control-Allow-Origin header included)
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
 Access-Control-Allow-Methods: GET, POST, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Access-Control-Allow-Origin: arrakis
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Max-Age: REGEX([0-9]+)
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -128,8 +128,8 @@ Date: REGEX(.*)
 ===============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -137,22 +137,22 @@ Date: REGEX(.*)
 ===================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. OPTIONS specific Registration with arrakis origin (Access-Control-Allow-Origin header included)
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]+)
 Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
 Access-Control-Allow-Methods: GET, DELETE, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Access-Control-Allow-Origin: arrakis
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Max-Age: REGEX([0-9]+)
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -160,8 +160,8 @@ Date: REGEX(.*)
 =======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

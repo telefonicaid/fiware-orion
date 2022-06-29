@@ -364,8 +364,8 @@ Date: REGEX(.*)
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 
 
 
@@ -499,8 +499,8 @@ Date: REGEX(.*)
 ========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Person:0001
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Person:0001
 
 
 
@@ -509,8 +509,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "id": "urn:ngsi-ld:Person:0001",

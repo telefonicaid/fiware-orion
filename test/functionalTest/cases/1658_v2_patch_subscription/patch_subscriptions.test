@@ -241,9 +241,9 @@ echo
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -252,8 +252,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 427
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -295,8 +295,8 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions (subject)
 =====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -305,8 +305,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 455
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -350,8 +350,8 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions (notification)
 ==========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -360,8 +360,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 452
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -405,8 +405,8 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions (expires)
 =====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -415,8 +415,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 453
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "1982-06-14T17:15:00.000Z",
@@ -462,8 +462,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 113
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "error parsing geo-query fields: Invalid selector in geometry specification",
@@ -476,8 +476,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 453
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "1982-06-14T17:15:00.000Z",
@@ -521,8 +521,8 @@ Date: REGEX(.*)
 11. PATCH /v2/subscriptions/ID (whole)
 ======================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -531,8 +531,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 427
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "expires": "2050-04-05T14:00:00.000Z",

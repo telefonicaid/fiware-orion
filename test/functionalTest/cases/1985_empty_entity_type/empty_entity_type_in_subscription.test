@@ -110,8 +110,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 85
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "entity type length: 0, min length supported: 1",
@@ -123,9 +123,9 @@ Date: REGEX(.*)
 =========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
 
 
 
@@ -134,8 +134,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 85
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "entity type length: 0, min length supported: 1",

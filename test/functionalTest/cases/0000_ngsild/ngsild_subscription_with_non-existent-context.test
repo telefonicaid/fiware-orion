@@ -107,8 +107,8 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
 
 
 

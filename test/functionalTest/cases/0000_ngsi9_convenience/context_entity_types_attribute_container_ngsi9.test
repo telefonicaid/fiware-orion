@@ -75,8 +75,8 @@ orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" -X "DELETE"
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -88,8 +88,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "duration": "PT1H",
@@ -99,8 +99,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 317
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextRegistrationResponses": [
@@ -132,10 +132,10 @@ Date: REGEX(.*)
 }
 3: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 --TEARDOWN--
 brokerStop CB

@@ -97,9 +97,9 @@ echo
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
@@ -108,8 +108,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 189
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {"id":"E","type":"T","A":{"type":"AT","value":1,"metadata":{}},"B":{"type":"BT","value":2,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}}}
 
@@ -119,8 +119,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 45
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {"id":"E","type":"T","A":1,"B":2,"C":3,"D":4}
 
@@ -130,8 +130,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 147
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {"id":"E","type":"T","B":{"type":"BT","value":2,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}}}
 
@@ -141,8 +141,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 39
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {"id":"E","type":"T","B":2,"D":4,"C":3}
 

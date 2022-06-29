@@ -175,8 +175,8 @@ echo
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 
 
 
@@ -184,8 +184,8 @@ Date: REGEX(.*)
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 
 
 
@@ -260,9 +260,9 @@ bye
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=urn:T
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/entities/E2?type=urn:T
 
 
 
@@ -278,8 +278,8 @@ Date: REGEX(.*)
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
 
 
 
@@ -313,9 +313,9 @@ Ngsild-Attribute-Format: Simplified
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4?type=urn:T
-Fiware-Correlator: REGEX(.*)
 Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+Location: /v2/entities/E4?type=urn:T
 
 
 

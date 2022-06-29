@@ -205,8 +205,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid URL parsing notification url",
@@ -219,8 +219,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid URL parsing notification url",
@@ -233,8 +233,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid URL parsing notification url",
@@ -251,9 +251,9 @@ Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notificat
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -276,9 +276,9 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 

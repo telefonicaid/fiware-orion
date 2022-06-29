@@ -111,9 +111,9 @@ echo
 =====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -122,8 +122,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 96
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid query: Invalid selector in geometry specification",
@@ -136,8 +136,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 96
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid query: URI param /geometry/ used without /coords/",
@@ -150,8 +150,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 96
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid query: URI param /coords/ used without /geometry/",
@@ -164,8 +164,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 85
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid query: Too few coordinates for polygon",
@@ -178,8 +178,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 95
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid query: invalid number of coordinates for /point/",
@@ -192,8 +192,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 110
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Invalid query: georel /near/ without either minDistance nor maxDistance",
@@ -206,8 +206,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 []
 
@@ -217,8 +217,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 []
 

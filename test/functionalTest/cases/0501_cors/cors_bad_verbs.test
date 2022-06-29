@@ -104,11 +104,11 @@ echo
 01. Bad Verb Entry Points
 =========================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -119,11 +119,11 @@ Date: REGEX(.*)
 02. Bad Verb All Entities
 =========================
 HTTP/1.1 405 Method Not Allowed
+Allow: POST, GET, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: POST, GET, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -134,11 +134,11 @@ Date: REGEX(.*)
 03. Bad Verb Entity
 ===================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, DELETE, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, DELETE, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -149,11 +149,11 @@ Date: REGEX(.*)
 04. Bad Verb Entity Attributes
 ==============================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, PATCH, POST, PUT, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, PATCH, POST, PUT, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -164,11 +164,11 @@ Date: REGEX(.*)
 05. Bad Verb Entity Attribute Value
 ===================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, PUT, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, PUT, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -179,11 +179,11 @@ Date: REGEX(.*)
 06. Bad Verb Entity Attribute
 =============================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, PUT, DELETE, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, PUT, DELETE, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -194,11 +194,11 @@ Date: REGEX(.*)
 07. Bad Verb Entity Type
 ========================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -209,11 +209,11 @@ Date: REGEX(.*)
 08. Bad Verb All Entity Types
 =============================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -224,11 +224,11 @@ Date: REGEX(.*)
 09. Bad Verb All Subscriptions
 ==============================
 HTTP/1.1 405 Method Not Allowed
+Allow: POST, GET, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: POST, GET, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -239,11 +239,11 @@ Date: REGEX(.*)
 10. Bad Verb Specific Subscription
 ==================================
 HTTP/1.1 405 Method Not Allowed
+Allow: GET, DELETE, PATCH, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: GET, DELETE, PATCH, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -254,11 +254,11 @@ Date: REGEX(.*)
 11. Bad Verb Batch Query
 ========================
 HTTP/1.1 405 Method Not Allowed
+Allow: POST, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: POST, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",
@@ -269,11 +269,11 @@ Date: REGEX(.*)
 12. Bad Verb Batch Update
 =========================
 HTTP/1.1 405 Method Not Allowed
+Allow: POST, OPTIONS
 Content-Length: 63
 Content-Type: application/json
-Allow: POST, OPTIONS
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "method not allowed",

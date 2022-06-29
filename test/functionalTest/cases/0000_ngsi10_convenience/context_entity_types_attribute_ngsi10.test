@@ -117,8 +117,8 @@ orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 HTTP/1.1 200 OK
 Content-Length: 128
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -131,8 +131,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 268
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -167,8 +167,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 271
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -203,8 +203,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 263
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -239,8 +239,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 271
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -275,8 +275,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 267
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -311,8 +311,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 128
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -323,10 +323,10 @@ Date: REGEX(.*)
 }
 8: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 --TEARDOWN--
 brokerStop CB

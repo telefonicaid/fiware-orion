@@ -133,8 +133,8 @@ orionCurl --url "$url"
 HTTP/1.1 200 OK
 Content-Length: 72
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "404",
@@ -145,8 +145,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 100
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {
@@ -159,8 +159,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 222
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -193,8 +193,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200",
@@ -204,8 +204,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 164
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attributes": [
@@ -229,17 +229,17 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: GET, PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 115
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "400",
@@ -250,8 +250,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 165
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "472",
@@ -262,8 +262,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200",
@@ -273,8 +273,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 100
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {

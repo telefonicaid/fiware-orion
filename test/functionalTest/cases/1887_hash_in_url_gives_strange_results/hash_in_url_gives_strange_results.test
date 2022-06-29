@@ -81,8 +81,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "invalid character in URI",
@@ -95,8 +95,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "invalid character in URI",
@@ -109,8 +109,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {"error":"BadRequest","description":"invalid character in URI"}
 
@@ -120,8 +120,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {"error":"BadRequest","description":"invalid character in URI"}
 

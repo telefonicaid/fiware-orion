@@ -88,17 +88,17 @@ echo
 ================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
 02. PATCH E1, without type for A1 - OK
 ======================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -107,8 +107,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 88
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "attribute type length: 0, min length supported: 1",
@@ -121,8 +121,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 71
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "A1": {

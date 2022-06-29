@@ -138,9 +138,9 @@ echo
 ================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
 
 
 
@@ -149,8 +149,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 121
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {
@@ -178,8 +178,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 121
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {
@@ -206,9 +206,9 @@ Date: REGEX(.*)
 =================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
 
 
 
@@ -217,8 +217,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 257
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 [
     {
@@ -264,9 +264,9 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 137
 Content-Type: application/json
-Fiware-Total-Count: 1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
 
 [
     {
@@ -294,9 +294,9 @@ Date: REGEX(.*)
 ====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/room1?type=t96C
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/room1?type=t96C
 
 
 
@@ -305,9 +305,9 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 146
 Content-Type: application/json
-Fiware-Total-Count: 1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
 
 [
     {

@@ -110,8 +110,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 88
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "orionError": {
@@ -127,8 +127,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 86
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -142,10 +142,10 @@ Date: REGEX(.*)
 03. POSTT /v1/queryContext - bad verb
 =====================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -154,8 +154,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 130
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -171,8 +171,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "errorCode": {
@@ -185,10 +185,10 @@ Date: REGEX(.*)
 06. One more error, just to show how it looks in the log file ...
 =================================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

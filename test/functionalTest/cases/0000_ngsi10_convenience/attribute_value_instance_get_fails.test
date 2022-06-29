@@ -74,8 +74,8 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground"
 HTTP/1.1 200 OK
 Content-Length: 358
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "contextResponses": [
@@ -120,8 +120,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 181
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "attributes": [
@@ -147,8 +147,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 34
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "code": "200", 
@@ -158,8 +158,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 102
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "statusCode": {

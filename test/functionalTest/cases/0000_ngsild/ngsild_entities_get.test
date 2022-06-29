@@ -178,8 +178,8 @@ echo
 ====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 
 
 
@@ -187,8 +187,8 @@ Date: REGEX(.*)
 =====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 
 
 
@@ -196,8 +196,8 @@ Date: REGEX(.*)
 ====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 
 
 
@@ -205,8 +205,8 @@ Date: REGEX(.*)
 =====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 
 
 
@@ -316,8 +316,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1233
 Content-Type: application/ld+json
-NGSILD-Results-Count: 4
 Date: REGEX(.*)
+NGSILD-Results-Count: 4
 
 [
   {
@@ -392,8 +392,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: application/json
-NGSILD-Results-Count: 4
 Date: REGEX(.*)
+NGSILD-Results-Count: 4
 
 []
 

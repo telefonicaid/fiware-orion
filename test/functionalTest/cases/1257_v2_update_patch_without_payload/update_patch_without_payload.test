@@ -55,9 +55,9 @@ echo
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
 
 
 
@@ -66,8 +66,8 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 98
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",

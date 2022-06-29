@@ -615,8 +615,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 82
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "/entities/ vector item /id/ is not a string",
@@ -629,8 +629,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 89
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "/entities/ vector item /idPattern/ is not a string",
@@ -643,8 +643,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 82
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "/entities/ vector item type is not a string",
@@ -657,8 +657,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "subject is not an object",
@@ -671,8 +671,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 68
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "notification is not an object",
@@ -685,8 +685,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 62
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "expires is not a string",
@@ -699,8 +699,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 65
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "/entities/ is not an array",
@@ -713,8 +713,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 65
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "condition is not an object",
@@ -727,8 +727,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 77
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "the field /attrs/ must be a JSON array",
@@ -741,8 +741,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 66
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "expression is not an object",
@@ -755,8 +755,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 56
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "q is not a string",
@@ -769,8 +769,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "georel is not a string",
@@ -783,8 +783,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "geometry is not a string",
@@ -797,8 +797,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "coords is not a string",
@@ -811,8 +811,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 77
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "the field /attrs/ must be a JSON array",
@@ -825,8 +825,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "url http notification is not a string",
@@ -839,8 +839,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "throttling is not an int",

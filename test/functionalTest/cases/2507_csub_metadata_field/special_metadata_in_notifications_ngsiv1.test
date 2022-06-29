@@ -279,9 +279,9 @@ echo
 ================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
 
 
 
@@ -289,9 +289,9 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 
 
 
@@ -346,8 +346,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. Update B:20
 ===============
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -414,8 +414,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. Update B:20, C:30
 =====================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -494,8 +494,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 08. Update A:1, D:40
 ====================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -562,8 +562,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. Update A:10, D:41
 =====================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -631,9 +631,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
 
 
 
@@ -710,8 +710,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 14. Update subscription conditions (to re-trigger initial notification)
 =======================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

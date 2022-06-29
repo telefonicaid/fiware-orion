@@ -121,8 +121,8 @@ echo
 ===========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
 
 
 
@@ -130,8 +130,8 @@ Date: REGEX(.*)
 ================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
 Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
 
 
 
@@ -140,8 +140,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 267
 Content-Type: application/json
-Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
     {
@@ -210,8 +210,8 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 128
 Content-Type: application/json
-Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "id": "urn:ngsi-ld:Building:store001",

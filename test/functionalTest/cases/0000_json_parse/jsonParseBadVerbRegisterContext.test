@@ -75,10 +75,10 @@ orionCurl --url "$url" -X "BAD_VERB" --payload "${payload}"
 echo "++++++++++++++++++++"
 --REGEXPECT--
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
 Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 ++++++++++++++++++++
 --TEARDOWN--

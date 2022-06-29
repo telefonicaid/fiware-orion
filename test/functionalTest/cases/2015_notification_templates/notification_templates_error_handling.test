@@ -318,8 +318,8 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 77
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "url httpCustom notification is missing",
@@ -332,8 +332,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 77
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "url httpCustom notification is missing",
@@ -346,8 +346,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 77
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "unknown method httpCustom notification",
@@ -360,8 +360,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "url http notification is missing",
@@ -374,8 +374,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 67
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "http notification is missing",
@@ -388,8 +388,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "notification has http and httpCustom",
@@ -402,8 +402,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 79
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "forbidden characters in http field /url/",
@@ -416,8 +416,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "forbidden characters in custom /url/",
@@ -430,8 +430,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 79
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "forbidden characters in custom /payload/",
@@ -444,8 +444,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 96
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "forbidden characters in custom notification httpCustom qs",
@@ -458,8 +458,8 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 101
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "description": "forbidden characters in custom notification httpCustom headers",
