@@ -1035,7 +1035,7 @@ This requests accepts the following URL parameters to customize the request resp
 
 The values that `options` parameter can have for this specific request are:
 
-| Option      | Description                                                                                                                                                                    |
+| Options     | Description                                                                                                                                                                    |
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `count`     | when used, the total number of entities is returned in the response as an HTTP header named `Fiware-Total-Count`.                                                              |
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
@@ -1158,26 +1158,23 @@ Response:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
-+ Parameters
-    + entityId (required, string) - Id of the entity to be retrieved
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names whose
-      data must be included in the response. The attributes are retrieved in the order specified by
-      this parameter. See "Filtering out attributes and metadata" section for more detail.
-      If this parameter is not included, the attributes are retrieved in arbitrary order, and all
-      the attributes of the entity are included in the response.
-    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      See "Filtering out attributes and metadata" section for more detail.
-    + options (optional, string) - Options dictionary
-      + Members
-          + keyValues - when used, the response payload uses the `keyValues` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + values - when used, the response payload uses the `values` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + unique - when used, the response payload uses the `values` simplified entity
-            representation. Recurring values are left out.
-            See "Simplified Entity Representation" section for details.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
+|------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| `entityId` |          | string | Id of the entity to be retrieved                                                                                                                                                                                                                                                                                                                                                        | `myRoom_112` |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                                                                                                                                                                                                              | `Room`       |
+| `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See "Filtering out attributes and metadata" section for more detail. | seatNumber   |
+| `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                                                                                                                                                                                                                                                                                | count        |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                                                    |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
+| `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
+| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
 
 + Response 200 (application/json)
 
@@ -1220,27 +1217,24 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId (required, string) - Id of the entity to be retrieved
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names whose
-      data are to be included in the response. The attributes are retrieved in the order specified
-      by this parameter.
-      If this parameter is not included, the attributes are retrieved in arbitrary order, and all
-      the attributes of the entity are included in the response.
-      See "Filtering out attributes and metadata" section for more detail.
-    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      See "Filtering out attributes and metadata" section for more detail.
-    + options (optional, string) - Options dictionary
-      + Members
-          + keyValues - when used, the response payload uses the `keyValues` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + values - when used, the response payload uses the `values` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + unique - when used, the response payload uses the `values` simplified entity
-            representation. Recurring values are left out.
-            See "Simplified Entity Representation" section for details.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
+|------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| `entityId` |          | string | Id of the entity to be retrieved                                                                                                                                                                                                                                                                                                                                                        | `myRoom_112` |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                                                                                                                                                                                                              | `Room`       |
+| `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See "Filtering out attributes and metadata" section for more detail. | seatNumber   |
+| `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                                                                                                                                                                                                                                                                                | count        |
+
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                                                    |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
+| `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
+| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
 
 + Response 200 (application/json)
 
@@ -1286,15 +1280,20 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId (required, string) - Entity id to be updated
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-    entities with the same entity id.
-    + options (optional, string) - Operations options
-        + Members
-            + append - Force an append operation
-            + keyValues - when used, the request payload uses the `keyValues` simplified entity
-              representation. See "Simplified Entity Representation" section for details.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example      |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
+| `entityId` |          | string | Id of the entity to be updated                                                              | `myRoom_112` |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                    | append       |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                        |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `append`    | Force an append operation.                                                                                                                         |
 
 + Request (application/json)
 
@@ -1323,14 +1322,13 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters 
-    + entityId (required, string) - Id of the entity to be updated
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + options (optional, string) - Operations options
-        + Members
-            + keyValues - when used, the request payload uses the `keyValues` simplified entity
-              representation. See "Simplified Entity Representation" section for details.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
+|------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| `entityId` |          | string | Id of the entity to be updated                                                                                                                                                                         | `myRoom_112` |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
+| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
 + Request (application/json)
 
@@ -1360,14 +1358,13 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters 
-    + entityId (required, string) - Id of the entity in question.
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + options (optional, string) - Operations options
-        + Members
-            + keyValues - when used, the request payload uses the `keyValues` simplified entity
-              representation. See "Simplified Entity Representation" section for details.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
+|------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| `entityId` |          | string | Id of the entity in question                                                                                                                                                                           | `myRoom_112` |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
+| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
 + Request (application/json)
 
@@ -1392,10 +1389,12 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters 
-    + entityId (required, string) - Id of the entity to be deleted
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example      |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
+| `entityId` |          | string | Id of the entity to be deleted                                                              | `myRoom_112` |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
 
 + Response 204
 
@@ -1413,13 +1412,12 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Id of the entity
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + attrName: temperature (required, string) - Name of the attribute to be retrieved.
-    + metadata: accuracy (optional, string) - A list of metadata names to include in the response.
-      See "Filtering out attributes and metadata" section for more detail.
+| Parameter  | Optional | Type   | Description                                                                                                               | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
+| `entityId` |          | string | Id of the entity to update                                                                                                | `Bcn_Welt`    |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
+| `attrName` |          | string | Name of the attribute to be retrieved.                                                                                    | `temperature` |
+| `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail. | `accuracy`    |
 
 + Response 200 (application/json)
 
@@ -1441,11 +1439,13 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Id of the entity to update
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + attrName: temperature (required, string) - Attribute name
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `entityId` |          | string | Id of the entity to update                                                                  | `Bcn_Welt`    |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| `attrName` |          | string | Attribute name.                                                                             | `temperature` |
 
 + Request (application/json)
 
@@ -1471,11 +1471,13 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Id of the entity.
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-    entities with the same entity id.
-    + attrName: temperature (required, string) - Attribute name.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `entityId` |          | string | Id of the entity.                                                                           | `Bcn_Welt`    |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| `attrName` |          | string | Attribute name to be deleted.                                                               | `temperature` |
 
 + Response 204
 
@@ -1502,11 +1504,13 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Id of the entity in question
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + attrName: address (required, string) - Name of the attribute to be retrieved.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `entityId` |          | string | Id of the entity in question.                                                               | `Bcn_Welt`    |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| `attrName` |          | string | Name of the attribute to be retrieved.                                                      | `address`     |
 
 + Response 200 (application/json)
 
@@ -1541,11 +1545,13 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Id of the entity to be updated.
-    + type (optional, string) - Entity type, to avoid ambiguity in case there are several
-      entities with the same entity id.
-    + attrName: address (required, string) - Attribute name.
+**Parameters**
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `entityId` |          | string | Id of the entity to be updated.                                                             | `Bcn_Welt`    |
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| `attrName` |          | string | Name of the attribute to be updated.                                                        | `address`     |
 
 + Request (application/json)
 
