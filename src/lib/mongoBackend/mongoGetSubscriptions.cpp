@@ -74,9 +74,9 @@ using ngsiv2::EntID;
 
 /* ****************************************************************************
 *
-* setSubscriptionId -
+* extractSubscriptionId -
 */
-static void setNewSubscriptionId(Subscription* s, const BSONObj* rP)
+static void extractSubscriptionId(Subscription* s, const BSONObj* rP)
 {
   s->id = getFieldF(rP, "_id").OID().toString();
 }
@@ -85,9 +85,9 @@ static void setNewSubscriptionId(Subscription* s, const BSONObj* rP)
 
 /* ****************************************************************************
 *
-* setDescription -
+* extractDescription -
 */
-static void setDescription(Subscription* s, const BSONObj* bobjP)
+static void extractDescription(Subscription* s, const BSONObj* bobjP)
 {
   s->description = bobjP->hasField(CSUB_DESCRIPTION) ? getStringFieldF(bobjP, CSUB_DESCRIPTION) : "";
 }
@@ -96,9 +96,9 @@ static void setDescription(Subscription* s, const BSONObj* bobjP)
 
 /* ****************************************************************************
 *
-* setSubject -
+* extractSubject -
 */
-static void setSubject(Subscription* s, const BSONObj* rP)
+static void extractSubject(Subscription* s, const BSONObj* rP)
 {
   // Entities
   std::vector<BSONElement> ents = getFieldF(rP, CSUB_ENTITIES).Array();
@@ -160,9 +160,9 @@ static void setSubject(Subscription* s, const BSONObj* rP)
 
 /* ****************************************************************************
 *
-* setNotification -
+* extractNotification -
 */
-static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant* tenantP)
+static void extractNotification(Subscription* subP, const BSONObj* rP, OrionldTenant* tenantP)
 {
   // Attributes
   setStringVectorF(rP, CSUB_ATTRS, &(subP->notification.attributes));
@@ -218,9 +218,9 @@ static void setNotification(Subscription* subP, const BSONObj* rP, OrionldTenant
 
 /* ****************************************************************************
 *
-* setStatus -
+* extractStatus -
 */
-static void setStatus(Subscription* s, const BSONObj& r)
+static void extractStatus(Subscription* s, const BSONObj& r)
 {
   s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&r, CSUB_EXPIRATION) : -1;
 
@@ -247,9 +247,9 @@ static void setStatus(Subscription* s, const BSONObj& r)
 #ifdef ORIONLD
 /* ****************************************************************************
 *
-* setSubscriptionId -
+* extractSubscriptionIdAsString -
 */
-static void setSubscriptionId(Subscription* s, const BSONObj* rP)
+static void extractSubscriptionIdAsString(Subscription* s, const BSONObj* rP)
 {
   //
   // NGSI-LD sub ids are Strings
@@ -274,9 +274,9 @@ static void setSubscriptionId(Subscription* s, const BSONObj* rP)
 
 /* ****************************************************************************
 *
-* setName -
+* extractName -
 */
-static void setName(Subscription* subP, const BSONObj* rP)
+static void extractName(Subscription* subP, const BSONObj* rP)
 {
   if (rP->hasField(CSUB_NAME))
     subP->name = getStringFieldF(rP, CSUB_NAME);
@@ -310,32 +310,33 @@ static void extractLang(Subscription* subP, const BSONObj* rP)
 
 /* ****************************************************************************
 *
-* setCsf -
+* extractCsf -
 */
-static void setCsf(Subscription* subP, const BSONObj* rP)
+static void extractCsf(Subscription* subP, const BSONObj* rP)
 {
   if (rP->hasField("csf"))
-    subP->csf = getStringFieldF(rP, "csf");
+    subP->csf = getStringField(rP, "csf");
 }
 
 
 
 /* ****************************************************************************
 *
-* setLdQ -
+* extractLdQ -
 */
-static void setLdQ(Subscription* subP, const BSONObj* rP)
+static void extractLdQ(Subscription* subP, const BSONObj* rP)
 {
   if (rP->hasField("ldQ"))
     subP->ldQ = getStringFieldF(rP, "ldQ");
 }
 
 
+
 /* ****************************************************************************
 *
-* setMimeType -
+* extractMimeType -
 */
-static void setMimeType(Subscription* s, const BSONObj* rP)
+static void extractMimeType(Subscription* s, const BSONObj* rP)
 {
   if (rP->hasField(CSUB_MIMETYPE))
   {
@@ -349,9 +350,9 @@ static void setMimeType(Subscription* s, const BSONObj* rP)
 
 /* ****************************************************************************
 *
-* setTimeInterval -
+* extractTimeInterval -
 */
-static void setTimeInterval(Subscription* s, const BSONObj& r)
+static void extractTimeInterval(Subscription* s, const BSONObj& r)
 {
   s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(&r, "timeInterval") : -1);
 }
@@ -433,11 +434,11 @@ void mongoListSubscriptions
 
     Subscription  sub;
 
-    setSubject(&sub, &r);
-    setNewSubscriptionId(&sub, &r);
-    setDescription(&sub, &r);
-    setStatus(&sub, r);
-    setNotification(&sub, &r, tenantP);
+    extractSubject(&sub, &r);
+    extractSubscriptionId(&sub, &r);
+    extractDescription(&sub, &r);
+    extractStatus(&sub, r);
+    extractNotification(&sub, &r, tenantP);
 
     subs->push_back(sub);
   }
@@ -508,11 +509,11 @@ void mongoGetSubscription
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    setNewSubscriptionId(subP, &r);
-    setDescription(subP, &r);
-    setSubject(subP, &r);
-    setNotification(subP, &r, tenantP);
-    setStatus(subP, r);
+    extractSubscriptionId(subP, &r);
+    extractDescription(subP, &r);
+    extractSubject(subP, &r);
+    extractNotification(subP, &r, tenantP);
+    extractStatus(subP, r);
 
     if (moreSafe(cursor))
     {
@@ -594,18 +595,18 @@ bool mongoGetLdSubscription
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    setSubscriptionId(subP, &r);
-    setDescription(subP, &r);
-    setMimeType(subP, &r);
-    setSubject(subP, &r);
-    setNotification(subP, &r, tenantP);
-    setStatus(subP, r);
-    setName(subP, &r);
+    extractSubscriptionIdAsString(subP, &r);
+    extractDescription(subP, &r);
+    extractMimeType(subP, &r);
+    extractSubject(subP, &r);
+    extractNotification(subP, &r, tenantP);
+    extractStatus(subP, r);
+    extractName(subP, &r);
     extractContext(subP, &r);
     extractLang(subP, &r);
-    setCsf(subP, &r);
-    setLdQ(subP, &r);
-    setTimeInterval(subP, r);
+    extractCsf(subP, &r);
+    extractLdQ(subP, &r);
+    extractTimeInterval(subP, r);
     mongoSetLdTimestamp(&subP->createdAt, "createdAt", r);
     mongoSetLdTimestamp(&subP->modifiedAt, "modifiedAt", r);
 
@@ -714,18 +715,18 @@ bool mongoGetLdSubscriptions
 
     Subscription s;
 
-    setSubscriptionId(&s, &r);
-    setDescription(&s, &r);
-    setMimeType(&s, &r);
-    setSubject(&s, &r);
-    setNotification(&s, &r, tenantP);
-    setStatus(&s, r);
-    setName(&s, &r);
+    extractSubscriptionIdAsString(&s, &r);
+    extractDescription(&s, &r);
+    extractMimeType(&s, &r);
+    extractSubject(&s, &r);
+    extractNotification(&s, &r, tenantP);
+    extractStatus(&s, r);
+    extractName(&s, &r);
     extractContext(&s, &r);
     extractLang(&s, &r);
-    setCsf(&s, &r);
-    setLdQ(&s, &r);
-    setTimeInterval(&s, r);
+    extractCsf(&s, &r);
+    extractLdQ(&s, &r);
+    extractTimeInterval(&s, r);
 
     subVecP->push_back(s);
   }

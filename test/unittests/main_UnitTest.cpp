@@ -104,6 +104,7 @@ char            dbUser[64]              = { 0 };
 char            dbPwd[64]               = { 0 };
 bool            experimental            = false;
 bool            mongocOnly              = false;
+bool            debugCurl               = false;
 
 
 

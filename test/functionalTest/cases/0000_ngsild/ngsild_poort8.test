@@ -1,0 +1,143 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -debugCurl
+
+--SHELL--
+
+#
+# The idea with this test was to have a context giving problems.
+# The context of issue #1148 works just fine, so I removed the last 'd' in the URL - to provoke a 404
+#
+# 01. Attempt to create an entity using an @context that does not exist
+# 02. Create an entity using POORT8's context
+# 03. GET the entity - without context
+# 04. GET the entity - with POORT8's context
+#
+
+echo "01. Attempt to create an entity using an @context that does not exist"
+echo "====================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "eans": 12
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Link: <https://raw.githubusercontent.com/POORT8/poort8.dvu.datamodels/main/datamodels.context-ngsi.jsonl>"
+echo
+echo
+
+
+echo "02. Create an entity using POORT8's context"
+echo "==========================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "eans": 12
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Link: <https://raw.githubusercontent.com/POORT8/poort8.dvu.datamodels/main/datamodels.context-ngsi.jsonld>"
+echo
+echo
+
+
+echo "03. GET the entity - without context"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+echo
+echo
+
+
+echo "04. GET the entity - with POORT8's context"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1 -H "Link: <https://raw.githubusercontent.com/POORT8/poort8.dvu.datamodels/main/datamodels.context-ngsi.jsonld>"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an entity using an @context that does not exist
+=====================================================================
+HTTP/1.1 503 Service Unavailable
+Content-Length: 214
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://raw.githubusercontent.com/POORT8/poort8.dvu.datamodels/main/datamodels.context-ngsi.jsonl",
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
+}
+
+
+02. Create an entity using POORT8's context
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+
+
+
+03. GET the entity - without context
+====================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "https://uri.fiware.org/ns/data-models#eans": {
+        "type": "Property",
+        "value": 12
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T"
+}
+
+
+04. GET the entity - with POORT8's context
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://raw.githubusercontent.com/POORT8/poort8.dvu.datamodels/main/datamodels.context-ngsi.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "eans": {
+        "type": "Property",
+        "value": 12
+    },
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

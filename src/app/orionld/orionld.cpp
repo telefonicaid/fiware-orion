@@ -228,8 +228,9 @@ bool            forwarding;
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
-bool            experimental    = false;
+bool            experimental = false;
 bool            mongocOnly   = false;
+bool            debugCurl    = false;
 
 
 
@@ -311,6 +312,7 @@ bool            mongocOnly   = false;
 #define DBSSL_DESC             "enable SSL connection to DB"
 #define DBCERTFILE_DESC        "path to TLS certificate file"
 #define DBURI_DESC             "complete URI for database connection"
+#define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
 
 
 
@@ -391,7 +393,8 @@ PaArgument paArgs[] =
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
-  { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC       },
+  { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
+  { "-debugCurl",             &debugCurl,               "DEBUG_CURL",                PaBool,    PaHid,  false,           false,  true,             DEBUG_CURL_DESC          },
 
   PA_END_OF_ARGS
 };
