@@ -556,6 +556,7 @@ extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
 extern int               maxAge;                   // From orionld.cpp (CORS)
 extern char              userAgentHeader[64];      // From notificationSend.cpp
 extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
+extern bool              debugCurl;                // From orionld.cpp
 
 
 

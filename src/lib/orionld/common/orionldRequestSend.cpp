@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrlContext, ...
-#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState, debugCurl
 #include "orionld/common/orionldRequestSend.h"                 // Own interface
 
 
@@ -98,6 +98,52 @@ static const char* headerName[7] = {
   "NGSILD-Scope",
   "X-Auth-Token"
 };
+
+
+
+// -----------------------------------------------------------------------------
+//
+// curlDebug
+//
+static int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, void* userptr)
+{
+  switch (type)
+  {
+  case CURLINFO_TEXT:
+    LM_TMP(("CURL: %s", data));
+    break;
+
+  case CURLINFO_HEADER_OUT:
+    LM_TMP(("CURL: Send header"));
+    break;
+
+  case CURLINFO_DATA_OUT:
+    LM_TMP(("CURL: Send data"));
+    break;
+
+  case CURLINFO_SSL_DATA_OUT:
+    LM_TMP(("CURL: Send SSL data"));
+    break;
+
+  case CURLINFO_HEADER_IN:
+    LM_TMP(("CURL: Recv header"));
+    break;
+
+  case CURLINFO_DATA_IN:
+    LM_TMP(("CURL: Recv data"));
+    break;
+
+  case CURLINFO_SSL_DATA_IN:
+    LM_TMP(("CURL: Recv SSL data"));
+    break;
+
+  default:
+    LM_TMP(("CURL: type &d", type));
+    break;
+  }
+
+  return 0;
+}
 
 
 
@@ -196,13 +242,21 @@ bool orionldRequestSend
     return false;
   }
 
+  //
+  // Is curl to be debugged?
+  //
+  if (debugCurl == true)
+  {
+    curl_easy_setopt(cc.curl, CURLOPT_VERBOSE,       1L);
+    curl_easy_setopt(cc.curl, CURLOPT_DEBUGFUNCTION, curlDebug);
+  }
+
 
   //
   // Prepare the CURL handle
   //
   curl_easy_setopt(cc.curl, CURLOPT_URL, url);                             // Set the URL Path
   curl_easy_setopt(cc.curl, CURLOPT_CUSTOMREQUEST, verb);                  // Set the HTTP verb
-  curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Allow redirection
   curl_easy_setopt(cc.curl, CURLOPT_WRITEFUNCTION, writeCallback);         // Callback function for writes
   curl_easy_setopt(cc.curl, CURLOPT_WRITEDATA, rBufP);                     // Custom data for response handling
   curl_easy_setopt(cc.curl, CURLOPT_TIMEOUT_MS, tmoInMilliSeconds);        // Timeout
