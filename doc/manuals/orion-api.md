@@ -1221,7 +1221,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1284,7 +1284,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
@@ -1326,7 +1326,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1362,7 +1362,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1393,7 +1393,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
@@ -1443,7 +1443,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1475,7 +1475,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1508,7 +1508,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1549,7 +1549,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1593,7 +1593,7 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter | Optional | Type   | Description                                | Example |
 |-----------|----------|--------|--------------------------------------------|---------|
@@ -1659,7 +1659,7 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter    | Optional | Type   | Description  | Example |
 |--------------|----------|--------|--------------|---------|
