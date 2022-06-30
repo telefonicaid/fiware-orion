@@ -37,6 +37,8 @@ brokerStart CB 0-255
 # 04. PATCH S1, setting A to 11 and B to 22
 # 05. GET S1 and see the new values of MQTT-Version and MQTT-QoS
 # 06. See S1 in mongo
+# 07. Restart broker
+# 08. GET S1 and see the receiverInfo
 #
 
 echo "01. Create a subscription S1 with a receiverInfo with A=1 and B=2"
@@ -119,6 +121,21 @@ echo
 echo "06. See S1 in mongo"
 echo "==================="
 mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "07. Restart broker"
+echo "=================="
+brokerStop CB
+brokerStart CB
+echo
+echo
+
+
+echo "08. GET S1 and see the receiverInfo"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
 echo
 echo
 
@@ -320,6 +337,53 @@ MongoDB server version: REGEX(.*)
 	"format" : "normalized"
 }
 bye
+
+
+07. Restart broker
+==================
+
+
+08. GET S1 and see the receiverInfo
+===================================
+HTTP/1.1 200 OK
+Content-Length: 340
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "receiverInfo": [
+                {
+                    "key": "A",
+                    "value": "11"
+                },
+                {
+                    "key": "B",
+                    "value": "22"
+                }
+            ],
+            "uri": "http://nowhere:1000/xxx"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "status": "active",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "temperature"
+    ]
+}
 
 
 --TEARDOWN--
