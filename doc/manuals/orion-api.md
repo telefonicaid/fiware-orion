@@ -1768,13 +1768,19 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of subscriptions to be retrieved
-    + offset: 20 (optional, number) - Skip a number of subscriptions
-    + options (optional, string) - Options dictionary
-      + Members
-          + count - when used, the total number of subscriptions is returned in the HTTP header
-            `Fiware-Total-Count`
+**Query Parameters**
+
+| Parameter | Optional | Type   | Description                                        | Example |
+|-----------|----------|--------|----------------------------------------------------|---------|
+| `limit`   | ✓        | number | Limit the number of subscriptions to be retrieved. | `10`    |
+| `offset`  | ✓        | number | Skip a number of registrations.                    | `20`    |
+| `options` | ✓        | string | Options dictionary.                                | `count` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                                      |
+|----------|--------------------------------------------------------------------------------------------------|
+| `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count` |
 
 + Response 200
 
@@ -1878,9 +1884,6 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + subscriptionId: abcdef (required, string) - subscription Id.
-
 + Response 200 (application/json)
 
         {
@@ -1925,9 +1928,6 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + subscriptionId: abcdef (required, string) - subscription Id.
-
 + Request (application/json)
 
         {
@@ -1946,9 +1946,6 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + subscriptionId: abcdef (required, string) - subscription Id.
-
 + Response 204
 
 ## Registration Operations
@@ -1959,7 +1956,7 @@ of certain subsets (entities, attributes) of the context information space, incl
 at specific geographical areas.
 
 A NGSIv2 server implementation may implement query and/or update forwarding to context information sources. In
-particular, some of the following forwarding mechanisms could be implemented (not exahustive list):
+particular, some of the following forwarding mechanisms could be implemented (not exhaustive list):
 
 * Legacy forwarding (based on NGSIv1 operations)
 * NGSI Context Source Forwarding Specification
@@ -2025,13 +2022,19 @@ Not present if registration has never had a successful notification.
 
 Lists all the context provider registrations present in the system.
 
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
-    + offset: 20 (optional, number) - Skip a number of registrations
-    + options (optional, string) - Options dictionary
-      + Members
-          + count - when used, the total number of registrations is returned in the HTTP header
-            `Fiware-Total-Count`
+**Query Parameters**
+
+| Parameter | Optional | Type   | Description                                        | Example |
+|-----------|----------|--------|----------------------------------------------------|---------|
+| `limit`   | ✓        | number | Limit the number of registrations to be retrieved. | `10`    |
+| `offset`  | ✓        | number | Skip a number of registrations.                    | `20`    |
+| `options` | ✓        | string | Options dictionary.                                | `count` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                                      |
+|----------|--------------------------------------------------------------------------------------------------|
+| `count`  | When used, the total number of registrations is returned in the HTTP header `Fiware-Total-Count` |
 
 Response:
 
@@ -2126,9 +2129,6 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + registrationId: abcdef (required, string) - registration Id.
-
 + Response 200 (application/json)
 
       {
@@ -2171,9 +2171,6 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + registrationId: abcdef (required, string) - registration Id.
-
 + Request (application/json)
 
         {
@@ -2191,9 +2188,6 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
-
-+ Parameters
-    + registrationId: abcdef (required, string) - registration Id.
 
 + Response 204
 
@@ -2258,12 +2252,17 @@ Response:
           ]
         }
 
-+ Parameters
-    + options (optional, string) - Options dictionary
-      + Members
-          + keyValues - when used, the request payload uses the `keyValues`
-            simplified entity representation. See the "Simplified Entity Representation"
-            section for details.
+**Query Parameters**
+
+| Parameter | Optional | Type   | Description         | Example     |
+|-----------|----------|--------|---------------------|-------------|
+| `options` | ✓        | string | Options dictionary. | `keyValues` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                      |
+|-------------|--------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 
 + Response 204
 
@@ -2295,22 +2294,23 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + limit: 10 (optional, number) - Limit the number of entities to be retrieved.
-    + offset: 20 (optional, number) - Skip a number of records.
-    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results.
-      See "Ordering Results" section for details.
-    + options (optional, string) - Options dictionary
-      + Members
-          + count - the total number of entities is returned in the response as an
-          HTTP header named `Fiware-Total-Count`.
-          + keyValues - when used, the response payload uses the `keyValues` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + values - when used, the response payload uses the `values` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
-          + unique - when used, the response payload uses the `values` simplified entity
-            representation. recurring values are left out.
-            See "Simplified Entity Representation" section for details.
+**Query Parameters**
+
+| Parameter | Optional | Type   | Description                                                               | Example              |
+|-----------|----------|--------|---------------------------------------------------------------------------|----------------------|
+| `limit`   | ✓        | number | Limit the number of entities to be retrieved.                             | `10`                 |
+| `offset`  | ✓        | number | Skip a number of records.                                                 | `20`                 |
+| `orderBy` | ✓        | string | Criteria for ordering results.See "Ordering Results" section for details. | `temperature,!speed` |
+| `options` | ✓        | string | Options dictionary.                                                       | `count`              |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                                      |
+|----------|--------------------------------------------------------------------------------------------------|
+| `count`  | When used, the total number of entities returned in the response as an HTTP header named `Fiware-Total-Count` |
+| `keyValues`  | When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `values`  | When used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `unique`  | When used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details. |
 
 + Request (application/json)
 
@@ -2379,7 +2379,7 @@ Response code:
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
 This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
 The request payload must be an NGSIv2 notification payload. 
-The behaviour must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
+The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
 
 Response code:
 
@@ -2387,11 +2387,17 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Parameters
-    + options (optional, string) - Options dictionary
-      + Members
-          + keyValues - when used, the request payload uses the `keyValues` simplified entity
-            representation. See "Simplified Entity Representation" section for details.
+**Query Parameters**
+
+| Parameter | Optional | Type   | Description         | Example     |
+|-----------|----------|--------|---------------------|-------------|
+| `options` | ✓        | string | Options dictionary. | `keyValues` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                      |
+|-------------|--------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 
 + Request (application/json)
 
