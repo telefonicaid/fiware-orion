@@ -1149,7 +1149,7 @@ The values that `options` parameter can have for this specific request are:
 
 ### Entity by ID
 
-#### Retrieve Entity [GET /v2/entities]
+#### Retrieve Entity [GET /v2/entities/{entityId}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
