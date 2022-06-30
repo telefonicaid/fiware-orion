@@ -339,7 +339,7 @@ PaArgument paArgs[] =
   { "-dbAuthMech",            dbAuthMechanism,          "MONGO_AUTH_MECH",           PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBAUTHMECHANISM_DESC     },
   { "-dbAuthDb",              dbAuthDb,                 "MONGO_AUTH_SOURCE",         PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBAUTHDB_DESC            },
   { "-dbSSL",                 &dbSSL,                   "MONGO_SSL",                 PaBool,    PaOpt,  false,           false,  true,             DBSSL_DESC               },
-  { "-dbCertFile",            &dbCertFile,              "MONGO_CERT_FILE",           PaBool,    PaOpt,  _i "",           PaNL,   PaNL,             DBCERTFILE_DESC          },
+  { "-dbCertFile",            &dbCertFile,              "MONGO_CERT_FILE",           PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBCERTFILE_DESC          },
   { "-dbURI",                 &dbURI,                   "MONGO_URI",                 PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBURI_DESC               },
   { "-db",                    dbName,                   "MONGO_DB",                  PaString,  PaOpt,  _i "orion",      PaNL,   PaNL,             DB_DESC                  },
   { "-dbTimeout",             &dbTimeout,               "MONGO_TIMEOUT",             PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC              },
