@@ -1010,7 +1010,7 @@ the JSON entity representation format (described in "JSON Entity Representation"
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Parameters**
+**Query Parameters**
 
 This requests accepts the following URL parameters to customize the request response.
 
@@ -1121,7 +1121,7 @@ Response:
           }
         }
 
-**Parameters**
+**Query Parameters**
 
 | Parameter | Optional | Type   | Description                                                              | Example |
 |-----------|----------|--------|--------------------------------------------------------------------------|---------|
@@ -1163,11 +1163,10 @@ Response:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
-**Parameters**
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `entityId` |          | string | Id of the entity to be retrieved                                                                                                                                                                                                                                                                                                                                                        | `myRoom_112` |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                                                                                                                                                                                                              | `Room`       |
 | `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See "Filtering out attributes and metadata" section for more detail. | seatNumber   |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
@@ -1686,18 +1685,6 @@ Response code:
 ## Subscriptions Operations
 
 A subscription is represented by a JSON object with the following fields:
-
-| Parameter      | Optional | Type   | Description                                                                                   |
-|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `id`           |          | string | Subscription unique identifier. Automatically created at creation time.                       |
-| `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
-| `subject`      |          | object | An object that describes the subject of the subscription.                                     |
-| `notification` |          | object | An object that describes the notification to send when the subscription is triggered.         |
-| `expires`      | ✓        | string | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
-| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
-
-
 
 + `id`: Subscription unique identifier. Automatically created at creation time.
 + `description` (optional): A free text used by the client to describe the subscription.
