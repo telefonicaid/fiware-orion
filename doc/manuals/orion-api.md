@@ -1225,7 +1225,6 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `entityId` |          | string | Id of the entity to be retrieved                                                                                                                                                                                                                                                                                                                                                        | `myRoom_112` |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                                                                                                                                                                                                              | `Room`       |
 | `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See "Filtering out attributes and metadata" section for more detail. | seatNumber   |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
@@ -1288,7 +1287,6 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
-| `entityId` |          | string | Id of the entity to be updated                                                              | `myRoom_112` |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
 | `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                    | append       |
 
@@ -1330,7 +1328,6 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `entityId` |          | string | Id of the entity to be updated                                                                                                                                                                         | `myRoom_112` |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
@@ -1366,7 +1363,6 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `entityId` |          | string | Id of the entity in question                                                                                                                                                                           | `myRoom_112` |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
@@ -1397,7 +1393,6 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
-| `entityId` |          | string | Id of the entity to be deleted                                                              | `myRoom_112` |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
 
 + Response 204
@@ -1418,9 +1413,7 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                                               | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
-| `entityId` |          | string | Id of the entity to update                                                                                                | `Bcn_Welt`    |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
-| `attrName` |          | string | Name of the attribute to be retrieved.                                                                                    | `temperature` |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail. | `accuracy`    |
 
 + Response 200 (application/json)
@@ -1447,9 +1440,7 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `entityId` |          | string | Id of the entity to update                                                                  | `Bcn_Welt`    |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-| `attrName` |          | string | Attribute name.                                                                             | `temperature` |
 
 + Request (application/json)
 
@@ -1479,9 +1470,7 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `entityId` |          | string | Id of the entity.                                                                           | `Bcn_Welt`    |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-| `attrName` |          | string | Attribute name to be deleted.                                                               | `temperature` |
 
 + Response 204
 
@@ -1512,9 +1501,7 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `entityId` |          | string | Id of the entity in question.                                                               | `Bcn_Welt`    |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-| `attrName` |          | string | Name of the attribute to be retrieved.                                                      | `address`     |
 
 + Response 200 (application/json)
 
@@ -1553,9 +1540,7 @@ Response:
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `entityId` |          | string | Id of the entity to be updated.                                                             | `Bcn_Welt`    |
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-| `attrName` |          | string | Name of the attribute to be updated.                                                        | `address`     |
 
 + Request (application/json)
 
