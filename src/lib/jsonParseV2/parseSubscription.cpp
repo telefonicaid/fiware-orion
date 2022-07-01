@@ -494,22 +494,6 @@ std::string parseCustomJsonItem
 
   std::string type = jsonParseTypeNames[node->value.GetType()];
 
-#if 0
-  if (caP->compoundValueP == NULL)
-  {
-    caP->compoundValueP            = new orion::CompoundValueNode();
-    caP->compoundValueP->name      = "";
-    caP->compoundValueP->valueType = stringToCompoundType(type);
-
-    parent = caP->compoundValueP;
-
-    if (!caP->typeGiven)
-    {
-      caP->type = (type == "Object")? defaultType(orion::ValueTypeObject) : defaultType(orion::ValueTypeVector);
-    }
-  }
-#endif
-
   //
   // Children of the node
   //
