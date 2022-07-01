@@ -785,7 +785,7 @@ static std::string parseCustomPayload
       *payload = payloadOpt.value;
     }
   }
-  else  // holder.HasMember("json")
+  else  if (holder.HasMember("json"))
   {
     std::string r = parseCustomJsonStandAlone(holder["json"], json);
     if (!r.empty())
