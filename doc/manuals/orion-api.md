@@ -1198,7 +1198,7 @@ The values that `options` parameter can have for this specific request are:
 
 Example Response 200:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -1375,7 +1375,7 @@ This parameter is part of the URL request. It is mandatory.
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
-**Request**
+**Request payload**
 
 Content-Type is `application/json`
 
@@ -1420,7 +1420,7 @@ This parameter is part of the URL request. It is mandatory.
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
-**Request**
+**Request payload**
 
 Content-Type is `application/json`
 
