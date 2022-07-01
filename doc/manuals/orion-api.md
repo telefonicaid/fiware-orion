@@ -1104,7 +1104,8 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 | `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
 
-+ **Request payload**
+**Request payload**
+
 Content-Type is `application/json`
 
 Example:
@@ -1436,7 +1437,6 @@ Content-Type is `application/json`
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
-+ Response 204
 
 #### Remove Entity [DELETE /v2/entities/{entityId}]
 
