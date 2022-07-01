@@ -1198,7 +1198,7 @@ The values that `options` parameter can have for this specific request are:
 
 Example Response 200:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
