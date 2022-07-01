@@ -1,3 +1,96 @@
+<!-- TOC -->
+
+- [FIWARE-NGSI v2 仕様](#fiware-ngsi-v2-specification)
+- [はじめに](#preface)
+    - [編集者](#editors)
+    - [謝辞](#acknowledgements)
+    - [ステータス](#status)
+- [変更履歴](#changelog)
+    - [著作権](#copyright)
+    - [ライセンス](#license)
+    - [コンフォーマンス](#conformance)
+    - [コンベンシン](#conventions)
+    - [リファレンス実装](#reference-implementations)
+- [仕様](#specification)
+    - [はじめに](#introduction)
+    - [用語](#terminology)
+        - [コンテキスト・データのモデリングと交換 (Context data modelling and exchange)](#context-data-modelling-and-exchange)
+            - [コンテキストのエンティティ (Context Entities)](#context-entities)
+            - [コンテキストの属性 (Context Attributes)](#context-attributes)
+            - [コンテキストのメタデータ (Context Metadata)](#context-metadata)
+    - [MIME 型 (MIME Types)](#mime-types)
+    - [JSON エンティティ表現 (JSON Entity Representation)](#json-entity-representation)
+    - [JSON 属性表現 (JSON Attribute Representation)](#json-attribute-representation)
+    - [簡略化されたエンティティ表現 (Simplified Entity Representation)](#simplified-entity-representation)
+    - [部分表現 (Partial Representations)](#partial-representations)
+    - [特殊な属性型 (Special Attribute Types)](#special-attribute-types)
+    - [組み込み属性 (Builtin Attributes)](#builtin-attributes)
+    - [特殊なメタデータ型 (Special Metadata Types)](#special-metadata-types)
+    - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
+    - [フィールド構文の制限事項 (Field syntax restrictions)](#field-syntax-restrictions)
+    - [属性名の制限 (Attribute names restrictions)](#attribute-names-restrictions)
+    - [メタデータ名の制限 (Metadata names restrictions)](#metadata-names-restrictions)
+    - [結果の順序付け (Ordering Results)](#ordering-results)
+    - [エラー・レスポンス (Error Responses)](#error-responses)
+    - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
+        - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
+        - [GeoJSON](#geojson)
+    - [シンプル・クエリ言語 (Simple Query Language)](#simple-query-language)
+    - [地理的クエリ (Geographical Queries)](#geographical-queries)
+        - [クエリの解決 (Query Resolution)](#query-resolution)
+    - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
+    - [通知メッセージ (Notification Messages)](#notification-messages)
+    - [カスタム通知 (Custom Notifications)](#custom-notifications)
+    - [Group API Entry Point](#group-api-entry-point)
+        - [API リソースを取得 [GET /v2]]](#retrieve-api-resources-get-v2)
+- [Group Entities](#group-entities)
+        - [エンティティをリスト [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]](#list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby)
+        - [エンティティを作成  [POST /v2/entities{?options}]](#create-entity-post-v2entitiesoptions)
+    - [ID によるエンティティ [/v2/entities/{entityId}{?type,attrs,options}]](#entity-by-id-v2entitiesentityidtypeattrsoptions)
+        - [エンティティを取得 [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]](#retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions)
+        - [エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]](#retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions)
+        - [エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs{?type,options}]](#update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions)
+        - [既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs{?type,options}]](#update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions)
+        - [すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs{?type,options}]](#replace-all-entity-attributes-put-v2entitiesentityidattrstypeoptions)
+        - [エンティティを削除する [DELETE /v2/entities/{entityId}{?type}]](#remove-entity-delete-v2entitiesentityidtype)
+- [Group Attributes](#group-attributes)
+    - [エンティティ ID による属性 [/v2/entities/{entityId}/attrs/{attrName}{?type}]](#attribute-by-entity-id-v2entitiesentityidattrsattrnametype)
+        - [属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]](#get-attribute-data-get-v2entitiesentityidattrsattrnametypemetadata)
+        - [属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]](#update-attribute-data-put-v2entitiesentityidattrsattrnametype)
+        - [単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrnametype)
+- [Group Attribute Value](#group-attribute-value)
+    - [エンティティ ID 別 [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]](#by-entity-id-v2entitiesentityidattrsattrnamevaluetype)
+        - [属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevaluetype)
+        - [属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevaluetype)
+- [Group Types](#group-types)
+    - [全エンティティ型 [/v2/types{?limit,offset,options}]](#entity-types-v2typeslimitoffsetoptions)
+        - [全エンティティ型のリスト [GET /v2/types/{?limit,offset,options}]](#list-entity-types-get-v2typeslimitoffsetoptions)
+    - [エンティティ型 [/v2/types/{entityType}]](#entity-type-v2typesentitytype)
+        - [エンティティ型を取得 [GET /v2/types/{entityType}]](#retrieve-entity-type-get-v2typesentitytype)
+- [Group Subscriptions](#group-subscriptions)
+    - [サブスクリプション・リスト [/v2/subscriptions]](#subscription-list-v2subscriptions)
+        - [サブスクリプションをリスト [GET /v2/subscriptions{?limit,offset,options}]](#list-subscriptions-get-v2subscriptionslimitoffsetoptions)
+        - [サブスクリプションを作成 [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
+    - [ID によるサブスクリプション [/v2/subscriptions/{subscriptionId}]](#subscription-by-id-v2subscriptionssubscriptionid)
+        - [サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
+        - [サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
+        - [サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
+- [Group Registrations](#group-registrations)
+    - [レジストレーション・リスト  [/v2/registrations]](#registration-list-v2registrations)
+        - [レジストレーションをリスト [GET /v2/registrations{?limit,offset,options}]](#list-registrations-get-v2registrationslimitoffsetoptions)
+        - [レジストレーションの作成 [POST /v2/registrations]](#create-registration-post-v2registrations)
+    - [ID によるレジストレーション [/v2/registrations/{registrationId}]](#registration-by-id-v2registrationsregistrationid)
+        - [レジストレーションを取得 [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
+        - [レジストレーションを更新 [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
+        - [レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
+- [Group Batch Operations](#group-batch-operations)
+        - [更新 [POST /v2/op/update]](#update-post-v2opupdate)
+        - [クエリ [POST /v2/op/query{?limit,offset,options}]](#query-post-v2opquerylimitoffsetoptions)
+        - [通知 [POST /v2/op/notify{?options}]](#notify-post-v2opnotifyoptions)
+
+<!-- /TOC -->
+
+<a name="fiware-ngsi-v2-specification"/>
 
 # FIWARE-NGSI v2 仕様
 
@@ -6,7 +99,11 @@
 サブスクリプション (subscriptions) など、コンテキスト情報のライフサイクル
 全体を管理することを目的としています。
 
+<a name="preface"/>
+
 # はじめに
+
+<a name="editors"/>
 
 ## 編集者
 
@@ -14,6 +111,8 @@ José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica 
 Fermín Galán Márquez (Telefónica España, formerly with Telefónica I+D),
 Tobias Jacobs (NEC).
   
+<a name="acknowledgements"/>
+
 ## 謝辞
 
 編集者は積極的に次の人々に感謝の意を表します
@@ -25,9 +124,13 @@ Iván Arias León (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
 Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
 Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
   
+<a name="status"/>
+
 ## ステータス
 
 この仕様は、NGSIv2 API 仕様 (v2.0) の最終的かつ安定版です。
+
+<a name="changelog"/>
 
 # 変更履歴
 
@@ -91,17 +194,25 @@ RC-2016.05 以降の変更点 :
 * 通知メタデータのフィルタリング
 * 通知のシステム/組み込みメタデータ : `previousValue` および `actionType`
 
+<a name="copyright"/>
+
 ## 著作権
 
 Copyright (c) 2011-2018 Telecom Italia, Telefónica I+D and NEC.
+
+<a name="license"/>
 
 ## ライセンス
 
 この仕様は、[FIWARE Open Specification License (implicit patent license)](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Implicit_Patents_License) 下でライセンスされています。
 
+<a name="conformance"/>
+
 ## コンフォーマンス
 
 この仕様では、"完全な" コンプライアンス・レベルについて説明します。
+
+<a name="conventions"/>
 
 ## コンベンション
 
@@ -110,12 +221,18 @@ NGSI version 2 では、使用されるプロパティおよび関連する成�
 パターンの一部として URI を参照し、それらを適切にマークする場合、
 サフィックス `_url` が追加されます。
 
+<a name="reference-implementations"/>
+
 ## リファレンス実装
 
 * NGISv2 Context Brokers
   * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.letsfiware.jp/user/ngsiv2_implementation_notes/index.html)
 
+<a name="specification"/>
+
 # 仕様
+
+<a name="introduction"/>
 
 ## はじめに
 
@@ -129,7 +246,11 @@ FIWARE NGSI (Next Generation Service Interface) API は、
   **コンテキスト・アベイラビリティ・インタフェース**
   (2つのインタフェースを分離するかどうかは、現在検討中です)
 
+<a name="terminology"/>
+
 ## 用語
+
+<a name="context-data-modelling-and-exchange"/>
 
 ### コンテキスト・データのモデリングと交換 (Context data modelling and exchange)
 
@@ -137,6 +258,8 @@ NGSI データモデルの主な要素は、下図のように、コンテキス
 およびメタデータです。
 
 ![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/master/doc/apiary/v2/Ngsi-data-model.png)
+
+<a name="context-entities"/>
 
 #### コンテキストのエンティティ (Context Entities)
 
@@ -153,6 +276,8 @@ NGSI データモデルの主な要素は、下図のように、コンテキス
 を持つことができます。
 
 各エンティティは、その id と型の組み合わせによって一意に識別されます。
+
+<a name="context-attributes"/>
 
 #### コンテキストの属性 (Context Attributes)
 
@@ -172,6 +297,8 @@ NGSI 値型は JSON 型 (JSON types) と同じではありません。
   * オプション **metadata** は、精度、プロバイダ、タイムスタンプなどの
     属性値のプロパティを記述します
   
+<a name="context-metadata"/>
+
 #### コンテキストのメタデータ (Context Metadata)
 
 コンテキストのメタデータは、いくつかの場所で FIWARE NGSI で使用され、
@@ -186,14 +313,18 @@ NGSI 値型は JSON 型 (JSON types) と同じではありません。
 NGSI では、メタデータにネストされたメタデータが含まれることは
 予期されていないことに注意してください。
 
-##  MIME 型 (MIME Types)
+<a name="mime-types"/>
+
+## MIME 型 (MIME Types)
 
 この仕様の API レスポンス・ペイロードは `application/json` と (属性値型
 オペレーションのために) `text/plain` MIME 型に基づいています。 
 HTTP リクエストを発行するクライアントは、それ以外の受け入れ型で、
 `406 Not Acceptable` エラーが発生します。
 
-##  JSON エンティティ表現 (JSON Entity Representation)
+<a name="json-entity-representation"/>
+
+## JSON エンティティ表現 (JSON Entity Representation)
 
 エンティティは、次の構文を持つ JSON オブジェクトで表されます :
 
@@ -227,7 +358,9 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 各オペレーションの仕様には、どの表現が入力として期待されるか、どの表現が
 出力として提供 (レンダリング) されるかに関する詳細が含まれます。
 
-##  JSON 属性表現 (JSON Attribute Representation)
+<a name="json-attribute-representation"/>
+
+## JSON 属性表現 (JSON Attribute Representation)
 
 属性は、次の構文を持つ JSON オブジェクトで表されます :
 
@@ -255,6 +388,8 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
   "metadata": <...>
 }
 ```
+
+<a name="simplified-entity-representation"/>
 
 ## 簡略化されたエンティティ表現 (Simplified Entity Representation)
 
@@ -287,6 +422,8 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 *  *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モード
    と同じです。
 
+<a name="partial-representations"/>
+
 ## 部分表現 (Partial Representations)
 
 一部のオペレーションでは、エンティティの部分表現を使用します :
@@ -318,6 +455,7 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
   属性に関連付けられたメタデータ要素がありません。レスポンスでは、
   属性にメタデータがない場合、このプロパティは `{}` に設定されます。
 
+<a name="special-attribute-types"/>
 
 ## 特殊な属性型 (Special Attribute Types)
 
@@ -341,6 +479,8 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon`, `geo:json`。
   これらはエンティティの場所に関連する特別なセマンティクスを持っています。
   "エンティティの地理空間プロパティ" を参照してください。
+
+<a name="builtin-attributes"/>
 
 ## 組み込み属性 (Builtin Attributes)
 
@@ -366,6 +506,8 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 通常の属性と同様に、`q` フィルタと `orderBy` で使うことができます。
 ただし、リソース URLs では使用できません。
 
+<a name="special-metadata-types"/>
+
 ## 特殊なメタデータ型 (Special Metadata Types)
 
 一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で NGSIv2
@@ -383,6 +525,8 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
       }
 }
 ```
+
+<a name="builtin-metadata"/>
 
 ## 組み込みメタデータ (Builtin Metadata)
 
@@ -416,6 +560,8 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs 
 では使用できません。
 
+<a name="field-syntax-restrictions"/>
+
 ## フィールド構文の制限事項 (Field syntax restrictions)
 
 NGSIv2 API の識別子として使用されるフィールドは、許可される構文に関する特別な
@@ -442,6 +588,8 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 クライアントがシンタックスの観点から無効なフィールドを使用しようとすると、
 クライアントは原因を説明する、"Bad Request" エラー・レスポンスを得ます。
 
+<a name="attribute-names-restrictions"/>
+
 ## 属性名の制限 (Attribute names restrictions)
 
 次の文字列を属性名として使用しないでください :
@@ -457,6 +605,8 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 * `*`, "すべてのカスタム/ユーザ属性" ("属性とメタデータのフィルタリング" を参照)
   という特別な意味を持っています。
 
+<a name="metadata-names-restrictions"/>
+
 ## メタデータ名の制限 (Metadata names restrictions)
 
 次の文字列をメタデータ名として使用しないでください :
@@ -465,6 +615,8 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 
 * `*`, "すべてのカスタム/ユーザ・メタデータ" ("属性とメタデータのフィルタリング"
   を参照) という特別な意味を持っています。
+
+<a name="ordering-results"/>
 
 ## 結果の順序付け (Ordering Results)
 
@@ -480,6 +632,8 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
   結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなど
   の順序で並べられます。フィールド名の前の "!" は、順序が逆になっていること
   を示します。
+
+<a name="error-responses"/>
 
 ## エラー・レスポンス (Error Responses)
 
@@ -518,6 +672,8 @@ NGSIv2 の `error` レポートは次のとおりです :
   + HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します。
   + HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します。
 
+<a name="geospatial-properties-of-entities"/>
+
 ## エンティティの地理空間プロパティ (Geospatial properties of entities)
 
 コンテキストのエンティティの地理空間的特性は、通常のコンテキスト属性を用いて
@@ -545,6 +701,8 @@ NGSIv2 の `error` レポートは次のとおりです :
 あります。これらの状況に推奨される HTTP ステータス・コードは、``413``,
 *Request entity too large* で、レスポンス・ペイロードで報告されたエラーは、
 ``NoResourcesAvailable`` でなければなりません。
+
+<a name="simple-location-format"/>
 
 ### シンプル・ロケーション・フォーマット (Simple Location Format)
 
@@ -613,7 +771,9 @@ NGSIv2 の `error` レポートは次のとおりです :
 }
 ```
 
-###  GeoJSON
+<a name="geojson"/>
+
+### GeoJSON
 
 GeoJSON を使用してエンコードされた位置を表すコンテキスト属性は、
 次の構文に準拠している必要があります :
@@ -637,6 +797,8 @@ GeoJSON を使用してエンコードされた位置を表すコンテキスト
   }
 }
 ```
+
+<a name="simple-query-language"/>
 
 ## シンプル・クエリ言語 (Simple Query Language)
 
@@ -774,6 +936,8 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 (値に関係なく)。`!temperature` は、 'temperature' という属性を持たないエンティティ
 と一致します。
 
+<a name="geographical-queries"/>
+
 ## 地理的クエリ (Geographical Queries)
 
 地理的クエリは、以下のパラメータを使用して指定されます。
@@ -825,6 +989,8 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 `georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
 マッチング・エンティティは、参照されたポリゴン内にあるものです。
 
+<a name="query-resolution"/>
+
 ### クエリの解決 (Query Resolution)
 
 実装が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは
@@ -853,6 +1019,8 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 * *default location* とラベル付けされた複数の属性公開ロケーションがある場合、
   クエリはあいまいであると宣言され、``409`` コードの  HTTP エラー・レスポンスが
   送られなければなりません。
+
+<a name="filtering-out-attributes-and-metadata"/>
 
 ## 属性とメタデータのフィルタリング (Filtering out attributes and metadata)
 
@@ -884,6 +1052,8 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 `attrs` と `metadata` フィールドは `notification` のサブ・フィールドして、
 サブスクリプションでも使用でき、サブスクリプションに関連する通知にどの
 属性メタデータを含めるかを指定するのと同じ意味を持ちます。
+
+<a name="notification-messages"/>
 
 ## 通知メッセージ (Notification Messages)
 
@@ -966,6 +1136,8 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 関連するサブスクリプションのフォーマットの値を持つ `Ngsiv2-AttrsFormat` HTTP ヘッダを
 含む必要があります。
 
+<a name="custom-notifications"/>
+
 ## カスタム通知 (Custom Notifications)
 
 NGSIv2 クライアントは、単純なテンプレート・メカニズムを使用して、HTTP 通知
@@ -980,7 +1152,6 @@ NGSIv2 クライアントは、単純なテンプレート・メカニズムを�
 5番目のフィールド `method` では、NGSIv2 クライアントが通知の配信に使用する
 HTTP メソッドを選択できますが、GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE,
  CONNECTなどの有効な HTTP 動詞しか使用できないことに注意してください。
-
 
 テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に :
 
@@ -1036,7 +1207,11 @@ The temperature is 23.4 degrees
 対応するサブスクリプションにあります)、通知の `Ngsiv2-AttrsFormat` ヘッダに
 `custom` の値が使用されます。
 
+<a name="group-api-entry-point"/>
+
 ## Group API Entry Point
+
+<a name="retrieve-api-resources-get-v2"/>
 
 ### API リソースを取得 [GET /v2]
 
@@ -1046,7 +1221,6 @@ The temperature is 23.4 degrees
 該当する場合は、"url" リンク値、[Link](https://tools.ietf.org/html/rfc5988)
 または Location ヘッダに従うことをお勧めします。独自の URL を構築する代わりに、
 クライアントと実装の詳細を切り離してください。
-
 
 + Response 200 (application/json)
 
@@ -1058,7 +1232,11 @@ The temperature is 23.4 degrees
         + registrations_url: /v2/registrations (required, string) - レジストレーション・
           リソースを指す URL
 
+<a name="group-entities"/>
+
 # Group Entities
+
+<a name="list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby"/>
 
 ### エンティティをリスト [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
 
@@ -1191,6 +1369,8 @@ id、型、パターン・マッチング (id または型)、またはクエリ
          }
         ]
 
+<a name="create-entity-post-v2entitiesoptions"/>
+
 ### エンティティを作成  [POST /v2/entities{?options}]
 
 ペイロードは、作成されるエンティティを表すオブジェクトです。オブジェクトは、
@@ -1249,7 +1429,11 @@ id、型、パターン・マッチング (id または型)、またはクエリ
 
             Location: /v2/entities/Bcn-Welt?type=Room
 
-## ID によるエンティティ  [/v2/entities/{entityId}{?type,attrs,options}]
+<a name="entity-by-id-v2entitiesentityidtypeattrsoptions"/>
+
+## ID によるエンティティ [/v2/entities/{entityId}{?type,attrs,options}]
+
+<a name="retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions"/>
 
 ### エンティティを取得 [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
 
@@ -1314,6 +1498,8 @@ JSON エンティティ表現形式 ("JSON エンティティ表現"のセクシ
           }
         }
 
+<a name="retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions"/>
+
 ### エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
 
 このリクエストは、エンティティ全体を取得するのと同様ですが、
@@ -1376,6 +1562,8 @@ HTTP ステータス・コードが 409 Conflict に設定されたエラー・�
           }
         }
 
+<a name="update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions"/>
+
 ### エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs{?type,options}]
 
 リクエスト・ペイロードは、追加または更新する属性を表すオブジェクトです。
@@ -1421,6 +1609,8 @@ HTTP ステータス・コードが 409 Conflict に設定されたエラー・�
 
 + Response 204
 
+<a name="update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions"/>
+
 ### 既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs{?type,options}]
 
 リクエスト・ペイロードは、更新する属性を表すオブジェクトです。オブジェクトは、
@@ -1458,6 +1648,8 @@ HTTP ステータス・コードが 409 Conflict に設定されたエラー・�
         }
 
 + Response 204
+
+<a name="replace-all-entity-attributes-put-v2entitiesentityidattrstypeoptions"/>
 
 ### すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs{?type,options}]
 
@@ -1497,6 +1689,8 @@ HTTP ステータス・コードが 409 Conflict に設定されたエラー・�
 
 + Response 204
 
+<a name="remove-entity-delete-v2entitiesentityidtype"/>
+
 ### エンティティを削除する [DELETE /v2/entities/{entityId}{?type}]
 
 エンティティを削除します。
@@ -1514,10 +1708,15 @@ HTTP ステータス・コードが 409 Conflict に設定されたエラー・�
 
 + Response 204
 
+<a name="group-attributes"/>
 
 # Group Attributes
 
+<a name="attribute-by-entity-id-v2entitiesentityidattrsattrnametype"/>
+
 ## エンティティ ID による属性 [/v2/entities/{entityId}/attrs/{attrName}{?type}]
+
+<a name="get-attribute-data-get-v2entitiesentityidattrsattrnametypemetadata"/>
 
 ### 属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
 
@@ -1545,6 +1744,8 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
           "type": "Number",
           "metadata": {}
         }
+
+<a name="update-attribute-data-put-v2entitiesentityidattrsattrnametype"/>
 
 ### 属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
@@ -1577,6 +1778,7 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 
 + Response 200
 
+<a name="remove-a-single-attribute-delete-v2entitiesentityidattrsattrnametype"/>
 
 ### 単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
@@ -1596,9 +1798,15 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 
 + Response 204
 
+<a name="group-attribute-value"/>
+
 # Group Attribute Value
 
+<a name="by-entity-id-v2entitiesentityidattrsattrnamevaluetype"/>
+
 ## エンティティ ID 別 [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
+
+<a name="get-attribute-value-get-v2entitiesentityidattrsattrnamevaluetype"/>
 
 ### 属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
@@ -1638,6 +1846,8 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
           "city": "Madrid",
           "country": "Spain"
         }
+
+<a name="update-attribute-value-put-v2entitiesentityidattrsattrnamevaluetype"/>
 
 ### 属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
@@ -1680,9 +1890,15 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 
 + Response 200
 
+<a name="group-types"/>
+
 # Group Types
 
+<a name="entity-types-v2typeslimitoffsetoptions"/>
+
 ## 全エンティティ型 [/v2/types{?limit,offset,options}]
+
+<a name="list-entity-types-get-v2typeslimitoffsetoptions"/>
 
 ### 全エンティティ型のリスト [GET /v2/types/{?limit,offset,options}]
 
@@ -1752,7 +1968,11 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
           }
         ]
 
+<a name="entity-type-v2typesentitytype"/>
+
 ## エンティティ型 [/v2/types/{entityType}]
+
+<a name="retrieve-entity-type-get-v2typesentitytype"/>
 
 ### エンティティ型を取得 [GET /v2/types/{entityType}]
 
@@ -1788,6 +2008,8 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
             },
             "count": 7
           }
+
+<a name="group-subscriptions"/>
 
 # Group Subscriptions
 
@@ -1888,7 +2110,11 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 * `attrs` と `expression` のどちらも使わない場合は、エンティティの属性の
   いずれかが変更されるたびに通知が送られます。
 
+<a name="subscription-list-v2subscriptions"/>
+
 ## サブスクリプション・リスト [/v2/subscriptions]
+
+<a name="list-subscriptions-get-v2subscriptionslimitoffsetoptions"/>
 
 ### サブスクリプションをリスト [GET /v2/subscriptions{?limit,offset,options}]
 
@@ -1950,6 +2176,8 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
           }
         ]
 
+<a name="create-subscription-post-v2subscriptions"/>
+
 ### サブスクリプションを作成 [POST /v2/subscriptions]
 
 新しいサブスクリプションを作成します。
@@ -1995,8 +2223,11 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 
             Location: /v2/subscriptions/abcde98765
 
+<a name="subscription-by-id-v2subscriptionssubscriptionid"/>
 
 ## ID によるサブスクリプション [/v2/subscriptions/{subscriptionId}]
+
+<a name="retrieve-subscription-get-v2subscriptionssubscriptionid"/>
 
 ### サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]
 
@@ -2045,6 +2276,8 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
           "throttling": 5
         }
 
+<a name="update-subscription-patch-v2subscriptionssubscriptionid"/>
+
 ### サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]
 
 サブスクリプションでは、リクエストに含まれるフィールドのみが更新されます。
@@ -2066,6 +2299,7 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 
 + Response 204
 
+<a name="delete-subscription-delete-v2subscriptionssubscriptionid"/>
 
 ### サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]
 
@@ -2081,6 +2315,8 @@ JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
     + subscriptionId: abcdef (required, string) - サブスクリプション ID。
 
 + Response 204
+
+<a name="group-registrations"/>
 
 # Group Registrations
 
@@ -2171,7 +2407,11 @@ NGSIv2 サーバ実装は、コンテキスト情報源へのクエリおよび/
    リクエスト転送の ISO8601 形式のタイムスタンプです。レジストレーションが
    成功したことがない場合は存在しません。
 
+<a name="registration-list-v2registrations"/>
+
 ## レジストレーション・リスト  [/v2/registrations]
+
+<a name="list-registrations-get-v2registrationslimitoffsetoptions"/>
 
 ### レジストレーションをリスト [GET /v2/registrations{?limit,offset,options}]
 
@@ -2226,6 +2466,8 @@ NGSIv2 サーバ実装は、コンテキスト情報源へのクエリおよび/
           }
         ]
 
+<a name="create-registration-post-v2registrations"/>
+
 ### レジストレーションの作成 [POST /v2/registrations]
 
 新しいコンテキスト・プロバイダのレジストレーションを作成します。これは通常、
@@ -2267,7 +2509,11 @@ JSON オブジェクトで表されます。
 
             Location: /v2/registrations/abcde98765
 
+<a name="registration-by-id-v2registrationsregistrationid"/>
+
 ## ID によるレジストレーション [/v2/registrations/{registrationId}]
+
+<a name="retrieve-registration-get-v2registrationsregistrationid"/>
 
 ### レジストレーションを取得 [GET /v2/registrations/{registrationId}]
 
@@ -2315,6 +2561,8 @@ JSON オブジェクトで表されます。
             }
       }
 
+<a name="update-registration-patch-v2registrationsregistrationid"/>
+
 ### レジストレーションを更新 [PATCH /v2/registrations/{registrationId}]
 
 リクエストに含まれるフィールドのみがレジストレーション時に更新されます。
@@ -2336,6 +2584,7 @@ JSON オブジェクトで表されます。
 
 + Response 204
 
+<a name="delete-registration-delete-v2registrationsregistrationid"/>
 
 ### レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]
 
@@ -2352,7 +2601,11 @@ JSON オブジェクトで表されます。
 
 + Response 204
 
+<a name="group-batch-operations"/>
+
 # Group Batch Operations
+
+<a name="update-post-v2opupdate"/>
 
 ### 更新 [POST /v2/op/update]
 
@@ -2426,8 +2679,9 @@ JSON オブジェクトで表されます。
 
 + Response 204
 
+<a name="query-post-v2opquerylimitoffsetoptions"/>
 
-###クエリ [POST /v2/op/query{?limit,offset,options}]
+### クエリ [POST /v2/op/query{?limit,offset,options}]
 
 レスポンス・ペイロードは、一致するエンティティごとに1つのオブジェクトを
 含む配列、またはエンティティが見つからない場合は空の配列  `[]`  です。
@@ -2535,6 +2789,8 @@ JSON オブジェクトで表されます。
           }
         ]
 
+
+<a name="notify-post-v2opnotifyoptions"/>
 
 ### 通知 [POST /v2/op/notify{?options}]
 
