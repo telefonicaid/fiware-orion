@@ -1010,7 +1010,7 @@ the JSON entity representation format (described in "JSON Entity Representation"
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Query Parameters**
+**Request Query Parameters**
 
 This requests accepts the following URL parameters to customize the request response.
 
@@ -1121,7 +1121,7 @@ Response:
           }
         }
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                                              | Example |
 |-----------|----------|--------|--------------------------------------------------------------------------|---------|
@@ -1163,7 +1163,7 @@ Response:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1172,7 +1172,7 @@ This parameter is part of the URL request. It is mandatory.
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1230,7 +1230,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1238,7 +1238,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1351,7 +1351,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1359,7 +1359,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|--------------------------------|---------|
 | `entityId` | string | Id of the entity to be updated | `Room`  |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1394,7 +1394,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1402,7 +1402,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be modified. | `Room`  |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1432,7 +1432,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1440,7 +1440,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|---------------------------------|---------|
 | `entityId` | string | Id of the entity to be deleted. | `Room`  |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
@@ -1462,7 +1462,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1471,7 +1471,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be retrieved      | `Room`        |
 | `attrName` | string | Name of the attribute to be retrieved | `temperature` |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                               | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -1498,7 +1498,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1507,7 +1507,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be updated      | `Room`        |
 | `attrName` | string | Name of the attribute to be updated | `Temperature` |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1537,7 +1537,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1546,7 +1546,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be deleted      | `Room`        |
 | `attrName` | string | Name of the attribute to be deleted | `Temperature` |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1577,7 +1577,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1586,7 +1586,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be retrieved      | `Room`     |
 | `attrName` | string | Name of the attribute to be retrieved | `Location` |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1625,7 +1625,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**URL Parameters**
+**Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1634,7 +1634,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be updated.      | `Room`     |
 | `attrName` | string | Name of the attribute to be updated. | `Location` |
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1676,7 +1676,7 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                | Example |
 |-----------|----------|--------|--------------------------------------------|---------|
@@ -1742,7 +1742,7 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter    | Optional | Type   | Description  | Example |
 |--------------|----------|--------|--------------|---------|
@@ -1866,7 +1866,7 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -1976,7 +1976,7 @@ Response:
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2028,7 +2028,7 @@ Response:
 
 Only the fields included in the request are updated in the subscription.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2054,7 +2054,7 @@ Response:
 
 Cancels subscription.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2144,7 +2144,7 @@ Not present if registration has never had a successful notification.
 
 Lists all the context provider registrations present in the system.
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -2245,7 +2245,7 @@ Response:
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2295,7 +2295,7 @@ Response:
 
 Only the fields included in the request are updated in the registration.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2321,7 +2321,7 @@ Response:
 
 Cancels a context provider registration.
 
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2398,7 +2398,7 @@ Response:
           ]
         }
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description         | Example     |
 |-----------|----------|--------|---------------------|-------------|
@@ -2440,7 +2440,7 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                                               | Example              |
 |-----------|----------|--------|---------------------------------------------------------------------------|----------------------|
@@ -2533,7 +2533,7 @@ Response code:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-**Query Parameters**
+**Request Query Parameters**
 
 | Parameter | Optional | Type   | Description         | Example     |
 |-----------|----------|--------|---------------------|-------------|
