@@ -1771,7 +1771,7 @@ This operation returns a JSON object with information about the type:
 |--------------|----------|--------|--------------|---------|
 | `entityType` |          | string | Entity Type. | `Room`  |
 
-*Response*
+**Response**
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
