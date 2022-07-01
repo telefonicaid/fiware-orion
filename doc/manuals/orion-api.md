@@ -1042,7 +1042,7 @@ The values that `options` parameter can have for this specific request are:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 Content-Type is `application/json`
 
@@ -1141,17 +1141,15 @@ Example:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Response 201
+Example response 201:
 
-    + Headers
+Headers:
+* Location: /v2/entities/Bcn-Welt?type=Room
 
-            Location: /v2/entities/Bcn-Welt?type=Room
+Example response 204
 
-+ Response 204
-
-    + Headers
-
-            Location: /v2/entities/Bcn-Welt?type=Room
+Headers:
+* Location: /v2/entities/Bcn-Welt?type=Room
 
 
 ### Entity by ID
@@ -1196,7 +1194,7 @@ The values that `options` parameter can have for this specific request are:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
-Example Response 200:
+Example response 200:
 
 Content-Type is `application/json`
 
@@ -1267,7 +1265,7 @@ The values that `options` parameter can have for this specific request are:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 Content-Type is `application/json`
 
@@ -1494,7 +1492,7 @@ Those parameter are part of the URL request. They are mandatory.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 Content-Type is `application/json`
 
@@ -1716,7 +1714,7 @@ The values that `options` parameter can have for this specific request are:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 Content-Types is `application/json`
 
@@ -1913,7 +1911,7 @@ The values that `options` parameter can have for this specific request are:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 ```json
 [
@@ -2000,11 +1998,10 @@ Content-Type is `application/json`
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 201:
+Example response 201:
 
-    + Headers
-
-            Location: /v2/subscriptions/62aa3d3ac734067e6f0d0871
+Headers: 
+* Location: /v2/subscriptions/62aa3d3ac734067e6f0d0871
 
 
 ### Subscription By ID
@@ -2028,7 +2025,7 @@ This parameter is part of the URL request. It is mandatory.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 Content-Type is `application/json`
 
@@ -2205,7 +2202,7 @@ The values that `options` parameter can have for this specific request are:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-Example Response 200:
+Example response 200:
 
 ```json
 [
@@ -2282,9 +2279,8 @@ Content-Type is `application/json`
 
 Example response 201:
 
-    + Headers
-
-            Location: /v2/registrations/62aa3d3ac734067e6f0d0871
+Headers: 
+* Location: /v2/registrations/62aa3d3ac734067e6f0d0871
 
 ### Registration By ID
 
