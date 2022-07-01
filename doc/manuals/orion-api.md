@@ -1269,7 +1269,7 @@ The values that `options` parameter can have for this specific request are:
 
 Example Response 200:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -1496,7 +1496,7 @@ Those parameter are part of the URL request. They are mandatory.
 
 Example Response 200:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -1613,7 +1613,7 @@ Those parameter are part of the URL request. They are mandatory.
 
 Response 200 example:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -1659,7 +1659,7 @@ Those parameter are part of the URL request. They are mandatory.
 
 **Request payload**
 
-Content-type is `application/json`.
+Content-type is `application/json` or `text/plain`
 
 ```json
 {
