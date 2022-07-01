@@ -41,7 +41,7 @@
             - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
             - [Create Entity [POST /v2/entities]](#create-entity-post-v2entities)
         - [Entity by ID](#entity-by-id)
-            - [Retrieve Entity [GET /v2/entities]](#retrieve-entity-get-v2entities)
+            - [Retrieve Entity [GET /v2/entities/{entityId}]](#retrieve-entity-get-v2entitiesentityid)
             - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
             - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
             - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
