@@ -1043,6 +1043,7 @@ The values that `options` parameter can have for this specific request are:
   more details.
 
 Example Response 200:
+
 Content-Type is `application/json`
 
 ```
@@ -1196,6 +1197,7 @@ The values that `options` parameter can have for this specific request are:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
 Example Response 200:
+
 Content-Type is `application/json``
 
 ```
@@ -1266,6 +1268,7 @@ The values that `options` parameter can have for this specific request are:
   more details.
 
 Example Response 200:
+
 Content-Type is `application/json``
 
 ```
