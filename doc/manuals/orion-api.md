@@ -2030,7 +2030,7 @@ This parameter is part of the URL request. It is mandatory.
 
 Example Response 200:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -2250,7 +2250,7 @@ The registration is represented by a JSON object as described at the beginning o
 
 **Request payload** 
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -2309,7 +2309,7 @@ This parameter is part of the URL request. It is mandatory.
 
 Example response 200:
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
@@ -2357,7 +2357,7 @@ This parameter is part of the URL request. It is mandatory.
 
 **Request payload** 
 
-Content-Type is `application/json``
+Content-Type is `application/json`
 
 ```json
 {
