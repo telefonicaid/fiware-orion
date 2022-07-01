@@ -1914,7 +1914,7 @@ The values that `options` parameter can have for this specific request are:
               "lastNotification": "2015-10-05T16:00:00.00Z",
               "lastFailure": "2015-10-06T16:00:00.00Z"
             },
-            "expires": "2016-04-05T14:00:00.00Z",
+            "expires": "2025-04-05T14:00:00.00Z",
             "status": "failed",
             "throttling": 5
           }
@@ -1956,7 +1956,7 @@ Response:
             },
             "attrs": ["temperature", "humidity"]
           },            
-          "expires": "2016-04-05T14:00:00.00Z",
+          "expires": "2025-04-05T14:00:00.00Z",
           "throttling": 5
         }
 
@@ -2016,7 +2016,7 @@ Response:
             "lastNotification": "2015-10-05T16:00:00.00Z"
             "lastSuccess": "2015-10-05T16:00:00.00Z"
           },
-          "expires": "2016-04-05T14:00:00.00Z",
+          "expires": "2025-04-05T14:00:00.00Z",
           "status": "active",
           "throttling": 5
         }
