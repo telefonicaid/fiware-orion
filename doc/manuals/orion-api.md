@@ -1046,7 +1046,7 @@ Example Response 200:
 
 Content-Type is `application/json`
 
-```
+```json
 [
   {
     "type": "Room",
@@ -1111,7 +1111,7 @@ Content-Type is `application/json`
 
 Example:
 
-```
+```json
 {
   "type": "Room",
   "id": "Bcn-Welt",
@@ -1200,7 +1200,7 @@ Example Response 200:
 
 Content-Type is `application/json``
 
-```
+```json
 {
   "type": "Room",
   "id": "Bcn_Welt",
@@ -1271,7 +1271,7 @@ Example Response 200:
 
 Content-Type is `application/json``
 
-```
+```json
 {
   "temperature": {
     "value": 21.7,
@@ -1337,7 +1337,7 @@ Content-Type is `application/json`
 
 Example:
 
-```
+```json
 {
    "ambientNoise": {
      "value": 31.5
@@ -1379,7 +1379,7 @@ This parameter is part of the URL request. It is mandatory.
 
 Content-Type is `application/json`
 
-```
+```json
 {
   "temperature": {
     "value": 25.5
@@ -1424,7 +1424,7 @@ This parameter is part of the URL request. It is mandatory.
 
 Content-Type is `application/json`
 
-```
+```json
 {
   "temperature": {
     "value": 25.5
@@ -1472,12 +1472,6 @@ This parameter is part of the URL request. It is mandatory.
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
 
-Response:
-
-* Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
@@ -1494,13 +1488,23 @@ Those parameter are part of the URL request. They are mandatory.
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail. | `accuracy`    |
 
-+ Response 200 (application/json)
+**Response**
 
-        {
-          "value": 21.7,
-          "type": "Number",
-          "metadata": {}
-        }
+* Successful operation uses 200 OK.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Example Response 200:
+
+Content-Type is `application/json``
+
+```json
+{
+  "value": 21.7,
+  "type": "Number",
+  "metadata": {}
+}
+```
 
 #### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
@@ -1529,19 +1533,20 @@ Those parameter are part of the URL request. They are mandatory.
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-+ Request (application/json)
+**Request**
 
-        {
-          "value": 25.0,
-          "metadata": {
-            "unitCode": {
-              "value": "CEL"
-            }
-          }
-        }
+Content-Type is `application/json`
 
-+ Response 200
-
+```json
+{
+  "value": 25.0,
+  "metadata": {
+    "unitCode": {
+      "value": "CEL"
+    }
+  }
+}
+```
 
 #### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
@@ -1587,12 +1592,6 @@ This operation returns the `value` property with the value of the attribute.
     marks are used at the beginning and end.
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
 
-Response:
-
-* Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
@@ -1608,14 +1607,24 @@ Those parameter are part of the URL request. They are mandatory.
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-+ Response 200 (application/json)
+**Response**
 
-        {
-          "address": "Ronda de la Comunicacion s/n",
-          "zipCode": 28050,
-          "city": "Madrid",
-          "country": "Spain"
-        }
+* Successful operation uses 200 OK.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Response 200 example:
+
+Content-Type is `application/json``
+
+```json
+{
+  "address": "Ronda de la Comunicacion s/n",
+  "zipCode": 28050,
+  "city": "Madrid",
+  "country": "Spain"
+}
+```
 
 #### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
@@ -1635,12 +1644,6 @@ The request payload is the new attribute value.
 
 The payload MIME type in the request is specified in the `Content-Type` HTTP header.
 
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request URL parameters**
 
 Those parameter are part of the URL request. They are mandatory. 
@@ -1656,16 +1659,24 @@ Those parameter are part of the URL request. They are mandatory.
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-+ Request (application/json)
+**Request**
 
-        {
-          "address": "Ronda de la Comunicacion s/n",
-          "zipCode": 28050,
-          "city": "Madrid",
-          "country": "Spain"
-        }
+Content-type is `application/json`.
 
-+ Response 200
+```json
+{
+  "address": "Ronda de la Comunicacion s/n",
+  "zipCode": 28050,
+  "city": "Madrid",
+  "country": "Spain"
+}
+```
+
+**Response**
+
+* Successful operation uses 204 No Content
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
 ### Types
 
@@ -1686,12 +1697,6 @@ names as strings.
 
 Results are ordered by entity `type` in alphabetical order.
 
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                | Example |
@@ -1707,40 +1712,50 @@ The values that `options` parameter can have for this specific request are:
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
 
-+ Response 200 (application/json)
+**Response**
 
-        [
-          {
-            "type": "Car",
-            "attrs": {
-              "speed": {
-                "types": [ "Number" ]
-              },
-              "fuel": {
-                "types": [ "gasoline", "diesel" ]
-              },
-              "temperature": {
-                "types": [ "urn:phenomenum:temperature" ]
-              }
-            },
-            "count": 12
-          },
-          {
-            "type": "Room",
-            "attrs": {
-              "pressure": {
-                "types": [ "Number" ]
-              },
-              "humidity": {
-                "types": [ "percentage" ]
-              },
-              "temperature": {
-                "types": [ "urn:phenomenum:temperature" ]
-              }
-            },
-            "count": 7
-          }
-        ]
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Example Response 200:
+
+Content-Types is `application/json`
+
+```json
+[
+  {
+    "type": "Car",
+    "attrs": {
+      "speed": {
+        "types": [ "Number" ]
+      },
+      "fuel": {
+        "types": [ "gasoline", "diesel" ]
+      },
+      "temperature": {
+        "types": [ "urn:phenomenum:temperature" ]
+      }
+    },
+    "count": 12
+  },
+  {
+    "type": "Room",
+    "attrs": {
+      "pressure": {
+        "types": [ "Number" ]
+      },
+      "humidity": {
+        "types": [ "percentage" ]
+      },
+      "temperature": {
+        "types": [ "urn:phenomenum:temperature" ]
+      }
+    },
+    "count": 7
+  }
+]
+```
 
 #### Retrieve entity information for a given type [GET /v2/types]
 
@@ -1752,34 +1767,38 @@ This operation returns a JSON object with information about the type:
   entities).
 * `count` : the number of entities belonging to that type.
 
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request Query Parameters**
 
 | Parameter    | Optional | Type   | Description  | Example |
 |--------------|----------|--------|--------------|---------|
 | `entityType` |          | string | Entity Type. | `Room`  |
 
-+ Response 200 (application/json)
+*Response*
 
-          {
-            "attrs": {
-              "pressure": {
-                "types": [ "Number" ]
-              },
-              "humidity": {
-                "types": [ "percentage" ]
-              },
-              "temperature": {
-                "types": [ "urn:phenomenum:temperature" ]
-              }
-            },
-            "count": 7
-          }
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Response 200 example:
+
+Content-Type is `application/json`
+
+```json
+{
+  "attrs": {
+    "pressure": {
+      "types": [ "Number" ]
+    },
+    "humidity": {
+      "types": [ "percentage" ]
+    },
+    "temperature": {
+      "types": [ "urn:phenomenum:temperature" ]
+    }
+  },
+  "count": 7
+}
+```
 
 ## Subscriptions Operations
 
@@ -1876,12 +1895,6 @@ Notification rules are as follow:
 
 Returns a list of all the subscriptions present in the system.
 
-Response:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                        | Example |
@@ -1896,89 +1909,100 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count` |
 
-+ Response 200
+**Response**
 
-        [
-          {
-            "id": "62aa3d3ac734067e6f0d0871",
-            "description": "One subscription to rule them all",
-            "subject": {                    
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "condition": {
-                 "attrs": [ "temperature " ],
-                 "expression": {
-                    "q": "temperature>40"
-                 }
-              }
-            },
-            "notification": {
-              "httpCustom": {
-                "url": "http://localhost:1234",
-                "headers": {
-                  "X-MyHeader": "foo"
-                },
-                "qs": {
-                  "authToken": "bar"
-                }
-              },
-              "attrsFormat": "keyValues",
-              "attrs": ["temperature", "humidity"],
-              "timesSent": 12,
-              "lastNotification": "2015-10-05T16:00:00.00Z",
-              "lastFailure": "2015-10-06T16:00:00.00Z"
-            },
-            "expires": "2025-04-05T14:00:00.00Z",
-            "status": "failed",
-            "throttling": 5
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Example Response 200:
+
+```json
+[
+  {
+    "id": "62aa3d3ac734067e6f0d0871",
+    "description": "One subscription to rule them all",
+    "subject": {                    
+      "entities": [
+        {
+          "id": "Bcn_Welt",
+          "type": "Room"
+        }
+      ],
+      "condition": {
+          "attrs": [ "temperature " ],
+          "expression": {
+            "q": "temperature>40"
           }
-        ]
-
+      }
+    },
+    "notification": {
+      "httpCustom": {
+        "url": "http://localhost:1234",
+        "headers": {
+          "X-MyHeader": "foo"
+        },
+        "qs": {
+          "authToken": "bar"
+        }
+      },
+      "attrsFormat": "keyValues",
+      "attrs": ["temperature", "humidity"],
+      "timesSent": 12,
+      "lastNotification": "2015-10-05T16:00:00.00Z",
+      "lastFailure": "2015-10-06T16:00:00.00Z"
+    },
+    "expires": "2025-04-05T14:00:00.00Z",
+    "status": "failed",
+    "throttling": 5
+  }
+]
+```
 
 #### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
 
-Response:
+**Request**
+
+Content-Type is `application/json`
+
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "q": "temperature>40"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },            
+  "expires": "2025-04-05T14:00:00.00Z",
+  "throttling": 5
+}
+```
+
+**Response**
 
 * Successful operation uses 201 Created
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Request (application/json)
-
-        {
-          "description": "One subscription to rule them all",
-          "subject": {
-            "entities": [
-              {
-                "idPattern": ".*",
-                "type": "Room"
-              }
-            ],
-            "condition": {
-              "attrs": [ "temperature" ],
-              "expression": {
-                "q": "temperature>40"
-              }
-            }
-          },
-          "notification": {
-            "http": {
-              "url": "http://localhost:1234"
-            },
-            "attrs": ["temperature", "humidity"]
-          },            
-          "expires": "2025-04-05T14:00:00.00Z",
-          "throttling": 5
-        }
-
-+ Response 201
+Example Response 201:
 
     + Headers
 
@@ -2000,45 +2024,48 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|----------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
-Response:
+**Response**
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Response 200 (application/json)
+Example Response 200:
 
-        {
-          "id": "62aa3d3ac734067e6f0d0871",
-          "description": "One subscription to rule them all",
-          "subject": {
-            "entities": [
-              {
-                "idPattern": ".*",
-                "type": "Room"
-              }
-            ],
-            "condition": {
-              "attrs": [ "temperature " ],
-              "expression": {
-                "q": "temperature>40"
-              }
-            }
-          },
-          "notification": {
-            "http": {
-              "url": "http://localhost:1234"
-            },
-            "attrs": ["temperature", "humidity"],
-            "timesSent": 12,
-            "lastNotification": "2015-10-05T16:00:00.00Z"
-            "lastSuccess": "2015-10-05T16:00:00.00Z"
-          },
-          "expires": "2025-04-05T14:00:00.00Z",
-          "status": "active",
-          "throttling": 5
-        }
+Content-Type is `application/json``
 
+```json
+{
+  "id": "62aa3d3ac734067e6f0d0871",
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature " ],
+      "expression": {
+        "q": "temperature>40"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"],
+    "timesSent": 12,
+    "lastNotification": "2015-10-05T16:00:00.00Z"
+    "lastSuccess": "2015-10-05T16:00:00.00Z"
+  },
+  "expires": "2025-04-05T14:00:00.00Z",
+  "status": "active",
+  "throttling": 5
+}
+```
 
 #### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
@@ -2052,19 +2079,21 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
-Response:
+**Request Payload**
+
+Content-Type is `application/json`
+
+```json
+{
+  "expires": "2025-04-05T14:00:00.00Z"
+}
+```
+
+**Response**
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
-
-+ Request (application/json)
-
-        {
-          "expires": "2025-04-05T14:00:00.00Z"
-        }
-
-+ Response 204
 
 #### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
 
@@ -2078,13 +2107,11 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
 
-Response:
+**Response**
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
-
-+ Response 204
 
 ## Registration Operations
 
@@ -2174,45 +2201,48 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of registrations is returned in the HTTP header `Fiware-Total-Count` |
 
-Response:
+**Response**
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Response 200
+Example Response 200:
 
-        [
-          {
-            "id": "62aa3d3ac734067e6f0d0871",
-            "description": "Example Context Source",
-            "dataProvided": {
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "attrs": [
-                "temperature"
-              ]
-            },
-            "provider": {
-              "http": {
-                "url": "http://contextsource.example.org"
-              },
-              "supportedForwardingMode": "all"
-            },
-            "expires": "2017-10-31T12:00:00",
-            "status": "active",
-            "forwardingInformation": {
-              "timesSent": 12,
-              "lastForwarding": "2017-10-06T16:00:00.00Z",
-              "lastSuccess": "2017-10-06T16:00:00.00Z",
-              "lastFailure": "2017-10-05T16:00:00.00Z"
-            }
-          }
-        ]
+```json
+[
+  {
+    "id": "62aa3d3ac734067e6f0d0871",
+    "description": "Example Context Source",
+    "dataProvided": {
+      "entities": [
+        {
+          "id": "Bcn_Welt",
+          "type": "Room"
+        }
+      ],
+      "attrs": [
+        "temperature"
+      ]
+    },
+    "provider": {
+      "http": {
+        "url": "http://contextsource.example.org"
+      },
+      "supportedForwardingMode": "all"
+    },
+    "expires": "2017-10-31T12:00:00",
+    "status": "active",
+    "forwardingInformation": {
+      "timesSent": 12,
+      "lastForwarding": "2017-10-06T16:00:00.00Z",
+      "lastSuccess": "2017-10-06T16:00:00.00Z",
+      "lastFailure": "2017-10-05T16:00:00.00Z"
+    }
+  }
+]
+```
+
 
 #### Create Registration [POST /v2/registrations]
 
@@ -2220,35 +2250,39 @@ Creates a new context provider registration. This is typically used for binding 
 as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
-Response:
+**Request payload** 
+
+Content-Type is `application/json``
+
+```json
+{
+  "description": "Relative Humidity Context Source",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "room2",
+        "type": "Room"
+      }
+    ],
+    "attrs": [
+      "relativeHumidity"
+    ]
+  },
+  "provider": {
+    "http":{ 
+      "url": "http://localhost:1234"
+    }
+  }
+}
+```
+
+**Response**
 
 * Successful operation uses 201 Created
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Request (application/json)
-
-        {
-          "description": "Relative Humidity Context Source",
-          "dataProvided": {
-            "entities": [
-              {
-                "id": "room2",
-                "type": "Room"
-              }
-            ],
-            "attrs": [
-              "relativeHumidity"
-            ]
-          },
-          "provider": {
-            "http":{ 
-              "url": "http://localhost:1234"
-            }
-          }
-        }
-
-+ Response 201
+Example response 201:
 
     + Headers
 
@@ -2269,43 +2303,47 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|----------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
-Response:
+**Response**
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
-+ Response 200 (application/json)
+Example response 200:
 
-      {
-            "id": "62aa3d3ac734067e6f0d0871",
-            "description": "Example Context Source",
-            "dataProvided": {
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "attrs": [
-                "temperature"
-              ]
-            },
-            "provider": {
-              "http": {
-                "url": "http://contextsource.example.org"
-              },
-              "supportedForwardingMode": "all"
-            },
-            "expires": "2017-10-31T12:00:00",
-            "status": "failed",
-            "forwardingInformation": {
-              "timesSent": 12,
-              "lastForwarding": "2017-10-06T16:00:00.00Z",
-              "lastFailure": "2017-10-06T16:00:00.00Z",
-              "lastSuccess": "2017-10-05T18:25:00.00Z",
-            }
-      }      
+Content-Type is `application/json``
+
+```json
+{
+      "id": "62aa3d3ac734067e6f0d0871",
+      "description": "Example Context Source",
+      "dataProvided": {
+        "entities": [
+          {
+            "id": "Bcn_Welt",
+            "type": "Room"
+          }
+        ],
+        "attrs": [
+          "temperature"
+        ]
+      },
+      "provider": {
+        "http": {
+          "url": "http://contextsource.example.org"
+        },
+        "supportedForwardingMode": "all"
+      },
+      "expires": "2017-10-31T12:00:00",
+      "status": "failed",
+      "forwardingInformation": {
+        "timesSent": 12,
+        "lastForwarding": "2017-10-06T16:00:00.00Z",
+        "lastFailure": "2017-10-06T16:00:00.00Z",
+        "lastSuccess": "2017-10-05T18:25:00.00Z",
+      }
+}      
+```
 
 #### Update Registration [PATCH /v2/registrations/{registrationId}]
 
@@ -2319,19 +2357,21 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
-Response:
+**Request payload** 
+
+Content-Type is `application/json``
+
+```json
+{
+    "expires": "2017-10-04T00:00:00"
+}
+```
+
+**Response**
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
-
-+ Request (application/json)
-
-        {
-            "expires": "2017-10-04T00:00:00"
-        }
-
-+ Response 204
 
 #### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
@@ -2345,13 +2385,11 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
 
-Response:
+**Response**
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
-
-+ Response 204
 
 ## Batch Operations
 
@@ -2380,40 +2418,6 @@ regular non-batch operations can be done:
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
 * `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
-Response:
-
-* Successful operation uses 204 No Content.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Request (application/json)
-
-        {
-          "actionType": "append",
-          "entities": [
-            {
-              "type": "Room",
-              "id": "Bcn-Welt",
-              "temperature": {
-                "value": 21.7
-               },
-              "humidity": {
-                "value": 60
-              }
-            },
-            {
-              "type": "Room",
-              "id": "Mad_Aud",
-              "temperature": {
-                "value": 22.9
-              },
-              "humidity": {
-                "value": 85
-              }
-            }
-          ]
-        }
-
 **Request Query Parameters**
 
 | Parameter | Optional | Type   | Description         | Example     |
@@ -2426,7 +2430,43 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 
-+ Response 204
+**Request payload**
+
+Content-type is `application/json`
+
+```json
+{
+  "actionType": "append",
+  "entities": [
+    {
+      "type": "Room",
+      "id": "Bcn-Welt",
+      "temperature": {
+        "value": 21.7
+        },
+      "humidity": {
+        "value": 60
+      }
+    },
+    {
+      "type": "Room",
+      "id": "Mad_Aud",
+      "temperature": {
+        "value": 22.9
+      },
+      "humidity": {
+        "value": 85
+      }
+    }
+  ]
+}
+```
+
+**Response**
+
+* Successful operation uses 204 No Content.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
 ### Query operation
 
@@ -2450,12 +2490,6 @@ The payload may contain the following elements (all of them optional):
 + `metadata`: a list of metadata names to include in the response.
    See "Filtering out attributes and metadata" section for more detail.
 
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request Query Parameters**
 
 | Parameter | Optional | Type   | Description                                                               | Example              |
@@ -2474,65 +2508,79 @@ The values that `options` parameter can have for this specific request are:
 | `values`  | When used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details. |
 | `unique`  | When used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details. |
 
-+ Request (application/json)
+**Request payload**
 
-        {
-          "entities": [
-            {
-              "idPattern": ".*",
-              "type": "Room"
-            },
-            {
-              "id": "Car",
-              "type": "P-9873-K"
-            }
-          ],
-          "attrs": [
-            "temperature",
-            "humidity"
-          ],
-          "expression": {
-             "q": "temperature>20"
-          },
-          "metadata": [
-            "accuracy",
-            "timestamp"
-          ]
-        }
+Content-Type is `application/json`
 
-+ Response 200 (application/json)
+```
+{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "Room"
+    },
+    {
+      "id": "Car",
+      "type": "P-9873-K"
+    }
+  ],
+  "attrs": [
+    "temperature",
+    "humidity"
+  ],
+  "expression": {
+      "q": "temperature>20"
+  },
+  "metadata": [
+    "accuracy",
+    "timestamp"
+  ]
+}
+``` 
 
-        [
-          {
-            "type": "Room",
-            "id": "DC_S1-D41",
-            "temperature": {
-              "value": 35.6,
-              "type": "Number"
-            }
-          },
-          {
-            "type": "Room",
-            "id": "Boe-Idearium",
-            "temperature": {
-              "value": 22.5,
-              "type": "Number"
-            }
-          },
-          {
-            "type": "Car",
-            "id": "P-9873-K",
-            "temperature": {
-              "value": 40,
-              "type": "Number",
-              "accuracy": 2,
-              "timestamp": {
-                "value": "2015-06-04T07:20:27.378Z",
-                "type": "DateTime"
-              }
-            }
-          }
-        ]
+**Response**
+
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Example response 200:
+
+Content-type is `application/json`
+
+```json
+[
+  {
+    "type": "Room",
+    "id": "DC_S1-D41",
+    "temperature": {
+      "value": 35.6,
+      "type": "Number"
+    }
+  },
+  {
+    "type": "Room",
+    "id": "Boe-Idearium",
+    "temperature": {
+      "value": 22.5,
+      "type": "Number"
+    }
+  },
+  {
+    "type": "Car",
+    "id": "P-9873-K",
+    "temperature": {
+      "value": 40,
+      "type": "Number",
+      "accuracy": 2,
+      "timestamp": {
+        "value": "2015-06-04T07:20:27.378Z",
+        "type": "DateTime"
+      }
+    }
+  }
+]
+```
 
 ### Notify operation
 
@@ -2542,12 +2590,6 @@ This operation is intended to consume a notification payload so that all the ent
 This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
 The request payload must be an NGSIv2 notification payload. 
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
-
-Response code:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
 
 **Request Query Parameters**
 
@@ -2561,27 +2603,34 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 
-+ Request (application/json)
+**Request payload**
 
-        {
-          "subscriptionId": "5aeb0ee97d4ef10a12a0262f",
-          "data": [{
-            "type": "Room",
-            "id": "DC_S1-D41",
-            "temperature": {
-              "value": 35.6,
-              "type": "Number"
-            }
-          },
-          {
-            "type": "Room",
-            "id": "Boe-Idearium",
-            "temperature": {
-              "value": 22.5,
-              "type": "Number"
-            }
-          }]
-        }
+Content-Type is `application/json`
 
-+ Response 200 (application/json)
+```json
+{
+  "subscriptionId": "5aeb0ee97d4ef10a12a0262f",
+  "data": [{
+    "type": "Room",
+    "id": "DC_S1-D41",
+    "temperature": {
+      "value": 35.6,
+      "type": "Number"
+    }
+  },
+  {
+    "type": "Room",
+    "id": "Boe-Idearium",
+    "temperature": {
+      "value": 22.5,
+      "type": "Number"
+    }
+  }]
+}
+```
 
+**Response**
+
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
