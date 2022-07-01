@@ -81,7 +81,7 @@ payload='{
     "value": 26
   },
   "P2": "MODIFIED",
-  "P3": { "@type": "@json", "@value": null },
+  "P3": "urn:ngsi-ld:null",
   "P5": "ADDED ATTR"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
