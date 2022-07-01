@@ -41,7 +41,7 @@
             - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
             - [Create Entity [POST /v2/entities]](#create-entity-post-v2entities)
         - [Entity by ID](#entity-by-id)
-            - [Retrieve Entity [GET /v2/entities]](#retrieve-entity-get-v2entities)
+            - [Retrieve Entity [GET /v2/entities/{entityId}]](#retrieve-entity-get-v2entitiesentityid)
             - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
             - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
             - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
@@ -1163,6 +1163,15 @@ Response:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                      | Example |
+|------------|--------|----------------------------------|---------|
+| `entityId` | string | Id of the entity to be retrieved | `Room`  |
+
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
@@ -1220,6 +1229,14 @@ Response:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
+
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                      | Example |
+|------------|--------|----------------------------------|---------|
+| `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
 **Query Parameters**
 
@@ -1283,6 +1300,14 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                    | Example |
+|------------|--------|--------------------------------|---------|
+| `entityId` | string | Id of the entity to be updated | `Room`  |
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
@@ -1324,6 +1349,14 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                    | Example |
+|------------|--------|--------------------------------|---------|
+| `entityId` | string | Id of the entity to be updated | `Room`  |
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
@@ -1359,6 +1392,14 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                      | Example |
+|------------|--------|----------------------------------|---------|
+| `entityId` | string | Id of the entity to be modified. | `Room`  |
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
@@ -1389,6 +1430,14 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                     | Example |
+|------------|--------|---------------------------------|---------|
+| `entityId` | string | Id of the entity to be deleted. | `Room`  |
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
@@ -1410,6 +1459,17 @@ Response:
 * Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
+
+**URL Parameters**
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                           | Example       |
+|------------|--------|---------------------------------------|---------------|
+| `entityId` | string | Id of the entity to be retrieved      | `Room`        |
+| `attrName` | string | Name of the attribute to be retrieved | `temperature` |
+
+**Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                               | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -1435,6 +1495,15 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
+
+**URL Parameters**
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                         | Example       |
+|------------|--------|-------------------------------------|---------------|
+| `entityId` | string | Id of the entity to be updated      | `Room`        |
+| `attrName` | string | Name of the attribute to be updated | `Temperature` |
 
 **Query Parameters**
 
@@ -1466,6 +1535,15 @@ Response:
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
 
+**URL Parameters**
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                         | Example       |
+|------------|--------|-------------------------------------|---------------|
+| `entityId` | string | Id of the entity to be deleted      | `Room`        |
+| `attrName` | string | Name of the attribute to be deleted | `Temperature` |
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
@@ -1496,6 +1574,15 @@ Response:
 * Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
+
+**URL Parameters**
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                           | Example    |
+|------------|--------|---------------------------------------|------------|
+| `entityId` | string | Id of the entity to be retrieved      | `Room`     |
+| `attrName` | string | Name of the attribute to be retrieved | `Location` |
 
 **Query Parameters**
 
@@ -1535,6 +1622,15 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
   more details.
+
+**URL Parameters**
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                          | Example    |
+|------------|--------|--------------------------------------|------------|
+| `entityId` | string | Id of the entity to be updated.      | `Room`     |
+| `attrName` | string | Name of the attribute to be updated. | `Location` |
 
 **Query Parameters**
 
@@ -1786,7 +1882,7 @@ The values that `options` parameter can have for this specific request are:
 
         [
           {
-            "id": "abcdefg",
+            "id": "62aa3d3ac734067e6f0d0871",
             "description": "One subscription to rule them all",
             "subject": {                    
               "entities": [
@@ -1818,7 +1914,7 @@ The values that `options` parameter can have for this specific request are:
               "lastNotification": "2015-10-05T16:00:00.00Z",
               "lastFailure": "2015-10-06T16:00:00.00Z"
             },
-            "expires": "2016-04-05T14:00:00.00Z",
+            "expires": "2025-04-05T14:00:00.00Z",
             "status": "failed",
             "throttling": 5
           }
@@ -1860,7 +1956,7 @@ Response:
             },
             "attrs": ["temperature", "humidity"]
           },            
-          "expires": "2016-04-05T14:00:00.00Z",
+          "expires": "2025-04-05T14:00:00.00Z",
           "throttling": 5
         }
 
@@ -1868,7 +1964,7 @@ Response:
 
     + Headers
 
-            Location: /v2/subscriptions/abcde98765
+            Location: /v2/subscriptions/62aa3d3ac734067e6f0d0871
 
 
 ### Subscription By ID
@@ -1877,6 +1973,14 @@ Response:
 
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
+
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter        | Type   | Description                            | Example                    |
+|------------------|--------|----------------------------------------|----------------------------|
+| `subscriptionId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
 Response:
 
@@ -1887,7 +1991,7 @@ Response:
 + Response 200 (application/json)
 
         {
-          "id": "abcdef",
+          "id": "62aa3d3ac734067e6f0d0871",
           "description": "One subscription to rule them all",
           "subject": {
             "entities": [
@@ -1912,7 +2016,7 @@ Response:
             "lastNotification": "2015-10-05T16:00:00.00Z"
             "lastSuccess": "2015-10-05T16:00:00.00Z"
           },
-          "expires": "2016-04-05T14:00:00.00Z",
+          "expires": "2025-04-05T14:00:00.00Z",
           "status": "active",
           "throttling": 5
         }
@@ -1921,6 +2025,14 @@ Response:
 #### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
+
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter        | Type   | Description                          | Example                    |
+|------------------|--------|--------------------------------------|----------------------------|
+| `subscriptionId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
 Response:
 
@@ -1931,7 +2043,7 @@ Response:
 + Request (application/json)
 
         {
-          "expires": "2016-04-05T14:00:00.00Z"
+          "expires": "2025-04-05T14:00:00.00Z"
         }
 
 + Response 204
@@ -1939,6 +2051,14 @@ Response:
 #### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
 
 Cancels subscription.
+
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter        | Type   | Description                          | Example                    |
+|------------------|--------|--------------------------------------|----------------------------|
+| `subscriptionId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
 
 Response:
 
@@ -2046,7 +2166,7 @@ Response:
 
         [
           {
-            "id": "abcdefg",
+            "id": "62aa3d3ac734067e6f0d0871",
             "description": "Example Context Source",
             "dataProvided": {
               "entities": [
@@ -2114,7 +2234,7 @@ Response:
 
     + Headers
 
-            Location: /v2/registrations/abcde98765
+            Location: /v2/registrations/62aa3d3ac734067e6f0d0871
 
 ### Registration By ID
 
@@ -2122,6 +2242,14 @@ Response:
 
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
+
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter        | Type   | Description                            | Example                    |
+|------------------|--------|----------------------------------------|----------------------------|
+| `registrationId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
 Response:
 
@@ -2132,7 +2260,7 @@ Response:
 + Response 200 (application/json)
 
       {
-            "id": "abcdefg",
+            "id": "62aa3d3ac734067e6f0d0871",
             "description": "Example Context Source",
             "dataProvided": {
               "entities": [
@@ -2165,6 +2293,14 @@ Response:
 
 Only the fields included in the request are updated in the registration.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter        | Type   | Description                          | Example                    |
+|------------------|--------|--------------------------------------|----------------------------|
+| `registrationId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
+
 Response:
 
 * Successful operation uses 204 No Content
@@ -2182,6 +2318,14 @@ Response:
 #### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
 Cancels a context provider registration.
+
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter        | Type   | Description                          | Example                    |
+|------------------|--------|--------------------------------------|----------------------------|
+| `registrationId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
 
 Response:
 
