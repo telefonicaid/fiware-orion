@@ -134,7 +134,7 @@ echo
 echo "09. PATCH E1 deleting attribute A1"
 echo "=================================="
 payload='{
-  "A1": { "@type": "@json", "@value": null }
+  "A1": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
 echo

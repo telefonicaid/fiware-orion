@@ -56,7 +56,6 @@ SET (SOURCES
     kjTreeLog.cpp
     kjTimestampAdd.cpp
     kjArrayAdd.cpp
-    kjJsonldNullObject.cpp
     kjChildPrepend.cpp
     kjNodeDecouple.cpp
     kjNavigate.cpp

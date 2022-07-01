@@ -52,7 +52,7 @@ echo
 echo "02. PATCH E1, attempting to delete the Property P1 (that does not exist), also, set a new object for R1"
 echo "======================================================================================================="
 payload='{
-  "P1": {"@type" :"@json", "@value" : null},
+  "P1": "urn:ngsi-ld:null",
   "R1": {
     "object": "urn:ngsi-ld:Building:R2"
   }

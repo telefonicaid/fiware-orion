@@ -32,12 +32,15 @@ brokerStart CB 0 IPv4 -experimental
 
 #
 # We need to define how to treat "non-needed" JSON literals, in ETSI ISG CIM.
-# Until then, Orion-LD ignores JSON literals (except for null) and just accepts the object as a compound.
+# Until then, Orion-LD ignores JSON literals and just accepts the object as a compound.
+#
+# The preliminary NGSI-LD API Spec changed (2022-06-30) and the JSON NULL Literal is no longer used for indicating deletion.
+# Instead, the string "urn:ngsi-ld:null" is used (a little trickier for language maps).
 #
 # 01. Create an entity TemperatureSensor:001 with two attributes, category and temperature
 # 02. PATCH the entity setting 'category' to JSON literal { "@type": "@json", "@value": 2 }
 # 03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later
-# 04. Now remove 'category' with the JSON literal { "@type": "@json", "@value": null }
+# 04. Now remove 'category' with urn:ngsi-ld:null
 # 05. GET the entity, making sure 'category' has been removed
 # 06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }
 # 07. GET the entity, see temperature is now a stupid compound ...
@@ -76,10 +79,10 @@ echo
 echo
 
 
-echo "04. Now remove 'category' with the JSON literal { '@type': '@json', '@value': null }"
-echo "===================================================================================="
+echo "04. Now remove 'category' with urn:ngsi-ld:null"
+echo "==============================================="
 payload='{
-  "category": { "@type": "@json", "@value": null }
+  "category": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001 -X PATCH --payload "$payload"
 echo
@@ -157,8 +160,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-04. Now remove 'category' with the JSON literal { '@type': '@json', '@value': null }
-====================================================================================
+04. Now remove 'category' with urn:ngsi-ld:null
+===============================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

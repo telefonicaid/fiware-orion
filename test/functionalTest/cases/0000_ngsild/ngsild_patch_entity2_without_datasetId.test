@@ -102,16 +102,16 @@ echo
 echo
 
 
-echo "04. Patch E1, updating P1 - P1.observedAt isn't removed as it's a metadata - need to add '.md.observedAt"
-echo "========================="
+echo "04. Patch E1, removing P1:observedAt"
+echo "===================================="
 payload='{
   "P1": {
     "value": {
       "v1": "P1:v1-Step04: changed",
-      "v3": { "@type": "@json", "@value": null },
+      "v3": "urn:ngsi-ld:null",
       "v4": "P1:v4-Step04: added"
     },
-    "observedAt": { "@type": "@json", "@value": null },
+    "observedAt": "urn:ngsi-ld:null",
     "unitCode": "step4"
   }
 }'
@@ -194,7 +194,7 @@ echo
 echo "13. Patch E1, removing the Relationship R1"
 echo "=========================================="
 payload='{
-  "R1": { "@type": "@json", "@value": null }
+  "R1": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo
@@ -246,7 +246,7 @@ echo
 echo "19. Patch E1, Delete P1, Add P2"
 echo "==============================="
 payload='{
-  "P1": { "@type": "@json", "@value": null },
+  "P1": "urn:ngsi-ld:null",
   "P2": 20
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
@@ -324,8 +324,8 @@ echo "28. Patch E1, Delete the two sub-properties from R2"
 echo "==================================================="
 payload='{
   "R2": {
-    "R2P1": { "@type": "@json", "@value": null },
-    "R2R1": { "@type": "@json", "@value": null }
+    "R2P1": "urn:ngsi-ld:null",
+    "R2R1": "urn:ngsi-ld:null"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
@@ -350,9 +350,9 @@ echo
 echo "31. Patch E1, Delete the three properties P2, P3, and R2"
 echo "========================================================"
 payload='{
-  "P2": { "@type": "@json", "@value": null },
-  "P3": { "@type": "@json", "@value": null },
-  "R2": { "@type": "@json", "@value": null }
+  "P2": "urn:ngsi-ld:null",
+  "P3": "urn:ngsi-ld:null",
+  "R2": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo
@@ -452,8 +452,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-04. Patch E1, updating P1 - P1.observedAt isn't removed as it's a metadata - need to add '.md.observedAt
-=========================
+04. Patch E1, removing P1:observedAt
+====================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

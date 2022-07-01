@@ -186,7 +186,7 @@ echo
 echo "16. PATCH E1, deleting P1"
 echo "========================="
 payload='{
-  "P1": {"@type": "@json", "@value": null }
+  "P1": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo
@@ -204,7 +204,7 @@ echo
 echo "18. PATCH E2, deleting P1"
 echo "========================="
 payload='{
-  "P1": {"@type": "@json", "@value": null }
+  "P1": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E2 -X PATCH --payload "$payload"
 echo

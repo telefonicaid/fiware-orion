@@ -46,7 +46,6 @@ extern "C"
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
@@ -98,7 +97,7 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 //
 // pCheckTypeFromContext -
 //
-bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
+static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
 {
   bool arrayReduction = true;
 
@@ -115,8 +114,20 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
         return false;
       }
 
+      LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
       if (parse8601Time(attrP->value.s) == -1)
       {
+        //
+        // Deletion?
+        // Should only be valid for merge+patch ops ...
+        //
+        LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
+        if (strcmp(attrP->value.s, "urn:ngsi-ld:null") == 0)
+        {
+          attrP->type = KjNull;
+          return true;
+        }
+
         orionldError(OrionldBadRequestData,
                      "Not a valid ISO8601 DateTime",
                      attrP->name,
@@ -178,6 +189,7 @@ bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
 // Make sure that:
 // - if the attribute already existed, that it is a Property in the DB
 // - OR: it's a new attribute
+// - OR, the string is "urn:ngsi-ld:null" ... (then it could also be a Relationship - doesn't matter)
 //
 inline bool pCheckAttributeString
 (
@@ -632,6 +644,98 @@ bool multiAttributeArray(KjNode* attrArrayP, bool* errorP)
 
 // -----------------------------------------------------------------------------
 //
+// deletionWithTypePresent -
+//
+bool deletionWithTypePresent(KjNode* attrP, KjNode* typeP)
+{
+  KjNode* valueP;
+
+  if ((strcmp(typeP->value.s, "Property") == 0) || (strcmp(typeP->value.s, "GeoProperty") == 0))
+  {
+    valueP = kjLookup(attrP, "value");
+    if ((valueP != NULL) && (valueP->type == KjString) && (strcmp(valueP->value.s, "urn:ngsi-ld:null") == 0))
+    {
+      attrP->type = KjNull;
+      return true;
+    }
+  }
+  else if (strcmp(typeP->value.s, "Relationship") == 0)
+  {
+    valueP = kjLookup(attrP, "object");
+    if ((valueP != NULL) && (valueP->type == KjString) && (strcmp(valueP->value.s, "urn:ngsi-ld:null") == 0))
+    {
+      attrP->type = KjNull;
+      return true;
+    }
+  }
+  else if (strcmp(typeP->value.s, "LanguageProperty") == 0)
+  {
+    valueP = kjLookup(attrP, "languageMap");
+    if ((valueP != NULL) && (valueP->type == KjObject))
+    {
+      KjNode* noneP = kjLookup(valueP, "@none");
+      if ((noneP != NULL ) && (noneP->type == KjString) && (strcmp(noneP->value.s, "urn:ngsi-ld:null") == 0))
+      {
+        attrP->type = KjNull;
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// deletionWithoutTypePresent -
+//
+bool deletionWithoutTypePresent
+(
+  KjNode*               attrP,
+  OrionldAttributeType  attributeType,
+  KjNode*               valueP,
+  KjNode*               objectP,
+  KjNode*               languageMapP
+)
+{
+  if ((attributeType == Property) || (attributeType == GeoProperty))
+  {
+    if ((valueP != NULL) && (valueP->type == KjString) && (strcmp(valueP->value.s, "urn:ngsi-ld:null") == 0))
+    {
+      attrP->type = KjNull;
+      return true;
+    }
+  }
+  else if (attributeType == Relationship)
+  {
+    if ((objectP != NULL) && (objectP->type == KjString) && (strcmp(objectP->value.s, "urn:ngsi-ld:null") == 0))
+    {
+      attrP->type = KjNull;
+      return true;
+    }
+  }
+  else if (attributeType == LanguageProperty)
+  {
+    if ((languageMapP != NULL) && (languageMapP->type == KjObject))
+    {
+      KjNode* noneP = kjLookup(languageMapP, "@none");
+      if ((noneP != NULL ) && (noneP->type == KjString) && (strcmp(noneP->value.s, "urn:ngsi-ld:null") == 0))
+      {
+        attrP->type = KjNull;
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckAttributeObject -
 //
 // - if "type" is present inside the object:
@@ -671,11 +775,12 @@ static bool pCheckAttributeObject
   if (typeP != NULL)  // Attribute Type given in incoming payload
   {
     //
-    // Check for the special JSON-LD null object - only valid for PATCH /entities/{eId} ...
+    // Check for Deletion -
+    // FIXME: Change ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL for ... ORIONLD_SERVICE_OPTION_xxxxx
     //
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) != 0)
     {
-      if (kjJsonldNullObject(attrP, typeP) == true)
+      if (deletionWithTypePresent(attrP, typeP) == true)
         return true;
     }
 
@@ -764,6 +869,16 @@ static bool pCheckAttributeObject
       orionldError(OrionldBadRequestData, title, attrP->name, 400);
       return false;
     }
+
+    //
+    // Check for Deletion -
+    // FIXME: Change ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL for ... ORIONLD_SERVICE_OPTION_xxxxx
+    //
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) != 0)
+    {
+      if (deletionWithoutTypePresent(attrP, attributeType, valueP, objectP, languageMapP) == true)
+        return true;
+    }
   }
 
   KjNode* fieldP = attrP->value.firstChildP;
@@ -774,30 +889,17 @@ static bool pCheckAttributeObject
   {
     next = fieldP->next;
 
-    if (fieldP->type == KjNull)  // Pure JSON null ... ?   OR, was it a JSON-LD null object that has been translated already?
+    if ((fieldP->type == KjString) && (strcmp(fieldP->value.s, "urn:ngsi-ld:null") == 0))
     {
-      if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
-      {
-        orionldError(OrionldBadRequestData, "null is not allowed as RHS in a JSON-LD document", fieldP->name, 400);
-        return false;
-      }
-      fieldP = next;
-      continue;
-    }
-
-    if (fieldP->type == KjObject)
-    {
-      KjNode* typeP = kjLookup(fieldP, "@type");
-
-      if ((typeP != NULL) && (kjJsonldNullObject(fieldP, typeP) == true))
-        typeP->type = KjNull;
+      fieldP->type = KjNull;
+      LM_TMP(("OBS: Field '%s' marked for deletion", fieldP->name));
     }
 
     if (fieldP->type == KjNull)  // JSON-LD null
     {
       if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
       {
-        orionldError(OrionldBadRequestData, "RHS as NULL not allowed", fieldP->name, 400);
+        orionldError(OrionldBadRequestData, "null is not allowed as RHS in a JSON-LD document", fieldP->name, 400);
         return false;
       }
 
@@ -1067,6 +1169,15 @@ bool pCheckAttribute
       attrP->name = orionldAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);
     else
       attrP->name = orionldSubAttributeExpand(orionldState.contextP, attrP->name, true, &attrContextInfoP);
+  }
+
+  // "Direct" Deletion?
+  if (attrP->type == KjString)
+    LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
+  if ((attrP->type == KjString) && (strcmp(attrP->value.s, "urn:ngsi-ld:null") == 0))
+  {
+    attrP->type = KjNull;
+    return true;
   }
 
   if (pCheckTypeFromContext(attrP, attrContextInfoP) == false)

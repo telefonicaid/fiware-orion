@@ -1,0 +1,241 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity using Real PATCH - delete attribute with attr: { value: "urn:ngsi-ld:null" } and with attribute type present
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create an entity E1 with a property P1, a Relationship R1, and a LanguageProperty LP1
+# 02. PATCH E1, deleting P1 using the special string "urn:ngsi-ld:null" for value, and with type=Property present
+# 03. GET E1 - make sure P1 is gone
+# 04. PATCH E1, deleting R1 using the special string "urn:ngsi-ld:null" for object, and with type=Relationship present
+# 05. GET E1 - make sure R1 is gone
+# 06. PATCH E1, deleting LP1 using the special string "urn:ngsi-ld:null" for languageMap::@none, and with type=LanguageProperty present
+# 07. GET E1 - make sure LP1 is gone
+# 08. See E1 in mongo - make sure E1 has no attributes left
+#
+
+echo "01. Create an entity E1 with a property P1, a Relationship R1, and a LanguageProperty LP1"
+echo "========================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "R1": {
+    "object": "urn:E1"
+  },
+  "LP1": {
+    "languageMap": {
+      "en": "yes",
+      "es": "si"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. PATCH E1, deleting P1 using the special string "urn:ngsi-ld:null" for value, and with type=Property present'
+echo '==============================================================================================================='
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "urn:ngsi-ld:null"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET E1 - make sure P1 is gone"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=simplified
+echo
+echo
+
+
+echo '04. PATCH E1, deleting R1 using the special string "urn:ngsi-ld:null" for object, and with type=Relationship present'
+echo '===================================================================================================================='
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:null"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '05. GET E1 - make sure R1 is gone'
+echo '================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=simplified
+echo
+echo
+
+
+echo '06. PATCH E1, deleting LP1 using the special string "urn:ngsi-ld:null" for languageMap::@none, and with type=LanguageProperty present'
+echo '====================================================================================================================================='
+payload='{
+  "LP1": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "@none": "urn:ngsi-ld:null"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '07. GET E1 - make sure LP1 is gone'
+echo '=================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=simplified
+echo
+echo
+
+
+
+
+echo "08. See E1 in mongo - make sure E1 has no attributes left"
+echo "========================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with a property P1, a Relationship R1, and a LanguageProperty LP1
+=========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. PATCH E1, deleting P1 using the special string "urn:ngsi-ld:null" for value, and with type=Property present
+===============================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET E1 - make sure P1 is gone
+=================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "LP1": {
+        "en": "yes",
+        "es": "si"
+    },
+    "R1": "urn:E1",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. PATCH E1, deleting R1 using the special string "urn:ngsi-ld:null" for object, and with type=Relationship present
+====================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET E1 - make sure R1 is gone
+=================================
+HTTP/1.1 200 OK
+Content-Length: 55
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "LP1": {
+        "en": "yes",
+        "es": "si"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+06. PATCH E1, deleting LP1 using the special string "urn:ngsi-ld:null" for languageMap::@none, and with type=LanguageProperty present
+=====================================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET E1 - make sure LP1 is gone
+==================================
+HTTP/1.1 200 OK
+Content-Length: 26
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+08. See E1 in mongo - make sure E1 has no attributes left
+=========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [ ],
+	"attrs" : {
+		
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
