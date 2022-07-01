@@ -1004,7 +1004,7 @@ and/or those which match a query or geographical query (see [Simple Query Langua
 The response payload is an array containing one object per matching entity. Each entity follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
 
-**Request Query Parameters**
+**Request query parameters**
 
 This requests accepts the following URL parameters to customize the request response.
 
@@ -1092,7 +1092,7 @@ Content-Type is `application/json`
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description                                                              | Example |
 |-----------|----------|--------|--------------------------------------------------------------------------|---------|
@@ -1174,7 +1174,7 @@ This parameter is part of the URL request. It is mandatory.
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1243,7 +1243,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1368,14 +1368,14 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|--------------------------------|---------|
 | `entityId` | string | Id of the entity to be updated | `Room`  |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
-**Request**
+**Request payload**
 
 Content-Type is `application/json`
 
@@ -1413,14 +1413,14 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be modified. | `Room`  |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
-**Request**
+**Request payload**
 
 Content-Type is `application/json`
 
@@ -1453,7 +1453,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|---------------------------------|---------|
 | `entityId` | string | Id of the entity to be deleted. | `Room`  |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
@@ -1481,7 +1481,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be retrieved      | `Room`        |
 | `attrName` | string | Name of the attribute to be retrieved | `temperature` |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                               | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -1527,13 +1527,13 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be updated      | `Room`        |
 | `attrName` | string | Name of the attribute to be updated | `Temperature` |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-**Request**
+**Request payload**
 
 Content-Type is `application/json`
 
@@ -1567,13 +1567,11 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be deleted      | `Room`        |
 | `attrName` | string | Name of the attribute to be deleted | `Temperature` |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-
-+ Response 204
 
 
 ### Attribute Value
@@ -1601,7 +1599,7 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be retrieved      | `Room`     |
 | `attrName` | string | Name of the attribute to be retrieved | `Location` |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
@@ -1653,13 +1651,13 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be updated.      | `Room`     |
 | `attrName` | string | Name of the attribute to be updated. | `Location` |
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-**Request**
+**Request payload**
 
 Content-type is `application/json`.
 
@@ -1697,7 +1695,7 @@ names as strings.
 
 Results are ordered by entity `type` in alphabetical order.
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description                                | Example |
 |-----------|----------|--------|--------------------------------------------|---------|
@@ -1767,7 +1765,7 @@ This operation returns a JSON object with information about the type:
   entities).
 * `count` : the number of entities belonging to that type.
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter    | Optional | Type   | Description  | Example |
 |--------------|----------|--------|--------------|---------|
@@ -1895,7 +1893,7 @@ Notification rules are as follow:
 
 Returns a list of all the subscriptions present in the system.
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -1964,7 +1962,7 @@ Example Response 200:
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
 
-**Request**
+**Request payload**
 
 Content-Type is `application/json`
 
@@ -2079,7 +2077,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
-**Request Payload**
+**Request payload**
 
 Content-Type is `application/json`
 
@@ -2187,7 +2185,7 @@ Not present if registration has never had a successful notification.
 
 Lists all the context provider registrations present in the system.
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -2418,7 +2416,7 @@ regular non-batch operations can be done:
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
 * `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description         | Example     |
 |-----------|----------|--------|---------------------|-------------|
@@ -2490,7 +2488,7 @@ The payload may contain the following elements (all of them optional):
 + `metadata`: a list of metadata names to include in the response.
    See "Filtering out attributes and metadata" section for more detail.
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description                                                               | Example              |
 |-----------|----------|--------|---------------------------------------------------------------------------|----------------------|
@@ -2591,7 +2589,7 @@ This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv
 The request payload must be an NGSIv2 notification payload. 
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
 
-**Request Query Parameters**
+**Request query parameters**
 
 | Parameter | Optional | Type   | Description         | Example     |
 |-----------|----------|--------|---------------------|-------------|
