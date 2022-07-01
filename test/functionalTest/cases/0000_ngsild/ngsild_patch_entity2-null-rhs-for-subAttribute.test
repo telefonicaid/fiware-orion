@@ -31,9 +31,9 @@ brokerStart CB 0 IPv4 -experimental
 --SHELL--
 #
 # 01. Create an entity E1 with a Relationship 'controlledAsset'
-# 02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error
+# 02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is an NGSI-LD null - see error
 # 03. GET E1, see it unaffected by step 2
-# 04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - that's OK
+# 04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is am NGSI-LD null - that's OK
 # 05. GET E1, see the changes from step 4
 #
 
@@ -55,12 +55,12 @@ echo
 echo
 
 
-echo "02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error"
+echo "02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a NGSI-LD null - see error"
 echo "=========================================================================================================================================="
 payload='{
   "controlledAsset": {
     "observedAt": "XXXX",
-    "valid": {"@type" :"@json", "@value" : null}
+    "valid": "urn:ngsi-ld:null"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
@@ -75,12 +75,12 @@ echo
 echo
 
 
-echo "04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error"
+echo "04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a NGSI-LD null - see error"
 echo "======================================================================================================================================="
 payload='{
   "controlledAsset": {
     "observedAt": "2022-03-14T15:49:00.123Z",
-    "valid": {"@type" :"@json", "@value" : null}
+    "valid": "urn:ngsi-ld:null"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
@@ -106,7 +106,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 
-02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error
+02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a NGSI-LD null - see error
 ==========================================================================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 122
@@ -143,7 +143,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a JSON-LD null - see error
+04. PATCH E1, attempting to add a valid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a NGSI-LD null - see error
 =======================================================================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)

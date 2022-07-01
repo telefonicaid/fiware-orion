@@ -45,7 +45,6 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
-#include "orionld/kjTree/kjJsonldNullObject.h"                   // kjJsonldNullObject
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -211,12 +210,8 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
   //
   // In JSON-LD, null is expressed in a different way ...
   //
-  if (newP->type == KjObject)
-  {
-    KjNode* typeP = kjLookup(newP, "@type");  // If it's an object, and it has a @type member - might be a JSON-LD null
-    if (typeP)
-      kjJsonldNullObject(newP, typeP);
-  }
+  if ((newP->type == KjString) && (strcmp(newP->value.s, "urn:ngsi-ld:null") == 0))
+    newP->type = KjNull;
 
 
   //
