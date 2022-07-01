@@ -1163,6 +1163,15 @@ Response:
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
 
+**URL Parameters**
+
+This parameter is part of the URL request. It is mandatory. 
+
+| Parameter  | Type   | Description                      | Example |
+|------------|--------|----------------------------------|---------|
+| `entityId` | string | Id of the entity to be retrieved | `Room`  |
+
+
 **Query Parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
