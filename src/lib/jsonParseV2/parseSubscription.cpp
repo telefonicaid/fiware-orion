@@ -1502,7 +1502,7 @@ static std::string parseNotifyConditionVector
   {
     std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
 
-    if (!r.empty())
+    if (r != "OK")
     {
       return badInput(ciP, r);
     }
