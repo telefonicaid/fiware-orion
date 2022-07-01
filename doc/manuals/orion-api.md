@@ -1004,12 +1004,6 @@ and/or those which match a query or geographical query (see [Simple Query Langua
 The response payload is an array containing one object per matching entity. Each entity follows
 the JSON entity representation format (described in "JSON Entity Representation" section).
 
-**Response code**
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request Query Parameters**
 
 This requests accepts the following URL parameters to customize the request response.
@@ -1042,84 +1036,60 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
 
+**Response**
 
-**Response** 
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
-+ Response 200 (application/json)
+Example Response 200:
+Content-Type is `application/json`
 
-        [
-         {
-           "type": "Room",
-           "id": "DC_S1-D41",
-           "temperature": {
-             "value": 35.6,
-             "type": "Number",
-             "metadata": {}
-           }
-         },
-         {
-           "type": "Room",
-           "id": "Boe-Idearium",
-           "temperature": {
-             "value": 22.5,
-             "type": "Number",
-             "metadata": {}
-           }
-         },
-         {
-           "type": "Car",
-           "id": "P-9873-K",
-           "speed": {
-             "value": 100,
-             "type": "number",
-             "metadata": {
-               "accuracy": {
-                 "value": 2,
-                 "type": "Number"
-               },
-               "timestamp": {
-                 "value": "2015-06-04T07:20:27.378Z",
-                 "type": "DateTime"
-               }
-             }
-           }
-         }
-        ]
+```
+[
+  {
+    "type": "Room",
+    "id": "DC_S1-D41",
+    "temperature": {
+      "value": 35.6,
+      "type": "Number",
+      "metadata": {}
+    }
+  },
+  {
+    "type": "Room",
+    "id": "Boe-Idearium",
+    "temperature": {
+      "value": 22.5,
+      "type": "Number",
+      "metadata": {}
+    }
+  },
+  {
+    "type": "Car",
+    "id": "P-9873-K",
+    "speed": {
+      "value": 100,
+      "type": "number",
+      "metadata": {
+        "accuracy": {
+          "value": 2,
+          "type": "Number"
+        },
+        "timestamp": {
+          "value": "2015-06-04T07:20:27.378Z",
+          "type": "DateTime"
+        }
+      }
+    }
+  }
+]
+```
 
 #### Create Entity [POST /v2/entities]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a "JSON Entity Representation" section).
-
-Response:
-
-* Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
-  upsert option is used). Response includes a `Location` header with the URL of the
-  created entity.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-+ Request (application/json)
-
-        {
-          "type": "Room",
-          "id": "Bcn-Welt",
-          "temperature": {
-            "value": 21.7
-          },
-          "humidity": {
-            "value": 60
-          },
-          "location": {
-            "value": "41.3763726, 2.1864475",
-            "type": "geo:point",
-            "metadata": {
-              "crs": {
-                "value": "WGS84"
-              }
-            }
-          }
-        }
 
 **Request Query Parameters**
 
@@ -1133,6 +1103,41 @@ The values that `options` parameter can have for this specific request are:
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 | `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
+
++ **Request payload**
+Content-Type is `application/json`
+
+Example:
+
+```
+{
+  "type": "Room",
+  "id": "Bcn-Welt",
+  "temperature": {
+    "value": 21.7
+  },
+  "humidity": {
+    "value": 60
+  },
+  "location": {
+    "value": "41.3763726, 2.1864475",
+    "type": "geo:point",
+    "metadata": {
+      "crs": {
+        "value": "WGS84"
+      }
+    }
+  }
+}
+```
+
+**Response**
+
+* Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
+  upsert option is used). Response includes a `Location` header with the URL of the
+  created entity.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
 + Response 201
 
@@ -1158,11 +1163,6 @@ This operation must return one entity element only, but there may be more than o
 same ID (e.g. entities with same ID but different types).
 In such case, an error message is returned, with the HTTP status code set to 409 Conflict. 
 
-Response:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
-
 **Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
@@ -1189,30 +1189,38 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
 
-+ Response 200 (application/json)
+**Response**
 
-        {
-          "type": "Room",
-          "id": "Bcn_Welt",
-          "temperature": {
-            "value": 21.7,
-            "type": "Number"
-          },
-          "humidity": {
-            "value": 60,
-            "type": "Number"
-          },
-          "location": {
-            "value": "41.3763726, 2.1864475",
-            "type": "geo:point",
-            "metadata": {
-              "crs": {
-                "value": "WGS84",
-                "type": "Text"
-              }
-            }
-          }
-        }
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
+
+Example Response 200:
+Content-Type is `application/json``
+
+```
+{
+  "type": "Room",
+  "id": "Bcn_Welt",
+  "temperature": {
+    "value": 21.7,
+    "type": "Number"
+  },
+  "humidity": {
+    "value": 60,
+    "type": "Number"
+  },
+  "location": {
+    "value": "41.3763726, 2.1864475",
+    "type": "geo:point",
+    "metadata": {
+      "crs": {
+        "value": "WGS84",
+        "type": "Text"
+      }
+    }
+  }
+}
+```
 
 #### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
 
@@ -1224,12 +1232,6 @@ entity element. If more than one entity with the same ID is found (e.g. entities
 same ID but different type), an error message is returned, with the HTTP status code set to
 409 Conflict.
 
-Response:
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
@@ -1256,28 +1258,37 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
 
-+ Response 200 (application/json)
+**Response**
 
-        {
-          "temperature": {
-            "value": 21.7,
-            "type": "Number"
-          },
-          "humidity": {
-            "value": 60,
-            "type": "Number"
-          },
-          "location": {
-            "value": "41.3763726, 2.1864475",
-            "type": "geo:point",
-            "metadata": {
-              "crs": {
-                "value": "WGS84",
-                "type": "Text"
-              }
-            }
-          }
-        }
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
+
+Example Response 200:
+Content-Type is `application/json``
+
+```
+{
+  "temperature": {
+    "value": 21.7,
+    "type": "Number"
+  },
+  "humidity": {
+    "value": 60,
+    "type": "Number"
+  },
+  "location": {
+    "value": "41.3763726, 2.1864475",
+    "type": "geo:point",
+    "metadata": {
+      "crs": {
+        "value": "WGS84",
+        "type": "Text"
+      }
+    }
+  }
+}
+```
 
 #### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
 
@@ -1345,12 +1356,6 @@ that `id` and `type` are not allowed.
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
 attributes in the payload doesn't exist in the entity, an error is returned.
 
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
 **Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
@@ -1366,18 +1371,26 @@ This parameter is part of the URL request. It is mandatory.
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
-+ Request (application/json)
+**Request**
 
-        {
-          "temperature": {
-            "value": 25.5
-          },
-          "seatNumber": {
-            "value": 6
-          }
-        }
+Content-Type is `application/json`
 
-+ Response 204
+```
+{
+  "temperature": {
+    "value": 25.5
+  },
+  "seatNumber": {
+    "value": 6
+  }
+}
+```
+
+**Response**
+
+* Successful operation uses 204 No Content
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
 #### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
 
@@ -1387,12 +1400,6 @@ that `id` and `type` are not allowed.
 
 The attributes previously existing in the entity are removed and replaced by the ones in the
 request.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
 
 **Request URL parameters**
 
@@ -1409,28 +1416,31 @@ This parameter is part of the URL request. It is mandatory.
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
 
-+ Request (application/json)
+**Request**
 
-        {
-          "temperature": {
-            "value": 25.5
-          },
-          "seatNumber": {
-            "value": 6
-          }
-        }
+Content-Type is `application/json`
 
+```
+{
+  "temperature": {
+    "value": 25.5
+  },
+  "seatNumber": {
+    "value": 6
+  }
+}
+```
+
+**Response**
+
+* Successful operation uses 204 No Content
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 + Response 204
 
 #### Remove Entity [DELETE /v2/entities/{entityId}]
 
 Delete the entity.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
 
 **Request URL parameters**
 
@@ -1446,8 +1456,11 @@ This parameter is part of the URL request. It is mandatory.
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
 
-+ Response 204
+**Response**
 
+* Successful operation uses 204 No Content
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
 ### Attributes
 
