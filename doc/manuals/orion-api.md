@@ -1294,13 +1294,7 @@ whether the `append` operation option is used or not.
   previously existing in the entity are appended. In addition to that, in case some of the
   attributes in the payload already exist in the entity, an error is returned.
 
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
-  more details.
-
-**URL Parameters**
+**Request URL parameters**
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1308,7 +1302,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|--------------------------------|---------|
 | `entityId` | string | Id of the entity to be updated | `Room`  |
 
-**Query Parameters**
+**Request query parameters**
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
@@ -1322,17 +1316,25 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
 
-+ Request (application/json)
+**Request payload**
 
-    + Body
+Content-Type is `application/json`
 
-            {
-              "ambientNoise": {
-                "value": 31.5
-              }
-            }
+Example:
 
-+ Response 204
+```
+{
+   "ambientNoise": {
+     "value": 31.5
+   }
+}
+```
+
+**Response**
+
+* Successful operation uses 204 No Content
+* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+  more details.
 
 #### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
 
