@@ -57,6 +57,8 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 /* ****************************************************************************
 *
 * parseContextAttributeCompoundValue -
+*
+* Using ConstValueIterator as parameters (for objects)
 */
 static std::string parseContextAttributeCompoundValue
 (
@@ -186,6 +188,8 @@ static std::string parseContextAttributeCompoundValue
 /* ****************************************************************************
 *
 * parseContextAttributeCompoundValue -
+*
+* Using ConstMemberIterator as parameters (for arrays)
 */
 std::string parseContextAttributeCompoundValue
 (

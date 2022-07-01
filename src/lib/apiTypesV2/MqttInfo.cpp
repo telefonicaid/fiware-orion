@@ -30,6 +30,7 @@
 #include "apiTypesV2/MqttInfo.h"
 
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/compoundResponses.h"
 
 #include "mongoDriver/safeMongo.h"
 
@@ -40,7 +41,7 @@ namespace ngsiv2
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo() : qos(0), custom(false), includePayload(true), providedAuth(false)
+MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), includePayload(true), providedAuth(false)
 {
 }
 
@@ -83,6 +84,11 @@ std::string MqttInfo::toJson()
     else if (!this->payload.empty())
     {
       jh.addString("payload", this->payload);
+    }
+
+    if (this->json != NULL)
+    {
+      jh.addRaw("json", this->json->toJson());
     }
   }
 
@@ -136,6 +142,33 @@ void MqttInfo::fill(const orion::BSONObj& bo)
     {
       this->payload = "";
       this->includePayload = true;
+    }
+
+    if (bo.hasField(CSUB_JSON))
+    {
+      orion::BSONElement be = getFieldF(bo, CSUB_JSON);
+      if (be.type() == orion::Object)
+      {
+        // FIXME PR: free memory
+        this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
+        this->json->valueType = orion::ValueTypeObject;
+        compoundObjectResponse(this->json, be);
+      }
+      else if (be.type() == orion::Array)
+      {
+        // FIXME PR: free memory
+        this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
+        this->json->valueType = orion::ValueTypeVector;
+        compoundVectorResponse(this->json, be);
+      }
+      else
+      {
+        LM_E(("Runtime Error (csub json field must be Object or Array but is %s)", orion::bsonType2String(be.type())));
+      }
+    }
+    else
+    {
+      this->json = NULL;
     }
   }
 }

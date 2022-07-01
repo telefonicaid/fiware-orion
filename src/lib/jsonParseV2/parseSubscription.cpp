@@ -305,41 +305,493 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
+* stringToCompoundType -
+*
+* FIXME PR: copied from existing stringToCompoundType. Unify?
+*/
+static orion::ValueType stringToCompoundType(std::string nodeType)
+{
+  if      (nodeType == "String")  return orion::ValueTypeString;
+  else if (nodeType == "Number")  return orion::ValueTypeNumber;
+  else if (nodeType == "True")    return orion::ValueTypeBoolean;
+  else if (nodeType == "False")   return orion::ValueTypeBoolean;
+  else if (nodeType == "Object")  return orion::ValueTypeObject;
+  else if (nodeType == "Array")   return orion::ValueTypeVector;
+  else if (nodeType == "Null")    return orion::ValueTypeNull;
+
+  return orion::ValueTypeString;
+}
+
+
+
+// Forward declaration
+std::string parseCustomJsonItem
+(
+  const rapidjson::Value::ConstMemberIterator&  node,
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
+);
+
+
+
+/* ****************************************************************************
+*
+* parseCustomJsonItem -
+*
+* Using ConstValueIterator as parameters (for objects)
+*
+* FIXME PR: copied from parseContextAttributeCompoundValue. Unify?
+*/
+static std::string parseCustomJsonItem
+(
+  const rapidjson::Value::ConstValueIterator&   node,
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
+)
+{
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit 9d8775d71a78168934da94d96e73e18a41a735e8
+
+    return "max deep reached";
+  }
+
+  if (node->IsObject())
+  {
+    for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
+    {
+      std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
+      orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
+
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      cvnP->name       = iter->name.GetString();
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue       = iter->value.GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->value.GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNull;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      parent->childV.push_back(cvnP);
+
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCustomJsonItem(iter, cvnP, deep + 1);
+        if (!r.empty())
+        {
+          return r;
+        }
+      }
+    }
+  }
+  else if (node->IsArray())
+  {
+    for (rapidjson::Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
+    {
+      std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
+      orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
+
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue       = iter->GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNull;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      parent->childV.push_back(cvnP);
+
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCustomJsonItem(iter, cvnP, deep + 1);
+        if (!r.empty())
+        {
+          return r;
+        }
+      }
+    }
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseCustomJsonItem -
+*
+* Using ConstMemberIterator as parameters (for arrays)
+*
+* FIXME PR: copied from parseContextAttributeCompoundValue. Unify?
+*/
+std::string parseCustomJsonItem
+(
+  const rapidjson::Value::ConstMemberIterator&  node,
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
+)
+{
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit 9d8775d71a78168934da94d96e73e18a41a735e8
+
+    return "max deep reached";
+  }
+
+  std::string type = jsonParseTypeNames[node->value.GetType()];
+
+#if 0
+  if (caP->compoundValueP == NULL)
+  {
+    caP->compoundValueP            = new orion::CompoundValueNode();
+    caP->compoundValueP->name      = "";
+    caP->compoundValueP->valueType = stringToCompoundType(type);
+
+    parent = caP->compoundValueP;
+
+    if (!caP->typeGiven)
+    {
+      caP->type = (type == "Object")? defaultType(orion::ValueTypeObject) : defaultType(orion::ValueTypeVector);
+    }
+  }
+#endif
+
+  //
+  // Children of the node
+  //
+  if (type == "Array")
+  {
+    for (rapidjson::Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
+    {
+      std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
+      orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
+
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue       = iter->GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      parent->childV.push_back(cvnP);
+
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCustomJsonItem(iter, cvnP, deep + 1);
+        if (!r.empty())
+        {
+          return r;
+        }
+      }
+    }
+  }
+  else if (type == "Object")
+  {
+    rapidjson::Value::ConstMemberIterator iter;
+    for (iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
+    {
+      std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
+      orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
+
+      cvnP->name       = iter->name.GetString();
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue       = iter->value.GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->value.GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      parent->childV.push_back(cvnP);
+
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCustomJsonItem(iter, cvnP, deep + 1);
+        if (!r.empty())
+        {
+          return r;
+        }
+      }
+    }
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseCustomJsonStandAlone -
+*
+* FIXME PR: copied from parseContextAttributeCompoundValueStandAlone. Unify?
+*/
+std::string parseCustomJsonStandAlone
+(
+  const Value&               holder,
+  orion::CompoundValueNode**  json
+)
+{
+  // FIXME PR: free for this new? be careful, we have httpInfo/mqttInfo object also in the cache
+  *json = new orion::CompoundValueNode();
+
+  if (holder.IsArray())
+  {
+    for (rapidjson::Value::ConstValueIterator iter = holder.Begin(); iter != holder.End(); ++iter)
+    {
+      std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
+      orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
+
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue = iter->GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNull;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      (*json)->childV.push_back(cvnP);
+      (*json)->valueType = orion::ValueTypeVector;
+
+      //
+      // Start recursive calls if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCustomJsonItem(iter, cvnP, 0);
+        if (!r.empty())
+        {
+          return r;
+        }
+      }
+    }
+  }
+  else if (holder.IsObject())
+  {
+    for (rapidjson::Value::ConstMemberIterator iter = holder.MemberBegin(); iter != holder.MemberEnd(); ++iter)
+    {
+      std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
+      orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
+
+      cvnP->name       = iter->name.GetString();
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue = iter->value.GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->value.GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNull;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      (*json)->childV.push_back(cvnP);
+      (*json)->valueType = orion::ValueTypeObject;
+
+      //
+      // Start recursive calls if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCustomJsonItem(iter, cvnP, 0);
+        if (r != "")
+        {
+          // Early return
+          return r;
+        }
+      }
+    }
+  }
+  else
+  {
+    return "json fields in httpCustom or mqttCustom must be object or array";
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseCustomPayload -
 *
 * Both for HTTP and MQTT notifications
 */
 static std::string parseCustomPayload
 (
-  ConnectionInfo*  ciP,
-  std::string*     payload,
-  bool*            includePayload,
-  const Value&     holder
+  ConnectionInfo*             ciP,
+  std::string*                payload,
+  orion::CompoundValueNode**  json,
+  bool*                       includePayload,
+  const Value&                holder
 )
 {
-  if (isNull(holder, "payload"))
+  if ((holder.HasMember("payload")) && (holder.HasMember("json")))
   {
-    *includePayload = false;
-
-    // We initialize also payload in this case, although its value is irrelevant
-    *payload = "";
+    return badInput(ciP, "payload and json fields cannot be used at the same time in httpCustom or mqttCustom");
   }
-  else
+
+  if (holder.HasMember("payload"))
   {
-    Opt<std::string> payloadOpt = getStringOpt(holder, "payload", "payload custom notification");
-
-    if (!payloadOpt.ok())
+    if (isNull(holder, "payload"))
     {
-      return badInput(ciP, payloadOpt.error);
-    }
+      *includePayload = false;
 
-    if (forbiddenChars(payloadOpt.value.c_str()))
+      // We initialize also payload in this case, although its value is irrelevant
+      *payload = "";
+    }
+    else
     {
-      return badInput(ciP, "forbidden characters in custom /payload/");
-    }
+      Opt<std::string> payloadOpt = getStringOpt(holder, "payload", "payload custom notification");
 
-    *includePayload = true;
-    *payload = payloadOpt.value;
+      if (!payloadOpt.ok())
+      {
+        return badInput(ciP, payloadOpt.error);
+      }
+
+      if (forbiddenChars(payloadOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in custom /payload/");
+      }
+
+      *includePayload = true;
+      *payload = payloadOpt.value;
+    }
+  }
+  else  // holder.HasMember("json")
+  {
+    std::string r = parseCustomJsonStandAlone(holder["json"], json);
+    if (!r.empty())
+    {
+      return badInput(ciP, r);
+    }
   }
 
   return "";
@@ -711,6 +1163,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // payload
     r = parseCustomPayload(ciP,
                            &subsP->notification.httpInfo.payload,
+                           &subsP->notification.httpInfo.json,
                            &subsP->notification.httpInfo.includePayload,
                            httpCustom);
     if (!r.empty())
@@ -859,6 +1312,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // payload
     r = parseCustomPayload(ciP,
                            &subsP->notification.mqttInfo.payload,
+                           &subsP->notification.mqttInfo.json,
                            &subsP->notification.mqttInfo.includePayload,
                            mqttCustom);
 
@@ -1048,7 +1502,7 @@ static std::string parseNotifyConditionVector
   {
     std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
 
-    if (r != "OK")
+    if (!r.empty())
     {
       return badInput(ciP, r);
     }

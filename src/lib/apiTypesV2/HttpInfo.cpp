@@ -31,6 +31,7 @@
 #include "apiTypesV2/HttpInfo.h"
 
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/compoundResponses.h"
 
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/BSONElement.h"
@@ -43,7 +44,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false), includePayload(true), timeout(0)
+HttpInfo::HttpInfo() : verb(NOVERB), json(NULL), custom(false), includePayload(true), timeout(0)
 {
 }
 
@@ -88,6 +89,11 @@ std::string HttpInfo::toJson()
     if (headers.size() != 0)
     {
       jh.addRaw("headers", objectToJson(headers));
+    }
+
+    if (this->json != NULL)
+    {
+      jh.addRaw("json", this->json->toJson());
     }
   }
 
@@ -154,6 +160,33 @@ void HttpInfo::fill(const orion::BSONObj& bo)
     {
       orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
+    }
+
+    if (bo.hasField(CSUB_JSON))
+    {
+      orion::BSONElement be = getFieldF(bo, CSUB_JSON);
+      if (be.type() == orion::Object)
+      {
+        // FIXME PR: free memory
+        this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
+        this->json->valueType = orion::ValueTypeObject;
+        compoundObjectResponse(this->json, be);
+      }
+      else if (be.type() == orion::Array)
+      {
+        // FIXME PR: free memory
+        this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
+        this->json->valueType = orion::ValueTypeVector;
+        compoundVectorResponse(this->json, be);
+      }
+      else
+      {
+        LM_E(("Runtime Error (csub json field must be Object or Array but is %s)", orion::bsonType2String(be.type())));
+      }
+    }
+    else
+    {
+      this->json = NULL;
     }
   }
 }
