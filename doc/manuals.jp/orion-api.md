@@ -1,18 +1,10 @@
+# FIWARE-NGSI v2 (release 2.1) 仕様
+
 <!-- TOC -->
 
-- [FIWARE-NGSI v2 仕様](#fiware-ngsi-v2-specification)
 - [はじめに](#preface)
-    - [編集者](#editors)
-    - [謝辞](#acknowledgements)
-    - [ステータス](#status)
-- [変更履歴](#changelog)
-    - [著作権](#copyright)
-    - [ライセンス](#license)
-    - [コンフォーマンス](#conformance)
-    - [コンベンシン](#conventions)
-    - [リファレンス実装](#reference-implementations)
 - [仕様](#specification)
-    - [はじめに](#introduction)
+    - [イントロダクション](#introduction)
     - [用語](#terminology)
         - [コンテキスト・データのモデリングと交換 (Context data modelling and exchange)](#context-data-modelling-and-exchange)
             - [コンテキストのエンティティ (Context Entities)](#context-entities)
@@ -41,304 +33,155 @@
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
-    - [Group API Entry Point](#group-api-entry-point)
-        - [API リソースを取得 [GET /v2]]](#retrieve-api-resources-get-v2)
-- [Group Entities](#group-entities)
-        - [エンティティをリスト [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]](#list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby)
-        - [エンティティを作成  [POST /v2/entities{?options}]](#create-entity-post-v2entitiesoptions)
-    - [ID によるエンティティ [/v2/entities/{entityId}{?type,attrs,options}]](#entity-by-id-v2entitiesentityidtypeattrsoptions)
-        - [エンティティを取得 [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]](#retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions)
-        - [エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]](#retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions)
-        - [エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs{?type,options}]](#update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions)
-        - [既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs{?type,options}]](#update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions)
-        - [すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs{?type,options}]](#replace-all-entity-attributes-put-v2entitiesentityidattrstypeoptions)
-        - [エンティティを削除する [DELETE /v2/entities/{entityId}{?type}]](#remove-entity-delete-v2entitiesentityidtype)
-- [Group Attributes](#group-attributes)
-    - [エンティティ ID による属性 [/v2/entities/{entityId}/attrs/{attrName}{?type}]](#attribute-by-entity-id-v2entitiesentityidattrsattrnametype)
-        - [属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]](#get-attribute-data-get-v2entitiesentityidattrsattrnametypemetadata)
-        - [属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]](#update-attribute-data-put-v2entitiesentityidattrsattrnametype)
-        - [単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrnametype)
-- [Group Attribute Value](#group-attribute-value)
-    - [エンティティ ID 別 [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]](#by-entity-id-v2entitiesentityidattrsattrnamevaluetype)
-        - [属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevaluetype)
-        - [属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevaluetype)
-- [Group Types](#group-types)
-    - [全エンティティ型 [/v2/types{?limit,offset,options}]](#entity-types-v2typeslimitoffsetoptions)
-        - [全エンティティ型のリスト [GET /v2/types/{?limit,offset,options}]](#list-entity-types-get-v2typeslimitoffsetoptions)
-    - [エンティティ型 [/v2/types/{entityType}]](#entity-type-v2typesentitytype)
-        - [エンティティ型を取得 [GET /v2/types/{entityType}]](#retrieve-entity-type-get-v2typesentitytype)
-- [Group Subscriptions](#group-subscriptions)
-    - [サブスクリプション・リスト [/v2/subscriptions]](#subscription-list-v2subscriptions)
-        - [サブスクリプションをリスト [GET /v2/subscriptions{?limit,offset,options}]](#list-subscriptions-get-v2subscriptionslimitoffsetoptions)
-        - [サブスクリプションを作成 [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
-    - [ID によるサブスクリプション [/v2/subscriptions/{subscriptionId}]](#subscription-by-id-v2subscriptionssubscriptionid)
-        - [サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
-        - [サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
-        - [サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
-- [Group Registrations](#group-registrations)
-    - [レジストレーション・リスト  [/v2/registrations]](#registration-list-v2registrations)
-        - [レジストレーションをリスト [GET /v2/registrations{?limit,offset,options}]](#list-registrations-get-v2registrationslimitoffsetoptions)
-        - [レジストレーションの作成 [POST /v2/registrations]](#create-registration-post-v2registrations)
-    - [ID によるレジストレーション [/v2/registrations/{registrationId}]](#registration-by-id-v2registrationsregistrationid)
-        - [レジストレーションを取得 [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
-        - [レジストレーションを更新 [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
-        - [レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
-- [Group Batch Operations](#group-batch-operations)
-        - [更新 [POST /v2/op/update]](#update-post-v2opupdate)
-        - [クエリ [POST /v2/op/query{?limit,offset,options}]](#query-post-v2opquerylimitoffsetoptions)
-        - [通知 [POST /v2/op/notify{?options}]](#notify-post-v2opnotifyoptions)
+- [API ルート (API Routes)](#api-routes)
+    - [API エントリ・ポイント (API Entry Point)](#api-entry-point)
+        - [API リソースを取得 [GET /v2]](#retrieve-api-resources-get-v2)
+    - [エンティティの操作 (Entities Operations)](#entities-operations)
+        - [エンティティのリスト (Entities List)](#entities-list)
+            - [エンティティをリスト [GET /v2/entities]](#list-entities-get-v2entities)
+            - [エンティティを作成  [POST /v2/entities]](#create-entity-post-v2entities)
+        - [id によるエンティティの操作 (Entity by ID)](#entity-by-id)
+            - [エンティティを取得 [GET /v2/entities/{entityId}]](#retrieve-entity-get-v2entitiesentityid)
+            - [エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
+            - [エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
+            - [既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
+            - [すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs]](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
+            - [エンティティを削除する [DELETE /v2/entities/{entityId}]](#remove-entity-delete-v2entitiesentityid)
+        - [属性 (Attributes)](#attributes)
+            - [属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}]](#get-attribute-data-get-v2entitiesentityidattrsattrname)
+            - [属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}]](#update-attribute-data-put-v2entitiesentityidattrsattrname)
+            - [単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
+        - [属性値 (Attribute Value)](#attribute-value)
+            - [属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
+            - [属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
+        - [エンティティ型 (Types)](#types)
+            - [全エンティティ型のリスト [GET /v2/types]](#list-entity-types-get-v2types)
+            - [特定の型のエンティティ情報を取得 [GET /v2/types/{entityType}]](#retrieve-entity-information-for-a-given-type-get-v2types)
+    - [サブスクリプションの操作 (Subscriptions Operations)](#subscriptions-operations)
+        - [サブスクリプションのリスト](#subscription-list)
+            - [サブスクリプションをリスト [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
+            - [サブスクリプションを作成 [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
+        - [id によるサブスクリプションの操作](#subscription-by-id)
+            - [サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
+            - [サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
+            - [サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
+    - [レジストレーションの操作 (Registration Operations)](#registration-operations)
+        - [レジストレーションのリスト](#registration-list)
+            - [レジストレーションをリスト [GET /v2/registrations]](#list-registrations-get-v2registrations)
+            - [レジストレーションを作成 [POST /v2/registrations]](#create-registration-post-v2registrations)
+        - [id によるレジストレーションの操作](#registration-by-id)
+            - [レジストレーションを取得 [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
+            - [レジストレーションを更新 [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
+            - [レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
+    - [バッチ操作 (Batch Operations)](#batch-operations)
+        - [更新操作 (Update operation)](#update-operation)
+            - [更新 [POST /v2/op/update]](#update-post-v2opupdate)
+        - [クエリ操作 (Query operation)](#query-operation)
+            - [クエリ [POST /v2/op/query]](#query-post-v2opquery)
+        - [通知操作 (Notify operation)](#notify-operation)
+            - [通知 [POST /v2/op/notify]](#notify-post-v2opnotify)
 
 <!-- /TOC -->
 
-<a name="fiware-ngsi-v2-specification"/>
-
-# FIWARE-NGSI v2 仕様
-
-この仕様は、FIWARE-NGSI version 2 API を定義します。FIWARE-NGSI v2 は、
-アップデート (update), クエリ (queries), レジストレーション (registrations),
-サブスクリプション (subscriptions) など、コンテキスト情報のライフサイクル
-全体を管理することを目的としています。
-
-<a name="preface"/>
+<a name="preface"></a>
 
 # はじめに
 
-<a name="editors"/>
+これは、[NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable) のリリース 2.1 です。2018年9月15日に
+リリースされた元の NGSIv2 と完全な下位互換性があります。
 
-## 編集者
-
-José Manuel Cantera Fonseca (FIWARE Foundation e.V., formerly with Telefónica I+D), 
-Fermín Galán Márquez (Telefónica España, formerly with Telefónica I+D),
-Tobias Jacobs (NEC).
-  
-<a name="acknowledgements"/>
-
-## 謝辞
-
-編集者は積極的に次の人々に感謝の意を表します
-この仕様に寄与しました : 
-Juan José Hierro (FIWARE Foundation e.V., formerly with Telefónica I+D), 
-Marcos Reyes (Telefónica España, formerly with Telefónica I+D), 
-Ken Zangelin (APInf, formerly with Telefónica I+D),
-Iván Arias León (Telefónica I+D), Carlos Romero Brox (Telefónica I+D),
-Antonio José López Navarro (Telefónica I+D),  Marc Capdevielle (Orange), Gilles Privat (Orange), 
-Sergio García Gómez (Telefónica I+D), Martin Bauer (NEC).
-  
-<a name="status"/>
-
-## ステータス
-
-この仕様は、NGSIv2 API 仕様 (v2.0) の最終的かつ安定版です。
-
-<a name="changelog"/>
-
-# 変更履歴
-
-v2.0 以降の変更点 :
-
-* "特殊なメタデータ型" のセクションを追加
-* 誤字の修正
-
-RC-2018.07 以降の変更点 :
-
-* なし
-
-RC-2018.04以降の変更点 :
-
-* セクション "システム/組み込み属性" を "組み込み属性" に改名
-* セクション "システム/組み込みメタデータ" を "組み込みメタデータ" に改名
-* 新しい組み込み属性の追加 : `dateExpires`
-* "エラー レスポンス"セクションの説明を改善
-* `POST /v2/entities` オペレーションの新しいオプションを追加しました : `upsert`
-* "レジストレーション " におけるコンプライアンスの推進について明確化
-* `POST /v2/op/update` オペレーションの `actionType` 値は現在、キャメル・ケース (camelCase) です
-* `POST /v2/op/query` オペレーションにおいて、`attributes` フィールド` を `attrs` に変更
-* `POST /v2/op/query` オペレーションに新しいフィールドを追加 : `expression` (古い `scope` フィールドは削除されました)
-* 新しいオペレーション `POST /v2/op/notify` を追加
-
-RC-2017.11 以降の変更点 : 
-
-* `orderBy` は、`id` と `type` を順序フィールド (ordering fields) として含むことができます
-* `GET /v2` レスポンスに `registrations_url` を含めます
-* レジストレーション管理オペレーションを追加
-   * `GET /v2/registrations`
-   * `POST /v2/registrations`
-   * `GET /v2/registrations/{id}`
-   * `PATCH /v2/registrations/{id}`
-   * `DELETE /v2/registrations/{id}`
-
-RC-2016.10 以降の変更点 :
-
-* 新しい "System/組み込みメタデータ" セクション (部分的に元の "通知の特別なメタデータ" セクションを使用)
-* 新しい "属性とメタデータのフィルタリング" セクション
-* セクション "仮想属性"を "システム/組み込み属性" に改名
-* 新しいシステム/組み込みメタデータ : `dateCreated` および `dateModified`
-* "属性名の制限" セクション に `*` を追加
-* サブスクリプション情報に `lastFailure` および `lastSuccess` を追加
-* サブスクリプション `status` フィールドに `failed` 値を追加
-* さまざまなアクション・タイプの明確な説明とともに、
-  `POST /v2/op/update` オペレーションの `actionType` として `REPLACE` を追加
-* `POST /v2/op/query` オペレーションに `metadata` フィールドを追加
-* 以下のオペレーションに `metadata` URI パラメータを追加 :
-   * `GET /v2/entities`
-   * `GET /v2/entities/{entityId}`
-   * `GET /v2/entities/{entityId}/attrs`
-   * `GET /v2/entities/{entityId}/attrs/{attrName}`
-
-RC-2016.05 以降の変更点 : 
-
-* schema.org に則ったエンティティ、属性、メタデータの既定のタイピング
-* `typePattern` (`idPattern` に似ています)
-* シンプル・クエリ言語 : メタデータ・フィルタ (`mq`)
-* シンプル・クエリ言語 : サブキー・フィルタリング (属性とメタデータの両方の値、つまり `q` と `mq`)
-* 通知メタデータのフィルタリング
-* 通知のシステム/組み込みメタデータ : `previousValue` および `actionType`
-
-<a name="copyright"/>
-
-## 著作権
-
-Copyright (c) 2011-2018 Telecom Italia, Telefónica I+D and NEC.
-
-<a name="license"/>
-
-## ライセンス
-
-この仕様は、[FIWARE Open Specification License (implicit patent license)](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Implicit_Patents_License) 下でライセンスされています。
-
-<a name="conformance"/>
-
-## コンフォーマンス
-
-この仕様では、"完全な" コンプライアンス・レベルについて説明します。
-
-<a name="conventions"/>
-
-## コンベンション
-
-NGSI version 2 では、使用されるプロパティおよび関連する成果物の名前付けに
-キャメル・ケース (camelCase) 構文が使用されています。API によって、HATEOAS
-パターンの一部として URI を参照し、それらを適切にマークする場合、
-サフィックス `_url` が追加されます。
-
-<a name="reference-implementations"/>
-
-## リファレンス実装
-
-* NGISv2 Context Brokers
-  * [Orion Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) - [Implementation Notes](https://fiware-orion.letsfiware.jp/user/ngsiv2_implementation_notes/index.html)
-
-<a name="specification"/>
+<a name="specification"></a>
 
 # 仕様
 
-<a name="introduction"/>
+<a name="introduction"></a>
 
-## はじめに
+## イントロダクション
 
-FIWARE NGSI (Next Generation Service Interface) API は、 
+FIWARE NGSI (Next Generation Service Interface) API は、
 
-* *コンテキスト・エンティティ*の概念を使用した単純な情報モデルに基づく、
-  コンテキスト情報の **データ・モデル**
-* クエリ、サブスクリプション、および更新オペレーションによって情報を交換する
-  **コンテキスト・データ・インターフェイス**
-* コンテキスト情報を取得する方法に関する情報を交換するための
-  **コンテキスト・アベイラビリティ・インタフェース**
-  (2つのインタフェースを分離するかどうかは、現在検討中です)
+-   *コンテキスト・エンティティ*の概念を使用した単純な情報モデルに基づく、コンテキスト情報の **データ・モデル**
+-   クエリ、サブスクリプション、および更新オペレーションによって情報を交換する**コンテキスト・データ・インターフェイス**
+-   コンテキスト情報を取得する方法に関する情報を交換するための **コンテキスト・アベイラビリティ・インタフェース**
+    (2つのインタフェースを分離するかどうかは、現在検討中です)
 
-<a name="terminology"/>
+<a name="terminology"></a>
 
 ## 用語
 
-<a name="context-data-modelling-and-exchange"/>
+<a name="context-data-modelling-and-exchange"></a>
 
 ### コンテキスト・データのモデリングと交換 (Context data modelling and exchange)
 
-NGSI データモデルの主な要素は、下図のように、コンテキストのエンティティ、属性
-およびメタデータです。
+NGSI データモデルの主な要素は、下図のように、コンテキストのエンティティ、属性およびメタデータです。
 
 ![NGSI data model](https://raw.githubusercontent.com/telefonicaid/fiware-orion/master/doc/apiary/v2/Ngsi-data-model.png)
 
-<a name="context-entities"/>
+<a name="context-entities"></a>
 
 #### コンテキストのエンティティ (Context Entities)
 
-コンテキストのエンティティ、または単にエンティティは、FIWARE NGSI 情報モデルの
-中心です。エンティティはモノ、すなわち、任意の物理的または論理的オブジェクトです。
-たとえば、センサ、人、部屋、発券システムの問題などです。
-各エンティティには **entity id** があります。
+コンテキストのエンティティ、または単にエンティティは、FIWARE NGSI 情報モデルの中心です。エンティティはモノ、すなわち、
+任意の物理的または論理的オブジェクトです。たとえば、センサ、人、部屋、発券システムの問題などです。各エンティティには
+**entity id** があります。
 
-さらに、FIWARE NGSI の型システム (type system) により、
-エンティティは、**エンティティ型 (entity type)** を持つことができます。
-エンティティ型はセマンティック型です。
-エンティティによって表されるモノの種類を記述することを意図しています。
-たとえば、id *sensor-365* のコンテキストのエンティティは、*temperatureSensor* 型
-を持つことができます。
+さらに、FIWARE NGSI の型システム (type system) により、エンティティは、**エンティティ型 (entity type)** を持つことが
+できます。エンティティ型はセマンティック型です。エンティティによって表されるモノの種類を記述することを意図しています。
+たとえば、id *sensor-365* のコンテキストのエンティティは、*temperatureSensor* 型を持つことができます。
 
 各エンティティは、その id と型の組み合わせによって一意に識別されます。
 
-<a name="context-attributes"/>
+<a name="context-attributes"></a>
 
 #### コンテキストの属性 (Context Attributes)
 
-コンテキストの属性は、コンテキストのエンティティのプロパティです。
-たとえば、現在の車の速度は、エンティティ *car-104* の
-属性 *current_speed* のようにモデル化できます。
+コンテキストの属性は、コンテキストのエンティティのプロパティです。たとえば、現在の車の速度は、エンティティ *car-104*
+の属性 *current_speed* のようにモデル化できます。
 
-NGSI データモデルでは、属性は、*属性名 (attribute name)*, *属性型 (attribute type)*,
-*属性値 (attribute value)* および *メタデータ (metadata)* を持っています。
-* 属性名は、その属性値がエンティティのどのような種類のプロパティを表すかを
-  記述します。例 : *current_speed*。
-* 属性型は、属性値の NGSI 値型 (NGSI value type) を表します。
-FIWARE NGSI には属性値用の独自の型システムがあるため、
-NGSI 値型は JSON 型 (JSON types) と同じではありません。
-* 属性値には次のものが含まれます :
-  * 実際のデータ
-  * オプション **metadata** は、精度、プロバイダ、タイムスタンプなどの
-    属性値のプロパティを記述します
-  
-<a name="context-metadata"/>
+NGSI データモデルでは、属性は、*属性名 (attribute name)*, *属性型 (attribute type)*, *属性値 (attribute value)* および
+*メタデータ (metadata)* を持っています。
+
+-   属性名は、その属性値がエンティティのどのような種類のプロパティを表すかを記述します。例: *current_speed*
+-   属性型は、属性値の NGSI 値型 (NGSI value type) を表します。FIWARE NGSI には属性値用の独自の型システムがあるため、
+    NGSI 値型は JSON 型 (JSON types) と同じではありません
+-   属性値には次のものが含まれます:
+    -   実際のデータ
+    -   オプション **metadata** は、精度、プロバイダ、タイムスタンプなどの属性値のプロパティを記述します
+
+<a name="context-metadata"></a>
 
 #### コンテキストのメタデータ (Context Metadata)
 
-コンテキストのメタデータは、いくつかの場所で FIWARE NGSI で使用され、
-そのうちの1つは、上述のように属性値のオプション部分です。属性と同様に、
-各メタデータには次のものがあります :
- * **メタデータ名 (metadata name)** メタデータの発生場所におけるメタデータの
-   役割を記述します。たとえば、メタデータ名 *accuracy* は、そのメタデータ値が
-   与えられた属性値がどの程度正確であるかを記述していることを示します。
- * **メタデータ型 (metadata type)**, メタデータ値の NGSI 値型を記述します。
- * **メタデータ値 (metadata value)** 実際のメタデータを含んでいます。
+コンテキストのメタデータは、いくつかの場所で FIWARE NGSI で使用され、そのうちの1つは、上述のように属性値のオプション部分
+です。属性と同様に、各メタデータには次のものがあります:
 
-NGSI では、メタデータにネストされたメタデータが含まれることは
-予期されていないことに注意してください。
+-   **メタデータ名 (metadata name)** には、メタデータの発生場所におけるメタデータの役割を記述します。たとえば、
+    メタデータ名 *accuracy* は、そのメタデータ値が与えられた属性値がどの程度正確であるかを記述していることを示します
+-   **メタデータ型 (metadata type)** には、メタデータ値の NGSI 値型を記述します
+-   **メタデータ値 (metadata value)** は、実際のメタデータを含んでいます
 
-<a name="mime-types"/>
+NGSI では、メタデータにネストされたメタデータが含まれることは予期されていないことに注意してください。
+
+<a name="mime-types"></a>
 
 ## MIME 型 (MIME Types)
 
-この仕様の API レスポンス・ペイロードは `application/json` と (属性値型
-オペレーションのために) `text/plain` MIME 型に基づいています。 
-HTTP リクエストを発行するクライアントは、それ以外の受け入れ型で、
-`406 Not Acceptable` エラーが発生します。
+この仕様の API レスポンス・ペイロードは `application/json` と (属性値型オペレーションのために) `text/plain` MIME 型に
+基づいています。HTTP リクエストを発行するクライアントは、それ以外の受け入れ型で `406 Not Acceptable`
+エラーが発生します。
 
-<a name="json-entity-representation"/>
+<a name="json-entity-representation"></a>
 
 ## JSON エンティティ表現 (JSON Entity Representation)
 
-エンティティは、次の構文を持つ JSON オブジェクトで表されます :
+エンティティは、次の構文を持つ JSON オブジェクトで表されます:
 
-* エンティティ id は、オブジェクトの `id` プロパティによって指定され、
-  その値はエンティティ id を含む文字列です。
+-   エンティティ id は、オブジェクトの `id` プロパティによって指定され、その値はエンティティ id を含む文字列です
+-   エンティティ型は、オブジェクトの `type` プロパティによって指定され、その値はエンティティの型名を含む文字列です
+-   エンティティ属性は、追加のプロパティによって指定されます。名前は属性の `name` であり、その表現は下の "JSON 属性表現"
+    のセクションで説明します。`id` および `type` は属性名として使用できません
 
-* エンティティ型は、オブジェクトの `type` プロパティによって指定され、
-  その値はエンティティの型名を含む文字列です。
-
-* エンティティ属性は、追加のプロパティによって指定されます。名前は
-  属性の `name` であり、その表現は下の "JSON 属性表現" のセクションで
-  説明します。 明らかに、`id` および `type` は属性名として使用できません。
-
-この構文の例を以下に示します :
+この構文の例を以下に示します:
 
 ```
 {
@@ -351,35 +194,26 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 }
 ```
 
-エンティティの正規化された表現には、常に `id`、`type`、および属性を表す
-プロパティが含まれます。しかし、簡略化 (simplified) または、
-部分表現 (simplified) (以下の "部分表現" のセクションを参照) は、
-一部を残してしまう可能性があります。
-各オペレーションの仕様には、どの表現が入力として期待されるか、どの表現が
-出力として提供 (レンダリング) されるかに関する詳細が含まれます。
+エンティティの正規化された表現には、常に `id`、`type`、および属性を表すプロパティが含まれます。しかし、簡略化
+(simplified) または、部分表現 (partial representations) (以下の "部分表現" のセクションを参照) は、一部を残してしまう
+可能性があります。各オペレーションの仕様には、どの表現が入力として期待されるか、どの表現が出力として提供 (レンダリング)
+されるかに関する詳細が含まれます。
 
-<a name="json-attribute-representation"/>
+<a name="json-attribute-representation"></a>
 
 ## JSON 属性表現 (JSON Attribute Representation)
 
-属性は、次の構文を持つ JSON オブジェクトで表されます :
+属性は、次の構文を持つ JSON オブジェクトで表されます:
 
-* 属性値は `value` プロパティによって指定され、その値は任意の JSON データ型
-  になります。
+-   属性値は、`value` プロパティによって指定され、その値は任意の JSON データ型になります
+-   属性 NGSI 型は、`type` プロパティによって指定され、その値は、NGSI 型を含む文字列です
+-   属性メタデータは、`metadata` プロパティによって指定されます。その値は、定義されたメタデータ要素ごとのプロパティを含む
+    別の JSON オブジェクトです (プロパティの名前はメタデータ要素の `name` です)。各メタデータ要素は、次のプロパティを
+    保持する JSON オブジェクトで表されます:
+    -   `value`: その値には、JSON データ型に対応するメタデータ値が含まれています
+    -   `type`: その値には、メタデータの NGSI 型の文字列表現が含まれます
 
-* 属性 NGSI 型は、`type` プロパティによって指定され、その値は、NGSI 型を
-  含む文字列です。
-
-* 属性メタデータは `metadata` プロパティによって指定されます。 その値は、
-  定義されたメタデータ要素ごとのプロパティを含む別の JSON オブジェクトです
-  (プロパティの名前はメタデータ要素の `name` です)。 各メタデータ要素は、
-  次のプロパティを保持する JSON オブジェクトで表されます :
-
-  * `value`: その値には、JSON データ型に対応するメタデータ値が含まれています。
-
-  * `type`: その値には、メタデータの NGSI 型の文字列表現が含まれます。
-
-この構文の例を以下に示します :
+この構文の例を以下に示します:
 
 ```
 {
@@ -389,16 +223,15 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 }
 ```
 
-<a name="simplified-entity-representation"/>
+<a name="simplified-entity-representation"></a>
 
 ## 簡略化されたエンティティ表現 (Simplified Entity Representation)
 
-実装によってサポートされなければならない 2つの表現モードがあります。
-これらの表現モードは、エンティティの簡略化された表現を生成することを可能にします。
+実装によってサポートされなければならない 2つの表現モードがあります。これらの表現モードは、エンティティの簡略化された表現
+を生成することを可能にします。
 
-* *keyValues* モード。このモードでは、型とメタデータに関する情報を除外して、
-  エンティティの属性を値のみで表します。
-  以下の例を参照してください。
+-   *keyValues* モード。このモードでは、型とメタデータに関する情報を除外して、エンティティの属性を値のみで表します。
+    以下の例を参照してください
 
 ```
 {
@@ -408,64 +241,48 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 }
 ```
 
-* *values* モード。このモードでは、エンティティを属性値の配列として表します
-  id と型に関する情報は除外されています。
-  以下の例を参照してください。
-  配列内の属性の順序は、`attrs` URI パラメータによって指定されます。
-  (たとえば、`attrs=branch,colour,engine`)。
-  `attrs` が使用されない場合、順序は任意です。
+-   *values* モード。このモードでは、エンティティを属性値の配列として表します。id と型に関する情報は除外されています。
+    以下の例を参照してください。配列内の属性の順序は、`attrs` URI パラメータによって指定されます。(たとえば、
+    `attrs=branch,colour,engine`)。`attrs` が使用されない場合、順序は任意です
 
 ```
 [ 'Ford', 'black', 78.3 ]
 ```
 
-*  *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モード
-   と同じです。
+-   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです
 
-<a name="partial-representations"/>
+<a name="partial-representations"></a>
 
 ## 部分表現 (Partial Representations)
 
-一部のオペレーションでは、エンティティの部分表現を使用します :
+一部のオペレーションでは、エンティティの部分表現を使用します:
 
-* `id` と` type` は、不変のプロパティであるため、更新オペレーションでは
-  使用できません。
+-   `id` と` type` は、不変のプロパティであるため、更新オペレーションでは使用できません
+-   エンティティ `type` が許されるリクエストでは、それを省略することができます。エンティティ作成オペレーションで省略
+    された場合、デフォルトの文字列値 `Thing` が型に使用されます
+-   場合によっては、エンティティのすべての属性が表示されるわけではありません。たとえば、エンティティ属性のサブセットを
+    選択するクエリ
+-   属性/メタデータ `value` は、属性/メタデータが `null` 値を持つことを意味するリクエストでは省略することができます。
+    レスポンスでは、値は常に存在します
+-   属性/メタデータ `type` はリクエストで省略することができます。属性/メタデータの作成または更新オペレーションで省略
+    された場合、その値に応じて、型に対してデフォルトが使用されます:
+    -   値が文字列の場合、`Text` 型が使用されます
+    -   値が数値の場合、`Number` 型が使用されます
+    -   値がブーリンの場合は、`Boolean` が使用されます
+    -   値がオブジェクトまたは配列の場合、`StructuredValue` が使用されます
+    -   値が null の場合、`None` が使用されます
+-   属性 `metadata` はリクエストでは省略することができます。つまり、属性に関連付けられたメタデータ要素がありません。
+    レスポンスでは、属性にメタデータがない場合、このプロパティは `{}` に設定されます
 
-* エンティティ `type` が許されるリクエストでは、それを省略することができます。
-  エンティティ作成オペレーションで省略された場合、デフォルトの文字列値
-  `Thing` が型に使用されます。
-
-* 場合によっては、エンティティのすべての属性が表示されるわけではありません。
-  たとえば、エンティティ属性のサブセットを選択するクエリ。
-
-* 属性/メタデータ `value` は、属性/メタデータが `null` 値を持つことを
-  意味するリクエストでは省略することができます。レスポンスでは、値は常に
-  存在します。
-
-* 属性/メタデータ `type` はリクエストで省略することができます。
-  属性/メタデータの作成または更新オペレーションで省略された場合、
-  その値に応じて、型に対してデフォルトが使用されます。
-  * 値が文字列の場合、`Text` 型が使用されます。
-  * 値が数値の場合、`Number` 型が使用されます。
-  * 値がブーリンの場合は、`Boolean` が使用されます。
-  * 値がオブジェクトまたは配列の場合、`StructuredValue` が使用されます。
-  * 値が null の場合、`None` が使用されます。
-
-* 属性 `metadata` はリクエストでは省略することができます。つまり、
-  属性に関連付けられたメタデータ要素がありません。レスポンスでは、
-  属性にメタデータがない場合、このプロパティは `{}` に設定されます。
-
-<a name="special-attribute-types"/>
+<a name="special-attribute-types"></a>
 
 ## 特殊な属性型 (Special Attribute Types)
 
-一般に、ユーザ定義の属性型は有益です。それらは不透明な方法で NGSIv2
-サーバによって処理されます。それにもかかわらず、以下に説明する型は、
-特別な意味を伝えるために使用されます :
+一般に、ユーザ定義の属性型は有益です。それらは不透明な方法で NGSIv2 サーバによって処理されます。それにもかかわらず、
+以下に説明する型は、特別な意味を伝えるために使用されます:
 
-* `DateTime`: 日付を ISO8601 形式で識別します。これらの属性は、
-  より大きい、未満、以上、以下 および範囲のクエリ演算子で
-  使用できます。たとえば、参照されたエンティティ属性のみが表示されます。
+-   `DateTime`: 日付を ISO8601 形式で識別します。これらの属性は、より大きい、未満、以上、以下 および範囲のクエリ演算子で
+    使用できます。たとえば、参照されたエンティティ属性のみが表示されます
 
 ```
 {
@@ -476,46 +293,39 @@ HTTP リクエストを発行するクライアントは、それ以外の受け
 }
 ```
 
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon`, `geo:json`。
-  これらはエンティティの場所に関連する特別なセマンティクスを持っています。
-  "エンティティの地理空間プロパティ" を参照してください。
+-   `geo:point`, `geo:line`, `geo:box`, `geo:polygon`, `geo:json`。これらはエンティティの場所に関連する特別な
+    セマンティクスを持っています。"エンティティの地理空間プロパティ" を参照してください
 
-<a name="builtin-attributes"/>
+<a name="builtin-attributes"></a>
 
 ## 組み込み属性 (Builtin Attributes)
 
-NGSIv2 クライアントによって直接変更できないエンティティのプロパティが
-ありますが、追加情報を提供するために NGSIv2 サーバによってレンダリングする
-ことができます。 表現の観点から見ると、それらは名前、値、型とともに
-通常の属性と同じです。
+NGSIv2 クライアントによって直接変更できないエンティティのプロパティがありますが、追加情報を提供するために NGSIv2
+サーバによってレンダリングすることができます。表現の観点から見ると、それらは名前、値、型とともに通常の属性と同じです。
 
-組み込み属性はデフォルトでレンダリングされません。特定の属性をレンダリング
-するには、URLs (または、POST /v2/op/query オペレーションのペイロード・フィールド)
-または、サブスクリプション (`notification` 内の `attrs` サブフィールド) の
+組み込み属性はデフォルトでレンダリングされません。特定の属性をレンダリングするには、URLs (または、POST /v2/op/query
+オペレーションのペイロード・フィールド) または、サブスクリプション (`notification` 内の `attrs` サブフィールド) の
 `attrs` パラメータにその名前を追加してください。
 
-組み込み属性のリストは次のとおりです :
+組み込み属性のリストは次のとおりです:
 
-* `dateCreated` (型 : `DateTime`) : エンティティ作成日。ISO 8601 文字列です。
+-   `dateCreated` (型: `DateTime`): エンティティ作成日。ISO 8601 文字列です
+-   `dateModified` (型: `DateTime`): エンティティ変更日。ISO 8601 文字列です
+-   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。サーバがエンティティの有効期限を制御
+    する方法は、実装の固有側面です
 
-* `dateModified` (型 : `DateTime`) :エンティティ変更日。ISO 8601 文字列です。
+通常の属性と同様に、`q` フィルタと `orderBy` で使うことができます。ただし、リソース URLs では使用できません。
 
-* `dateExpires` (型 : `DateTime`) : エンティティの有効期限。ISO 8601 文字列です。
-  サーバがエンティティの有効期限を制御する方法は、実装の固有側面です。
-
-通常の属性と同様に、`q` フィルタと `orderBy` で使うことができます。
-ただし、リソース URLs では使用できません。
-
-<a name="special-metadata-types"/>
+<a name="special-metadata-types"></a>
 
 ## 特殊なメタデータ型 (Special Metadata Types)
 
-一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で NGSIv2
-サーバによって処理されます。それでも、以下に説明する型は、特別な意味を伝えるために使用されます:
+一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で NGSIv2 サーバによって処理されます。
+それでも、以下に説明する型は、特別な意味を伝えるために使用されます:
 
-* `DateTime`:  ISO8601 形式で日付を識別します。このメタデータは、クエリ演算子の より大きい
-   (greater-than), より小さい (less-than), 以上 (greater-or-equal), 以下 (less-or-equal)
-   および 範囲 (range) で使用できます。たとえば (参照される属性メタデータのみが表示されます):
+-   `DateTime`:  ISO8601 形式で日付を識別します。このメタデータは、クエリ演算子の より大きい (greater-than), より小さい
+    (less-than), 以上 (greater-or-equal), 以下 (less-or-equal) および 範囲 (range) で使用できます。たとえば (参照される
+    属性メタデータのみが表示されます):
 
 ```
 "metadata": {
@@ -526,229 +336,183 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 }
 ```
 
-<a name="builtin-metadata"/>
+<a name="builtin-metadata"></a>
 
 ## 組み込みメタデータ (Builtin Metadata)
 
-いくつかの属性プロパティは、NGSIv2 クライアントによって直接、変更可能では
-ありませんが、NGSIv2 サーバによってレンダリングされて追加情報を提供する
-ことができます。表現の観点から見ると、それらは名前、値、型ともに
-通常のメタデータと似ています。
+いくつかの属性プロパティは、NGSIv2 クライアントによって直接、変更可能ではありませんが、NGSIv2 サーバによってレンダリング
+されて追加情報を提供することができます。表現の観点から見ると、それらは名前、値、型ともに通常のメタデータと似ています。
 
-組み込みメタデータは、デフォルトではレンダリングされません。特定のメタデータを
-レンダリングするには、その名前を `metadata` URL パラメータ
-(または、POST /v2/op/query オペレーションのペイロード・フィールド)
-または、サブスクリプション (`notification` の `metadata` サブフィールド) に
-追加してください。
+組み込みメタデータは、デフォルトではレンダリングされません。特定のメタデータをレンダリングするには、その名前を
+`metadata` URL パラメータ (または、POST /v2/op/query オペレーションのペイロード・フィールド) または、サブスクリプション
+(`notification` の `metadata` サブフィールド) に追加してください。
 
-組み込みメタデータのリストは次のとおりです :
+組み込みメタデータのリストは次のとおりです:
 
-* `dateCreated` (型 : `DateTime`) : 属性作成日。ISO 8601 文字列です。
+-   `dateCreated` (型: `DateTime`): 属性作成日。ISO 8601 文字列です
+-   `dateModified` (型: `DateTime`): 属性変更日。ISO 8601 文字列です
+-   `previousValue` (型: any): 通知でのみ。このメタデータの値は、関連する属性の通知をトリガーするリクエストに対する
+    以前の値です。このメタデータの型は、関連付けられた属性の以前の型でなければなりません。`previousValue` の型/値が、
+    関連する属性と同じ型/値である場合、その属性は実際に値を変更していません
+-   `actionType` (型: `Text`): 通知のみ。添付されている属性が、通知をトリガーしたリクエストに含まれていた場合に
+    含まれます。その値は、リクエスト・オペレーションのタイプによって異なります。更新の場合は `update`、作成の場合は
+    `append`、削除の場合は `delete` です。その型は常に `Text` です
 
-* `dateModified` (型 : `DateTime`) : 属性変更日。ISO 8601 文字列です。
+通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs では使用できません。
 
-* `previousValue` (型 : any) : 通知でのみ。このメタデータの値は、関連する
-  属性の通知をトリガーするリクエストに対する以前の値です。このメタデータの型は、
-  関連付けられた属性の以前の型でなければなりません。`previousValue` の型/値が、
-  関連する属性と同じ型/値である場合、その属性は実際に値を変更していません。
-
-* `actionType` (型 : `Text`) : 通知のみ。添付されている属性が、通知を
-  トリガーしたリクエストに含まれていた場合に含まれます。 その値は、リクエスト・
-  オペレーションのタイプによって異なります。更新の場合は `update`、
-  作成の場合は `append`、削除の場合は `delete`です。その型は常に `Text`です。
-
-通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs 
-では使用できません。
-
-<a name="field-syntax-restrictions"/>
+<a name="field-syntax-restrictions"></a>
 
 ## フィールド構文の制限事項 (Field syntax restrictions)
 
-NGSIv2 API の識別子として使用されるフィールドは、許可される構文に関する特別な
-規則に従います。 これらの規則は :
+NGSIv2 API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
 
-*エンティティ id (Entity id)
-*エンティティ型 (Entity type)
-*属性名 (Attribute name)
-*属性型 (Attribute type)
-*メタデータ名 (Metadata name)
-*メタデータ型 (Metadata type)
+-   エンティティ id (Entity id)
+-   エンティティ型 (Entity type)
+-   属性名 (Attribute name)
+-   属性型 (Attribute type)
+-   メタデータ名 (Metadata name)
+-   メタデータ型 (Metadata type)
 
-ルールは次のとおりです :
+ルールは次のとおりです:
 
-* 使用できる文字は、制御文字, 空白, `&`, `?`, `/`, `#` の文字を除き、
-  プレーンな ASCII セットの文字です。
-* 最大フィールド長は 256文字です。
-* 最小フィールド長は 1文字です。
+-   使用できる文字は、制御文字, 空白, `&`, `?`, `/`, `#` の文字を除き、プレーンな ASCII セットの文字です
+-   最大フィールド長は 256文字です
+-   最小フィールド長は 1文字です
 
-上記の規則に加えて、NGSIv2 サーバ実装が与えられれば、それらのフィールド
-または他のフィールドに構文上の制約を追加して、たとえばクロス・スクリプト・
-インジェクション攻撃を回避することができます。
+上記の規則に加えて、NGSIv2 サーバ実装が与えられれば、それらのフィールドまたは他のフィールドに構文上の制約を追加して、
+たとえばクロス・スクリプト・インジェクション攻撃を回避することができます。
 
-クライアントがシンタックスの観点から無効なフィールドを使用しようとすると、
-クライアントは原因を説明する、"Bad Request" エラー・レスポンスを得ます。
+クライアントがシンタックスの観点から無効なフィールドを使用しようとすると、クライアントは原因を説明する、"Bad Request"
+エラー・レスポンスを得ます。
 
-<a name="attribute-names-restrictions"/>
+<a name="attribute-names-restrictions"></a>
 
 ## 属性名の制限 (Attribute names restrictions)
 
-次の文字列を属性名として使用しないでください :
+次の文字列を属性名として使用しないでください:
 
-* `id`, エンティティ id を表すために使用されるフィールドと競合するためです。 
+-   `id` は、エンティティ id を表すために使用されるフィールドと競合するためです
+-   `type` は、エンティティ型を表すために使用されるフィールドと競合するためです
+-   `geo:distance` は、中心点に近接するために `orderBy` で使用される文字列と競合するためです
+-   組み込み属性名 ("組み込み属性" の特定のセクションを参照)
+-   `*` は、"すべてのカスタム/ユーザ属性" ("属性とメタデータのフィルタリング" を参照) という特別な意味を持っています
 
-* `type`, エンティティ型を表すために使用されるフィールドと競合するためです。
-
-* `geo:distance`, `orderBy` で中心点に接近するために使用される文字列と衝突するためです。
-
-* 組み込み属性名 ("組み込み属性" の特定のセクションを参照)
-
-* `*`, "すべてのカスタム/ユーザ属性" ("属性とメタデータのフィルタリング" を参照)
-  という特別な意味を持っています。
-
-<a name="metadata-names-restrictions"/>
+<a name="metadata-names-restrictions"></a>
 
 ## メタデータ名の制限 (Metadata names restrictions)
 
-次の文字列をメタデータ名として使用しないでください :
+次の文字列をメタデータ名として使用しないでください:
 
-* 組み込みメタデータ名 ("組み込みメタデータ" の特定のセクションを参照)
+-   組み込みメタデータ名 ("組み込みメタデータ" の特定のセクションを参照)
+-   `*` は、"すべてのカスタム/ユーザ・メタデータ" ("属性とメタデータのフィルタリング" を参照) という特別な意味を持って
+    います
 
-* `*`, "すべてのカスタム/ユーザ・メタデータ" ("属性とメタデータのフィルタリング"
-  を参照) という特別な意味を持っています。
-
-<a name="ordering-results"/>
+<a name="ordering-results"></a>
 
 ## 結果の順序付け (Ordering Results)
 
-エンティティのリストを検索するオペレーションは、`orderBy` URI パラメータが、
-結果を順序付けする際の基準として使用される属性またはプロパティを
-指定することを可能にする。`orderBy` の値は次のようになります :
+エンティティのリストを検索するオペレーションは、`orderBy` URI パラメータが、結果を順序付けする際の基準として使用される
+属性またはプロパティを指定することを可能にする。`orderBy` の値は次のようになります:
 
-* "near" (`georel=near`) の空間関係が使用されているときにリファレンス・
-  ジオメトリまでの距離によって結果を並べるキーワード `geo : distance`。
+-   キーワード `geo:distance` は、"near" (`georel=near`) の空間関係 (spatial relationship) が使用されているときに
+    リファレンス・ジオメトリまでの距離によって結果を並べます
+-   カンマで区切られた属性のリストです。組み込み属性、エンティティ id の `id`、エンティティ型の `type` などがあります。
+    たとえば、`temperature,!humidity`。結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなどの順序で
+    並べられます。フィールド名の前の "!" は、順序が逆になっていることを示します
 
-* カンマで区切られた属性のリストです。組み込み属性、エンティティ ID の `id`、
-  エンティティ型の `type` などがあります。たとえば、`temperature,!humidity`。
-  結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなど
-  の順序で並べられます。フィールド名の前の "!" は、順序が逆になっていること
-  を示します。
-
-<a name="error-responses"/>
+<a name="error-responses"></a>
 
 ## エラー・レスポンス (Error Responses)
 
-エラー・ペイロードが存在する場合は、次のフィールドを含む JSON オブジェクトです :
+エラー・ペイロードが存在する場合は、次のフィールドを含む JSON オブジェクトです:
 
-+ `error` (必須, 文字列) : エラーのテキスト記述。
-+ `description` (オプション, 文字列) : エラーに関する追加情報。
+-   `error` (必須, 文字列): エラーのテキスト記述
+-   `description` (オプション, 文字列): エラーに関する追加情報
 
-すべての NGSIv2 サーバの実装では、この節で説明する以下の HTTP ステータス・
-コードと `error` テキストを使用する必要があります。 しかしながら、`description`
-フィールドのために使用される特定のテキストは実装の固有側面です。
+すべての NGSIv2 サーバの実装では、この節で説明する以下の HTTP ステータス・コードと `error` テキストを使用する必要が
+あります。しかしながら、`description` フィールドのために使用される特定のテキストは実装の固有側面です。
 
-NGSIv2 の `error` レポートは次のとおりです :
+NGSIv2 の `error` レポートは次のとおりです:
 
-+ 着信 JSON ペイロードがパースできない場合、`ParseError` (`400`) が返されます。
-+ URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生する
-  エラー (つまり、NGSIv2 サーバのステータスに依存しないエラー) は、
-  `BadRequest`(`400`) となります。
-  + 例外 : 受信した JSON ペイロード・エラー。これには別の `error` メッセージが
-    あります (前の箇条書きを参照)。
-+ 空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) に
-  なります。詳細は、"エンティティの地理空間プロパティ"を参照してください。
-+ リクエストに起因する曖昧さは、いくつかのリソースを参照する可能性があります。
-  その ID だけを提供するエンティティを更新しようとすると、その ID を持つ複数の
-  エンティティが存在すると、`TooManyResults` (`409`) になります。
-+ リクエストによって識別されるリソースが見つからない場合、`NotFound` (`404`)が
-  返されます。
-+ リクエストと状態の組み合わせに起因するものの、排他的ではないリクエスト
-  (たとえば、既存の属性に対して `options=append` を指定した POST) は、
-  `Unprocessable` (`422`) になります。
-  + 例外 : 前の箇条書きで説明した 404, 409 または 413 のエラーにつながる
-    リクエストと状態の条件。
-+ HTTP 層のエラーは次のように使用されます : 
-  + HTTP 405 Method Not Allowed は、`MethodNotAlowed` (`405`) に対応しています。
-  + HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します。
-  + HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します。
-  + HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します。
+-   着信 JSON ペイロードがパースできない場合、`ParseError` (`400`) が返されます
+-   URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生するエラー (つまり、NGSIv2 サーバの
+    ステータスに依存しないエラー) は、`BadRequest` (`400`) となります
+    -   例外: 受信した JSON ペイロード・エラー。これには別の `error` メッセージがあります (前の箇条書きを参照)
+-   空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) になります。詳細は、"エンティティの
+    地理空間プロパティ"を参照してください
+-   リクエストに起因する曖昧さは、いくつかのリソースを参照する可能性があります。その id だけを提供するエンティティを更新
+    しようとすると、その id を持つ複数のエンティティが存在すると、`TooManyResults` (`409`) になります
+-   リクエストによって識別されるリソースが見つからない場合、`NotFound` (`404`) が返されます
+-   リクエストと状態の組み合わせに起因するものの、排他的ではないリクエスト (たとえば、既存の属性に対して
+    `options=append` を指定した POST) は、`Unprocessable` (`422`) になります
+    -   例外: 前の箇条書きで説明した 404, 409 または 413 のエラーにつながるリクエストと状態の条件
+-   HTTP 層のエラーは次のように使用されます:
+    -   HTTP 405 Method Not Allowed は、`MethodNotAlowed` (`405`) に対応しています
+    -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
+    -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
+    -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
 
-<a name="geospatial-properties-of-entities"/>
+<a name="geospatial-properties-of-entities"></a>
 
 ## エンティティの地理空間プロパティ (Geospatial properties of entities)
 
-コンテキストのエンティティの地理空間的特性は、通常のコンテキスト属性を用いて
-表すことができます。
-地理空間的プロパティの提供は、地理的クエリの解決を可能にします。
+コンテキストのエンティティの地理空間プロパティは、通常のコンテキスト属性を用いて表すことができます。地理空間的
+プロパティの提供は、地理的クエリの解決を可能にします。
 
-準拠した実装では、2つの異なる構文をサポートする必要があります :
+準拠した実装では、2つの異なる構文をサポートする必要があります:
 
-* *Simple Location Format*。これは、開発者とユーザが既存のエンティティに
-  素早く簡単に追加できる、非常に軽量な形式です。
+-   *Simple Location Format*。これは、開発者とユーザが既存のエンティティに素早く簡単に追加できる、非常に軽量な形式です
+-   *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、JSON (JavaScript Object Notation) に
+    基づく地理空間データ交換フォーマットです。GeoJSON は、より高度な柔軟性を提供し、ポイント高度またはより複雑な
+    地理空間形状、たとえば、
+    [マルチ・ジオメトリ](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries)
+    の表現を可能にします
 
-* *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、
-  JSON (JavaScript Object Notation) に基づく地理空間データ交換フォーマットです。
-  GeoJSON は、より高度な柔軟性を提供し、ポイント高度またはより複雑な地理空間形状、
-  たとえば、[マルチ・ジオメトリ](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries)の表現を可能にします。
-
-クライアント・アプリケーションは、適切な NGSI 属性型を提供することによって、
-どのエンティティ属性がジオスペース属性を伝えるかを定義します。通常、これは
-`location` という名前のエンティティ属性ですが、エンティティが複数の地理空間
-属性を含むユースケースを妨げるものはありません。たとえば、異なる粒度レベルで
-指定された場所、または異なる精度で異なる場所の方法によって提供された場所。
-それにもかかわらず、空間特性には、バックエンド・データベースによって課せられた
-リソースの制約下にある特別なインデックスが必要であることに注目してください。
-したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性が
-あります。これらの状況に推奨される HTTP ステータス・コードは、``413``,
-*Request entity too large* で、レスポンス・ペイロードで報告されたエラーは、
+クライアント・アプリケーションは、適切な NGSI 属性型を提供することによって、どのエンティティ属性がジオスペース属性を
+伝えるかを定義します。通常、これは `location` という名前のエンティティ属性ですが、エンティティが複数の地理空間属性を含む
+ユースケースを妨げるものはありません。たとえば、異なる粒度レベルで指定された場所、または異なる精度でさまざまな
+ロケーション・メソッドによって提供された場所 (location) です。それでも、空間プロパティ (spatial properties) には、
+バックエンド・データベースによって課せられたリソースの制約下にある特別なインデックスが必要であることに注意してください。
+したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性があります。これらの状況に推奨される HTTP
+ステータス・コードは、``413``, *Request entity too large* で、レスポンス・ペイロードで報告されたエラーは、
 ``NoResourcesAvailable`` でなければなりません。
 
-<a name="simple-location-format"/>
+<a name="simple-location-format"></a>
 
 ### シンプル・ロケーション・フォーマット (Simple Location Format)
 
-シンプル・ロケーション・フォーマットは、基本的なジオメトリ
-( *point*, *line*, *box*, *polygon* ) をサポートし、地理的位置をエンコードする
-際の典型的な使用例をカバーしています。
-[GeoRSS Simple](http://www.georss.org/simple.html) に触発されています。
+シンプル・ロケーション・フォーマットは、基本的なジオメトリ (*point*, *line*, *box*, *polygon*) をサポートし、
+地理的位置をエンコードする際の典型的な使用例をカバーしています。[GeoRSS Simple](http://www.georss.org/simple.html)
+に触発されています。
 
-シンプル・ロケーション・フォーマットは、地球表面上の複雑な位置を表すことを
-意図していないことに注目してください。たとえば、高度座標を取得する必要の
-あるアプリケーションでは、GeoJSON をそのエンティティの地理空間プロパティの
-表現形式として使用する必要があります。
+シンプル・ロケーション・フォーマットは、地球表面上の複雑な位置を表すことを意図していないことに注目してください。
+たとえば、高度座標を取得する必要のあるアプリケーションでは、GeoJSON をそのエンティティの地理空間プロパティの表現形式
+として使用する必要があります。
 
-シンプル・ロケーション・フォーマットでエンコードされたロケーションを表す
-コンテキスト属性は、次の構文に準拠している必要があります :
+シンプル・ロケーション・フォーマットでエンコードされたロケーションを表すコンテキスト属性は、次の構文に準拠している必要が
+あります:
 
-* 属性型は、(`geo:point`, `geo:line`, `geo:box`, `geo:polygon`)の
-  いずれかの値でなければなりません。
-* 属性値は座標のリストでなければなりません。既定では、座標は、[WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) 座標リファレンス・システム (CRS)を
-  使用して定義され、緯度と経度の単位は小数です。このような座標リストは、
-  `type` 属性で指定されたジオメトリをエンコードすることを可能にし、
-  以下で定義される特定の規則に従ってエンコードされます :
+-   属性型は、(`geo:point`, `geo:line`, `geo:box`, `geo:polygon`) のいずれかの値でなければなりません
+-   属性値は座標のリストでなければなりません。既定では、座標は、
+    [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
+    [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) 座標リファレンス・システム (CRS) を使用して定義され、
+    緯度と経度の単位は小数です。このような座標リストは、`type` 属性で指定されたジオメトリをエンコードすることを可能に
+    し、以下で定義される特定の規則に従ってエンコードされます:
+    -   `geo:point` 型: 属性値には有効な緯度経度のペアをカンマで区切った文字列を含める必要があります
+    -   `geo:line` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも2つのペアが必要です
+    -   `geo:polygon` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも4つのペアが存在
+        しなければならず、最後のペアは最初のものと同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
+        ポリゴンを構成する線分が定義された領域の外縁に残るように、座標ペアを適切に順序付けする必要があります。たとえば、
+        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。入力データによって前者の条件が
+        満たされていない場合、実装でエラーが発生するはずです
+    -   `geo:box` 型: バウンディング・ボックスは矩形領域であり、地図の範囲や関心のある大まかな領域を定義するためによく
+        使用されます。ボックスは、緯度経度ペアの2つの長さの文字列配列によって表現されます。最初のペアは下のコーナー、
+        2番目のペアは上のコーナーです
 
-  * `geo:point` 型 : 属性値には有効な緯度経度のペアをカンマで区切った
-    文字列を含める必要があります。
-  * `geo:line` 型 : 属性値に有効な緯度経度ペアの文字列配列を含める
-    必要があります。少なくとも2つのペアが必要です。
-  * `geo:polygon` 型 : 属性値に有効な緯度経度ペアの文字列配列を
-    含める必要があります。
-    少なくとも4つのペアが存在しなければならず、最後のペアは最初のものと
-    同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
-    ポリゴンを構成する線分が定義された領域の外縁に残るように、
-    座標ペアを適切に順序付けする必要があります。
-    たとえば、次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効な
-    ポリゴン定義の例です。入力データによって前者の条件が満たされて
-    いない場合、実装でエラーが発生するはずです。 
-  * `geo:box` 型 : バウンディング・ボックスは矩形領域であり、地図の範囲や
-    関心のある大まかな領域を定義するためによく使用されます。ボックスは、
-    緯度経度ペアの2つの長さの文字列配列によって表現されます。
-    最初のペアは下のコーナー、2番目のペアは上のコーナーです。
+注: [この文献](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)で、
+実装のさまざまな欠点を説明しているように、サークル・ジオメトリはサポートされていません。
 
-注 : [文献](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)で、実装のさまざまな欠点を説明しているように、
-サークル・ジオメトリはサポートされていません。
-
-以下の例は、参照される構文を示しています :
+以下の例は、参照される構文を示しています:
 
 ```
 {
@@ -771,20 +535,19 @@ NGSIv2 の `error` レポートは次のとおりです :
 }
 ```
 
-<a name="geojson"/>
+<a name="geojson"></a>
 
 ### GeoJSON
 
-GeoJSON を使用してエンコードされた位置を表すコンテキスト属性は、
-次の構文に準拠している必要があります :
+GeoJSON を使用してエンコードされた位置を表すコンテキスト属性は、次の構文に準拠している必要があります:
 
-* 属性の NGSI 型は `geo:json` でなければなりません。
-* 属性値は有効な GeoJSON オブジェクトである必要があります。
-  GeoJSON の座標で経度が緯度の前に来ることに注目してください。
+-   属性の NGSI 型は `geo:json` でなければなりません
+-   属性値は有効な GeoJSON オブジェクトである必要があります。GeoJSON の座標で経度が緯度の前に来ることに注目してください
 
-以下の例は、GeoJSON の使い方を示しています。
-その他の GeoJSON の例は、[GeoJSON IETF 仕様書](https://tools.ietf.org/html/draft-butler-geojson-06#page-14)にあります。
-さらに、[この GeoJSON チュートリアル](http://www.macwright.org/2015/03/23/geojson-second-bite.html)は、フォーマットの理解に役立ちます。
+以下の例は、GeoJSON の使い方を示しています。その他の GeoJSON の例は、
+[GeoJSON IETF 仕様書](https://tools.ietf.org/html/draft-butler-geojson-06#page-14) にあります。さらに、
+[この GeoJSON チュートリアル](http://www.macwright.org/2015/03/23/geojson-second-bite.html)は、
+フォーマットの理解に役立ちます。
 
 ```
 {
@@ -798,276 +561,220 @@ GeoJSON を使用してエンコードされた位置を表すコンテキスト
 }
 ```
 
-<a name="simple-query-language"/>
+<a name="simple-query-language"></a>
 
 ## シンプル・クエリ言語 (Simple Query Language)
 
-シンプル・クエリ言語は、一連の条件に一致するエンティティを取得する
-ための簡単な構文を提供します。クエリは、';' キャラクタで区切られた
-ステートメントのリストで構成されます。各ステートメントは一致条件を表します。
-クエリは、一致するすべての条件 (AND 論理演算子) に一致するすべての
-エンティティを返します。
+シンプル・クエリ言語は、一連の条件に一致するエンティティを取得するための簡単な構文を提供します。クエリは、';' キャラクタ
+で区切られたステートメントのリストで構成されます。各ステートメントは一致条件を表します。クエリは、一致するすべての条件
+(AND 論理演算子) に一致するすべてのエンティティを返します。
 
-ステートメントには、2種類あります : *単項ステートメント* と *バイナリ・ステートメント*
+ステートメントには、2種類あります: *単項ステートメント* と *バイナリ・ステートメント*
 
-バイナリ・ステートメントは、属性パス (たとえば、`temperature` や `brand.name`)、
-演算子と値 (値の形式は演算子に依存します)、たとえば :
+バイナリ・ステートメントは、属性パス (たとえば、`temperature` や `brand.name`)、演算子と値
+(値の形式は演算子に依存します)、たとえば:
 
 ```
 temperature==50
 temperature<=20
 ```
 
-属性パスの構文は、`.` 文字で区切られたトークンのリストで構成されます。
-このトークンのリストは、次の規則に従って JSON プロパティ名を指定します。
+属性パスの構文は、`.` 文字で区切られたトークンのリストで構成されます。このトークンのリストは、次の規則に従って JSON
+プロパティ名を指定します。
 
-* 最初のトークンは、エンティティの NGSI 属性 (*ターゲット NGSI 属性*) の名前です。
-* 属性値によるフィルタリング (つまり、式が `q` クエリで使用されている) の場合、
-  残りのトークン (存在する場合) は、JSON オブジェクトでなければならない、
-  *ターゲット NGSI 属性*のサブ・プロパティへのパスを表します。
-  そのようなサブプロパティは、*ターゲット・プロパティ*として定義されます。
-* メタデータによるフィルタリング (つまり、式が `mq` クエリで使用されている) の場合、
-  2番目のトークンはターゲットNGSI属性, *ターゲット・メタデータ*に
-  関連付けられたメタデータ名を表し、残りのトークン (存在する場合) は
-  JSON オブジェクトでなければならない *ターゲット・メタデータ値*の
-  サブ・プロパティへのパスを表します。
-  そのようなサブ・プロパティは、*ターゲット・プロパティ*として定義されます。
+-   最初のトークンは、エンティティの NGSI 属性 (*ターゲット NGSI 属性*) の名前です
+-   属性値によるフィルタリング (つまり、式が `q` クエリで使用されている) の場合、残りのトークン (存在する場合) は、JSON
+    オブジェクトでなければならない、*ターゲット NGSI 属性*のサブ・プロパティへのパスを表します。そのようなサブプロパティ
+    は、*ターゲット・プロパティ*として定義されます
+-   メタデータによるフィルタリング (つまり、式が `mq` クエリで使用されている) の場合、2番目のトークンはターゲット NGSI
+    属性, *ターゲット・メタデータ*に関連付けられたメタデータ名を表し、残りのトークン (存在する場合) は JSON
+    オブジェクトでなければならない *ターゲット・メタデータ値*のサブ・プロパティへのパスを表します。そのようなサブ・
+    プロパティは、*ターゲット・プロパティ*として定義されます
 
-*ターゲット・プロパティ値*は、上記のトークンのリストによって指定される、
-JSON プロパティの値、つまり、*ターゲット・プロパティ*の値として定義されます。
+*ターゲット・プロパティ値*は、上記のトークンのリストによって指定される、JSON プロパティの値、つまり、*ターゲット・
+プロパティ*の値として定義されます。
 
-トークンが 1つだけ提供されている場合 (メタデータによるフィルタリングの場合は2つ)、
-*ターゲット・プロパティ* は *ターゲット NGSI 属性* (またはメタデータで
-フィルタリングする場合の *ターゲット・メタデータ*)と *ターゲット・プロパティ値*
-は、*ターゲット NGSI 属性*値 (または、メタデータによるフィルタリングの場合の
-*ターゲット・メタデータ*値) になります。この場合、*ターゲット NGSI 属性*
-(または、メタデータによるフィルタリングの場合の*ターゲット・メタデータ*)
-の値は JSON オブジェクトであってはなりません。
+トークンが 1つだけ提供されている場合 (メタデータによるフィルタリングの場合は2つ)、*ターゲット・プロパティ* は
+*ターゲット NGSI 属性* (またはメタデータでフィルタリングする場合の *ターゲット・メタデータ*) と
+*ターゲット・プロパティ値* は、*ターゲット NGSI 属性*値 (または、メタデータによるフィルタリングの場合の
+*ターゲット・メタデータ*値) になります。この場合、*ターゲット NGSI 属性* (または、メタデータによるフィルタリングの場合の
+*ターゲット・メタデータ*) の値は JSON オブジェクトであってはなりません。
 
-トークンの一部に `.` が含まれている場合、セパレータとして一重引用符 (`'`) を
-使用できます。たとえば、次の属性パス `'a.b'.w.'x.y'` は3つのトークンで構成
-されます : 最初のトークンは `ab`、2番目のトークンは `w`、3番目のトークンは `xy ` です。
+トークンの一部に `.` が含まれている場合、セパレータとして一重引用符 (`'`) を使用できます。たとえば、次の属性パス
+`'a.b'.w.'x.y'` は3つのトークンで構成されます: 最初のトークンは `ab`、2番目のトークンは `w`、3番目のトークンは `xy `
+です。
 
-演算子のリスト、および、使用する値の形式は次のとおりです :
+演算子のリスト、および、使用する値の形式は次のとおりです:
 
-+ **等号**: `==`. この演算子は、次の型の右辺を受け入れます :
-    + 単一要素、たとえば `temperature == 40` です。エンティティがマッチするためには、
-      *ターゲット・プロパティ* (temperature) が含まれていなければならず、
-      *ターゲット・プロパティ値*は、クエリ値 (40) でなければなりません。
-      または、*ターゲット・プロパティ値*が配列の場合はその値を含んでいなければ
-      なりません。
-    + カンマで区切られた値のリストです。たとえば、`color==black,red`。
-      エンティティがマッチするためには、*ターゲット・プロパティ* が含まれて
-      いなければならず、*ターゲット・プロパティ値*が、リスト内の値のうちの
-      **いずれか**でなければなりません (OR 句) 。または、*ターゲット・プロパティ値*が
-      配列の場合は、リスト内の値の**いずれか**を含んでいなければなりません。
-      たとえば、`color` という名前の属性を持つエンティティは、その値が
-      ` black`であるとマッチしますが、`color` という名前の属性を持つ
-      エンティティは、その値が `white` であるとはマッチしません。
-    + 範囲 (range)。最小値と最大値として指定され、`..` で区切られています。
-      たとえば、`temperature==10..20` です。エンティティがマッチするためには、
-      *ターゲット・プロパティ* (temperature) が含まれていなければならず、
-      *ターゲット・プロパティ値*は、範囲の上限と下限の間 (どちらも含まれています)
-      にある必要があります。範囲は、ISO8601 形式の日付、数字または文字列を表す
-      *ターゲット・プロパティ*でのみ使用できます。
-+ **不等号**: `!=`. この演算子は、次の型の右辺を受け入れます :
-    + 単一の要素、たとえば `temperature!=41` です。エンティティが一致するには、
-      *ターゲット・プロパティ* (temperature) が含まれていなければならず、
-      *ターゲット・プロパティー値*は、クエリ値 (41) で**あってはなりません**。
-    + カンマで区切られた値のリスト、たとえば `color!=black,red`。
-      エンティティがマッチするには、*ターゲット・プロパティ* が含まれていなければならず、
-      *ターゲット・プロパティ値*が、リスト内のいずれかの値で*あっては
-      なりません* (AND 句)。または、*ターゲット・プロパティ値*が配列の場合、
-      リスト内の値の**いずれか**を含んでいてはなりません。
-      例えば。属性 `color` が `black` に設定されたエンティティはマッチせず、
-      属性 `color` が `white` に設定されたエンティティはマッチします。
-    + 範囲 (range)、最小値と最大値として指定され、`..` で区切られています。
-      たとえば `temperature!=10..20`。エンティティがマッチするためには、
-      *ターゲット・プロパティ* (temperature) が含まれていなければならず、
-      *ターゲット・プロパティ値*は上限と下限の間 (どちらも含まれています) に
-      ある**必要はありません**。範囲は、ISO8601 形式の日付、数字または文字列
-      の日付を表す要素 *ターゲット・プロパティ*でのみ使用できます。
-+ **より大きい**: `>`。右側は単一の要素でなければなりません。
-    たとえば `temperature>42` です。エンティティがマッチするためには、
-    *ターゲット・プロパティ* (temperature) が含まれていなければならず、
-    *ターゲット・プロパティ値*がクエリ値 (42) より厳密に大きくなければなりません。
-    このオペレーションは、date 型、number 型または string 型の
-    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で
-    使用されると、予測できない結果になる可能性があります)。
-+ **未満**: `<`。右側は単一の要素でなければなりません。
-    たとえば、`temperature<43` です。エンティティがマッチするためには、
-    *ターゲット・プロパティ* (temperature) が含まれていなければならず、
-    *ターゲット・プロパティ値*は 値 (43) より厳密に小さくなければなりません。
-    このオペレーションは、date 型、number 型または string 型の
-    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で
-    使用されると、予測できない結果になる可能性があります)。
-+ **以上**: `>=`。右側は単一の要素でなければなりません。
-    たとえば、`temperature>=44` です。エンティティがマッチするためには、
-    *ターゲット・プロパティ* (temperature)が含まれていなければならず、
-    *ターゲット・プロパティ値*は 値 (44) 以上でなければなりません。
-    このオペレーションは、date 型、number 型または string 型の
-    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で
-    使用されると、予測できない結果になる可能性があります)。
-+ **以下**: `<=`。右側は単一の要素でなければなりません。
-    たとえば、`temperature<=45` です。エンティティがマッチするためには、
-    *ターゲット・プロパティ* (temperature)が含まれていなければならず、
-    *ターゲットプロパティ値*は、値 (45) 以下でなければなりません。
-    このオペレーションは、date 型、number 型または string 型の
-    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で
-    使用されると、予測できない結果になる可能性があります)。
-+ **マッチ・パターン**: `~=`。値は正規表現として表現された、与えられたパターンと
-    一致します。`color~=ow`。エンティティがマッチするためには、*targetプロパティ* 
-    (color) が含まれていなければならず、*ターゲット・プロパティの値*が、
-    右側の文字列と一致する必要があります。この例では `ow` (`brown` と `yellow` は
-    マッチし、`black` と `white` はマッチしません) です。
-    このオペレーションは、string 型の *ターゲット・プロパティ*に対してのみ有効です。
+-   **等号**: `==`。この演算子は、次の型の右辺を受け入れます:
+    -   単一要素、たとえば `temperature==40` です。エンティティがマッチするためには、*ターゲット・プロパティ*
+        (temperature) が含まれていなければならず、*ターゲット・プロパティ値*は、クエリ値 (40) でなければなりません。
+        または、*ターゲット・プロパティ値*が配列の場合はその値を含んでいなければなりません
+    -   カンマで区切られた値のリストです。たとえば、`color==black,red`。エンティティがマッチするためには、*ターゲット・
+        プロパティ* が含まれていなければならず、*ターゲット・プロパティ値*が、リスト内の値のうちの**いずれか**でなければ
+        なりません (OR 句) 。または、*ターゲット・プロパティ値*が配列の場合は、リスト内の値の**いずれか**を含んで
+        いなければなりません。たとえば、`color` という名前の属性を持つエンティティは、その値が ` black` であるとマッチ
+        しますが、`color` という名前の属性を持つエンティティは、その値が `white` であるとはマッチしません
+    -   範囲 (range)。最小値と最大値として指定され、`..` で区切られています。たとえば、`temperature==10..20` です。
+        エンティティがマッチするためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、
+        *ターゲット・プロパティ値*は、範囲の上限と下限の間 (どちらも含まれています) にある必要があります。範囲は、
+        ISO8601 形式の日付、数字または文字列を表す*ターゲット・プロパティ*でのみ使用できます
+-   **不等号**: `!=`。この演算子は、次の型の右辺を受け入れます:
+    -   単一の要素、たとえば `temperature!=41` です。エンティティが一致するには、*ターゲット・プロパティ* (temperature)
+        が含まれていなければならず、*ターゲット・プロパティー値*は、クエリ値 (41) で**あってはなりません**
+    -   カンマで区切られた値のリスト、たとえば `color!=black,red`。エンティティがマッチするには、
+        *ターゲット・プロパティ*が含まれていなければならず、*ターゲット・プロパティ値*が、リスト内のいずれかの値で
+        *あってはなりません* (AND 句)。または、*ターゲット・プロパティ値*が配列の場合、リスト内の値の**いずれか**を
+        含んでいてはなりません。例えば。属性 `color` が `black` に設定されたエンティティはマッチせず、属性 `color` が
+        `white` に設定されたエンティティはマッチします
+    -   範囲 (range)、最小値と最大値として指定され、`..` で区切られています。たとえば `temperature!=10..20`。
+        エンティティがマッチするためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、
+        *ターゲット・プロパティ値* は上限と下限の間 (どちらも含まれています) にある**必要はありません**。範囲は、
+        ISO8601 形式の日付、数字または文字列の日付を表す要素 *ターゲット・プロパティ*でのみ使用できます
+-   **より大きい**: `>`。右側は単一の要素でなければなりません。たとえば `temperature>42` です。エンティティがマッチ
+    するためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、*ターゲット・プロパティ値*が
+    クエリ値 (42) より厳密に大きくなければなりません。このオペレーションは、date 型、number 型または string 型の
+    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果に
+    なる可能性があります)
+-   **未満**: `<`。右側は単一の要素でなければなりません。たとえば、`temperature<43` です。エンティティがマッチするため
+    には、*ターゲット・プロパティ* (temperature) が含まれていなければならず、*ターゲット・プロパティ値*は 値 (43)
+    より厳密に小さくなければなりません。このオペレーションは、date 型、number 型または string 型の
+    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果に
+    なる可能性があります)
+-   **以上**: `>=`。右側は単一の要素でなければなりません。たとえば、`temperature>=44` です。エンティティがマッチするため
+    には、*ターゲット・プロパティ* (temperature)が含まれていなければならず、*ターゲット・プロパティ値*は 値 (44) 以上で
+    なければなりません。このオペレーションは、date 型、number 型または string 型の*ターゲット・プロパティ*に対してのみ
+    有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果になる可能性があります)
+-   **以下**: `<=`。右側は単一の要素でなければなりません。たとえば、`temperature<=45` です。エンティティがマッチするため
+    には、*ターゲット・プロパティ* (temperature)が含まれていなければならず、*ターゲットプロパティ値*は、値 (45) 以下で
+    なければなりません。このオペレーションは、date 型、number 型または string 型の*ターゲット・プロパティ*に対してのみ
+    有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果になる可能性があります)
+-   **マッチ・パターン**: `~=`。値は正規表現として表現された、与えられたパターンと一致します。`color~=ow`。
+    エンティティがマッチするためには、*targetプロパティ* (color) が含まれていなければならず、*ターゲット・プロパティの
+    値*が、右側の文字列と一致する必要があります。この例では `ow` (`brown` と `yellow` はマッチし、`black` と `white`
+    はマッチしません) です。このオペレーションは、string 型の *ターゲット・プロパティ*に対してのみ有効です
 
-シンボル` : `は`==`の代わりに使用できます。
+シンボル `:` は `==` の代わりに使用できます。
 
-等号または不等号の場合、一致する文字列に `,` が含まれている場合は、カンマの特殊な
-意味を無効にするために一重引用符 (`'`) を使用できます。たとえば、`color=='light,green','deep,blue'`。
-最初の例は、正確な値  'light,green' または 'deep,blue' と color を一致させます。
-また、`q=title=='20'` は文字列 "20" にマッチしますが、数値 20 ではマッチしません。
+等号または不等号の場合、一致する文字列に `,` が含まれている場合は、カンマの特殊な意味を無効にするために一重引用符 (`'`)
+を使用できます。たとえば、`color=='light,green','deep,blue'`。最初の例は、正確な値  'light,green' または 'deep,blue' と
+color を一致させます。また、`q=title=='20'` は文字列 "20" にマッチしますが、数値 20 ではマッチしません。
 
-単項否定ステートメントは単項演算子 `!` を使用しますが、肯定単項ステートメントは
-演算子をまったく使用しません。単項ステートメントは、*ターゲット・プロパティ*の
-存在をチェックするために使用されます。
-たとえば、`temperature` は、'temperature' という属性を持つエンティティにマッチします
-(値に関係なく)。`!temperature` は、 'temperature' という属性を持たないエンティティ
-と一致します。
+単項否定ステートメントは単項演算子 `!` を使用しますが、肯定単項ステートメントは演算子をまったく使用しません。単項
+ステートメントは、*ターゲット・プロパティ*の存在をチェックするために使用されます。たとえば、`temperature` は、
+'temperature' という属性を持つエンティティにマッチします (値に関係なく)。`!temperature` は、'temperature' という属性を
+持たないエンティティと一致します。
 
-<a name="geographical-queries"/>
+<a name="geographical-queries"></a>
 
 ## 地理的クエリ (Geographical Queries)
 
 地理的クエリは、以下のパラメータを使用して指定されます。
 
-``georel`` は、一致するエンティティとリファレンス・シェイプ (`geometry`) の間の
-空間的関係 (述語) を指定することを意図しています。';' で区切られたトークンリストで
-構成されています。最初のトークンはリレーションシップ名であり、残りのトークン (あれば) は
-リレーションシップに関する詳細情報を提供する修飾語です。次の値が認識されます :
+``georel`` は、一致するエンティティとリファレンス・シェイプ (`geometry`) の間の空間的関係 (述語) を指定することを意図
+しています。';' で区切られたトークンリストで構成されています。最初のトークンはリレーションシップ名であり、残りのトークン
+(あれば) はリレーションシップに関する詳細情報を提供する修飾語です。次の値が認識されます:
 
-+ `georel=near`。``near`` リレーションシップは、一致するエンティティが、リファレンス・
-  ジオメトリにある閾値距離に配置しなければならないことを意味します。これは次の修飾子を
-  サポートしています :
-  + `maxDistance`。一致するエンティティを配置する必要がある最大距離をメートルで表します。
-  + `minDistance`。一致するエンティティを配置する必要がある最小距離をメートルで表します。
-+ `georel=coveredBy`。一致するエンティティは、リファレンス・ジオメトリ内に完全に存在する
-  エンティティであることを示します。
-  このタイプのクエリを解決するときは、シェイプの境界線をシェイプの一部とみなす必要があります。 
-+ `georel=intersects`。一致するエンティティはリファレンス・ジオメトリと交差する
-  エンティティであることを示します。
-+ `georel=equals`。一致するエンティティとリファレンス・ジオメトリの位置に関連付けられた
-  ジオメトリは、まったく同じでなければなりません。
-+ `georel=disjoint`。一致するエンティティは、リファレンス・参照ジオメトリと**交差しない**
-  エンティティであることを示します。
+-   `georel=near`。``near`` リレーションシップは、一致するエンティティが、リファレンス・ジオメトリにある閾値距離に配置
+    しなければならないことを意味します。これは次の修飾子をサポートしています:
+    -   `maxDistance`。一致するエンティティを配置する必要がある最大距離をメートルで表します
+    -   `minDistance`。一致するエンティティを配置する必要がある最小距離をメートルで表します
+-   `georel=coveredBy`。一致するエンティティは、リファレンス・ジオメトリ内に完全に存在するエンティティであることを
+    示します。このタイプのクエリを解決するときは、シェイプの境界線をシェイプの一部とみなす必要があります
+-   `georel=intersects`。一致するエンティティはリファレンス・ジオメトリと交差するエンティティであることを示します。
+-   `georel=equals`。一致するエンティティとリファレンス・ジオメトリの位置に関連付けられたジオメトリは、まったく同じで
+    なければなりません
+-   `georel=disjoint`。一致するエンティティは、リファレンス・参照ジオメトリと**交差しない**エンティティであることを
+    示します
 
-`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。
-次のジオメトリ (シンプル・ロケーション・フォーマットを参照) をサポートする必要があります。
+`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ (シンプル・
+ロケーション・フォーマットを参照) をサポートする必要があります。
 
-+ `geometry=point` は、地球表面上の点を定義します。
-+ `geometry=line` は、折れ線を定義します。
-+ `geometry=polygon` はポリゴンを定義します。
-+ `geometry=box` は、バウンディング・ボックス (bounding box) を定義します。
+-   `geometry=point` は、地球表面上の点を定義します
+-   `geometry=line` は、折れ線を定義します
+-   `geometry=polygon` はポリゴンを定義します
+-   `geometry=box` は、バウンディング・ボックス (bounding box) を定義します
 
-**coords**は、指定されたジオメトリとシンプル・ロケーション・フォーマットで規定されている
-規則に従って、セミコロンで区切られた地理座標のペアのリストを含む文字列でなければなりません :
+**coords** は、指定されたジオメトリとシンプル・ロケーション・フォーマットで規定されている規則に従って、セミコロンで
+区切られた地理座標のペアのリストを含む文字列でなければなりません:
 
-* `geometry=point`。`coords` は、WGS-84 地理座標のペアを含んでいます。
-* `geometry=line`。`coords` は、WGS-84 地理座標のペアのリストを含んでいます。
-* `geometry=polygon`。`coords` は、少なくとも 4組の WGS-84 地理座標で構成されています。
-* `geometry=box`。`coords` は、2組の WGS-84 地理座標で構成されています。
+-   `geometry=point`。`coords` は、WGS-84 地理座標のペアを含んでいます
+-   `geometry=line`。`coords` は、WGS-84 地理座標のペアのリストを含んでいます
+-   `geometry=polygon`。`coords` は、少なくとも 4組の WGS-84 地理座標で構成されています
+-   `geometry=box`。`coords` は、2組の WGS-84 地理座標で構成されています
 
-例 :
+例:
 
-`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`.
-マッチング・エンティティは、基準点から 1,000メートル以内に配置する必要があります。
+`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`。マッチング・エンティティは、基準点から 1,000メートル
+以内に配置する必要があります。
 
-`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`.
-マッチング・エンティティは、基準点から (少なくとも) 5,000メートル離れていなければなりません。
+`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`。マッチング・エンティティは、基準点から (少なくとも)
+5,000メートル離れていなければなりません。
 
-`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
+`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`。
 マッチング・エンティティは、参照されたポリゴン内にあるものです。
 
-<a name="query-resolution"/>
+<a name="query-resolution"></a>
 
 ### クエリの解決 (Query Resolution)
 
-実装が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは
-```422```, *Unprocessable Entity* でなければなりません。エラー・ペイロードに
-存在するエラー名は、``NotSupportedQuery`` でなければなりません。
+実装が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは ```422```, *Unprocessable Entity* で
+なければなりません。エラー・ペイロードに存在するエラー名は、``NotSupportedQuery`` でなければなりません。
 
-地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、
-マッチング目的で使用される地理的位置を含むエンティティ属性を決定する
-責任があります。この目的のために、以下の規則を遵守しなければなりません。
+地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、マッチング目的で使用される地理的位置を含む
+エンティティ属性を決定する責任があります。この目的のために、以下の規則を遵守しなければなりません。
 
-* エンティティに、GeoJSON または、シンプル・ロケーション・フォーマットとして
-  エンコードされた場所に対応する属性がない場合、そのようなエンティティは地理空間
-  プロパティを宣言せず、地理的なクエリに一致しません。
+-   エンティティに、GeoJSON または、シンプル・ロケーション・フォーマットとしてエンコードされた場所に対応する属性がない
+    場合、そのようなエンティティは地理空間プロパティを宣言せず、地理的なクエリに一致しません
+-   エンティティがロケーションに対応する1つの属性のみを公開する場合、そのような属性は地理的クエリを解決する際に使用
+    されます
+-   エンティティが複数のロケーションを公開している場合、ブーリン値が ``true`` の ``defaultLocation`` という名前の
+    メタデータ・プロパティを含む属性は、地理的クエリを解決するためのリファレンス・ロケーションとして扱われます
+-   複数の属性が公開されているが、いずれもデフォルトのロケーションとしてラベル付けされていない場合、クエリはあいまいで
+    あると宣言され、``409`` コードの HTTP エラー・レスポンスが送られなければなりません
+-   *default location* とラベル付けされた複数の属性公開ロケーションがある場合、クエリはあいまいであると宣言され、``409``
+    コードの  HTTP エラー・レスポンスが送られなければなりません
 
-* エンティティがロケーションに対応する1つの属性のみを公開する場合、
-  そのような属性は地理的クエリを解決する際に使用されます。
-
-* エンティティが複数のロケーションを公開している場合、ブーリン値が ``true`` の
-  ``defaultLocation`` という名前のメタデータ・プロパティを含む属性は、
-  地理的クエリを解決するためのリファレンス・ロケーションとして扱われます。
-
-* 複数の属性が公開されているが、いずれもデフォルトのロケーションとしてラベル付け
-  されていない場合、クエリはあいまいであると宣言され、``409`` コードの
-  HTTP エラー・レスポンスが送られなければなりません。
-
-* *default location* とラベル付けされた複数の属性公開ロケーションがある場合、
-  クエリはあいまいであると宣言され、``409`` コードの  HTTP エラー・レスポンスが
-  送られなければなりません。
-
-<a name="filtering-out-attributes-and-metadata"/>
+<a name="filtering-out-attributes-and-metadata"></a>
 
 ## 属性とメタデータのフィルタリング (Filtering out attributes and metadata)
 
-`attrs` URL パラメータ または、POST /v2/op/query のフィールド は、検索オペレーションで
-レスポンスに含める必要のある属性のリストを指定するために使用できます。同様に、
-`metadata` URL パラメータ または POST /v2/op/query のフィールドを使用して、
+`attrs` URL パラメータ または、POST /v2/op/query のフィールド は、検索オペレーションでレスポンスに含める必要のある属性の
+リストを指定するために使用できます。同様に、`metadata` URL パラメータ または POST /v2/op/query のフィールドを使用して、
 レスポンスに含める必要のあるメタデータのリストを指定することができます。
 
-デフォルトでは、`attrs` が省略された場合、または `metadata` が省略された場合、
-組み込み属性 (メタデータ) を除くすべての属性 (すべてのメタデータ) が含まれます。
-組み込みの属性 (メタデータ) を含めるためには、それらを明示的に `attrs` (`metadata`)
-に含める必要があります。
+デフォルトでは、`attrs` が省略された場合、または `metadata` が省略された場合、組み込み属性 (メタデータ) を除くすべての
+属性 (すべてのメタデータ) が含まれます。組み込みの属性 (メタデータ) を含めるためには、それらを明示的に `attrs`
+(`metadata`) に含める必要があります。
 
-たとえば、属性 A と B のみを含めるには :
+たとえば、属性 A と B のみを含めるには:
 
 `attrs=A,B`
 
-*only* 組み込み属性 (メタデータ) を含めると、ユーザ定義の属性 (メタデータ) は
-使用できなくなります。組み込み属性 (メタデータ) *と* ユーザー定義属性(メタデータ)を
-同時に組み込む場合、
+*only* 組み込み属性 (メタデータ) を含めると、ユーザ定義の属性 (メタデータ) は使用できなくなります。組み込み属性
+(メタデータ) *と* ユーザー定義属性 (メタデータ) を同時に組み込む場合、
 
-* ユーザ定義属性 (メタデータ) を明示的に含める必要があります。例えば、
-  ユーザ定義属性 A と B を組み込み属性 `dateModified` とともに含めるには、
-  `attrs=dateModified,A,B` を使用します。
-* 特別な値 `*` は、すべてのユーザ定義属性と組み込み属性 `dateModified` とともに
-  含めるために、たとえば、"すべてのユーザ定義属性 (メタデータ)" を意味する
-  エイリアスとして `attrs=dateModified,*` を使用できます。
+-   ユーザ定義属性 (メタデータ) を明示的に含める必要があります。例えば、ユーザ定義属性 A と B を組み込み属性
+    `dateModified` とともに含めるには、`attrs=dateModified,A,B` を使用します
+-   特別な値 `*` は、すべてのユーザ定義属性と組み込み属性 `dateModified` とともに含めるために、たとえば、"すべてのユーザ
+    定義属性 (メタデータ)" を意味するエイリアスとして `attrs=dateModified,*` を使用できます
 
-`attrs` と `metadata` フィールドは `notification` のサブ・フィールドして、
-サブスクリプションでも使用でき、サブスクリプションに関連する通知にどの
-属性メタデータを含めるかを指定するのと同じ意味を持ちます。
+`attrs` と `metadata` フィールドは `notification` のサブ・フィールドして、サブスクリプションでも使用でき、
+サブスクリプションに関連する通知にどの属性メタデータを含めるかを指定するのと同じ意味を持ちます。
 
-<a name="notification-messages"/>
+<a name="notification-messages"></a>
 
 ## 通知メッセージ (Notification Messages)
 
-通知には2つのフィールドがあります :
+通知には2つのフィールドがあります:
 
-* `subscriptionId` は通知を発信した関連するサブスクリプションを表します。
-* `data` はエンティティと関連するすべての属性を含む通知データそのものを
-  持つ配列です。配列内の各要素は異なるエンティティに対応します。
-  デフォルトでは、エンティティは `normalized` モードで表されます。
-  しかし、`attrsFormat` 修飾子を使用すると、簡略化された表現モードを
-  リクエストすることができます。
+-   `subscriptionId` は通知を発信した関連するサブスクリプションを表します
+-   `data` はエンティティと関連するすべての属性を含む通知データそのものを持つ配列です。配列内の各要素は異なる
+    エンティティに対応します。デフォルトでは、エンティティは `normalized` モードで表されます。しかし、`attrsFormat`
+    修飾子を使用すると、簡略化された表現モードをリクエストすることができます
 
-`attrsFormat` が `normalized` の場合、または `attrsFormat` が省略されている場合、
-デフォルトのエンティティ表現が使用されます :
+`attrsFormat` が `normalized` の場合、または `attrsFormat` が省略されている場合、デフォルトのエンティティ表現が使用
+されます:
 
 ```
 {
@@ -1100,8 +807,7 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 }
 ```
 
-`attrsFormat` が `keyValues` の場合、keyValues の部分エンティティ表現モードが
-使用されます :
+`attrsFormat` が `keyValues` の場合、keyValues の部分エンティティ表現モードが使用されます:
 
 ```
 {
@@ -1122,8 +828,7 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 }
 ```
 
-`attrsFormat` が `values` の場合、values の部分エンティティ表現モードが
-使用されます：
+`attrsFormat` が `values` の場合、values の部分エンティティ表現モードが使用されます:
 
 ```
 {
@@ -1132,40 +837,35 @@ JSON プロパティの値、つまり、*ターゲット・プロパティ*の�
 }
 ```
 
-通知は、通知の受信者が通知ペイロードを処理する必要なくフォーマットを認識できるように、
-関連するサブスクリプションのフォーマットの値を持つ `Ngsiv2-AttrsFormat` HTTP ヘッダを
-含む必要があります。
+通知は、通知の受信者が通知ペイロードを処理する必要なくフォーマットを認識できるように、関連するサブスクリプションの
+フォーマットの値を持つ `Ngsiv2-AttrsFormat` HTTP ヘッダを含む必要があります。
 
-<a name="custom-notifications"/>
+<a name="custom-notifications"></a>
 
 ## カスタム通知 (Custom Notifications)
 
-NGSIv2 クライアントは、単純なテンプレート・メカニズムを使用して、HTTP 通知
-メッセージをカスタマイズできます。サブスクリプションの `notification.httpCustom`
-プロパティは、以下のフィールドをテンプレート化するよう指定します :
+NGSIv2 クライアントは、単純なテンプレート・メカニズムを使用して、HTTP 通知メッセージをカスタマイズできます。
+サブスクリプションの `notification.httpCustom` プロパティは、以下のフィールドをテンプレート化するよう指定します:
 
-* `url`
-* `headers` (ヘッダ名と値の両方をテンプレート化できます)
-* `qs` (パラメータ名と値の両方をテンプレート化できます)
-* `payload`
+-   `url`
+-   `headers` (ヘッダ名と値の両方をテンプレート化できます)
+-   `qs` (パラメータ名と値の両方をテンプレート化できます)
+-   `payload`
 
-5番目のフィールド `method` では、NGSIv2 クライアントが通知の配信に使用する
-HTTP メソッドを選択できますが、GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE,
- CONNECTなどの有効な HTTP 動詞しか使用できないことに注意してください。
+5番目のフィールド `method` では、NGSIv2 クライアントが通知の配信に使用する HTTP メソッドを選択できますが、GET, PUT,
+POST, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT などの有効な HTTP 動詞しか使用できないことに注意してください。
 
-テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に :
+テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に:
 
-* `${id}` は、エンティティの `id` に置き換えられます。
-* `${type}` は、エンティティの `type` に置き換えられます。
-* 他の `${token}` は、名前が `token` の属性の値に置き換えられます。属性が通知に
-  含まれていない場合は空文字列に置き換えられます。値が数値、bool または null の場合、
-  その文字列表現が使用されます。値が JSON 配列またはオブジェクトの場合、
-  JSON 表現は文字列として使用されます。
+-   `${id}` は、エンティティの `id` に置き換えられます
+-   `${type}` は、エンティティの `type` に置き換えられます
+-   他の `${token}` は、名前が `token` の属性の値に置き換えられます。属性が通知に含まれていない場合は空文字列に
+    置き換えられます。値が数値、bool または null の場合、その文字列表現が使用されます。値が JSON 配列または
+    オブジェクトの場合、JSON 表現は文字列として使用されます
 
-例 :
+例:
 
-与えられたサブスクリプションの次の `notification.httpCustom` オブジェクトを
-考えてみましょう。
+与えられたサブスクリプションの次の `notification.httpCustom` オブジェクトを考えてみましょう。
 
 ```
 "httpCustom": {
@@ -1181,10 +881,9 @@ HTTP メソッドを選択できますが、GET, PUT, POST, DELETE, PATCH, HEAD,
 }
 ```
 
-次に、このサブスクリプションに関連付けられた通知がトリガーされ、
-id "DC_S1-D41" および 型 "Room" で、値が 23.4 の "temperature" という
-属性を含むエンティティの通知データであると仮定します。テンプレートを
-適用した結果の通知は次のようになります :
+次に、このサブスクリプションに関連付けられた通知がトリガーされ、id "DC_S1-D41" および 型 "Room" で、値が 23.4 の
+"temperature" という属性を含むエンティティの通知データであると仮定します。テンプレートを適用した結果の通知は次のように
+なります:
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
@@ -1193,1648 +892,1737 @@ Content-Length: 31
 The temperature is 23.4 degrees
 ```
 
-いくつかの考慮事項 : 
+いくつかの考慮事項:
 
-* NGSIv2 クライアントは、置換後に通知が正しい HTTP メッセージであることを
-  確認する責任があります。たとえば Content-Type ヘッダが application/xml の場合、
-  ペイロードは 整形式 XML 文書に対応する必要があります。具体的には、テンプレート
-  適用後の結果の URL の形式が誤っている場合、通知は送信されません。
-* 通知するデータに複数のエンティティが含まれている場合は、エンティティごとに
-  個別の通知 (HTTP メッセージ) が送信されます。デフォルトの動作とは異なり、
-  すべてのエンティティが同じ HTTP メッセージで送信されます。
+-   NGSIv2 クライアントは、置換後に通知が正しい HTTP メッセージであることを確認する責任があります。たとえば Content-Type
+    ヘッダが application/xml の場合、ペイロードは 整形式 XML 文書に対応する必要があります。具体的には、テンプレート
+    適用後の結果の URL の形式が誤っている場合、通知は送信されません
+-   通知するデータに複数のエンティティが含まれている場合は、エンティティごとに個別の通知 (HTTP メッセージ) が送信
+    されます。デフォルトの動作とは異なり、すべてのエンティティが同じ HTTP メッセージで送信されます
 
-通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は
-対応するサブスクリプションにあります)、通知の `Ngsiv2-AttrsFormat` ヘッダに
-`custom` の値が使用されます。
+通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
+`Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
 
-<a name="group-api-entry-point"/>
+<a name="api-routes"></a>
 
-## Group API Entry Point
+# API ルート (API Routes)
 
-<a name="retrieve-api-resources-get-v2"/>
+<a name="api-entry-point"></a>
+
+## API エントリ・ポイント (API Entry Point)
+
+<a name="retrieve-api-resources-get-v2"></a>
 
 ### API リソースを取得 [GET /v2]
 
-このリソースには、属性はありません。代わりに、JSON 本体のリンクの形で
-初期 API アフォーダンス (initial API affordance) を提供します。
+このリソースには、属性はありません。代わりに、JSON 本体のリンクの形で初期 API アフォーダンス (initial API affordance)
+を提供します。
 
-該当する場合は、"url" リンク値、[Link](https://tools.ietf.org/html/rfc5988)
-または Location ヘッダに従うことをお勧めします。独自の URL を構築する代わりに、
-クライアントと実装の詳細を切り離してください。
+該当する場合は、"url" リンク値、[Link](https://tools.ietf.org/html/rfc5988) または Location ヘッダに従うことを
+お勧めします。独自の URL を構築する代わりに、クライアントと実装の詳細を切り離してください。
 
-+ Response 200 (application/json)
+-   Response 200 (application/json)
 
     + Attributes (object)
         + entities_url: /v2/entities (required, string) - エンティティ・リソースを指す URL
         + types_url: /v2/types (required, string) - 型リソースを指す URL
-        + subscriptions_url: /v2/subscriptions (required, string) - サブスクリプション・
-          リソースを指す URL
-        + registrations_url: /v2/registrations (required, string) - レジストレーション・
-          リソースを指す URL
+        + subscriptions_url: /v2/subscriptions (required, string) - サブスクリプション・リソースを指す URL
+        + registrations_url: /v2/registrations (required, string) - レジストレーション・リソースを指す URL
 
-<a name="group-entities"/>
+<a name="entities-operations"></a>
 
-# Group Entities
+## エンティティの操作 (Entities Operations)
 
-<a name="list-entities-get-v2entitieslimitoffsetoptionstypeididpatterntypepatternqmqgeorelgeometrycoordsattrsmetadataorderby"/>
+<a name="entities-list"></a>
 
-### エンティティをリスト [GET /v2/entities{?limit,offset,options,type,id,idPattern,typePattern,q,mq,georel,geometry,coords,attrs,metadata,orderBy}]
+### エンティティのリスト (Entities List)
 
-id、型、パターン・マッチング (id または型)、またはクエリまたは地理的クエリ
-([シンプル・クエリ・ランゲージ](#simple_query_language) および [地理的クエリ](#geographical_queries))で、
-一致するエンティティのリストを取得します。与えられたエンティティは、検索される
-すべての基準に一致しなければなりません。すなわち、基準が論理的 AND 方法で結合されます。
-そのパターン・マッチング・クエリ・パラメータは、それらに対応する正確なマッチング・
-パラメータと互換性がない (すなわち、相互に排他的である) ことに留意してください。
-すなわち、`id` の `idPattern` および `type` の `typePattern` 
+<a name="list-entities-get-v2entities"></a>
 
-レスポンス・ペイロードは、一致するエンティティごとに1つのオブジェクトを含む配列です。
-各エンティティは、"JSON エンティティの表現" で説明した JSON エンティティの表現形式に従います。
+#### エンティティをリスト [GET /v2/entities]
 
-レスポンス・コード :
+Id、型、パターン・マッチング (id または型)、またはクエリまたは地理的クエリ ([シンプル・クエリ・ランゲージ](#simple-query-language)
+および [地理的クエリ](#geographical-queries)を参照) で、一致するエンティティのリストを取得します。与えられた
+エンティティは、検索されるすべての基準に一致しなければなりません。すなわち、基準が論理的 AND 方法で結合されます。その
+パターン・マッチング・クエリ・パラメータは、それらに対応する正確なマッチング・パラメータと互換性がない (すなわち、
+相互に排他的である) ことに留意してください。すなわち、`id` の `idPattern` および `type` の `typePattern` レスポンス・
+ペイロードは、一致するエンティティごとに1つのオブジェクトを含む配列です。各エンティティは、"JSON エンティティの表現"
+で説明した JSON エンティティの表現形式に従います。
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものと、エラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+**リクエスト・クエリ・パラメータ**
 
-+ Parameters
-    + id: Boe_Idearium (optional, string) - カンマで区切られた要素のリスト。
-      ID がリスト内のいずれかの要素とマッチするエンティティを取得します。
-      `idPattern` と互換性がありません。
-    
-    + type: Room (optional, string) -  カンマで区切られた要素のリスト。
-      リスト内の要素の1つに型がマッチするエンティティを取得します。
-      `typePattern` と互換性がありません。
+このリクエストは、リクエスト・レスポンスをカスタマイズするために、次の URL パラメータを受け入れます。
 
-    + idPattern: Bode_.* (optional, string) - 正式な正規表現です。
-      ID が正規表現とマッチするエンティティを取得します。
-      `id` と互換性がありません。
+<!-- Use this tool to prettify the table: http://markdowntable.com/ -->
+| パラメータ     | オプション | タイプ   | 説明                                                                                                                                                                                                                                                      | 例                                |
+|----------------|------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| `id`           | ✓          | string   | 要素のコンマ区切りリスト。id がリスト内の要素の1つと一致するエンティティを取得します。`idPattern` と同時に使用できません                                                                                                                                  | Boe_Idearium                     |
+| `type`         | ✓          | string   | 要素のコンマ区切りリスト。型がリスト内の要素の1つと一致するエンティティを取得します。`typePattern` と同時に使用できません                                                                                                                                 | Room                              |
+| `idPattern`    | ✓          | string   | 正しくフォーマットされた正規表現。id が正規表現と一致するエンティティを取得します。`id `と互換性がありません                                                                                                                                              | Bode_.\*                          |
+| `typePattern`  | ✓          | string   | 正しくフォーマットされた正規表現。型が正規表現に一致するエンティティを取得します。`type` と互換性がありません                                                                                                                                             | Room_.\*                         |
+| `q`            | ✓          | string   | temperature>40 (オプション, 文字列) - `;` で区切られたステートメントのリストで構成されるクエリ式。つまり、q=statement1;statement2;statement3 です。 [シンプル・クエリ言語仕様](#simple-query-language)を参照してください                                  | temperature>40                   |
+| `mq`           | ✓          | string   | `;` で区切られたステートメントのリストで構成される属性メタデータのクエリ式。つまり、mq=statement1;statement2;statement3 です。[シンプルクエリ言語仕様](#simple-query-language)を参照してください                                                          | temperature.accuracy<0.9         |
+| `georel`       | ✓          | string   | 一致するエンティティと参照形状 (reference shape) の間の空間的関係。[地理的クエリ](#geographical-queries)を参照してください                                                                                                                                | near                             |
+| `geometry`     | ✓          | string   | クエリが制限されている地理的領域。[地理的クエリ](#geographical-queries)を参照してください                                                                                                                                                                 | point                             |
+| `limit`        | ✓          | number   | 取得するエンティティの数を制限します                                                                                                                                                                                                                      | 20                                |
+| `offset`       | ✓          | number   | エンティティが取得される場所からのオフセットを確立します                                                                                                                                                                                                  | 20                                |
+| `coords`       | ✓          | string   | ';' で区切られた座標の緯度経度ペアのリスト。[地理的クエリ](#geographical-queries)を参照してください                                                                                                                                                       | 41.390205,2.154007;48.8566,2.3522 |
+| `attrs`        | ✓          | string   | データがレスポンスに含まれる属性名のコンマ区切りのリスト。属性は、このパラメータで指定された順序で取得されます。このパラメータが含まれていない場合、属性は任意の順序で取得されます。詳細については、"属性とメタデータの除外" セクションを参照してください | seatNumber                       |
+| `metadata`     | ✓          | string   | レスポンスに含めるメタデータ名のリスト。詳細については、"属性とメタデータの除外" セクションを参照してください                                                                                                                                             | accuracy                          |
+| `orderBy`      | ✓          | string   | 結果を順序付けするための基準。詳細については、"結果の順序付け" セクションを参照してください                                                                                                                                                               | temperature,!speed                |
+| `options`      | ✓          | string   | クエリのオプションのコンマ区切りリスト。次の表を参照してください                                                                                                                                                                                          | count                             |
 
-    + typePattern: Room_.* (optional, string) - 正式な正規表現です。
-      型が正規表現とマッチするエンティティを取得します。
-      `type`と互換性がありません。
-    
-    + q: temperature>40 (optional, string) - クエリ式です。`;` で
-      区切られたステートメントのリストで構成されます。
-      つまり、q=statement1;statement2;statement3 です。
-      [シンプル・クエリ・ランゲージ](#simple_query_language)を
-      参照してください。
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-    + mq: temperature.accuracy<0.9 (optional, string) - 属性メタデータ
-      のクエリ式です。`;` で区切られたステートメントのリストで構成されます。
-      つまり、mq=statement1;statement2;statement3 です。
-      [シンプル・クエリ・ランゲージ](#simple_query_language)を
-      参照してください。
-    
-    + georel: near (optional, string) - マッチングするエンティティと
-      リファレンス・シェイプとの空間的関係。
-      [地理的クエリ](#geographical_queries)を参照してください。
+| オプション  | 説明                                                                                                                                                                                    |
+|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `count`     | 使用すると、エンティティの総数が `Fiware-Total-Count` という名前の HTTP ヘッダとしてレスポンスに返されます                                                                              |
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティ表現" を参照してください                          |
+| `values`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。詳細については、"簡略化されたエンティティ表現" を参照してください                             |
+| `unique`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。繰り返しの値は省略されます。詳細については、"簡略化されたエンティティ表現" を参照してください |
 
-    + geometry: point (optional, string) - クエリが制限される地理的領域。
-      [地理的クエリ](#geographical_queries)を参照してください。
-    
-    + coords: 41.390205,2.154007;48.8566,2.3522 (optional, string) - ';' で
-      区切られた座標の緯度経度のペアのリスト。
-      [地理的クエリ](#geographical_queries)を参照してください。
-    
-    + limit: 20 (optional, number) - 取得するエンティティの数を制限します。
-    
-    + offset: 20 (optional, number) - エンティティの取得元からのオフセットを
-      設定します。
-    
-    + attrs: seatNumber (optional, string) - データをレスポンスに含める
-      属性名のカンマ区切りのリスト。属性は、このパラメータで指定された
-      順序で取得されます。このパラメータが含まれていない場合、属性は任意の
-      順序で取得されます。詳細については、"属性とメタデータのフィルタリング"
-      を参照してください。
+**レスポンス**
 
-    + metadata: accuracy (optional, string) - レスポンスに含めるメタデータ名のリスト。
-      詳細については、"属性とメタデータのフィルタリング" を参照してください。
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものと、エラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-    + orderBy: temperature,!speed (optional, string) - 結果の順序付けの基準。
-      詳細については、"結果の順序付け" を参照してください。
-    
-    + options (optional, string) - オプション辞書
-      + Members
-          + count - 使用された場合、エンティティの総数は `Fiware-Total-Count`
-            という名前の HTTP ヘッダとして返されます。
-          + keyValues - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + values - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + unique - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。反復値は除外されます。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
+レスポンス 200 の例:
 
-+ Response 200 (application/json)
+Content-Type は、`application/json` です。
 
-        [
-         {
-           "type": "Room",
-           "id": "DC_S1-D41",
-           "temperature": {
-             "value": 35.6,
-             "type": "Number",
-             "metadata": {}
-           }
-         },
-         {
-           "type": "Room",
-           "id": "Boe-Idearium",
-           "temperature": {
-             "value": 22.5,
-             "type": "Number",
-             "metadata": {}
-           }
-         },
-         {
-           "type": "Car",
-           "id": "P-9873-K",
-           "speed": {
-             "value": 100,
-             "type": "number",
-             "metadata": {
-               "accuracy": {
-                 "value": 2,
-                 "type": "Number"
-               },
-               "timestamp": {
-                 "value": "2015-06-04T07:20:27.378Z",
-                 "type": "DateTime"
-               }
-             }
-           }
-         }
-        ]
-
-<a name="create-entity-post-v2entitiesoptions"/>
-
-### エンティティを作成  [POST /v2/entities{?options}]
-
-ペイロードは、作成されるエンティティを表すオブジェクトです。オブジェクトは、
-"JSON エンティティ表現" のセクションで説明している、JSON エンティティ表現形式
-に従います。
-
-レスポンス : 
-
-* 成功したオペレーションでは、201 Created (upsert オプションが使用されない場合)
-  または、204 no Content (upsert オプションが使用される場合) を使用します。
-  レスポンスには、作成されたエンティティの URL を含む `Location` ヘッダが含まれます。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
-
-+ Request (application/json)
-
-        {
-          "type": "Room",
-          "id": "Bcn-Welt",
-          "temperature": {
-            "value": 21.7
-          },
-          "humidity": {
-            "value": 60
-          },
-          "location": {
-            "value": "41.3763726, 2.1864475",
-            "type": "geo:point",
-            "metadata": {
-              "crs": {
-                "value": "WGS84"
-              }
-            }
-          }
+```json
+[
+  {
+    "type": "Room",
+    "id": "DC_S1-D41",
+    "temperature": {
+      "value": 35.6,
+      "type": "Number",
+      "metadata": {}
+    }
+  },
+  {
+    "type": "Room",
+    "id": "Boe-Idearium",
+    "temperature": {
+      "value": 22.5,
+      "type": "Number",
+      "metadata": {}
+    }
+  },
+  {
+    "type": "Car",
+    "id": "P-9873-K",
+    "speed": {
+      "value": 100,
+      "type": "number",
+      "metadata": {
+        "accuracy": {
+          "value": 2,
+          "type": "Number"
+        },
+        "timestamp": {
+          "value": "2015-06-04T07:20:27.378Z",
+          "type": "DateTime"
         }
+      }
+    }
+  }
+]
+```
 
-+ Parameters
-    + options (optional, string) - オプション辞書
-      + Members
-          + keyValues - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + upsert - 使用されると、エンティティはすでに存在する場合に更新されます。
-            upsert が使用されておらず、エンティティがすでに存在する場合、
-            `422 Unprocessable Entity` エラーが返されます。
+<a name="create-entity-post-v2entities"></a>
 
-+ Response 201
+#### エンティティを作成  [POST /v2/entities]
 
-    + Headers
+ペイロードは、作成されるエンティティを表すオブジェクトです。オブジェクトは、"JSON エンティティ表現" のセクションで説明
+している、JSON エンティティ表現形式に従います。
 
-            Location: /v2/entities/Bcn-Welt?type=Room
+**リクエスト・クエリ・パラメータ**
 
-+ Response 204
+| パラメータ | オプション | タイプ | 説明                                                             | 例     |
+|- ----------|------------|--------|------------------------------------------------------------------|--------|
+| `options`  | ✓          | string | クエリのオプションのコンマ区切りリスト。次の表を参照してください | upsert |
 
-    + Headers
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-            Location: /v2/entities/Bcn-Welt?type=Room
+| オプション  | 説明                                                                                                                                                                   |
+|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティ表現" を参照してください         |
+| `upsert`    | 使用すると、エンティティがすでに存在する場合は更新されます。upsert が使用されておらず、エンティティがすでに存在する場合、`422 Unprocessable Entity` エラーが返されます |
 
-<a name="entity-by-id-v2entitiesentityidtypeattrsoptions"/>
+**リクエスト・ペイロード**
 
-## ID によるエンティティ [/v2/entities/{entityId}{?type,attrs,options}]
+Content-Type は、`application/json` です。
 
-<a name="retrieve-entity-get-v2entitiesentityidtypeattrsmetadataoptions"/>
+例:
 
-### エンティティを取得 [GET /v2/entities/{entityId}{?type,attrs,metadata,options}]
+```json
+{
+  "type": "Room",
+  "id": "Bcn-Welt",
+  "temperature": {
+    "value": 21.7
+  },
+  "humidity": {
+    "value": 60
+  },
+  "location": {
+    "value": "41.3763726, 2.1864475",
+    "type": "geo:point",
+    "metadata": {
+      "crs": {
+        "value": "WGS84"
+      }
+    }
+  }
+}
+```
 
-レスポンスは、ID で識別されるエンティティを表すオブジェクトです。オブジェクトは、
+**レスポンス**
+
+-   成功したオペレーションでは、201 Created (upsert オプションが使用されない場合) または、204 no Content (upsert
+    オプションが使用される場合) を使用します。レスポンスには、作成されたエンティティの URL を含む `Location`
+    ヘッダが含まれます
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 201 の例:
+
+ヘッダ:
+
+-   Location: /v2/entities/Bcn-Welt?type=Room
+
+レスポンス 204 の例:
+
+ヘッダ:
+
+-   Location: /v2/entities/Bcn-Welt?type=Room
+
+<a name="entity-by-id"></a>
+
+### id によるエンティティの操作 (Entity by ID)
+
+<a name="retrieve-entity-get-v2entitiesentityid"></a>
+
+#### エンティティを取得 [GET /v2/entities/{entityId}]
+
+レスポンスは、id で識別されるエンティティを表すオブジェクトです。オブジェクトは、
 JSON エンティティ表現形式 ("JSON エンティティ表現"のセクションを参照) に従います。
 
-このオペレーションは、1つのエンティティ要素のみを返す必要がありますが、同じ ID を
+このオペレーションは、1つのエンティティ要素のみを返す必要がありますが、同じ id を
 持つエンティティが複数存在する可能性があります。このような場合、HTTP ステータス・
 コードが 409 Conflict に設定されたエラー・メッセージが返されます。
 
-レスポンス :
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、200 OK を使用します
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Parameters
-    + entityId (required, string) - 取得するエンティティの ID
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrs: temperature,humidity (optional, string) - データをレスポンスに含める
-      必要がある属性名のカンマ区切りのリスト。属性は、このパラメータで指定された
-      順序で取得されます。詳細については、"属性とメタデータのフィルタリング" を
-      参照してください。このパラメータが含まれていない場合、属性は任意の順序で
-      取得され、エンティティのすべての属性がレスポンスに含まれます。
-    + options (optional, string) - レスポンスに含めるメタデータ名のリスト。
-      詳細については、"属性とメタデータのフィルタリング" を参照してください。
-    + options (optional, string) - オプション辞書
-      + Members
-          + keyValues - 使用されると、レスポンス・ペイロードは、単純された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + values - 使用されると、レスポンス・ペイロードは、単純された
-            エンティティ表現 `values` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + unique - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。反復値は除外されます。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
+| パラメータ | タイプ | 説明                      | 例      |
+|------------|--------|---------------------------|---------|
+| `entityId` | string | 取得するエンティティの id | `Room`  |
 
-+ Response 200 (application/json)
 
-        {
-          "type": "Room",
-          "id": "Bcn_Welt",
-          "temperature": {
-            "value": 21.7,
-            "type": "Number"
-          },
-          "humidity": {
-            "value": 60,
-            "type": "Number"
-          },
-          "location": {
-            "value": "41.3763726, 2.1864475",
-            "type": "geo:point",
-            "metadata": {
-              "crs": {
-                "value": "WGS84",
-                "type": "Text"
-              }
-            }
-          }
-        }
+**リクエスト・クエリ・パラメータ**
 
-<a name="retrieve-entity-attributes-get-v2entitiesentityidattrstypeattrsmetadataoptions"/>
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                                                                                                                                                                               | 例        |
+|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します                                                                                                                                                                                                                       | `Room`    |
+| `attrs`    | ✓          | string | データをレスポンスに含める必要がある属性名のコンマ区切りのリスト。属性は、このパラメータで指定された順序で取得されます。このパラメータが含まれていない場合、属性は任意の順序で取得され、エンティティのすべての属性がレスポンスに含まれます。詳細については、"属性とメタデータの除外" セクションを参照してください | seatNumber |
+| `metadata` | ✓          | string | レスポンスに含めるメタデータ名のリスト。詳細については、"属性とメタデータの除外" セクションを参照してください                                                                                                                                                                                                      | accuracy  |
+| `options`  | ✓          | string | クエリのオプションのコンマ区切りリスト。次の表を参照してください                                                                                                                                                                                                                                                   | count     |
 
-### エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs{?type,attrs,metadata,options}]
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-このリクエストは、エンティティ全体を取得するのと同様ですが、
-これは `id` と `type` フィールドを省略しています。
+| オプション  | 説明                                                                                                                                                                                        |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください                            |
+| `values`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください                               |
+| `unique`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。繰り返しの値は省略されます。詳細については、"簡略化されたエンティティの表現" を参照してください  |
 
-エンティティ全体を取得する一般的なリクエストと同様に、このオペレーション
-ではエンティティ要素を 1つだけ返す必要があります。同じ ID を持つ複数の
-エンティティ (たとえば ID は同じで型が異なるエンティティ) が見つかると、
-HTTP ステータス・コードが 409 Conflict に設定されたエラー・メッセージが返されます。
+**レスポンス**
 
-レスポンス : 
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス"
+    のサブセクションを参照してください
 
-* 成功したオペレーションでは、200 OK を使用します
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+レスポンス 200 の例:
 
-+ Parameters
-    + entityId (required, string) - 取得するエンティティの ID。
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrs: temperature,humidity (optional, string) - レスポンスにデータを
-      含める属性名のカンマ区切りのリスト。属性は、このパラメータで指定された
-      順序で取得されます。このパラメータが含まれていない場合、属性は任意の順序で
-      取得され、エンティティのすべての属性がレスポンスに含まれます。
-      詳細については、"属性とメタデータのフィルタリング" を参照してください。
-    + metadata: accuracy (optional, string) - レスポンスに含めるメタデータ名の
-      リスト。詳細については、"属性とメタデータのフィルタリング" を参照してください。
-    + options (optional, string) - オプション辞書
-      + Members
-          + keyValues - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + values - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + unique - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。反復値は除外されます。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
+Content-Type は、`application/json` です。
 
-+ Response 200 (application/json)
+```json
+{
+  "type": "Room",
+  "id": "Bcn_Welt",
+  "temperature": {
+    "value": 21.7,
+    "type": "Number"
+  },
+  "humidity": {
+    "value": 60,
+    "type": "Number"
+  },
+  "location": {
+    "value": "41.3763726, 2.1864475",
+    "type": "geo:point",
+    "metadata": {
+      "crs": {
+        "value": "WGS84",
+        "type": "Text"
+      }
+    }
+  }
+}
+```
 
-        {
-          "temperature": {
-            "value": 21.7,
-            "type": "Number"
-          },
-          "humidity": {
-            "value": 60,
-            "type": "Number"
-          },
-          "location": {
-            "value": "41.3763726, 2.1864475",
-            "type": "geo:point",
-            "metadata": {
-              "crs": {
-                "value": "WGS84",
-                "type": "Text"
-              }
-            }
-          }
-        }
+<a name="retrieve-entity-attributes-get-v2entitiesentityidattrs"></a>
 
-<a name="update-or-append-entity-attributes-post-v2entitiesentityidattrstypeoptions"/>
+#### エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs]
 
-### エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs{?type,options}]
+このリクエストは、エンティティ全体を取得するのと同様ですが、これは `id` と `type` フィールドを省略しています。
 
-リクエスト・ペイロードは、追加または更新する属性を表すオブジェクトです。
-オブジェクトは、`id` と `type ` が許可されていないことを除いて、JSON エンティティの
-表現形式 ("JSON エンティティ表現" のセクションを参照) に従います。
+エンティティ全体を取得する一般的なリクエストと同様に、このオペレーションではエンティティ要素を 1つだけ返す必要が
+あります。同じ id を持つ複数のエンティティ (たとえば id は同じで型が異なるエンティティ) が見つかると、HTTP ステータス・
+コードが 409 Conflict に設定されたエラー・メッセージが返されます。
 
-エンティティ属性は、`append` オペレーションのオプションが使用されているか
-どうかに応じて、ペイロード内の属性で更新されます。
+**リクエスト URL パラメータ**
 
-* `append` が使用されていない場合、エンティティ属性は更新され (以前に存在する場合)、
-  ペイロードに追加されます (存在しない場合)。
-* `append` が使用されている場合 (つまり、厳密なアペンド・セマンティクス)、
-  ペイロード内の、エンティティ内に以前に存在しなかったすべての属性が追加されます。
-  それに加えて、ペイロード内の属性の一部がすでにエンティティに存在する場合、
-  エラーが返されます。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-レスポンス :
+| パラメータ | タイプ | 説明                      | 例     |
+|------------|--------|---------------------------|--------|
+| `entityId` | string | 取得するエンティティの id | `Room` |
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+**リクエスト・クエリ・パラメータ**
 
-+ Parameters
-    + entityId (required, string) - 更新されるエンティティ ID。
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + options (optional, string) - オペレーションのオプション
-        + Members
-            + append - 追加オペレーションを強制します
-            + keyValues - 使用されると、リクエスト・ペイロードは、単純化された
-              エンティティ表現 `keyValues` を使用します。
-              詳細は、"簡略化されたエンティティ表現" を参照してください。
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                                                                                                                                                                               | 例        |
+|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します                                                                                                                                                                                                                       | `Room`    |
+| `attrs`    | ✓          | string | データをレスポンスに含める必要がある属性名のコンマ区切りのリスト。属性は、このパラメータで指定された順序で取得されます。このパラメータが含まれていない場合、属性は任意の順序で取得され、エンティティのすべての属性がレスポンスに含まれます。詳細については、"属性とメタデータの除外" セクションを参照してください | seatNumber |
+| `metadata` | ✓          | string | レスポンスに含めるメタデータ名のリスト。詳細については、"属性とメタデータの除外" セクションを参照してください                                                                                                                                                                                                      | accuracy  |
+| `options`  | ✓          | string | クエリのオプションのコンマ区切りリスト。次の表を参照してください                                                                                                                                                                                                                                                   | count     |
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-+ Request (application/json)
+| オプション  | 説明                                                                                                                                                                                       |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください                          |
+| `values`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください                              |
+| `unique`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。繰り返しの値は省略されます。詳細については、"簡略化されたエンティティの表現" を参照してください |
 
-    + Body
+**レスポンス**
 
-            {
-              "ambientNoise": {
-                "value": 31.5
-              }
-            }
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-+ Response 204
+レスポンス 200 の例:
 
-<a name="update-existing-entity-attributes-patch-v2entitiesentityidattrstypeoptions"/>
+Content-Type は、`application/json` です。
 
-### 既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs{?type,options}]
+```json
+{
+  "temperature": {
+    "value": 21.7,
+    "type": "Number"
+  },
+  "humidity": {
+    "value": 60,
+    "type": "Number"
+  },
+  "location": {
+    "value": "41.3763726, 2.1864475",
+    "type": "geo:point",
+    "metadata": {
+      "crs": {
+        "value": "WGS84",
+        "type": "Text"
+      }
+    }
+  }
+}
+```
 
-リクエスト・ペイロードは、更新する属性を表すオブジェクトです。オブジェクトは、
-`id` および `type` が許可されていないことを除いて、JSON エンティティの表現形式
-("JSON エンティティの表現" のセクションを参照) に従います。
+<a name="update-or-append-entity-attributes-post-v2entitiesentityidattrs"></a>
 
-エンティティ属性は、ペイロード内の属性で更新されます。それに加えて、ペイロード内の
-1つ以上の属性がエンティティに存在しない場合、エラーが返されます。
+#### エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs]
 
-レスポンス : 
+リクエスト・ペイロードは、追加または更新する属性を表すオブジェクトです。オブジェクトは、`id` と `type ` が許可されて
+いないことを除いて、JSON エンティティの表現形式 ("JSON エンティティ表現" のセクションを参照) に従います。
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+エンティティ属性は、`append` オペレーションのオプションが使用されているかどうかに応じて、ペイロード内の属性で更新
+されます。
 
-+ Parameters 
-    + entityId (required, string) - 更新されるエンティティの ID。
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + options (optional, string) - オペレーションのオプション
-        + Members
-            + keyValues - 使用されると、リクエスト・ペイロードは、単純化された
-              エンティティ表現 `keyValues` を使用します。
-              詳細は、"簡略化されたエンティティ表現" を参照してください。
+-   `append` が使用されていない場合、エンティティ属性は更新され (以前に存在する場合)、ペイロードに追加されます
+    (存在しない場合)
+-   `append` が使用されている場合 (つまり、厳密なアペンド・セマンティクス)、ペイロード内の、エンティティ内に以前に存在
+    しなかったすべての属性が追加されます。それに加えて、ペイロード内の属性の一部がすでにエンティティに存在する場合、
+    エラーが返されます
 
-+ Request (application/json)
+**リクエスト URL パラメータ**
 
-        {
-          "temperature": {
-            "value": 25.5
-          },
-          "seatNumber": {
-            "value": 6
-          }
-        }
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Response 204
+| パラメータ | タイプ | 説明                      | 例     |
+|------------|--------|---------------------------|--------|
+| `entityId` | string | 更新するエンティティの id | `Room` |
 
-<a name="replace-all-entity-attributes-put-v2entitiesentityidattrstypeoptions"/>
+**リクエスト・クエリ・パラメータ**
 
-### すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs{?type,options}]
+| パラメータ  | オプション | タイプ   | 説明                                                                                    | 例     |
+|------------|----------|--------|----------------------------------------------------------------------------------------------|--------|
+| `type`     | ✓        | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します | `Room` |
+| `options`  | ✓        | string | クエリのオプションのコンマ区切りリスト。次の表を参照してください                             | append |
 
-リクエスト・ペイロードは、新しいエンティティ属性を表すオブジェクトです。
-オブジェクトは、上記の "JSON エンティティ表現" で説明した JSON エンティティ表現形式に
-従いますが、`id` および `type` は許されません。
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-エンティティ内に以前に存在していた属性は削除され、リクエスト内の属性に
-置き換えられます。
+| オプション  | 説明                                                                                                                                                                       |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" セクションを参照してください |
+| `append`    | 追加操作を強制します                                                                                                                                                       |
 
-レスポンス : 
+**リクエスト・ペイロード**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+Content-Type は、`application/json` です。
 
-+ Parameters 
-    + entityId (required, string) - 問題のエンティティの ID です。
-    + type (optional, string) - 同じエンティティIDを持つ複数のエンティティがある場合の
-    あいまいさを避けるためのエンティティ型。
-    + options (optional, string) - オペレーションのオプション
-        + Members
-            + keyValues - 使用されると、リクエスト・ペイロードは、
-              単純化されたエンティティ表現 `keyValues` を使用します。
-              詳細は、"簡略化されたエンティティ表現" を参照してください。
+例:
 
-+ Request (application/json)
+```json
+{
+   "ambientNoise": {
+     "value": 31.5
+   }
+}
+```
 
-        {
-          "temperature": {
-            "value": 25.5
-          },
-          "seatNumber": {
-            "value": 6
-          }
-        }
+**レスポンス**
 
-+ Response 204
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-<a name="remove-entity-delete-v2entitiesentityidtype"/>
+<a name="update-existing-entity-attributes-patch-v2entitiesentityidattrs"></a>
 
-### エンティティを削除する [DELETE /v2/entities/{entityId}{?type}]
+#### 既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs]
+
+リクエスト・ペイロードは、更新する属性を表すオブジェクトです。オブジェクトは、`id` および `type` が許可されていない
+ことを除いて、JSON エンティティの表現形式 ("JSON エンティティの表現" のセクションを参照) に従います。
+
+エンティティ属性は、ペイロード内の属性で更新されます。それに加えて、ペイロード内の1つ以上の属性がエンティティに存在
+しない場合、エラーが返されます。
+
+**リクエスト URL パラメータ**
+
+このパラメータは URL リクエストの一部です。これは必須です。
+
+| パラメータ | タイプ | 説明                      | 例     |
+|------------|--------|---------------------------|--------|
+| `entityId` | string | 更新するエンティティの id | `Room` |
+
+**リクエスト・クエリ・パラメータ**
+
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                                                                                                | 例        |
+|------------|------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します                                                                                                                                        | `Room`    |
+| `options`  | ✓          | string | このメソッドでは、`keyValues` オプションのみが許可されています。使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください。 | keyValues |
+
+**リクエスト・ペイロード**
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "temperature": {
+    "value": 25.5
+  },
+  "seatNumber": {
+    "value": 6
+  }
+}
+```
+
+**レスポンス**
+
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+<a name="replace-all-entity-attributes-put-v2entitiesentityidattrs"></a>
+
+#### すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs]
+
+リクエスト・ペイロードは、新しいエンティティ属性を表すオブジェクトです。オブジェクトは、上記の "JSON エンティティ表現"
+で説明した JSON エンティティ表現形式に従いますが、`id` および `type` は許されません。
+
+エンティティ内に以前に存在していた属性は削除され、リクエスト内の属性に置き換えられます。
+
+**リクエスト URL パラメータ**
+
+このパラメータは URL リクエストの一部です。これは必須です。
+
+| パラメータ | タイプ | 説明                      | 例     |
+|------------|--------|---------------------------|--------|
+| `entityId` | string | 変更するエンティティの id | `Room` |
+
+**リクエスト・クエリ・パラメータ**
+
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                                                                                                | 例        |
+|------------|------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します                                                                                                                                        | `Room`    |
+| `options`  | ✓          | string | このメソッドでは、`keyValues` オプションのみが許可されています。使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください。 | keyValues |
+
+**リクエスト・ペイロード**
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "temperature": {
+    "value": 25.5
+  },
+  "seatNumber": {
+    "value": 6
+  }
+}
+```
+
+**レスポンス**
+
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+<a name="remove-entity-delete-v2entitiesentityid"></a>
+
+#### エンティティを削除する [DELETE /v2/entities/{entityId}]
 
 エンティティを削除します。
 
-レスポンス :
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Parameters 
-    + entityId (required, string) - 削除するエンティティの ID
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
+| パラメータ | タイプ | 説明                      | 例     |
+|------------|--------|---------------------------|--------|
+| `entityId` | string | 削除するエンティティの id | `Room` |
 
-+ Response 204
+**リクエスト・クエリ・パラメータ**
 
-<a name="group-attributes"/>
+| パラメータ | オプション | タイプ | 説明                                                                                         | 例     |
+|------------|------------|--------|----------------------------------------------------------------------------------------------|--------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します | `Room` |
 
-# Group Attributes
+**レスポンス**
 
-<a name="attribute-by-entity-id-v2entitiesentityidattrsattrnametype"/>
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-## エンティティ ID による属性 [/v2/entities/{entityId}/attrs/{attrName}{?type}]
+<a name="attributes"></a>
 
-<a name="get-attribute-data-get-v2entitiesentityidattrsattrnametypemetadata"/>
+### 属性 (Attributes)
 
-### 属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}{?type,metadata}]
+<a name="get-attribute-data-get-v2entitiesentityidattrsattrname"></a>
 
-属性 (Attributes) の属性データを含む JSON オブジェクトを返します。このオブジェクトは、
-JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
+#### 属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}]
 
-レスポンス : 
+属性の属性データを含む JSON オブジェクトを返します。オブジェクトは、属性の JSON 表現に従います ("JSON 属性表現" セクションで説明)。
 
-* 正常なオペレーションには、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+**リクエスト URL パラメータ**
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - エンティティの ID
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrName: temperature (required, string) - 取得する属性の名前。
-    + attrName: temperature (required, string) - レスポンスに含めるメタデータ名の
-      リスト。詳細については、"属性とメタデータのフィルタリング" を参照してください。
+これらのパラメータは URL リクエストの一部です。これらは必須です。
 
-+ Response 200 (application/json)
+| パラメータ | タイプ | 説明                      | 例            |
+|------------|--------|---------------------------|---------------|
+| `entityId` | string | 取得するエンティティの id | `Room`        |
+| `attrName` | string | 取得する属性の名前       | `temperature` |
 
-        {
-          "value": 21.7,
-          "type": "Number",
-          "metadata": {}
-        }
+**リクエスト・クエリ・パラメータ**
 
-<a name="update-attribute-data-put-v2entitiesentityidattrsattrnametype"/>
+| パラメータ | オプション | タイプ | 説明                                                                                                          | 例         |
+|------------|------------|--------|---------------------------------------------------------------------------------------------------------------|------------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します                  | `Room`     |
+| `metadata` | ✓          | string | レスポンスに含めるメタデータ名のリスト。詳細については、"属性とメタデータの除外" セクションを参照してください | `accuracy` |
 
-### 属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
+**レスポンス**
+
+-   正常なオペレーションには、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 200 の例:
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "value": 21.7,
+  "type": "Number",
+  "metadata": {}
+}
+```
+
+<a name="update-attribute-data-put-v2entitiesentityidattrsattrname"></a>
+
+#### 属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
 リクエスト・ペイロードは、新しい属性データを表すオブジェクトです。
 以前の属性データは、リクエスト内の属性データに置き換えられます。
-このオブジェクトは、JSON 表現に従います ("JSON属性表現" のセクションを参照)。
+このオブジェクトは、JSON 表現に従います ("JSON 属性表現" のセクションを参照)。
 
-レスポンス : 
+レスポンス:
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+-   成功したオペレーションでは、204 No Content を使用します。
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください。
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - 更新するエンティティの ID
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrName: temperature (required, string) - 属性名。
+**リクエスト URL パラメータ**
 
-+ Request (application/json)
+これらのパラメータは URL リクエストの一部です。これらは必須です。
 
-        {
-          "value": 25.0,
-          "metadata": {
-            "unitCode": {
-              "value": "CEL"
-            }
-          }
-        }
+| パラメータ | タイプ | 説明                      | 例            |
+|------------|--------|---------------------------|---------------|
+| `entityId` | string | 更新するエンティティの id | `Room`        |
+| `attrName` | string | 更新する属性の名前        | `Temperature` |
 
-+ Response 200
+**リクエスト・クエリ・パラメータ**
 
-<a name="remove-a-single-attribute-delete-v2entitiesentityidattrsattrnametype"/>
+| パラメータ | オプション | タイプ | 説明                                                                                        | 例       |
+|------------|------------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します | `Room`        |
 
-### 単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
+**リクエスト・ペイロード**
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "value": 25.0,
+  "metadata": {
+    "unitCode": {
+      "value": "CEL"
+    }
+  }
+}
+```
+
+<a name="remove-a-single-attribute-delete-v2entitiesentityidattrsattrname"></a>
+
+#### 単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
 エンティティ属性を削除します。
 
-レスポンス : 
+レスポンス:
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - エンティティの ID。
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrName: temperature (required, string) - 属性名。
+**リクエスト URL パラメータ**
 
-+ Response 204
+これらのパラメータは URL リクエストの一部です。これらは必須です。
 
-<a name="group-attribute-value"/>
+| パラメータ | タイプ | 説明                      | 例            |
+|------------|--------|---------------------------|---------------|
+| `entityId` | string | 削除するエンティティの id | `Room`        |
+| `attrName` | string | 削除する属性の名前        | `Temperature` |
 
-# Group Attribute Value
+**リクエスト・クエリ・パラメータ**
 
-<a name="by-entity-id-v2entitiesentityidattrsattrnamevaluetype"/>
+| パラメータ | オプション | タイプ | 説明                                                                                         | 例     |
+|------------|------------|--------|----------------------------------------------------------------------------------------------|--------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します | `Room` |
 
-## エンティティ ID 別 [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
+<a name="attribute-value"></a>
 
-<a name="get-attribute-value-get-v2entitiesentityidattrsattrnamevaluetype"/>
+### 属性値
 
-### 属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+<a name="get-attribute-value-get-v2entitiesentityidattrsattrnamevalue"></a>
+
+#### 属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value]
 
 このオペレーションは属性の値  (Attribute Value) を持つ `value` プロパティを返します。
 
-* 属性値が JSON 配列、またはオブジェクトの場合 : 
-  * `Accept` ヘッダを `application/json` または `text/plain` に展開できる場合は、
-    その値を application/json または text/plain のレスポンス・タイプの JSON として
-    返します。`Accept: */*` の場合は、`Accept` ヘッダの最初のものか、
-    `application/json` のどちらかです。
-  * その他のエラーは HTTP エラー
-    "406 Not Acceptable: accepted MIME types: application/json, text/plain" を
-    返します。
-* 属性値が文字列、数値、ヌルまたはブール値の場合 :
-  * `Accept` ヘッダを text/plain に展開できる場合は、値をテキストとして返します。
-    文字列の場合、最初と最後に引用符が使用されます。
-  * その他の場合、HTTP エラー "406 Not Acceptable: accepted MIME types: text/plain" を
-    返します。
+-   属性値が JSON 配列、またはオブジェクトの場合:
+    -   `Accept` ヘッダを `application/json` または `text/plain` に展開できる場合は、その値を application/json または
+         text/plain のレスポンス・タイプの JSON として返します。`Accept: */*` の場合は、`Accept` ヘッダの最初のものか、
+        `application/json` のどちらかです
+    -   その他のエラーは HTTP エラー "406 Not Acceptable: accepted MIME types: application/json, text/plain" を返します
+-   属性値が文字列、数値、ヌルまたはブール値の場合:
+    -   `Accept` ヘッダを text/plain に展開できる場合は、値をテキストとして返します。文字列の場合、最初と最後に引用符
+        が使用されます
+    -   その他の場合、HTTP エラー "406 Not Acceptable: accepted MIME types: text/plain" を返します
 
-レスポンス : 
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+これらのパラメータは URL リクエストの一部です。これらは必須です。
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - 問題のエンティティの ID
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrName: address (required, string) - 取得する属性の名前。
+| パラメータ | タイプ | 説明                      | 例         |
+|------------|--------|---------------------------|------------|
+| `entityId` | string | 取得するエンティティの id | `Room`     |
+| `attrName` | string | 取得する属性の名前        | `Location` |
 
-+ Response 200 (application/json)
+**リクエスト・クエリ・パラメータ**
 
-        {
-          "address": "Ronda de la Comunicacion s/n",
-          "zipCode": 28050,
-          "city": "Madrid",
-          "country": "Spain"
-        }
+| パラメータ | オプション | タイプ | 説明                                                                                         | 例     |
+|------------|------------|--------|----------------------------------------------------------------------------------------------|--------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します | `Room` |
 
-<a name="update-attribute-value-put-v2entitiesentityidattrsattrnamevaluetype"/>
+**レスポンス**
 
-### 属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 200 の例
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "address": "Ronda de la Comunicacion s/n",
+  "zipCode": 28050,
+  "city": "Madrid",
+  "country": "Spain"
+}
+```
+
+<a name="update-attribute-value-put-v2entitiesentityidattrsattrnamevalue"></a>
+
+#### 属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
 リクエスト・ペイロードは新しい属性値です。
 
-* リクエストのペイロード MIME 型が `application/json` の場合、属性の値は
-  ペイロードにコード化された JSON オブジェクト、または配列に設定されます。
-  ペイロードが有効な JSON ドキュメントでない場合はエラーが返されます。
-* リクエストのペイロード MIME 型が `text/plain` の場合、ペイロードには
-  以下のアルゴリズムが適用されます。
-  * ペイロードが引用符 (`"`) で始まり、終了すると、その値は文字列として
-    扱われます。引用符自体は文字列の一部と見なされません。
-  * `true` か` false` の場合は、値がブール値とみなされます。
-  * `null` の場合は、値がヌルとみなされます。
-  * これらの最初の 3つのテストが失敗すると、テキストは数字として解釈されます。
-  * 有効な数値でない場合、エラーが返され、属性の値は変更されません。
+-   リクエストのペイロード MIME 型が `application/json` の場合、属性の値はペイロードにコード化された JSON オブジェクト、
+    または配列に設定されます。ペイロードが有効な JSON ドキュメントでない場合はエラーが返されます
+-   リクエストのペイロード MIME 型が `text/plain` の場合、ペイロードには以下のアルゴリズムが適用されます
+    -   ペイロードが引用符 (`"`) で始まり、終了すると、その値は文字列として扱われます。引用符自体は文字列の一部と
+        見なされません
+    -   `true` か `false` の場合は、値がブール値とみなされます
+    -   `null` の場合は、値がヌルとみなされます
+    -   これらの最初の 3つのテストが失敗すると、テキストは数字として解釈されます
+    -   有効な数値でない場合、エラーが返され、属性の値は変更されません
 
 リクエストのペイロード MIME 型は `Content-Type` HTTP ヘッダで指定されます。
 
-レスポンス : 
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+これらのパラメータは URL リクエストの一部です。これらは必須です。
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - 更新されるエンティティの ID です。
-    + type (optional, string) - 同じエンティティ ID を持つ複数のエンティティが
-      ある場合のあいまいさを避けるためのエンティティ型。
-    + attrName: address (required, string) - 属性名。
+| パラメータ | タイプ | 説明                      | 例         |
+|------------|--------|---------------------------|------------|
+| `entityId` | string | 更新するエンティティの id | `Room`     |
+| `attrName` | string | 更新する属性の名前        | `Location` |
 
-+ Request (application/json)
+**リクエスト・クエリ・パラメータ**
 
-        {
-          "address": "Ronda de la Comunicacion s/n",
-          "zipCode": 28050,
-          "city": "Madrid",
-          "country": "Spain"
-        }
+| パラメータ | オプション | タイプ | 説明                                                                                         | 例     |
+|------------|------------|--------|----------------------------------------------------------------------------------------------|--------|
+| `type`     | ✓          | string | エンティティ型。同じエンティティ id を持つエンティティが複数ある場合のあいまいさを回避します | `Room` |
 
-+ Response 200
+**リクエスト・ペイロード**
 
-<a name="group-types"/>
+Content-type は、`application/json` または `text/plain` です。
 
-# Group Types
+```json
+{
+  "address": "Ronda de la Comunicacion s/n",
+  "zipCode": 28050,
+  "city": "Madrid",
+  "country": "Spain"
+}
+```
 
-<a name="entity-types-v2typeslimitoffsetoptions"/>
+**レスポンス**
 
-## 全エンティティ型 [/v2/types{?limit,offset,options}]
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-<a name="list-entity-types-get-v2typeslimitoffsetoptions"/>
+<a name="types"></a>
 
-### 全エンティティ型のリスト [GET /v2/types/{?limit,offset,options}]
+### エンティティ型 (Types)
 
-`values` オプションが使用されていない場合、このオペレーションは 全ての
-エンティティ型 (Entity types) を持つ JSON 配列を返します。各要素は、型に関する情報を
-持つ JSON オブジェクトです。
+<a name="list-entity-types-get-v2types"></a>
 
-* `type` : エンティティ型名。
-* `attrs` : 属性名とその型のすべてのエンティティの集合。属性名をキーとする値を
-   持つ JSON オブジェクトで表現されます。その値にはそのような属性の情報が
-   含まれます。特に、属性で使用される型のリストその名前とすべてのエンティティ。
-* `count` : その型に属するエンティティの数。
+#### 全エンティティ型のリスト [GET /v2/types]
 
-`values` オプションが使用されている場合、オペレーションはエンティティ型名の
-リストを文字列として持つ JSON 配列を返します。
+`values` オプションが使用されていない場合、このオペレーションは 全てのエンティティ型 (Entity types) を持つ JSON 配列を
+返します。各要素は、型に関する情報を持つ JSON オブジェクトです。
+
+-   `type`: エンティティ型名
+-   `attrs`: 属性名とその型のすべてのエンティティの集合。属性名をキーとする値を持つ JSON オブジェクトで表現されます。
+    その値にはそのような属性の情報が含まれます。特に、属性で使用される型のリストその名前とすべてのエンティティ
+-   `count`: その型に属するエンティティの数
+
+`values` オプションが使用されている場合、オペレーションはエンティティ型名のリストを文字列として持つ JSON 配列を
+返します。
 
 結果はアルファベット順にエンティティ `type` によって順序付けられます。
 
-レスポンス・コード : 
+**リクエスト・クエリ・パラメータ**
 
-* 成功したオペレーションでは、200 OK を使用します
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+| パラメータ | オプション | タイプ | 説明                               | 例      |
+|------------|------------|--------|------------------------------------|---------|
+| `limit`    | ✓          | number | 取得するタイプの数を制限します     | `10`    |
+| `offset`   | ✓          | number | いくつかのレコードをスキップします | `20`    |
+| `options`  | ✓          | string | オプション                         | `count` |
 
-+ Parameters
-    + limit: 10 (optional, number) - 検索する型の数を制限します。
-    + offset: 20 (optional, number) - いくつかのレコードをスキップします。
-    + options (optional, string) - オプション辞書。
-      + Members
-          + count - 使用すると、型の総数が HTTP ヘッダ `Fiware-Total-Count` に
-            返されます
-          + values - 使用すると、レスポンス・ペイロードは、エンティティ型の
-            リストを含む JSON 配列です。
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-+ Response 200 (application/json)
+| オプション | 説明                                                                           |
+|------------|--------------------------------------------------------------------------------|
+| `count`    | 使用すると、型 (types) の総数が HTTP ヘッダ `Fiware-Total-Count` に返されます  |
+| `values`   | 使用すると、レスポンス・ペイロードはエンティティ型のリストを含む JSON 配列です |
 
-        [
-          {
-            "type": "Car",
-            "attrs": {
-              "speed": {
-                "types": [ "Number" ]
-              },
-              "fuel": {
-                "types": [ "gasoline", "diesel" ]
-              },
-              "temperature": {
-                "types": [ "urn:phenomenum:temperature" ]
-              }
-            },
-            "count": 12
-          },
-          {
-            "type": "Room",
-            "attrs": {
-              "pressure": {
-                "types": [ "Number" ]
-              },
-              "humidity": {
-                "types": [ "percentage" ]
-              },
-              "temperature": {
-                "types": [ "urn:phenomenum:temperature" ]
-              }
-            },
-            "count": 7
-          }
-        ]
+**レスポンス**
 
-<a name="entity-type-v2typesentitytype"/>
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-## エンティティ型 [/v2/types/{entityType}]
+レスポンス 200 の例:
 
-<a name="retrieve-entity-type-get-v2typesentitytype"/>
+Content-Type は、`application/json` です。
 
-### エンティティ型を取得 [GET /v2/types/{entityType}]
+```json
+[
+  {
+    "type": "Car",
+    "attrs": {
+      "speed": {
+        "types": [ "Number" ]
+      },
+      "fuel": {
+        "types": [ "gasoline", "diesel" ]
+      },
+      "temperature": {
+        "types": [ "urn:phenomenum:temperature" ]
+      }
+    },
+    "count": 12
+  },
+  {
+    "type": "Room",
+    "attrs": {
+      "pressure": {
+        "types": [ "Number" ]
+      },
+      "humidity": {
+        "types": [ "percentage" ]
+      },
+      "temperature": {
+        "types": [ "urn:phenomenum:temperature" ]
+      }
+    },
+    "count": 7
+  }
+]
+```
 
-このオペレーションは、型 (Entity type) に関する情報を含む JSON オブジェクトを返します :
+<a name="retrieve-entity-information-for-a-given-type-get-v2types"></a>
 
-* `attrs` : 属性名とその型のすべてのエンティティの集合。属性名をキーとする値を
-  持つ JSON オブジェクトで表現されます。その値にはそのような属性の情報が
-  含まれます。特に、属性で使用される型のリストその名前とすべてのエンティティです。
-* `count` : その型に属するエンティティの数。
+#### 特定の型のエンティティ情報を取得 [GET /v2/types/{entityType}]
 
-レスポンス・コード : 
+このオペレーションは、型 (Entity type) に関する情報を含む JSON オブジェクトを返します:
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+-   `attrs`: 属性名とその型のすべてのエンティティの集合。属性名をキーとする値を持つ JSON オブジェクトで表現されます。
+    その値にはそのような属性の情報が含まれます。特に、属性で使用される型のリストその名前とすべてのエンティティです
+-   `count`: その型に属するエンティティの数
 
-+ Parameters
-    + entityType: Room (required, string) - エンティティ型
+**リクエスト・クエリ・パラメータ**
 
-+ Response 200 (application/json)
+| パラメータ   | オプション | タイプ | 説明           | 例     |
+|--------------|------------|--------|----------------|--------|
+| `entityType` |            | string | エンティティ型 | `Room` |
 
-          {
-            "attrs": {
-              "pressure": {
-                "types": [ "Number" ]
-              },
-              "humidity": {
-                "types": [ "percentage" ]
-              },
-              "temperature": {
-                "types": [ "urn:phenomenum:temperature" ]
-              }
-            },
-            "count": 7
-          }
+**レスポンス**
 
-<a name="group-subscriptions"/>
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-# Group Subscriptions
+レスポンス 200 の例:
 
-サブスクリプション (Subscriptions) は、次のフィールドを持つ JSON オブジェクトで表されます :
+Content-Type は、`application/json` です。
 
-+ `id`: サブスクリプション固有の識別子。作成時に自動的に作成されます。
-+ `description` (optional): サブスクリプションを記述するためにクライアントが
-  使用するフリー・テキストです。
-+ `subject`: サブスクリプションのサブジェクトを記述するオブジェクト。
-+ `notification`: サブスクリプションがトリガされたときに送信する通知を
-  記述するオブジェクト。
-+ `expires`: ISO8601 形式のサブスクリプション有効期限。恒久サブスクリプションでは、
-  このフィールドを省略する必要があります。
-+ `status`: `active` (アクティブなサブスクリプションの場合) または `inactive`
-  (非アクティブなサブスクリプションの場合) のいずれか。このフィールドが
-  サブスクリプション作成時に提供されない場合、新しいサブスクリプションは 
-  `active` ステータスで作成されます。これは後でクライアントによって変更される
-  可能性があります。 期限切れのサブスクリプションの場合、この属性は、クライアントが
-  `active`/`inactive` に更新しても、`expired` に設定されます。また、通知に問題が
-  発生したサブスクリプションの場合、ステータスは `failed` に設定されます。
-  通知が再び機能し始めると、状態は `active` に戻されます。
-+ `throttling`: 2つの連続した通知の間に経過しなければならない最小時間(秒)。
-  オプションです。
+```json
+{
+  "attrs": {
+    "pressure": {
+      "types": [ "Number" ]
+    },
+    "humidity": {
+      "types": [ "percentage" ]
+    },
+    "temperature": {
+      "types": [ "urn:phenomenum:temperature" ]
+    }
+  },
+  "count": 7
+}
+```
 
-`subject` には、以下のサブフィールドが含まれています :
+<a name="subscriptions-operations"></a>
 
-+ `entities`: オブジェクトのリスト。各オブジェクトは以下のサブフィールドで
-  構成されています : 
-  + `id` または `idPattern`: 影響を受けるエンティティの ID またはパターン。
-    両方を同時に使用することはできませんが、そのうちの1つが存在する必要があります。
-  + `type` または `typePattern`: 影響を受けるエンティティの型または型パターン。
-    両方を同時に使用することはできません。
-    これを省略すると、"任意のエンティティ型" を意味します。
-+ `condition`: 通知をトリガーする条件。このフィールドはオプションで、
-  2つのプロパティを含むことができ、両方ともオプションです。
-    + `attrs`: 属性名の配列
-    + `expression`: `q`、`mq`、`georel`、`geometry`, `coords` で構成される式です。
-      上記の "エンティティをリスト" オペレーションを参照してください。
+## サブスクリプションの操作 (Subscriptions Operations)
 
-`notification` オブジェクトには、以下のサブフィールドが含まれています :
+サブスクリプション (Subscriptions) は、次のフィールドを持つ JSON オブジェクトで表されます:
 
-+ `attrs` または `exceptAttrs` (どちらも同時に使用できません) :
-  + `attrs`: 通知メッセージに含める属性のリスト。また、`attrsFormat` `value` が
-    使われたときに、属性に通知が現れる順序を定義します ("通知メッセージ" を参照)。
-    空のリストは、すべての属性が通知に含まれることを意味します。詳細については、
-    "属性とメタデータのフィルタリング" を参照してください。
-  + `exceptAttrs`: 通知メッセージから除外される属性のリスト。すなわち、
-    通知メッセージには、このフィールドにリストされているものを除くすべての
-    エンティティ属性が含まれます。
-  + `attrs` も `exceptAttrs` も指定されていなければ、全ての属性が通知に含まれます。
-+ `http` or `httpCustom` (それらのうちの1つが存在しなければなりませんが、
-  同時に両方は存在しません) : HTTP プロトコルを通して渡される通知のための
-  パラメータを伝えるために使われます。
-+ `attrsFormat` (optional): エンティティが通知でどのように表現されるかを指定します。
-  受け入れられる値は `normalized` (デフォルト)、`keyValues` または `values` です。
-  `attrsFormat` がそれらと異なる値をとると、エラーが発生します。
-  "通知メッセージ" のセクションを参照してください。
-+ `metadata` (optional): 通知メッセージに含めるメタデータのリスト。詳細については、
-  "属性とメタデータのフィルタリング" を参照してください。
-+ `timesSent` (編集不可、GET オペレーションのみ) : このサブスクリプションのために
-  送信された通知の数です。
-+ `lastNotification` (編集不可、GET オペレーションのみ) : ISO8601形式の最後の
-  通知タイムスタンプ。
-+ `lastFailure` (編集不可、GETオペレーションのみ) : ISO8601 形式の最後の
-  失敗タイムスタンプ。サブスクリプションが通知に問題がない場合は存在しません。
-+ `lastSuccess` (編集不可、GETオペレーションのみ) : 最後に成功した通知のための
-  ISO8601 形式のタイムスタンプ。サブスクリプションが正常に通知されなかった場合
-  には存在しません。
+-   `id`: サブスクリプション固有の識別子。作成時に自動的に作成されます
+-   `description` (optional): サブスクリプションを記述するためにクライアントが使用するフリー・テキストです
+-   `subject`: サブスクリプションのサブジェクトを記述するオブジェクト
+-   `notification`: サブスクリプションがトリガされたときに送信する通知を記述するオブジェクト
+-   `expires`: ISO8601 形式のサブスクリプション有効期限。恒久サブスクリプションでは、このフィールドを省略する必要が
+    あります
+-   `status`: `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)
+    のいずれか。このフィールドがサブスクリプション作成時に提供されない場合、新しいサブスクリプションは `active`
+    ステータスで作成されます。これは後でクライアントによって変更される可能性があります。期限切れのサブスクリプションの
+    場合、この属性は、クライアントが `active`/`inactive` に更新しても、`expired` に設定されます。また、通知に問題が
+    発生したサブスクリプションの場合、ステータスは `failed` に設定されます。通知が再び機能し始めると、状態は `active`
+    に戻されます
+-   `throttling`: 2つの連続した通知の間に経過しなければならない最小時間 (秒)。オプションです
 
-`http` オブジェクトには、以下のサブフィールドが含まれています :
+`subject` には、以下のサブフィールドが含まれています:
 
-+ `url` : 通知が生成されたときに呼び出されるサービスを参照するURL。
-  NGSIv2 準拠のサーバは `http` URL スキーマをサポートしなければなりません。
-  他のスキーマをサポートすることもできます。
+-   `entities`: オブジェクトのリスト。各オブジェクトは以下のサブフィールドで構成されています:
+    -   `id` または `idPattern`: 影響を受けるエンティティの id またはパターン。両方を同時に使用することはできませんが、
+        そのうちの1つが存在する必要があります
+    -   `type` または `typePattern`: 影響を受けるエンティティの型または型パターン。両方を同時に使用することは
+        できません。これを省略すると、"任意のエンティティ型" を意味します
+-   `condition`: 通知をトリガーする条件。このフィールドはオプションで、2つのプロパティを含むことができ、両方とも
+    オプションです
+    -   `attrs`: 属性名の配列
+    -   `expression`: `q`、`mq`、`georel`、`geometry`, `coords` で構成される式です。上記の "エンティティをリスト"
+        オペレーションを参照してください
 
-`httpCustom` オブジェクトには以下のサブフィールドが含まれています。
+`notification` オブジェクトには、以下のサブフィールドが含まれています:
 
-+ `url`: 上記の` http` と同じです。
-+ `headers` (optional): 通知メッセージに含まれる HTTP ヘッダのキー・マップ。
-+ `qs` (optional): 通知メッセージに含まれる URL クエリ・パラメータのキー・マップ。
-+ `method` (optional): 通知を送るときに使うメソッドです。デフォルトは POST です。
-  有効な HTTP メソッドのみが許可されます。無効な HTTP メソッドを指定すると、
-  400 Bad Request エラーが返されます。
-+ `payload` (optional): 通知に使用されるペイロード。省略した場合、デフォルトの
-  ペイロード ("通知メッセージ" を参照) が使用されます。
+-   `attrs` または `exceptAttrs` (どちらも同時に使用できません):
+    -   `attrs`: 通知メッセージに含める属性のリスト。また、`attrsFormat` `value` が使われたときに、属性に通知が現れる
+        順序を定義します ("通知メッセージ" を参照)。空のリストは、すべての属性が通知に含まれることを意味します。詳細に
+        ついては、"属性とメタデータのフィルタリング" を参照してください。
+    -   `exceptAttrs`: 通知メッセージから除外される属性のリスト。すなわち、通知メッセージには、このフィールドにリスト
+        されているものを除くすべてのエンティティ属性が含まれます
+    -   `attrs` も `exceptAttrs` も指定されていなければ、全ての属性が通知に含まれます
+-   `http` or `httpCustom` (それらのうちの1つが存在しなければなりませんが、同時に両方は存在しません): HTTP プロトコルを
+    通して渡される通知のためのパラメータを伝えるために使われます
+-   `attrsFormat` (optional): エンティティが通知でどのように表現されるかを指定します。受け入れられる値は `normalized`
+    (デフォルト)、`keyValues` または `values` です。`attrsFormat` がそれらと異なる値をとると、エラーが発生します。
+    "通知メッセージ" のセクションを参照してください
+-   `metadata` (optional): 通知メッセージに含めるメタデータのリスト。詳細については、"属性とメタデータのフィルタリング"
+    を参照してください
+-   `timesSent` (編集不可、GET オペレーションのみ): このサブスクリプションのために送信された通知の数です
+-   `lastNotification` (編集不可、GET オペレーションのみ): ISO8601形式の最後の通知タイムスタンプ
+-   `lastFailure` (編集不可、GET オペレーションのみ): ISO8601 形式の最後の失敗タイムスタンプ。サブスクリプションが通知に
+    問題がない場合は存在しません
+-   `lastSuccess` (編集不可、GET オペレーションのみ): 最後に成功した通知のための ISO8601 形式のタイムスタンプ。
+    サブスクリプションが正常に通知されなかった場合には存在しません
 
-`httpCustom` が使用されている場合は、"カスタム通知" セクションで説明している
-考慮事項が適用されます。
+`http` オブジェクトには、以下のサブフィールドが含まれています:
 
-通知ルールは次のとおりです :
+-   `url`: 通知が生成されたときに呼び出されるサービスを参照するURL。NGSIv2 準拠のサーバは `http` URL スキーマをサポート
+    しなければなりません。他のスキーマをサポートすることもできます
 
-* `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性の1つが
-  変更され、同時に `expression` が一致するたびに通知が送られます。
-* `attrs` が使用され、`expression` が使用されない場合、`attrs` リスト内の
-  いずれかの属性が変化するたびに通知が送られます。
-* `attrs` が使用されておらず、`expression` が使われている場合、エンティティの
-  属性のいずれかが変更され、同時に `expression` が一致すると通知が送られます。
-* `attrs` と `expression` のどちらも使わない場合は、エンティティの属性の
-  いずれかが変更されるたびに通知が送られます。
+`httpCustom` オブジェクトには以下のサブフィールドが含まれています:
 
-<a name="subscription-list-v2subscriptions"/>
+-   `url`: 上記の` http` と同じです
+-   `headers` (optional): 通知メッセージに含まれる HTTP ヘッダのキー・マップ
+-   `qs` (optional): 通知メッセージに含まれる URL クエリ・パラメータのキー・マップ
+-   `method` (optional): 通知を送るときに使うメソッドです。デフォルトは POST です
+    有効な HTTP メソッドのみが許可されます。無効な HTTP メソッドを指定すると、400 Bad Request エラーが返されます
+-   `payload` (optional): 通知に使用されるペイロード。省略した場合、デフォルトのペイロード ("通知メッセージ" を参照) が
+    使用されます
 
-## サブスクリプション・リスト [/v2/subscriptions]
+`httpCustom` が使用されている場合は、"カスタム通知" セクションで説明している考慮事項が適用されます。
 
-<a name="list-subscriptions-get-v2subscriptionslimitoffsetoptions"/>
+通知ルールは次のとおりです:
 
-### サブスクリプションをリスト [GET /v2/subscriptions{?limit,offset,options}]
+-   `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性の1つが変更され、同時に `expression` が一致する
+    たびに通知が送られます
+-   `attrs` が使用され、`expression` が使用されない場合、`attrs` リスト内のいずれかの属性が変化するたびに通知が
+    送られます
+-   `attrs` が使用されておらず、`expression` が使われている場合、エンティティの属性のいずれかが変更され、同時に
+    `expression` が一致すると通知が送られます
+-   `attrs` と `expression` のどちらも使わない場合は、エンティティの属性のいずれかが変更されるたびに通知が送られます
 
-システムに存在するすべてのサブスクリプションのリストを返します :
+<a name="subscription-list"></a>
 
-レスポンス : 
+### サブスクリプション・リスト
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+<a name="list-subscriptions-get-v2subscriptions"></a>
 
-+ Parameters
-    + limit: 10 (optional, number) - 取得するサブスクリプション数を制限します。
-    + offset: 20 (optional, number) - スキップするサブスクリプション数です。
-    + options (optional, string) - オプション辞書
-      + Members
-          + count - 使用すると、サブスクリプションの総数は、
-            HTTP ヘッダ `Fiware-Total-Count` に返されます
+#### サブスクリプションをリスト [GET /v2/subscriptions]
 
-+ Response 200
+システムに存在するすべてのサブスクリプションのリストを返します:
 
-        [
-          {
-            "id": "abcdefg",
-            "description": "One subscription to rule them all",
-            "subject": {                    
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "condition": {
-                 "attrs": [ "temperature " ],
-                 "expression": {
-                    "q": "temperature>40"
-                 }
-              }
-            },
-            "notification": {
-              "httpCustom": {
-                "url": "http://localhost:1234",
-                "headers": {
-                  "X-MyHeader": "foo"
-                },
-                "qs": {
-                  "authToken": "bar"
-                }
-              },
-              "attrsFormat": "keyValues",
-              "attrs": ["temperature", "humidity"],
-              "timesSent": 12,
-              "lastNotification": "2015-10-05T16:00:00.00Z",
-              "lastFailure": "2015-10-06T16:00:00.00Z"
-            },
-            "expires": "2016-04-05T14:00:00.00Z",
-            "status": "failed",
-            "throttling": 5
-          }
-        ]
+**リクエスト・クエリ・パラメータ**
 
-<a name="create-subscription-post-v2subscriptions"/>
+| パラメータ | オプション | タイプ | 説明                               | 例      |
+|------------|------------|--------|------------------------------------|---------|
+| `limit`    | ✓          | number | 取得するタイプの数を制限します     | `10`    |
+| `offset`   | ✓          | number | いくつかのレコードをスキップします | `20`    |
+| `options`  | ✓          | string | オプション                         | `count` |
 
-### サブスクリプションを作成 [POST /v2/subscriptions]
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
+
+| オプション | 説明                                                                                 |
+|------------|--------------------------------------------------------------------------------------|
+| `count`    | 使用すると、サブスクリプションの総数が HTTP ヘッダ `Fiware-Total-Count` に返されます |
+
+**レスポンス**
+
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 200 の例:
+
+```json
+[
+  {
+    "id": "62aa3d3ac734067e6f0d0871",
+    "description": "One subscription to rule them all",
+    "subject": {
+      "entities": [
+        {
+          "id": "Bcn_Welt",
+          "type": "Room"
+        }
+      ],
+      "condition": {
+          "attrs": [ "temperature " ],
+          "expression": {
+            "q": "temperature>40"
+      }
+    },
+    "notification": {
+      "httpCustom": {
+        "url": "http://localhost:1234",
+        "headers": {
+          "X-MyHeader": "foo"
+        },
+        "qs": {
+          "authToken": "bar"
+        }
+      },
+      "attrsFormat": "keyValues",
+      "attrs": ["temperature", "humidity"],
+      "timesSent": 12,
+      "lastNotification": "2015-10-05T16:00:00.00Z",
+      "lastFailure": "2015-10-06T16:00:00.00Z"
+    },
+    "expires": "2025-04-05T14:00:00.00Z",
+    "status": "failed",
+    "throttling": 5
+  }
+]
+```
+
+<a name="create-subscription-post-v2subscriptions"></a>
+
+#### サブスクリプションを作成 [POST /v2/subscriptions]
 
 新しいサブスクリプションを作成します。
 サブスクリプションは、このセクションの冒頭で説明した JSON オブジェクトで表されます。
 
-レスポンス : 
+**リクエスト・ペイロード**
 
-* 成功したオペレーションでは、201 Created を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+Content-Type は、`application/json` です。
 
-+ Request (application/json)
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "q": "temperature>40"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },
+  "expires": "2025-04-05T14:00:00.00Z",
+  "throttling": 5
+}
+```
 
-        {
-          "description": "One subscription to rule them all",
-          "subject": {
-            "entities": [
-              {
-                "idPattern": ".*",
-                "type": "Room"
-              }
-            ],
-            "condition": {
-              "attrs": [ "temperature" ],
-              "expression": {
-                "q": "temperature>40"
-              }
-            }
-          },
-          "notification": {
-            "http": {
-              "url": "http://localhost:1234"
-            },
-            "attrs": ["temperature", "humidity"]
-          },            
-          "expires": "2016-04-05T14:00:00.00Z",
-          "throttling": 5
-        }
+**レスポンス**
 
-+ Response 201
+-   成功したオペレーションでは、201 Created を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-    + Headers
+レスポンス 201 の例:
 
-            Location: /v2/subscriptions/abcde98765
+ヘッダ:
 
-<a name="subscription-by-id-v2subscriptionssubscriptionid"/>
+-   Location: /v2/subscriptions/62aa3d3ac734067e6f0d0871
 
-## ID によるサブスクリプション [/v2/subscriptions/{subscriptionId}]
+<a name="subscription-by-id"></a>
 
-<a name="retrieve-subscription-get-v2subscriptionssubscriptionid"/>
+### id によるサブスクリプションの操作
 
-### サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]
+<a name="retrieve-subscription-get-v2subscriptionssubscriptionid"></a>
 
-レスポンスは、このセクションの冒頭で説明した JSON オブジェクトによって
-表されるサブスクリプションです。
+#### サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]
 
-レスポンス : 
+レスポンスは、このセクションの冒頭で説明した JSON オブジェクトによって表されるサブスクリプションです。
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+**リクエスト URL パラメータ**
 
-+ Parameters
-    + subscriptionId: abcdef (required, string) - サブスクリプションID。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Response 200 (application/json)
+| パラメータ       | タイプ | 説明                            | 例                         |
+|------------------|--------|---------------------------------|----------------------------|
+| `subscriptionId` | string | 取得するサブスクリプションの id | `62aa3d3ac734067e6f0d0871` |
 
-        {
-          "id": "abcdef",
-          "description": "One subscription to rule them all",
-          "subject": {
-            "entities": [
-              {
-                "idPattern": ".*",
-                "type": "Room"
-              }
-            ],
-            "condition": {
-              "attrs": [ "temperature " ],
-              "expression": {
-                "q": "temperature>40"
-              }
-            }
-          },
-          "notification": {
-            "http": {
-              "url": "http://localhost:1234"
-            },
-            "attrs": ["temperature", "humidity"],
-            "timesSent": 12,
-            "lastNotification": "2015-10-05T16:00:00.00Z"
-            "lastSuccess": "2015-10-05T16:00:00.00Z"
-          },
-          "expires": "2016-04-05T14:00:00.00Z",
-          "status": "active",
-          "throttling": 5
-        }
+**レスポンス**
 
-<a name="update-subscription-patch-v2subscriptionssubscriptionid"/>
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-### サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]
+レスポンス 200 の例:
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "id": "62aa3d3ac734067e6f0d0871",
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature " ],
+      "expression": {
+        "q": "temperature>40"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"],
+    "timesSent": 12,
+    "lastNotification": "2015-10-05T16:00:00.00Z"
+    "lastSuccess": "2015-10-05T16:00:00.00Z"
+  },
+  "expires": "2025-04-05T14:00:00.00Z",
+  "status": "active",
+  "throttling": 5
+}
+```
+
+<a name="update-subscription-patch-v2subscriptionssubscriptionid"></a>
+
+#### サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]
 
 サブスクリプションでは、リクエストに含まれるフィールドのみが更新されます。
 
-レスポンス : 
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Parameters
-    + subscriptionId: abcdef (required, string) - サブスクリプション ID。
+| パラメータ       | タイプ | 説明                            | 例                         |
+|------------------|--------|---------------------------------|----------------------------|
+| `subscriptionId` | string | 更新するサブスクリプションの id | `62aa3d3ac734067e6f0d0871` |
 
-+ Request (application/json)
+**リクエスト・ペイロード**
 
-        {
-          "expires": "2016-04-05T14:00:00.00Z"
-        }
+Content-Type は、`application/json` です。
 
-+ Response 204
+```json
+{
+  "expires": "2025-04-05T14:00:00.00Z"
+}
+```
 
-<a name="delete-subscription-delete-v2subscriptionssubscriptionid"/>
+**レスポンス**
 
-### サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+<a name="delete-subscription-delete-v2subscriptionssubscriptionid"></a>
+
+#### サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]
 
 サブスクリプションをキャンセルします。
 
-レスポンス : 
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Parameters
-    + subscriptionId: abcdef (required, string) - サブスクリプション ID。
+| パラメータ       | タイプ | 説明                            | 例                         |
+|------------------|--------|---------------------------------|----------------------------|
+| `subscriptionId` | string | 削除するサブスクリプションの id | `62aa3d3ac734067e6f0d0871` |
 
-+ Response 204
+**レスポンス**
 
-<a name="group-registrations"/>
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-# Group Registrations
+<a name="registration-operations"></a>
 
-コンテキストのレジストレーション (Registrations) は、特定の地理的領域に位置するものを含む
-コンテキスト情報空間の特定のサブセット (エンティティ、属性) のプロバイダの役割を
-果たすことができるように、外部コンテキスト情報ソースをバインドすることを可能にします。
+## レジストレーションの操作 (Registration Operations)
 
-NGSIv2 サーバ実装は、コンテキスト情報源へのクエリおよび/または更新転送を
-実装することができます。特に、以下の転送メカニズムの一部を実装することができます。
-完全なリストではありません。
+コンテキストのレジストレーション (Registrations) は、特定の地理的領域に位置するものを含むコンテキスト情報空間の特定の
+サブセット (エンティティ、属性) のプロバイダの役割を果たすことができるように、外部コンテキスト情報ソースをバインドする
+ことを可能にします。
 
-* レガシー転送 (NGSIv1 オペレーションに基づく)
-* NGSI コンテキスト・ソースの転送仕様
+NGSIv2 サーバ実装は、コンテキスト情報源へのクエリおよび/または更新転送を実装することができます。特に、以下の転送
+メカニズム (forwarding mechanisms) の一部を実装することができます (完全なリストではありません):
+
+-   レガシー転送 (NGSIv1 オペレーションに基づく)
+-   NGSI コンテキスト・ソースの転送仕様
 
 詳細を知るには、対応する仕様を確認してください。
 
-コンテキストのレジストレーションは、次のフィールドを持つ JSON オブジェクトで
+コンテキストのレジストレーションは、次のフィールドを持つ JSON オブジェクトで表されます。
+
+-   `id`: レジストレーションに割り当てられた一意の識別子。作成時に自動的に生成されます
+-   `description`: このレジストレーションに与えられた説明です。オプション
+-   `provider`: レジストレーションされたコンテキスト・ソースを記述するオブジェクト。必須
+-   `dataProvided`: このソースによって提供されるデータを記述するオブジェクトです。必須
+-   `status`: このレジストレーションの現在の状態を捕捉する列挙されたフィールド:
+    `active` (アクティブなレジストレーションの場合) または、`inactive` (非アクティブなレジストレーションの場合)
+    のどちらか。このフィールドがレジストレーションの作成時に提供されない場合、後でクライアントによって変更される可能性の
+    ある `active` 状態で新規のレジストレーションが作成されます。有効期限が切れたレジストレーションの場合、この属性は、
+    クライアントが `active`/`inactive` に更新しても、`expired` に設定されます。また、転送オペレーションで問題が発生した
+    レジストレーションの場合、ステータスは、`failed` に設定されます。転送オペレーションが再び開始されるとすぐに、
+    ステータスは、`active` に戻されます
+-   `expires`: レジストレーションの有効期限を ISO8601 形式で指定します。恒久的なレジストレーションは、このフィールドを
+    省略しなければなりません
+-   `forwardingInformation`: プロバイダに対して行われた転送オペレーションに関連する情報です。その実装が転送機能を
+    サポートしている場合は、実装によって自動的に提供されます
+
+`provider` フィールドには以下のサブフィールドが含まれています:
+
+-   `http`: HTTP プロトコルを通じて情報を提供するプロバイダのためのパラメータを伝えるために使われます。現在サポート
+    されているプロトコルのみです。これには、提供インタフェースを提供するエンドポイントとして機能する URL を持つ `url`
+    という名前のサブフィールドが含まれている必要があります。エンドポイントは、プロトコル固有の部分 (たとえば、
+    `/v2/entities`) を含んでいなければなりません
+-   `supportedForwardingMode`: このコンテキスト・プロバイダによってサポートされている転送モードを伝えるのに
+    使用されます。デフォルトでは `all` です。指定できる値は次のとおりです:
+    -   `none`: このプロバイダは、リクエスト転送をサポートしていません
+    -   `query`: このプロバイダは、クエリデータへのリクエスト転送のみをサポートしています
+    -   `update`: このプロバイダは、データを更新するためのリクエスト転送のみをサポートしています
+    -   `all`: このプロバイダは、クエリと更新転送の両方のリクエストをサポートします。(デフォルト値)
+
+`dataProvided` フィールドには、以下のサブフィールドが含まれています:
+
+-   `entities`: オブジェクトのリスト。各オブジェクトは以下のサブフィールドで構成されています:
+    -   `id` または `idPattern`: 影響を受けるエンティティの id、またはパターンです
+        両方を同時に使用することはできませんが、そのうちの1つが存在する必要があります
+    -   `type` または `typePattern`: 影響を受けるエンティティの型またはパターンです。両方を同時に使用することは
+        できません。これを省略すると、"任意のエンティティ型" を意味します
+-   `attrs`: 提供される属性のリストです。指定されていない場合はすべての属性です
+-   `expression`: フィルタ式によって、提供されたデータの範囲が何であるかを表現することができます。現在のところ、
+    地理的範囲のみが、次のサブタームでサポートされています:
+    -   `georel`: この仕様のジオクエリ・セクションで指定されている、地理的関係のいずれかです
+    -   `geometry`: この仕様のジオクエリ・セクションで指定されている、サポートされている任意のジオメトリです
+    -   `coords`: この仕様のジオクエリ・セクションで指定されている、座標の文字列表現です
+
+`forwardingInformation` フィールドには、以下のサブフィールドが含まれています:
+
+-    `timesSent` (編集不可、GET オペレーションのみ): このレジストレーションにより送信されたリクエスト転送の数です
+-    `lastForwarding` (編集不可、GET オペレーションのみ): ISO8601 形式の最後の転送タイムスタンプです
+-    `lastFailure` (編集不可、GET オペレーションのみ): ISO8601 形式の最後の失敗タイムスタンプです。レジストレーションが
+     転送に問題がない場合は存在しません
+-    `lastSuccess` (編集不可、GET オペレーションのみ): 最後に成功したリクエスト転送の ISO8601 形式のタイムスタンプです。
+     レジストレーションが成功したことがない場合は存在しません
+
+<a name="registration-list"></a>
+
+### レジストレーション・リスト
+
+<a name="list-registrations-get-v2registrations"></a>
+
+#### レジストレーションをリスト [GET /v2/registrations]
+
+システムに存在するすべてのコンテキスト・プロバイダのレジストレーションをリストします。
+
+**リクエスト・クエリ・パラメータ**
+
+| パラメータ | オプション | タイプ | 説明                               | 例      |
+|------------|------------|--------|------------------------------------|---------|
+| `limit`    | ✓          | number | 取得するタイプの数を制限します     | `10`    |
+| `offset`   | ✓          | number | いくつかのレコードをスキップします | `20`    |
+| `options`  | ✓          | string | オプション                         | `count` |
+
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
+
+| オプション | 説明                                                                                 |
+|------------|--------------------------------------------------------------------------------------|
+| `count`    | 使用すると、レジストレーションの総数が HTTP ヘッダ `Fiware-Total-Count` に返されます |
+
+**レスポンス**
+
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 200 の例:
+
+```json
+[
+  {
+    "id": "62aa3d3ac734067e6f0d0871",
+    "description": "Example Context Source",
+    "dataProvided": {
+      "entities": [
+        {
+          "id": "Bcn_Welt",
+          "type": "Room"
+        }
+      ],
+      "attrs": [
+        "temperature"
+      ]
+    },
+    "provider": {
+      "http": {
+        "url": "http://contextsource.example.org"
+      },
+      "supportedForwardingMode": "all"
+    },
+    "expires": "2017-10-31T12:00:00",
+    "status": "active",
+    "forwardingInformation": {
+      "timesSent": 12,
+      "lastForwarding": "2017-10-06T16:00:00.00Z",
+      "lastSuccess": "2017-10-06T16:00:00.00Z",
+      "lastFailure": "2017-10-05T16:00:00.00Z"
+    }
+  }
+]
+```
+
+<a name="create-registration-post-v2registrations"></a>
+
+#### レジストレーションの作成 [POST /v2/registrations]
+
+新しいコンテキスト・プロバイダのレジストレーションを作成します。これは通常、特定のデータのプロバイダとしてコンテキスト・
+ソースをバインドするために使用されます。このセクションの冒頭で説明したように、レジストレーションは JSON オブジェクトで
 表されます。
 
-+ `id` : レジストレーションに割り当てられた一意の識別子。作成時に自動的に生成されます。
-+ `description` : このレジストレーションに与えられた説明です。オプション。
-+ `provider` : レジストレーションされたコンテキスト・ソースを記述するオブジェクト。必須。
-+ `dataProvided` : このソースによって提供されるデータを記述するオブジェクトです。必須。
-+ `status`: このレジストレーションの現在の状態を捕捉する列挙されたフィールド :
-`active` (アクティブなレジストレーションの場合) または、
-`inactive` (非アクティブなレジストレーションの場合) のどちらか。
-  このフィールドがレジストレーションの作成時に提供されない場合、後でクライアントに
-  よって変更される可能性のある `active` 状態で新規のレジストレーションが作成されます。
-  有効期限が切れたレジストレーションの場合、この属性は、クライアントが
-  `active`/`inactive` に更新しても、`expired` に設定されます。
-  また、転送オペレーションで問題が発生したレジストレーションの場合、ステータスは、
-  `failed` に設定されます。転送オペレーションが再び開始されるとすぐに、ステータスは、
-  `active` に戻されます。
-+ `expires` : レジストレーションの有効期限を ISO8601 形式で指定します。
-  恒久的なレジストレーションは、このフィールドを省略しなければなりません。
-+ `forwardingInformation`: プロバイダに対して行われた転送オペレーションに関連する
-  情報です。その実装が転送機能をサポートしている場合は、実装によって自動的に提供されます。
+**リクエスト・ペイロード**
 
-`provider` フィールドには以下のサブフィールドが含まれています :
-+ `http` : HTTP プロトコルを通じて情報を提供するプロバイダのためのパラメータを
-  伝えるために使われます。
-現在サポートされているプロトコルのみです。
-これには、提供インタフェースを提供するエンドポイントとして機能する URL を持つ
-`url` という名前のサブフィールドが含まれている必要があります。
-エンドポイントは、プロトコル固有の部分 (たとえば、`/v2/entities`) を
-含んでいなければなりません。
-+ `supportedForwardingMode` : このコンテキスト・プロバイダによって
-サポートされている転送モードを伝えるのに使用されます。デフォルトでは `all` です。
-指定できる値は次のとおりです :
-    + `none` : このプロバイダは、リクエスト転送をサポートしていません。
-    + `query` : このプロバイダは、クエリデータへのリクエスト転送のみを
-      サポートしています。
-    + `update` : このプロバイダは、データを更新するためのリクエスト転送のみを
-      サポートしています。
-    + `all` : このプロバイダは、クエリと更新転送の両方のリクエストを
-      サポートします。(デフォルト値)
+Content-Type は、`application/json` です。
 
-`dataProvided` フィールドには、以下のサブフィールドが含まれています :
-
-+ `entities`: オブジェクトのリスト。各オブジェクトは以下のサブフィールドで
-  構成されています : 
-    + `id` または `idPattern`: 影響を受けるエンティティの ID、またはパターンです。
-      両方を同時に使用することはできませんが、そのうちの1つが存在する必要があります。
-    + `type` または `typePattern`: 影響を受けるエンティティの型またはパターンです。
-      両方を同時に使用することはできません。
-      これを省略すると、"任意のエンティティ型" を意味します。
-+ `attrs`: 提供される属性のリストです。指定されていない場合はすべての属性です。
-+ `expression`: フィルタ式によって、提供されたデータの範囲が何であるかを
-  表現することができます。
-現在のところ、地理的範囲のみが、次のサブタームでサポートされています :
-    + `georel` : この仕様のジオクエリ・セクションで指定されている、
-      地理的関係のいずれかです。
-    + `geometry` : この仕様のジオクエリ・セクションで指定されている、
-      サポートされている任意のジオメトリです。
-    + `coords` : この仕様のジオクエリ・セクションで指定されている、
-      座標の文字列表現です。
-
-`forwardingInformation` フィールドには、以下のサブフィールドが含まれています :
-
-+  `timesSent` (編集不可、GET オペレーションのみ) : このレジストレーションに
-   より送信されたリクエスト転送の数です。
-+  `lastForwarding` (編集不可、GET オペレーションのみ) : ISO8601 形式の
-   最後の転送タイムスタンプです。
-+  `lastFailure` (編集不可、GET オペレーションのみ) : ISO8601 形式の
-   最後の失敗タイムスタンプです。レジストレーションが転送に問題がない場合は
-   存在しません。
-+  `lastSuccess` (編集不可、GET オペレーションのみ) : 最後に成功した
-   リクエスト転送の ISO8601 形式のタイムスタンプです。レジストレーションが
-   成功したことがない場合は存在しません。
-
-<a name="registration-list-v2registrations"/>
-
-## レジストレーション・リスト  [/v2/registrations]
-
-<a name="list-registrations-get-v2registrationslimitoffsetoptions"/>
-
-### レジストレーションをリスト [GET /v2/registrations{?limit,offset,options}]
-
-システムに存在するすべてのコンテキスト・プロバイダのレジストレーションを
-リストします。
-
-+ Parameters
-    + limit: 10 (optional, number) - 取得するレジストレーションの数を制限します。
-    + offset: 20 (optional, number) - レジストレーションの数をスキップします。
-    + options (optional, string) - オプション辞書
-      + Members
-          + count - 使用された場合、レジストレーションの総数は、
-            HTTP ヘッダ `Fiware-Total-Count` に返されます。
-
-レスポンス :
-
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
-
-+ Response 200
-
-        [
-          {
-            "id": "abcdefg",
-            "description": "Example Context Source",
-            "dataProvided": {
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "attrs": [
-                "temperature"
-              ]
-            },
-            "provider": {
-              "http": {
-                "url": "http://contextsource.example.org"
-              },
-              "supportedForwardingMode": "all"
-            },
-            "expires": "2017-10-31T12:00:00",
-            "status": "active",
-            "forwardingInformation": {
-              "timesSent": 12,
-              "lastForwarding": "2017-10-06T16:00:00.00Z",
-              "lastSuccess": "2017-10-06T16:00:00.00Z",
-              "lastFailure": "2017-10-05T16:00:00.00Z"
-            }
-          }
-        ]
-
-<a name="create-registration-post-v2registrations"/>
-
-### レジストレーションの作成 [POST /v2/registrations]
-
-新しいコンテキスト・プロバイダのレジストレーションを作成します。これは通常、
-特定のデータのプロバイダとしてコンテキスト・ソースをバインドするために
-使用されます。このセクションの冒頭で説明したように、レジストレーションは
-JSON オブジェクトで表されます。
-
-レスポンス : 
-
-* 成功したオペレーションでは、201 Created を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
-
-+ Request (application/json)
-
-        {
-          "description": "Relative Humidity Context Source",
-          "dataProvided": {
-            "entities": [
-              {
-                "id": "room2",
-                "type": "Room"
-              }
-            ],
-            "attrs": [
-              "relativeHumidity"
-            ]
-          },
-          "provider": {
-            "http":{ 
-              "url": "http://localhost:1234"
-            }
-          }
-        }
-
-+ Response 201
-
-    + Headers
-
-            Location: /v2/registrations/abcde98765
-
-<a name="registration-by-id-v2registrationsregistrationid"/>
-
-## ID によるレジストレーション [/v2/registrations/{registrationId}]
-
-<a name="retrieve-registration-get-v2registrationsregistrationid"/>
-
-### レジストレーションを取得 [GET /v2/registrations/{registrationId}]
-
-レスポンスは、このセクションの冒頭で説明した JSON オブジェクトに
-よって表されるレジストレーションです。
-
-レスポンス : 
-
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
-
-+ Parameters
-    + registrationId: abcdef (required, string) - レジストレーション ID です。
-
-+ Response 200 (application/json)
-
+```json
+{
+  "description": "Relative Humidity Context Source",
+  "dataProvided": {
+    "entities": [
       {
-            "id": "abcdefg",
-            "description": "Example Context Source",
-            "dataProvided": {
-              "entities": [
-                {
-                  "id": "Bcn_Welt",
-                  "type": "Room"
-                }
-              ],
-              "attrs": [
-                "temperature"
-              ]
-            },
-            "provider": {
-              "http": {
-                "url": "http://contextsource.example.org"
-              },
-              "supportedForwardingMode": "all"
-            },
-            "expires": "2017-10-31T12:00:00",
-            "status": "failed",
-            "forwardingInformation": {
-              "timesSent": 12,
-              "lastForwarding": "2017-10-06T16:00:00.00Z",
-              "lastFailure": "2017-10-06T16:00:00.00Z",
-              "lastSuccess": "2017-10-05T18:25:00.00Z",
-            }
+        "id": "room2",
+        "type": "Room"
       }
+    ],
+    "attrs": [
+      "relativeHumidity"
+    ]
+  },
+  "provider": {
+    "http":{
+      "url": "http://localhost:1234"
+    }
+  }
+}
+```
 
-<a name="update-registration-patch-v2registrationsregistrationid"/>
+**レスポンス**
 
-### レジストレーションを更新 [PATCH /v2/registrations/{registrationId}]
+-   成功したオペレーションでは、201 Created を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 201 の例:
+
+ヘッダ:
+
+-   Location: /v2/registrations/62aa3d3ac734067e6f0d0871
+
+<a name="registration-by-id"></a>
+
+### id によるレジストレーションの操作
+
+<a name="retrieve-registration-get-v2registrationsregistrationid"></a>
+
+#### レジストレーションを取得 [GET /v2/registrations/{registrationId}]
+
+レスポンスは、このセクションの冒頭で説明した JSON オブジェクトによって表されるレジストレーションです。
+
+**リクエスト URL パラメータ**
+
+このパラメータは URL リクエストの一部です。これは必須です。
+
+| パラメータ       | タイプ | 説明                            | 例                         |
+|------------------|--------|---------------------------------|----------------------------|
+| `registrationId` | string | 取得するサブスクリプションの id | `62aa3d3ac734067e6f0d0871` |
+
+**レスポンス**
+
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+レスポンス 200 の例:
+
+Content-Type は、`application/json` です。
+
+```json
+{
+      "id": "62aa3d3ac734067e6f0d0871",
+      "description": "Example Context Source",
+      "dataProvided": {
+        "entities": [
+          {
+            "id": "Bcn_Welt",
+            "type": "Room"
+          }
+        ],
+        "attrs": [
+          "temperature"
+        ]
+      },
+      "provider": {
+        "http": {
+          "url": "http://contextsource.example.org"
+        },
+        "supportedForwardingMode": "all"
+      },
+      "expires": "2017-10-31T12:00:00",
+      "status": "failed",
+      "forwardingInformation": {
+        "timesSent": 12,
+        "lastForwarding": "2017-10-06T16:00:00.00Z",
+        "lastFailure": "2017-10-06T16:00:00.00Z",
+        "lastSuccess": "2017-10-05T18:25:00.00Z",
+      }
+}
+```
+
+<a name="update-registration-patch-v2registrationsregistrationid"></a>
+
+#### レジストレーションを更新 [PATCH /v2/registrations/{registrationId}]
 
 リクエストに含まれるフィールドのみがレジストレーション時に更新されます。
 
-レスポンス : 
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Parameters
-    + registrationId: abcdef (required, string) - レジストレーション ID です。
+| パラメータ       | タイプ | 説明                            | 例                         |
+|------------------|--------|---------------------------------|----------------------------|
+| `registrationId` | string | 更新するサブスクリプションの id | `62aa3d3ac734067e6f0d0871` |
 
-+ Request (application/json)
+**リクエスト・ペイロード**
 
-        {
-            "expires": "2017-10-04T00:00:00"
-        }
+Content-Type は、`application/json` です。
 
-+ Response 204
+```json
+{
+    "expires": "2017-10-04T00:00:00"
+}
+```
 
-<a name="delete-registration-delete-v2registrationsregistrationid"/>
+**レスポンス**
 
-### レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
+
+<a name="delete-registration-delete-v2registrationsregistrationid"></a>
+
+#### レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]
 
 コンテキスト・プロバイダのレジストレーションを取り消します。
 
-レスポンス : 
+**リクエスト URL パラメータ**
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このパラメータは URL リクエストの一部です。これは必須です。
 
-+ Parameters
-    + registrationId: abcdef (required, string) - レジストレーション ID です。
+| パラメータ       | タイプ | 説明                            | 例                         |
+|------------------|--------|---------------------------------|----------------------------|
+| `registrationId` | string | 削除するサブスクリプションの id | `62aa3d3ac734067e6f0d0871` |
 
-+ Response 204
+**レスポンス**
 
-<a name="group-batch-operations"/>
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-# Group Batch Operations
+<a name="batch-operations"></a>
 
-<a name="update-post-v2opupdate"/>
+## バッチ操作 (Batch Operations)
 
-### 更新 [POST /v2/op/update]
+<a name="update-operation"></a>
 
-このオペレーションにより、単一のバッチ・オペレーション (Batch Operations) で
-複数のエンティティを作成、更新、および/または、削除することができます。
-ペイロードは、2つのプロパティを持つオブジェクトです :
+### 更新操作 (Update operation)
 
-+ `actionType`, 更新アクションの種類を指定するには、`append`, `appendStrict`,
-  `update`, `delete`, `replace` のいずれかを指定します。
-+ `entities`, エンティティの配列。各エンティティは、JSON エンティティの表現形式
-  ("JSONエンティティの表現" のセクションを参照) を使用して指定します。
+<a name="update-post-v2opupdate"></a>
 
-このオペレーションは、`entities` ベクトル内のエンティティと同じ数の
-個別オペレーションに分割されているので、` actionType` がそれぞれの
-エンティティに対して実行されます。`actionType` に応じて、
-通常の非バッチオペレーションによるマッピングを行うことができます :
+#### 更新 [POST /v2/op/update]
 
-* `append`: `POST /v2/entities` (エンティティがまだ存在しない場合)、
-  または `POST /v2/entities/<id>/attrs` (エンティティが既に存在する場合)
-  にマップします。
-* `appendStrict`: `POST /v2/entities` (エンティティがまだ存在しない場合)
-  または `POST /v2/entities/<id>/attrs?options=append`
-  (エンティティが既に存在する場合) にマップします。
-* `update`: `PATCH /v2/entities/<id>/attrs` にマップされます。
-* `delete`: エンティティに含まれているすべての属性に対して、
-  `DELETE /v2/entities/<id>/attrs/<attrName>` にマッピングし、
-  エンティティに属性が含まれていない場合は、
-  `DELETE /v2/entities/<id>` にマッピングします。
-* `replace`: `PUT /v2/entities/<id>/attrs` にマップされます。
+このオペレーションにより、単一のバッチ・オペレーション (Batch Operations) で複数のエンティティを作成、更新、
+および/または、削除することができます。ペイロードは、2つのプロパティを持つオブジェクトです:
 
-レスポンス :
+-   `actionType`, 更新アクションの種類を指定するには、`append`, `appendStrict`, `update`, `delete`, `replace`
+    のいずれかを指定します
+-   `entities`, エンティティの配列。各エンティティは、JSON エンティティの表現形式 ("JSON エンティティの表現"
+    のセクションを参照) を使用して指定します
 
-* 成功したオペレーションでは、204 No Content を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+このオペレーションは、`entities` ベクトル内のエンティティと同じ数の個別オペレーションに分割されているので、`actionType`
+がそれぞれのエンティティに対して実行されます。`actionType` に応じて、通常の非バッチオペレーションによるマッピングを行う
+ことができます:
 
-+ Request (application/json)
+-   `append`: `POST /v2/entities` (エンティティがまだ存在しない場合)、または `POST /v2/entities/<id>/attrs`
+    (エンティティが既に存在する場合) にマップします
+-   `appendStrict`: `POST /v2/entities` (エンティティがまだ存在しない場合) または
+    `POST /v2/entities/<id>/attrs?options=append` (エンティティが既に存在する場合) にマップします
+-   `update`: `PATCH /v2/entities/<id>/attrs` にマップされます
+-   `delete`: エンティティに含まれているすべての属性に対して、`DELETE /v2/entities/<id>/attrs/<attrName>`
+    にマッピングし、エンティティに属性が含まれていない場合は、`DELETE /v2/entities/<id>` にマッピングします
+-   `replace`: `PUT /v2/entities/<id>/attrs` にマップされます
 
-        {
-          "actionType": "append",
-          "entities": [
-            {
-              "type": "Room",
-              "id": "Bcn-Welt",
-              "temperature": {
-                "value": 21.7
-               },
-              "humidity": {
-                "value": 60
-              }
-            },
-            {
-              "type": "Room",
-              "id": "Mad_Aud",
-              "temperature": {
-                "value": 22.9
-              },
-              "humidity": {
-                "value": 85
-              }
-            }
-          ]
-        }
+| パラメータ | オプション | タイプ | 説明       | 例          |
+|------------|------------|--------|------------|-------------|
+| `options`  | ✓          | string | オプション | `keyValues` |
 
-+ Parameters
-    + options (optional, string) - オプション辞書
-      + Members
-          + keyValues - 使用されると、リクエスト・ペイロードは、単純化された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-+ Response 204
+| オプション  | 説明                                                                                                                                                                       |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" セクションを参照してください |
 
-<a name="query-post-v2opquerylimitoffsetoptions"/>
+**リクエスト・ペイロード**
 
-### クエリ [POST /v2/op/query{?limit,offset,options}]
+```json
+{
+  "actionType": "append",
+  "entities": [
+    {
+      "type": "Room",
+      "id": "Bcn-Welt",
+      "temperature": {
+        "value": 21.7
+        },
+      "humidity": {
+        "value": 60
+      }
+    },
+    {
+      "type": "Room",
+      "id": "Mad_Aud",
+      "temperature": {
+        "value": 22.9
+      },
+      "humidity": {
+        "value": 85
+      }
+    }
+  ]
+}
+```
 
-レスポンス・ペイロードは、一致するエンティティごとに1つのオブジェクトを
-含む配列、またはエンティティが見つからない場合は空の配列  `[]`  です。
-エンティティは、JSON エンティティの表現形式 ("JSONエンティティの表現" の
-セクションを参照) に従います。
+**レスポンス**
 
-ペイロードには、次の要素 (すべてオプション) が含まれている場合があります :
+-   成功したオペレーションでは、204 No Content を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-+ `entities`: 検索する検索対象のリストです。各要素は、次の要素を
-  持つ JSON オブジェクトで表されます。
-    + `id` or `idPattern`: 影響を受けるエンティティの ID、またはパターン。
-      両方を同時に使用することはできませんが、そのうちの1つが存在する
-      必要があります。
-    + `type` or `typePattern`: 検索するエンティティの型またはパターン型です。
-      両方を同時に使用することはできません。
-      これを省略すると、"任意のエンティティ型" を意味します。
-+ `attrs`: 提供される属性のリスト (指定されていない場合はすべての属性) です。
-+ `expression`: `q`, `mq`, `georel`, `geometry`, `coords`で構成される式です。
-  (上記の "エンティティのリスト" オペレーションを参照してください)。
-+ `metadata`: レスポンスに含めるメタデータ名のリスト。
-  詳細については、"属性とメタデータのフィルタリング" を参照してください。
+<a name="query-operation"></a>
 
-レスポンス・コード : 
+### クエリ操作 (Query operation)
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+<a name="query-post-v2opquery"></a>
 
-+ Parameters
-    + limit: 10 (optional, number) - 取得するエンティティの数を制限します。
-    + offset: 20 (optional, number) - スキップするレコード数です。
-    + orderBy: temperature,!speed (optional, string) - 結果の順序付けの基準。
-      詳細については、"結果の順序付け" を参照してください。
-    + options (optional, string) - オプション辞書
-      + Members
-          + count - エンティティの総数は、`Fiware-Total-Count` という
-            名前の HTTP ヘッダとして返されます。
-          + keyValues - 使用されると、リクエスト・ペイロードは、単純化された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + values - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
-          + unique - 使用されると、レスポンス・ペイロードは、単純化された
-            エンティティ表現 `values` を使用します。反復値は除外されます。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
+#### クエリ [POST /v2/op/query]
 
-+ Request (application/json)
+レスポンス・ペイロードは、一致するエンティティごとに1つのオブジェクトを含む配列、またはエンティティが見つからない場合は
+空の配列 `[]` です。エンティティは、JSON エンティティの表現形式 ("JSON エンティティの表現" のセクションを参照) に
+従います。
 
-        {
-          "entities": [
-            {
-              "idPattern": ".*",
-              "type": "Room"
-            },
-            {
-              "id": "Car",
-              "type": "P-9873-K"
-            }
-          ],
-          "attrs": [
-            "temperature",
-            "humidity"
-          ],
-          "expression": {
-             "q": "temperature>20"
-          },
-          "metadata": [
-            "accuracy",
-            "timestamp"
-          ]
-        }
+ペイロードには、次の要素 (すべてオプション) が含まれている場合があります:
 
-+ Response 200 (application/json)
+-   `entities`: 検索する検索対象のリストです。各要素は、次の要素を持つ JSON オブジェクトで表されます:
+    -   `id` または `idPattern`: 影響を受けるエンティティの id、またはパターン。両方を同時に使用することはできませんが、
+        そのうちの1つが存在する必要があります
+    -   `type` または `typePattern`: 検索するエンティティの型またはパターン型です。両方を同時に使用することは
+        できません。これを省略すると、"任意のエンティティ型" を意味します
+-   `attrs`: 提供される属性のリスト (指定されていない場合はすべての属性) です
+-   `expression`: `q`, `mq`, `georel`, `geometry`, `coords`で構成される式です。(上記の "エンティティのリスト"
+    オペレーションを参照してください)
+-   `metadata`: レスポンスに含めるメタデータ名のリスト。詳細については、"属性とメタデータのフィルタリング" を参照して
+    ください
 
-        [
-          {
-            "type": "Room",
-            "id": "DC_S1-D41",
-            "temperature": {
-              "value": 35.6,
-              "type": "Number"
-            }
-          },
-          {
-            "type": "Room",
-            "id": "Boe-Idearium",
-            "temperature": {
-              "value": 22.5,
-              "type": "Number"
-            }
-          },
-          {
-            "type": "Car",
-            "id": "P-9873-K",
-            "temperature": {
-              "value": 40,
-              "type": "Number",
-              "accuracy": 2,
-              "timestamp": {
-                "value": "2015-06-04T07:20:27.378Z",
-                "type": "DateTime"
-              }
-            }
-          }
-        ]
+**リクエスト・クエリ・パラメータ**
 
+| パラメータ | オプション | タイプ | 説明                                                                                        | 例                   |
+|------------|------------|--------|---------------------------------------------------------------------------------------------|----------------------|
+| `limit`    | ✓          | number | 取得するエンティティの数を制限します                                                        | `10`                 |
+| `offset`   | ✓          | number | いくつかのレコードをスキップします                                                          | `20`                 |
+| `orderBy`  | ✓          | string | 結果を順序付けするための基準。詳細については、"結果の順序付け" セクションを参照してください | `temperature,!speed` |
+| `options`  | ✓          | string | オプション                                                                                  | `count`              |
 
-<a name="notify-post-v2opnotifyoptions"/>
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
 
-### 通知 [POST /v2/op/notify{?options}]
+| オプション  | 説明                                                                                                                                                                                       |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `count`     | 使用すると、エンティティの総数が `Fiware-Total-Count` という名前の HTTP ヘッダとして応答に返されます                                                                                       |
+| `keyValues` | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください                          |
+| `values`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。詳細については、"簡略化されたエンティティの表現" を参照してください                              |
+| `unique`    | 使用すると、レスポンス・ペイロードは簡略化されたエンティティ表現の `values` を使用します。繰り返しの値は省略されます。詳細については、"簡略化されたエンティティの表現" を参照してください |
 
-このオペレーションは、通知ペイロードを消費し、その通知によって含まれる
-すべてのエンティティのデータが永続化され、必要に応じて上書きされるように
-することを目的としています。このオペレーションは、1つの NGSIv2 エンドポイントが
-別の NGSIv2 エンドポイント (フェデレーション・シナリオ)にレジストレーション
-されている場合に便利です。 リクエスト・ペイロードは、NGSIv2 通知ペイロード
-でなければなりません。その動作は、`actionType` が `append` に等しい、
-`POST /v2/op/update` とまったく同じでなければなりません。 
+**リクエスト・ペイロード**
 
-レスポンス・コード : 
+Content-Type は、`application/json` です。
 
-* 成功したオペレーションでは、200 OK を使用します。
-* エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。
-  詳細については、"エラー・レスポンス" のサブセクションを参照してください。
+```
+{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "Room"
+    },
+    {
+      "id": "Car",
+      "type": "P-9873-K"
+    }
+  ],
+  "attrs": [
+    "temperature",
+    "humidity"
+  ],
+  "expression": {
+      "q": "temperature>20"
+  },
+  "metadata": [
+    "accuracy",
+    "timestamp"
+  ]
+}
+```
 
-+ Parameters
-    + options (optional, string) - オプション辞書
-      + Members
-          + keyValues - 使用されると、リクエスト・ペイロードは、単純化された
-            エンティティ表現 `keyValues` を使用します。
-            詳細は、"簡略化されたエンティティ表現" を参照してください。
+**レスポンス**
 
-+ Request (application/json)
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
 
-        {
-          "subscriptionId": "5aeb0ee97d4ef10a12a0262f",
-          "data": [{
-            "type": "Room",
-            "id": "DC_S1-D41",
-            "temperature": {
-              "value": 35.6,
-              "type": "Number"
-            }
-          },
-          {
-            "type": "Room",
-            "id": "Boe-Idearium",
-            "temperature": {
-              "value": 22.5,
-              "type": "Number"
-            }
-          }]
-        }
+レスポンス 200 の例:
 
-+ Response 200 (application/json)
+Content-type は、`application/json` です。
+
+```json
+[
+  {
+    "type": "Room",
+    "id": "DC_S1-D41",
+    "temperature": {
+      "value": 35.6,
+      "type": "Number"
+    }
+  },
+  {
+    "type": "Room",
+    "id": "Boe-Idearium",
+    "temperature": {
+      "value": 22.5,
+      "type": "Number"
+    }
+  },
+  {
+    "type": "Car",
+    "id": "P-9873-K",
+    "temperature": {
+      "value": 40,
+      "type": "Number",
+      "accuracy": 2,
+      "timestamp": {
+        "value": "2015-06-04T07:20:27.378Z",
+        "type": "DateTime"
+      }
+    }
+  }
+]
+```
+
+<a name="notify-operation"></a>
+
+### 通知操作 (Notify operation)
+
+<a name="notify-post-v2opnotify"></a>
+
+#### 通知 [POST /v2/op/notify]
+
+このオペレーションは、通知ペイロードを消費し、その通知によって含まれるすべてのエンティティのデータが永続化され、必要に
+応じて上書きされるようにすることを目的としています。このオペレーションは、1つの NGSIv2 エンドポイントが別の NGSIv2
+エンドポイント (フェデレーション・シナリオ)にレジストレーションされている場合に便利です。リクエスト・ペイロードは、
+NGSIv2 通知ペイロードでなければなりません。その動作は、`actionType` が `append` に等しい、`POST /v2/op/update` と全く
+同じでなければなりません。
+
+**リクエスト・クエリ・パラメータ**
+
+| パラメータ | オプション | タイプ | 説明       | 例          |
+|------------|------------|--------|------------|-------------|
+| `options`  | ✓          | string | オプション | `keyValues` |
+
+この特定のリクエストに対して `options` パラメータが持つことができる値は次のとおりです:
+
+| オプション  | 説明                                                                                                                                                              |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | 使用すると、リクエスト・ペイロードは簡略化されたエンティティ表現の `keyValues` を使用します。 詳細については、"簡略化されたエンティティの表現" を参照してください |
+
+**リクエスト・ペイロード**
+
+Content-Type は、`application/json` です。
+
+```json
+{
+  "subscriptionId": "5aeb0ee97d4ef10a12a0262f",
+  "data": [{
+    "type": "Room",
+    "id": "DC_S1-D41",
+    "temperature": {
+      "value": 35.6,
+      "type": "Number"
+    }
+  },
+  {
+    "type": "Room",
+    "id": "Boe-Idearium",
+    "temperature": {
+      "value": 22.5,
+      "type": "Number"
+    }
+  }]
+}
+```
+
+**レスポンス**
+
+-   成功したオペレーションでは、200 OK を使用します
+-   エラーは、2xx 以外のものとエラー・ペイロード (オプション) を使用します。詳細については、"エラー・レスポンス" の
+    サブセクションを参照してください
