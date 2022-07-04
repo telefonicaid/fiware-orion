@@ -1800,34 +1800,69 @@ Content-Type is `application/json`
 
 A subscription is represented by a JSON object with the following fields:
 
-+ `id`: Subscription unique identifier. Automatically created at creation time.
-+ `description` (optional): A free text used by the client to describe the subscription.
-+ `subject`: An object that describes the subject of the subscription.
-+ `notification`: An object that describes the notification to send when the subscription is
-  triggered.
-+ `expires`: Subscription expiration date in ISO8601 format. Permanent subscriptions must omit
-  this field.
-+ `status`: Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
-  If this field is not provided at subscription creation time, new subscriptions are created with
-  the `active` status, which can be changed by clients afterwards. For expired subscriptions, this
-  attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
-  Also, for subscriptions experiencing problems with notifications, the status is set to `failed`.
-  As soon as the notifications start working again, the status is changed back to `active`.
-+ `throttling`: Minimal period of time in seconds which must elapse between two consecutive
-  notifications. It is optional.
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `id`           |          | string | Subscription unique identifier. Automatically created at creation time.                       |
+| `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
+| `subject`      |          | object | An object that describes the subject of the subscription.                                     |
+| `notification` |          | object | An object that describes the notification to send when the subscription is triggered.         |
+| `expires`      | ✓        | string | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
+| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
 
 A `subject` contains the following subfields:
 
-+ `entities`: A list of objects, each one composed of the following subfields:
-  + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-     time, but one of them must be present.
-  + `type` or `typePattern`: Type or type pattern of the affected entities. Both cannot be used at
-     the same time. If omitted, it means "any entity type".
-+ `condition`: Condition to trigger notifications. This field is optional and it may contain two
-  properties, both optional:
-    + `attrs`: array of attribute names
-    + `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
-       entities" operation above about this field).
+<table>
+<thead>
+	<tr>
+		<th>Parameter</th>
+		<th>Optional</th>
+		<th>Type</th>
+		<th>Description</th>
+	</tr>
+</thead>
+<tbody>
+  <!-- entities -->
+	<tr>
+		<td><code>entities</code></td>
+		<td></td>
+		<td>string</td>
+		<td>A list of objects, each one composed of the following subfields:
+      <table>
+        <tr>
+          <th><code>id</code> or <code>idPattern</code></th>
+          <th>Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</th>
+        </tr>
+        <tr>
+          <th><code>type</code> or <code>typePattern</code></th>
+          <th>Type or type pattern of the affected entities. Both cannot be used at
+     the same time. If omitted, it means "any entity type".</th>          
+        </tr>
+      </table>
+    </td>
+	</tr>
+  <!-- condition -->
+  <tr>
+		<td><code>condition</code></td>
+		<td></td>
+		<td>string</td>
+		<td>Condition to trigger notifications. This field is optional and it may contain two properties, both optional:
+      <table>
+        <tr>
+          <th><code>attrs</code></th>
+          <th>Array of attribute names that will trigger the notification.</th>
+        </tr>
+        <tr>
+          <th><code>expression</code> </th>
+          <th>an expression composed of <code>q</code>, <code>mq</code>, <code>georel</code>, 
+          <code>geometry</code> and <code>coords</code> (see "List entities" operation above about 
+          this field)</th>          
+        </tr>
+      </table>
+    </td>
+	</tr>
+</tbody>
+</table>
 
 A `notification` object contains the following subfields:
 
