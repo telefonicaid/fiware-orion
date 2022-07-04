@@ -189,11 +189,23 @@ static bool setPayload
 static bool setJsonPayload
 (
   orion::CompoundValueNode*  json,
+  const Entity&              en,
   std::string*               payloadP,
   std::string*               mimeTypeP
 )
 {
-  *payloadP = json->toJson();
+  // Prepare a map for macro replacements. We firstly tried to pass Entity object to
+  // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
+  // makes compiler to cry (maybe some kind of circular dependency problem?)
+  std::map<std::string, std::string> replacements;
+  replacements.insert(std::pair<std::string, std::string>("id", en.id));
+  replacements.insert(std::pair<std::string, std::string>("type", en.type));
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
+  }
+
+  *payloadP = json->toJson(&replacements);
   *mimeTypeP = "application/json";  // FIXME PR: this can be overriden by headers?
   return true;
 }
@@ -284,7 +296,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else
     {
-      setJsonPayload(json, &payload, &mimeType);
+      setJsonPayload(json, en, &payload, &mimeType);
       renderFormat = NGSI_V2_CUSTOM;
     }
 
