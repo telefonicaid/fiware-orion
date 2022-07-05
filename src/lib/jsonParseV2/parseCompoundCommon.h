@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_
-#define SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSECOMPOUNDCOMMON_H_
+#define SRC_LIB_JSONPARSEV2_PARSECOMPOUNDCOMMON_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,24 +23,32 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
+
 #include <string>
 
 #include "rapidjson/document.h"
 
-#include "ngsi/ContextAttribute.h"
+#include "orionTypes/OrionValueType.h"
+#include "parse/CompoundValueNode.h"
+
+/* ****************************************************************************
+*
+* stringToCompoundType -
+*
+*/
+extern orion::ValueType stringToCompoundType(std::string nodeType);
 
 
 
 /* ****************************************************************************
 *
-* parseContextAttribute - 
+* parseCompoundValue -
 */
-extern std::string parseContextAttributeCompoundValue
+extern std::string parseCompoundValue
 (
-  const rapidjson::Value::ConstMemberIterator&  node,
-  ContextAttribute*                             caP,
+  const rapidjson::Value::ConstValueIterator&   node,
   orion::CompoundValueNode*                     parent,
   int                                           deep
 );
@@ -49,12 +57,13 @@ extern std::string parseContextAttributeCompoundValue
 
 /* ****************************************************************************
 *
-* parseContextAttributeCompoundValueStandAlone - 
+* parseCompoundValue -
 */
-extern std::string parseContextAttributeCompoundValueStandAlone
+extern std::string parseCompoundValue
 (
-  rapidjson::Document&  document,
-  ContextAttribute*     caP
+  const rapidjson::Value::ConstMemberIterator&  node,
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 );
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSECOMPOUNDCOMMON_H_

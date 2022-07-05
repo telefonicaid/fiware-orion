@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,27 +20,20 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
-#include <string>
 
-#include "rapidjson/document.h"
+#include "jsonParseV2/parseCompoundCommon.h"
 
-#include "logMsg/logMsg.h"
 #include "common/limits.h"
-#include "ngsi/Metadata.h"
-#include "parse/CompoundValueNode.h"
-
 #include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseMetadataCompoundValue.h"
-
-
 
 /* ****************************************************************************
 *
 * stringToCompoundType -
+*
 */
-static orion::ValueType stringToCompoundType(std::string nodeType)
+orion::ValueType stringToCompoundType(std::string nodeType)
 {
   if      (nodeType == "String")  return orion::ValueTypeString;
   else if (nodeType == "Number")  return orion::ValueTypeNumber;
@@ -57,12 +50,11 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 
 /* ****************************************************************************
 *
-* parseMetadataCompoundValue -
+* parseCompoundValue -
 */
-static std::string parseMetadataCompoundValue
+std::string parseCompoundValue
 (
   const rapidjson::Value::ConstValueIterator&   node,
-  Metadata*                                     mdP,
   orion::CompoundValueNode*                     parent,
   int                                           deep
 )
@@ -121,7 +113,7 @@ static std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        std::string r = parseCompoundValue(iter, cvnP, deep + 1);
         if (r != "OK")
         {
           return r;
@@ -170,7 +162,7 @@ static std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        std::string r = parseCompoundValue(iter, cvnP, deep + 1);
         if (r != "OK")
         {
           return r;
@@ -186,12 +178,11 @@ static std::string parseMetadataCompoundValue
 
 /* ****************************************************************************
 *
-* parseMetadataCompoundValue -
+* parseCompoundValue -
 */
-std::string parseMetadataCompoundValue
+std::string parseCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
-  Metadata*                                     mdP,
   orion::CompoundValueNode*                     parent,
   int                                           deep
 )
@@ -208,16 +199,6 @@ std::string parseMetadataCompoundValue
   }
 
   std::string type   = jsonParseTypeNames[node->value.GetType()];
-
-  if (mdP->compoundValueP == NULL)
-  {
-    mdP->compoundValueP            = new orion::CompoundValueNode();
-    mdP->compoundValueP->name      = "";
-    mdP->compoundValueP->valueType = stringToCompoundType(type);
-
-    parent = mdP->compoundValueP;
-  }
-
 
   //
   // Children of the node
@@ -259,7 +240,7 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        std::string r = parseCompoundValue(iter, cvnP, deep + 1);
         if (r != "OK")
         {
           return r;
@@ -307,7 +288,7 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        std::string r = parseCompoundValue(iter, cvnP, deep + 1);
         if (r != "OK")
         {
           return r;
@@ -318,3 +299,4 @@ std::string parseMetadataCompoundValue
 
   return "OK";
 }
+
