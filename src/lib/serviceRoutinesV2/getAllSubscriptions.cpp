@@ -77,6 +77,13 @@ std::string getAllSubscriptions
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
 
+    // free sub memory associated to subscriptions
+    // FIXME PR: refactor this to have only one return?
+    for (unsigned int ix = 0; ix < subs.size(); ix++)
+    {
+      subs[ix].release();
+    }
+
     return out;
   }
 
@@ -88,6 +95,12 @@ std::string getAllSubscriptions
 
   std::string out;
   TIMED_RENDER(out = vectorToJson(subs));
+
+  // free sub memory associated to subscriptions
+  for (unsigned int ix = 0; ix < subs.size(); ix++)
+  {
+    subs[ix].release();
+  }
 
   return out;
 }

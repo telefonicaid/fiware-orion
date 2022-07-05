@@ -77,9 +77,19 @@ std::string getSubscription
   {
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
+
+    // free sub memory associated to subscriptions
+    // FIXME PR: refactor to have only one return?
+    sub.release();
+
     return out;
   }
 
   TIMED_RENDER(out = sub.toJson());
+
+  // free sub memory associated to subscriptions
+  // FIXME PR: refactor to have only one return?
+  sub.release();
+
   return out;
 }

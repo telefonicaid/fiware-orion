@@ -149,14 +149,14 @@ void MqttInfo::fill(const orion::BSONObj& bo)
       orion::BSONElement be = getFieldF(bo, CSUB_JSON);
       if (be.type() == orion::Object)
       {
-        // FIXME PR: free memory
+        // this new memory is freed in MqttInfo::release()
         this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
         this->json->valueType = orion::ValueTypeObject;
         compoundObjectResponse(this->json, be);
       }
       else if (be.type() == orion::Array)
       {
-        // FIXME PR: free memory
+        // this new memory is freed in MqttInfo::release()
         this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
         this->json->valueType = orion::ValueTypeVector;
         compoundVectorResponse(this->json, be);
@@ -170,6 +170,23 @@ void MqttInfo::fill(const orion::BSONObj& bo)
     {
       this->json = NULL;
     }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* MqttInfo::release -
+*/
+void MqttInfo::release()
+{
+  if (json != NULL)
+  {
+    // This will cause the orion::CompoundValueNode destructor to be called, which
+    // recursively frees all memory
+    delete json;
+    json = NULL;
   }
 }
 }

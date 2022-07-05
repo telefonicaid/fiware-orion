@@ -2009,6 +2009,20 @@ static unsigned int processSubscriptions
     notification.httpInfo = tSubP->httpInfo;
     notification.mqttInfo = tSubP->mqttInfo;
     notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
+    if (notification.type == ngsiv2::HttpNotification)
+    {
+      if (tSubP->httpInfo.json != NULL)
+      {
+        notification.httpInfo.json = tSubP->httpInfo.json->clone();
+      }
+    }
+    else  // notification.type == ngsiv2::MqttNotification
+    {
+      if (tSubP->mqttInfo.json != NULL)
+      {
+        notification.mqttInfo.json = tSubP->mqttInfo.json->clone();
+      }
+    }
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
@@ -2024,6 +2038,12 @@ static unsigned int processSubscriptions
                                                                 notification,
                                                                 tSubP->blacklist,
                                                                 tSubP->covered);
+
+    // notification already consumed, it can be freed
+    // Only one of the release operation will do something, but it is simpler (and safer)
+    // than using notification type
+    notification.httpInfo.release();
+    notification.mqttInfo.release();
 
     if (notificationSent)
     {

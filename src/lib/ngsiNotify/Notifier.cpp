@@ -206,7 +206,7 @@ static bool setJsonPayload
   }
 
   *payloadP = json->toJson(&replacements);
-  *mimeTypeP = "application/json";  // FIXME PR: this can be overriden by headers?
+  *mimeTypeP = "application/json";  // this can be overriden by headers field
   return true;
 }
 

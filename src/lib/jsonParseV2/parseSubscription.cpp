@@ -607,7 +607,7 @@ std::string parseCustomJsonStandAlone
   orion::CompoundValueNode**  json
 )
 {
-  // FIXME PR: free for this new? be careful, we have httpInfo/mqttInfo object also in the cache
+  // this new memory is freed in in HttpInfo::release()/MqttInfo::release()()
   *json = new orion::CompoundValueNode();
 
   if (holder.IsArray())

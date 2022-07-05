@@ -68,6 +68,9 @@ extern std::string postSubscriptions
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
     TIMED_RENDER(answer = scr.toJson());
+
+    // free sub memory associated to subscriptions
+    parseDataP->subsV2.release();
     return answer;
   }
 
@@ -94,6 +97,10 @@ extern std::string postSubscriptions
 
     ciP->httpStatusCode = SccCreated;
   }
+
+  // free sub memory associated to subscriptions
+  // FIXME PR: refactor to have only one return?
+  parseDataP->subsV2.release();
 
   return answer;
 }

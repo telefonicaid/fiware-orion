@@ -57,6 +57,7 @@ struct MqttInfo
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);
+  void         release();
 };
 }
 

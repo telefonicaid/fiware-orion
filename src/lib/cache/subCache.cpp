@@ -603,6 +603,9 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->subscriptionId = NULL;
   }
 
+  cSubP->httpInfo.release();
+  cSubP->mqttInfo.release();
+
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
     cSubP->entityIdInfos[ix]->release();
@@ -849,13 +852,22 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
   cSubP->covered               = covered;
-  cSubP->httpInfo              = httpInfo;
-  cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->subAltTypeV           = altTypes;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
+  cSubP->httpInfo = httpInfo;
+  if (httpInfo.json != NULL)
+  {
+    cSubP->httpInfo.json = httpInfo.json->clone();
+  }
+
+  cSubP->mqttInfo = mqttInfo;
+  if (mqttInfo.json != NULL)
+  {
+    cSubP->mqttInfo.json = mqttInfo.json->clone();
+  }
 
   //
   // String filters

@@ -158,6 +158,17 @@ std::string Subscription::toJson(void)
 
 /* ****************************************************************************
 *
+* Subscription::release -
+*/
+void Subscription::release()
+{
+  notification.release();
+}
+
+
+
+/* ****************************************************************************
+*
 * Notification::toJson -
 *
 * FIXME P2: we should move 'attrsFormat' from Subject class to Notification
@@ -250,6 +261,20 @@ std::string Notification::toJson(const std::string& attrsFormat)
   jh.addBool("covered", this->covered);
 
   return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* Notification::release -
+*/
+void Notification::release()
+{
+  // Only one of the release operation will do something, but it is simpler (and safer)
+  // than using notification type
+  httpInfo.release();
+  mqttInfo.release();
 }
 
 

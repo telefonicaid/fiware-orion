@@ -84,5 +84,8 @@ std::string patchSubscription
     ciP->httpStatusCode = SccNoContent;
   }
 
+  // free sub memory associated to subscriptions
+  parseDataP->subsV2.release();
+
   return answer;
 }
