@@ -111,7 +111,7 @@ payload='{
   "type": "T",
   "A": {
     "value": 10,
-    "type": "Text"
+    "type": "Number"
   },
   "B": {
     "value": {"b1": 1, "b2": 2},
