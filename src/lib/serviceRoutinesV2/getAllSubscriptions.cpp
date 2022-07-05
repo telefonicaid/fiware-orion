@@ -70,31 +70,22 @@ std::string getAllSubscriptions
                                      offset,
                                      &count));
 
+  std::string out;
   if (oe.code != SccOk)
   {
-    std::string out;
-
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
-
-    // free sub memory associated to subscriptions
-    // FIXME PR: refactor this to have only one return?
-    for (unsigned int ix = 0; ix < subs.size(); ix++)
+  }
+  else  // oe.code == SccOk
+  {
+    if ((ciP->uriParamOptions["count"]))
     {
-      subs[ix].release();
+      ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+      ciP->httpHeaderValue.push_back(double2string(count));
     }
 
-    return out;
+    TIMED_RENDER(out = vectorToJson(subs));
   }
-
-  if ((ciP->uriParamOptions["count"]))
-  {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(double2string(count));
-  }
-
-  std::string out;
-  TIMED_RENDER(out = vectorToJson(subs));
 
   // free sub memory associated to subscriptions
   for (unsigned int ix = 0; ix < subs.size(); ix++)

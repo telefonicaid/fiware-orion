@@ -68,38 +68,35 @@ extern std::string postSubscriptions
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
     TIMED_RENDER(answer = scr.toJson());
-
-    // free sub memory associated to subscriptions
-    parseDataP->subsV2.release();
-    return answer;
   }
-
-  OrionError  beError;
-  std::string subsID;
-
-  TIMED_MONGO(subsID = mongoCreateSubscription(
-                          parseDataP->subsV2,
-                          &beError,
-                          ciP->tenant,
-                          ciP->servicePathV));
-
-  // Check potential error
-  if (beError.code != SccNone)
+  else  // ciP->servicePathV.size() == 1
   {
-    TIMED_RENDER(answer = beError.toJson());
-    ciP->httpStatusCode = beError.code;
-  }
-  else
-  {
-    std::string location = "/v2/subscriptions/" + subsID;
-    ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
-    ciP->httpHeaderValue.push_back(location);
+    OrionError  beError;
+    std::string subsID;
 
-    ciP->httpStatusCode = SccCreated;
+    TIMED_MONGO(subsID = mongoCreateSubscription(
+                            parseDataP->subsV2,
+                            &beError,
+                            ciP->tenant,
+                            ciP->servicePathV));
+
+    // Check potential error
+    if (beError.code != SccNone)
+    {
+      TIMED_RENDER(answer = beError.toJson());
+      ciP->httpStatusCode = beError.code;
+    }
+    else
+    {
+      std::string location = "/v2/subscriptions/" + subsID;
+      ciP->httpHeader.push_back(HTTP_RESOURCE_LOCATION);
+      ciP->httpHeaderValue.push_back(location);
+
+      ciP->httpStatusCode = SccCreated;
+    }
   }
 
   // free sub memory associated to subscriptions
-  // FIXME PR: refactor to have only one return?
   parseDataP->subsV2.release();
 
   return answer;

@@ -523,7 +523,7 @@ Some notes to take into account:
     `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
     will not work
   * It takes into account the nature of the attribute value to be replaced. For instance,
-    `"t": "${temperature}"` resolves to `"t": 10"` if temperature attribute is a number or to
+    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
     `"t": "10"` if `temperature` attribute is a string.
   * If the attribute doesn't exist in the entity, then `null` value is used
 * URL automatic decoding applied to `payload` and `headers` fields (described
@@ -531,6 +531,8 @@ Some notes to take into account:
   to `json` field.
 * `payload` and `json` cannot be used at the same time
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+[Top](#top)
 
 ## Custom notifications without payload
 
