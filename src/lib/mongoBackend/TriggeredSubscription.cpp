@@ -131,7 +131,7 @@ TriggeredSubscription::~TriggeredSubscription()
     mdStringFilterP = NULL;
   }
 
-  // Only one of the release operation will actually do something
+  // Only one of the release operations will actually do something
   httpInfo.release();
   mqttInfo.release();
 }

@@ -1613,8 +1613,14 @@ static bool addTriggeredSubscriptions_noCache
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
 
-      httpInfo.fill(sub);
-      mqttInfo.fill(sub);
+      if (sub.hasField(CSUB_MQTTTOPIC))
+      {
+        mqttInfo.fill(sub);
+      }
+      else
+      {
+        httpInfo.fill(sub);
+      }
 
       bool op = false;
       StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
@@ -2040,7 +2046,7 @@ static unsigned int processSubscriptions
                                                                 tSubP->covered);
 
     // notification already consumed, it can be freed
-    // Only one of the release operation will do something, but it is simpler (and safer)
+    // Only one of the release operations will do something, but it is simpler (and safer)
     // than using notification type
     notification.httpInfo.release();
     notification.mqttInfo.release();

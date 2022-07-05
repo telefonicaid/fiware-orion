@@ -271,7 +271,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
 */
 void Notification::release()
 {
-  // Only one of the release operation will do something, but it is simpler (and safer)
+  // Only one of the release operations will do something, but it is simpler (and safer)
   // than using notification type
   httpInfo.release();
   mqttInfo.release();

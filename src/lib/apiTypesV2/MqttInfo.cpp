@@ -51,7 +51,7 @@ MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), includePayload(true), 
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), includePayload(true), providedAuth(false)
+MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), json(NULL), includePayload(true), providedAuth(false)
 {
 }
 
