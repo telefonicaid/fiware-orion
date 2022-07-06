@@ -2099,56 +2099,39 @@ Please check the corresponding specification in order to get the details.
 
 A context registration is represented by a JSON object with the following fields:
 
-+ `id` : Unique identifier assigned to the registration. Automatically generated at creation time.
-+ `description` : Description given to this registration. Optional. 
-+ `provider` : Object that describes the context source registered. Mandatory. 
-+ `dataProvided` : Object that describes the data provided by this source. Mandatory. 
-+ `status`: Enumerated field which captures the current status of this registration:
-Either `active` (for active registrations) or `inactive` (for inactive registrations).
-  If this field is not provided at registration creation time, new registrations are created with
-  the `active` status, which may be changed by clients afterwards. For expired registrations, this
-  attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
-  Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`.
-  As soon as the forwarding operations start working again, the status is changed back to `active`.
-+ `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
-+ `forwardingInformation`: Information related to the forwarding operations made against the provider.
-Automatically provided by the implementation, in the case such implementation supports forwarding capabilities.
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `id`           |          | string | Unique identifier assigned to the registration. Automatically generated at creation time.     |
+| `description`  | ✓        | string | Description given to this registration. |
+| `provider`     |          | object | Object that describes the context source registered. |
+| `dataProvided` |          | object | Object that describes the data provided by this source. |
+| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`, `expired` or `failed`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
+| `expires`      | ✓        | string | Registration expiration date in ISO8601 format. Permanent registrations must omit this field. |
+| `forwardingInformation` |          | string | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
 The `provider` field contains the following subfields:
-+ `http` : It is used to convey parameters for providers that deliver information through the HTTP protocol.
-(Only protocol supported nowadays).
-It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface.
-The endpoint must *not* include the protocol
-specific part (for instance `/v2/entities`). 
-+ `supportedForwardingMode` : It is used to convey the forwarding mode supported by this context provider. By default `all`. 
-Allowed values are:
-    + `none` : This provider does not support request forwarding.
-    + `query` : This provider only supports request forwarding to query data.
-    + `update` : This provider only supports request forwarding to update data.
-    + `all` : This provider supports both query and update forwarding requests. (Default value)
+
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `http`         |          | string | It is used to convey parameters for providers that deliver information through the HTTP protocol.(Only protocol supported nowadays). <br>It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpoint must *not* include the protocol specific part (for instance `/v2/entities`). |
+| `supportedForwardingMode`  |          | string | It is used to convey the forwarding mode supported by this context provider. By default `all`. Allowed values are: <ul><li><code>none</code>: This provider does not support request forwarding.</li><li><code>query</code>: This provider only supports request forwarding to query data.</li><li><code>update</code>: This provider only supports request forwarding to update data.</li><li><code>all</code>: This provider supports both query and update forwarding requests. (Default value).</li></ul> |
 
 The `dataProvided` field contains the following subfields:
 
-+ `entities`: A list of objects, each one composed of the following subfields:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but one of them must be present.
-    + `type` or `typePattern`: Type or pattern of the affected entities. Both cannot be used at
-      the same time. If omitted, it means "any entity type".
-+ `attrs`: List of attributes to be provided (if not specified, all attributes).
-+ `expression`: By means of a filtering expression, allows to express what is the scope of the data provided.
-Currently only geographical scopes are supported through the following subterms:
-    + `georel` : Any of the geographical relationships as specified by the Geoqueries section of this specification. 
-    + `geometry` : Any of the supported geometries as specified by the Geoqueries section of this specification. 
-    + `coords` : String representation of coordinates as specified by the Geoqueries section of this specification. 
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `entities`     |          | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> or <code>typePattern</code>: Type or pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| `attrs`        |          | string | List of attributes to be provided (if not specified, all attributes). |
+| `expression`   |          | string | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the Geoqueries section of this specification. </li><li><code>geometry</code>: Any of the supported geometries as specified by the Geoqueries section of this specification.</li> <li><code>coords</code>: String representation of coordinates as specified by the Geoqueries section of this specification.</li></ul> |
 
 The `forwardingInformation` field contains the following subfields:
 
-+ `timesSent` (not editable, only present in GET operations): Number of request forwardings sent due to this registration.
-+ `lastForwarding` (not editable, only present in GET operations): Last forwarding timestamp in ISO8601 format.
-+ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
-Not present if registration has never had a problem with forwarding.
-+ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
-Not present if registration has never had a successful notification.
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `timesSent`    |          | string | Not editable, only present in GET operations. Number of request forwardings sent due to this registration. |
+| `lastForwarding`|         | string | Not editable, only present in GET operations. Last forwarding timestamp in ISO8601 format. |
+| `lastFailure`  |          | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if registration has never had a problem with forwarding. |
+| `lastSuccess`  |          | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful request forwarding. Not present if registration has never had a successful notification. |
 
 ### Registration list
 
