@@ -21,6 +21,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
+* [Custom notification with JSON payload](#custom-notification-with-json-payload)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
@@ -493,6 +494,45 @@ Orion supports the `alterationTypes` field to specify under which alterations (e
 modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
+
+## Custom notification with JSON payload
+
+As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
+used to generate JSON-based payloads. For instance:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+Some notes to take into account:
+
+* The value of the `json` field must be an array or object. Although a simple string or number is
+  also a valid JSON, these cases are not supported.
+* The macro replacement logic works the same way than in `payload` case, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * The value of the JSON object or JSON array item in which the macro is used has to match
+    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
+    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
+    will not work
+  * It takes into account the nature of the attribute value to be replaced. For instance,
+    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
+    `"t": "10"` if `temperature` attribute is a string.
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* URL automatic decoding applied to `payload` and `headers` fields (described
+  [here](forbidden_characters.md#custom-payload-and-headers-special-treatment)) is not applied
+  to `json` field.
+* `payload` and `json` cannot be used at the same time
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+[Top](#top)
 
 ## Custom notifications without payload
 
