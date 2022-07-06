@@ -1844,8 +1844,7 @@ An `httpCustom` object contains the following subfields.
 | `headers` | ✓        | string | A key-map of HTTP headers that are included in notification messages.                         |
 | `qs`      | ✓        | string | A key-map of URL query parameters that are included in notification messages.                 |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
-| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see "Notification Messages" sections) is used.
- |
+| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see "Notification Messages" sections) is used.|
 
 If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
 
