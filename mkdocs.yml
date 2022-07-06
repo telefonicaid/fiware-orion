@@ -13,6 +13,7 @@ google_analytics: ['UA-83236805-1', 'fiware-orion.readthedocs.io']
 pages:
   - Home: index.md
   - 'Getting Started': 'quick_start_guide.md'
+  - 'API': 'orion-api.md'
   - 'User & Programmers Manual':
       - 'Introduction': 'user/index.md'
       - 'API Walkthrough': 'user/walkthrough_apiv2.md'
