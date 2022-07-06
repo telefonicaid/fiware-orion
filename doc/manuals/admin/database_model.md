@@ -323,7 +323,7 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     its value is `null` means that no payload has to be included in the notification. If its value is `""` or if
     the field is omitted, then the NGSIv2 normalized format is used.
 -   **json**: optional field to store a JSON object or array to generated JSON-based payload for
-    notification customization functionality in NGSIv2. More detail of this functionality [here](../users/ngsiv2_implementation_notes#)
+    notification customization functionality in NGSIv2. More detail of this functionality [here](../user/ngsiv2_implementation_notes#)
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.
