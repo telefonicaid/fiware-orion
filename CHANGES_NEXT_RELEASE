@@ -1,1 +1,2 @@
+- Add: json field in httpCustom and mqttCustom subscriptions (#2560)
 - Upgrade Debian version from 11.2 to 11.3 in Dockerfile

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification with JSON errors
+Custom notification MQTT with JSON errors
 
 --SHELL-INIT--
 dbInit CB
@@ -45,8 +45,9 @@ payload='{
     ]
   },
   "notification": {
-    "httpCustom": {
-      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
       "json": {
         "text": "foo"
       },

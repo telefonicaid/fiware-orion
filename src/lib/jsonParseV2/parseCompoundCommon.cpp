@@ -23,6 +23,8 @@
 * Author: Fermín Galán
 */
 
+#include <string>
+
 #include "jsonParseV2/parseCompoundCommon.h"
 
 #include "common/limits.h"

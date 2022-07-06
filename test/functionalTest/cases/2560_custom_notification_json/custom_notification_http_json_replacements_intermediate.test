@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification with JSON with constants
+Custom notification HTTP with JSON with replacements in intermediate elements
 
 --SHELL-INIT--
 dbInit CB
@@ -31,8 +31,8 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription for E1 with custom notification with constant JSON object
-# 02. Create subscription for E1 with custom notification with constant JSON array
+# 01. Create subscription for E1 with custom notification with JSON object
+# 02. Create subscription for E1 with custom notification with JSON array
 # 03. GET /v2/subscriptions and see both subscriptions
 # 04. Create E1 entity to trigger both notifications
 # 05. Dump accumulator, see 2 notifications
@@ -53,25 +53,11 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "json": {
-        "text": "foo",
-        "number": 10,
-        "bool": true,
-        "null": null,
-        "array": [
-          "22",
-          {
-            "x" : [ "x1", "x2" ],
-            "y" : 3
-          },
-          [ "z1", "z2" ]
-        ],
-        "object": {
-          "x": {
-            "x1": "a",
-            "x2": "b"
-          },
-          "y": [ "y1", "y2" ]
-        }
+        "x": {
+          "x1": "${A}",
+          "x2": "b"
+        },
+        "y": [ "y1", "${B}" ]
       }
     }
   }
@@ -96,25 +82,12 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "json": [
-        "foo",
-        10,
-        true,
-        null,
-        [
-          "22",
-          {
-            "x" : [ "x1", "x2" ],
-            "y" : 3
-          },
-          [ "z1", "z2" ]
-        ],
-        {
-          "x": {
-            "x1": "a",
-            "x2": "b"
-          },
-          "y": [ "y1", "y2" ]
-        }
+        "22",
+         {
+           "x" : [ "${A}", "x2" ],
+           "y" : 3
+         },
+         [ "z1", "${B}" ]
       ]
     }
   }
@@ -137,8 +110,12 @@ payload='{
   "id": "E1",
   "type": "T",
   "A": {
-    "value": "trigger!",
-    "type": "Text"
+    "value": 10,
+    "type": "Number"
+  },
+  "B": {
+    "value": {"b1": 1, "b2": 2},
+    "type": "StructuredValue"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -177,7 +154,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see both subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 820
+Content-Length: 655
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -191,34 +168,14 @@ Date: REGEX(.*)
             "covered": false,
             "httpCustom": {
                 "json": {
-                    "array": [
-                        "22",
-                        {
-                            "x": [
-                                "x1",
-                                "x2"
-                            ],
-                            "y": 3
-                        },
-                        [
-                            "z1",
-                            "z2"
-                        ]
-                    ],
-                    "bool": true,
-                    "null": null,
-                    "number": 10,
-                    "object": {
-                        "x": {
-                            "x1": "a",
-                            "x2": "b"
-                        },
-                        "y": [
-                            "y1",
-                            "y2"
-                        ]
+                    "x": {
+                        "x1": "${A}",
+                        "x2": "b"
                     },
-                    "text": "foo"
+                    "y": [
+                        "y1",
+                        "${B}"
+                    ]
                 },
                 "url": "http://127.0.0.1:9997/notify"
             },
@@ -245,34 +202,18 @@ Date: REGEX(.*)
             "covered": false,
             "httpCustom": {
                 "json": [
-                    "foo",
-                    10,
-                    true,
-                    null,
-                    [
-                        "22",
-                        {
-                            "x": [
-                                "x1",
-                                "x2"
-                            ],
-                            "y": 3
-                        },
-                        [
-                            "z1",
-                            "z2"
-                        ]
-                    ],
+                    "22",
                     {
-                        "x": {
-                            "x1": "a",
-                            "x2": "b"
-                        },
-                        "y": [
-                            "y1",
-                            "y2"
-                        ]
-                    }
+                        "x": [
+                            "${A}",
+                            "x2"
+                        ],
+                        "y": 3
+                    },
+                    [
+                        "z1",
+                        "${B}"
+                    ]
                 ],
                 "url": "http://127.0.0.1:9997/notify"
             },
@@ -309,7 +250,7 @@ Date: REGEX(.*)
 =========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 152
+Content-Length: 51
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -318,39 +259,22 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
-    "array": [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
-    "bool": true,
-    "null": null,
-    "number": 10,
-    "object": {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
+    "x": {
+        "x1": 10,
+        "x2": "b"
     },
-    "text": "foo"
+    "y": [
+        "y1",
+        {
+            "b1": 1,
+            "b2": 2
+        }
+    ]
 }
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 105
+Content-Length: 51
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -358,36 +282,22 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-
 [
-    "foo",
-    10,
-    true,
-    null,
-    [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
+    "22",
     {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
-    }
+        "x": [
+            10,
+            "x2"
+        ],
+        "y": 3
+    },
+    [
+        "z1",
+        {
+            "b1": 1,
+            "b2": 2
+        }
+    ]
 ]
 =======================================
 #SORT_END

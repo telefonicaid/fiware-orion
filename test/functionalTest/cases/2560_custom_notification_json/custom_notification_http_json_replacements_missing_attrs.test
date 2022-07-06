@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification with JSON with content-type header override
+Custom notification HTTP with JSON with replacements with missing elements
 
 --SHELL-INIT--
 dbInit CB
@@ -31,13 +31,13 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription with json payload and conte-type text/plain
-# 02. Create entity to trigger notification
-# 03. Dump accumulator, see notification with content-type
+# 01. Create subscription for E1 with custom notification with JSON object (A and B attrs)
+# 02. Create E1 with A=10
+# 03. Dump accumulator, see A=10 and B=null
 #
 
-echo "01. Create subscription with json payload and conte-type text/plain"
-echo "==================================================================="
+echo "01. Create subscription for E1 with custom notification with JSON object (A and B attrs)"
+echo "========================================================================================"
 payload='{
   "subject": {
     "entities": [
@@ -50,29 +50,9 @@ payload='{
   "notification": {
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-      "headers": {
-        "content-type": "text/plain"
-      },
       "json": {
-        "text": "foo",
-        "number": 10,
-        "bool": true,
-        "null": null,
-        "array": [
-          "22",
-          {
-            "x" : [ "x1", "x2" ],
-            "y" : 3
-          },
-          [ "z1", "z2" ]
-        ],
-        "object": {
-          "x": {
-            "x1": "a",
-            "x2": "b"
-          },
-          "y": [ "y1", "y2" ]
-        }
+        "A": "${A}",
+        "B": "${B}"
       }
     }
   }
@@ -82,14 +62,14 @@ echo
 echo
 
 
-echo "02. Create entity to trigger notification"
-echo "========================================="
+echo "02. Create E1 with A=10"
+echo "======================="
 payload='{
   "id": "E1",
   "type": "T",
   "A": {
-    "value": "trigger!",
-    "type": "Text"
+    "value": 10,
+    "type": "Number"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -97,16 +77,16 @@ echo
 echo
 
 
-echo "03. Dump accumulator, see notification with content-type"
-echo "========================================================"
+echo "03. Dump accumulator, see A=10 and B=null"
+echo "========================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create subscription with json payload and conte-type text/plain
-===================================================================
+01. Create subscription for E1 with custom notification with JSON object (A and B attrs)
+========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -115,8 +95,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity to trigger notification
-=========================================
+02. Create E1 with A=10
+=======================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -125,47 +105,21 @@ Date: REGEX(.*)
 
 
 
-03. Dump accumulator, see notification with content-type
-========================================================
+03. Dump accumulator, see A=10 and B=null
+=========================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 152
+Content-Length: 17
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
-    "array": [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
-    "bool": true,
-    "null": null,
-    "number": 10,
-    "object": {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
-    },
-    "text": "foo"
+    "A": 10,
+    "B": null
 }
 =======================================
 

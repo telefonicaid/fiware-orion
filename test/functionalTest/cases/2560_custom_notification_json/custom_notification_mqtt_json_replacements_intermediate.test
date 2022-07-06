@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification with JSON with replacements in intermediate elements
+Custom notification MQTT with JSON with replacements in intermediate elements
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
 
 --SHELL--
 
@@ -50,8 +50,9 @@ payload='{
     ]
   },
   "notification": {
-    "httpCustom": {
-      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "topic1",
       "json": {
         "x": {
           "x1": "${A}",
@@ -79,8 +80,9 @@ payload='{
     ]
   },
   "notification": {
-    "httpCustom": {
-      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "topic1",
       "json": [
         "22",
          {
@@ -154,7 +156,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see both subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 655
+Content-Length: 691
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -166,7 +168,7 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "httpCustom": {
+            "mqttCustom": {
                 "json": {
                     "x": {
                         "x1": "${A}",
@@ -177,7 +179,9 @@ Date: REGEX(.*)
                         "${B}"
                     ]
                 },
-                "url": "http://127.0.0.1:9997/notify"
+                "qos": 0,
+                "topic": "topic1",
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false
         },
@@ -200,7 +204,7 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "httpCustom": {
+            "mqttCustom": {
                 "json": [
                     "22",
                     {
@@ -215,7 +219,9 @@ Date: REGEX(.*)
                         "${B}"
                     ]
                 ],
-                "url": "http://127.0.0.1:9997/notify"
+                "qos": 0,
+                "topic": "topic1",
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false
         },
@@ -245,18 +251,10 @@ Date: REGEX(.*)
 
 
 
+#SORT_START
 05. Dump accumulator, see 2 notifications
 =========================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 51
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
-
+MQTT message at topic topic1:
 {
     "x": {
         "x1": 10,
@@ -271,16 +269,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
     ]
 }
 =======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 51
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
-
+MQTT message at topic topic1:
 [
     "22",
     {
@@ -299,6 +288,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
     ]
 ]
 =======================================
+#SORT_END
 
 
 --TEARDOWN--

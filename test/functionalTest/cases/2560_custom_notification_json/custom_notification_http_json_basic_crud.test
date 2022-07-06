@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification with JSON basic CRUD
+Custom notification HTTP with JSON basic CRUD
 
 --SHELL-INIT--
 dbInit CB
