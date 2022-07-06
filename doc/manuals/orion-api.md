@@ -1812,100 +1812,40 @@ A subscription is represented by a JSON object with the following fields:
 
 A `subject` contains the following subfields:
 
-<table>
-<thead>
-	<tr>
-		<th>Parameter</th>
-		<th>Optional</th>
-		<th>Type</th>
-		<th>Description</th>
-	</tr>
-</thead>
-<tbody>
-  <!-- entities -->
-	<tr>
-		<td><code>entities</code></td>
-		<td></td>
-		<td>string</td>
-		<td>A list of objects, each one composed of the following subfields:
-      <table>
-        <tr>
-          <th><code>id</code> or <code>idPattern</code></th>
-          <th>Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</th>
-        </tr>
-        <tr>
-          <th><code>type</code> or <code>typePattern</code></th>
-          <th>Type or type pattern of the affected entities. Both cannot be used at
-     the same time. If omitted, it means "any entity type".</th>          
-        </tr>
-      </table>
-    </td>
-	</tr>
-  <!-- condition -->
-  <tr>
-		<td><code>condition</code></td>
-		<td></td>
-		<td>string</td>
-		<td>Condition to trigger notifications. This field is optional and it may contain two properties, both optional:
-      <table>
-        <tr>
-          <th><code>attrs</code></th>
-          <th>Array of attribute names that will trigger the notification.</th>
-        </tr>
-        <tr>
-          <th><code>expression</code> </th>
-          <th>an expression composed of <code>q</code>, <code>mq</code>, <code>georel</code>, 
-          <code>geometry</code> and <code>coords</code> (see "List entities" operation above about 
-          this field)</th>          
-        </tr>
-      </table>
-    </td>
-	</tr>
-</tbody>
-</table>
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `entities`     | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| `condition`    | ✓        | string | Condition to trigger notifications. This field is optional and it may contain two properties, both optional: <ul><li><code>attrs</code> Array of attribute names that will trigger the notification. </li> <li><code>expression</code> An expression composed of <code>q</code>, <code>mq</code>, <code>georel</code>, <code>geometry</code> and <code>coords</code> (see "List entities" operation above about this field)</li></ul> |
 
 A `notification` object contains the following subfields:
 
-+ `attrs` or `exceptAttrs` (both cannot be used at the same time):
-  + `attrs`: List of attributes to be included in notification messages. It also defines the
-    order in which attributes must appear in notifications when `attrsFormat` `value` is used
-    (see "Notification Messages" section). An empty list means that all attributes are to be
-    included in notifications. See "Filtering out attributes and metadata" section for more detail.
-  + `exceptAttrs`: List of attributes to be excluded from the notification message, i.e.
-     a notification message includes all entity attributes except the ones listed in this field.
-  + If neither `attrs` nor `exceptAttrs` is specified, all attributes are included in
-    notifications.
-+ `http` or `httpCustom` (one of them must be present, but not both at the same time): It is used
-  to convey parameters for notifications delivered through the HTTP protocol.
-+ `attrsFormat` (optional): specifies how the entities are represented in notifications.
-  Accepted values are `normalized` (default), `keyValues` or `values`.
-  If `attrsFormat` takes any value different
-  than those, an error is raised. See detail in "Notification Messages" section.
-+ `metadata` (optional): List of metadata to be included in notification messages.
-  See "Filtering out attributes and metadata" section for more detail.
-+ `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
-   this subscription.
-+ `lastNotification` (not editable, only present in GET operations): Last notification timestamp in ISO8601 format.
-+ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
-  Not present if subscription has never had a problem with notifications.
-+ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful notification.
-  Not present if subscription has never had a successful notification.
+| Parameter                | Optional | Type   | Description                                                                                   |
+|--------------------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `attrs` or `exceptAttrs` |          | string | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see "Notification Messages" section). An empty list means that all attributes are to be included in notifications. See "Filtering out attributes and metadata" section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
+| `http` or `httpCustom`   | ✓        | string | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol. |
+| `attrsFormat`            | ✓        | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in "Notification Messages" section. |
+| `metadata`               | ✓        | string | List of metadata to be included in notification messages. See "Filtering out attributes and metadata" section for more detail. |
+| `timesSent`              |          | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription. |
+| `lastNotification`       |          | string | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format. |
+| `lastFailure`            |          | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications. |
+| `lastSuccess`            |          | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
 
 An `http` object contains the following subfields:
 
-+ `url` : URL referencing the service to be invoked when a notification is generated. An NGSIv2
-  compliant server must support the `http` URL schema. Other schemas could also be supported.
+| Parameter | Optional | Type   | Description                                                                                   |
+|-----------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. An NGSIv2 compliant server must support the `http` URL schema. Other schemas could also be supported. |
 
 An `httpCustom` object contains the following subfields.
 
-+ `url`: same as in `http` above.
-+ `headers` (optional): a key-map of HTTP headers that are included in notification messages.
-+ `qs` (optional): a key-map of URL query parameters that are included in notification messages.
-+ `method` (optional): the method to use when sending the notification (default is POST).
-   Only valid HTTP methods are allowed.
-   On specifying an invalid HTTP method, a 400 Bad Request error is returned.
-+ `payload` (optional): the payload to be used in notifications.
-   If omitted, the default payload (see "Notification Messages" sections) is used.
+| Parameter | Optional | Type   | Description                                                                                   |
+|-----------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `url`     |          | string | Same as in `http` above.                                                                      |
+| `headers` | ✓        | string | A key-map of HTTP headers that are included in notification messages.                         |
+| `qs`      | ✓        | string | A key-map of URL query parameters that are included in notification messages.                 |
+| `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
+| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see "Notification Messages" sections) is used.
+ |
 
 If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
 
