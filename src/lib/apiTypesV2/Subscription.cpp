@@ -162,8 +162,8 @@ std::string Subscription::toJson(void)
 */
 void Subscription::release()
 {
-  // FIXME PR: should this be in the class destructor? some problems found when
-  // std::vector storing Subscriptions are used...
+  // Should this be in the class destructor? If do so, problems found when
+  // Subscription is stored in std::vector in some points of the code...
   notification.release();
 }
 
