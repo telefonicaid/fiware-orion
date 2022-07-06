@@ -32,7 +32,7 @@ sudo aptitude install -y libssl1.0-dev libcurl4-gnutls-dev libsasl2-dev libgnutl
 Some libraries are built from source code and those sources must be downloaded and compiled.
 * cmake                3.14.5
 * Mongo C++ Driver:    legacy-1.1.2
-* Mongo C driver:      1.21.2
+* Mongo C driver:      1.22.0
 * libmicrohttpd:       0.9.75
 * rapidjson:           1.0.2
 * kbase:               0.8
@@ -120,9 +120,9 @@ Install the driver like this:
 sudo mkdir /opt/mongoc
 sudo chown $USER:$GROUP /opt/mongoc
 cd /opt/mongoc
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz
-tar xzf mongo-c-driver-1.21.2.tar.gz
-cd mongo-c-driver-1.21.2
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.22.0/mongo-c-driver-1.22.0.tar.gz
+tar xzf mongo-c-driver-1.22.0.tar.gz
+cd mongo-c-driver-1.22.0
 mkdir cmake-build
 cd cmake-build
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..

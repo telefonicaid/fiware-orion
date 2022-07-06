@@ -204,10 +204,10 @@ function mongocDriver()
   sudo chown $USER:$GROUP mongoc
   cd /opt/mongoc
 
-  wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz
-  tar xzf mongo-c-driver-1.21.2.tar.gz
+  wget https://github.com/mongodb/mongo-c-driver/releases/download/1.22.0/mongo-c-driver-1.22.0.tar.gz
+  tar xzf mongo-c-driver-1.22.0.tar.gz
 
-  cd mongo-c-driver-1.21.2
+  cd mongo-c-driver-1.22.0
   mkdir -p cmake-build
 
   cd cmake-build

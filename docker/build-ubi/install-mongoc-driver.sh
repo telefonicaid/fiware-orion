@@ -34,9 +34,9 @@ make install
 
 echo
 echo -e "\e[1;32m Builder: installing mongo c driver \e[0m"
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.2/mongo-c-driver-1.21.2.tar.gz
-tar xzf mongo-c-driver-1.21.2.tar.gz
-cd mongo-c-driver-1.21.2
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.22.0/mongo-c-driver-1.22.0.tar.gz
+tar xzf mongo-c-driver-1.22.0.tar.gz
+cd mongo-c-driver-1.22.0
 mkdir cmake-build
 cd cmake-build
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
