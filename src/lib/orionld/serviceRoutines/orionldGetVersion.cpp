@@ -32,6 +32,7 @@
 #include <mongo/version.h>                                     // MONGOCLIENT_VERSION
 #include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
 #include <mongoc/mongoc.h>                                     // MONGOC_VERSION_S
+#include <bson/bson.h>                                         // BSON_VERSION_S
 
 extern "C"
 {
@@ -161,6 +162,10 @@ bool orionldGetVersion(void)
 
   // mongoc
   nodeP = kjString(orionldState.kjsonP, "mongoc version", MONGOC_VERSION_S);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // bson
+  nodeP = kjString(orionldState.kjsonP, "bson version", BSON_VERSION_S);
   kjChildAdd(orionldState.responseTree, nodeP);
 
 
