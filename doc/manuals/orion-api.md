@@ -1841,7 +1841,7 @@ A `condition` contains the following subfields:
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
-| `expression` | ✓        | array | An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List entities" operation above about this field) |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List entities" operation above about this field) |
 
 `condition` field modifies the triggering Notification rules as follow:
 
