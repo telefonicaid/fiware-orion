@@ -198,6 +198,12 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
   if (newP == NULL)  // Not sure this is ever a possibility ...
     return;
 
+  //
+  // In JSON-LD, null is expressed in a different way ...
+  //
+  if ((newP->type == KjString) && (strcmp(newP->value.s, "urn:ngsi-ld:null") == 0))
+    newP->type = KjNull;
+
   if (oldP == NULL)  // It's NEW - doesn't exist in OLD - simply ADD
   {
     // Except if it's a NULL. If NULL, then it is ignored
@@ -206,12 +212,6 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
 
     return;
   }
-
-  //
-  // In JSON-LD, null is expressed in a different way ...
-  //
-  if ((newP->type == KjString) && (strcmp(newP->value.s, "urn:ngsi-ld:null") == 0))
-    newP->type = KjNull;
 
 
   //

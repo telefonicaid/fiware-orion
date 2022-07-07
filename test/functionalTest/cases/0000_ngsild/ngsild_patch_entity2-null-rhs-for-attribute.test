@@ -33,6 +33,9 @@ brokerStart CB 0 IPv4 -experimental
 # 01. Create an entity E1 with a Relationship R1
 # 02. PATCH E1, attempting to delete the Property P1 (that does not exist), also, set a new object for R1
 # 03. GET E1, see the new object for R1
+# 04. Add a LanguageProperty LP to E1, with en,es
+# 05. PATCH LP, modifying values for en and es AND attempt to delete se (that doesn't exist)
+# 06. GET E1, make sure en and es are modified for LP, and that se is not there
 #
 
 echo "01. Create an entity E1 with a Relationship R1"
@@ -69,6 +72,44 @@ echo
 echo
 
 
+echo "04. Add a LanguageProperty LP to E1, with en,es"
+echo "==============================================="
+payload='{
+  "LP": {
+    "languageMap": {
+      "en": "one",
+      "es": "uno"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. PATCH LP, modifying values for en and es AND attempt to delete se (that doesn't exist)"
+echo "=========================================================================================="
+payload='{
+  "LP": {
+    "languageMap": {
+      "en": "five",
+      "es": "fem",
+      "se": "urn:ngsi-ld:null"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. GET E1, make sure en and es are modified for LP, and that se is not there"
+echo "============================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
 --REGEXPECT--
 01. Create an entity E1 with a Relationship R1
 ==============================================
@@ -95,6 +136,45 @@ Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "R1": {
+        "object": "urn:ngsi-ld:Building:R2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. Add a LanguageProperty LP to E1, with en,es
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. PATCH LP, modifying values for en and es AND attempt to delete se (that doesn't exist)
+==========================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. GET E1, make sure en and es are modified for LP, and that se is not there
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 162
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "LP": {
+        "languageMap": {
+            "en": "five",
+            "es": "fem"
+        },
+        "type": "LanguageProperty"
+    },
     "R1": {
         "object": "urn:ngsi-ld:Building:R2",
         "type": "Relationship"
