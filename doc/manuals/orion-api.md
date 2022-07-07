@@ -58,11 +58,11 @@
             - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
             - [Retrieve entity information for a given type [GET /v2/types]](#retrieve-entity-information-for-a-given-type-get-v2types)
     - [Subscriptions Operations](#subscriptions-operations)
-        - [Subscription payload datamodel](#Subscriptionpayloaddatamodel)
-            - [`subscription.subject`](#subscription.subject)
-            - [`subscription.notification`](#subscription.notification)
-            - [`subscription.notification.http`](#subscription.notification.http)
-            - [`subscription.notification.httpCustom`](#subscription.notification.httpCustom)
+        - [Subscription payload datamodel](#subscription-payload-datamodel)
+            - [`subscription.subject`](#subscriptionsubject)
+            - [`subscription.notification`](#subscriptionnotification)
+            - [`subscription.notification.http`](#subscriptionnotification.http)
+            - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
             - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
@@ -71,11 +71,11 @@
             - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
             - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
     - [Registration Operations](#registration-operations)
-        - [Registration payload datamodel](#Registrationpayloaddatamodel)
+        - [Registration payload datamodel](#registration-payload-datamodel)
             - [`registration`](#registration)
-            - [`registration.provider`](#registration.provider)
-            - [`registration.dataProvided`](#registration.dataProvided)
-            - [`registration.forwardingInformation`](#registration.forwardingInformation)
+            - [`registration.provider`](#registrationprovider)
+            - [`registration.dataProvided`](#registrationdataprovided)
+            - [`registration.forwardingInformation`](#registrationforwardinginformation)
         - [Registration list](#registration-list)
             - [List Registrations [GET /v2/registrations]](#list-registrations-get-v2registrations)
             - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
@@ -1810,7 +1810,7 @@ Content-Type is `application/json`
 
 ### Subscription payload datamodel
 
-#### `subscription`
+#### `subscription`
 
 A subscription is represented by a JSON object with the following fields:
 
