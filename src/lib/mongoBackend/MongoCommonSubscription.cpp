@@ -33,6 +33,7 @@
 #include "common/defaultValues.h"
 
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/compoundValueBson.h"
 
 #include "mongoDriver/BSONArrayBuilder.h"
 
@@ -129,6 +130,28 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
     b->append(CSUB_PAYLOAD, httpInfo.payload);
     LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
   }
+
+  if (httpInfo.json != NULL)
+  {
+    std::string logStr;
+    if (httpInfo.json->isObject())
+    {
+      orion::BSONObjBuilder jsonBuilder;
+      compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+      orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+      logStr = jsonBuilderObj.toString();
+      b->append(CSUB_JSON, jsonBuilderObj);
+    }
+    else  // httpInfo.json->isVector();
+    {
+      orion::BSONArrayBuilder jsonBuilder;
+      compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+      orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+      logStr = jsonBuilderArr.toString();
+      b->append(CSUB_JSON, jsonBuilderArr);
+    }
+    LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+  }
 }
 
 
@@ -148,6 +171,28 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
   {
     b->append(CSUB_PAYLOAD, mqttInfo.payload);
     LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+  }
+
+  if (mqttInfo.json != NULL)
+  {
+    std::string logStr;
+    if (mqttInfo.json->isObject())
+    {
+      orion::BSONObjBuilder jsonBuilder;
+      compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+      orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+      logStr = jsonBuilderObj.toString();
+      b->append(CSUB_JSON, jsonBuilderObj);
+    }
+    else  // httpInfo.json->isVector();
+    {
+      orion::BSONArrayBuilder jsonBuilder;
+      compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+      orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+      logStr = jsonBuilderArr.toString();
+      b->append(CSUB_JSON, jsonBuilderArr);
+    }
+    LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
   }
 }
 

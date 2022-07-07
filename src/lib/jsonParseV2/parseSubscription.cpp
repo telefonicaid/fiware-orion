@@ -49,6 +49,7 @@
 #include "jsonParseV2/parseStringVector.h"
 #include "jsonParseV2/parseSubscription.h"
 #include "jsonParseV2/parseExpression.h"
+#include "jsonParseV2/parseCompoundCommon.h"
 
 
 
@@ -305,41 +306,184 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
+* parseCustomJson -
+*
+*/
+std::string parseCustomJson
+(
+  const Value&               holder,
+  orion::CompoundValueNode**  json
+)
+{
+  // this new memory is freed in in HttpInfo::release()/MqttInfo::release()()
+  *json = new orion::CompoundValueNode();
+
+  if (holder.IsArray())
+  {
+    for (rapidjson::Value::ConstValueIterator iter = holder.Begin(); iter != holder.End(); ++iter)
+    {
+      std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
+      orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
+
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue = iter->GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNull;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      (*json)->childV.push_back(cvnP);
+      (*json)->valueType = orion::ValueTypeVector;
+
+      //
+      // Start recursive calls if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCompoundValue(iter, cvnP, 0);
+        if (r != "OK")
+        {
+          return r;
+        }
+      }
+    }
+  }
+  else if (holder.IsObject())
+  {
+    for (rapidjson::Value::ConstMemberIterator iter = holder.MemberBegin(); iter != holder.MemberEnd(); ++iter)
+    {
+      std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
+      orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
+
+      cvnP->name       = iter->name.GetString();
+      cvnP->valueType  = stringToCompoundType(nodeType);
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue = iter->value.GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->value.GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNull;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      (*json)->childV.push_back(cvnP);
+      (*json)->valueType = orion::ValueTypeObject;
+
+      //
+      // Start recursive calls if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        std::string r = parseCompoundValue(iter, cvnP, 0);
+        if (r != "OK")
+        {
+          // Early return
+          return r;
+        }
+      }
+    }
+  }
+  else
+  {
+    return "json fields in httpCustom or mqttCustom must be object or array";
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseCustomPayload -
 *
 * Both for HTTP and MQTT notifications
 */
 static std::string parseCustomPayload
 (
-  ConnectionInfo*  ciP,
-  std::string*     payload,
-  bool*            includePayload,
-  const Value&     holder
+  ConnectionInfo*             ciP,
+  std::string*                payload,
+  orion::CompoundValueNode**  json,
+  bool*                       includePayload,
+  const Value&                holder
 )
 {
-  if (isNull(holder, "payload"))
+  if ((holder.HasMember("payload")) && (holder.HasMember("json")))
   {
-    *includePayload = false;
-
-    // We initialize also payload in this case, although its value is irrelevant
-    *payload = "";
+    return badInput(ciP, "payload and json fields cannot be used at the same time in httpCustom or mqttCustom");
   }
-  else
+
+  if (holder.HasMember("payload"))
   {
-    Opt<std::string> payloadOpt = getStringOpt(holder, "payload", "payload custom notification");
-
-    if (!payloadOpt.ok())
+    if (isNull(holder, "payload"))
     {
-      return badInput(ciP, payloadOpt.error);
-    }
+      *includePayload = false;
 
-    if (forbiddenChars(payloadOpt.value.c_str()))
+      // We initialize also payload in this case, although its value is irrelevant
+      *payload = "";
+    }
+    else
     {
-      return badInput(ciP, "forbidden characters in custom /payload/");
-    }
+      Opt<std::string> payloadOpt = getStringOpt(holder, "payload", "payload custom notification");
 
-    *includePayload = true;
-    *payload = payloadOpt.value;
+      if (!payloadOpt.ok())
+      {
+        return badInput(ciP, payloadOpt.error);
+      }
+
+      if (forbiddenChars(payloadOpt.value.c_str()))
+      {
+        return badInput(ciP, "forbidden characters in custom /payload/");
+      }
+
+      *includePayload = true;
+      *payload = payloadOpt.value;
+    }
+  }
+  else  if (holder.HasMember("json"))
+  {
+    std::string r = parseCustomJson(holder["json"], json);
+    if (!r.empty())
+    {
+      return badInput(ciP, r);
+    }
   }
 
   return "";
@@ -711,6 +855,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // payload
     r = parseCustomPayload(ciP,
                            &subsP->notification.httpInfo.payload,
+                           &subsP->notification.httpInfo.json,
                            &subsP->notification.httpInfo.includePayload,
                            httpCustom);
     if (!r.empty())
@@ -859,6 +1004,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // payload
     r = parseCustomPayload(ciP,
                            &subsP->notification.mqttInfo.payload,
+                           &subsP->notification.mqttInfo.json,
                            &subsP->notification.mqttInfo.includePayload,
                            mqttCustom);
 

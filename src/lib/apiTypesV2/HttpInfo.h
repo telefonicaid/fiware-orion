@@ -31,6 +31,7 @@
 #include "rest/Verb.h"
 
 #include "mongoDriver/BSONObj.h"
+#include "parse/CompoundValueNode.h"
 
 
 
@@ -44,9 +45,10 @@ struct HttpInfo
 {
   std::string                         url;
   Verb                                verb;
-  std::map<std::string, std::string>  qs;      // URI parameters
+  std::map<std::string, std::string>  qs;       // URI parameters
   std::map<std::string, std::string>  headers;
-  std::string                         payload;
+  std::string                         payload;  // either payload or json is used
+  orion::CompoundValueNode*           json;     // either payload or json is used
   bool                                custom;
   bool                                includePayload;
   long long                           timeout;
@@ -55,6 +57,7 @@ struct HttpInfo
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);
+  void         release();
 };
 }
 

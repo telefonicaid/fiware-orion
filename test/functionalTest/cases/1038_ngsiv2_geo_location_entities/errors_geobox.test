@@ -315,13 +315,13 @@ echo
 01. Create entity with geo:box without vector coordinates -> fail
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 104
+Content-Length: 138
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geo:line, geo:box and geo:polygon needs array of strings as value",
+    "description": "error parsing location attribute: geo:line, geo:box and geo:polygon needs array of strings as value",
     "error": "BadRequest"
 }
 
@@ -343,13 +343,13 @@ Date: REGEX(.*)
 02. Create entity with geo:box with 1 coordinate -> fail
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geo:box uses exactly 2 coordinates",
+    "description": "error parsing location attribute: geo:box uses exactly 2 coordinates",
     "error": "BadRequest"
 }
 
@@ -371,13 +371,13 @@ Date: REGEX(.*)
 03. Create entity with geo:box with 3 coordinates -> fail
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geo:box uses exactly 2 coordinates",
+    "description": "error parsing location attribute: geo:box uses exactly 2 coordinates",
     "error": "BadRequest"
 }
 
@@ -399,13 +399,13 @@ Date: REGEX(.*)
 04. Create entity with geo:box with 2 aligned coordinates -> fail
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geo:box coordinates are not defining an actual box",
+    "description": "error parsing location attribute: geo:box coordinates are not defining an actual box",
     "error": "BadRequest"
 }
 

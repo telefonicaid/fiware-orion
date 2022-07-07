@@ -60,12 +60,6 @@ check the FIWARE Catalogue entry for
 You can find the User & Programmer's Manual and the Installation &
 Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
-For documentation previous to Orion 0.23.0 please check the manuals at FIWARE
-public wiki:
-
--   [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
--   [Orion Context Broker - User and Programmers Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
-
 Any feedback on this documentation is highly welcome, including bugs, typos or
 things you think should be included but aren't. You can use
 [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
@@ -99,11 +93,11 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220301)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220301-251267820)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220526)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220526-251860297)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220301)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220301-251267815)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)
 
 [Top](#top)
 

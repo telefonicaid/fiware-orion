@@ -73,5 +73,8 @@ HttpStatusCode mongoSubscribeContext
     responseP->subscribeError.errorCode.fill(oe.code, oe.details);
   }
 
+  // free sub memory associated to subscription
+  sub.release();
+
   return SccOk;
 }

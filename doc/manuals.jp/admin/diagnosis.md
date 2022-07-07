@@ -125,14 +125,14 @@ contextBr 7100      orion    7u  IPv4 6749373      0t0  TCP *:1026 (LISTEN)
 
 -   Orion Context Broker は、REST リクエストに空のレスポンスを送信します。たとえば、メッセージは一般的に "empty response from server" です。一部の URL のリクエストが正常に動作する場合、たとえば /version では、症状が現れることがあります
 -   "md5sum /usr/bin/contextBroker" で取得できる /usr/bin/contextBroker バイナリの MD5SUM は正しいものでありません。(このセクションの最後にある特定のバージョンのチェックリスト)
--   prelink パッケージがインストールされています。これは "rpm -qa | grep prelink" コマンドを実行して確認できます
+-   prelink パッケージがインストールされています
 
 この問題の原因は、[prelink](http://en.wikipedia.org/wiki/Prelink)です。これは、バイナリを高速に起動するように変更するプログラムです。contextBroker などの長時間実行するサービスを実装するバイナリにはあまり役に立ちませんが、一部のライブラリと互換性がないことが知られています。Context Broker で使用されているライブラリの一部と互換性がないようです。
 
 この問題の解決策は次のとおりです :
 
 -   事前リンクを無効にします。次のいずれかの方法を実装します :
-    -   prelink ソフトウェアを削除します。通常は root または sudo を使用して実行します : `rpm -e prelink`
+    -   prelink ソフトウェアを削除します
     -   contextBroker バイナリのプリリンク処理を無効にして、次の1行のみの内容の `/etc/prelink.conf.d/contextBroker.conf` ファイルを作成します
 
 ```

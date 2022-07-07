@@ -23,8 +23,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     jsonRequestTreat.cpp
     parseEntity.cpp
+    parseCompoundCommon.cpp
     parseContextAttribute.cpp
-    parseContextAttributeCompoundValue.cpp
     parseMetadataVector.cpp
     parseMetadata.cpp
     parseAttributeValue.cpp
@@ -38,7 +38,6 @@ SET (SOURCES
     parseScope.cpp
     parseBatchUpdate.cpp
     utilsParse.cpp
-    parseMetadataCompoundValue.cpp
     parseRegistration.cpp
     badInput.cpp
     parseStringVector.cpp
@@ -50,8 +49,8 @@ SET (SOURCES
 SET (HEADERS
     jsonRequestTreat.h
     parseEntity.h
+    parseCompoundCommon.h
     parseContextAttribute.h
-    parseContextAttributeCompoundValue.cpp
     parseMetadataVector.h
     parseMetadata.h
     parseAttributeValue.h
@@ -65,7 +64,6 @@ SET (HEADERS
     parseStringList.h
     parseBatchUpdate.h
     utilsParse.h
-    parseMetadataCompoundValue.h
     parseRegistration.h
     parseStringVector.h
     badInput.h

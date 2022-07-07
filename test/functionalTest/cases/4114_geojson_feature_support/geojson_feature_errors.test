@@ -46,7 +46,7 @@ brokerStart CB
 # 13. Update entity with location geo:json using FeatureCollection type without features field but invalid, see error
 # 14. Update entity with location geo:json using FeatureCollection with features field but 0 items, see error
 # 15. Update entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
-# 16. Update entity with location geo:json u    sing FeatureCollection with features field, one item but without geometry field, see error
+# 16. Update entity with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
 # 17. Update entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
 #
 # 18. Update attr with location geo:json using Feature type without geometry field, see error
@@ -715,13 +715,13 @@ echo
 01. Create entity with location geo:json using Feature type without geometry field, see error
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature not found",
+    "description": "error parsing location attribute: geometry in Feature not found",
     "error": "BadRequest"
 }
 
@@ -729,13 +729,13 @@ Date: REGEX(.*)
 02. Create entity with location geo:json using Feature type with geometry field but invalid, see error
 ======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature is not an object",
+    "description": "error parsing location attribute: geometry in Feature is not an object",
     "error": "BadRequest"
 }
 
@@ -743,13 +743,13 @@ Date: REGEX(.*)
 03. Create entity with location geo:json using FeatureCollection type without features field, see error
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features field not found in FeatureCollection",
+    "description": "error parsing location attribute: features field not found in FeatureCollection",
     "error": "BadRequest"
 }
 
@@ -757,13 +757,13 @@ Date: REGEX(.*)
 04. Create entity with location geo:json using FeatureCollection type with features field but invalid, see error
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection is not an array",
+    "description": "error parsing location attribute: features in FeatureCollection is not an array",
     "error": "BadRequest"
 }
 
@@ -771,13 +771,13 @@ Date: REGEX(.*)
 05. Create entity with location geo:json using FeatureCollection with features field but 0 items, see error
 ===========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 80
+Content-Length: 114
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection has 0 items",
+    "description": "error parsing location attribute: features in FeatureCollection has 0 items",
     "error": "BadRequest"
 }
 
@@ -785,13 +785,13 @@ Date: REGEX(.*)
 06. Create entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection has more than 1 item",
+    "description": "error parsing location attribute: features in FeatureCollection has more than 1 item",
     "error": "BadRequest"
 }
 
@@ -799,13 +799,13 @@ Date: REGEX(.*)
 07. Create entity with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
 ====================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature not found",
+    "description": "error parsing location attribute: geometry in Feature not found",
     "error": "BadRequest"
 }
 
@@ -813,13 +813,13 @@ Date: REGEX(.*)
 08. Create entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
 ============================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature is not an object",
+    "description": "error parsing location attribute: geometry in Feature is not an object",
     "error": "BadRequest"
 }
 
@@ -837,13 +837,13 @@ Date: REGEX(.*)
 10. Update entity with location geo:json using Feature type without geometry field, see error
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature not found",
+    "description": "error parsing location attribute: geometry in Feature not found",
     "error": "BadRequest"
 }
 
@@ -851,13 +851,13 @@ Date: REGEX(.*)
 11. Update entity with location geo:json using Feature type with geometry field but invalid, see error
 ======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature is not an object",
+    "description": "error parsing location attribute: geometry in Feature is not an object",
     "error": "BadRequest"
 }
 
@@ -865,13 +865,13 @@ Date: REGEX(.*)
 12. Update entity with location geo:json using FeatureCollection type without features field, see error
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features field not found in FeatureCollection",
+    "description": "error parsing location attribute: features field not found in FeatureCollection",
     "error": "BadRequest"
 }
 
@@ -879,13 +879,13 @@ Date: REGEX(.*)
 13. Update entity with location geo:json using FeatureCollection type with features field but invalid, see error
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection is not an array",
+    "description": "error parsing location attribute: features in FeatureCollection is not an array",
     "error": "BadRequest"
 }
 
@@ -893,13 +893,13 @@ Date: REGEX(.*)
 14. Update entity with location geo:json using FeatureCollection with features field but 0 items, see error
 ===========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 80
+Content-Length: 114
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection has 0 items",
+    "description": "error parsing location attribute: features in FeatureCollection has 0 items",
     "error": "BadRequest"
 }
 
@@ -907,13 +907,13 @@ Date: REGEX(.*)
 15. Update entity with location geo:json using FeatureCollection with features field but more than 1 item, see error
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection has more than 1 item",
+    "description": "error parsing location attribute: features in FeatureCollection has more than 1 item",
     "error": "BadRequest"
 }
 
@@ -921,13 +921,13 @@ Date: REGEX(.*)
 16. Update entity with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
 ====================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature not found",
+    "description": "error parsing location attribute: geometry in Feature not found",
     "error": "BadRequest"
 }
 
@@ -935,13 +935,13 @@ Date: REGEX(.*)
 17. Update entity with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
 ============================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature is not an object",
+    "description": "error parsing location attribute: geometry in Feature is not an object",
     "error": "BadRequest"
 }
 
@@ -949,13 +949,13 @@ Date: REGEX(.*)
 18. Update attr with location geo:json using Feature type without geometry field, see error
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature not found",
+    "description": "error parsing location attribute: geometry in Feature not found",
     "error": "BadRequest"
 }
 
@@ -963,13 +963,13 @@ Date: REGEX(.*)
 19. Update attr with location geo:json using Feature type with geometry field but invalid, see error
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature is not an object",
+    "description": "error parsing location attribute: geometry in Feature is not an object",
     "error": "BadRequest"
 }
 
@@ -977,13 +977,13 @@ Date: REGEX(.*)
 20. Update attr with location geo:json using FeatureCollection type without features field, see error
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features field not found in FeatureCollection",
+    "description": "error parsing location attribute: features field not found in FeatureCollection",
     "error": "BadRequest"
 }
 
@@ -991,13 +991,13 @@ Date: REGEX(.*)
 21. Update attr with location geo:json using FeatureCollection type with features field but invalid, see error
 ==============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
+Content-Length: 118
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection is not an array",
+    "description": "error parsing location attribute: features in FeatureCollection is not an array",
     "error": "BadRequest"
 }
 
@@ -1005,13 +1005,13 @@ Date: REGEX(.*)
 22. Update attr with location geo:json using FeatureCollection with features field but 0 items, see error
 =========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 80
+Content-Length: 114
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection has 0 items",
+    "description": "error parsing location attribute: features in FeatureCollection has 0 items",
     "error": "BadRequest"
 }
 
@@ -1019,13 +1019,13 @@ Date: REGEX(.*)
 23. Update attr with location geo:json using FeatureCollection with features field but more than 1 item, see error
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 123
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "features in FeatureCollection has more than 1 item",
+    "description": "error parsing location attribute: features in FeatureCollection has more than 1 item",
     "error": "BadRequest"
 }
 
@@ -1033,13 +1033,13 @@ Date: REGEX(.*)
 24. Update attr with location geo:json using FeatureCollection with features field, one item but without geometry field, see error
 ==================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
+Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature not found",
+    "description": "error parsing location attribute: geometry in Feature not found",
     "error": "BadRequest"
 }
 
@@ -1047,13 +1047,13 @@ Date: REGEX(.*)
 25. Update attr with location geo:json using FeatureCollection with features field, one item but wit geometry field but invalid, see error
 ==========================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "geometry in Feature is not an object",
+    "description": "error parsing location attribute: geometry in Feature is not an object",
     "error": "BadRequest"
 }
 
