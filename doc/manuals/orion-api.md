@@ -1820,7 +1820,7 @@ A subscription is represented by a JSON object with the following fields:
 | `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
 | [`subject`](#subscriptionsubject)      |          | object | An object that describes the subject of the subscription.                                     |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
-| `expires`      | ✓        | ISO 8601 string | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
+| `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
 | `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
 
