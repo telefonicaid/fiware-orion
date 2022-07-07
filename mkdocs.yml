@@ -16,6 +16,7 @@ pages:
   - 'User & Programmers Manual':
       - 'Introduction': 'user/index.md'
       - 'API Walkthrough': 'user/walkthrough_apiv2.md'
+      - 'API Reference': 'user/orion-api.md'      
       - 'Pagination': 'user/pagination.md'
       - 'CORS': 'user/cors.md'
       - 'Geolocation': 'user/geolocation.md'
