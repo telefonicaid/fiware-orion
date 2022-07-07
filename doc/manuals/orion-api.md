@@ -1843,7 +1843,7 @@ A `condition` contains the following subfields:
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List entities" operation above about this field) |
 
-`condition` field modifies the triggering Notification rules as follow:
+Based on the `condition` field, the notification triggering rules are as follow:
 
 * If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
   the `attrs` list changes and at the same time `expression` matches.
