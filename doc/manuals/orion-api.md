@@ -1,4 +1,4 @@
- # FIWARE-NGSI v2 (release 2.1) Specification
+# FIWARE-NGSI v2 (release 2.1) Specification
  
 <!-- TOC -->
 
@@ -58,6 +58,12 @@
             - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
             - [Retrieve entity information for a given type [GET /v2/types]](#retrieve-entity-information-for-a-given-type-get-v2types)
     - [Subscriptions Operations](#subscriptions-operations)
+        - [Subscription payload datamodel](#subscription-payload-datamodel)
+            - [`subscription.subject`](#subscriptionsubject)
+            - [`subscription.subject.condition`](#subscriptionsubjectcondition)
+            - [`subscription.notification`](#subscriptionnotification)
+            - [`subscription.notification.http`](#subscriptionnotificationhttp)
+            - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
             - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
@@ -66,6 +72,11 @@
             - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
             - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
     - [Registration Operations](#registration-operations)
+        - [Registration payload datamodel](#registration-payload-datamodel)
+            - [`registration`](#registration)
+            - [`registration.provider`](#registrationprovider)
+            - [`registration.dataProvided`](#registrationdataprovided)
+            - [`registration.forwardingInformation`](#registrationforwardinginformation)
         - [Registration list](#registration-list)
             - [List Registrations [GET /v2/registrations]](#list-registrations-get-v2registrations)
             - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
@@ -1798,83 +1809,41 @@ Content-Type is `application/json`
 
 ## Subscriptions Operations
 
+### Subscription payload datamodel
+
+#### `subscription`
+
 A subscription is represented by a JSON object with the following fields:
 
-+ `id`: Subscription unique identifier. Automatically created at creation time.
-+ `description` (optional): A free text used by the client to describe the subscription.
-+ `subject`: An object that describes the subject of the subscription.
-+ `notification`: An object that describes the notification to send when the subscription is
-  triggered.
-+ `expires`: Subscription expiration date in ISO8601 format. Permanent subscriptions must omit
-  this field.
-+ `status`: Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
-  If this field is not provided at subscription creation time, new subscriptions are created with
-  the `active` status, which can be changed by clients afterwards. For expired subscriptions, this
-  attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
-  Also, for subscriptions experiencing problems with notifications, the status is set to `failed`.
-  As soon as the notifications start working again, the status is changed back to `active`.
-+ `throttling`: Minimal period of time in seconds which must elapse between two consecutive
-  notifications. It is optional.
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `id`           |          | string | Subscription unique identifier. Automatically created at creation time.                       |
+| `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
+| [`subject`](#subscriptionsubject)      |          | object | An object that describes the subject of the subscription.                                     |
+| [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
+| `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
+| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
+
+#### `subscription.subject`
 
 A `subject` contains the following subfields:
 
-+ `entities`: A list of objects, each one composed of the following subfields:
-  + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-     time, but one of them must be present.
-  + `type` or `typePattern`: Type or type pattern of the affected entities. Both cannot be used at
-     the same time. If omitted, it means "any entity type".
-+ `condition`: Condition to trigger notifications. This field is optional and it may contain two
-  properties, both optional:
-    + `attrs`: array of attribute names
-    + `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
-       entities" operation above about this field).
+| Parameter                                    | Optional | Type   | Description                                                                     |
+|----------------------------------------------|----------|--------|---------------------------------------------------------------------------------|
+| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change will trigger condition" |
 
-A `notification` object contains the following subfields:
+#### `subscription.subject.condition`
 
-+ `attrs` or `exceptAttrs` (both cannot be used at the same time):
-  + `attrs`: List of attributes to be included in notification messages. It also defines the
-    order in which attributes must appear in notifications when `attrsFormat` `value` is used
-    (see "Notification Messages" section). An empty list means that all attributes are to be
-    included in notifications. See "Filtering out attributes and metadata" section for more detail.
-  + `exceptAttrs`: List of attributes to be excluded from the notification message, i.e.
-     a notification message includes all entity attributes except the ones listed in this field.
-  + If neither `attrs` nor `exceptAttrs` is specified, all attributes are included in
-    notifications.
-+ `http` or `httpCustom` (one of them must be present, but not both at the same time): It is used
-  to convey parameters for notifications delivered through the HTTP protocol.
-+ `attrsFormat` (optional): specifies how the entities are represented in notifications.
-  Accepted values are `normalized` (default), `keyValues` or `values`.
-  If `attrsFormat` takes any value different
-  than those, an error is raised. See detail in "Notification Messages" section.
-+ `metadata` (optional): List of metadata to be included in notification messages.
-  See "Filtering out attributes and metadata" section for more detail.
-+ `timesSent` (not editable, only present in GET operations): Number of notifications sent due to
-   this subscription.
-+ `lastNotification` (not editable, only present in GET operations): Last notification timestamp in ISO8601 format.
-+ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
-  Not present if subscription has never had a problem with notifications.
-+ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful notification.
-  Not present if subscription has never had a successful notification.
+A `condition` contains the following subfields:
 
-An `http` object contains the following subfields:
+| Parameter    | Optional | Type  | Description                                                                                                                   |
+|--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
+| `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List entities" operation above about this field) |
 
-+ `url` : URL referencing the service to be invoked when a notification is generated. An NGSIv2
-  compliant server must support the `http` URL schema. Other schemas could also be supported.
-
-An `httpCustom` object contains the following subfields.
-
-+ `url`: same as in `http` above.
-+ `headers` (optional): a key-map of HTTP headers that are included in notification messages.
-+ `qs` (optional): a key-map of URL query parameters that are included in notification messages.
-+ `method` (optional): the method to use when sending the notification (default is POST).
-   Only valid HTTP methods are allowed.
-   On specifying an invalid HTTP method, a 400 Bad Request error is returned.
-+ `payload` (optional): the payload to be used in notifications.
-   If omitted, the default payload (see "Notification Messages" sections) is used.
-
-If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
-
-Notification rules are as follow:
+Based on the `condition` field, the notification triggering rules are as follow:
 
 * If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
   the `attrs` list changes and at the same time `expression` matches.
@@ -1884,6 +1853,43 @@ Notification rules are as follow:
   attributes of the entity changes and at the same time `expression` matches.
 * If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
   attributes of the entity changes.
+
+#### `subscription.notification`
+
+A `notification` object contains the following subfields:
+
+| Parameter              | Optional          | Type   | Description                                                                                                                                                                                                                                                     |
+|------------------------|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see "Notification Messages" section). An empty list means that all attributes are to be included in notifications. See "Filtering out attributes and metadata" section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
+| [`http`](#subscriptionnotificationhttp) or [`httpCustom`](#subscriptionnotificationhttpcustom) | ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol.                                                                                                              |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in "Notification Messages" section. |
+| `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                  |
+| `timesSent`            | Only on retrieval | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                                                                                                            |
+| `lastNotification`     | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                                                                                                    |
+| `lastFailure`          | Only on retrieval | ISO8601  | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                                                                                                 |
+| `lastSuccess`          | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification.                                                                               |
+
+#### `subscription.notification.http`
+
+An `http` object contains the following subfields:
+
+| Parameter | Optional | Type   | Description                                                                                   |
+|-----------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. An NGSIv2 compliant server must support the `http` URL schema. Other schemas could also be supported. |
+
+#### `subscription.notification.httpCustom`
+
+An `httpCustom` object contains the following subfields.
+
+| Parameter | Optional | Type   | Description                                                                                   |
+|-----------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `url`     |          | string | Same as in `http` above.                                                                      |
+| `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages.                         |
+| `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages.                 |
+| `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
+| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see "Notification Messages" sections) is used.|
+
+If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
 
 ### Subscription List
 
@@ -2123,58 +2129,51 @@ particular, some of the following forwarding mechanisms could be implemented (no
 
 Please check the corresponding specification in order to get the details.
 
+### Registration payload datamodel
+
+#### `registration`
+
 A context registration is represented by a JSON object with the following fields:
 
-+ `id` : Unique identifier assigned to the registration. Automatically generated at creation time.
-+ `description` : Description given to this registration. Optional. 
-+ `provider` : Object that describes the context source registered. Mandatory. 
-+ `dataProvided` : Object that describes the data provided by this source. Mandatory. 
-+ `status`: Enumerated field which captures the current status of this registration:
-Either `active` (for active registrations) or `inactive` (for inactive registrations).
-  If this field is not provided at registration creation time, new registrations are created with
-  the `active` status, which may be changed by clients afterwards. For expired registrations, this
-  attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`).
-  Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`.
-  As soon as the forwarding operations start working again, the status is changed back to `active`.
-+ `expires` : Registration expiration date in ISO8601 format. Permanent registrations must omit this field.
-+ `forwardingInformation`: Information related to the forwarding operations made against the provider.
-Automatically provided by the implementation, in the case such implementation supports forwarding capabilities.
+| Parameter               | Optional | Type   | Description                                                                                                                                                                                 |
+|-------------------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`                    |          | string | Unique identifier assigned to the registration. Automatically generated at creation time.                                                                                                   |
+| `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
+| [`provider`](#registrationprovider)              |          | object | Object that describes the context source registered.                                                                                                                                        |
+| [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
+| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`, `expired` or `failed`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
+| `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
+| [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
+
+#### `registration.provider`
 
 The `provider` field contains the following subfields:
-+ `http` : It is used to convey parameters for providers that deliver information through the HTTP protocol.
-(Only protocol supported nowadays).
-It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface.
-The endpoint must *not* include the protocol
-specific part (for instance `/v2/entities`). 
-+ `supportedForwardingMode` : It is used to convey the forwarding mode supported by this context provider. By default `all`. 
-Allowed values are:
-    + `none` : This provider does not support request forwarding.
-    + `query` : This provider only supports request forwarding to query data.
-    + `update` : This provider only supports request forwarding to update data.
-    + `all` : This provider supports both query and update forwarding requests. (Default value)
+
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `http`         |          | object | It is used to convey parameters for providers that deliver information through the HTTP protocol.(Only protocol supported nowadays). <br>It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpoint must *not* include the protocol specific part (for instance `/v2/entities`). |
+| `supportedForwardingMode`  |          | string | It is used to convey the forwarding mode supported by this context provider. By default `all`. Allowed values are: <ul><li><code>none</code>: This provider does not support request forwarding.</li><li><code>query</code>: This provider only supports request forwarding to query data.</li><li><code>update</code>: This provider only supports request forwarding to update data.</li><li><code>all</code>: This provider supports both query and update forwarding requests. (Default value).</li></ul> |
+
+#### `registration.dataProvided`
 
 The `dataProvided` field contains the following subfields:
 
-+ `entities`: A list of objects, each one composed of the following subfields:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but one of them must be present.
-    + `type` or `typePattern`: Type or pattern of the affected entities. Both cannot be used at
-      the same time. If omitted, it means "any entity type".
-+ `attrs`: List of attributes to be provided (if not specified, all attributes).
-+ `expression`: By means of a filtering expression, allows to express what is the scope of the data provided.
-Currently only geographical scopes are supported through the following subterms:
-    + `georel` : Any of the geographical relationships as specified by the Geoqueries section of this specification. 
-    + `geometry` : Any of the supported geometries as specified by the Geoqueries section of this specification. 
-    + `coords` : String representation of coordinates as specified by the Geoqueries section of this specification. 
+| Parameter      | Optional | Type   | Description                                                                                   |
+|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> or <code>typePattern</code>: Type or pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| `attrs`        |          | array | List of attributes to be provided (if not specified, all attributes). |
+| `expression`   |          | object | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the Geoqueries section of this specification. </li><li><code>geometry</code>: Any of the supported geometries as specified by the Geoqueries section of this specification.</li> <li><code>coords</code>: String representation of coordinates as specified by the Geoqueries section of this specification.</li></ul> |
+
+#### `registration.forwardingInformation`
 
 The `forwardingInformation` field contains the following subfields:
 
-+ `timesSent` (not editable, only present in GET operations): Number of request forwardings sent due to this registration.
-+ `lastForwarding` (not editable, only present in GET operations): Last forwarding timestamp in ISO8601 format.
-+ `lastFailure` (not editable, only present in GET operations): Last failure timestamp in ISO8601 format.
-Not present if registration has never had a problem with forwarding.
-+ `lastSuccess` (not editable, only present in GET operations): Timestamp in ISO8601 format for last successful request forwarding.
-Not present if registration has never had a successful notification.
+| Parameter        | Optional          | Type   | Description                                                                                                                                                                            |
+|------------------|-------------------|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `timesSent`      | Only on retrieval | number | Not editable, only present in GET operations. Number of request forwardings sent due to this registration.                                                                             |
+| `lastForwarding` | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last forwarding timestamp in ISO8601 format.                                                                                             |
+| `lastFailure`    | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if registration has never had a problem with forwarding.                           |
+| `lastSuccess`    | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful request forwarding. Not present if registration has never had a successful notification. |
 
 ### Registration list
 
