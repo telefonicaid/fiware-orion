@@ -61,7 +61,7 @@
         - [Subscription payload datamodel](#subscription-payload-datamodel)
             - [`subscription.subject`](#subscriptionsubject)
             - [`subscription.notification`](#subscriptionnotification)
-            - [`subscription.notification.http`](#subscriptionnotification.http)
+            - [`subscription.notification.http`](#subscriptionnotificationhttp)
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
