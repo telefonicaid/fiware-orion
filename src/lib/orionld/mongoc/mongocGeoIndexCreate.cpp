@@ -59,10 +59,14 @@ bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
   bson_init(&key);
   BSON_APPEND_UTF8(&key, indexPath, "2dsphere");
 
+  LM_TMP(("HERE"));
   mongocConnectionGet();
+  LM_TMP(("HERE"));
 
   mongoc_database_t*  dbP                = mongoc_client_get_database(orionldState.mongoc.client, tenantP->mongoDbName);
+  LM_TMP(("HERE"));
   char*               indexName          = mongoc_collection_keys_to_index_string(&key);
+  LM_TMP(("HERE"));
   bson_t*             createIndexCommand = BCON_NEW("createIndexes",
                                                     BCON_UTF8(collectionName),
                                                     "indexes",
@@ -75,22 +79,32 @@ bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
                                                     "}",
                                                     "]");
 
+  LM_TMP(("HERE"));
   bson_error_t  mcError;
   bson_t        reply;
 
+  LM_TMP(("HERE"));
   bson_init(&reply);
 
+  LM_TMP(("HERE"));
   bool r = mongoc_database_write_command_with_opts(dbP, createIndexCommand, NULL, &reply, &mcError);
+  LM_TMP(("HERE"));
 
   if (r == true)
+  {
+    LM_TMP(("HERE"));
     dbGeoIndexAdd(tenantP->tenant, eqName);
+    LM_TMP(("HERE"));
+  }
   else
     LM_E(("Database Error (error creating 2dsphere index for attribute '%s' for db '%s': %s)", eqName, tenantP->mongoDbName, mcError.message));
 
   bson_destroy(&key);
   bson_free(indexName);
   bson_destroy(createIndexCommand);
+  LM_TMP(("HERE"));
   mongoc_database_destroy(dbP);
+  LM_TMP(("HERE"));
   bson_destroy(&reply);
 
   return r;
