@@ -21,6 +21,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
+* [JSON ペイロードを使用したカスタム通知](#custom-notification-with-json-payload)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
@@ -462,6 +463,44 @@ Orionは `alterationTypes` フィールドをサポートして、サブスク�
 (エンティティの作成、エンティティの変更など) を指定します。
 
 詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
+
+[トップ](#top)
+
+<a name="custom-notification-with-json-payload"></a>
+## JSON ペイロードを使用したカスタム通知
+
+`httpCustom` または `mqttCustom` の `payload` フィールドの代わりに、`json` フィールドを使用して JSON
+ベースのペイロードを生成できます。例えば:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+考慮すべきいくつかの注意事項:
+
+* `json` フィールドの値は配列またはオブジェクトである必要があります。単純な文字列または数値も有効な JSON
+  ですが、これらのケースはサポートされていません
+* マクロ置換ロジックは、次の考慮事項を除いて、`payload` の場合と同じように機能します:
+  * JSON オブジェクトのキー部分では使用できません。つまり、`"${key}":10` は機能しません
+  * マクロが使用される JSON オブジェクトまたは JSON 配列アイテムの値は、マクロ式と正確に一致する必要があります。
+    したがって、`"t": "${temperature}"` は機能しますが、`"t": "the temperature is ${temperature}"` または
+    `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"` は機能しません
+  * 置き換えられる属性値の性質が考慮されます。例えば、
+    `"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10` に解決され、`temperature` 属性が文字列の場合は
+    `"t": "10"` に解決されます
+  * 属性がエンティティに存在しない場合は、`null` 値が使用されます
+* `payload` および `headers` フィールドに適用される URL 自動デコード
+  ([ここ](forbidden_characters.md#custom-payload-and-headers-special-treatment) で説明しています) は、
+  `json` フィールドには適用されません
+* `payload` と `json` を同時に使用することはできません
+* `Content-Type` ヘッダは `application/json` に設定されますが、`headers` フィールドで上書きされる場合を除きます
 
 [トップ](#top)
 
