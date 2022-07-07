@@ -1,4 +1,4 @@
- # FIWARE-NGSI v2 (release 2.1) Specification
+# FIWARE-NGSI v2 (release 2.1) Specification
  
 <!-- TOC -->
 
@@ -58,6 +58,11 @@
             - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
             - [Retrieve entity information for a given type [GET /v2/types]](#retrieve-entity-information-for-a-given-type-get-v2types)
     - [Subscriptions Operations](#subscriptions-operations)
+        - [Subscription payload datamodel](#Subscriptionpayloaddatamodel)
+            - [`subscription.subject`](#subscription.subject)
+            - [`subscription.notification`](#subscription.notification)
+            - [`subscription.notification.http`](#subscription.notification.http)
+            - [`subscription.notification.httpCustom`](#subscription.notification.httpCustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
             - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
@@ -66,6 +71,11 @@
             - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
             - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
     - [Registration Operations](#registration-operations)
+        - [Registration payload datamodel](#Registrationpayloaddatamodel)
+            - [`registration`](#registration)
+            - [`registration.provider`](#registration.provider)
+            - [`registration.dataProvided`](#registration.dataProvided)
+            - [`registration.forwardingInformation`](#registration.forwardingInformation)
         - [Registration list](#registration-list)
             - [List Registrations [GET /v2/registrations]](#list-registrations-get-v2registrations)
             - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
@@ -1798,6 +1808,10 @@ Content-Type is `application/json`
 
 ## Subscriptions Operations
 
+### Subscription payload datamodel
+
+#### `subscription`
+
 A subscription is represented by a JSON object with the following fields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
@@ -1810,12 +1824,16 @@ A subscription is represented by a JSON object with the following fields:
 | `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
 
+#### `subscription.subject`
+
 A `subject` contains the following subfields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `entities`     | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
 | `condition`    | ✓        | string | Condition to trigger notifications. This field is optional and it may contain two properties, both optional: <ul><li><code>attrs</code> Array of attribute names that will trigger the notification. </li> <li><code>expression</code> An expression composed of <code>q</code>, <code>mq</code>, <code>georel</code>, <code>geometry</code> and <code>coords</code> (see "List entities" operation above about this field)</li></ul> |
+
+#### `subscription.notification`
 
 A `notification` object contains the following subfields:
 
@@ -1830,11 +1848,15 @@ A `notification` object contains the following subfields:
 | `lastFailure`            |          | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications. |
 | `lastSuccess`            |          | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
 
+#### `subscription.notification.http`
+
 An `http` object contains the following subfields:
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `url`     |          | string | URL referencing the service to be invoked when a notification is generated. An NGSIv2 compliant server must support the `http` URL schema. Other schemas could also be supported. |
+
+#### `subscription.notification.httpCustom`
 
 An `httpCustom` object contains the following subfields.
 
@@ -2097,6 +2119,10 @@ particular, some of the following forwarding mechanisms could be implemented (no
 
 Please check the corresponding specification in order to get the details.
 
+### Registration payload datamodel
+
+#### `registration`
+
 A context registration is represented by a JSON object with the following fields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
@@ -2109,12 +2135,16 @@ A context registration is represented by a JSON object with the following fields
 | `expires`      | ✓        | string | Registration expiration date in ISO8601 format. Permanent registrations must omit this field. |
 | `forwardingInformation` |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
+#### `registration.provider`
+
 The `provider` field contains the following subfields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `http`         |          | string | It is used to convey parameters for providers that deliver information through the HTTP protocol.(Only protocol supported nowadays). <br>It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpoint must *not* include the protocol specific part (for instance `/v2/entities`). |
 | `supportedForwardingMode`  |          | string | It is used to convey the forwarding mode supported by this context provider. By default `all`. Allowed values are: <ul><li><code>none</code>: This provider does not support request forwarding.</li><li><code>query</code>: This provider only supports request forwarding to query data.</li><li><code>update</code>: This provider only supports request forwarding to update data.</li><li><code>all</code>: This provider supports both query and update forwarding requests. (Default value).</li></ul> |
+
+#### `registration.dataProvided`
 
 The `dataProvided` field contains the following subfields:
 
@@ -2123,6 +2153,8 @@ The `dataProvided` field contains the following subfields:
 | `entities`     |          | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> or <code>typePattern</code>: Type or pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
 | `attrs`        |          | string | List of attributes to be provided (if not specified, all attributes). |
 | `expression`   |          | string | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the Geoqueries section of this specification. </li><li><code>geometry</code>: Any of the supported geometries as specified by the Geoqueries section of this specification.</li> <li><code>coords</code>: String representation of coordinates as specified by the Geoqueries section of this specification.</li></ul> |
+
+#### `registration.forwardingInformation`
 
 The `forwardingInformation` field contains the following subfields:
 
