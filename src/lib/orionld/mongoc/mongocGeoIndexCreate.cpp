@@ -59,6 +59,8 @@ bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
   bson_init(&key);
   BSON_APPEND_UTF8(&key, indexPath, "2dsphere");
 
+  mongocConnectionGet();
+
   mongoc_database_t*  dbP                = mongoc_client_get_database(orionldState.mongoc.client, tenantP->mongoDbName);
   char*               indexName          = mongoc_collection_keys_to_index_string(&key);
   bson_t*             createIndexCommand = BCON_NEW("createIndexes",
@@ -78,7 +80,6 @@ bool mongocGeoIndexCreate(OrionldTenant* tenantP, const char* attrLongName)
 
   bson_init(&reply);
 
-  mongocConnectionGet();
   bool r = mongoc_database_write_command_with_opts(dbP, createIndexCommand, NULL, &reply, &mcError);
 
   if (r == true)
