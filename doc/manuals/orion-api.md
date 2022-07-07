@@ -1837,16 +1837,16 @@ A `subject` contains the following subfields:
 
 A `notification` object contains the following subfields:
 
-| Parameter                | Optional | Type   | Description                                                                                   |
-|--------------------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| Parameter              | Optional          | Type   | Description                                                                                                                                                                                                                                                     |
+|------------------------|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | string | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see "Notification Messages" section). An empty list means that all attributes are to be included in notifications. See "Filtering out attributes and metadata" section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
-| `http` or `httpCustom`   | ✓        | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol. |
-| `attrsFormat`            | ✓        | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in "Notification Messages" section. |
-| `metadata`               | ✓        | string | List of metadata to be included in notification messages. See "Filtering out attributes and metadata" section for more detail. |
-| `timesSent`              |          | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription. |
-| `lastNotification`       |          | string | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format. |
-| `lastFailure`            |          | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications. |
-| `lastSuccess`            |          | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
+| `http` or `httpCustom` | ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol.                                                                                                              |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in "Notification Messages" section. |
+| `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                  |
+| `timesSent`            | Only on retrieval | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                                                                                                            |
+| `lastNotification`     | Only on retrieval | string | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                                                                                                    |
+| `lastFailure`          | Only on retrieval | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                                                                                                 |
+| `lastSuccess`          | Only on retrieval | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification.                                                                               |
 
 #### `subscription.notification.http`
 
@@ -2125,14 +2125,14 @@ Please check the corresponding specification in order to get the details.
 
 A context registration is represented by a JSON object with the following fields:
 
-| Parameter      | Optional | Type   | Description                                                                                   |
-|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `id`           |          | string | Unique identifier assigned to the registration. Automatically generated at creation time.     |
-| `description`  | ✓        | string | Description given to this registration. |
-| `provider`     |          | object | Object that describes the context source registered. |
-| `dataProvided` |          | object | Object that describes the data provided by this source. |
+| Parameter               | Optional | Type   | Description                                                                                                                                                                                 |
+|-------------------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`                    |          | string | Unique identifier assigned to the registration. Automatically generated at creation time.                                                                                                   |
+| `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
+| `provider`              |          | object | Object that describes the context source registered.                                                                                                                                        |
+| `dataProvided`          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
 | `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`, `expired` or `failed`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
-| `expires`      | ✓        | string | Registration expiration date in ISO8601 format. Permanent registrations must omit this field. |
+| `expires`               | ✓        | string | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
 | `forwardingInformation` |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
 #### `registration.provider`
@@ -2158,12 +2158,12 @@ The `dataProvided` field contains the following subfields:
 
 The `forwardingInformation` field contains the following subfields:
 
-| Parameter      | Optional | Type   | Description                                                                                   |
-|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `timesSent`    |          | string | Not editable, only present in GET operations. Number of request forwardings sent due to this registration. |
-| `lastForwarding`|         | string | Not editable, only present in GET operations. Last forwarding timestamp in ISO8601 format. |
-| `lastFailure`  |          | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if registration has never had a problem with forwarding. |
-| `lastSuccess`  |          | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful request forwarding. Not present if registration has never had a successful notification. |
+| Parameter        | Optional          | Type   | Description                                                                                                                                                                            |
+|------------------|-------------------|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `timesSent`      | Only on retrieval | string | Not editable, only present in GET operations. Number of request forwardings sent due to this registration.                                                                             |
+| `lastForwarding` | Only on retrieval | string | Not editable, only present in GET operations. Last forwarding timestamp in ISO8601 format.                                                                                             |
+| `lastFailure`    | Only on retrieval | string | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if registration has never had a problem with forwarding.                           |
+| `lastSuccess`    | Only on retrieval | string | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful request forwarding. Not present if registration has never had a successful notification. |
 
 ### Registration list
 
