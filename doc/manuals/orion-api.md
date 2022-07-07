@@ -60,6 +60,7 @@
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
             - [`subscription.subject`](#subscriptionsubject)
+            - [`subscription.subject.condition`](#subscriptionsubjectcondition)
             - [`subscription.notification`](#subscriptionnotification)
             - [`subscription.notification.http`](#subscriptionnotificationhttp)
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
@@ -1828,10 +1829,30 @@ A subscription is represented by a JSON object with the following fields:
 
 A `subject` contains the following subfields:
 
-| Parameter      | Optional | Type   | Description                                                                                   |
-|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `entities`     | ✓        | array| A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
-| `condition`    | ✓        | object| Condition to trigger notifications. This field is optional and it may contain two properties, both optional: <ul><li><code>attrs</code> Array of attribute names that will trigger the notification. </li> <li><code>expression</code> An expression composed of <code>q</code>, <code>mq</code>, <code>georel</code>, <code>geometry</code> and <code>coords</code> (see "List entities" operation above about this field)</li></ul> |
+| Parameter                                    | Optional | Type   | Description                                                                     |
+|----------------------------------------------|----------|--------|---------------------------------------------------------------------------------|
+| `entities`                                   | ✓        | string | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change" |
+
+#### `subscription.subject.condition`
+
+A `condition` contains the following subfields:
+
+| Parameter    | Optional | Type  | Description                                                                                                                   |
+|--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
+| `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
+| `expression` | ✓        | array | An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List entities" operation above about this field) |
+
+`condition` field modifies the triggering Notification rules as follow:
+
+* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
+  the `attrs` list changes and at the same time `expression` matches.
+* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
+  attributes in the `attrs` list changes.
+* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
+  attributes of the entity changes and at the same time `expression` matches.
+* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
+  attributes of the entity changes.
 
 #### `subscription.notification`
 
@@ -1869,17 +1890,6 @@ An `httpCustom` object contains the following subfields.
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see "Notification Messages" sections) is used.|
 
 If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
-
-Notification rules are as follow:
-
-* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes and at the same time `expression` matches.
-* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
-  attributes in the `attrs` list changes.
-* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
-  attributes of the entity changes and at the same time `expression` matches.
-* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
-  attributes of the entity changes.
 
 ### Subscription List
 
