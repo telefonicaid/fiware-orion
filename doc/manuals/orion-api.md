@@ -1831,7 +1831,7 @@ A `subject` contains the following subfields:
 
 | Parameter                                    | Optional | Type   | Description                                                                     |
 |----------------------------------------------|----------|--------|---------------------------------------------------------------------------------|
-| `entities`                                   | ✓        | string | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
 | [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change will trigger condition" |
 
 #### `subscription.subject.condition`
