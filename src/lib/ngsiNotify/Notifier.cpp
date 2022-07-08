@@ -126,6 +126,8 @@ static bool setPayload
   const std::string&               notifPayload,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
+  const std::string&               service,
+  const std::string&               token,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -165,7 +167,7 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, en))
+    if (!macroSubstitute(payloadP, notifPayload, en, service, token))
     {
       return false;
     }
@@ -190,6 +192,8 @@ static bool setJsonPayload
 (
   orion::CompoundValueNode*  json,
   const Entity&              en,
+  const std::string&         service,
+  const std::string&         token,
   std::string*               payloadP,
   std::string*               mimeTypeP
 )
@@ -198,8 +202,11 @@ static bool setJsonPayload
   // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
   // makes compiler to cry (maybe some kind of circular dependency problem?)
   std::map<std::string, std::string> replacements;
-  replacements.insert(std::pair<std::string, std::string>("id", en.id));
-  replacements.insert(std::pair<std::string, std::string>("type", en.type));
+  replacements.insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
+  replacements.insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
+  replacements.insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
+  replacements.insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
+  replacements.insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
     replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
@@ -272,7 +279,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 2. URL
     //
     std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-    if (macroSubstitute(&url, notifUrl, en) == false)
+    if (macroSubstitute(&url, notifUrl, en, tenant, xauthToken) == false)
     {
       // Warning already logged in macroSubstitute()
       return paramsV;  // empty vector
@@ -288,7 +295,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     {
      bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
      std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
-     if (!setPayload(includePayload, notifPayload, subscriptionId, en, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
+     if (!setPayload(includePayload, notifPayload, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
      {
        // Warning already logged in macroSubstitute()
        return paramsV;  // empty vector
@@ -296,7 +303,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     }
     else
     {
-      setJsonPayload(json, en, &payload, &mimeType);
+      setJsonPayload(json, en, tenant, xauthToken, &payload, &mimeType);
       renderFormat = NGSI_V2_CUSTOM;
     }
 
@@ -312,7 +319,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
+        if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
         {
           // Warning already logged in macroSubstitute()
           return paramsV;  // empty vector
@@ -338,7 +345,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
+        if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
         {
           // Warning already logged in macroSubstitute()
           return paramsV;  // empty vector
@@ -403,7 +410,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 8. Topic (only in the case of MQTT notifications)
     if (notification.type == ngsiv2::MqttNotification)
     {
-      if (macroSubstitute(&topic, notification.mqttInfo.topic, en) == false)
+      if (macroSubstitute(&topic, notification.mqttInfo.topic, en, tenant, xauthToken) == false)
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector

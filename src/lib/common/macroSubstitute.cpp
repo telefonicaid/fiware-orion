@@ -126,7 +126,7 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
+bool macroSubstitute(std::string* to, const std::string& from, const Entity& en, const std::string& service, const std::string& authToken)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -198,6 +198,18 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
     {
       toAdd += en.type.length() * times;
     }
+    else if (macroName == "service")
+    {
+      toAdd += service.length() * times;
+    }
+    else if (macroName == "servicePath")
+    {
+      toAdd += en.servicePath.length() * times;
+    }
+    else if (macroName == "authToken")
+    {
+      toAdd += authToken.length() * times;
+    }
     else
     {
       std::string value;
@@ -231,6 +243,18 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
     else if (macroName == "type")
     {
       value = en.type;
+    }
+    else if (macroName == "service")
+    {
+      value = service;
+    }
+    else if (macroName == "servicePath")
+    {
+      value = en.servicePath;
+    }
+    else if (macroName == "authToken")
+    {
+      value = authToken;
     }
     else
     {
