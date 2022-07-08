@@ -202,7 +202,7 @@ An example of this syntax in shown below:
 
 The normalized representation of entities always include `id`, `type` and the properties that
 represent attributes. However, simplified or partial representations
-(see the "Partial Representations" section below) may leave some of them out.
+(see the [Partial Representations](#partial-representations) section below) may leave some of them out.
 The specification of each operation includes details about what representation is expected as input
 or what representation will be provided (rendered) as output.
 
@@ -311,7 +311,7 @@ meaning:
 ```
 
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
-  related with entity location. See "Geospatial properties of entities" section.
+  related with entity location. See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
 
 ## Builtin Attributes
 
@@ -417,19 +417,19 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* Builtin attribute names (see specific section on "Builtin Attributes")
+* Builtin attribute names (see specific section on [Builtin Attributes](#builtin-attributes))
 
 * `*`, as it has a special meaning as "all the custom/user attributes" (see section on
-  "Filtering out attributes and metadata").
+  [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
 
 ## Metadata names restrictions
 
 The following strings must not be used as metadata names:
 
-* Builtin metadata names (see specific section on "Builtin Metadata")
+* Builtin metadata names (see specific section on [Builtin Metadata](#builtin-metadata))
 
 * `*`, as it has a special meaning as "all the custom/user metadata" (see section on
-  "Filtering out attributes and metadata").
+  [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
 
 ## Ordering Results
 
@@ -462,7 +462,7 @@ NGSIv2 `error` reporting is as follows:
 + Errors which are only caused by request itself (i.e. they do not depend on the NGSIv2 server status),
   either in the URL parameters or in the payload, results in `BadRequest`(`400`).
   + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
-+ Attempt to exceed spatial index limit results in `NoResourceAvailable` (`413`). See "Geospatial properties of entities"
++ Attempt to exceed spatial index limit results in `NoResourceAvailable` (`413`). See [Geospatial properties of entities](#geospatial-properties-of-entities)
   section for details.
 + Ambiguity due to the request may refer to several resources, e.g. attempt to update an entity providing only its ID
   and several entities with that ID exist, results in `TooManyResults` (`409`).
@@ -740,7 +740,7 @@ provide more information about the relationship. The following values are recogn
   reference geometry. 
 
 `geometry` allows to define the reference shape to be used when resolving the query.
- The following geometries (see Simple Location Format) must be supported:
+ The following geometries (see [Simple Location Format](#simple-location-format)) must be supported:
 
 + `geometry=point`, defines a point on the Earth surface.
 + `geometry=line`, defines a polygonal line.
@@ -1006,8 +1006,8 @@ to keep your client decoupled from implementation details.
 #### List Entities [GET /v2/entities]
 
 Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
-and/or those which match a query or geographical query (see [Simple Query Language](#simple_query_language) and 
-[Geographical Queries](#geographical_queries)). A given entity has to match all the criteria to be retrieved
+and/or those which match a query or geographical query (see [Simple Query Language](#simple-query-language) and 
+[Geographical Queries](#geographical-queries)). A given entity has to match all the criteria to be retrieved
 (i.e., the criteria is combined in a logical AND way). Note that pattern matching query parameters are incompatible
 (i.e. mutually exclusive) with their corresponding exact matching parameters, i.e. `idPattern` with `id` and
 `typePattern` with `type`.
@@ -1026,16 +1026,16 @@ This requests accepts the following URL parameters to customize the request resp
 | `type`        | ✓        | string | A comma-separated list of elements. Retrieve entities whose type matches one of the elements in the list. Incompatible with `typePattern`.                                                                             | Room                              |
 | `idPattern`   | ✓        | string | A correctly formatted regular expression. Retrieve entities whose ID matches the regular expression. Incompatible with `id`.                                                                                           | Bode_.*                           |
 | `typePattern` | ✓        | string | A correctly formatted regular expression. Retrieve entities whose type matches the regular expression. Incompatible with `type`.                                                                                       | Room_.*                           |
-| `q`           | ✓        | string | temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`, i.e., q=statement1;statement2;statement3. See [Simple Query Language specification](#simple_query_language) | temperature>40                    |
-| `mq`          | ✓        | string | A query expression for attribute metadata, composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3. See [Simple Query Language specification](#simple_query_language)             | temperature.accuracy<0.9          |
-| `georel`      | ✓        | string | Spatial relationship between matching entities and a reference shape. See [Geographical Queries](#geographical_queries).                                                                                               | near                              |
-| `geometry`    | ✓        | string | Geographical area to which the query is restricted.See [Geographical Queries](#geographical_queries).                                                                                                                  | point                             |
+| `q`           | ✓        | string | temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`, i.e., q=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language) | temperature>40                    |
+| `mq`          | ✓        | string | A query expression for attribute metadata, composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language)             | temperature.accuracy<0.9          |
+| `georel`      | ✓        | string | Spatial relationship between matching entities and a reference shape. See [Geographical Queries](#geographical-queries).                                                                                               | near                              |
+| `geometry`    | ✓        | string | Geographical area to which the query is restricted.See [Geographical Queries](#geographical-queries).                                                                                                                  | point                             |
 | `limit`       | ✓        | number | Limits the number of entities to be retrieved                                                                                                                                                                          | 20                                |
 | `offset`      | ✓        | number | Establishes the offset from where entities are retrieved                                                                                                                                                               | 20                                |
-| `coords`      | ✓        | string | List of latitude-longitude pairs of coordinates separated by ';'. See [Geographical Queries](#geographical_queries)                                                                                                    | 41.390205,2.154007;48.8566,2.3522 |
-| `attrs`       | ✓        | string | Comma-separated list of attribute names whose data are to be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                      | seatNumber                        |
-| `metadata`    | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                              | accuracy                          |
-| `orderBy`     | ✓        | string | Criteria for ordering results. See "Ordering Results" section for details.                                                                                                                                             | temperature,!speed                |
+| `coords`      | ✓        | string | List of latitude-longitude pairs of coordinates separated by ';'. See [Geographical Queries](#geographical-queries)                                                                                                    | 41.390205,2.154007;48.8566,2.3522 |
+| `attrs`       | ✓        | string | Comma-separated list of attribute names whose data are to be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                                                                                                                                      | seatNumber                        |
+| `metadata`    | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                              | accuracy                          |
+| `orderBy`     | ✓        | string | Criteria for ordering results. See [Ordering Results](#ordering-results) section for details.                                                                                                                                             | temperature,!speed                |
 | `options`     | ✓        | string |  A comma-separated list of options for the query. See the following table                                                                                                                                                              | count                     |
 
 The values that `options` parameter can have for this specific request are:
@@ -1043,14 +1043,14 @@ The values that `options` parameter can have for this specific request are:
 | Options     | Description                                                                                                                                                                    |
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `count`     | when used, the total number of entities is returned in the response as an HTTP header named `Fiware-Total-Count`.                                                              |
-| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
-| `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
-| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
+| `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
+| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -1113,7 +1113,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                                                                        |
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
 
 **Request payload**
@@ -1149,7 +1149,7 @@ Example:
 * Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
   upsert option is used). Response includes a `Location` header with the URL of the
   created entity.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 201:
@@ -1188,22 +1188,22 @@ This parameter is part of the URL request. It is mandatory.
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                                                                                                                                                                                                              | `Room`       |
-| `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See "Filtering out attributes and metadata" section for more detail. | seatNumber   |
-| `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
+| `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | seatNumber   |
+| `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
 | `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                                                                                                                                                                                                                                                                                | count        |
 
 The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                                                                                                    |
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
-| `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
-| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
+| `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
+| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for more details.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for more details.
 
 Example response 200:
 
@@ -1257,8 +1257,8 @@ This parameter is part of the URL request. It is mandatory.
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                                                                                                                                                                                                              | `Room`       |
-| `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See "Filtering out attributes and metadata" section for more detail. | seatNumber   |
-| `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
+| `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | seatNumber   |
+| `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
 | `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                                                                                                                                                                                                                                                                                | count        |
 
 
@@ -1266,14 +1266,14 @@ The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                                                                                                    |
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details.                             |
-| `values`    | when used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details.                                |
-| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See "Simplified Entity Representation" section for details. |
+| `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
+| `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
+| `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -1337,7 +1337,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                                                                        |
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
 
 **Request payload**
@@ -1357,7 +1357,7 @@ Example:
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 #### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
@@ -1382,7 +1382,7 @@ This parameter is part of the URL request. It is mandatory.
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
-| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
+| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
 
 **Request payload**
 
@@ -1402,7 +1402,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 #### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
@@ -1427,7 +1427,7 @@ This parameter is part of the URL request. It is mandatory.
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
-| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. | keyValues    |
+| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
 
 **Request payload**
 
@@ -1447,7 +1447,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 #### Remove Entity [DELETE /v2/entities/{entityId}]
@@ -1471,7 +1471,7 @@ This parameter is part of the URL request. It is mandatory.
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 ### Attributes
@@ -1495,12 +1495,12 @@ Those parameter are part of the URL request. They are mandatory.
 | Parameter  | Optional | Type   | Description                                                                                                               | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
-| `metadata` | ✓        | string | A list of metadata names to include in the response. See "Filtering out attributes and metadata" section for more detail. | `accuracy`    |
+| `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | `accuracy`    |
 
 **Response**
 
 * Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -1524,7 +1524,7 @@ is replaced by the one in the request. The object follows the JSON representatio
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 **Request URL parameters**
@@ -1564,7 +1564,7 @@ Removes an entity attribute.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 **Request URL parameters**
@@ -1617,7 +1617,7 @@ Those parameter are part of the URL request. They are mandatory.
 **Response**
 
 * Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Response 200 example:
@@ -1682,7 +1682,7 @@ Content-type is `application/json` or `text/plain`
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 ### Types
@@ -1722,7 +1722,7 @@ The values that `options` parameter can have for this specific request are:
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -1783,7 +1783,7 @@ This operation returns a JSON object with information about the type:
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Response 200 example:
@@ -1841,7 +1841,7 @@ A `condition` contains the following subfields:
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
-| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List entities" operation above about this field) |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field) |
 
 Based on the `condition` field, the notification triggering rules are as follow:
 
@@ -1860,10 +1860,10 @@ A `notification` object contains the following subfields:
 
 | Parameter              | Optional          | Type   | Description                                                                                                                                                                                                                                                     |
 |------------------------|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see "Notification Messages" section). An empty list means that all attributes are to be included in notifications. See "Filtering out attributes and metadata" section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
+| `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp) or [`httpCustom`](#subscriptionnotificationhttpcustom) | ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol.                                                                                                              |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in "Notification Messages" section. |
-| `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See "Filtering out attributes and metadata" section for more detail.                                                                                                                                  |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                  |
 | `timesSent`            | Only on retrieval | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                                                                                                            |
 | `lastNotification`     | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                                                                                                    |
 | `lastFailure`          | Only on retrieval | ISO8601  | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                                                                                                 |
@@ -1887,7 +1887,7 @@ An `httpCustom` object contains the following subfields.
 | `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages.                         |
 | `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages.                 |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
-| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see "Notification Messages" sections) is used.|
+| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
 
 If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
 
@@ -1914,7 +1914,7 @@ The values that `options` parameter can have for this specific request are:
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -2001,7 +2001,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 201 Created
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 201:
@@ -2028,7 +2028,7 @@ This parameter is part of the URL request. It is mandatory.
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -2093,7 +2093,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 #### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
@@ -2111,7 +2111,7 @@ This parameter is part of the URL request. It is mandatory.
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 ## Registration Operations
@@ -2198,7 +2198,7 @@ The values that `options` parameter can have for this specific request are:
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -2273,7 +2273,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 201 Created
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 201:
@@ -2299,7 +2299,7 @@ This parameter is part of the URL request. It is mandatory.
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -2363,7 +2363,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 #### Delete Registration [DELETE /v2/registrations/{registrationId}]
@@ -2381,7 +2381,7 @@ This parameter is part of the URL request. It is mandatory.
 **Response**
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 ## Batch Operations
@@ -2421,7 +2421,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                      |
 |-------------|--------------------------------------------------------------------------------------------------|
-| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 **Request payload**
 
@@ -2458,7 +2458,7 @@ Content-type is `application/json`
 **Response**
 
 * Successful operation uses 204 No Content.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 ### Query operation
@@ -2478,10 +2478,9 @@ The payload may contain the following elements (all of them optional):
     + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attrs`: List of attributes to be provided (if not specified, all attributes).
-+ `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see "List
-   entities" operation above about this field).
++ `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field).
 + `metadata`: a list of metadata names to include in the response.
-   See "Filtering out attributes and metadata" section for more detail.
+   See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.
 
 **Request query parameters**
 
@@ -2489,7 +2488,7 @@ The payload may contain the following elements (all of them optional):
 |-----------|----------|--------|---------------------------------------------------------------------------|----------------------|
 | `limit`   | ✓        | number | Limit the number of entities to be retrieved.                             | `10`                 |
 | `offset`  | ✓        | number | Skip a number of records.                                                 | `20`                 |
-| `orderBy` | ✓        | string | Criteria for ordering results.See "Ordering Results" section for details. | `temperature,!speed` |
+| `orderBy` | ✓        | string | Criteria for ordering results.See [Ordering Results](#ordering-results) section for details. | `temperature,!speed` |
 | `options` | ✓        | string | Options dictionary.                                                       | `count`              |
 
 The values that `options` parameter can have for this specific request are:
@@ -2497,9 +2496,9 @@ The values that `options` parameter can have for this specific request are:
 | Options  | Description                                                                                      |
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of entities returned in the response as an HTTP header named `Fiware-Total-Count` |
-| `keyValues`  | When used, the response payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
-| `values`  | When used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details. |
-| `unique`  | When used, the response payload uses the `values` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `keyValues`  | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `values`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `unique`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 **Request payload**
 
@@ -2534,7 +2533,7 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
 Example response 200:
@@ -2594,7 +2593,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                      |
 |-------------|--------------------------------------------------------------------------------------------------|
-| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See "Simplified Entity Representation" section for details. |
+| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 **Request payload**
 
@@ -2625,5 +2624,5 @@ Content-Type is `application/json`
 **Response**
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on "Error Responses" for
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
