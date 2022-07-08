@@ -736,6 +736,35 @@ bool deletionWithoutTypePresent
 
 // -----------------------------------------------------------------------------
 //
+// isJsonLiteral -
+//
+// FIXME: move to its own module
+//
+static bool isJsonLiteral(KjNode* attrP, KjNode* typeP)
+{
+  if (typeP == NULL)
+  {
+    typeP = kjLookup(attrP, "@type");
+    if (typeP == NULL)
+      return false;
+  }
+  else if (strcmp(typeP->name, "@type") != 0)
+    return false;
+
+  if (strcmp(typeP->value.s, "@json") != 0)
+    return false;
+
+  // Must have an @value also
+  if (kjLookup(attrP, "@value") == NULL)
+    return false;
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckAttributeObject -
 //
 // - if "type" is present inside the object:
@@ -801,6 +830,25 @@ static bool pCheckAttributeObject
       {
         attributeType = GeoProperty;
         geoJsonValue  = true;
+      }
+      else if (isJsonLiteral(attrP, typeP) == true)
+      {
+        KjNode* typeP  = kjString(orionldState.kjsonP, "type", "Property");
+        KjNode* valueP = kjObject(orionldState.kjsonP, "value");
+
+        // Steal children from attrP and put them in valueP
+        valueP->value.firstChildP = attrP->value.firstChildP;
+        valueP->lastChild         = attrP->lastChild;
+
+        // valueP stole the entire RHS - now empty the RHS of attrP
+        attrP->value.firstChildP = NULL;
+        attrP->lastChild         = NULL;
+
+        // Finally, add typeP and valueP to attrP
+        kjChildAdd(attrP, typeP);
+        kjChildAdd(attrP, valueP);
+
+        return true;
       }
       else
       {
@@ -895,7 +943,7 @@ static bool pCheckAttributeObject
       LM_TMP(("OBS: Field '%s' marked for deletion", fieldP->name));
     }
 
-    if (fieldP->type == KjNull)  // JSON-LD null
+    if (fieldP->type == KjNull)
     {
       if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
       {

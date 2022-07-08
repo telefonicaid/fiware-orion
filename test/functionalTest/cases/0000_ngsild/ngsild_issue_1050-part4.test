@@ -39,10 +39,10 @@ brokerStart CB 0 IPv4 -experimental
 #
 # 01. Create an entity TemperatureSensor:001 with two attributes, category and temperature
 # 02. PATCH the entity setting 'category' to JSON literal { "@type": "@json", "@value": 2 }
-# 03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later
+# 03. GET the entity, making sure 'category' has been modified according to the json literal in step 02
 # 04. Now remove 'category' with urn:ngsi-ld:null
 # 05. GET the entity, making sure 'category' has been removed
-# 06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }
+# 06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 6 }
 # 07. GET the entity, see temperature is now a stupid compound ...
 #
 
@@ -72,8 +72,8 @@ echo
 echo
 
 
-echo "03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later"
-echo "======================================================================================================="
+echo "03. GET the entity, making sure 'category' has been modified according to the json literal in step 02"
+echo "====================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
 echo
 echo
@@ -96,7 +96,7 @@ echo
 echo
 
 
-echo "06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }"
+echo "06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 6 }"
 echo "===================================================================================================="
 payload='{
   "temperature": { "value": { "@type": "@json", "@value": 6 } }
@@ -125,22 +125,15 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
 
 02. PATCH the entity setting 'category' to JSON literal { @type: @json, @value: 2 }
 ===================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 123
-Content-Type: application/json
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "detail": "@json",
-    "title": "Invalid value for attribute /type/",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
-03. GET the entity, making sure 'category' hasn't been removed - deal with non-NULL json literals later
-=======================================================================================================
+03. GET the entity, making sure 'category' has been modified according to the json literal in step 02
+=====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 179
+Content-Length: 199
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -148,7 +141,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "category": {
         "type": "Property",
-        "value": "sensor"
+        "value": {
+            "@type": "@json",
+            "@value": 2
+        }
     },
     "id": "urn:ngsi-ld:TemperatureSensor:001",
     "temperature": {
@@ -186,7 +182,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 2 }
+06. To try these 'JSON literals', PATCH temperature with the value { '@type': '@json', '@value': 6 }
 ====================================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
