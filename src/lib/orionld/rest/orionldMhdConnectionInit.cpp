@@ -935,6 +935,13 @@ MHD_Result orionldMhdConnectionInit
     }
   }
 
+  // 2. NGSI-LD requests don't support the broker to be started with -noCache
+  if (noCache == true)
+  {
+    orionldError(OrionldBadRequestData, "Not Implemented", "Running without Subscription Cache is not implemented for NGSI-LD requests", 501);
+    return MHD_YES;
+  }
+
   // 3. Check invalid verb
   orionldState.verbString = (char*) method;
   orionldState.verb       = verbGet(method);
