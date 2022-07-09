@@ -34,7 +34,13 @@ brokerStart CB 0 IPv4 -experimental
 # 01. Create a subscription without optional fields
 # 02. Create a registration without optional fields
 # 03. Create an entity without optional fields
-# 04. grep logfile for error - see nothing
+# 04. GET subscriptions
+# 05. GET registrations
+# 06. GET entities
+# 07. GET the subscription
+# 08. GET the registration
+# 09. GET the entity
+# 10. grep logfile for error - see nothing
 #
 
 
@@ -54,6 +60,7 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+subLocation=$(grep Location /tmp/httpHeaders.out | awk -FLocation: '{print $2}')
 echo
 echo
 
@@ -74,6 +81,7 @@ payload='{
   "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+regLocation=$(grep Location /tmp/httpHeaders.out | awk -FLocation: '{print $2}')
 echo
 echo
 
@@ -89,7 +97,49 @@ echo
 echo
 
 
-echo "04. grep logfile for error - see nothing"
+echo "04. GET subscriptions"
+echo "====================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "05. GET registrations"
+echo "====================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations
+echo
+echo
+
+
+echo "06. GET entities"
+echo "================"
+orionCurl --url /ngsi-ld/v1/entities
+echo
+echo
+
+
+echo "07. GET the subscription"
+echo "========================"
+orionCurl --url $subLocation
+echo
+echo
+
+
+echo "08. GET the registration"
+echo "========================"
+orionCurl --url $regLocation
+echo
+echo
+
+
+echo "09. GET the entity"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "10. grep logfile for error - see nothing"
 echo "========================================"
 egrep 'ERR|WARN' /tmp/orionld.log
 echo
@@ -124,7 +174,149 @@ Location: /ngsi-ld/v1/entities/REGEX(.*)
 
 
 
-04. grep logfile for error - see nothing
+04. GET subscriptions
+=====================
+HTTP/1.1 200 OK
+Content-Length: 319
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "entities": [
+            {
+                "type": "FillingSensor"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://quantumleap:8668/v2/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+05. GET registrations
+=====================
+HTTP/1.1 200 OK
+Content-Length: 210
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "endpoint": "http://my.csource.org:1026",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "type": "Vehicle"
+                    }
+                ]
+            }
+        ],
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+06. GET entities
+================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+07. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 317
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "FillingSensor"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://quantumleap:8668/v2/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+08. GET the registration
+========================
+HTTP/1.1 200 OK
+Content-Length: 208
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "endpoint": "http://my.csource.org:1026",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+    "information": [
+        {
+            "entities": [
+                {
+                    "type": "Vehicle"
+                }
+            ]
+        }
+    ],
+    "type": "ContextSourceRegistration"
+}
+
+
+09. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 26
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+10. grep logfile for error - see nothing
 ========================================
 
 
