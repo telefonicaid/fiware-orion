@@ -1,0 +1,133 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation without optional fields - check for errors in log file
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create a subscription without optional fields
+# 02. Create a registration without optional fields
+# 03. Create an entity without optional fields
+# 04. grep logfile for error - see nothing
+#
+
+
+echo "01. Create a subscription without optional fields"
+echo "================================================="
+payload='{
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "FillingSensor"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://quantumleap:8668/v2/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a registration without optional fields"
+echo "================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an entity without optional fields"
+echo "============================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. grep logfile for error - see nothing"
+echo "========================================"
+egrep 'ERR|WARN' /tmp/orionld.log
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription without optional fields
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+
+
+
+02. Create a registration without optional fields
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
+
+
+
+03. Create an entity without optional fields
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/REGEX(.*)
+
+
+
+04. grep logfile for error - see nothing
+========================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
