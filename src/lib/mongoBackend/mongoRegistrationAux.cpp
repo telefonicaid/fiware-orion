@@ -127,12 +127,15 @@ static void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj* c
       }
       else
       {
-        entity.id = getStringFieldF(&ce, REG_ENTITY_ID);
+        entity.id = getStringFieldF(&ce, REG_ENTITY_ID);  // Mandatory if isPattern
       }
     }
     else
     {
-      entity.id = getStringFieldF(&ce, REG_ENTITY_ID);
+      if (ce.hasField("id"))
+        entity.id = getStringFieldF(&ce, REG_ENTITY_ID);  // Optional
+      else
+        entity.id = "";
     }
 
     if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
