@@ -209,6 +209,8 @@ static bool setJsonPayload
   replacements.insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
+    // Note that if some attribute is named service, servicePath or authToken (although it would be
+    // an anti-pattern), the attribute takes precedence
     replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
   }
 

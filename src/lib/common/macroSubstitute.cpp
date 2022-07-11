@@ -246,15 +246,36 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en,
     }
     else if (macroName == "service")
     {
-      value = service;
+      if (en.attributeVector.get("service") >= 0)
+      {
+        attributeValue(&value, en.attributeVector.vec, macroName.c_str());
+      }
+      else
+      {
+        value = service;
+      }
     }
     else if (macroName == "servicePath")
     {
-      value = en.servicePath;
+      if (en.attributeVector.get("servicePath") >= 0)
+      {
+        attributeValue(&value, en.attributeVector.vec, macroName.c_str());
+      }
+      else
+      {
+        value = en.servicePath;
+      }
     }
     else if (macroName == "authToken")
     {
-      value = authToken;
+      if (en.attributeVector.get("authToken") >= 0)
+      {
+        attributeValue(&value, en.attributeVector.vec, macroName.c_str());
+      }
+      else
+      {
+        value = authToken;
+      }
     }
     else
     {

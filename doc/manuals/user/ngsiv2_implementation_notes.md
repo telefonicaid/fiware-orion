@@ -510,6 +510,9 @@ specification, the following ones can be used:
 * `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
   update request triggering the subscription.
 
+In the rare case an attribute was named in the same way of the above (e.g. an attribute which
+name is `service`) then the attribute value takes precedence.
+
 [Top](#top)
 
 ## Custom notification with JSON payload
