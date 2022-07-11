@@ -1012,10 +1012,7 @@ and/or those which match a query or geographical query (see [Simple Query Langua
 (i.e. mutually exclusive) with their corresponding exact matching parameters, i.e. `idPattern` with `id` and
 `typePattern` with `type`.
 
-The response payload is an array containing one object per matching entity. Each entity follows
-the JSON entity representation format (described in "JSON Entity Representation" section).
-
-**Request query parameters**
+_**Request query parameters**_
 
 This requests accepts the following URL parameters to customize the request response.
 
@@ -1047,15 +1044,21 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
-
-Example response 200:
+  
+_**Response payload**_
 
 Content-Type is `application/json`
+
+The response payload is an array containing one object per matching entity. Each entity follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
+
+Example:
 
 ```json
 [
@@ -1100,10 +1103,7 @@ Content-Type is `application/json`
 
 #### Create Entity [POST /v2/entities]
 
-The payload is an object representing the entity to be created. The object follows
-the JSON entity representation format (described in a "JSON Entity Representation" section).
-
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                                              | Example |
 |-----------|----------|--------|--------------------------------------------------------------------------|---------|
@@ -1116,9 +1116,13 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
 
-**Request payload**
+_**Request payload**_
 
 Content-Type is `application/json`
+
+The payload is an object representing the entity to be created. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
 
 Example:
 
@@ -1144,7 +1148,7 @@ Example:
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
   upsert option is used). Response includes a `Location` header with the URL of the
@@ -1167,14 +1171,7 @@ Headers:
 
 #### Retrieve Entity [GET /v2/entities/{entityId}]
 
-The response is an object representing the entity identified by the ID. The object follows
-the JSON entity representation format (described in "JSON Entity Representation" section).
-
-This operation must return one entity element only, but there may be more than one entity with the
-same ID (e.g. entities with same ID but different types).
-In such case, an error message is returned, with the HTTP status code set to 409 Conflict. 
-
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1183,7 +1180,7 @@ This parameter is part of the URL request. It is mandatory.
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1200,14 +1197,20 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for more details.
 
-Example response 200:
+_**Response payload**_
 
 Content-Type is `application/json`
+
+The response is an object representing the entity identified by the ID. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
+
+Example:
 
 ```json
 {
@@ -1236,15 +1239,7 @@ Content-Type is `application/json`
 
 #### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
 
-This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
-fields.
-
-Just like the general request of getting an entire entity, this operation must return only one
-entity element. If more than one entity with the same ID is found (e.g. entities with
-same ID but different type), an error message is returned, with the HTTP status code set to
-409 Conflict.
-
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1252,7 +1247,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1270,15 +1265,22 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response payload**_
 
 Content-Type is `application/json`
+
+The response is an object representing the entity identified by the ID. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
+
+Example:
 
 ```json
 {
@@ -1897,7 +1899,7 @@ If `httpCustom` is used, then the considerations described in "Custom Notificati
 
 Returns a list of all the subscriptions present in the system.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -1911,13 +1913,17 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count` |
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Reponse payload**_
+
+The response payload is an array containing one object per subscription. Each subscription follows the JSON subscription representation format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example:
 
 ```json
 [
