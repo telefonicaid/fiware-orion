@@ -26,10 +26,13 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjString
 }
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/langStringExtract.h"                  // Own interface
 
 
@@ -38,13 +41,16 @@ extern "C"
 //
 // langStringExtract -
 //
+// FIXME: merge this function with langValueFix
+//
 char* langStringExtract(KjNode* languageMapP, const char* lang, char** pickedLanguageP)
 {
   KjNode* langItemP = kjLookup(languageMapP, lang);  // Find the desired language item (key == lang) inside the languageMap
 
   if (langItemP == NULL)
-    langItemP  = kjLookup(languageMapP, "en");    // English is the default if 'lang' is not present
-
+    langItemP = kjLookup(languageMapP, "@none");  // If present, the key '@none' is the default language
+  if (langItemP == NULL)
+    langItemP = kjLookup(languageMapP, "en");     // English is the default if 'lang' is not present and @none also not
   if (langItemP == NULL)
     langItemP = languageMapP->value.firstChildP;  // If English also not present, just pick the first one
 
@@ -54,4 +60,31 @@ char* langStringExtract(KjNode* languageMapP, const char* lang, char** pickedLan
 
   *pickedLanguageP = langItemP->name;
   return langItemP->value.s;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// langItemPick -
+//
+KjNode* langItemPick(KjNode* languageMapP, const char* attrName, const char* lang, char** pickedLanguageP)
+{
+  *pickedLanguageP = NULL;
+
+  KjNode* langItemP = kjLookup(languageMapP, lang);  // Find the desired language item (key == lang) inside the languageMap
+
+  if (langItemP == NULL)
+    langItemP = kjLookup(languageMapP, "@none");  // If present, the key '@none' is the default language
+  if (langItemP == NULL)
+    langItemP = kjLookup(languageMapP, "en");     // English is the default if 'lang' is not present and @none also not
+  if (langItemP == NULL)
+    langItemP = languageMapP->value.firstChildP;  // If English also not present, just pick the first one
+  if (langItemP == NULL)                          // If there is no item at all inside the language map, use "empty languageMap"
+    return kjString(orionldState.kjsonP, attrName, "empty languageMap");
+
+  *pickedLanguageP = langItemP->name;
+
+  langItemP->name = kaStrdup(&orionldState.kalloc, attrName);
+  return langItemP;
 }

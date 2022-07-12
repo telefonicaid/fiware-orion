@@ -52,41 +52,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// langFix -
-//
-void langFix(KjNode* attrP, const char* lang)
-{
-  KjNode* typeP        = kjLookup(attrP, "type");
-  KjNode* languageMapP = kjLookup(attrP, "value");
-
-  if ((typeP == NULL) || (languageMapP == NULL))
-    LM_RVE(("%s: invalid languageProperty", attrP->name));
-
-  typeP->value.s = (char*) "Property";
-
-  KjNode* valueP = kjLookup(languageMapP, lang);
-  if (valueP == NULL)
-    valueP = kjLookup(languageMapP, "en");
-  if (valueP == NULL)
-    valueP = languageMapP->value.firstChildP;
-
-  languageMapP->type = KjString;
-
-  if (valueP != NULL)
-  {
-    languageMapP->value.s = valueP->value.s;
-
-    KjNode* langP = kjString(orionldState.kjsonP, "lang", valueP->name);
-    kjChildAdd(attrP, langP);
-  }
-  else
-    languageMapP->value.s = (char*) "empty languageMap";
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // kjTreeFromNotification -
 //
 KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, const char* lang, char** detailsP)

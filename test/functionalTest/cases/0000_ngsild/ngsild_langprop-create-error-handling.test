@@ -220,13 +220,13 @@ Date: REGEX(.*)
 03. Attempt to create an entity with a LanguageProperty with a languageMap item that is not a string
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 201
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
+    "title": "Items of the value of a LanguageProperty attribute must be JSON String or Array of String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -276,13 +276,13 @@ Date: REGEX(.*)
 07. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty key
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 206
+Content-Length: 195
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "An item of the value (languageMap) of a LanguageProperty has an empty string",
+    "title": "A key of the languageMap of a LanguageProperty is an empty string",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -290,13 +290,13 @@ Date: REGEX(.*)
 08. Attempt to create an entity with a LanguageProperty with a languageMap item that has an empty value
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 206
+Content-Length: 215
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "An item of the value (languageMap) of a LanguageProperty has an empty string",
+    "title": "Items of a value array of a LanguageProperty attribute cannot be an empty JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

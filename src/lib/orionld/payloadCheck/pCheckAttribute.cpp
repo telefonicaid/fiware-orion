@@ -447,13 +447,28 @@ bool pCheckLanguageMap(KjNode* languageMapP, const char* attrName)
 
   for (KjNode* langItemP = languageMapP->value.firstChildP; langItemP != NULL; langItemP = langItemP->next)
   {
-    PCHECK_STRING(langItemP, 0, "Items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
-
-    // Check the key-value pair for either key or value EMPTY
-    if ((langItemP->name[0] == 0) || (langItemP->value.s[0] == 0))
+    // Check the key-value pair for empty KEY
+    if (langItemP->name[0] == 0)
     {
-      orionldError(OrionldBadRequestData, "An item of the value (languageMap) of a LanguageProperty has an empty string", attrName, 400);
+      orionldError(OrionldBadRequestData, "A key of the languageMap of a LanguageProperty is an empty string", attrName, 400);
       return false;
+    }
+
+    if (langItemP->type == KjString)
+    {
+      PCHECK_STRING_EMPTY(langItemP, 0, "Items of a value array of a LanguageProperty attribute cannot be an empty JSON String", attrName, 400);
+    }
+    else if (langItemP->type == KjArray)
+    {
+      for (KjNode* langValueP = langItemP->value.firstChildP; langValueP != NULL; langValueP = langValueP->next)
+      {
+        PCHECK_STRING(langValueP, 0, "Items of a value array of a LanguageProperty attribute must be JSON String", attrName, 400);
+        PCHECK_STRING_EMPTY(langValueP, 0, "Items of a value array of a LanguageProperty attribute cannot be an empty JSON String", attrName, 400);
+      }
+    }
+    else
+    {
+      PCHECK_STRING_OR_ARRAY(langItemP, 0, "Items of the value of a LanguageProperty attribute must be JSON String or Array of String", attrName, 400);
     }
   }
 

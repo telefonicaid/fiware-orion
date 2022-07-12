@@ -46,6 +46,7 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"          // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocEntityRetrieve.h"                 // Own interface
 
 
@@ -85,6 +86,98 @@ static bool timestampToString(KjNode* nodeP)
 
 // -----------------------------------------------------------------------------
 //
+// langValueFix -
+//
+// FIXME: Move to its own module
+//        Also used in
+//          o mongoCppLegacyEntityRetrieve.cpp
+//          o legacyGetEntities.cpp
+//
+void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang)
+{
+  // Special case - URI param lang is set and it's a LanguageProperty
+  KjNode* langValueNodeP = kjLookup(valueP, lang);
+
+  LM_TMP(("KZ: In langValueFix for attribute '%s'", attrP->name));
+
+  if (langValueNodeP == NULL)
+    langValueNodeP = kjLookup(valueP, "@none");   // If present, the key '@none' is the default language
+  if (langValueNodeP == NULL)
+    langValueNodeP = kjLookup(valueP, "en");      // Pick English as default if the desired language is not found and @none also not
+  if (langValueNodeP == NULL)
+    langValueNodeP = valueP->value.firstChildP;   // If English is also not found, just take the first one
+
+  LM_TMP(("KZ: In langValueFix (keyValues: %s)", (orionldState.uriParamOptions.keyValues == true)? "YES" : "NO"));
+  if (langValueNodeP == NULL)
+  {
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      valueP->type      = KjString;
+      valueP->value.s   = (char*) "empty languageMap ...";
+    }
+    else
+    {
+      attrP->type      = KjString;
+      attrP->value.s   = (char*) "empty languageMap ...";
+    }
+  }
+  else if (langValueNodeP->type == KjString)
+  {
+    LM_TMP(("KZ: It's a String"));
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      valueP->type      = KjString;
+      valueP->value.s   = langValueNodeP->value.s;
+    }
+    else
+    {
+      attrP->type      = KjString;
+      attrP->value.s   = langValueNodeP->value.s;
+    }
+  }
+  else  // It's an array
+  {
+    LM_TMP(("KZ: It's an Array"));
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      valueP->type                       = KjArray;
+      valueP->value.firstChildP          = langValueNodeP->value.firstChildP;
+      valueP->lastChild                  = langValueNodeP->lastChild;
+    }
+    else
+    {
+      attrP->type                       = KjArray;
+      attrP->value.firstChildP          = langValueNodeP->value.firstChildP;
+      attrP->lastChild                  = langValueNodeP->lastChild;
+    }
+
+    langValueNodeP->value.firstChildP = NULL;
+    langValueNodeP->lastChild         = NULL;
+  }
+
+  if (orionldState.uriParamOptions.keyValues == false)
+  {
+    LM_TMP(("KZ: No key-values"));
+    if (langValueNodeP != NULL)
+    {
+      // Picked Language as sub-attr
+      KjNode* langNameNodeP = kjString(orionldState.kjsonP, "lang", langValueNodeP->name);
+      kjChildAdd(attrP, langNameNodeP);
+    }
+
+    // Transform to Property
+    LM_TMP(("KZ: Transforming lang-prop '%s' to Normal Property", attrP->name));
+    typeP->value.s  = (char*) "Property";
+    valueP->name    = (char*) "value";
+  }
+  else
+    LM_TMP(("KZ: key-values"));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // presentationAttributeFix -
 //
 // 1. Remove 'createdAt' and 'modifiedAt' if options=sysAttrs is not set
@@ -93,8 +186,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 {
   if (keyValues == true)
   {
-    KjNode*  typeP    = kjLookup(attrP, "type");
-    KjNode*  valueP;
+    KjNode* typeP = kjLookup(attrP, "type");
 
     if (typeP == NULL)
     {
@@ -111,7 +203,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     // FIXME: Here I need to know what to look for!!!
     //        "value" or "object"
     //
-    valueP = kjLookup(attrP, "value");
+    KjNode* valueP = kjLookup(attrP, "value");
     if (valueP == NULL)
       valueP = kjLookup(attrP, "object");
 
@@ -121,27 +213,20 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
       valueP = kjString(orionldState.kjsonP, "value", "Internal Error - attribute value lost");
     }
 
-    if ((lang == NULL) || (strcmp(typeP->value.s, "LanguageProperty") != 0))
+    bool isLanguageProperty = (strcmp(typeP->value.s, "LanguageProperty") == 0);
+    LM_TMP(("KZ: attr type: '%s'", typeP->value.s));
+    if ((isLanguageProperty == false) || (lang == NULL))
     {
-      // Inherit the value field
+      // Just inherit the value field
+      LM_TMP(("KZ: NOT Calling langValueFix"));
       attrP->type      = valueP->type;
       attrP->value     = valueP->value;
       attrP->lastChild = valueP->lastChild;
     }
     else
     {
-      // Special case - URI param lang is set and it's a LanguageProperty
-      KjNode* langValueNodeP = kjLookup(valueP, lang);
-
-      if (langValueNodeP == NULL)
-        langValueNodeP = kjLookup(valueP, "en");   // Pick English as default if the desired language is not found
-      if (langValueNodeP == NULL)
-        langValueNodeP = valueP->value.firstChildP;  // If English is also not found, just take the first one
-
-      char* value = (langValueNodeP != NULL)? langValueNodeP->value.s : (char*) "empty languageMap ...";
-
-      attrP->type      = KjString;
-      attrP->value.s   = value;
+      LM_TMP(("KZ: Calling langValueFix"));
+      langValueFix(attrP, valueP, typeP, lang);
     }
   }
   else if (sysAttrs == false)
@@ -155,8 +240,14 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (modifiedAtP != NULL)
       kjChildRemove(attrP, modifiedAtP);
 
+    kjTreeLog(attrP, "KZ: attr");
     for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
     {
+      LM_TMP(("KZ: md '%s'", mdP->name));
+      if (mdP->type != KjObject)
+        continue;
+
+      LM_TMP(("KZ: Looking for timestamps in sub-attr '%s' of type '%s'", mdP->name, kjValueType(mdP->type)));
       createdAtP  = kjLookup(mdP, "createdAt");
       modifiedAtP = kjLookup(mdP, "modifiedAt");
 
@@ -258,33 +349,10 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
     // If the language is asked for, then the LanguageProperty is converted into a normal property ...
     if (lang != NULL)
     {
-      KjNode* langValueNodeP   = kjLookup(languageMapP, lang);
-      char*   stringValue      = NULL;
-
-      if (langValueNodeP == NULL)
-      {
-        langValueNodeP = kjLookup(languageMapP, "en");         // Pick English as default if the desired language is not found
-        if (langValueNodeP == NULL)
-          langValueNodeP = languageMapP->value.firstChildP;    // If English is also not found, just take the first one
-      }
-
-      char* langName = (char*) "none";
-      if (langValueNodeP != NULL)
-      {
-        stringValue = langValueNodeP->value.s;
-        langName    = langValueNodeP->name;
-      }
-      else
-        stringValue = (char*) "empty languageMap ...";
-
-      // Convert the LanguageProperty into a normal Property
-      typeP->value.s        = (char*) "Property";
-      languageMapP->type    = KjString;
-      languageMapP->value.s = stringValue;
-
-      // Picked Language as sub-attr
-      KjNode* langNameNodeP = kjString(orionldState.kjsonP, "lang", langName);
-      kjChildAdd(attrP, langNameNodeP);
+      LM_TMP(("KZ: lang set - fixing the attr '%s'", attrP->name));
+      kjTreeLog(attrP, "KZ: Attribute Before langValueFix");
+      langValueFix(attrP, languageMapP, typeP, lang);
+      kjTreeLog(attrP, "KZ: Attribute After langValueFix");
     }
     else
       languageMapP->name = (char*) "languageMap";
@@ -404,9 +472,9 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 
 // ----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityRetrieve -
+// mongocEntityRetrieve -
 //
-// FIXME: Only do DB stuff - for dbModrel stuff use dbModelToApiEntity()
+// FIXME: Only do DB stuff - for dbModel stuff use dbModelToApiEntity()
 //
 // PARAMETERS
 //   entityId        ID of the entity to be retrieved
@@ -528,9 +596,12 @@ KjNode* mongocEntityRetrieve
     {
       for (KjNode* attrP = dbAttrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
+        LM_TMP(("KZ: Calling datamodelAttributeFix for attribute '%s' (lang: '%s')", attrP->name, lang));
         datamodelAttributeFix(attrP, entityId, sysAttrs, lang);
       }
     }
+    else
+      LM_TMP(("KZ: Not calling datamodelAttributeFix as SIMPLIFIED"));
 
     if ((dbDataSetsP != NULL) && (dbDataSetsP->value.firstChildP != NULL))
     {
@@ -672,36 +743,18 @@ KjNode* mongocEntityRetrieve
     if (strcmp(attrP->name, "location") == 0)
       special = true;
 
+    LM_TMP(("KZ: Treating attribute '%s'", attrP->name));
     if (special == false)
     {
-      char* attrName            = kaStrdup(&orionldState.kalloc, attrP->name);
-      bool  valueMayBeCompacted = false;
+      char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
       eqForDot(attrName);
-
-      attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrName, &valueMayBeCompacted, NULL);
-
-      if (valueMayBeCompacted == true)
-      {
-        KjNode* valueP = kjLookup(attrP, "value");
-
-        if (valueP != NULL)
-        {
-          if (valueP->type == KjString)
-            valueP->value.s = orionldContextItemAliasLookup(orionldState.contextP, valueP->value.s, NULL, NULL);
-          else if (valueP->type == KjArray)
-          {
-            for (KjNode* arrItemP = valueP->value.firstChildP; arrItemP != NULL; arrItemP = arrItemP->next)
-            {
-              if (arrItemP->type == KjString)
-                arrItemP->value.s = orionldContextItemAliasLookup(orionldState.contextP, arrItemP->value.s, NULL, NULL);
-            }
-          }
-        }
-      }
+      attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrName, NULL, NULL);
     }
 
     if (attrP->type == KjObject)
     {
+      kjTreeLog(attrP, "KZ: Attr");
+      LM_TMP(("KZ: Calling presentationAttributeFix for '%s'", attrP->name));
       if (presentationAttributeFix(attrP, entityId, sysAttrs, keyValues, lang) == false)
       {
         LM_E(("Internal Error (presentationAttributeFix failed)"));
@@ -711,6 +764,8 @@ KjNode* mongocEntityRetrieve
     else  // KjArray
     {
       int instances = 0;
+      LM_TMP(("KZ: '%s' is an array", attrP->name));
+      kjTreeLog(attrP, "KZ: Attr is an array");
       for (KjNode* aP = attrP->value.firstChildP; aP != NULL; aP = aP->next)
       {
         if (presentationAttributeFix(aP, entityId, sysAttrs, keyValues, lang) == false)
