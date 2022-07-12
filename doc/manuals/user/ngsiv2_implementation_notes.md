@@ -382,7 +382,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `alterationType` attribute
 
-Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Apart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
 Orion implements the `alterationType` attribute.
 
 This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
@@ -413,7 +413,7 @@ supported upon completion of [this issue](https://github.com/telefonicaid/fiware
 
 ## `ignoreType` metadata
 
-Appart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
+Apart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
 Orion implements the `ignoreType` metadata.
 
 When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
@@ -500,7 +500,7 @@ Please find details in [this specific documentation](subscriptions_alttype.md)
 
 ## Custom notification extra macros
 
-Appart from the `${...}` macros described in "Custom Notifications" section in the NGSIv2
+Apart from the `${...}` macros described in "Custom Notifications" section in the NGSIv2
 specification, the following ones can be used:
 
 * `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
