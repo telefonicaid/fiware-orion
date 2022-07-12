@@ -37,4 +37,12 @@ extern "C"
 //
 extern char* langStringExtract(KjNode* languageMapP, const char* lang, char** pickedLanguageP);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// langItemPick -
+//
+extern KjNode* langItemPick(KjNode* languageMapP, const char* attrName, const char* lang, char** pickedLanguageP);
+
 #endif  // SRC_LIB_ORIONLD_COMMON_LANGSTRINGEXTRACT_H_

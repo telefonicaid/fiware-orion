@@ -77,6 +77,7 @@ static bool geoPropertyInAttrs(char** attrsV, int attrsCount, const char* geoPro
 
 
 
+extern void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang);
 // ----------------------------------------------------------------------------
 //
 // apiEntityLanguageProps -
@@ -93,6 +94,11 @@ static void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
     if (languageMapP == NULL)
       continue;
 
+#if 1
+    LM_TMP(("KZ: Calling langValueFix"));
+    KjNode* typeP = kjLookup(attrP, "type");
+    langValueFix(attrP, languageMapP, typeP, lang);
+#else
     // Find the language item inside the languageMap
     KjNode* langItemP   = kjLookup(languageMapP, lang);
     char*   stringValue = NULL;
@@ -142,6 +148,7 @@ static void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
       KjNode* langItemP = kjString(orionldState.kjsonP, "lang", langChosen);
       kjChildAdd(attrP, langItemP);
     }
+#endif
   }
 }
 

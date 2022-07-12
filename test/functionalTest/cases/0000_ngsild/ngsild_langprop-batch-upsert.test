@@ -285,7 +285,7 @@ Date: REGEX(.*)
 05. Attempt to Batch Upsert with the RHS of L:languageMap:es as a non-string, e.g. the number 14 - see error
 ============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 270
+Content-Length: 288
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -296,7 +296,7 @@ Date: REGEX(.*)
             "error": {
                 "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
                 "status": 400,
-                "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
+                "title": "Items of the value of a LanguageProperty attribute must be JSON String or Array of String",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }

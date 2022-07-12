@@ -141,6 +141,8 @@ static void attributeToConcise(KjNode* attrP, bool* simplifiedP)
   kjChildRemove(attrP, attrTypeP);
   LM_TMP(("CONCISE: Just removed type '%s'", attrTypeP->value.s));
 
+  LM_TMP(("KZ: Attribute '%s' is of type '%s'", attrP->name, attrTypeP->value.s));
+
   if ((strcmp(attrTypeP->value.s, "Property") != 0) && (strcmp(attrTypeP->value.s, "GeoProperty") != 0))
     return;
 
@@ -214,8 +216,11 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 
         if (valueP != NULL)
         {
-          if (strcmp(attrTypeP->value.s, "LanguageMap") == 0)
-            valueP->name = (char*) "langeuageMap";
+          if (strcmp(attrTypeP->value.s, "LanguageProperty") == 0)
+          {
+            LM_TMP(("KZ: attribute '%s' is a LanguageProperty", attrP->name));
+            valueP->name = (char*) "languageMap";
+          }
           else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
             valueP->name = (char*) "object";
         }

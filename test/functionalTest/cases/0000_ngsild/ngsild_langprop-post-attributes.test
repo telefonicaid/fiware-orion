@@ -277,7 +277,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 07. Attempt with RHS of L1:languageMap:es to a non-string, e.g. the number 14 - see error
 =========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 184
+Content-Length: 202
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -286,7 +286,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "notUpdated": [
         {
             "attributeName": "L1",
-            "reason": "Items of the value of a LanguageProperty attribute must be JSON Strings: https://uri.etsi.org/ngsi-ld/default-context/L1"
+            "reason": "Items of the value of a LanguageProperty attribute must be JSON String or Array of String: https://uri.etsi.org/ngsi-ld/default-context/L1"
         }
     ],
     "updated": []

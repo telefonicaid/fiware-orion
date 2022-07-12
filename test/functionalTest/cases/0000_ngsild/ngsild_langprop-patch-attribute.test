@@ -239,13 +239,13 @@ Date: REGEX(.*)
 07. Attempt to PATCH the RHS of L:languageMap:es to a non-string, e.g. the number 14 - see error
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 201
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/L",
-    "title": "Items of the value of a LanguageProperty attribute must be JSON Strings",
+    "title": "Items of the value of a LanguageProperty attribute must be JSON String or Array of String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

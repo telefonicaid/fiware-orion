@@ -323,14 +323,34 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
 
     if ((lang != NULL) && (strcmp(attrTypeNodeP->value.s, "LanguageProperty") == 0))
     {
-      KjNode* langP = kjLookup(attrP, lang);
-      if (langP == NULL)
-        langP = kjLookup(attrP, "en");
-      if (langP == NULL)
-        langP = attrP->value.firstChildP;
+      LM_TMP(("KZ: lang+KEYVALUES+LanguageProperty for attr '%s'", dbAttrP->name));
+      // FIXME: try to use langValueFix
+      KjNode* langValueNodeP = kjLookup(attrP, lang);
+      if (langValueNodeP == NULL)
+        langValueNodeP = kjLookup(attrP, "@none");
+      if (langValueNodeP == NULL)
+        langValueNodeP = kjLookup(attrP, "en");
+      if (langValueNodeP == NULL)
+        langValueNodeP = attrP->value.firstChildP;
 
-      attrP->type = KjString;
-      attrP->value.s = (langP != NULL)? langP->value.s : (char*) "empty languageMap";
+      if (langValueNodeP == NULL)
+      {
+        attrP->type      = KjString;
+        attrP->value.s   = (char*) "empty languageMap ...";
+      }
+      else if (langValueNodeP->type == KjString)
+      {
+        attrP->type      = KjString;
+        attrP->value.s   = langValueNodeP->value.s;
+      }
+      else  // It's an array
+      {
+        attrP->type                       = KjArray;
+        attrP->value.firstChildP          = langValueNodeP->value.firstChildP;
+        attrP->lastChild                  = langValueNodeP->lastChild;
+        langValueNodeP->value.firstChildP = NULL;
+        langValueNodeP->lastChild         = NULL;
+      }
     }
 
     attrP->name = shortName;
@@ -369,12 +389,13 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
           nodeP->name = (char*) "object";
         else if (attrType == LanguageProperty)
         {
-          LM_TMP(("LANG: Got a languageMap"));
-          LM_TMP(("LANG: lang: %s", lang));
+          LM_TMP(("KZ: lang+NOT-KEYVALUES+LanguageProperty for attr '%s'", dbAttrP->name));
+          LM_TMP(("KZ: lang: %s", lang));
 
           if (lang != NULL)
           {
-            LM_TMP(("LANG: Need to look up '%s' in the languageMap", lang));
+            // FIXME: Try to use langValueFix
+            LM_TMP(("KZ: Need to look up '%s' in the languageMap", lang));
             KjNode* langNodeP = kjLookup(nodeP, lang);
 
             if (renderFormat == RF_NORMALIZED)  // For CONCISE the attribute type is not present
@@ -382,6 +403,12 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
 
             if (langNodeP != NULL)
               LM_TMP(("Found wanted language '%s'. Value: '%s'", langNodeP->name, langNodeP->value.s));
+
+            if (langNodeP == NULL)
+            {
+              LM_TMP(("wanted language '%s' not found - looking up Default instead", lang));
+              langNodeP = kjLookup(nodeP, "@none");  // Try @none if not found
+            }
 
             if (langNodeP == NULL)
             {
@@ -397,16 +424,29 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
 
             if (langNodeP != NULL)
             {
-              LM_TMP(("Time to change type of the languageMap, and add 'lang': '%s'", langNodeP->name));
+              LM_TMP(("KZ: Time to change type of the languageMap, and add 'lang': '%s'", langNodeP->name));
               KjNode* langP = kjString(orionldState.kjsonP, "lang", langNodeP->name);
               kjChildAdd(attrP, langP);
 
-              nodeP->type    = KjString;
-              nodeP->value.s = langNodeP->value.s;
+              if (langNodeP->type == KjString)
+              {
+                LM_TMP(("KZ: Lang String"));
+                nodeP->type    = KjString;
+                nodeP->value.s = langNodeP->value.s;
+              }
+              else if (langNodeP->type == KjArray)
+              {
+                LM_TMP(("KZ: Lang Array"));
+                attrP->type                   = KjArray;
+                attrP->value.firstChildP      = langNodeP->value.firstChildP;
+                attrP->lastChild              = langNodeP->lastChild;
+                langNodeP->value.firstChildP  = NULL;
+                langNodeP->lastChild          = NULL;
+              }
             }
             else
             {
-              LM_TMP(("empty languageMap"));
+              LM_TMP(("KZ: empty languageMap"));
               nodeP->type    = KjString;
               nodeP->value.s = (char*) "empty languageMap";
             }

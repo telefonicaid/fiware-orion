@@ -86,6 +86,7 @@ static bool timestampToString(KjNode* nodeP)
 
 
 
+extern void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang);  // FIXME: Move to its own module
 // -----------------------------------------------------------------------------
 //
 // presentationAttributeFix -
@@ -132,20 +133,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
       attrP->lastChild = valueP->lastChild;
     }
     else
-    {
-      // Special case - URI param lang is set and it's a LanguageProperty
-      KjNode* langValueNodeP = kjLookup(valueP, lang);
-
-      if (langValueNodeP == NULL)
-        langValueNodeP = kjLookup(valueP, "en");   // Pick English as default if the desired language is not found
-      if (langValueNodeP == NULL)
-        langValueNodeP = valueP->value.firstChildP;  // If English is also not found, just take the first one
-
-      char* value = (langValueNodeP != NULL)? langValueNodeP->value.s : (char*) "empty languageMap ...";
-
-      attrP->type      = KjString;
-      attrP->value.s   = value;
-    }
+      langValueFix(attrP, valueP, typeP, lang);
   }
   else if (sysAttrs == false)
   {
