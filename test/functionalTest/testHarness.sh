@@ -443,8 +443,7 @@ if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
 then  
   if [ -f "$SCRIPT_HOME/testEnv.sh" ]
   then
-    # First, we try with a testEnv.sh file in the script home (usual situation in the
-    # RPM deployment case)
+    # First, we try with a testEnv.sh file in the script home
     vMsg Sourcing $SCRIPT_HOME/testEnv.sh
     source $SCRIPT_HOME/testEnv.sh
   elif [ -f "$SCRIPT_HOME/../../scripts/testEnv.sh" ]

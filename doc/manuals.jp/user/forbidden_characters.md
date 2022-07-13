@@ -63,20 +63,20 @@ GET/v2/subscriptions のような、NGSIv2 API オペレーションの `httpCus
 "httpCustom": {
   "url": "http://foo.com/entity/${id}",
   "headers": {
-    "Content-Type": "application/json",
+    "Content-Type": "text/plain",
     "Authorization": "Basic ABC...ABC%3D%3D"
   },
   "method": "PUT",
   "qs": {
     "type": "${type}"
   },
-  "payload": "{ %22temperature%22: ${temperature}, %22asString%22: %22${temperature}%22 }"
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
 }
 ```
 
 上記ペイロード値は、この文字列の URL エンコードされたバージョンであることに注意してください :
-`{ "temperature": ${temperature}, "asString": "${temperature}" }`。`"Basic ABC...ABC%3D%3D"`
-は、この文字列のURLエンコードされたバージョンであることに注意してください: `"Basic ABC...ABC=="`
+`(type Number の) "temperature" 属性の値は ${temperature}` です。`"Basic ABC...ABC%3D%3D"`
+は、この文字列の URL エンコードされたバージョンであることに注意してください: `"Basic ABC...ABC=="`
 
 さて、NGSIv2 実装がこのサブスクリプションに関連する通知をトリガすることを考えてみましょう。通知データは、id が `DC_S1-D41`、型が `Room` で、値が 23.4 の temperature という名前の属性を含むエンティティ用です。テンプレートを適用した結果の通知は次のようになります :
 
@@ -84,7 +84,7 @@ GET/v2/subscriptions のような、NGSIv2 API オペレーションの `httpCus
 PUT http://foo.com/entity/DC_S1-D41?type=Room
 Authorization: "Basic ABC...ABC=="
 Content-Type: application/json 
-Content-Length: 43
+Content-Length: 65
 
-{ "temperature": 23.4, "asString": "23.4" }
+the value of the "temperature" attribute (of type Number) is 23.4
 ```

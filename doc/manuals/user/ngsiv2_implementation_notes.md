@@ -21,6 +21,8 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
+* [Custom notification extra macros](#custom-notification-extra-macros)
+* [Custom notification with JSON payload](#custom-notification-with-json-payload)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Notify only attributes that change](#notify-only-attributes-that-change)
@@ -380,7 +382,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `alterationType` attribute
 
-Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Apart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
 Orion implements the `alterationType` attribute.
 
 This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
@@ -411,7 +413,7 @@ supported upon completion of [this issue](https://github.com/telefonicaid/fiware
 
 ## `ignoreType` metadata
 
-Appart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
+Apart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
 Orion implements the `ignoreType` metadata.
 
 When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
@@ -494,6 +496,64 @@ modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
 
+[Top](#top)
+
+## Custom notification extra macros
+
+Apart from the `${...}` macros described in "Custom Notifications" section in the NGSIv2
+specification, the following ones can be used:
+
+* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
+  update request triggering the subscription.
+* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
+  update request triggering the subscription.
+* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
+  update request triggering the subscription.
+
+In the rare case an attribute was named in the same way of the above (e.g. an attribute which
+name is `service`) then the attribute value takes precedence.
+
+[Top](#top)
+
+## Custom notification with JSON payload
+
+As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
+used to generate JSON-based payloads. For instance:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+Some notes to take into account:
+
+* The value of the `json` field must be an array or object. Although a simple string or number is
+  also a valid JSON, these cases are not supported.
+* The macro replacement logic works the same way than in `payload` case, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * The value of the JSON object or JSON array item in which the macro is used has to match
+    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
+    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
+    will not work
+  * It takes into account the nature of the attribute value to be replaced. For instance,
+    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
+    `"t": "10"` if `temperature` attribute is a string.
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* URL automatic decoding applied to `payload` and `headers` fields (described
+  [here](forbidden_characters.md#custom-payload-and-headers-special-treatment)) is not applied
+  to `json` field.
+* `payload` and `json` cannot be used at the same time
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+[Top](#top)
+
 ## Custom notifications without payload
 
 If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
@@ -562,6 +622,10 @@ This default behaviour can be changed using the `covered` field set to `true` th
 in which case all attributes are included in the notification, no matter if they exist or not in the
 entity. For these attributes that don't exist (`brightness` in this example) the `null`
 value (of type `"None"`) is used.
+
+In the case of custom notifications, if `covered` is set to `true` then `null` will be use to replace `${...}`
+for non existing attributes (the default behaviour when `covered` is not set to `true` is to replace by the
+empty string the non existing attributes).
 
 We use the term "covered" in the sense the notification "covers" completely all the attributes
 in the `notification.attrs` field. It can be useful for those notification endpoints that are

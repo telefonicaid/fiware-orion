@@ -1,1 +1,5 @@
+- Add: json field in httpCustom and mqttCustom subscriptions (#2560)
+- Add: ${service}, ${servicePath} and ${authToken} macros in custom notifications (#4159)
+- Upgrade Debian version from 11.2 to 11.3 in Dockerfile
 - Remove: deprecated NGSIv1 location metadata to specify entity geo-location
+- Remove: RPM package stuff

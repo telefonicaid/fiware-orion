@@ -90,6 +90,7 @@ struct Notification
   long long                lastSuccessCode;
 
   std::string              toJson(const std::string& attrsFormat);
+  void                     release();
 
   Notification():
     attributes(),
@@ -156,6 +157,7 @@ struct Subscription
   RenderFormat  attrsFormat;
   Restriction   restriction;
   std::string   toJson();
+  void          release();
 
   ~Subscription();
 };

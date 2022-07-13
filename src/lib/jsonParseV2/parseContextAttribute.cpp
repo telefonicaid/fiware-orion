@@ -38,8 +38,8 @@
 
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadataVector.h"
-#include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "jsonParseV2/parseContextAttribute.h"
+#include "jsonParseV2/parseCompoundCommon.h"
 #include "jsonParseV2/utilsParse.h"
 
 
@@ -76,6 +76,25 @@ static std::string checkGeoJson(ContextAttribute* caP)
 
   return "OK";
 }
+
+
+
+/* ****************************************************************************
+*
+* prepareContextAttributeCompoundRoot -
+*/
+static void prepareContextAttributeCompoundRoot(ContextAttribute* caP, const std::string& type)
+{
+  caP->compoundValueP            = new orion::CompoundValueNode();
+  caP->compoundValueP->name      = "";
+  caP->compoundValueP->valueType = stringToCompoundType(type);
+
+  if (!caP->typeGiven)
+  {
+     caP->type = (type == "Object")? defaultType(orion::ValueTypeObject) : defaultType(orion::ValueTypeVector);
+  }
+}
+
 
 
 /* ****************************************************************************
@@ -161,7 +180,8 @@ static std::string parseContextAttributeObject
         //
         caP->valueType  = orion::ValueTypeVector;
         *compoundVector = true;
-        std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
+        prepareContextAttributeCompoundRoot(caP, jsonParseTypeNames[iter->value.GetType()]);
+        std::string r   = parseCompoundValue(iter, caP->compoundValueP, 0);
         if (r != "OK")
         {
           return r;
@@ -170,7 +190,8 @@ static std::string parseContextAttributeObject
       else if (type == "Object")
       {
         caP->valueType  = orion::ValueTypeObject;
-        std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
+        prepareContextAttributeCompoundRoot(caP, jsonParseTypeNames[iter->value.GetType()]);
+        std::string r   = parseCompoundValue(iter, caP->compoundValueP, 0);
         if (r != "OK")
         {
           return r;
@@ -276,7 +297,8 @@ std::string parseContextAttribute
     {
       compoundVector  = true;
       caP->valueType  = orion::ValueTypeObject;
-      std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
+      prepareContextAttributeCompoundRoot(caP, jsonParseTypeNames[iter->value.GetType()]);
+      std::string r   = parseCompoundValue(iter, caP->compoundValueP, 0);
 
       if (r == "max deep reached")
       {
@@ -294,7 +316,8 @@ std::string parseContextAttribute
     else if (type == "Object")
     {
       caP->valueType = orion::ValueTypeObject;
-      std::string r = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
+      prepareContextAttributeCompoundRoot(caP, jsonParseTypeNames[iter->value.GetType()]);
+      std::string r = parseCompoundValue(iter, caP->compoundValueP, 0);
 
       if (r == "max deep reached")
       {

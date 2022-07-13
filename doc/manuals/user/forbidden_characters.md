@@ -77,19 +77,19 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 "httpCustom": {
   "url": "http://foo.com/entity/${id}",
   "headers": {
-    "Content-Type": "application/json",
+    "Content-Type": "text/plain",
     "Authorization": "Basic ABC...ABC%3D%3D"
   },
   "method": "PUT",
   "qs": {
     "type": "${type}"
   },
-  "payload": "{ %22temperature%22: ${temperature}, %22asString%22: %22${temperature}%22 }"
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
 }
 ```
 
 Note that the above payload value is the URL encoded version of this string:
-`{ "temperature": ${temperature}, "asString": "${temperature}" }`. Note also that
+`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
 `"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
 
 Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
@@ -100,7 +100,7 @@ Notification data is for entity with id `DC_S1-D41` and type `Room`, including a
 PUT http://foo.com/entity/DC_S1-D41?type=Room
 Authorization: "Basic ABC...ABC=="
 Content-Type: application/json 
-Content-Length: 43
+Content-Length: 65
 
-{ "temperature": 23.4, "asString": "23.4" }
+the value of the "temperature" attribute (of type Number) is 23.4
 ```

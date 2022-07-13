@@ -1,4 +1,4 @@
-FROM debian:11.2-slim
+FROM debian:11.3-slim
 
 ADD build.sh /opt/bin/
 ADD build-dep.sh /opt/bin/
