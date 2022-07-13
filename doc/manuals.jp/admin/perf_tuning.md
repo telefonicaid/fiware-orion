@@ -40,6 +40,10 @@ Orion Context Broker は、データベース管理者に柔軟性を提供す�
 * [エンティティのコレクション](database_model.md#entities-collection)
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (これは複合インデックスであり、この場合のキー順は重要です)
     * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
 
 さらに、クエリによっては *追加* インデックスが必要になるかもしれません。
 
