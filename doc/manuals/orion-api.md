@@ -995,6 +995,10 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
 This request returns a JSON object with the following elements:
@@ -1004,10 +1008,6 @@ This request returns a JSON object with the following elements:
   subscriptions resource
 + registrations_url: /v2/registrations (required, string) - URL which points to the
   registrations resource
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 ## Entities Operations
 
@@ -1067,7 +1067,11 @@ _**Response code**_
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
-  
+
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
 The response payload is an array containing one object per matching entity. Each entity follows
@@ -1117,10 +1121,6 @@ Example:
 ]
 ```
 
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
-
 #### Create Entity [POST /v2/entities]
 
 _**Request query parameters**_
@@ -1135,6 +1135,14 @@ The values that `options` parameter can have for this specific request are:
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
+
+_**Request headers**_
+
+| Header | Optional | Description | Example |
+|--------|----------|-------------|---------|
+| `Content-Type` | | MIME type. Required to be `application/json`. | `Content-Type: application/json`|
+| `Fiware-Service` | ✓ | This header describes the tenant. More info ... | `organization-name` |
+| `Fiware-Service-Path` | ✓ | This header describes path or subservice. More info ... | `project-name` |
 
 _**Request payload**_
 
@@ -1166,14 +1174,6 @@ Example:
 }
 ```
 
-_**Request headers**_
-
-| Header | Optional | Description | Example |
-|--------|----------|-------------|---------|
-| `Content-Type` | | MIME type. Required to be `application/json`. | `Content-Type: application/json`|
-| `Fiware-Service` | ✓ | This header describes the tenant. More info ... | `organization-name` |
-| `Fiware-Service-Path` | ✓ | This header describes path or subservice. More info ... | `project-name` |
-
 _**Response code**_
 
 * Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
@@ -1181,7 +1181,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-_**Response header**_
+_**Response headers**_
 
 Response includes a `Location` header with the URL of the created entity.
 
@@ -1217,6 +1217,10 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
 
 _**Response code**_
 
@@ -1256,10 +1260,6 @@ Example:
 }
 ```
 
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
-
 #### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
 
 _**Request URL parameters**_
@@ -1294,6 +1294,10 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
 The response is an object representing the entity identified by the ID. The object follows
@@ -1325,10 +1329,6 @@ Example:
   }
 }
 ```
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 #### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
 
@@ -1530,6 +1530,10 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
 The response is an object representing the attribute identified by the attribute name given in the URL contained in the
@@ -1545,10 +1549,6 @@ Example:
   "metadata": {}
 }
 ```
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 #### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
@@ -1644,6 +1644,18 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+* If attribute value is JSON Array or Object:
+  * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
+    response type of application/json or text/plain (whichever is the first in `Accept` header or
+    `application/json` in case of `Accept: */*`).
+  * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
+* If attribute value is a string, number, null or boolean:
+  * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
+    marks are used at the beginning and end.
+  * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
+
 _**Response payload**_
 
 The response payload can be an object, array, string, number, boolean or null. Further information about the complete attribute representation 
@@ -1659,18 +1671,6 @@ Example:
   "country": "Spain"
 }
 ```
-
-_**Response headers**_
-
-* If attribute value is JSON Array or Object:
-  * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
-    response type of application/json or text/plain (whichever is the first in `Accept` header or
-    `application/json` in case of `Accept: */*`).
-  * Else return a HTTP error "406 Not Acceptable: accepted MIME types: application/json, text/plain"
-* If attribute value is a string, number, null or boolean:
-  * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
-    marks are used at the beginning and end.
-  * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
 
 #### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
 
@@ -1691,19 +1691,6 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-_**Request payload**_
-
-Content-type is `application/json` or `text/plain`
-
-```json
-{
-  "address": "Ronda de la Comunicacion s/n",
-  "zipCode": 28050,
-  "city": "Madrid",
-  "country": "Spain"
-}
-```
-
 _**Request headers**_
 
 * If the request payload MIME type is `application/json`, then the value of the attribute is set to
@@ -1719,6 +1706,19 @@ _**Request headers**_
   * If not a valid number, then an error is returned and the attribute's value is unchanged.
 
 The payload MIME type in the request is specified in the `Content-Type` HTTP header.
+
+_**Request payload**_
+
+Content-type is `application/json` or `text/plain`
+
+```json
+{
+  "address": "Ronda de la Comunicacion s/n",
+  "zipCode": 28050,
+  "city": "Madrid",
+  "country": "Spain"
+}
+```
 
 _**Response code**_
 
@@ -1834,7 +1834,16 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
+
+This request return a JSON with 2 fields for the entity type retrieved
+- `attrs`. An object that contains a object for each type of attributes present on the entities that belongs to that specific type. 
+   This object contains an array, `types`, with al the different types found for that attribute in all the entities of the type specified.
+- `count`. The amount of entities that have that specific entity type.
 
 Example:
 
@@ -1854,10 +1863,6 @@ Example:
   "count": 7
 }
 ```
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 ## Subscriptions Operations
 
@@ -1969,7 +1974,11 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-_**Reponse payload**_
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
 
 The response payload is an array containing one object per subscription. Each subscription follows the JSON subscription representation 
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
@@ -2017,10 +2026,6 @@ Example:
   }
 ]
 ```
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 #### Create Subscription [POST /v2/subscriptions]
 
@@ -2092,9 +2097,13 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
-Content-Type is `application/json`
+A JSON object containing subscription represented by a JSON object as described at the beginning of this section.
 
 Example:
 
@@ -2264,7 +2273,13 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
+
+A JSON array containing all the registrations represented by a JSON object as described at the beginning of this section.
 
 Example:
 
@@ -2302,10 +2317,6 @@ Example:
 ]
 ```
 
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
-
 #### Create Registration [POST /v2/registrations]
 
 Creates a new context provider registration. This is typically used for binding context sources
@@ -2313,6 +2324,8 @@ as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
 _**Request payload** 
+
+The registration to be created represented by a JSON object as described at the beginning of this section.
 
 Content-Type is `application/json`
 
@@ -2370,7 +2383,13 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
+
+The registration retrieved represented by a JSON object as described at the beginning of this section.
 
 Example:
 
@@ -2405,10 +2424,6 @@ Example:
       }
 }      
 ```
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 #### Update Registration [PATCH /v2/registrations/{registrationId}]
 
@@ -2606,6 +2621,10 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
 Example:
@@ -2644,10 +2663,6 @@ Example:
   }
 ]
 ```
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
 
 ### Notify operation
 
