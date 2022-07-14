@@ -1062,8 +1062,6 @@ _**Request headers**_
 | `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
 | `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project` |
 
-
-
 _**Response code**_
 
 * Successful operation uses 200 OK
@@ -1227,14 +1225,14 @@ _**Request headers**_
 | `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
-
 _**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for more details.
+
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
 
 _**Response payload**_
 
@@ -1448,6 +1446,8 @@ _**Request payload**_
 The request payload is an object with the attribute information following the JSON representation for attributes described in 
 [JSON Attribute Representation](#json-attribute-representation) section.
 
+Example:
+
 ```json
 {
   "temperature": {
@@ -1502,6 +1502,8 @@ _**Request payload**_
 The request payload is an object with the attribute information following the JSON representation for attributes described in 
 [JSON Attribute Representation](#json-attribute-representation) section.
 
+Example:
+
 ```json
 {
   "temperature": {
@@ -1541,7 +1543,6 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
 | `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
@@ -1641,6 +1642,8 @@ _**Request payload**_
 The reques payload is an object representing the attribute identified by the attribute name given in the URL 
 contained in the entity identified by the ID. The object follow structure described in the 
 [JSON Attribute Representation](#json-attribute-representation).
+
+Example:
 
 ```json
 {
@@ -1798,6 +1801,8 @@ _**Request payload**_
 
 The payload of the request can be a JSON object or array, or plain text, according to the header 
 of the request as described in the previous section. 
+
+Example:
 
 ```json
 {
@@ -2089,7 +2094,7 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The response payload is an array containing one object per subscription. Each subscription follows the JSON subscription representation 
+The payload is an array containing one object per subscription. Each subscription follows the JSON subscription representation 
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
 Example:
@@ -2151,8 +2156,10 @@ _**Request headers**_
 
 _**Request payload**_
 
-The request payload is a JSON object containing a subscription that follows the JSON subscription representation 
+The payload is a JSON object containing a subscription that follows the JSON subscription representation 
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example:
 
 ```json
 {
@@ -2488,6 +2495,8 @@ _**Request payload**
 The payload is a JSON object containing a registration that follows the JSON registration representation 
 format (described in ["Registration payload datamodel](#registration-payload-datamodel) section). 
 
+Example:
+
 ```json
 {
   "description": "Relative Humidity Context Source",
@@ -2608,6 +2617,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
 | `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
@@ -2615,6 +2625,8 @@ _**Request payload**
 
 The payload is a JSON object containing the fields to be modified of the registration following the JSON registration 
 representation format (described in ["Registration payload datamodel](#registration-payload-datamodel) section).
+
+Example:
 
 ```json
 {
@@ -2644,7 +2656,6 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
 | `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
