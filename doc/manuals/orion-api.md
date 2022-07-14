@@ -1866,14 +1866,16 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
 _**Response payload**_
 
 This request return a JSON array with an object for each different entity type found, that contains elements:
 - `type`. The name of the entity type. The type itself.
 - `attrs`. An object that contains all the attributes and the types of each attribute that belongs to that specific type.
 - `count`. The amount of entities that have that specific entity type.
-
-Content-Types is `application/json`
 
 Example:
 
