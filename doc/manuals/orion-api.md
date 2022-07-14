@@ -1057,10 +1057,12 @@ The values that `options` parameter can have for this specific request are:
 
 _**Request headers**_
 
-| Header | Optional | Description | Example |
-|--------|----------|-------------|---------|
-| `Fiware-Service` | ✓ | This header describes the tenant. More info ... | `organization-name` |
-| `Fiware-Service-Path` | ✓ | This header describes path or subservice. More info ... | `project-name` |
+| Header               | Optional | Description                                                                                    | Example   |
+|----------------------|----------|------------------------------------------------------------------------------------------------|-----------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project` |
+
+
 
 _**Response code**_
 
@@ -1138,11 +1140,11 @@ The values that `options` parameter can have for this specific request are:
 
 _**Request headers**_
 
-| Header | Optional | Description | Example |
-|--------|----------|-------------|---------|
-| `Content-Type` | | MIME type. Required to be `application/json`. | `Content-Type: application/json`|
-| `Fiware-Service` | ✓ | This header describes the tenant. More info ... | `organization-name` |
-| `Fiware-Service-Path` | ✓ | This header describes path or subservice. More info ... | `project-name` |
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Request payload**_
 
@@ -1218,6 +1220,13 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Response headers**_
 
 Successful operations return `Content-Type` header with `application/json` value.
@@ -1279,7 +1288,6 @@ _**Request query parameters**_
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
 | `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                                                                                                                                                                                                                                                                                | count        |
 
-
 The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                                                                                                    |
@@ -1287,6 +1295,13 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -1367,9 +1382,18 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+The request payload is an object with the attribute information following the JSON representation for attributes described in 
+[JSON Attribute Representation](#json-attribute-representation) section.
 
 Example:
 
@@ -1411,9 +1435,18 @@ _**Request query parameters**_
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+The request payload is an object with the attribute information following the JSON representation for attributes described in 
+[JSON Attribute Representation](#json-attribute-representation) section.
 
 ```json
 {
@@ -1456,9 +1489,18 @@ _**Request query parameters**_
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+The request payload is an object with the attribute information following the JSON representation for attributes described in 
+[JSON Attribute Representation](#json-attribute-representation) section.
 
 ```json
 {
@@ -1495,6 +1537,14 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Response code**_
 
 * Successful operation uses 204 No Content
@@ -1523,6 +1573,13 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | `accuracy`    |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -1571,9 +1628,19 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+The reques payload is an object representing the attribute identified by the attribute name given in the URL 
+contained in the entity identified by the ID. The object follow structure described in the 
+[JSON Attribute Representation](#json-attribute-representation).
 
 ```json
 {
@@ -1611,6 +1678,13 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Response code**_
 
 * Successful operation uses 204 No Content
@@ -1637,6 +1711,13 @@ _**Request query parameters**_
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -1707,9 +1788,16 @@ _**Request headers**_
 
 The payload MIME type in the request is specified in the `Content-Type` HTTP header.
 
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type.                                                                                     | `text/plain`       |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-type is `application/json` or `text/plain`
+The payload of the request can be a JSON object or array, or plain text, according to the header 
+of the request as described in the previous section. 
 
 ```json
 {
@@ -1759,6 +1847,13 @@ The values that `options` parameter can have for this specific request are:
 |----------|------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -1827,6 +1922,13 @@ _**Request query parameters**_
 | Parameter    | Optional | Type   | Description  | Example |
 |--------------|----------|--------|--------------|---------|
 | `entityType` |          | string | Entity Type. | `Room`  |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -1968,6 +2070,13 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count` |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Response code**_
 
 * Successful operation uses 200 OK
@@ -2032,9 +2141,18 @@ Example:
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+The request payload is a JSON object containing a subscription that follows the JSON subscription representation 
+format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
 ```json
 {
@@ -2091,6 +2209,13 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|----------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Response code**_
 
 * Successful operation uses 200 OK
@@ -2103,7 +2228,8 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-A JSON object containing subscription represented by a JSON object as described at the beginning of this section.
+The payload is a JSON object containing a subscription that follows the JSON subscription representation 
+format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
 Example:
 
@@ -2152,9 +2278,20 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+The payload is a JSON object containing the fields to be modified of the subscrition following the JSON subscription 
+representation format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example: 
 
 ```json
 {
@@ -2179,6 +2316,13 @@ This parameter is part of the URL request. It is mandatory.
 | Parameter        | Type   | Description                          | Example                    |
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -2267,6 +2411,13 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of registrations is returned in the HTTP header `Fiware-Total-Count` |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Response code**_
 
 * Successful operation uses 200 OK
@@ -2279,7 +2430,8 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-A JSON array containing all the registrations represented by a JSON object as described at the beginning of this section.
+A JSON array containing all the registrations represented by an object for each registration following 
+[Registratin Payload Datamodel](#registration-payload-datamodel)
 
 Example:
 
@@ -2323,11 +2475,18 @@ Creates a new context provider registration. This is typically used for binding 
 as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload** 
 
-The registration to be created represented by a JSON object as described at the beginning of this section.
-
-Content-Type is `application/json`
+The payload is a JSON object containing a registration that follows the JSON registration representation 
+format (described in ["Registration payload datamodel](#registration-payload-datamodel) section). 
 
 ```json
 {
@@ -2377,6 +2536,13 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|----------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example   |
+|----------------------|----------|------------------------------------------------------------------------------------------------|-----------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project` |
+
 _**Response code**_
 
 * Successful operation uses 200 OK
@@ -2389,7 +2555,8 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The registration retrieved represented by a JSON object as described at the beginning of this section.
+The payload is a JSON object containing a registration that follows the JSON registration representation 
+format (described in ["Registration payload datamodel](#registration-payload-datamodel) section). 
 
 Example:
 
@@ -2437,9 +2604,17 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload** 
 
-Content-Type is `application/json`
+The payload is a JSON object containing the fields to be modified of the registration following the JSON registration 
+representation format (described in ["Registration payload datamodel](#registration-payload-datamodel) section).
 
 ```json
 {
@@ -2464,6 +2639,14 @@ This parameter is part of the URL request. It is mandatory.
 | Parameter        | Type   | Description                          | Example                    |
 |------------------|--------|--------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
 
 _**Response code**_
 
@@ -2510,9 +2693,17 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-type is `application/json`
+Example:
 
 ```json
 {
@@ -2587,9 +2778,19 @@ The values that `options` parameter can have for this specific request are:
 | `values`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `unique`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-```
+Example:
+
+```json
 {
   "entities": [
     {
@@ -2628,7 +2829,6 @@ Successful operations return `Content-Type` header with `application/json` value
 _**Response payload**_
 
 Example:
-
 
 ```json
 [
@@ -2685,9 +2885,17 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `fiware-service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `fiware-servicepath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `project`          |
+
 _**Request payload**_
 
-Content-Type is `application/json`
+Example:
 
 ```json
 {
