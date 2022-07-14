@@ -1391,7 +1391,7 @@ _**Request headers**_
 _**Request payload**_
 
 The request payload is an object with the attribute information following the JSON representation for attributes described in 
-[JSON Attribute Representation](#json-attribute-representation) section.
+[JSON Attribute Representation](#json-attribute-representation) and [Partial Representations](#partial-representations) section.
 
 Example:
 
@@ -1444,7 +1444,7 @@ _**Request headers**_
 _**Request payload**_
 
 The request payload is an object with the attribute information following the JSON representation for attributes described in 
-[JSON Attribute Representation](#json-attribute-representation) section.
+[JSON Attribute Representation](#json-attribute-representation) and [Partial Representations](#partial-representations) section.
 
 Example:
 
@@ -1500,7 +1500,7 @@ _**Request headers**_
 _**Request payload**_
 
 The request payload is an object with the attribute information following the JSON representation for attributes described in 
-[JSON Attribute Representation](#json-attribute-representation) section.
+[JSON Attribute Representation](#json-attribute-representation) and [Partial Representations](#partial-representations) section.
 
 Example:
 
