@@ -1269,6 +1269,9 @@ Example:
 
 #### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
 
+This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
+fields.
+
 _**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
