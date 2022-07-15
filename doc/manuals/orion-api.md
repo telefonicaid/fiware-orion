@@ -1773,6 +1773,17 @@ _**Request query parameters**_
 
 _**Request headers**_
 
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type.                                                                                     | `text/plain`       |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload of the request can be a JSON object or array, or plain text, according to the payload MIME type 
+specified in the `Content-Type` HTTP header as follow:
+
 * If the request payload MIME type is `application/json`, then the value of the attribute is set to
   the JSON object or array coded in the payload (if the payload is not a valid JSON document,
   then an error is returned).
@@ -1784,18 +1795,6 @@ _**Request headers**_
   * If `null`, the value is taken as null.
   * If these first three tests 'fail', the text is interpreted as a number.
   * If not a valid number, then an error is returned and the attribute's value is unchanged.
-
-
-| Header               | Optional | Description                                                                                    | Example            |
-|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Content-Type`       |          | MIME type. Either `application/json` or `text/plain`.                                                                                    | `text/plain`       |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
-| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
-
-_**Request payload**_
-
-The payload of the request can be a JSON object or array, or plain text, according to the header 
-of the request as described in the previous section. 
 
 Example:
 
