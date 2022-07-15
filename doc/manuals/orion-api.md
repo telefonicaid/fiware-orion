@@ -1593,7 +1593,7 @@ _**Response payload**_
 
 The response is an object representing the attribute identified by the attribute name given in the URL contained in the
 entity identified by the ID. The object follow structure described in the 
-[JSON Attribute Representation](#json-attribute-representation).
+[JSON Attribute Representation](#json-attribute-representation) (and side [Partial Representations](#partial-representations) section)
 
 Example:
 
@@ -1638,7 +1638,7 @@ _**Request payload**_
 
 The reques payload is an object representing the attribute identified by the attribute name given in the URL 
 contained in the entity identified by the ID. The object follow structure described in the 
-[JSON Attribute Representation](#json-attribute-representation).
+[JSON Attribute Representation](#json-attribute-representation) (and side [Partial Representations](#partial-representations) section).
 
 Example:
 
@@ -1739,8 +1739,7 @@ _**Response headers**_
 
 _**Response payload**_
 
-The response payload can be an object, array, string, number, boolean or null. Further information about the complete attribute representation 
-described in the [JSON Attribute Representation](#json-attribute-representation) section.
+The response payload can be an object, array, string, number, boolean or null with the value of the attribute.
 
 Example:
 
@@ -1786,11 +1785,10 @@ _**Request headers**_
   * If these first three tests 'fail', the text is interpreted as a number.
   * If not a valid number, then an error is returned and the attribute's value is unchanged.
 
-The payload MIME type in the request is specified in the `Content-Type` HTTP header.
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Content-Type`       |          | MIME type.                                                                                     | `text/plain`       |
+| `Content-Type`       |          | MIME type. Either `application/json` or `text/plain`.                                                                                    | `text/plain`       |
 | `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
@@ -2489,7 +2487,7 @@ _**Request headers**_
 | `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
-_**Request payload** 
+_**Request payload**_
 
 The payload is a JSON object containing a registration that follows the JSON registration representation 
 format (described in ["Registration payload datamodel](#registration-payload-datamodel) section). 
@@ -2620,7 +2618,7 @@ _**Request headers**_
 | `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
-_**Request payload** 
+_**Request payload**_
 
 The payload is a JSON object containing the fields to be modified of the registration following the JSON registration 
 representation format (described in ["Registration payload datamodel](#registration-payload-datamodel) section).
