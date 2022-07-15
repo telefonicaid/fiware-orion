@@ -1727,6 +1727,12 @@ _**Response code**_
 
 _**Response headers**_
 
+`Content-Type` header with `application/json` or `text/plain` (depending on the response payload)
+
+_**Response payload**_
+
+The response payload can be an object, array, string, number, boolean or null with the value of the attribute.
+
 * If attribute value is JSON Array or Object:
   * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
     response type of application/json or text/plain (whichever is the first in `Accept` header or
@@ -1736,10 +1742,6 @@ _**Response headers**_
   * If `Accept` header can be expanded to text/plain return the value as text. In case of a string, citation
     marks are used at the beginning and end.
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
-
-_**Response payload**_
-
-The response payload can be an object, array, string, number, boolean or null with the value of the attribute.
 
 Example:
 
