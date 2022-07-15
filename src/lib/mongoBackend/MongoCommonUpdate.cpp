@@ -1069,7 +1069,7 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, targetAltType, &subVec);
+  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attributes, modifiedAttrs, targetAltType, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   double now = getCurrentTime();
@@ -1582,18 +1582,21 @@ static bool addTriggeredSubscriptions_noCache
         continue;
       }
 
-      /* Except in the case of ONANYCHANGE subscriptions (the ones with empty condValues), we check if
-       * condValues include some of the modifiedAttributes. In previous versions we defered this to DB
-       * as an additional element in the csubs query (in both pattern and no-pattern "$or branches"), eg:
-       *
-       * "conditions.value": { $in: [ "pressure" ] }
-       *
-       * However, it is difficult to check this condition *OR* empty array (for the case of ONANYCHANGE)
-       * at query level, so now do the check in the code.
-       */
-      if (!condValueAttrMatch(sub, modifiedAttrs))
+      // Depending of the alteration type, we use the list of attributes in the request or the list
+      // with effective modifications
+      if (targetAltType == ngsiv2::EntityUpdate)
       {
-        continue;
+        if (!condValueAttrMatch(sub, attributes))
+        {
+          continue;
+        }
+      }
+      else
+      {
+        if (!condValueAttrMatch(sub, modifiedAttrs))
+        {
+          continue;
+        }
       }
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));

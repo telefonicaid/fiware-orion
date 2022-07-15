@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-case
+Subscription alterationType entityUpdate (extra case)
 
 --SHELL-INIT--
 dbInit CB
@@ -61,6 +61,7 @@ payload='{
       }
     ],
     "condition": {
+      "attrs": ["temperature"],
       "alterationTypes": [ "entityUpdate" ]
     }
   },
