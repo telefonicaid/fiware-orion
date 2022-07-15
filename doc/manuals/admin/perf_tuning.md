@@ -49,6 +49,10 @@ read **and** write performance:
 * Collection [entities](database_model.md#entities-collection)
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that this is a compound index and key order matters in this case)
     * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
 
 In addition, depending on your queries, you may need *additional* indexes.
 
