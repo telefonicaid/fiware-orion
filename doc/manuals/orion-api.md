@@ -989,15 +989,25 @@ applicable to retrieve resources. Instead of constructing your own URLs,
 to keep your client decoupled from implementation details.
 
 
-+ Response 200 (application/json)
+_**Response code**_
 
-    + Attributes (object)
-        + entities_url: /v2/entities (required, string) - URL which points to the entities resource
-        + types_url: /v2/types (required, string) - URL which points to the types resource
-        + subscriptions_url: /v2/subscriptions (required, string) - URL which points to the
-          subscriptions resource
-        + registrations_url: /v2/registrations (required, string) - URL which points to the
-          registrations resource
+* Successful operation uses 200 OK
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
+  more details.
+
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+This request returns a JSON object with the following elements:
++ entities_url: /v2/entities (required, string) - URL which points to the entities resource
++ types_url: /v2/types (required, string) - URL which points to the types resource
++ subscriptions_url: /v2/subscriptions (required, string) - URL which points to the
+  subscriptions resource
++ registrations_url: /v2/registrations (required, string) - URL which points to the
+  registrations resource
 
 ## Entities Operations
 
@@ -1005,17 +1015,15 @@ to keep your client decoupled from implementation details.
 
 #### List Entities [GET /v2/entities]
 
-Retrieves a list of entities that match different criteria by id, type, pattern matching (either id or type)
+Retrieves an array of entities objects following the [JSON Entity Representation](#json-entity-representation), 
+that match different criteria by id, type, pattern matching (either id or type)
 and/or those which match a query or geographical query (see [Simple Query Language](#simple-query-language) and 
 [Geographical Queries](#geographical-queries)). A given entity has to match all the criteria to be retrieved
 (i.e., the criteria is combined in a logical AND way). Note that pattern matching query parameters are incompatible
 (i.e. mutually exclusive) with their corresponding exact matching parameters, i.e. `idPattern` with `id` and
 `typePattern` with `type`.
 
-The response payload is an array containing one object per matching entity. Each entity follows
-the JSON entity representation format (described in "JSON Entity Representation" section).
-
-**Request query parameters**
+_**Request query parameters**_
 
 This requests accepts the following URL parameters to customize the request response.
 
@@ -1047,15 +1055,30 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example   |
+|----------------------|----------|------------------------------------------------------------------------------------------------|-----------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`|
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The response payload is an array containing one object per matching entity. Each entity follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
+
+Example:
 
 ```json
 [
@@ -1100,10 +1123,7 @@ Content-Type is `application/json`
 
 #### Create Entity [POST /v2/entities]
 
-The payload is an object representing the entity to be created. The object follows
-the JSON entity representation format (described in a "JSON Entity Representation" section).
-
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                                              | Example |
 |-----------|----------|--------|--------------------------------------------------------------------------|---------|
@@ -1116,9 +1136,19 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `upsert`    | when used, entity is updated if already exits. If upsert is not used and the entity already exist a `422 Unprocessable Entity` error is returned.  |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is an object representing the entity to be created. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
 
 Example:
 
@@ -1144,22 +1174,17 @@ Example:
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 201 Created (if upsert option is not used) or 204 No Content (if
-  upsert option is used). Response includes a `Location` header with the URL of the
-  created entity.
+  upsert option is used).
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 201:
+_**Response headers**_
 
-Headers:
-* Location: /v2/entities/Bcn-Welt?type=Room
+Response includes a `Location` header with the URL of the created entity.
 
-Example response 204
-
-Headers:
 * Location: /v2/entities/Bcn-Welt?type=Room
 
 
@@ -1167,14 +1192,7 @@ Headers:
 
 #### Retrieve Entity [GET /v2/entities/{entityId}]
 
-The response is an object representing the entity identified by the ID. The object follows
-the JSON entity representation format (described in "JSON Entity Representation" section).
-
-This operation must return one entity element only, but there may be more than one entity with the
-same ID (e.g. entities with same ID but different types).
-In such case, an error message is returned, with the HTTP status code set to 409 Conflict. 
-
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1183,7 +1201,7 @@ This parameter is part of the URL request. It is mandatory.
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1200,14 +1218,29 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The response is an object representing the entity identified by the ID. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
+
+Example:
 
 ```json
 {
@@ -1239,12 +1272,7 @@ Content-Type is `application/json`
 This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
 
-Just like the general request of getting an entire entity, this operation must return only one
-entity element. If more than one entity with the same ID is found (e.g. entities with
-same ID but different type), an error message is returned, with the HTTP status code set to
-409 Conflict.
-
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1252,7 +1280,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be retrieved | `Room`  |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                                                                                                                                                                                                             | Example      |
 |------------|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1260,7 +1288,6 @@ This parameter is part of the URL request. It is mandatory.
 | `attrs`    | ✓        | string | Comma-separated list of attribute names whose data must be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order, and all the attributes of the entity are included in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | seatNumber   |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                                                                                                                                               | accuracy     |
 | `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                                                                                                                                                                                                                                                                                | count        |
-
 
 The values that `options` parameter can have for this specific request are:
 
@@ -1270,15 +1297,31 @@ The values that `options` parameter can have for this specific request are:
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
+
+Example:
 
 ```json
 {
@@ -1305,10 +1348,6 @@ Content-Type is `application/json`
 
 #### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
 
-The request payload is an object representing the attributes to append or update. The object follows
-the JSON entity representation format (described in "JSON Entity Representation" section), except
-that `id` and `type` are not allowed.
-
 The entity attributes are updated with the ones in the payload, depending on
 whether the `append` operation option is used or not.
 
@@ -1318,7 +1357,7 @@ whether the `append` operation option is used or not.
   previously existing in the entity are appended. In addition to that, in case some of the
   attributes in the payload already exist in the entity, an error is returned.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1326,7 +1365,7 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|--------------------------------|---------|
 | `entityId` | string | Id of the entity to be updated | `Room`  |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
@@ -1340,9 +1379,20 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is an object with the attributes to append or update in the entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
 
 Example:
 
@@ -1354,7 +1404,7 @@ Example:
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -1362,14 +1412,10 @@ Example:
 
 #### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
 
-The request payload is an object representing the attributes to update. The object follows
-the JSON entity representation format (described in "JSON Entity Representation" section), except
-that `id` and `type` are not allowed.
-
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
 attributes in the payload doesn't exist in the entity, an error is returned.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1377,16 +1423,29 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|--------------------------------|---------|
 | `entityId` | string | Id of the entity to be updated | `Room`  |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is an object representing the attributes to update in entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
+
+Example:
 
 ```json
 {
@@ -1399,7 +1458,7 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -1407,14 +1466,10 @@ Content-Type is `application/json`
 
 #### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
 
-The request payload is an object representing the new entity attributes. The object follows
-the JSON entity representation format (described in a "JSON Entity Representation" above), except
-that `id` and `type` are not allowed.
-
-The attributes previously existing in the entity are removed and replaced by the ones in the
+New entity attributes in the payload are added to the entity.The attributes previously existing in the entity are removed and replaced by the ones in the
 request.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1422,16 +1477,29 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|----------------------------------|---------|
 | `entityId` | string | Id of the entity to be modified. | `Room`  |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is an object representing the new entity attributes added or replaced in the entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
+
+Example:
 
 ```json
 {
@@ -1444,7 +1512,7 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -1454,7 +1522,7 @@ Content-Type is `application/json`
 
 Delete the entity.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -1462,13 +1530,20 @@ This parameter is part of the URL request. It is mandatory.
 |------------|--------|---------------------------------|---------|
 | `entityId` | string | Id of the entity to be deleted. | `Room`  |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example      |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`       |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -1481,7 +1556,7 @@ This parameter is part of the URL request. It is mandatory.
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in "JSON Attribute Representation" section).
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1490,22 +1565,37 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be retrieved      | `Room`        |
 | `attrName` | string | Name of the attribute to be retrieved | `temperature` |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                                               | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | `accuracy`    |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The response is an object representing the attribute identified by the attribute name given in the URL contained in the
+entity identified by the ID. The object follow structure described in the 
+[JSON Attribute Representation](#json-attribute-representation) (and side [Partial Representations](#partial-representations) section)
+
+Example:
 
 ```json
 {
@@ -1521,13 +1611,7 @@ The request payload is an object representing the new attribute data. Previous a
 is replaced by the one in the request. The object follows the JSON representation for attributes
 (described in "JSON Attribute Representation" section).
 
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
-
-**Request URL parameters**
+_**Request URL parameters**_
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1536,15 +1620,27 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be updated      | `Room`        |
 | `attrName` | string | Name of the attribute to be updated | `Temperature` |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The reques payload is an object representing the attribute identified by the attribute name given in the URL 
+contained in the entity identified by the ID. The object follow structure described in the 
+[JSON Attribute Representation](#json-attribute-representation) (and side [Partial Representations](#partial-representations) section).
+
+Example:
 
 ```json
 {
@@ -1557,17 +1653,17 @@ Content-Type is `application/json`
 }
 ```
 
-#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
-
-Removes an entity attribute.
-
-Response:
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-**Request URL parameters**
+#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+
+Removes an entity attribute from a given entity.
+
+_**Request URL parameters**_
 
 Those parameter are part of the URL request. They are mandatory. 
 
@@ -1576,18 +1672,66 @@ Those parameter are part of the URL request. They are mandatory.
 | `entityId` | string | Id of the entity to be deleted      | `Room`        |
 | `attrName` | string | Name of the attribute to be deleted | `Temperature` |
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
 
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
+
+* Successful operation uses 204 No Content
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
+  more details.
 
 ### Attribute Value
 
 #### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]
 
 This operation returns the `value` property with the value of the attribute.
+
+_**Request URL parameters**_
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                           | Example    |
+|------------|--------|---------------------------------------|------------|
+| `entityId` | string | Id of the entity to be retrieved      | `Room`     |
+| `attrName` | string | Name of the attribute to be retrieved | `Location` |
+
+_**Request query parameters**_
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
+
+* Successful operation uses 200 OK.
+* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
+  more details.
+
+_**Response headers**_
+
+`Content-Type` header with `application/json` or `text/plain` (depending on the response payload)
+
+_**Response payload**_
+
+The response payload can be an object, array, string, number, boolean or null with the value of the attribute.
 
 * If attribute value is JSON Array or Object:
   * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
@@ -1599,30 +1743,7 @@ This operation returns the `value` property with the value of the attribute.
     marks are used at the beginning and end.
   * Else return a HTTP error "406 Not Acceptable: accepted MIME types: text/plain"
 
-**Request URL parameters**
-
-Those parameter are part of the URL request. They are mandatory. 
-
-| Parameter  | Type   | Description                           | Example    |
-|------------|--------|---------------------------------------|------------|
-| `entityId` | string | Id of the entity to be retrieved      | `Room`     |
-| `attrName` | string | Name of the attribute to be retrieved | `Location` |
-
-**Request query parameters**
-
-| Parameter  | Optional | Type   | Description                                                                                 | Example       |
-|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-
-**Response**
-
-* Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
-
-Response 200 example:
-
-Content-Type is `application/json`
+Example:
 
 ```json
 {
@@ -1637,6 +1758,34 @@ Content-Type is `application/json`
 
 The request payload is the new attribute value.
 
+_**Request URL parameters**_
+
+Those parameter are part of the URL request. They are mandatory. 
+
+| Parameter  | Type   | Description                          | Example    |
+|------------|--------|--------------------------------------|------------|
+| `entityId` | string | Id of the entity to be updated.      | `Room`     |
+| `attrName` | string | Name of the attribute to be updated. | `Location` |
+
+_**Request query parameters**_
+
+| Parameter  | Optional | Type   | Description                                                                                 | Example       |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type.                                                                                     | `text/plain`       |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload of the request can be a JSON object or array, or plain text, according to the payload MIME type 
+specified in the `Content-Type` HTTP header as follow:
+
 * If the request payload MIME type is `application/json`, then the value of the attribute is set to
   the JSON object or array coded in the payload (if the payload is not a valid JSON document,
   then an error is returned).
@@ -1649,26 +1798,7 @@ The request payload is the new attribute value.
   * If these first three tests 'fail', the text is interpreted as a number.
   * If not a valid number, then an error is returned and the attribute's value is unchanged.
 
-The payload MIME type in the request is specified in the `Content-Type` HTTP header.
-
-**Request URL parameters**
-
-Those parameter are part of the URL request. They are mandatory. 
-
-| Parameter  | Type   | Description                          | Example    |
-|------------|--------|--------------------------------------|------------|
-| `entityId` | string | Id of the entity to be updated.      | `Room`     |
-| `attrName` | string | Name of the attribute to be updated. | `Location` |
-
-**Request query parameters**
-
-| Parameter  | Optional | Type   | Description                                                                                 | Example       |
-|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
-
-**Request payload**
-
-Content-type is `application/json` or `text/plain`
+Example:
 
 ```json
 {
@@ -1679,7 +1809,7 @@ Content-type is `application/json` or `text/plain`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -1704,7 +1834,7 @@ names as strings.
 
 Results are ordered by entity `type` in alphabetical order.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                | Example |
 |-----------|----------|--------|--------------------------------------------|---------|
@@ -1719,15 +1849,31 @@ The values that `options` parameter can have for this specific request are:
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Types is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+This request return a JSON array with an object for each different entity type found, that contains elements:
+- `type`. The name of the entity type. The type itself.
+- `attrs`. An object that contains all the attributes and the types of each attribute that belongs to that specific type.
+- `count`. The amount of entities that have that specific entity type.
+
+Example:
 
 ```json
 [
@@ -1774,21 +1920,37 @@ This operation returns a JSON object with information about the type:
   entities).
 * `count` : the number of entities belonging to that type.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter    | Optional | Type   | Description  | Example |
 |--------------|----------|--------|--------------|---------|
 | `entityType` |          | string | Entity Type. | `Room`  |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Response 200 example:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+This request return a JSON with 2 fields for the entity type retrieved
+- `attrs`. An object that contains a object for each type of attributes present on the entities that belongs to that specific type. 
+   This object contains an array, `types`, with al the different types found for that attribute in all the entities of the type specified.
+- `count`. The amount of entities that have that specific entity type.
+
+Example:
 
 ```json
 {
@@ -1897,7 +2059,7 @@ If `httpCustom` is used, then the considerations described in "Custom Notificati
 
 Returns a list of all the subscriptions present in the system.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -1911,13 +2073,29 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count` |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The payload is an array containing one object per subscription. Each subscription follows the JSON subscription representation 
+format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example:
 
 ```json
 [
@@ -1966,9 +2144,20 @@ Example response 200:
 Creates a new subscription.
 The subscription is represented by a JSON object as described at the beginning of this section.
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is a JSON object containing a subscription that follows the JSON subscription representation 
+format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example:
 
 ```json
 {
@@ -1998,16 +2187,16 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 201 Created
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 201:
+_**Response headers**_
 
-Headers: 
-* Location: /v2/subscriptions/62aa3d3ac734067e6f0d0871
+* Return the header `Location` with the value of the path used to create the subscription (I.E : `/v2/subscriptions/62aa3d3ac734067e6f0d0871`) 
+when the creation succeeds (Response code 201).
 
 
 ### Subscription By ID
@@ -2017,7 +2206,7 @@ Headers:
 The response is the subscription represented by a JSON object as described at the beginning of this
 section.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2025,15 +2214,29 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|----------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The payload is a JSON object containing a subscription that follows the JSON subscription representation 
+format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example:
 
 ```json
 {
@@ -2072,7 +2275,7 @@ Content-Type is `application/json`
 
 Only the fields included in the request are updated in the subscription.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2080,9 +2283,20 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is a JSON object containing the fields to be modified of the subscrition following the JSON subscription 
+representation format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+
+Example: 
 
 ```json
 {
@@ -2090,7 +2304,7 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -2100,7 +2314,7 @@ Content-Type is `application/json`
 
 Cancels subscription.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2108,7 +2322,14 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `subscriptionId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -2181,7 +2402,7 @@ The `forwardingInformation` field contains the following subfields:
 
 Lists all the context provider registrations present in the system.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                        | Example |
 |-----------|----------|--------|----------------------------------------------------|---------|
@@ -2195,13 +2416,29 @@ The values that `options` parameter can have for this specific request are:
 |----------|--------------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of registrations is returned in the HTTP header `Fiware-Total-Count` |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
+
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+A JSON array containing all the registrations represented by an object for each registration following 
+[Registratin Payload Datamodel](#registration-payload-datamodel)
+
+Example:
 
 ```json
 [
@@ -2237,16 +2474,26 @@ Example response 200:
 ]
 ```
 
-
 #### Create Registration [POST /v2/registrations]
 
 Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
 The registration is represented by a JSON object as described at the beginning of this section.
 
-**Request payload** 
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is a JSON object containing a registration that follows the JSON registration representation 
+format (described in ["Registration payload datamodel](#registration-payload-datamodel) section). 
+
+Example:
 
 ```json
 {
@@ -2270,16 +2517,16 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 201 Created
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 201:
+_**Response headers**_
 
-Headers: 
-* Location: /v2/registrations/62aa3d3ac734067e6f0d0871
+The request return a header `Location` with the path of the registration (I.E: `/v2/registrations/62aa3d3ac734067e6f0d0871`) 
+when the operation succeeds (Return code 201).
 
 ### Registration By ID
 
@@ -2288,7 +2535,7 @@ Headers:
 The response is the registration represented by a JSON object as described at the beginning of this
 section.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2296,15 +2543,29 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|----------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be retrieved | `62aa3d3ac734067e6f0d0871` |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example   |
+|----------------------|----------|------------------------------------------------------------------------------------------------|-----------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`|
+
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-Type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+The payload is a JSON object containing a registration that follows the JSON registration representation 
+format (described in ["Registration payload datamodel](#registration-payload-datamodel) section). 
+
+Example:
 
 ```json
 {
@@ -2342,7 +2603,7 @@ Content-Type is `application/json`
 
 Only the fields included in the request are updated in the registration.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2350,9 +2611,20 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
 
-**Request payload** 
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+The payload is a JSON object containing the fields to be modified of the registration following the JSON registration 
+representation format (described in ["Registration payload datamodel](#registration-payload-datamodel) section).
+
+Example:
 
 ```json
 {
@@ -2360,7 +2632,7 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -2370,7 +2642,7 @@ Content-Type is `application/json`
 
 Cancels a context provider registration.
 
-**Request URL parameters**
+_**Request URL parameters**_
 
 This parameter is part of the URL request. It is mandatory. 
 
@@ -2378,7 +2650,14 @@ This parameter is part of the URL request. It is mandatory.
 |------------------|--------|--------------------------------------|----------------------------|
 | `registrationId` | string | Id of the subscription to be deleted | `62aa3d3ac734067e6f0d0871` |
 
-**Response**
+_**Request headers**_
+
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Response code**_
 
 * Successful operation uses 204 No Content
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -2411,7 +2690,7 @@ regular non-batch operations can be done:
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
 * `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description         | Example     |
 |-----------|----------|--------|---------------------|-------------|
@@ -2423,9 +2702,17 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Request payload**
+_**Request headers**_
 
-Content-type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+Example:
 
 ```json
 {
@@ -2455,7 +2742,7 @@ Content-type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 204 No Content.
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
@@ -2482,7 +2769,7 @@ The payload may contain the following elements (all of them optional):
 + `metadata`: a list of metadata names to include in the response.
    See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description                                                               | Example              |
 |-----------|----------|--------|---------------------------------------------------------------------------|----------------------|
@@ -2500,11 +2787,19 @@ The values that `options` parameter can have for this specific request are:
 | `values`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `unique`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
-```
+_**Request payload**_
+
+Example:
+
+```json
 {
   "entities": [
     {
@@ -2530,15 +2825,19 @@ Content-Type is `application/json`
 }
 ``` 
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-Example response 200:
+_**Response headers**_
 
-Content-type is `application/json`
+Successful operations return `Content-Type` header with `application/json` value.
+
+_**Response payload**_
+
+Example:
 
 ```json
 [
@@ -2583,7 +2882,7 @@ This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv
 The request payload must be an NGSIv2 notification payload. 
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
 
-**Request query parameters**
+_**Request query parameters**_
 
 | Parameter | Optional | Type   | Description         | Example     |
 |-----------|----------|--------|---------------------|-------------|
@@ -2595,9 +2894,17 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
-**Request payload**
+_**Request headers**_
 
-Content-Type is `application/json`
+| Header               | Optional | Description                                                                                    | Example            |
+|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
+| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+
+_**Request payload**_
+
+Example:
 
 ```json
 {
@@ -2621,7 +2928,7 @@ Content-Type is `application/json`
 }
 ```
 
-**Response**
+_**Response code**_
 
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
