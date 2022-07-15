@@ -255,16 +255,6 @@ With regards to `FeatureCollection`, it is only accepted at creation/update time
 The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
 if you try to use them.
 
-## Legacy attribute format in notifications
-
-Apart from the values described for `attrsFormat` in the NGSIv2 specification, Orion also supports a
-`legacy` value, in order to send notifications in NGSIv1 format. This way, users can benefit from the
-enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
-
-Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
-
-[Top](#top)
-
 ## Datetime support
 
 From "Special Attribute Types" section at NGSIv2 specification:

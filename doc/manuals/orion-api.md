@@ -871,7 +871,7 @@ is used:
 
 If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
 
-```
+```json
 {
   "subscriptionId": "12345",
   "data": [
@@ -893,16 +893,49 @@ If `attrsFormat` is `keyValues` then keyValues partial entity representation mod
 
 If `attrsFormat` is `values` then values partial entity representation mode is used:
 
-```
+```json
 {
   "subscriptionId": "12345",
   "data": [ [23, 70], [24] ]
 }
 ```
 
-Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the
-associated subscription, so that notification receivers are aware of the format without
-needing to process the notification payload.
+If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users 
+can benefit from the enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
+
+Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
+
+```json
+{
+	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
+	"originator": "localhost",
+	"contextResponses": [{
+		"contextElement": {
+			"type": "Car",
+			"isPattern": "false",
+			"id": "Car1",
+			"attributes": [{
+				"name": "temperature",
+				"type": "centigrade",
+				"value": "26.5",
+				"metadatas": [{
+					"name": "TimeInstant",
+					"type": "recvTime",
+					"value": "2015-12-12 11:11:11.123"
+				}]
+			}]
+		},
+		"statusCode": {
+			"code": "200",
+			"reasonPhrase": "OK"
+		}
+	}]
+}
+```
+
+Notifications must include the `Ngsiv2-AttrsFormat` (when using `attrsFormat` = `legacy` is excluded ) 
+HTTP header with the value of the format of the associated subscription, so that notification receivers 
+are aware of the format without needing to process the notification payload.
 
 ## Custom Notifications
 
@@ -2033,7 +2066,7 @@ A `notification` object contains the following subfields:
 |------------------------|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp) or [`httpCustom`](#subscriptionnotificationhttpcustom) | ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol.                                                                                                              |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                  |
 | `timesSent`            | Only on retrieval | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                                                                                                            |
 | `lastNotification`     | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                                                                                                    |
