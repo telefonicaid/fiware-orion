@@ -9,7 +9,6 @@
 * [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
-* [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
