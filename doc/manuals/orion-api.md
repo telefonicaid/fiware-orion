@@ -1316,7 +1316,7 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The response is an object representing the entity identified by the ID. The object follows
+The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
 but omitting `id` and `type` fields.
@@ -1393,8 +1393,10 @@ _**Request headers**_
 
 _**Request payload**_
 
-The request payload is an object with the attribute information following the JSON representation for attributes described in 
-[JSON Attribute Representation](#json-attribute-representation) and [Partial Representations](#partial-representations) section.
+The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
 
 Example:
 
@@ -1446,8 +1448,10 @@ _**Request headers**_
 
 _**Request payload**_
 
-The request payload is an object with the attribute information following the JSON representation for attributes described in 
-[JSON Attribute Representation](#json-attribute-representation) and [Partial Representations](#partial-representations) section.
+The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
 
 Example:
 
@@ -1502,8 +1506,10 @@ _**Request headers**_
 
 _**Request payload**_
 
-The request payload is an object with the attribute information following the JSON representation for attributes described in 
-[JSON Attribute Representation](#json-attribute-representation) and [Partial Representations](#partial-representations) section.
+The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
+side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
+but omitting `id` and `type` fields.
 
 Example:
 
