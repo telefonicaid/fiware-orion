@@ -1348,10 +1348,6 @@ Example:
 
 #### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
 
-The request payload is an object representing the attributes to append or update. The object follows
-the JSON entity representation format (described in "JSON Entity Representation" section), except
-that `id` and `type` are not allowed.
-
 The entity attributes are updated with the ones in the payload, depending on
 whether the `append` operation option is used or not.
 
@@ -1393,7 +1389,7 @@ _**Request headers**_
 
 _**Request payload**_
 
-The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+The payload is an object with the attributes to append or update in the entity identified by the ID in the URL parameter. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
 but omitting `id` and `type` fields.
@@ -1415,10 +1411,6 @@ _**Response code**_
   more details.
 
 #### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
-
-The request payload is an object representing the attributes to update. The object follows
-the JSON entity representation format (described in "JSON Entity Representation" section), except
-that `id` and `type` are not allowed.
 
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
 attributes in the payload doesn't exist in the entity, an error is returned.
@@ -1448,7 +1440,7 @@ _**Request headers**_
 
 _**Request payload**_
 
-The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+The payload is an object representing the attributes to update in entity identified by the ID in the URL parameter. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
 but omitting `id` and `type` fields.
@@ -1474,11 +1466,7 @@ _**Response code**_
 
 #### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
 
-The request payload is an object representing the new entity attributes. The object follows
-the JSON entity representation format (described in a "JSON Entity Representation" above), except
-that `id` and `type` are not allowed.
-
-The attributes previously existing in the entity are removed and replaced by the ones in the
+New entity attributes in the payload are added to the entity.The attributes previously existing in the entity are removed and replaced by the ones in the
 request.
 
 _**Request URL parameters**_
@@ -1506,7 +1494,7 @@ _**Request headers**_
 
 _**Request payload**_
 
-The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+The payload is an object representing the new entity attributes added or replaced in the entity identified by the ID in the URL parameter. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
 but omitting `id` and `type` fields.
