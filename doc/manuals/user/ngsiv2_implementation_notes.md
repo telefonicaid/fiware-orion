@@ -15,7 +15,6 @@
 * [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
 * [`ignoreType` metadata](#ignoretype-metadata)
-* [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -416,22 +415,6 @@ At the present moment `ignoreType` is supported only for geo-location types, thi
 mechanism to overcome the limit of only one geo-location per entity (more details
 in [this section of the documentation](#limit-to-attributes-for-entity-location). Support
 for `ignoreType` in `DateTime` may come in the future.
-
-[Top](#top)
-
-## Notification throttling
-
-From NGSIv2 specification regarding subscription throttling:
-
-> throttling: Minimal period of time in seconds which must elapse between two consecutive notifications. It is optional.
-
-The way in which Orion implements this is discarding notifications during the throttling guard period. Thus, notifications may be lost
-if they arrive too close in time. If your use case doesn't support losing notifications this way, then you should not use throttling.
-
-In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
-measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
-values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
-is not 100% accurate.
 
 [Top](#top)
 
