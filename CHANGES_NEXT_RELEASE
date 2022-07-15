@@ -1,4 +1,5 @@
 - Add: json field in httpCustom and mqttCustom subscriptions (#2560)
 - Add: ${service}, ${servicePath} and ${authToken} macros in custom notifications (#4159)
+- Fix: conditions.alterationTypes not working properly when conditions.attributes is used in entityUpdate case (#1494, reopened)
 - Upgrade Debian version from 11.2 to 11.3 in Dockerfile
 - Remove: RPM package stuff
