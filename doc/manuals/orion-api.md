@@ -1378,6 +1378,7 @@ The values that `options` parameter can have for this specific request are:
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
 
 _**Request headers**_
 
@@ -1429,6 +1430,7 @@ _**Request query parameters**_
 |------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
 | `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
 
 _**Request headers**_
 
@@ -1622,9 +1624,16 @@ Those parameter are part of the URL request. They are mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                 | Example       |
-|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| Parameter  | Optional | Type   | Description                                                                                 | Example            |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|--------------------|
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`             |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                    | `overrideMetadata` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options            | Description                                                                                                                                          |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
 
 _**Request headers**_
 
