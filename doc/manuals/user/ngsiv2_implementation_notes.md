@@ -390,7 +390,7 @@ is ignored) and can take the following values:
 
 * `entityCreate` if the update that triggers the notification is a entity creation operation
 * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
-* `entityChange` if the update that triggers the notification was an update with an actual change
+* `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
 * `entityDelete` if the update that triggers the notification was a entity delete operation
 
 The type of this attribute is `Text`
