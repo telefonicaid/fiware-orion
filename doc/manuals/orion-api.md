@@ -2670,25 +2670,6 @@ _**Response code**_
 #### Update [POST /v2/op/update]
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
-The payload is an object with two properties:
-
-+ `actionType`, to specify the kind of update action to do: either `append`, `appendStrict`, `update`,
-  `delete`, or `replace`.
-+ `entities`, an array of entities, each entity specified using the JSON entity representation format
-  (described in the section "JSON Entity Representation").
-
-This operation is split in as many individual operations as entities in the `entities` vector, so
-the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
-regular non-batch operations can be done:
-
-* `append`: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
-  (if the entity already exists).
-* `appendStrict`: maps to `POST /v2/entities` (if the entity does not already exist) or
-  `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
-* `update`: maps to `PATCH /v2/entities/<id>/attrs`.
-* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
-  to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
-* `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
 _**Request query parameters**_
 
@@ -2711,6 +2692,26 @@ _**Request headers**_
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
+
+The payload is an object with two properties:
+
++ `actionType`, to specify the kind of update action to do: either `append`, `appendStrict`, `update`,
+  `delete`, or `replace`.
++ `entities`, an array of entities, each entity specified using the JSON entity representation format
+  (described in the section "JSON Entity Representation").
+
+This operation is split in as many individual operations as entities in the `entities` vector, so
+the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
+regular non-batch operations can be done:
+
+* `append`: maps to `POST /v2/entities` (if the entity does not already exist) or `POST /v2/entities/<id>/attrs`
+  (if the entity already exists).
+* `appendStrict`: maps to `POST /v2/entities` (if the entity does not already exist) or
+  `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
+* `update`: maps to `PATCH /v2/entities/<id>/attrs`.
+* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+  to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
+* `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 
 Example:
 
@@ -2752,22 +2753,7 @@ _**Response code**_
 
 #### Query [POST /v2/op/query]
 
-The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
-no entities are found. The entities follow the JSON entity representation format
-(described in the section "JSON Entity Representation").
-
-The payload may contain the following elements (all of them optional):
-
-+ `entities`: a list of entities to search for. Each element is represented by a JSON object with the
-  following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
-      time, but one of them must be present.
-    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
-      the same time. If omitted, it means "any entity type".
-+ `attrs`: List of attributes to be provided (if not specified, all attributes).
-+ `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field).
-+ `metadata`: a list of metadata names to include in the response.
-   See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.
+This operation execture a query among the existing entities based on filters provided in the request payload. 
 
 _**Request query parameters**_
 
@@ -2796,6 +2782,19 @@ _**Request headers**_
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
+
+The request payload may contain the following elements (all of them optional):
+
++ `entities`: a list of entities to search for. Each element is represented by a JSON object with the
+  following elements:
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+      time, but one of them must be present.
+    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
+      the same time. If omitted, it means "any entity type".
++ `attrs`: List of attributes to be provided (if not specified, all attributes).
++ `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field).
++ `metadata`: a list of metadata names to include in the response.
+   See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.
 
 Example:
 
@@ -2836,6 +2835,10 @@ _**Response headers**_
 Successful operations return `Content-Type` header with `application/json` value.
 
 _**Response payload**_
+
+The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
+no entities are found. The entities follow the JSON entity representation format
+(described in the section "JSON Entity Representation").
 
 Example:
 
@@ -2878,8 +2881,7 @@ Example:
 #### Notify [POST /v2/op/notify]
 
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
-This operation is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
-The request payload must be an NGSIv2 notification payload. 
+It is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
 
 _**Request query parameters**_
@@ -2903,6 +2905,8 @@ _**Request headers**_
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
+
+The request payload must be an NGSIv2 notification payload, as described in section [Notification Messages](#notification-messages).
 
 Example:
 
