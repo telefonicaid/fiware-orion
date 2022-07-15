@@ -1890,6 +1890,7 @@ The values that `options` parameter can have for this specific request are:
 |----------|------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
+| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (up to 30 seconds). |
 
 _**Request headers**_
 
@@ -1974,6 +1975,7 @@ _**Request headers**_
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
+| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (up to 30 seconds). |
 
 _**Response code**_
 

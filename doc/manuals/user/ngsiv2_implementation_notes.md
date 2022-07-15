@@ -15,7 +15,6 @@
 * [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
 * [`ignoreType` metadata](#ignoretype-metadata)
-* [`noAttrDetail` option](#noattrdetail-option)
 * [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
@@ -417,18 +416,6 @@ At the present moment `ignoreType` is supported only for geo-location types, thi
 mechanism to overcome the limit of only one geo-location per entity (more details
 in [this section of the documentation](#limit-to-attributes-for-entity-location). Support
 for `ignoreType` in `DateTime` may come in the future.
-
-[Top](#top)
-
-## `noAttrDetail` option
-
-The value `noAttrDetail` of the URI param `options` may be used in order to avoid NGSIv2 type browsing queries
-(`GET /v2/types` and `GET /v2/types/<type>`) to provide attribute type details.
-When used, the `types` list associated to each attribute name is set to `[]`.
-
-Using this option, Orion solves these queries much faster, especially in the case of a large number of attributes, each one with a different type.
-This can be very useful if your use case doesn't need the attribute type detail.
-In some cases savings from 30 seconds to 0.5 seconds with the `noAttrDetails` option have been detected.
 
 [Top](#top)
 
