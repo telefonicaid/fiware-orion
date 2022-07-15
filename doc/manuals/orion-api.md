@@ -184,7 +184,7 @@ An entity is represented by a JSON object with the following syntax:
   the entity's type name.
 
 * Entity attributes are specified by additional properties, whose names are the `name` of the 
-  attribute and whose representation is described in the "JSON Attribute Representation" section
+  attribute and whose representation is described in the [JSON Attribute Representation](#json-attribute-representation) section
   below. Obviously, `id` and `type` are not allowed to be used as attribute names.
 
 An example of this syntax in shown below:
@@ -1554,7 +1554,7 @@ _**Response code**_
 #### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
-representation for attributes (described in "JSON Attribute Representation" section).
+representation for attributes (described in [JSON Attribute Representation](#json-attribute-representation) section).
 
 _**Request URL parameters**_
 
@@ -1609,7 +1609,7 @@ Example:
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
-(described in "JSON Attribute Representation" section).
+(described in [JSON Attribute Representation](#json-attribute-representation) section).
 
 _**Request URL parameters**_
 
@@ -2051,7 +2051,7 @@ An `httpCustom` object contains the following subfields.
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
 
-If `httpCustom` is used, then the considerations described in "Custom Notifications" section apply.
+If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
 
 ### Subscription List
 
@@ -2093,7 +2093,7 @@ Successful operations return `Content-Type` header with `application/json` value
 _**Response payload**_
 
 The payload is an array containing one object per subscription. Each subscription follows the JSON subscription representation 
-format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
+format (described in [Subscription payload datamodel](#subscription-payload-datamodel) section).
 
 Example:
 
@@ -2142,7 +2142,6 @@ Example:
 #### Create Subscription [POST /v2/subscriptions]
 
 Creates a new subscription.
-The subscription is represented by a JSON object as described at the beginning of this section.
 
 _**Request headers**_
 
@@ -2203,8 +2202,7 @@ when the creation succeeds (Response code 201).
 
 #### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
 
-The response is the subscription represented by a JSON object as described at the beginning of this
-section.
+Returns the subscription requested.
 
 _**Request URL parameters**_
 
@@ -2383,7 +2381,7 @@ The `dataProvided` field contains the following subfields:
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> or <code>typePattern</code>: Type or pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
 | `attrs`        |          | array | List of attributes to be provided (if not specified, all attributes). |
-| `expression`   |          | object | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the Geoqueries section of this specification. </li><li><code>geometry</code>: Any of the supported geometries as specified by the Geoqueries section of this specification.</li> <li><code>coords</code>: String representation of coordinates as specified by the Geoqueries section of this specification.</li></ul> |
+| `expression`   |          | object | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the [Geographical queries](#geographical-queries) section. </li><li><code>geometry</code>: Any of the supported geometries as specified by the [Geographical queries](#geographical-queries) section.</li> <li><code>coords</code>: String representation of coordinates as specified by the [Geographical queries](#geographical-queries)section.</li></ul> |
 
 #### `registration.forwardingInformation`
 
@@ -2478,7 +2476,6 @@ Example:
 
 Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
-The registration is represented by a JSON object as described at the beginning of this section.
 
 _**Request headers**_
 
@@ -2532,8 +2529,7 @@ when the operation succeeds (Return code 201).
 
 #### Retrieve Registration [GET /v2/registrations/{registrationId}]
 
-The response is the registration represented by a JSON object as described at the beginning of this
-section.
+Returns the registration requested.
 
 _**Request URL parameters**_
 
@@ -2698,7 +2694,7 @@ The payload is an object with two properties:
 + `actionType`, to specify the kind of update action to do: either `append`, `appendStrict`, `update`,
   `delete`, or `replace`.
 + `entities`, an array of entities, each entity specified using the JSON entity representation format
-  (described in the section "JSON Entity Representation").
+  (described in the section [JSON Entity Representation](#json-entity-representation)).
 
 This operation is split in as many individual operations as entities in the `entities` vector, so
 the `actionType` is executed for each one of them. Depending on the `actionType`, a mapping with
@@ -2838,7 +2834,7 @@ _**Response payload**_
 
 The response payload is an Array containing one object per matching entity, or an empty array `[]` if 
 no entities are found. The entities follow the JSON entity representation format
-(described in the section "JSON Entity Representation").
+(described in the section [JSON Entity Representation](#json-entity-representation)).
 
 Example:
 
