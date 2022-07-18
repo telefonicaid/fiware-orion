@@ -9,15 +9,12 @@
 * [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
-* [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
 * [`ignoreType` metadata](#ignoretype-metadata)
-* [`noAttrDetail` option](#noattrdetail-option)
-* [Notification throttling](#notification-throttling)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -25,16 +22,9 @@
 * [Custom notification with JSON payload](#custom-notification-with-json-payload)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
-* [Notify only attributes that change](#notify-only-attributes-that-change)
 * [Covered subscriptions](#covered-subscriptions)
-* [`timeout` subscriptions option](#timeout-subscriptions-option)
-* [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
-* [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
-* [`forcedUpdate` option](#forcedupdate-option)
-* [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
-* [`skipForwarding` option](#skipforwarding-option)
 * [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -255,16 +245,6 @@ With regards to `FeatureCollection`, it is only accepted at creation/update time
 The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
 if you try to use them.
 
-## Legacy attribute format in notifications
-
-Apart from the values described for `attrsFormat` in the NGSIv2 specification, Orion also supports a
-`legacy` value, in order to send notifications in NGSIv1 format. This way, users can benefit from the
-enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
-
-Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
-
-[Top](#top)
-
 ## Datetime support
 
 From "Special Attribute Types" section at NGSIv2 specification:
@@ -431,34 +411,6 @@ for `ignoreType` in `DateTime` may come in the future.
 
 [Top](#top)
 
-## `noAttrDetail` option
-
-The value `noAttrDetail` of the URI param `options` may be used in order to avoid NGSIv2 type browsing queries
-(`GET /v2/types` and `GET /v2/types/<type>`) to provide attribute type details.
-When used, the `types` list associated to each attribute name is set to `[]`.
-
-Using this option, Orion solves these queries much faster, especially in the case of a large number of attributes, each one with a different type.
-This can be very useful if your use case doesn't need the attribute type detail.
-In some cases savings from 30 seconds to 0.5 seconds with the `noAttrDetails` option have been detected.
-
-[Top](#top)
-
-## Notification throttling
-
-From NGSIv2 specification regarding subscription throttling:
-
-> throttling: Minimal period of time in seconds which must elapse between two consecutive notifications. It is optional.
-
-The way in which Orion implements this is discarding notifications during the throttling guard period. Thus, notifications may be lost
-if they arrive too close in time. If your use case doesn't support losing notifications this way, then you should not use throttling.
-
-In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
-measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
-values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
-is not 100% accurate.
-
-[Top](#top)
-
 ## Ordering between different attribute value types
 
 From NGISv2 specification "Ordering Results" section:
@@ -572,19 +524,6 @@ topic is described with more detail [in this specific document](mqtt_notificatio
 
 [Top](#top)
 
-## Notify only attributes that change
-
-Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
-the NGSIv2 specification. This field takes a `true` or `false` value (default is `false`, if the field is ommitted). If
-set to `true` then notifications associated to the subscription include only attributes that changed in the triggering
-update request, in combination with the `attrs` or `exceptAttrs` field.
-
-For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onlyChangedAttrs` is `false`) and the triggering
-update modified only A, then A, B and C are notified (in other words, the triggering update doesn't matter). However,
-if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
-
-[Top](#top)
-
 ## Covered subscriptions
 
 The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
@@ -655,83 +594,6 @@ And if you try to create/update a subscription with that you will get a 400 Bad 
 
 [Top](#top)
 
-
-## `timeout` subscriptions option
-
-Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
-field. This field specifies the maximum time the subscription waits for the response when using HTTP
-notifications in milliseconds.
-
-The maximum value allowed for this parameter is 1800000 (30 minutes). If 
-`timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
-[Command line options](../admin/cli.md#command-line-options) for more details.
-
-[Top](#top)
-
-## `lastFailureReason` and `lastSuccessCode` subscriptions fields
-
-Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports this two extra fields within the `notification`
-field:
-
-* `lastFailureReason`: a text string describing the cause of the last failure (i.e. the failure
-  occurred at `lastFailure` time).
-* `lastSuccessCode`: the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
-  time a successful notification was sent (i.e. the success occurred at `lastSuccess` time).
-
-Both can be used to analyze possible problems with notifications. See section in the
-[problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
-for more details.
-
-Note these two fields are included in HTTP subscriptions, but not in MQTT ones. See
-[MQTT notifications document](#mqtt_notifications.md) for more detail.
-
-[Top](#top)
-
-## `failsCounter` and `maxFailsLimit` subscriptions fields
-
-Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports a `failsCounter` field within the `notification`
-field. The value of this field is the number of consecutive failing notifications associated
-to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset
-to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).
-
-There is also an optional field `maxFailsLimit` (also within `notification` field) which establishes
-a maximum allowed number of consecutive fails. If the number of fails overpasses the value of
-`maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then
-Orion automatically passes the subscription to `inactive` state. A subscripiton update operation
-(`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state
-`active` again).
-
-In addition, when Orion automatically disables a subscription, a log trace in WARN level is printed
-in this format:
-
-```
-time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
-```
-
-[Top](#top)
-
-## `flowControl` option
-As extra URI param option to the ones included in the NGSIv2 specification, Orion implements flowControl,
-than can be used to specify that an update operation have to use flow control, which can improve performance
-and avoid saturacion in high-load scenarios. This only works if the ContextBroker has been started using
-the [`-notifFlowControl` parameter](../admin/cli.md), otherwise is ignored. The flow control mechanism
-is explained in [this section in the documentation](../admin/perf_tuning.md#updates-flow-control-mechanism).
-
-The following requests can use the flowControl URI param option:
-
-* `POST /v2/entities/E/attrs?options=flowControl`
-* `POST /v2/entities/E/attrs?options=append,flowControl`
-* `POST /v2/op/update?options=flowControl`
-* `PUT /v2/entities/E/attrs?options=flowControl`
-* `PUT /v2/entities/E/attrs/A?options=flowControl`
-* `PUT /v2/entities/E/attrs/A/value?options=flowControl`
-* `PATCH /v2/entities/E/attrs?options=flowControl`
-
-[Top](#top)
-
 ## Ambiguous subscription status `failed` not used
 
 NGSIv2 specification describes `failed` value for `status` field in subscriptions:
@@ -754,28 +616,6 @@ Thus, `failed` is not used by Orion Context Broker and the status of the subscri
 if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
 `inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
 the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
-
-[Top](#top)
-
-## `forcedUpdate` option
-As extra URI param option to the ones included in the NGSIv2 specification, Orion implements forcedUpdate, 
-than can be used to specify that an update operation have to trigger any matching subscription (and send 
-corresponding notification) no matter if there is an actual attribute update or not. Remember that the 
-default behaviour (i.e. without using the forcedUpdate URI param option) is to updated only if attribute 
-is effectively updated.
-
-The following requests can use the forcedUpdate URI param option:
-
-* `POST /v2/entities/E/attrs?options=forcedUpdate`
-* `POST /v2/entities/E/attrs?options=append,forcedUpdate`
-* `POST /v2/op/update?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
-* `PATCH /v2/entities/E/attrs?options=forcedUpdate`
-
-Check also the `entityChange` [alteration type](subscriptions_alttype.md) for the same effect,
-but applyed to the subscription, not matter if the update request included the `forcedUpdate` option or not.
 
 [Top](#top)
 
@@ -810,16 +650,6 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
-
-[Top](#top)
-
-## `skipForwarding` option
-
-You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
-forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
-
-Note that in updates `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
-just use an update request with append/creation semantics).
 
 [Top](#top)
 

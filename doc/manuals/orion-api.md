@@ -63,7 +63,9 @@
             - [`subscription.subject.condition`](#subscriptionsubjectcondition)
             - [`subscription.notification`](#subscriptionnotification)
             - [`subscription.notification.http`](#subscriptionnotificationhttp)
+            - [`subscription.notification.mqtt`](#subscriptionnotificationmqtt)
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
+            - [`subscription.notification.mqttCustom`](#subscriptionnotificationmqttcustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
             - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
@@ -871,7 +873,7 @@ is used:
 
 If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
 
-```
+```json
 {
   "subscriptionId": "12345",
   "data": [
@@ -893,16 +895,49 @@ If `attrsFormat` is `keyValues` then keyValues partial entity representation mod
 
 If `attrsFormat` is `values` then values partial entity representation mode is used:
 
-```
+```json
 {
   "subscriptionId": "12345",
   "data": [ [23, 70], [24] ]
 }
 ```
 
-Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the
-associated subscription, so that notification receivers are aware of the format without
-needing to process the notification payload.
+If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users 
+can benefit from the enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
+
+Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
+
+```json
+{
+	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
+	"originator": "localhost",
+	"contextResponses": [{
+		"contextElement": {
+			"type": "Car",
+			"isPattern": "false",
+			"id": "Car1",
+			"attributes": [{
+				"name": "temperature",
+				"type": "centigrade",
+				"value": "26.5",
+				"metadatas": [{
+					"name": "TimeInstant",
+					"type": "recvTime",
+					"value": "2015-12-12 11:11:11.123"
+				}]
+			}]
+		},
+		"statusCode": {
+			"code": "200",
+			"reasonPhrase": "OK"
+		}
+	}]
+}
+```
+
+Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`) 
+HTTP header with the value of the format of the associated subscription, so that notification receivers 
+are aware of the format without needing to process the notification payload.
 
 ## Custom Notifications
 
@@ -1054,6 +1089,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1217,6 +1253,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1296,6 +1333,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1378,6 +1416,9 @@ The values that `options` parameter can have for this specific request are:
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
 
@@ -1425,10 +1466,19 @@ This parameter is part of the URL request. It is mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
-|------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
-| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
+| Parameter | Optional | Type   | Description                                                                                 | Example   |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------|-----------|
+| `type`    | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`    |
+| `options` | ✓        | string | A comma-separated list of options for the query. See the following table                    | keyValues |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                        |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
 
@@ -1479,10 +1529,18 @@ This parameter is part of the URL request. It is mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
-|------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
-| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
+| Parameter | Optional | Type   | Description                                                                                 | Example   |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------|-----------|
+| `type`    | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`    |
+| `options` | ✓        | string | A comma-separated list of options for the query. See the following table                    | keyValues |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                        |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
 
@@ -1571,6 +1629,13 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | `accuracy`    |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                  | `skipForwarding` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                         |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1622,9 +1687,18 @@ Those parameter are part of the URL request. They are mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                 | Example       |
-|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| Parameter  | Optional | Type   | Description                                                                                 | Example            |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|--------------------|
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`             |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                    | `overrideMetadata` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options            | Description                                                                                                                                          |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
 
@@ -1711,6 +1785,13 @@ _**Request query parameters**_
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                 | `skipForwarding` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                         |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1769,9 +1850,17 @@ Those parameter are part of the URL request. They are mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                 | Example       |
-|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| Parameter  | Optional | Type   | Description                                                                                 | Example        |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|----------------|
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`         |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                    | `forcedUpdate` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options        | Description                                                                                                                                          |
+|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
 
@@ -1848,6 +1937,7 @@ The values that `options` parameter can have for this specific request are:
 |----------|------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
+| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
 
 _**Request headers**_
 
@@ -1922,9 +2012,15 @@ This operation returns a JSON object with information about the type:
 
 _**Request query parameters**_
 
-| Parameter    | Optional | Type   | Description  | Example |
-|--------------|----------|--------|--------------|---------|
-| `entityType` |          | string | Entity Type. | `Room`  |
+| Parameter    | Optional | Type   | Description         | Example |
+|--------------|----------|--------|---------------------|---------|
+| `options` | ✓        | string | Options dictionary.                        | `noAttrDetail` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                              |
+|----------|------------------------------------------------------------------------------------------|
+| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
 
 _**Request headers**_
 
@@ -1977,15 +2073,20 @@ Example:
 
 A subscription is represented by a JSON object with the following fields:
 
-| Parameter      | Optional | Type   | Description                                                                                   |
-|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `id`           |          | string | Subscription unique identifier. Automatically created at creation time.                       |
-| `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
-| [`subject`](#subscriptionsubject)      |          | object | An object that describes the subject of the subscription.                                     |
+| Parameter      | Optional | Type    | Description                                                                                   |
+|----------------|----------|---------|-----------------------------------------------------------------------------------------------|
+| `id`           |          | string  | Subscription unique identifier. Automatically created at creation time.                       |
+| `description`  | ✓        | string  | A free text used by the client to describe the subscription.                                  |
+| [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.                                                                                              |
-| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications.    |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`. Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". |
+| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
+
+Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
+measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
+values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
+is not 100% accurate.
 
 #### `subscription.subject`
 
@@ -2004,6 +2105,7 @@ A `condition` contains the following subfields:
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field) |
+| `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 
 Based on the `condition` field, the notification triggering rules are as follow:
 
@@ -2020,28 +2122,65 @@ Based on the `condition` field, the notification triggering rules are as follow:
 
 A `notification` object contains the following subfields:
 
-| Parameter              | Optional          | Type   | Description                                                                                                                                                                                                                                                     |
-|------------------------|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Parameter          | Optional          | Type    | Description                                                                                                                                                                       |
+|--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
-| [`http`](#subscriptionnotificationhttp) or [`httpCustom`](#subscriptionnotificationhttpcustom) | ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol.                                                                                                              |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues` or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
-| `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                  |
-| `timesSent`            | Only on retrieval | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                                                                                                            |
-| `lastNotification`     | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                                                                                                    |
-| `lastFailure`          | Only on retrieval | ISO8601  | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                                                                                                 |
-| `lastSuccess`          | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification.                                                                               |
+| [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
+| `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is ommitted)) |
+| `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
+| `timesSent`        | Only on retrieval | number  | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                              |
+| `lastNotification` | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                      |
+| `lastFailure`      | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                   |
+| `lastSuccess`      | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
+| `lastFailureReason`| Only on retrieval | string  | Not editable, only present in GET operations. Describes the cause of the last failure (i.e. the failure occurred at `lastFailure` time). Not included in MQTT subscriptions.|
+| `lastSuccessCode`  | Only on retrieval | number  | Not editable, only present in GET operations. the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last time a successful notification was sent (i.e. the success occurred at `lastSuccess` time). Not included in MQTT subscriptions.|
+| `failsCounter`     | Only on retrieval | number  | Not editable, only present in GET operations. The number of consecutive failing notifications associated to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).|
+| `maxFailsLimit`    | ✓                 | number  | Establishes a maximum allowed number of consecutive fails. If the number of fails overpasses the value of `maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then Orion automatically passes the subscription to `inactive` state. A subscripiton update operation (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state `active` again). |
+
+Regarding `onlyChangedAttrs` field, as an example, if `attrs` is `[A, B, C]` for a given subscription, the default behavior 
+(when `onlyChangedAttrs` is `false`) and the triggering update modified only A, then A, B and C are notified (in other 
+words, the triggering update doesn't matter). However, if `onlyChangedAttrs` is `true` and the triggering update only 
+modified A then only A is included in the notification.
+
+Regarding `lastFailureReason` and `lastSuccessCode`, both can be used to analyze possible problems with notifications. 
+See section in the [problem diagnosis procedures document](admin/diagnosis.md#diagnose-notification-reception-problems)
+for more details.
+
+Regarding `maxFailsLimit` field, in addition, when Orion automatically disables a subscription, a log trace in WARN 
+level is printed. The line have the following format:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
 
 #### `subscription.notification.http`
 
-An `http` object contains the following subfields:
+A `http` object contains the following subfields:
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `url`     |          | string | URL referencing the service to be invoked when a notification is generated. An NGSIv2 compliant server must support the `http` URL schema. Other schemas could also be supported. |
+| `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
+
+#### `subscription.notification.mqtt`
+
+A `mqtt` object contains the following subfields:
+
+| Parameter | Optional | Type   | Description                                                                                                                                |
+|-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
+| `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
+| `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+
+For further information about MQTT notifications, see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
 #### `subscription.notification.httpCustom`
 
-An `httpCustom` object contains the following subfields.
+A `httpCustom` object contains the following subfields.
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
@@ -2050,8 +2189,25 @@ An `httpCustom` object contains the following subfields.
 | `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages.                 |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
+| `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
+
+#### `subscription.notification.mqttCustom`
+
+A `mqttCustom` object contains the following subfields.
+
+| Parameter | Optional | Type   | Description                                                                                                                                |
+|-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
+| `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
+| `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
+
+If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
+see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
 ### Subscription List
 
@@ -2678,6 +2834,9 @@ The values that `options` parameter can have for this specific request are:
 | Options     | Description                                                                                      |
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
 
@@ -2768,6 +2927,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues`  | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `values`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `unique`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | When used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
