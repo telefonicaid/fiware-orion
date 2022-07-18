@@ -2016,6 +2016,12 @@ _**Request query parameters**_
 |--------------|----------|--------|---------------------|---------|
 | `entityType` |          | string | Entity Type.        | `Room`  |
 
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                              |
+|----------|------------------------------------------------------------------------------------------|
+| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
+
 _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
