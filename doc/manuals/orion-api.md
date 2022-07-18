@@ -2014,7 +2014,8 @@ _**Request query parameters**_
 
 | Parameter    | Optional | Type   | Description         | Example |
 |--------------|----------|--------|---------------------|---------|
-| `options` | ✓        | string | Options dictionary.                        | `count` |
+| `options` | ✓        | string | Options dictionary.                        | `noAttrDetail` |
+
 The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                              |
