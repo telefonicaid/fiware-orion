@@ -1,0 +1,612 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Subscriptions - issue #1179
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB captn
+brokerStart CB 0 IPv4 -multiservice
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription X1
+# 02. See subscription X1 in DB
+# 03. Create a matching Entity
+# 04. Dump accumulator - see one notification
+# 05. Create subscription X2
+# 06. Create subscription X3
+# 07. GET subscriptions
+# 08. Count subscriptions
+#
+
+echo "01. Create subscription X1"
+echo "=========================="
+payload='{
+  "description": "QL WeatherObserved",
+  "type": "Subscription",
+  "name": "Notify QL WeatherObserved Data Linked",
+  "entities": [
+    {
+      "idPattern": "urn:WeatherObserved",
+      "type": "WeatherObserved"
+    }
+  ],
+  "watchedAttributes": [
+    "dateObserved"
+  ],
+  "isActive": true,
+  "notification": {
+    "attributes": [
+      "location",
+      "atmosphericPressure",
+      "dateObserved",
+      "feelLikesTemperature",
+      "gustSpeed",
+      "relativeHumidity",
+      "temperature",
+      "visibility",
+      "weatherType",
+      "windDirection",
+      "windSpeed",
+      "address"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  },
+  "@context":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json" -H "fiware-service: captn" -H "fiware-servicepath: /" -H "Authorization: Bearer TOKEN"
+echo
+echo
+
+
+echo "02. See subscription X1 in DB"
+echo "============================="
+mongoCmd2 ftest-captn "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. Create a matching Entity"
+echo "============================"
+payload='{
+  "id": "urn:WeatherObserved",
+  "type": "WeatherObserved",
+  "dateObserved": "2022-07-12T15:23:00.123Z"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "fiware-service: captn"
+echo
+echo
+
+
+echo "04. Dump accumulator - see one notification"
+echo "==========================================="
+accumulatorDump
+echo
+echo
+
+
+echo "05. Create subscription X2"
+echo "=========================="
+payload='{
+  "description": "NR WeatherObserved",
+  "type": "Subscription",
+  "name": "Notify NR WeatherObserved Data",
+  "entities": [
+    {
+      "idPattern": "urn:WeatherObserved",
+      "type": "WeatherObserved"
+    }
+  ],
+  "watchedAttributes": [
+    "dateObserved"
+  ],
+  "isActive": true,
+  "notification": {
+    "attributes": [
+      "location",
+      "atmosphericPressure",
+      "dateObserved",
+      "feelLikesTemperature",
+      "gustSpeed",
+      "relativeHumidity",
+      "temperature",
+      "visibility",
+      "weatherType",
+      "windDirection",
+      "windSpeed",
+      "address"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  },
+  "@context":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json" -H "fiware-service: captn" -H "fiware-servicepath: /" -H "Authorization: Bearer TOKEN"
+echo
+echo
+
+
+echo "06. Create subscription X3"
+echo "=========================="
+payload='{
+  "description": "QL WeatherObserved",
+  "type": "Subscription",
+  "name": "Notify QL WeatherObserved Data Linked",
+  "entities": [
+    {
+      "idPattern": "urn:WeatherObserved",
+      "type": "WeatherObserved"
+    }
+  ],
+  "watchedAttributes": [
+    "https://uri.etsi.org/ngsi-ld/default-context/dateObserved"
+  ],
+  "isActive": true,
+  "notification": {
+    "attributes": [
+      "location",
+      "atmosphericPressure",
+      "dateObserved",
+      "feelLikesTemperature",
+      "gustSpeed",
+      "relativeHumidity",
+      "temperature",
+      "visibility",
+      "weatherType",
+      "windDirection",
+      "windSpeed",
+      "address"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  },
+  "@context":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json" -H "fiware-service: captn" -H "fiware-servicepath: /" -H "Authorization: Bearer TOKEN"
+echo
+echo
+
+
+echo "07. GET subscriptions"
+echo "====================="
+orionCurl --url '/ngsi-ld/v1/subscriptions?options=count' -H "fiware-service: captn"
+echo
+echo
+
+
+echo "08. Count subscriptions"
+echo "======================="
+orionCurl --url "/ngsi-ld/v1/subscriptions?count=true&limit=0" -H "fiware-service: captn"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription X1
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+
+
+
+02. See subscription X1 in DB
+=============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "QL WeatherObserved",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:WeatherObserved",
+			"isPattern" : "true",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/WeatherObserved",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"location",
+		"https://uri.etsi.org/ngsi-ld/default-context/atmosphericPressure",
+		"https://uri.etsi.org/ngsi-ld/default-context/dateObserved",
+		"https://uri.etsi.org/ngsi-ld/default-context/feelLikesTemperature",
+		"https://uri.etsi.org/ngsi-ld/default-context/gustSpeed",
+		"https://uri.etsi.org/ngsi-ld/default-context/relativeHumidity",
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature",
+		"https://uri.etsi.org/ngsi-ld/default-context/visibility",
+		"https://uri.etsi.org/ngsi-ld/default-context/weatherType",
+		"https://uri.etsi.org/ngsi-ld/default-context/windDirection",
+		"https://uri.etsi.org/ngsi-ld/default-context/windSpeed",
+		"https://uri.etsi.org/ngsi-ld/default-context/address"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Notify QL WeatherObserved Data Linked",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/dateObserved"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+03. Create a matching Entity
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:WeatherObserved
+
+
+
+04. Dump accumulator - see one notification
+===========================================
+POST http://REGEX(.*)
+Fiware-Servicepath: /
+Content-Length: 346
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Ngsild-Tenant: captn
+Content-Type: application/json; charset=utf-8
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "data": [
+        {
+            "dateObserved": {
+                "type": "Property",
+                "value": "2022-07-12T15:23:00.123Z"
+            },
+            "id": "urn:WeatherObserved",
+            "type": "WeatherObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+05. Create subscription X2
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+
+
+
+06. Create subscription X3
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+
+
+
+07. GET subscriptions
+=====================
+HTTP/1.1 200 OK
+Content-Length: 2012
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 3
+
+[
+    {
+        "description": "QL WeatherObserved",
+        "entities": [
+            {
+                "idPattern": "urn:WeatherObserved",
+                "type": "WeatherObserved"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "location",
+                "atmosphericPressure",
+                "dateObserved",
+                "feelLikesTemperature",
+                "gustSpeed",
+                "relativeHumidity",
+                "temperature",
+                "visibility",
+                "weatherType",
+                "windDirection",
+                "windSpeed",
+                "address"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "lastSuccess": "202REGEX(.*)",
+            "status": "ok"
+        },
+        "status": "active",
+        "subscriptionName": "Notify QL WeatherObserved Data Linked",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "dateObserved"
+        ]
+    },
+    {
+        "description": "NR WeatherObserved",
+        "entities": [
+            {
+                "idPattern": "urn:WeatherObserved",
+                "type": "WeatherObserved"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "location",
+                "atmosphericPressure",
+                "dateObserved",
+                "feelLikesTemperature",
+                "gustSpeed",
+                "relativeHumidity",
+                "temperature",
+                "visibility",
+                "weatherType",
+                "windDirection",
+                "windSpeed",
+                "address"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "subscriptionName": "Notify NR WeatherObserved Data",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "dateObserved"
+        ]
+    },
+    {
+        "description": "QL WeatherObserved",
+        "entities": [
+            {
+                "idPattern": "urn:WeatherObserved",
+                "type": "WeatherObserved"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "location",
+                "atmosphericPressure",
+                "dateObserved",
+                "feelLikesTemperature",
+                "gustSpeed",
+                "relativeHumidity",
+                "temperature",
+                "visibility",
+                "weatherType",
+                "windDirection",
+                "windSpeed",
+                "address"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "subscriptionName": "Notify QL WeatherObserved Data Linked",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "dateObserved"
+        ]
+    }
+]
+
+
+08. Count subscriptions
+=======================
+HTTP/1.1 200 OK
+Content-Length: 2012
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 3
+
+[
+    {
+        "description": "QL WeatherObserved",
+        "entities": [
+            {
+                "idPattern": "urn:WeatherObserved",
+                "type": "WeatherObserved"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "location",
+                "atmosphericPressure",
+                "dateObserved",
+                "feelLikesTemperature",
+                "gustSpeed",
+                "relativeHumidity",
+                "temperature",
+                "visibility",
+                "weatherType",
+                "windDirection",
+                "windSpeed",
+                "address"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "lastSuccess": "202REGEX(.*)",
+            "status": "ok"
+        },
+        "status": "active",
+        "subscriptionName": "Notify QL WeatherObserved Data Linked",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "dateObserved"
+        ]
+    },
+    {
+        "description": "NR WeatherObserved",
+        "entities": [
+            {
+                "idPattern": "urn:WeatherObserved",
+                "type": "WeatherObserved"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "location",
+                "atmosphericPressure",
+                "dateObserved",
+                "feelLikesTemperature",
+                "gustSpeed",
+                "relativeHumidity",
+                "temperature",
+                "visibility",
+                "weatherType",
+                "windDirection",
+                "windSpeed",
+                "address"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "subscriptionName": "Notify NR WeatherObserved Data",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "dateObserved"
+        ]
+    },
+    {
+        "description": "QL WeatherObserved",
+        "entities": [
+            {
+                "idPattern": "urn:WeatherObserved",
+                "type": "WeatherObserved"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "location",
+                "atmosphericPressure",
+                "dateObserved",
+                "feelLikesTemperature",
+                "gustSpeed",
+                "relativeHumidity",
+                "temperature",
+                "visibility",
+                "weatherType",
+                "windDirection",
+                "windSpeed",
+                "address"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "subscriptionName": "Notify QL WeatherObserved Data Linked",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "dateObserved"
+        ]
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB captn
+accumulatorStop

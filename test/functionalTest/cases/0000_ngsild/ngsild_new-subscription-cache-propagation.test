@@ -1,0 +1,316 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Propagation of Subscriptions between two brokers running against one and the same MongoDB
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB  0 IPv4 -subCacheIval 2 -experimental
+brokerStart CB2 0 IPv4 -subCacheIval 2 -experimental
+
+--SHELL--
+
+#
+# 01. Create subscription S1 on CB
+# 02. Create subscription S2 on CB
+# 03. GET all subscriptions from CB - see S1
+# 04. GET all subscriptions from CB2 - see S2
+# 05. sleep 2 secs - to let the subscriptions propagate
+# 06. GET all subscriptions from CB - see S1 and S2
+# 07. GET all subscriptions from CB2 - see S2 and S1
+#
+
+echo "01. Create subscription S1 on CB"
+echo "================================"
+payload='{
+  "type": "Subscription",
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription S2 on CB"
+echo "================================"
+payload='{
+  "type": "Subscription",
+  "id": "urn:ngsi-ld:subscriptions:S2",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --port $CB2_PORT
+echo
+echo
+
+
+echo "03. GET all subscriptions from CB - see S1"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "04. GET all subscriptions from CB2 - see S2"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/subscriptions --port $CB2_PORT
+echo
+echo
+
+
+echo "05. sleep 2 secs - to let the subscriptions propagate"
+echo "====================================================="
+sleep 2.1
+echo Slept 2 seconds
+echo
+echo
+
+echo "06. GET all subscriptions from CB - see S1 and S2"
+echo "================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "07. GET all subscriptions from CB2 - see S2 and S1"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions --port $CB2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription S1 on CB
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. Create subscription S2 on CB
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2
+
+
+
+03. GET all subscriptions from CB - see S1
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 270
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S1",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+04. GET all subscriptions from CB2 - see S2
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 270
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S2",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+05. sleep 2 secs - to let the subscriptions propagate
+=====================================================
+Slept 2 seconds
+
+
+06. GET all subscriptions from CB - see S1 and S2
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 539
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S1",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    },
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S2",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+07. GET all subscriptions from CB2 - see S2 and S1
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 539
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S1",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    },
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S2",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://localhost:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CB2
+dbDrop CB
