@@ -63,7 +63,9 @@
             - [`subscription.subject.condition`](#subscriptionsubjectcondition)
             - [`subscription.notification`](#subscriptionnotification)
             - [`subscription.notification.http`](#subscriptionnotificationhttp)
+            - [`subscription.notification.mqtt`](#subscriptionnotificationmqtt)
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
+            - [`subscription.notification.mqttCustom`](#subscriptionnotificationmqttcustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
             - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
@@ -2074,15 +2076,16 @@ Example:
 
 A subscription is represented by a JSON object with the following fields:
 
-| Parameter      | Optional | Type   | Description                                                                                   |
-|----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `id`           |          | string | Subscription unique identifier. Automatically created at creation time.                       |
-| `description`  | ✓        | string | A free text used by the client to describe the subscription.                                  |
-| [`subject`](#subscriptionsubject)      |          | object | An object that describes the subject of the subscription.                                     |
+| Parameter      | Optional | Type    | Description                                                                                   |
+|----------------|----------|---------|-----------------------------------------------------------------------------------------------|
+| `id`           |          | string  | Subscription unique identifier. Automatically created at creation time.                       |
+| `description`  | ✓        | string  | A free text used by the client to describe the subscription.                                  |
+| [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`. Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". |
-| `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
+| `status`       |          | string  | Status can have the following values: <ul><li><code>`active`</code>: The default status when created. Notifications are send when condition match.</li> <li><code>`inactive`</code>: When set to this value, the notification does not fire when the condition match.</li> <li><code>`expired`</code>: When the expires date is older than the current date, the status is set to <code>expired</code> (no matter if the client updates it to <code>active</code>/<code>inactive</code>). </li> <li><code>`failed`</code>: The status is set to this value when last notification experienced a problem. </li>
+<li><code>`oneshot`</code>: When set to this value, the notification will be fired only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription <code>status</code> transits to <code>inactive</code> </li> </ul> |
+| `throttling`   | ✓        | number  | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
@@ -2835,6 +2838,7 @@ The values that `options` parameter can have for this specific request are:
 | Options     | Description                                                                                      |
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
 | `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
