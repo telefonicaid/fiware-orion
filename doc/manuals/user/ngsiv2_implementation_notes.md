@@ -24,7 +24,6 @@
 * [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
-* [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
 * [`skipForwarding` option](#skipforwarding-option)
@@ -638,28 +637,6 @@ Thus, `failed` is not used by Orion Context Broker and the status of the subscri
 if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
 `inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
 the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
-
-[Top](#top)
-
-## `forcedUpdate` option
-As extra URI param option to the ones included in the NGSIv2 specification, Orion implements forcedUpdate, 
-than can be used to specify that an update operation have to trigger any matching subscription (and send 
-corresponding notification) no matter if there is an actual attribute update or not. Remember that the 
-default behaviour (i.e. without using the forcedUpdate URI param option) is to updated only if attribute 
-is effectively updated.
-
-The following requests can use the forcedUpdate URI param option:
-
-* `POST /v2/entities/E/attrs?options=forcedUpdate`
-* `POST /v2/entities/E/attrs?options=append,forcedUpdate`
-* `POST /v2/op/update?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
-* `PATCH /v2/entities/E/attrs?options=forcedUpdate`
-
-Check also the `entityChange` [alteration type](subscriptions_alttype.md) for the same effect,
-but applyed to the subscription, not matter if the update request included the `forcedUpdate` option or not.
 
 [Top](#top)
 

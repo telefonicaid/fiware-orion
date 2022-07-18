@@ -1412,6 +1412,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 
 _**Request headers**_
 
@@ -1459,11 +1460,18 @@ This parameter is part of the URL request. It is mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
-|------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
-| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
+| Parameter | Optional | Type   | Description                                                                                 | Example   |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------|-----------|
+| `type`    | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`    |
+| `options` | ✓        | string | A comma-separated list of options for the query. See the following table                    | keyValues |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                        |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 
 _**Request headers**_
 
@@ -1514,10 +1522,17 @@ This parameter is part of the URL request. It is mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                                                                                                                            | Example      |
-|------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                                                                                                            | `Room`       |
-| `options`  | ✓        | string | Only `keyValues` option is allowed for this method. When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. | keyValues    |
+| Parameter | Optional | Type   | Description                                                                                 | Example   |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------|-----------|
+| `type`    | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`    |
+| `options` | ✓        | string | A comma-separated list of options for the query. See the following table                    | keyValues |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                                                        |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 
 _**Request headers**_
 
@@ -1667,6 +1682,7 @@ The values that `options` parameter can have for this specific request are:
 | Options            | Description                                                                                                                                          |
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 
 _**Request headers**_
 
@@ -1811,9 +1827,16 @@ Those parameter are part of the URL request. They are mandatory.
 
 _**Request query parameters**_
 
-| Parameter  | Optional | Type   | Description                                                                                 | Example       |
-|------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
-| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| Parameter  | Optional | Type   | Description                                                                                 | Example        |
+|------------|----------|--------|---------------------------------------------------------------------------------------------|----------------|
+| `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`         |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                    | `forcedUpdate` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options        | Description                                                                                                                                          |
+|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 
 _**Request headers**_
 
@@ -2784,6 +2807,7 @@ The values that `options` parameter can have for this specific request are:
 | Options     | Description                                                                                      |
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
 
 _**Request headers**_
 
