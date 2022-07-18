@@ -601,20 +601,6 @@ And if you try to create/update a subscription with that you will get a 400 Bad 
 
 [Top](#top)
 
-
-## `timeout` subscriptions option
-
-Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports the `timeout` extra parameter within the `http` or `httpCustom`
-field. This field specifies the maximum time the subscription waits for the response when using HTTP
-notifications in milliseconds.
-
-The maximum value allowed for this parameter is 1800000 (30 minutes). If 
-`timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
-[Command line options](../admin/cli.md#command-line-options) for more details.
-
-[Top](#top)
-
 ## `lastFailureReason` and `lastSuccessCode` subscriptions fields
 
 Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
