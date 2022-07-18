@@ -2053,6 +2053,7 @@ A `condition` contains the following subfields:
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field) |
+| `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 
 Based on the `condition` field, the notification triggering rules are as follow:
 
