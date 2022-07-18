@@ -2028,7 +2028,7 @@ _**Request headers**_
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
-| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (up to 30 seconds). |
+| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
 
 _**Response code**_
 
