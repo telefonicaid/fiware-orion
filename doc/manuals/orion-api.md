@@ -2073,7 +2073,7 @@ A `notification` object contains the following subfields:
 | Parameter              | Optional          | Type   | Description                                                                                                                                                                                                                                                     |
 |------------------------|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
-| [`http`](#subscriptionnotificationhttp) or [`httpCustom`](#subscriptionnotificationhttpcustom) | ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the HTTP protocol.                                                                                                              |
+| [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not both at the same time. It is used to convey parameters for notifications delivered through the transport protocol.                                                                                                              |
 | `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`             | ✓                 | string | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                  |
 | `timesSent`            | Only on retrieval | number | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                                                                                                            |
@@ -2083,15 +2083,29 @@ A `notification` object contains the following subfields:
 
 #### `subscription.notification.http`
 
-An `http` object contains the following subfields:
+A `http` object contains the following subfields:
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `url`     |          | string | URL referencing the service to be invoked when a notification is generated. An NGSIv2 compliant server must support the `http` URL schema. Other schemas could also be supported. |
 
+#### `subscription.notification.mqtt`
+
+A `mqtt` object contains the following subfields:
+
+| Parameter | Optional | Type   | Description                                                                                                                                |
+|-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
+| `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
+| `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+
+For further information, see the specific [mqtt documentation](user/mqtt_notifications.md)
+
 #### `subscription.notification.httpCustom`
 
-An `httpCustom` object contains the following subfields.
+A `httpCustom` object contains the following subfields.
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
@@ -2102,6 +2116,21 @@ An `httpCustom` object contains the following subfields.
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
+
+#### `subscription.notification.mqttCustom`
+
+A `mqttCustom` object contains the following subfields.
+
+| Parameter | Optional | Type   | Description                                                                                                                                |
+|-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
+| `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
+| `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
+
+If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
 
 ### Subscription List
 
