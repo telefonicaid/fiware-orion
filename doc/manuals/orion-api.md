@@ -1938,7 +1938,6 @@ The values that `options` parameter can have for this specific request are:
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
 | `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
-| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
