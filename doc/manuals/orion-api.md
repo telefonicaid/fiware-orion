@@ -2014,8 +2014,7 @@ _**Request query parameters**_
 
 | Parameter    | Optional | Type   | Description         | Example |
 |--------------|----------|--------|---------------------|---------|
-| `entityType` |          | string | Entity Type.        | `Room`  |
-
+| `options` | ✓        | string | Options dictionary.                        | `count` |
 The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                              |
