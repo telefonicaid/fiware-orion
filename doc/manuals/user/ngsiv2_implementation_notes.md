@@ -23,7 +23,6 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
-* [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` option](#forcedupdate-option)
@@ -596,26 +595,6 @@ And if you try to create/update a subscription with that you will get a 400 Bad 
 }
 ```
 
-
-[Top](#top)
-
-## `lastFailureReason` and `lastSuccessCode` subscriptions fields
-
-Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports this two extra fields within the `notification`
-field:
-
-* `lastFailureReason`: a text string describing the cause of the last failure (i.e. the failure
-  occurred at `lastFailure` time).
-* `lastSuccessCode`: the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
-  time a successful notification was sent (i.e. the success occurred at `lastSuccess` time).
-
-Both can be used to analyze possible problems with notifications. See section in the
-[problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
-for more details.
-
-Note these two fields are included in HTTP subscriptions, but not in MQTT ones. See
-[MQTT notifications document](#mqtt_notifications.md) for more detail.
 
 [Top](#top)
 
