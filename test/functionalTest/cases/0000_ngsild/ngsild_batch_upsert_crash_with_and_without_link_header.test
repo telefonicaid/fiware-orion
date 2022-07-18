@@ -35,6 +35,7 @@ brokerStart CB 0 IPv4 -multiservice
 # 01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header
 # 02. UPDATE the entity by re-executing the same UPSERT operation (but now WITH additional Context in Link header)
 # 03. GET version (just to see that the broker is still alive
+# 04. GET Tenants
 #
 
 echo "01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header"
@@ -142,6 +143,13 @@ echo
 echo
 
 
+echo "04. GET Tenants"
+echo "==============="
+orionCurl --url /ngsi-ld/ex/v1/tenants
+echo
+echo
+
+
 --REGEXPECT--
 01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header
 =====================================================================================
@@ -199,6 +207,18 @@ Date: REGEX(.*)
     "openssl version": "REGEX(.*)",
     "rapidjson version": "REGEX(.*)"
 }
+
+
+04. GET Tenants
+===============
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "smartmaas001"
+]
 
 
 --TEARDOWN--
