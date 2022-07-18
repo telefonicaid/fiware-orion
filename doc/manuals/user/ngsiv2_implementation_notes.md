@@ -23,7 +23,6 @@
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
-* [`failsCounter` and `maxFailsLimit` subscriptions fields](#failscounter-and-maxfailslimit-subscriptions-fields)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [`flowControl` option](#flowcontrol-option)
@@ -595,30 +594,6 @@ And if you try to create/update a subscription with that you will get a 400 Bad 
 }
 ```
 
-
-[Top](#top)
-
-## `failsCounter` and `maxFailsLimit` subscriptions fields
-
-Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
-`GET /v2/subscriptions/subId` requests, Orion supports a `failsCounter` field within the `notification`
-field. The value of this field is the number of consecutive failing notifications associated
-to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset
-to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).
-
-There is also an optional field `maxFailsLimit` (also within `notification` field) which establishes
-a maximum allowed number of consecutive fails. If the number of fails overpasses the value of
-`maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then
-Orion automatically passes the subscription to `inactive` state. A subscripiton update operation
-(`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state
-`active` again).
-
-In addition, when Orion automatically disables a subscription, a log trace in WARN level is printed
-in this format:
-
-```
-time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
-```
 
 [Top](#top)
 

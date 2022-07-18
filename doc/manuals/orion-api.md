@@ -2084,6 +2084,8 @@ A `notification` object contains the following subfields:
 | `lastSuccess`      | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
 | `lastFailureReason`| Only on retrieval | string  | Not editable, only present in GET operations. Describes the cause of the last failure (i.e. the failure occurred at `lastFailure` time). Not included in MQTT subscriptions.|
 | `lastSuccessCode`  | Only on retrieval | number  | Not editable, only present in GET operations. the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last time a successful notification was sent (i.e. the success occurred at `lastSuccess` time). Not included in MQTT subscriptions.|
+| `failsCounter`     | Only on retrieval | number  | Not editable, only present in GET operations. The number of consecutive failing notifications associated to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).|
+| `maxFailsLimit`    | ✓                 | number  | Establishes a maximum allowed number of consecutive fails. If the number of fails overpasses the value of `maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then Orion automatically passes the subscription to `inactive` state. A subscripiton update operation (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state `active` again). |
 
 Regarding `covered` field, as an example, if `attrs` is `[A, B, C]` for a given subscription, the default behavior 
 (when `onlyChangedAttrs` is `false`) and the triggering update modified only A, then A, B and C are notified (in other 
@@ -2093,6 +2095,13 @@ modified A then only A is included in the notification.
 Regarding `lastFailureReason` and `lastSuccessCode`, both can be used to analyze possible problems with notifications. 
 See section in the [problem diagnosis procedures document](admin/diagnosis.md#diagnose-notification-reception-problems)
 for more details.
+
+Regarding `maxFailsLimit` field, in addition, when Orion automatically disables a subscription, a log trace in WARN 
+level is printed. The line have the following format:
+
+```
+time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
+```
 
 #### `subscription.notification.http`
 
