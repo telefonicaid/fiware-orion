@@ -2191,8 +2191,7 @@ A `httpCustom` object contains the following subfields.
 | `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages.                 |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
-| `timeout` | ✓        | number | Maximum time the subscription waits for the response when using in milliseconds. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the
-[Command line options](admin/cli.md#command-line-options) for more details. |
+| `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
 
