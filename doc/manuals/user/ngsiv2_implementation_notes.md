@@ -531,19 +531,6 @@ topic is described with more detail [in this specific document](mqtt_notificatio
 
 [Top](#top)
 
-## Notify only attributes that change
-
-Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
-the NGSIv2 specification. This field takes a `true` or `false` value (default is `false`, if the field is ommitted). If
-set to `true` then notifications associated to the subscription include only attributes that changed in the triggering
-update request, in combination with the `attrs` or `exceptAttrs` field.
-
-For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onlyChangedAttrs` is `false`) and the triggering
-update modified only A, then A, B and C are notified (in other words, the triggering update doesn't matter). However,
-if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
-
-[Top](#top)
-
 ## Covered subscriptions
 
 The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
