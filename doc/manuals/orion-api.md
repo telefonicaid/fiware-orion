@@ -1087,6 +1087,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1250,6 +1251,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1329,6 +1331,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1624,6 +1627,13 @@ _**Request query parameters**_
 |------------|----------|--------|---------------------------------------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id.                               | `Room`        |
 | `metadata` | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail. | `accuracy`    |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                                                  | `skipForwarding` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                         |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1773,6 +1783,13 @@ _**Request query parameters**_
 | Parameter  | Optional | Type   | Description                                                                                 | Example       |
 |------------|----------|--------|---------------------------------------------------------------------------------------------|---------------|
 | `type`     | ✓        | string | Entity type, to avoid ambiguity in case there are several entities with the same entity id. | `Room`        |
+| `options`  | ✓        | string | A comma-separated list of options for the query. See the following table                 | `skipForwarding` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options     | Description                                                                                                         |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1919,6 +1936,7 @@ The values that `options` parameter can have for this specific request are:
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
 | `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (up to 30 seconds). |
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -1993,9 +2011,16 @@ This operation returns a JSON object with information about the type:
 
 _**Request query parameters**_
 
-| Parameter    | Optional | Type   | Description  | Example |
-|--------------|----------|--------|--------------|---------|
-| `entityType` |          | string | Entity Type. | `Room`  |
+| Parameter    | Optional | Type   | Description         | Example |
+|--------------|----------|--------|---------------------|---------|
+| `entityType` |          | string | Entity Type.        | `Room`  |
+| `options`    | ✓        | string | Options dictionary. | `count` |
+
+The values that `options` parameter can have for this specific request are:
+
+| Options  | Description                                                                              |
+|----------|------------------------------------------------------------------------------------------|
+| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
@@ -2904,6 +2929,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues`  | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `values`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `unique`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
+| `skipForwarding` | When used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 

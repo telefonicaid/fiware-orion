@@ -25,7 +25,6 @@
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
-* [`skipForwarding` option](#skipforwarding-option)
 * [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -651,16 +650,6 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
-
-[Top](#top)
-
-## `skipForwarding` option
-
-You can use `skipForwarding` option in queries (e.g. `GET /v2/entities?options=skipForwarding`) in order to skip
-forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information.
-
-Note that in updates `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB
-just use an update request with append/creation semantics).
 
 [Top](#top)
 
