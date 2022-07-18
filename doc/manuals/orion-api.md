@@ -933,7 +933,7 @@ Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notific
 }
 ```
 
-Notifications must include the `Ngsiv2-AttrsFormat` (when using `attrsFormat` = `legacy` is excluded ) 
+Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`) 
 HTTP header with the value of the format of the associated subscription, so that notification receivers 
 are aware of the format without needing to process the notification payload.
 
