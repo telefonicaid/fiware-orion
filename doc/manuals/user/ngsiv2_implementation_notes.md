@@ -24,7 +24,6 @@
 * [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
-* [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
 * [`skipForwarding` option](#skipforwarding-option)
 * [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
@@ -593,25 +592,6 @@ And if you try to create/update a subscription with that you will get a 400 Bad 
 }
 ```
 
-
-[Top](#top)
-
-## `flowControl` option
-As extra URI param option to the ones included in the NGSIv2 specification, Orion implements flowControl,
-than can be used to specify that an update operation have to use flow control, which can improve performance
-and avoid saturacion in high-load scenarios. This only works if the ContextBroker has been started using
-the [`-notifFlowControl` parameter](../admin/cli.md), otherwise is ignored. The flow control mechanism
-is explained in [this section in the documentation](../admin/perf_tuning.md#updates-flow-control-mechanism).
-
-The following requests can use the flowControl URI param option:
-
-* `POST /v2/entities/E/attrs?options=flowControl`
-* `POST /v2/entities/E/attrs?options=append,flowControl`
-* `POST /v2/op/update?options=flowControl`
-* `PUT /v2/entities/E/attrs?options=flowControl`
-* `PUT /v2/entities/E/attrs/A?options=flowControl`
-* `PUT /v2/entities/E/attrs/A/value?options=flowControl`
-* `PATCH /v2/entities/E/attrs?options=flowControl`
 
 [Top](#top)
 
