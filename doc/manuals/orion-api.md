@@ -2016,13 +2016,6 @@ _**Request query parameters**_
 | Parameter    | Optional | Type   | Description         | Example |
 |--------------|----------|--------|---------------------|---------|
 | `entityType` |          | string | Entity Type.        | `Room`  |
-| `options`    | ✓        | string | Options dictionary. | `count` |
-
-The values that `options` parameter can have for this specific request are:
-
-| Options  | Description                                                                              |
-|----------|------------------------------------------------------------------------------------------|
-| `skipForwarding` | when used, CB skips forwarding to CPrs. The query is evaluated using exclusively CB local context information. |
 
 _**Request headers**_
 
