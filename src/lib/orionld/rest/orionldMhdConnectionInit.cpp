@@ -378,6 +378,31 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
 
 // -----------------------------------------------------------------------------
 //
+// pCheckTenantName -
+//
+bool pCheckTenantName(const char* dbName)
+{
+  size_t len = strlen(dbName);
+
+  if (len > 52)
+  {
+    orionldError(OrionldBadRequestData, "Invalid tenant name", "Tenant name too long (maximum is set to 52 characters)", 400);
+    return false;
+  }
+
+  if (strcspn(dbName, "/. \"\\$") != len)
+  {
+    orionldError(OrionldBadRequestData, "Invalid tenant name", "Invalid character for a mongo database name", 400);
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldHttpHeaderReceive -
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
@@ -433,7 +458,18 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   {
     if (multitenancy == true)  // Has the broker been started with multi-tenancy enabled (it's disabled by default)
     {
-      toLowercase((char*) value);
+      if (pCheckTenantName(value) == false)
+        return MHD_YES;
+
+      toLowercase((char*) value);  // All tenants are lowercase - mongo decides that
+
+      // Tenant already given?
+      if ((orionldState.tenantName != NULL) && (strcmp(orionldState.tenantName, value) != 0))
+      {
+        orionldError(OrionldBadRequestData, "HTTP header duplication", "Tenant set twice (or perhaps both Fiware-Service and NGSILD-Tenant?)", 400);
+        return MHD_YES;
+      }
+
       orionldState.tenantName = (char*) value;  // FIXME: Deprecate this field
       orionldState.in.tenant  = (char*) value;
     }

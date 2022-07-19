@@ -225,6 +225,7 @@ static bool patchApply
     {
       mongocKjTreeToBson(tree, &compound);
       bson_append_array(setP, path, -1, &compound);
+      bson_destroy(&compound);
     }
     else if (tree->type == KjObject)
     {

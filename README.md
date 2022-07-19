@@ -43,7 +43,8 @@ There are a number of docker images to choose from.
 
 If you (at your own risk) want to evaluate the bleeding edge development changes, you can use the latest image:
 `docker run fiware/orion-ld:latest` or even better: use
-[docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
+[docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it.
+Please note that for production and/or performance implementations, there is a thorough guide for that right [here](https://github.com/FIWARE/load-tests)
 
 If you instead want to use a more stable image, the latest release (as of Jan 2022) is
 [1.0.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.0.1)
@@ -61,11 +62,10 @@ https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-
 
 If you are not sharing your data across systems and have no need for linked data concepts, then the current stable
 version of **NGSI** (**NGSI-v2**) is more than sufficient.
-If so, please use the original unforked [Orion](https://github.com/telefonicaid/fiware-orion) instead.
+If so, please use the original unforked [Orion](https://github.com/telefonicaid/fiware-orion) instead of Orion-LD (that is not up-to-date in terms of NGSIv2).
 
-Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples). See
-also the
-[OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/-/raw/master/spec/updated/generated/full_api.json)
+Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples).
+See also the [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/-/raw/master/spec/updated/generated/full_api.json)
 
 Documentation:
 
@@ -81,6 +81,6 @@ Documentation:
 A Test Suite for NGSI-LD compliant brokers can be found [here](https://github.com/fiware/NGSI-LD_Tests).
 This test suite is kind of deprecated in favor of the [ETSI NGSI-LD API Conformance Test Suite](https://forge.etsi.org/rep/cim/ngsi-ld-test-suite).
 However, the ETSI test suite still needs quite some work to be usable.
-A TTF (Testing Task force) is applied for (ETSI fundings) and hopefully the test suite will be improved upon during this year of 2022.
+A TTF (Testing Task force) is applied for (ETSI fundings) and hopefully the test suite will be improved upon during 2023.
 
-Orion-LD passes about 95% of the test cases of the older deprecated test suite, while ETSI's test suite isn't usable at the moment.
+Orion-LD passes about 95% of the test cases of the older deprecated test suite, while ETSI's test suite isn't really usable at the moment.
