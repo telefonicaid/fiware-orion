@@ -440,7 +440,8 @@ static bool subMatch
   const char*                      servicePath,
   const char*                      entityId,
   const char*                      entityType,
-  const std::vector<std::string>&  attrV,
+  const std::vector<std::string>&  attributes,
+  const std::vector<std::string>&  modifiedAttrs,
   ngsiv2::SubAltType               targetAltType
 )
 {
@@ -489,10 +490,23 @@ static bool subMatch
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).
   //
-  if (!attributeMatch(cSubP, attrV))
+  // Depending of the alteration type, we use the list of attributes in the request or the list
+  // with effective modifications
+  if (targetAltType == ngsiv2::EntityUpdate)
   {
-    LM_T(LmtSubCacheMatch, ("No match due to attributes"));
-    return false;
+    if (!attributeMatch(cSubP, attributes))
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+      return false;
+    }
+  }
+  else
+  {
+    if (!attributeMatch(cSubP, modifiedAttrs))
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+      return false;
+    }
   }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
@@ -534,7 +548,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -557,7 +571,8 @@ void subCacheMatch
   const char*                        servicePath,
   const char*                        entityId,
   const char*                        entityType,
-  const std::vector<std::string>&    attrV,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    modifiedAttrs,
   ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
@@ -566,7 +581,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, modifiedAttrs, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",

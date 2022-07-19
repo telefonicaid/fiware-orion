@@ -21,6 +21,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
+* [カスタム通知の追加マクロ](#custom-notification-extra-macros)
 * [JSON ペイロードを使用したカスタム通知](#custom-notification-with-json-payload)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
@@ -363,7 +364,8 @@ NGSIv2 仕様の "組み込み属性" (Builtin Attributes) セクションで説
 
 * `entityCreate` 通知をトリガーする更新がエンティティ作成操作の場合
 * `entityUpdate` 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
-* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合
+* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合、または、実際の変更ではないが
+  `forcedUpdate` が使用されている更新である場合
 * `entityDelete` 通知をトリガーする更新がエンティティ削除操作であった場合
 
 この属性のタイプは `Text` です。
@@ -463,6 +465,24 @@ Orionは `alterationTypes` フィールドをサポートして、サブスク�
 (エンティティの作成、エンティティの変更など) を指定します。
 
 詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
+
+[トップ](#top)
+
+<a name="custom-notification-extra-macros"></a>
+## カスタム通知の追加マクロ
+
+NGSIv2 仕様の "カスタム通知" セクションで説明されている `${...}` マクロとは別に、
+次のマクロを使用できます:
+
+* `${service}` は、サブスクリプションをトリガーする更新リクエストのサービス (つまり、
+  `fiware-service` ヘッダ値) に置き換えられます
+* `${servicePath}` は、サブスクリプションをトリガーする更新リクエストのサービス・パス (つまり、
+  `fiware-servicepath` ヘッダ値) に置き換えられます
+* `${authToken}` は、サブスクリプションをトリガーする更新リクエストの認証トークン (つまり、
+  `x-auth-token` ヘッダ値) に置き換えられます
+
+まれに、属性が上記と同じ方法で名前が付けられた場合 (たとえば、名前が `service` である属性)、
+属性値が優先されます。
 
 [トップ](#top)
 

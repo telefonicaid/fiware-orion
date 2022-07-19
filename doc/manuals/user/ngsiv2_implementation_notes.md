@@ -21,6 +21,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
+* [Custom notification extra macros](#custom-notification-extra-macros)
 * [Custom notification with JSON payload](#custom-notification-with-json-payload)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
@@ -381,7 +382,7 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## `alterationType` attribute
 
-Appart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
+Apart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
 Orion implements the `alterationType` attribute.
 
 This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
@@ -389,7 +390,7 @@ is ignored) and can take the following values:
 
 * `entityCreate` if the update that triggers the notification is a entity creation operation
 * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
-* `entityChange` if the update that triggers the notification was an update with an actual change
+* `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
 * `entityDelete` if the update that triggers the notification was a entity delete operation
 
 The type of this attribute is `Text`
@@ -412,7 +413,7 @@ supported upon completion of [this issue](https://github.com/telefonicaid/fiware
 
 ## `ignoreType` metadata
 
-Appart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
+Apart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
 Orion implements the `ignoreType` metadata.
 
 When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
@@ -494,6 +495,25 @@ Orion supports the `alterationTypes` field to specify under which alterations (e
 modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
+
+[Top](#top)
+
+## Custom notification extra macros
+
+Apart from the `${...}` macros described in "Custom Notifications" section in the NGSIv2
+specification, the following ones can be used:
+
+* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
+  update request triggering the subscription.
+* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
+  update request triggering the subscription.
+* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
+  update request triggering the subscription.
+
+In the rare case an attribute was named in the same way of the above (e.g. an attribute which
+name is `service`) then the attribute value takes precedence.
+
+[Top](#top)
 
 ## Custom notification with JSON payload
 
