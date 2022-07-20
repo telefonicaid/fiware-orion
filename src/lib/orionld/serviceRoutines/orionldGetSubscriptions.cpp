@@ -35,9 +35,32 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/legacyDriver/legacyGetSubscriptions.h"         // legacyGetSubscriptions
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// tenantMatch -
+//
+static bool tenantMatch(OrionldTenant* requestTenantP, const char* subscriptionTenant)
+{
+  if (requestTenantP == &tenant0)
+  {
+    if (subscriptionTenant == NULL)
+      return true;
+  }
+  else
+  {
+    if ((subscriptionTenant != NULL) && (strcmp(requestTenantP->tenant, subscriptionTenant) == 0))
+      return true;
+  }
+
+  return false;
+}
 
 
 
@@ -76,8 +99,10 @@ bool orionldGetSubscriptions(void)
     int count = 0;
     for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
     {
-      ++count;
+      if (tenantMatch(orionldState.tenantP, cSubP->tenant) == true)
+        ++count;
     }
+
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
   }
 
@@ -85,6 +110,9 @@ bool orionldGetSubscriptions(void)
   {
     for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
     {
+      if (tenantMatch(orionldState.tenantP, cSubP->tenant) == false)
+        continue;
+
       if (ix < offset)
       {
         ++ix;
