@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
+#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
@@ -464,14 +465,20 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
       toLowercase((char*) value);  // All tenants are lowercase - mongo decides that
 
       // Tenant already given?
-      if ((orionldState.tenantName != NULL) && (strcmp(orionldState.tenantName, value) != 0))
+      if (orionldState.tenantName != NULL)
       {
-        orionldError(OrionldBadRequestData, "HTTP header duplication", "Tenant set twice (or perhaps both Fiware-Service and NGSILD-Tenant?)", 400);
-        return MHD_YES;
+        if (strcmp(orionldState.tenantName, value) != 0)
+        {
+          orionldError(OrionldBadRequestData, "HTTP header duplication", "Tenant set twice (or perhaps both Fiware-Service and NGSILD-Tenant?)", 400);
+          return MHD_YES;
+        }
       }
-
-      orionldState.tenantName = (char*) value;  // FIXME: Deprecate this field
-      orionldState.in.tenant  = (char*) value;
+      else
+      {
+        orionldState.tenantName = (char*) value;  // FIXME: Deprecate this field
+        orionldState.in.tenant  = (char*) value;
+        orionldState.tenantP    = orionldTenantLookup(orionldState.tenantName);
+      }
     }
     else
     {

@@ -45,7 +45,6 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
@@ -114,14 +113,12 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
         return false;
       }
 
-      LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
       if (parse8601Time(attrP->value.s) == -1)
       {
         //
         // Deletion?
         // Should only be valid for merge+patch ops ...
         //
-        LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
         if (strcmp(attrP->value.s, "urn:ngsi-ld:null") == 0)
         {
           attrP->type = KjNull;
@@ -947,16 +944,12 @@ static bool pCheckAttributeObject
   KjNode* fieldP = attrP->value.firstChildP;
   KjNode* next;
 
-  kjTreeLog(attrP, "GEO: Looping over all attribute fields");
   while (fieldP != NULL)
   {
     next = fieldP->next;
 
     if ((fieldP->type == KjString) && (strcmp(fieldP->value.s, "urn:ngsi-ld:null") == 0))
-    {
       fieldP->type = KjNull;
-      LM_TMP(("OBS: Field '%s' marked for deletion", fieldP->name));
-    }
 
     if (fieldP->type == KjNull)
     {
@@ -1057,11 +1050,8 @@ static bool pCheckAttributeObject
     fieldP = next;
   }
 
-  kjTreeLog(attrP, "GEO: attr after");
   if (attributeType == GeoProperty)
   {
-    LM_TMP(("GEO: %s is a geo property", attrP->name));
-
     if (pCheckGeoProperty(attrP) == false)
     {
       LM_W(("pCheckGeoProperty flagged an error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
@@ -1235,8 +1225,6 @@ bool pCheckAttribute
   }
 
   // "Direct" Deletion?
-  if (attrP->type == KjString)
-    LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
   if ((attrP->type == KjString) && (strcmp(attrP->value.s, "urn:ngsi-ld:null") == 0))
   {
     attrP->type = KjNull;

@@ -346,7 +346,7 @@ Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
 07. GET subscriptions
 =====================
 HTTP/1.1 200 OK
-Content-Length: 2012
+Content-Length: 2072
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -383,8 +383,10 @@ NGSILD-Results-Count: 3
                 "uri": "http://localhost:9997/notify"
             },
             "format": "normalized",
+            "lastNotification": "202REGEX(.*)",
             "lastSuccess": "202REGEX(.*)",
-            "status": "ok"
+            "status": "ok",
+            "timesSent": 1
         },
         "status": "active",
         "subscriptionName": "Notify QL WeatherObserved Data Linked",
@@ -477,7 +479,7 @@ NGSILD-Results-Count: 3
 08. Count subscriptions
 =======================
 HTTP/1.1 200 OK
-Content-Length: 2012
+Content-Length: 2072
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -514,8 +516,10 @@ NGSILD-Results-Count: 3
                 "uri": "http://localhost:9997/notify"
             },
             "format": "normalized",
+            "lastNotification": "202REGEX(.*)",
             "lastSuccess": "202REGEX(.*)",
-            "status": "ok"
+            "status": "ok",
+            "timesSent": 1
         },
         "status": "active",
         "subscriptionName": "Notify QL WeatherObserved Data Linked",

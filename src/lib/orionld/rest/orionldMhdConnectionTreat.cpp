@@ -57,7 +57,6 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
-#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/performance.h"                          // PERFORMANCE
@@ -952,8 +951,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   {
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS) == ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS)
     {
-      orionldState.tenantP = orionldTenantLookup(orionldState.tenantName);
-      if (orionldState.tenantP == NULL)
+      if (orionldState.tenantP == &tenant0)  // Tenant given (then it can't be the default tenant) but, it's still the default tenant???
       {
         //
         // Tenant does not exist in the tenant cache of this broker

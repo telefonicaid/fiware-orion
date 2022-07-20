@@ -1331,6 +1331,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            orionldState.tenantP);
     subP->blacklist = cSubP->blacklist;
     subP->metadata  = cSubP->metadata;
+    subP->tenantP   = tenantP;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
