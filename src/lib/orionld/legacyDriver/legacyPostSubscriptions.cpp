@@ -61,7 +61,7 @@ bool legacyPostSubscriptions(void)
   std::string          subId;
   OrionError           oError;
 
-  LM_TMP(("KZ: In old POST Subscription function - using mongoBackend"));
+  LM_TMP(("KZ: In legacy POST Subscription function - using mongoBackend"));
 
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
@@ -92,8 +92,11 @@ bool legacyPostSubscriptions(void)
   {
     KjNode* uriP = kjLookup(endpointP, "uri");
 
+    LM_TMP(("MQTT: uri: '%s'", uriP->value.s));
+
     if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
     {
+      LM_TMP(("MQTT: it's MQTT"));
       bool            mqtts         = false;
       char*           mqttUser      = NULL;
       char*           mqttPassword  = NULL;
@@ -163,6 +166,8 @@ bool legacyPostSubscriptions(void)
         return false;
       }
     }
+    else
+      LM_TMP(("MQTT: it's HTTP"));
   }
 
   //

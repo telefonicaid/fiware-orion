@@ -1,0 +1,315 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications via MQTT - Issue 1178
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic example_mosquitto_topic
+
+--SHELL--
+
+#
+# 01. Create subscription with MQTT broker as endpoint
+# 02. See the subscription in mongo
+# 03. GET the subscription
+# 04. Create an entity matching the subscription
+# 05. Dump and Reset the MQTT test client and see one notification
+# 06. Restart the broker
+# 07. Update the entity matching the subscription
+# 08. Dump and Reset the MQTT test client and see one notification
+#
+
+echo "01. Create subscription with MQTT broker as endpoint"
+echo "===================================================="
+payload='{
+  "type": "Subscription",
+  "name": "Car-Subscription",
+  "description": "Car subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Device:age01_Car",
+      "type": "Device"
+    }
+  ],
+  "watchedAttributes": [
+    "Engine_Oxigen",
+    "Engine_Temperature"
+  ],
+  "notification": {
+    "attributes": [
+      "Engine_Oxigen",
+      "Engine_Temperature"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/example_mosquitto_topic"
+    }
+  },
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+subLocation=$(grep Location /tmp/httpHeaders.out | awk -FLocation: '{print $2}')
+echo
+echo
+
+
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription"
+echo "========================"
+orionCurl --url $subLocation -H 'Link: <https://fiware.github.io/data-models/context.jsonld>'
+echo
+echo
+
+
+echo "04. Create an entity matching the subscription"
+echo "=============================================="
+payload='{
+  "id": "urn:ngsi-ld:Device:age01_Car",
+  "type": "Device",
+  "Engine_Oxigen": 12,
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "05. Dump and Reset the MQTT test client and see one notification"
+echo "================================================================"
+mqttTestClientDump example_mosquitto_topic
+mqttTestClientReset example_mosquitto_topic
+echo
+echo
+
+
+echo "06. Restart the broker"
+echo "======================"
+brokerStop CB
+brokerStart CB
+echo
+echo
+
+
+echo "07. Update the entity matching the subscription"
+echo "==============================================="
+payload='{
+  "Engine_Oxigen": 77
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Device:age01_Car/attrs --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump and Reset the MQTT test client and see one notification"
+echo "================================================================"
+mqttTestClientDump example_mosquitto_topic
+mqttTestClientReset example_mosquitto_topic
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with MQTT broker as endpoint
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
+
+
+
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "mqtt://localhost:1883/example_mosquitto_topic",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "Car subscription",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:Device:age01_Car",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/Engine_Oxigen",
+		"https://uri.etsi.org/ngsi-ld/default-context/Engine_Temperature"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Car-Subscription",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/Engine_Oxigen",
+		"https://uri.etsi.org/ngsi-ld/default-context/Engine_Temperature"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+03. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 522
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Car subscription",
+    "entities": [
+        {
+            "id": "urn:ngsi-ld:Device:age01_Car",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "isActive": true,
+    "notification": {
+        "attributes": [
+            "Engine_Oxigen",
+            "Engine_Temperature"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "mqtt://localhost:1883/example_mosquitto_topic"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "status": "active",
+    "subscriptionName": "Car-Subscription",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "Engine_Oxigen",
+        "Engine_Temperature"
+    ]
+}
+
+
+04. Create an entity matching the subscription
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Device:age01_Car
+
+
+
+05. Dump and Reset the MQTT test client and see one notification
+================================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "Engine_Oxigen": 12,
+        "id": "urn:ngsi-ld:Device:age01_Car",
+        "type": "Device"
+      }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "type": "Notification"
+  },
+  "metadata": {
+    "Content-Type": "application/json",
+    "Link": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  }
+}
+=======================================
+
+
+
+06. Restart the broker
+======================
+
+
+07. Update the entity matching the subscription
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. Dump and Reset the MQTT test client and see one notification
+================================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "Engine_Oxigen": 77,
+        "id": "urn:ngsi-ld:Device:age01_Car",
+        "type": "Device"
+      }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:REGEX(.*)",
+    "type": "Notification"
+  },
+  "metadata": {
+    "Content-Type": "application/json",
+    "Link": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  }
+}
+=======================================
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+mqttTestClientStop example_mosquitto_topic

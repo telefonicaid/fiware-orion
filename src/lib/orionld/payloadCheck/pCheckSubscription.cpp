@@ -218,6 +218,7 @@ bool pCheckSubscription
     }
     else if (strcmp(subItemP->name, "notification") == 0)
     {
+      LM_TMP(("MQTT: Checking the 'notification' part of the subscription"));
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       PCHECK_DUPLICATE(notificationP,  subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       if (pCheckNotification(notificationP, false, uriPP, notifierInfoPP, mqttChangeP) == false)
