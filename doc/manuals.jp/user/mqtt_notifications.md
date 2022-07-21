@@ -47,7 +47,7 @@ MQTT サブスクリプションのカスタム通知 ([NGSIv2 仕様](http://te
 
 * `httpCustom` の代わりに `mqttCustom` が使用されます
 * `mqtt` で使用されているのと同じフィールドを `mqttCustom` で使用できます
-* `headers` と `qs` は MQTT で同等ではないため、使用できません
+* `headers`, `qs` と `method` は MQTT で同等ではないため、使用できません
 * マクロ置換は `topic` および `payload` フィールドで実行されます。`url`, `qos`, `user` と `passwd` は固定値です
 
 ## 接続管理

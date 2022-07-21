@@ -9,15 +9,12 @@
 * [カスタム通知でのヘッダの削除](#header-removal-in-custom-notifications)
 * [エンティティ・ロケーションの属性に制限](#limit-to-attributes-for-entity-location)
 * [`geo:json` 属性でサポートされる GeoJSON タイプ](#supported-geojson-types-in-geojson-attributes)
-* [通知の従来の属性フォーマット](#legacy-attribute-format-in-notifications)
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
 * [`alterationType` 属性](#alterationtype-attribute)
 * [`actionType` メタデータ](#actiontype-metadata)
 * [`ignoreType` メタデータ](#ignoretype-metadata)
-* [`noAttrDetail` オプション](#noattrdetail-option)
-* [通知スロットリング](#notification-throttling)
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
@@ -25,16 +22,9 @@
 * [JSON ペイロードを使用したカスタム通知](#custom-notification-with-json-payload)
 * [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
 * [MQTT 通知](#mqtt-notifications)
-* [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
-* [`timeout` サブスクリプション・オプション](#timeout-subscriptions-option)
-* [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
-* [`failsCounter` と `maxFailsLimit` サブスクリプション・フィールド](#failscounter-and-maxfailslimit-subscriptions-fields)
-* [`flowControl` オプション](#flowcontrol-option)
 * [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
-* [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
-* [`skipForwarding` オプション](#skipforwarding-option)
 * [DateTime および geolocation タイプでの `null` サポート](#null-support-in-datetime-and-geolocation-types)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
@@ -246,15 +236,6 @@ NGSIv2 仕様では、`geo:json` 属性に使用される可能性のある GeoJ
 
 [トップ](#top)
 
-<a name="legacy-attribute-format-in-notifications"></a>
-## 通知の従来の属性フォーマット
-
-NGSIv2 仕様の `attrsFormat` で述べている値とは別に、Orion は、NGSIv1 形式の通知を送信するために、`legacy` 値もサポートしています。このようにして、ユーザは NGSIv1 レガシー通知レシーバを使用した NGSIv2 サブスクリプション (フィルタリングなど) の拡張の恩恵を受けることができます。
-
-NGSIv1 は非推奨であることに注意してください。したがって、`legacy` 通知形式をもう使用しないことを推奨します。
-
-[トップ](#top)
-
 <a name="datetime-support"></a>
 ## 日時のサポート
 
@@ -406,28 +387,6 @@ NGSIv2 仕様の "Builtin metadata" セクションで説明されているメ�
 
 [トップ](#top)
 
-<a name="noattrdetail-option"></a>
-## `noAttrDetail` オプション
-
-URI param `options` の値 `noAttrDetail` は、NGSIv2 型のブラウジング・クエリ (`GET /v2/types` および `GET /v2/types/<type>`) が、属性型の詳細を提供しないようにするために使用されます。使用すると、各属性名に関連付けられた `types` リストが `[]` に設定されます。
-
-このオプションを使用すると、Orion はこれらのクエリをはるかに迅速に解決します。特に、それぞれが異なる型の多数の属性の場合は、これは、ユース・ケースに属性型の詳細が必要ない場合に非常に便利です。場合によっては、`noAttrDetails` オプションで30秒から 0.5 秒の節約が検出されました。
-
-[トップ](#top)
-
-<a name="notification-throttling"></a>
-## 通知スロットリング
-
-サブスクリプション・スロットリングに関する NGSIv2 仕様から :
-
-> throttling : 2つの連続した通知の間に経過する必要のある秒単位の最小限の時間。オプションです。
-
-Orion がこれを実装する方法は、保護期間のスロットル中に通知を破棄することです。したがって、あまりにも近づいてしまえば、通知が失われる可能性があります。ユース・ケースがこのように通知を失うことをサポートしていない場合は、スロットリングを使用しないでください。
-
-さらに、Orion はローカルでスロットリングを実装します。multi-CB 構成では、最終通知の尺度が各 Orion ノードに対してローカルであることを考慮してください。各ノードは DB と定期的に同期してより新しい値を取得しますが ([ここ](../admin/perf_tuning.md#subscription-cache)ではこれ以上)、特定のノードに古い値があることがありますので、スロットリングは100％正確ではありません。
-
-[トップ](#top)
-
 <a name="ordering-between-different-attribute-value-types"></a>
 ## 異なる属性値型間の順序付け
 
@@ -544,21 +503,6 @@ NGISv2 仕様で説明されているサブスクリプションの `notificatio
 
 [トップ](#top)
 
-<a name="notify-only-attributes-that-change"></a>
-## 変更された属性のみを通知
-
-Orion は、NGSIv2 仕様で説明されているものとは別に、サブスクリプションの中で追加のフィールド `onlyChangedAttrs`
-(`notification` 内に) をサポートしています。 このフィールドは `true` または `false` の値を取ります
-(フィールドが省略された場合、デフォルトは `false` です)。 `true` に設定されている場合、サブスクリプションに
-関連した通知は `attrs` または `exceptAttrs` フィールドと組み合わせて、トリガーしている更新リクエストで
-変更された属性のみを含みます。
-
-例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
-A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
-が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
-
-[トップ](#top)
-
 <a name="covered-subscriptions"></a>
 ## カバード・サブスクリプション (Covered subscriptions)
 
@@ -628,83 +572,6 @@ A のみを修正した場合、A, B, C が通知されます(つまり、トリ
 
 [トップ](#top)
 
-<a name="timeout-subscriptions-option"></a>
-## `timeout` サブスクリプション・オプション
-
-`GET/v2/subscriptions` および `GET/v2/subsets/subId` リクエストの NGSIv2 仕様で説明されているサブスクリプションフィールドとは別に、Orion は `http` または `httpCustom` フィールド内の `timeout` 追加パラメータをサポートします。このフィールドは、HTTP 通知を使用するときにサブスクリプションがレスポンスを待機する最大時間をミリ秒単位で指定します。
-
-このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に設定されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](../admin/cli.md#command-line-options)のセクションを参照してください。
-
-[トップ](#top)
-
-<a name="lastfailurereason-and-lastsuccesscode-subscriptions-fields"></a>
-## `lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド
-
-`GET /v2/subscriptions` および `GET /v2/subscriptions/subId` リクエストの
-NGSIv2 仕様で説明されているサブスクリプション・フィールドとは別に、
-Orion は通知フィールド内でこの2つの追加フィールドをサポートしています  :
-
-* `lastFailureReason`: 最後の失敗の原因を記述するテキスト文字列
-  (すなわち、失敗が `lastFailure` の時点で発生した)
-* `lastSuccessCode`: 最後に成功した通知が送信されたときに
-  受信エンドポイントによって返された HTTP コード (200, 400, 404, 500 など)
-  (つまり、成功が `lastSuccess` の時点で発生した)
-
-どちらも通知に関する問題の分析に使用できます。 詳しくは、
-[問題診断ドキュメント](../admin/diagnosis.md#diagnose-notification-reception-problems)
-のセクションを参照してください。
-
-これらの2つのフィールドは HTTP サブスクリプションに含まれていますが、MQTT サブスクリプションには
-含まれていないことに注意してください。詳細については、[MQTT 通知ドキュメント](#mqtt_notifications.md)
-を参照してください。
-
-[トップ](#top)
-
-<a name="failscounter-and-maxfailslimit-subscriptions-fields"></a>
-## `failsCounter` と `maxFailsLimit` サブスクリプション・フィールド
-
-`GET /v2/subscriptions` および `GET /v2/subscriptions/subId` リクエストの NGSIv2 仕様で説明されている
-サブスクリプション・フィールドとは別に、Orion は `notification` フィールド内の `failsCounter` フィールドを
-サポートします。このフィールドの値は、サブスクリプションに関連付けられた連続して失敗した通知の数です。
-`failsCounter` は、通知の試行が失敗するたびに1ずつ増加し、通知の試行が成功すると0にリセットされます
-(この場合、`failsCounter` は省略されます)。
-
-連続した失敗の最大許容数を確立するオプションのフィールド `maxFailsLimit` (これも `notification` フィールド内)
-もあります。失敗の数が `maxFailsLimit` の値を超えた場合 (つまり、特定の瞬間に `failsCounter` が `maxFailsLimit`
-より大きい場合)、Orion はサブスクリプションを自動的に `inactive` 状態に渡します。サブスクリプションを再度有効に
-するには (状態を再び `active` に設定)、サブスクリプションの更新操作 (`PATCH /v2/subscription/subId`) が必要です。
-
-さらに、Orion がサブスクリプションを自動的に無効にすると、WARN レベルのログトレースがこの形式で出力されます:
-
-```
-time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | comp=Orion | op=... | msg= Subscription <subId> automatically disabled due to failsCounter (N) overpasses maxFailsLimit (M)
-```
-
-[Top](#top)
-
-[トップ](#top)
-
-<a name="flowcontrol-option"></a>
-## `flowControl` オプション
-
-これにより、更新操作でフロー制御を使用する必要があることを指定できます。これにより、パフォーマンスが
-向上し、高負荷シナリオでの飽和を回避できます。これは、[`-notifFlowControl` パラメータ](../admin/cli.md)
-を使用して ContextBroker が開始されている場合にのみ機能し、そうでない場合は無視されます。
-フロー制御メカニズムは、[ドキュメントのこのセクション](../admin/perf_tuning.md#updates-flow-control-mechanism)
-で説明しています。
-
-次のリクエストでは、flowControl URI param オプションを使用できます :
-
-* `POST /v2/entities/E/attrs?options=flowControl`
-* `POST /v2/entities/E/attrs?options=append,flowControl`
-* `POST /v2/op/update?options=flowControl`
-* `PUT /v2/entities/E/attrs?options=flowControl`
-* `PUT /v2/entities/E/attrs/A?options=flowControl`
-* `PUT /v2/entities/E/attrs/A/value?options=flowControl`
-* `PATCH /v2/entities/E/attrs?options=flowControl`
-
-[トップ](#top)
-
 <a name="ambiguous-subscription-status-failed-not-used"></a>
 ## あいまいなサブスクリプション・ステータス `failed` は使用されない
 
@@ -732,31 +599,6 @@ NGSIv2 仕様では、サブスクリプションの `status` フィールドの
 
 [トップ](#top)
 
-<a name="forcedupdate-option"></a>
-## `forcedUpdate` オプション
-
-NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・オプションとして、Orion は forcedUpdate
-を実装します。実際の属性の更新があってもなくても、更新オペレーションが一致するサブスクリプションを
-トリガして、対応する通知を送信する必要があることを指定するために使用できます。デフォルトの動作
-(つまり、forcedUpdate URI param オプションを使用しない場合) は、属性が実際に更新された場合にのみ
-更新されることに注意してください。
-
-次のリクエストでは、forcedUpdate URI param オプションを使用できます :
-
-* `POST /v2/entities/E/attrs?options=forcedUpdate`
-* `POST /v2/entities/E/attrs?options=append,forcedUpdate`
-* `POST /v2/op/update?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs/A?options=forcedUpdate`
-* `PUT /v2/entities/E/attrs/A/value?options=forcedUpdate`
-* `PATCH /v2/entities/E/attrs?options=forcedUpdate`
-
-同じ効果については、`entityChange` [変更タイプ](subscriptions_alttype.md) (alteration type)
-も確認してください。ただし、更新リクエストに `forcedUpdate` オプションが含まれているかどうかに
-関係なく、サブスクリプションに適用されます。
-
-[Top](#top)
-
 <a name="registrations"></a>
 ## レジストレーション
 
@@ -780,18 +622,6 @@ Orion がこのような転送を実装する方法は次のとおりです :
 コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
-
-[Top](#top)
-
-<a name="skipforwarding-option"></a>
-## `skipForwarding` オプション
-
-CPrs への転送をスキップするために、クエリで `skipForwarding` オプションを使用できます (例:
-`GET /v2/entities?options=skipForwarding`)。この場合、クエリは CB ローカル・コンテキスト情報のみを使用して評価
-されます。
-
-`skipForwarding` を更新しても効果がないことに注意してください (更新をローカルで CB に解釈する場合は、追加/作成
-セマンティクスを使用して更新要求を使用するだけです)。
 
 [Top](#top)
 
