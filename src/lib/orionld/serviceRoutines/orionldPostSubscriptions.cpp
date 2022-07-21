@@ -104,6 +104,8 @@ bool orionldPostSubscriptions(void)
     return false;
   }
 
+  LM_TMP(("MQTT: After pCheckSubscription: mqtt is %s", (mqtt == true)? "true" : "false"));
+
   // Subscription id special treats
   if (subIdP != NULL)
   {

@@ -186,6 +186,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   cSubP->httpInfo.fill(&sub);
 
+  LM_TMP(("MQTT: httpInfo.url: '%s'", cSubP->httpInfo.url.c_str()));
 
   //
   // 04.3 expression

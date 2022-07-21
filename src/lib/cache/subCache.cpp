@@ -764,6 +764,8 @@ void subCacheItemInsert(CachedSubscription* cSubP)
   // -
   //
 
+  LM_TMP(("MQTT: httpInfo.url: '%s'", cSubP->httpInfo.url.c_str()));
+
   //
   // Triggers - FIXME: hardcoded all triggers to be always ON - needs to be implemented
   //
@@ -850,6 +852,7 @@ void subCacheItemInsert
   //
   CachedSubscription* cSubP = new CachedSubscription();
 
+  LM_TMP(("MQTT: httpInfo.url: '%s'", httpInfo.url.c_str()));
 
   //
   // First the non-complex values
