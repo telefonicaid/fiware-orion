@@ -345,7 +345,23 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
   kjTreeLog(treeP, "QM: Tree to navigate");
   LM_TMP(("QM: compV[0] == '%s'", compV[0]));
   LM_TMP(("QM: compV[1] == '%s'", compV[1]));
-  return kjNavigate(treeP, compV);
+  KjNode* result = kjNavigate(treeP, compV);
+  if (result != NULL)
+    return result;
+
+  //
+  // Could be a Relationship ...
+  // Perhaps I should "bake in" the value|object|languageMap inside kjNavigate ...
+  //
+  if ((components == 2) && (strcmp(compV[1], "value") == 0))
+  {
+    compV[1] = (char*) "object";
+    result = kjNavigate(treeP, compV);
+    if (result != NULL)
+      return result;
+  }
+
+  return NULL;
 }
 
 
