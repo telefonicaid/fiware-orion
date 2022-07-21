@@ -218,6 +218,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTY;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
     serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LOCAL;
   }
   else if (serviceP->serviceRoutine == orionldGetEntity)
   {
