@@ -26,7 +26,7 @@ Retrieval of Entities with basic options
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+brokerStart CB 0
 
 --SHELL--
 
@@ -42,6 +42,7 @@ brokerStart CB 212-249
 # 09. GET all entities with id E5, see empty array
 # 10. GET all entities with id E.* with count and limit==0 - see empty array and count==4
 # 11. GET all entities of type T with options=sysAttrs set, see E1 and E3, with createdAt/modifiedAt present
+# 12. GET ALL LOCAL entities
 #
 
 echo "01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T"
@@ -169,6 +170,13 @@ echo
 echo "11. GET all entities of type T with options=sysAttrs set, see E1 and E3, with createdAt/modifiedAt present"
 echo "=========================================================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&options=sysAttrs&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "12. GET ALL LOCAL entities"
+echo "=========================="
+orionCurl --url '/ngsi-ld/v1/entities?local=true&prettyPrint=yes' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -443,6 +451,70 @@ Date: REGEX(.*)
       "object": "http://a.b.c/entity/E3",
       "createdAt": "REGEX(.*)",
       "modifiedAt": "REGEX(.*)"
+    }
+  }
+]
+
+
+
+12. GET ALL LOCAL entities
+==========================
+HTTP/1.1 200 OK
+Content-Length: 1233
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "E1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E1"
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E2",
+    "type": "T2",
+    "P1": {
+      "type": "Property",
+      "value": "E2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E2"
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "E3"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E3"
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E4",
+    "type": "T2",
+    "P1": {
+      "type": "Property",
+      "value": "E4"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E4"
     }
   }
 ]

@@ -47,6 +47,7 @@ brokerStart CB 0 IPv4 -experimental
 # 13. Normalized Representation
 # 14. Simplified Representation
 # 15. keyValues Representation
+# 16. local=true
 #
 
 echo "00. Create 100 Entities"
@@ -174,6 +175,13 @@ echo
 echo "15. keyValues Representation"
 echo "============================"
 orionCurl --url '/ngsi-ld/v1/entities?type=T0,T9&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+echo "16. local=true"
+echo "=============="
+orionCurl --url '/ngsi-ld/v1/entities?local=true&prettyPrint=yes&spaces=2&options=keyValues&limit=4&count=true' --noPayloadCheck
 echo
 echo
 
@@ -1025,6 +1033,40 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "id": "urn:ngsi-ld:entities:E19",
     "type": "T9",
     "A1": "E19:A1"
+  }
+]
+
+
+
+16. local=true
+==============
+HTTP/1.1 200 OK
+Content-Length: 335
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 100
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": "E1:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E02",
+    "type": "T1",
+    "A1": "E2:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E03",
+    "type": "T1",
+    "A1": "E3:A1"
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E04",
+    "type": "T2",
+    "A1": "E4:A1"
   }
 ]
 

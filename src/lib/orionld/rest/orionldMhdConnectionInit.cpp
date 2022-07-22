@@ -845,6 +845,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.level = (char*) value;
   }
+  else if (strcmp(key, "local") == 0)
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.local = true;
+  }
   else if (strcmp(key, "entity::type") == 0)  // Is NGSIv1 ?entity::type=X the same as NGSIv2 ?type=X ?
   {
     orionldState.uriParams.type = (char*) value;

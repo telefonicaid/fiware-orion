@@ -95,7 +95,6 @@ static void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
       continue;
 
 #if 1
-    LM_TMP(("KZ: Calling langValueFix"));
     KjNode* typeP = kjLookup(attrP, "type");
     langValueFix(attrP, languageMapP, typeP, lang);
 #else
@@ -195,6 +194,7 @@ bool legacyGetEntities(void)
   char*                 geometry       = orionldState.uriParams.geometry;
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
+  bool                  local          = orionldState.uriParams.local;
   char*                 lang           = orionldState.uriParams.lang;
   bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   bool                  concise        = orionldState.uriParamOptions.concise;
@@ -205,9 +205,7 @@ bool legacyGetEntities(void)
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
 
-  LM_TMP(("Legacy Function"));
-
-  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
+  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL) && (local == false))
   {
     orionldError(OrionldBadRequestData,
                  "Too broad query",
@@ -424,6 +422,7 @@ bool legacyGetEntities(void)
 
   PERFORMANCE(mongoBackendStart);
   std::vector<std::string>  servicePathV;
+
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
                                                   orionldState.tenantP,
