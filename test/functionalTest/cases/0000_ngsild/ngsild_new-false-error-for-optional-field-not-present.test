@@ -113,7 +113,7 @@ echo
 
 echo "06. GET entities"
 echo "================"
-orionCurl --url /ngsi-ld/v1/entities
+orionCurl --url /ngsi-ld/v1/entities?local=true
 echo
 echo
 

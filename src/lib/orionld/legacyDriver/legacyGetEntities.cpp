@@ -209,18 +209,11 @@ bool legacyGetEntities(void)
   {
     orionldError(OrionldBadRequestData,
                  "Too broad query",
-                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
+                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
                  400);
 
     return false;
   }
-
-  if ((idPattern != NULL) && (id != NULL))
-  {
-    orionldError(OrionldBadRequestData, "Incompatible parameters", "id, idPattern", 400);
-    return false;
-  }
-
 
   //
   // If any of "geometry", "georel" and "coordinates" is present, they must all be present

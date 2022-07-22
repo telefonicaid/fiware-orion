@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -26,7 +26,7 @@ URI params in orionldState
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 31
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
