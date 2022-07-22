@@ -143,15 +143,15 @@ static char* uriCompose
   char* compV[50];
   int   compNo = 0;
 
-  LM_TMP(("dbURI:           '%s'", dbURI));
-  LM_TMP(("dbHost:          '%s'", dbHost));
-  LM_TMP(("dbUser:          '%s'", dbUser));
-  LM_TMP(("dbPwd:           '%s'", dbPwd));
-  LM_TMP(("dbAuthDb:        '%s'", dbAuthDb));
-  LM_TMP(("dbReplicaSet:    '%s'", dbReplicaSet));
-  LM_TMP(("dbAuthMechanism: '%s'", dbAuthMechanism));
-  LM_TMP(("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
-  LM_TMP(("tlsCertificate:  '%s'", tlsCertificateFilePath));
+  LM(("dbURI:           '%s'", dbURI));
+  LM(("dbHost:          '%s'", dbHost));
+  LM(("dbUser:          '%s'", dbUser));
+  LM(("dbPwd:           '%s'", dbPwd));
+  LM(("dbAuthDb:        '%s'", dbAuthDb));
+  LM(("dbReplicaSet:    '%s'", dbReplicaSet));
+  LM(("dbAuthMechanism: '%s'", dbAuthMechanism));
+  LM(("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
+  LM(("tlsCertificate:  '%s'", tlsCertificateFilePath));
 
 
   if (dbURI[0] != 0)
@@ -247,7 +247,7 @@ static char* uriCompose
     len += strlen(compV[ix]);
   }
 
-  LM_TMP(("mongo uri: %s", uri));
+  LM(("mongo uri: %s", uri));
   return uri;
 }
 

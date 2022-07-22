@@ -74,8 +74,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
   char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);
 
-  LM_TMP(("DS: dbModelFromApiAttribute(%s)", attrEqName));
-
   // attrP->name is cloned as we can't destroy the context (expansion of attr name comes from there)
   dotForEq(attrEqName);      // Orion DB-Model states that dots are replaced for equal signs in attribute names
   attrP->name = attrEqName;  // Cause, that's the name of the attribute in the database
@@ -89,7 +87,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
   if (attrP->type == KjArray)
   {
-    LM_TMP(("DS: Attribute '%s' is an array", attrP->name));
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DATASET_SUPPORT) == 0)
     {
       LM_W(("Datasets present - not yet implemented"));
@@ -115,7 +112,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     //
     KjNode* newAttrP    = kjClone(orionldState.kjsonP, attrP);
 
-    LM_TMP(("DS: Morphing attribute '%s' into an array", attrEqName));
     // Now morph attrP into an Array:
     attrP->type = KjArray;
 
@@ -123,8 +119,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     attrP->value.firstChildP = newAttrP;
     attrP->lastChild         = newAttrP;
 
-    LM_TMP(("DS: Must remove the attr '%s' from its entity and put under $datasets!", attrP->name));
-    kjTreeLog(attrP, "DS: Morphed attr into array with itself as only member");
     *ignoreP = true;
     return dbModelFromApiAttributeDatasetArray(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP);
   }

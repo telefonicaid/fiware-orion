@@ -75,7 +75,6 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
     }
 
     kjChildAdd(orionldState.datasets, datasetArrayP);
-    LM_TMP(("DS: Created a dataset array for the attribute '%s'", attrNameEq));
   }
 
 
@@ -99,7 +98,6 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
         return false;
       }
 
-      LM_TMP(("DS: Got a default instance of attribute '%s'", attrNameEq));
       if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP) == false)
         return false;
 
@@ -107,8 +105,6 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
     }
     else
     {
-      LM_TMP(("DS: Got a dataset instance (%s) of attribute '%s' - adding it to dataset array for '%s'", datasetIdNodeP->value.s, attrNameEq, datasetArrayP->name));
-
       kjChildRemove(attrArrayP, attrP);  // Remove the attribute instance from the attribute ...
       kjChildAdd(datasetArrayP, attrP);  // ... And insert it under @datasets::attrName
 
@@ -118,7 +114,6 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
       // Should they be removed here or are they already removed by pCheckAttribute?
       // For now, I remove them here - then we'll see ...
       //
-      LM_TMP(("DS: Adding timestamps for attr '%s'", attrP->name));
       KjNode* createdAtP  = kjLookup(attrP, "createdAt");
       KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
 
@@ -128,27 +123,16 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
       createdAtP  = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
       modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
 
-      LM_TMP(("DS: Adding timestamps for attr '%s' (of type '%s')", attrP->name, kjValueType(attrP->type)));
-      kjTreeLog(attrP, "DS: attrP");
-      LM_TMP(("DS: attrP->lastChild at %p", attrP->lastChild));
       kjChildAdd(attrP, createdAtP);
-      LM_TMP(("DS: Adding timestamps for attr '%s'", attrP->name));
       kjChildAdd(attrP, modifiedAtP);
-      LM_TMP(("DS: Added timestamps for attr '%s'", attrP->name));
     }
 
     attrP = next;
-    LM_TMP(("And the loop continues? (attrP==%p)", attrP));
   }
 
-  LM_TMP(("Done"));
   // No datasets?
   if (datasetArrayP->value.firstChildP == NULL)
-  {
-    LM_TMP(("DS: No datasets for attribute '%s'", datasetArrayP->name));
     kjChildRemove(orionldState.datasets, datasetArrayP);
-  }
-  LM_TMP(("Done"));
 
   //
   // The array of the attribute now needs to be an object - just the default attribute is left in there -
@@ -158,11 +142,9 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
   if (attrArrayP->value.firstChildP != NULL)
   {
     attrArrayP->type  = attrArrayP->value.firstChildP->type;
-    LM_TMP(("Done"));
     attrArrayP->value = attrArrayP->value.firstChildP->value;
   }
 
-  LM_TMP(("Done"));
   return true;
 }
 

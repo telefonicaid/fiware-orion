@@ -47,6 +47,7 @@
 */
 extern int             inSigHandler;
 extern char*           progName;
+extern bool            lmtmp;
 extern __thread char   transactionId[66];
 extern __thread char   correlatorId[64];
 
@@ -549,18 +550,18 @@ do                                                                           \
 #endif
 
 
-#ifdef LM_NO_TMP
-#define LM_TMP(s)
-#else
+
 /* ****************************************************************************
 *
-* LM_TMP - temporal log message
+* LM - DEBUG message
 *
-* LM_TMP is meant *only* for temporal logging and all occurrencies of LM_TMP
-* should be removed before creating pull requests for review.
+* LM is for logging for DEBUG compilations only
 */
+#ifndef DEBUG
+#define LM(s)
+#else
 extern bool lmtmp;
-#define LM_TMP(s)                                                          \
+#define LM(s)                                                              \
 do                                                                         \
 {                                                                          \
   char* text;                                                              \

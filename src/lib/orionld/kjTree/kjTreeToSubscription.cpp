@@ -56,7 +56,6 @@ bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
 
   if (strchr(q, '|') != NULL)
   {
-    LM_TMP(("KZ: pipe in 'q' - not valid for mongoBackend q"));
     //
     // This is a difficult situation ...
     // I need the subscription for operations that support NGSI-LD Subscription notifications.
@@ -76,13 +75,11 @@ bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
   }
   else if (strstr(q, "~=") != NULL)
   {
-    LM_TMP(("KZ: pattern-match in 'q' - not valid for mongoBackend q"));
     LM_W(("Pattern Match for subscriptions - not implemented"));
     orionldError(OrionldOperationNotSupported, "Not Implemented", "Pattern matching in Q-filter", 501);
     return false;
   }
 
-  LM_TMP(("Creating Scope from q '%s'", qOrig));
   Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qOrig);
   std::string  errorString;
 
@@ -265,15 +262,11 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
     {
-      LM_TMP(("KZ: Got a 'q': '%s'", kNodeP->value.s));
       STRING_CHECK(kNodeP, "Subscription::q");
       DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
 
       if (oldTreatmentForQ(subP, kNodeP->value.s) == false)  // New treatment doesn't even use this function - just the Kj Tree
-      {
-        LM_TMP(("KZ: oldTreatmentForQ failed"));
         return false;
-      }
     }
     else if (strcmp(kNodeP->name, "geoQ") == 0)
     {

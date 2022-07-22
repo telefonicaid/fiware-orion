@@ -409,10 +409,7 @@ bool pCheckTenantName(const char* dbName)
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (strcmp(key, "Orionld-Legacy") == 0)
-  {
     orionldState.in.legacy = (char*) value;
-    LM_TMP(("Got header '%s' = '%s'", key, value));
-  }
   else if (strcmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));
@@ -936,7 +933,7 @@ MHD_Result orionldMhdConnectionInit
   ++requestNo;
 
   // if ((requestNo % 100 == 0) || (requestNo == 1))
-  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
+  LM(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 2. Prepare orionldState

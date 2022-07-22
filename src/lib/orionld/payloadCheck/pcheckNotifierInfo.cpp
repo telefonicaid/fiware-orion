@@ -113,8 +113,6 @@ bool pcheckNotifierInfo(KjNode* niP, bool* mqttChangeP)
 
       if (*rest != 0)
       {
-        LM_TMP(("ERROR: keyP->value.s == '%s'", keyP->value.s));
-        LM_TMP(("ERROR: rest == '%s'", rest));
         orionldError(OrionldBadRequestData, "Invalid value for notifierInfo item /MQTT-OoS/ - not a valid number", valueP->value.s, 400);
         return false;
       }

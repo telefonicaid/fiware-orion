@@ -1354,7 +1354,6 @@ bool entitiesQuery
 
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
-  // LM_TMP(("***** WARNING: DESTRUCTIVE ***** - finalQuery: %s", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
 
   Query  query(finalQuery.obj());
 
@@ -1553,6 +1552,12 @@ bool entitiesQuery
   PERFORMANCE_BEGIN(7, "entitiesQuery, part 7");
   releaseMongoConnection(connection);
 
+#if 0
+
+  //
+  // KZ Comment ... I'd need to talk to Fermin about this "entities limit reached"
+  //
+
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
    * FIXME P10 (it is easy :) limit should be unsigned int */
@@ -1566,6 +1571,7 @@ bool entitiesQuery
       return true;
     }
   }
+#endif
 
   /* All the not-patterned entities in the request not in the response are added (without attributes), as they are
    * used before pruning in the CPr calculation logic */

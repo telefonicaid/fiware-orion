@@ -98,8 +98,6 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
   // Special case - URI param lang is set and it's a LanguageProperty
   KjNode* langValueNodeP = kjLookup(valueP, lang);
 
-  LM_TMP(("KZ: In langValueFix for attribute '%s'", attrP->name));
-
   if (langValueNodeP == NULL)
     langValueNodeP = kjLookup(valueP, "@none");   // If present, the key '@none' is the default language
   if (langValueNodeP == NULL)
@@ -107,7 +105,6 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
   if (langValueNodeP == NULL)
     langValueNodeP = valueP->value.firstChildP;   // If English is also not found, just take the first one
 
-  LM_TMP(("KZ: In langValueFix (keyValues: %s)", (orionldState.uriParamOptions.keyValues == true)? "YES" : "NO"));
   if (langValueNodeP == NULL)
   {
     if (orionldState.uriParamOptions.keyValues == false)
@@ -123,7 +120,6 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
   }
   else if (langValueNodeP->type == KjString)
   {
-    LM_TMP(("KZ: It's a String"));
     if (orionldState.uriParamOptions.keyValues == false)
     {
       valueP->type      = KjString;
@@ -137,7 +133,6 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
   }
   else  // It's an array
   {
-    LM_TMP(("KZ: It's an Array"));
     if (orionldState.uriParamOptions.keyValues == false)
     {
       valueP->type                       = KjArray;
@@ -157,7 +152,6 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
 
   if (orionldState.uriParamOptions.keyValues == false)
   {
-    LM_TMP(("KZ: No key-values"));
     if (langValueNodeP != NULL)
     {
       // Picked Language as sub-attr
@@ -166,12 +160,9 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
     }
 
     // Transform to Property
-    LM_TMP(("KZ: Transforming lang-prop '%s' to Normal Property", attrP->name));
     typeP->value.s  = (char*) "Property";
     valueP->name    = (char*) "value";
   }
-  else
-    LM_TMP(("KZ: key-values"));
 }
 
 
@@ -214,20 +205,15 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     }
 
     bool isLanguageProperty = (strcmp(typeP->value.s, "LanguageProperty") == 0);
-    LM_TMP(("KZ: attr type: '%s'", typeP->value.s));
     if ((isLanguageProperty == false) || (lang == NULL))
     {
       // Just inherit the value field
-      LM_TMP(("KZ: NOT Calling langValueFix"));
       attrP->type      = valueP->type;
       attrP->value     = valueP->value;
       attrP->lastChild = valueP->lastChild;
     }
     else
-    {
-      LM_TMP(("KZ: Calling langValueFix"));
       langValueFix(attrP, valueP, typeP, lang);
-    }
   }
   else if (sysAttrs == false)
   {
@@ -243,11 +229,9 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     kjTreeLog(attrP, "KZ: attr");
     for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
     {
-      LM_TMP(("KZ: md '%s'", mdP->name));
       if (mdP->type != KjObject)
         continue;
 
-      LM_TMP(("KZ: Looking for timestamps in sub-attr '%s' of type '%s'", mdP->name, kjValueType(mdP->type)));
       createdAtP  = kjLookup(mdP, "createdAt");
       modifiedAtP = kjLookup(mdP, "modifiedAt");
 
@@ -349,7 +333,6 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
     // If the language is asked for, then the LanguageProperty is converted into a normal property ...
     if (lang != NULL)
     {
-      LM_TMP(("KZ: lang set - fixing the attr '%s'", attrP->name));
       kjTreeLog(attrP, "KZ: Attribute Before langValueFix");
       langValueFix(attrP, languageMapP, typeP, lang);
       kjTreeLog(attrP, "KZ: Attribute After langValueFix");
@@ -542,12 +525,9 @@ KjNode* mongocEntityRetrieve
   // => I will need a semaphore to protect the data ... :(((
   //    ... as many simultaneous requests may be active at one single point in time
   //
-  LM_TMP(("MC: Calling mongoc_cursor_next"));
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    LM_TMP(("MC: got a response - calling mongocKjTreeFromBson"));
     dbTree = mongocKjTreeFromBson(mongoDocP, &title, &details);
-    LM_TMP(("MC: mongocKjTreeFromBson returned a tree at %p", dbTree));
     break;  // Just using the first one - can't be no more than one ()!
   }
 
@@ -596,12 +576,9 @@ KjNode* mongocEntityRetrieve
     {
       for (KjNode* attrP = dbAttrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
-        LM_TMP(("KZ: Calling datamodelAttributeFix for attribute '%s' (lang: '%s')", attrP->name, lang));
         datamodelAttributeFix(attrP, entityId, sysAttrs, lang);
       }
     }
-    else
-      LM_TMP(("KZ: Not calling datamodelAttributeFix as SIMPLIFIED"));
 
     if ((dbDataSetsP != NULL) && (dbDataSetsP->value.firstChildP != NULL))
     {
@@ -743,7 +720,6 @@ KjNode* mongocEntityRetrieve
     if (strcmp(attrP->name, "location") == 0)
       special = true;
 
-    LM_TMP(("KZ: Treating attribute '%s'", attrP->name));
     if (special == false)
     {
       char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
@@ -753,8 +729,6 @@ KjNode* mongocEntityRetrieve
 
     if (attrP->type == KjObject)
     {
-      kjTreeLog(attrP, "KZ: Attr");
-      LM_TMP(("KZ: Calling presentationAttributeFix for '%s'", attrP->name));
       if (presentationAttributeFix(attrP, entityId, sysAttrs, keyValues, lang) == false)
       {
         LM_E(("Internal Error (presentationAttributeFix failed)"));
@@ -764,8 +738,6 @@ KjNode* mongocEntityRetrieve
     else  // KjArray
     {
       int instances = 0;
-      LM_TMP(("KZ: '%s' is an array", attrP->name));
-      kjTreeLog(attrP, "KZ: Attr is an array");
       for (KjNode* aP = attrP->value.firstChildP; aP != NULL; aP = aP->next)
       {
         if (presentationAttributeFix(aP, entityId, sysAttrs, keyValues, lang) == false)

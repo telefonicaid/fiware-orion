@@ -56,14 +56,9 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** noti
       DUPLICATE_CHECK(uriP, "endpoint::uri", epItemP);
       STRING_CHECK(uriP, "endpoint::uri");
       URI_CHECK(uriP->value.s, "endpoint::uri", true);
-      LM_TMP(("MQTT: subscription::notification::endpoint::uri: '%s'", uriP->value.s));
+
       if (strncmp(uriP->value.s, "mqtt", 4) == 0)
-      {
-        LM_TMP(("MQTT: It's an MQTT Notifying subscription"));
         *mqttChangeP = true;
-      }
-      else
-        LM_TMP(("MQTT: It's an HTTP Notifying subscription"));
     }
     else if (strcmp(epItemP->name, "accept") == 0)
     {

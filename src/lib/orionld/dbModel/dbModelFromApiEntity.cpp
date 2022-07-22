@@ -149,10 +149,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, &ignore) == false)
     {
       if (ignore == true)
-      {
-        LM_TMP(("DS: Attribute '%s' to be ignored - removing it from attrsP", attrP->name));
         kjChildRemove(attrsP, attrP);
-      }
       else
       {
         //
@@ -165,10 +162,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
       }
     }
     else if (ignore == true)
-    {
-      LM_TMP(("DS: Attribute '%s' to be ignored - removing it from attrsP", attrP->name));
       kjChildRemove(attrsP, attrP);
-    }
 
     attrP = next;
   }

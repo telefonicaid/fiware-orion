@@ -61,12 +61,6 @@ void mongocSubCountersUpdate
   bool                 ngsild
 )
 {
-  LM_TMP(("SC: Updating subscription '%s'", cSubP->subscriptionId));
-  LM_TMP(("SC: Count:                 %d", deltaCount));
-  LM_TMP(("SC: lastNotificationTime:  %f", lastNotificationTime));
-  LM_TMP(("SC: lastSuccess:           %f", lastSuccess));
-  LM_TMP(("SC: lastFailure:           %f", lastFailure));
-
   mongocConnectionGet();
 
   if (orionldState.mongoc.subscriptionsP == NULL)
@@ -107,16 +101,12 @@ void mongocSubCountersUpdate
     bson_append_document(&request, "$inc", 4, &count);
   bson_append_document(&request, "$max", 4, &max);
 
-  LM_TMP(("Sending count+timestamps"));
   bool b = mongoc_collection_update_one(orionldState.mongoc.subscriptionsP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
-  LM_TMP(("Sent count+timestamps"));
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;
-    LM_E(("SC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, errP->domain, errP->code, errP->message));
+    LM_E(("mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, errP->domain, errP->code, errP->message));
   }
-  else
-    LM_TMP(("SC: Successfully updated subscription '%s'", cSubP->subscriptionId));
 
   bson_destroy(&reply);
   bson_destroy(&selector);

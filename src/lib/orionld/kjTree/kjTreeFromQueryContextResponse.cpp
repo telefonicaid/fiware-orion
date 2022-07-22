@@ -266,7 +266,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
       {
         if ((aP->type == "LanguageProperty") && (lang != NULL) && (aP->valueType == orion::ValueTypeObject))
         {
-          LM_TMP(("KZ: LanguageProperty AND lang != NULL"));
           KjNode* langValueP = NULL;
           char*   details    = NULL;
 
@@ -279,8 +278,8 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
           }
 
           char*   pickedLanguage;
-          LM_TMP(("KZ: Calling langItemPick with attrName '%s'", attrName));
           KjNode* langValueNodeP = langItemPick(langValueP, attrName, lang, &pickedLanguage);
+
           if (langValueNodeP->type == KjString)
             aTop = kjString(orionldState.kjsonP, attrName, langValueNodeP->value.s);
           else  // langValueP->type == KjArray

@@ -82,12 +82,10 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
     }
     else if (strcmp(nItemP->name, "endpoint") == 0)
     {
-      LM_TMP(("MQTT: Checking the 'endpoint' part of the subscription::notification"));
-
       PCHECK_DUPLICATE(endpointP, nItemP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       PCHECK_OBJECT(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       PCHECK_OBJECT_EMPTY(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
-      LM_TMP(("MQTT: Calling pcheckEndpoint"));
+
       if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP, mqttChangeP) == false)
         return false;
     }

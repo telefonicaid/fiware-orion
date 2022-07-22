@@ -139,9 +139,6 @@ static void attributeToConcise(KjNode* attrP, bool* simplifiedP)
     LM_RVE(("Attribute '%s' has a type that is not a JSON String", attrP->name));
 
   kjChildRemove(attrP, attrTypeP);
-  LM_TMP(("CONCISE: Just removed type '%s'", attrTypeP->value.s));
-
-  LM_TMP(("KZ: Attribute '%s' is of type '%s'", attrP->name, attrTypeP->value.s));
 
   if ((strcmp(attrTypeP->value.s, "Property") != 0) && (strcmp(attrTypeP->value.s, "GeoProperty") != 0))
     return;
@@ -176,7 +173,6 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
     // compaction of the value of 'type' for the Entity
     if (strcmp(attrP->name, "type") == 0)
     {
-      LM_TMP(("KZ orionldContextItemAliasLookup(contextP:%p, type:'%s')", subP->contextP, attrP->value.s));
       attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);
       continue;
     }
@@ -216,13 +212,8 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
 
         if (valueP != NULL)
         {
-          if (strcmp(attrTypeP->value.s, "LanguageProperty") == 0)
-          {
-            LM_TMP(("KZ: attribute '%s' is a LanguageProperty", attrP->name));
-            valueP->name = (char*) "languageMap";
-          }
-          else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
-            valueP->name = (char*) "object";
+          if      (strcmp(attrTypeP->value.s, "LanguageProperty")  == 0) valueP->name = (char*) "languageMap";
+          else if (strcmp(attrTypeP->value.s, "Relationship")      == 0) valueP->name = (char*) "object";
         }
       }
     }
@@ -413,8 +404,6 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 //
 static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP)
 {
-  LM_TMP(("Filter out attrs according to mAltP->subP->attributes"));
-
   KjNode* filteredEntityP = kjObject(orionldState.kjsonP, NULL);
   KjNode* attrP           = apiEntityP->value.firstChildP;
   KjNode* next;
@@ -436,7 +425,6 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
       {
         const char* attrName = mAltP->subP->attributes[ix].c_str();
 
-        LM_TMP(("XY: Comparing '%s' and '%s'", dotName, attrName));
         if (strcmp(dotName, attrName) == 0)
         {
           clone = true;
@@ -477,21 +465,15 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 {
-  LM_TMP(("KZ: Subscription '%s': renderFormat: '%s'", mAltP->subP->subscriptionId, renderFormatToString(mAltP->subP->renderFormat)));
-  LM_TMP(("KZ: contextP at %p", mAltP->subP->contextP));
   kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
   bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
-
-  LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
 
   //
   // Filter out unwanted attributes, if so requested (by the Subscription)
   //
   if (mAltP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, mAltP);
-
-  LM_TMP(("GEO: sub::accept: %s", mimeTypeToString(mAltP->subP->httpInfo.mimeType)));
 
   //
   // Payload Body
@@ -678,7 +660,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
     ioVec[headerIx].iov_base = buf;
     ++headerIx;
-    LM_TMP(("HttpInfo header '%s': '%s'", key, value));
   }
 
   // Empty line delimiting HTTP Headers and Payload Body
@@ -693,16 +674,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 
   ioVecLen = headerIx + 1;
 
-  // <DEBUG>
-  int len = 0;
-  LM_TMP(("Notification (%d iovecs):", ioVecLen));
-  for (int ix = 0; ix < ioVecLen; ix++)
-  {
-    LM_TMP((" %d/%d %s", ioVec[ix].iov_len, strlen((char*) ioVec[ix].iov_base), (char*) ioVec[ix].iov_base));
-    len += ioVec[ix].iov_len;
-  }
-  // </DEBUG>
-
   //
   // Now, the message is ready, is this an HTTP notification?
   // If it's MQTT, then something very different will have to be done instead !
@@ -711,7 +682,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     return mqttNotify(mAltP->subP, ioVec, ioVecLen);
 
   // Connect
-  LM_TMP(("Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
   int fd = orionldServerConnect(mAltP->subP->ip, mAltP->subP->port);
 
   if (fd == -1)
@@ -720,7 +690,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     notificationFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
     return -1;
   }
-  LM_TMP(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
 
   // Send
   int nb;
@@ -733,6 +702,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     return -1;
   }
 
-  LM_TMP(("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, mAltP->subP->ip, mAltP->subP->port, mAltP->subP->subscriptionId));
+  LM(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
+  LM(("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, mAltP->subP->ip, mAltP->subP->port, mAltP->subP->subscriptionId));
   return fd;
 }

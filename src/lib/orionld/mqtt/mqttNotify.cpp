@@ -94,7 +94,6 @@ static KjNode* headersParse(struct iovec* ioVec, int ioVecSize, CachedSubscripti
 
     // The end of the line is \r\n - let's remove that
     header[headerLen - 2] = 0;
-    LM_TMP(("headersParse: '%s'", header));
 
     char* colonP = strchr(header, ':');
     if (colonP == NULL)
@@ -126,7 +125,6 @@ static KjNode* headersParse(struct iovec* ioVec, int ioVecSize, CachedSubscripti
 //
 int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
 {
-  LM_TMP(("MQTT Notification"));
   //
   // The headers and the body comes already rendered inside ioVec
   // That is perfect for the payload body, that would need to be rendered otherwise.
@@ -154,10 +152,10 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   int dataStart = strlen(buf);
 
   char* body = (char*) ioVec[ioVecSize - 1].iov_base;
-  LM_TMP(("body: %s", body));
+
   int bodyLen  = snprintf(&buf[dataStart], totalLen - dataStart, ",\"body\":%s}", (char*) body);
   totalLen = dataStart + bodyLen;
-  LM_TMP(("Complete rendered message: %s", buf));
+
   MqttInfo*                 mqttP             = &cSubP->httpInfo.mqtt;
   MqttConnection*           mqttConnectionP   = mqttConnectionLookup(mqttP->host, mqttP->port, mqttP->username, mqttP->password, mqttP->version);
   MQTTClient_message        mqttMsg           = MQTTClient_message_initializer;
@@ -178,7 +176,6 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   mqttMsg.qos        = mqttP->qos;
   mqttMsg.retained   = 0;
 
-  LM_TMP(("Publishing MQTT message on topic '%s'", mqttP->topic));
   MQTTClient_publishMessage(mqttConnectionP->client, mqttP->topic, &mqttMsg, &mqttToken);
 
   extern int  mqttTimeout;  // From mqttNotification.cpp - should be a CLI

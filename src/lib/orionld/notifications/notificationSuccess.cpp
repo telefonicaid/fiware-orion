@@ -38,7 +38,6 @@
 //
 void notificationSuccess(CachedSubscription* subP, const double timestamp)
 {
-  LM_TMP(("SC: Updating counters and timestamps after successful notification"));
   subP->lastSuccess           = timestamp;
   subP->lastNotificationTime  = timestamp;
   subP->consecutiveErrors     = 0;

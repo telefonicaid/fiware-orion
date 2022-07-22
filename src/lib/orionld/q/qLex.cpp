@@ -59,7 +59,7 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 //
 static QNode* qDateTimePush(QNode* prev, double dateTime)
 {
-  // LM_TMP(("Modifying a String to a DateTime (QNode of type QNodeFloatValue)"));
+  // LM(("Modifying a String to a DateTime (QNode of type QNodeFloatValue)"));
 
   QNode* qNodeP = qNode(QNodeFloatValue);
 

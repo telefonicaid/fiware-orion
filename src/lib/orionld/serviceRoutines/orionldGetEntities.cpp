@@ -69,11 +69,6 @@ static bool geoCheck(OrionldGeoInfo* geoInfoP)
       (orionldState.uriParams.coordinates != NULL) ||
       (orionldState.uriParams.geoproperty != NULL))
   {
-    // LM_TMP(("GEO: geometry:    '%s'", orionldState.uriParams.geometry));
-    // LM_TMP(("GEO: georel:      '%s'", orionldState.uriParams.georel));
-    // LM_TMP(("GEO: coordinates:  %s",  orionldState.uriParams.coordinates));
-    // LM_TMP(("GEO: geoProperty: '%s'", orionldState.uriParams.geoproperty));
-
     //
     // geometry
     //
@@ -234,11 +229,9 @@ static KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, boo
   if ((geometryNodeP != NULL) && (geometryNodeP->type == KjObject))
   {
     geometryP = kjLookup(geometryNodeP, "value");
-    LM_TMP(("GEO: geometry value at %p", geometryP));
     if (geometryP == NULL)
     {
       // "value" not found ... can it be Simplified format?
-      LM_TMP(("GEO: 'value' not found - using geometryNodeP"));
       geometryP = geometryNodeP;
     }
 
@@ -352,10 +345,6 @@ bool orionldGetEntities(void)
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
-
-  // LM_TMP(("GEOJSON: attrs URI param:            %s", orionldState.uriParams.attrs));
-  // LM_TMP(("GEOJSON: geometryProperty URI param: %s", geojsonGeometryLongName));
-  // LM_TMP(("GEOJSON: Calling mongocEntitiesQuery"));
 
   int64_t       count;
   KjNode*       dbEntityArray = mongocEntitiesQuery(&orionldState.in.typeList,
