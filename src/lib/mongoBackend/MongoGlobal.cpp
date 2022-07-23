@@ -1552,7 +1552,7 @@ bool entitiesQuery
   PERFORMANCE_BEGIN(7, "entitiesQuery, part 7");
   releaseMongoConnection(connection);
 
-#if 0
+#if 1
 
   //
   // KZ Comment ... I'd need to talk to Fermin about this "entities limit reached"
