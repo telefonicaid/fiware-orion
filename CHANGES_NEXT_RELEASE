@@ -46,3 +46,4 @@
 * Issue #1151  GET /entities?id=X is NO LONGER translated to GET /entities/X - that was a BAD IDEA
 * Issue #280   Prometheus counters for notification (total+failed)
 * Issue #280   New URI param "?local=true", to GET only local entities in GET /entities
+* Issue #280   Adding tenant to response wherever Location is present
