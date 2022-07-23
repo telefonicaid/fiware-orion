@@ -709,6 +709,7 @@ echo
 
 echo "08. Batch Create entity E8+E10 on T1 tenant and with user contexts 1+2 in payload body"
 echo "======================================================================================"
+echo LATER
 echo
 echo
 
@@ -774,6 +775,7 @@ HTTP/1.1 201 Created
 Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E2"
@@ -810,6 +812,7 @@ HTTP/1.1 207 Multi-Status
 Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 {
     "errors": [
@@ -846,6 +849,7 @@ HTTP/1.1 201 Created
 Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E6"
@@ -867,6 +871,7 @@ Date: REGEX(.*)
 
 08. Batch Create entity E8+E10 on T1 tenant and with user contexts 1+2 in payload body
 ======================================================================================
+LATER
 
 
 09. See all entities in TRoE DB, default tenant
