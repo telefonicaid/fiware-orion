@@ -92,7 +92,7 @@ extern "C"
   float           diffF;                                 \
                                                          \
   kTimeDiff(&start, &end, &diff, &diffF);                \
-  LM_TMP(("TPUT: %s %f", text, diffF));                  \
+  LM(("TPUT: %s %f", text, diffF));                      \
 }
 
 
@@ -519,8 +519,8 @@ static void requestCompleted
     else
       kTimeDiff(&performanceTimestamps.mongoBackendStart, &performanceTimestamps.mongoBackendEnd, &mongo, &mongoF);
 
-    LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
-    LM_TMP(("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
+    LM(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
+    LM(("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
   }
 #endif
 }
@@ -1292,7 +1292,7 @@ static MHD_Result connectionTreat
   {
     MHD_Result retVal;
 
-    LM_K(("Servicing request %d: %s %s -----------------", reqNo, method, url));
+    LM(("Servicing request %d: %s %s -----------------", reqNo, method, url));
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //

@@ -106,8 +106,6 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
     NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
   }
-  else
-    LM_TMP(("KZ: cSubP->name == \"\""));
 
   //
   // description
@@ -190,12 +188,10 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   if (cSubP->qText != NULL)
   {
-    LM_TMP(("KZ: cSubP->qText: '%s' (should be EXACTLY as ldQ in the database)", cSubP->qText));
     nodeP = kjString(orionldState.kjsonP, "q", cSubP->qText);
     NULL_CHECK(nodeP);
     dbModelValueStrip(nodeP);
     qAliasCompact(nodeP, true);  // qAliasCompact uses orionldState.contextP - all OK
-    LM_TMP(("KZ: Compacted qText: '%s'", nodeP->value.s));
     kjChildAdd(sP, nodeP);
   }
 
@@ -211,15 +207,10 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
     NULL_CHECK(nodeP);
     kjChildAdd(geoqP, nodeP);
 
-    LM_TMP(("KZ: cSubP->expression.georel: '%s'", cSubP->expression.georel.c_str()));
     nodeP = kjString(orionldState.kjsonP, "georel", cSubP->expression.georel.c_str());
     NULL_CHECK(nodeP);
     kjChildAdd(geoqP, nodeP);
 
-    LM_TMP(("KZ: cSubP->expression.coords: '%s'", cSubP->expression.coords.c_str()));
-    LM_TMP(("KZ: cSubP->geoCoordinatesP at %p", cSubP->geoCoordinatesP));
-    // nodeP = dbModelToApiCoordinates(cSubP->expression.coords.c_str());
-    LM_TMP(("KZ: cSubP->geoCoordinatesP is of type '%s'", kjValueType(cSubP->geoCoordinatesP->type)));
     nodeP = kjClone(orionldState.kjsonP, cSubP->geoCoordinatesP);
     nodeP->name = (char*) "coordinates";
     NULL_CHECK(nodeP);
@@ -389,7 +380,6 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastFailure
   //
-  LM_TMP(("Getting lastFailure from sub cache"));
   if (cSubP->lastFailure > 0)
   {
     numberToDate(cSubP->lastFailure, dateTime, sizeof(dateTime));
@@ -468,7 +458,6 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // createdAt
   //
-  LM_TMP(("KZ: cSubP->createdAt == %f", cSubP->createdAt));
   if ((sysAttrs == true) && (cSubP->createdAt > 0))
   {
     numberToDate(cSubP->createdAt, dateTime, sizeof(dateTime));
@@ -480,7 +469,6 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // modifiedAt
   //
-  LM_TMP(("KZ: cSubP->modifiedAt == %f", cSubP->modifiedAt));
   if ((sysAttrs == true) && (cSubP->modifiedAt > 0))
   {
     numberToDate(cSubP->modifiedAt, dateTime, sizeof(dateTime));

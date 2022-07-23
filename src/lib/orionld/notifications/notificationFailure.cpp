@@ -40,7 +40,6 @@
 //
 void notificationFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
 {
-  LM_TMP(("SC: Updating counters and timestamps after failed notification"));
   subP->lastNotificationTime  = timestamp;
   subP->lastFailure           = timestamp;
   subP->consecutiveErrors    += 1;

@@ -145,8 +145,6 @@ static void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP
 //
 KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, const char* lang, char** detailsP)
 {
-  LM_TMP(("LANG: Attribute: '%s', type: '%s', lang at: '%p'", caP->name.c_str(), caP->type.c_str(), lang));
-
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
 

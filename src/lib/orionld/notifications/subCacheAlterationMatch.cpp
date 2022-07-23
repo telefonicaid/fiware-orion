@@ -64,12 +64,15 @@ static bool entityIdMatch(CachedSubscription* subP, const char* entityId, int eI
     }
     else
     {
+      if (eiP->entityId == "")  // No entity ID
+        return true;
+
       if (strcmp(eiP->entityId.c_str(), entityId) == 0)
         return true;
     }
   }
 
-  LM_TMP(("Sub '%s': no match due to Entity ID", subP->subscriptionId));
+  LM(("Sub '%s': no match due to Entity ID", subP->subscriptionId));
   return false;
 }
 
@@ -92,7 +95,7 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
       return true;
   }
 
-  LM_TMP(("Sub '%s': no match due to Entity Type", subP->subscriptionId));
+  LM(("Sub '%s': no match due to Entity Type", subP->subscriptionId));
   return false;
 }
 
@@ -217,7 +220,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     //        should a notification be sent or not?
     //        I just brouight this doubt to ETSI ISG CIM (2022-05-27)
     //
-    LM_TMP(("SC: Altered Attributes == 0"));
+
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[EntityModified] == true)
     {
@@ -225,7 +228,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
       ++matches;
     }
     else
-      LM_TMP(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
+      LM(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
   }
 
   for (int aaIx = 0; aaIx < altP->alteredAttributes; aaIx++)
@@ -236,7 +239,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     while (nIx < watchAttrs)
     {
-      // LM_TMP(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
+      // LM(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
       if (strcmp(aaP->attrName, subP->notifyConditionV[nIx].c_str()) == 0)
         break;
       ++nIx;
@@ -248,7 +251,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[aaP->alterationType] == false)
     {
-      LM_TMP(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
+      LM(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
       continue;
     }
 
@@ -257,7 +260,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
   }
 
   if (matches == 0)
-    LM_TMP(("Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
+    LM(("Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
 
   *matchesP += matches;
 
@@ -317,11 +320,9 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
 
   char* compV[20];
 
-  LM_TMP(("QM: path: '%s'", path));
   // pathComponentsSplit destroys the path, I need to work on a copy
   char* pathCopy = kaStrdup(&orionldState.kalloc, path);
   components = pathComponentsSplit(pathCopy, compV);
-  LM_TMP(("QM: components: %d", components));
 
   //
   // - the first component is always the longName of the ATTRIBUTE
@@ -342,9 +343,7 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
     *isTimestampP = false;
 
   compV[components] = NULL;
-  kjTreeLog(treeP, "QM: Tree to navigate");
-  LM_TMP(("QM: compV[0] == '%s'", compV[0]));
-  LM_TMP(("QM: compV[1] == '%s'", compV[1]));
+
   KjNode* result = kjNavigate(treeP, compV);
   if (result != NULL)
     return result;
@@ -382,20 +381,11 @@ bool qRangeCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool is
   if (high == NULL)
     return false;
 
-  LM_TMP(("QM: LHS        is of type '%s'", kjValueType(lhsNode->type)));
-  LM_TMP(("QM: Low  range is of type '%s'", qNodeType(low->type)));
-  LM_TMP(("QM: High range is of type '%s'", qNodeType(high->type)));
-  LM_TMP(("QM: Is it a Timestamp?     %s",  K_FT(isTimestamp)));
-
   if (isTimestamp)
   {
     double lhsTimestamp  = parse8601Time(lhsNode->value.s);
     double lowTimestamp  = (low->type == QNodeFloatValue)? low->value.f :  parse8601Time(low->value.s);
     double highTimestamp = parse8601Time(high->value.s);
-
-    LM_TMP(("QM: LHS  timestamp:  %f", lhsTimestamp));
-    LM_TMP(("QM: Low  timestamp:  %f", lowTimestamp));
-    LM_TMP(("QM: High timestamp:  %f", highTimestamp));
 
     if ((lhsTimestamp >= lowTimestamp) && (lhsTimestamp <= highTimestamp))
       return true;
@@ -575,13 +565,9 @@ bool stringComparison(KjNode* lhsP, QNode* rhs, bool isTimestamp)
 //
 bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
-  LM_TMP(("CLIST: Comma-List comparison for '%s' that is %s timestamp", lhsNode->name, (isTimestamp == true)? "a" : "NOT a"));
-
   if (isTimestamp == true)  // The first in the list id a FLOAT, the rest need to be converted to float
   {
     double timestamp;
-
-    LM_TMP(("CLIST: '%s' is of type '%s'", lhsNode->name, kjValueType(lhsNode->type)));
 
     if (lhsNode->type == KjFloat)
       timestamp = lhsNode->value.f;
@@ -590,23 +576,16 @@ bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, boo
     else
       return false;
 
-    LM_TMP(("CLIST: LHS FLOAT == %f", timestamp));
-
     QNode* child1 = rhs->value.children;
 
     if (child1->type != QNodeFloatValue)
       LM_E(("CLIST: Internal Error (LHS is a timestamp but the first in the RHS list is not a FLOAT ..."));
     else if (child1->value.f == timestamp)
-    {
-      LM_TMP(("CLIST: The first of the list was a match!"));
       return true;
-    }
 
-    LM_TMP(("CLIST: The first of the list was NOT a match"));
     // Compare the rest of the children in the comma list (converting them to FLOAT)
     for (QNode* rhP = child1->next; rhP != NULL; rhP = rhP->next)
     {
-      LM_TMP(("CLIST: Comparing with a '%s'", qNodeType(rhP->type)));
       if (rhP->type == QNodeFloatValue)
       {
         if (rhP->value.f == timestamp)
@@ -614,23 +593,18 @@ bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, boo
       }
       else if (rhP->type == QNodeStringValue)
       {
-        LM_TMP(("CLIST: Comparing with a String '%s' at %p", rhP->value.s, rhP->value.s));
         double rhsTimestamp = parse8601Time(rhP->value.s);
-        LM_TMP(("CLIST: Converted to FLOAT %f", rhsTimestamp));
 
         if (rhsTimestamp == timestamp)
           return true;
-        LM_TMP(("CLIST: %f != %f", rhsTimestamp, timestamp));
       }
     }
 
-    LM_TMP(("CLIST: No Match"));
     return false;
   }
 
   for (QNode* rhP = rhs->value.children; rhP != NULL; rhP = rhP->next)
   {
-    LM_TMP(("CLIST: Comparing '%s' with '%s'", kjValueType(lhsNode->type), qNodeType(rhP->type)));
     switch (lhsNode->type)
     {
     case KjInt:     if (intComparison(lhsNode->value.i,    rhP)              == true) return true; break;
@@ -642,7 +616,6 @@ bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, boo
     }
   }
 
-  LM_TMP(("CLIST: No hit"));
   return false;
 }
 
@@ -654,53 +627,30 @@ bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, boo
 //
 bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
-  if (altP->patchedEntity == NULL)
-    LM_TMP(("QM: no patchTree ..."));
-  else
-    kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
-
-  LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
-  LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
-
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
   //
   if (isTimestamp == true)
   {
-    LM_TMP(("QM: it's a timestamp"));
-
     // lhsNode must be a string, and a valid ISO8601 at that
     if (lhsNode->type != KjString)
-    {
-      LM_TMP(("QM: LHS '%s' is not a KjString", lhsNode->name));
       return false;
-    }
 
-    LM_TMP(("QM: parsing ISO8601 '%s'", lhsNode->value.s));
     double timestamp = parse8601Time(lhsNode->value.s);
-    LM_TMP(("QM: parsed ISO8601, got %f", timestamp));
 
     if (rhs->type == QNodeIntegerValue)
     {
       long long ts = (long long) timestamp;
       if (rhs->value.i == ts)
-      {
-        LM_TMP(("QM: Matching timestamp (%lld == %lld)", rhs->value.i, ts));
         return true;
-      }
 
-      LM_TMP(("QM: Non-matching timestamp (%lld vs %lld)", rhs->value.i, ts));
       return false;
     }
     else if (rhs->type == QNodeFloatValue)
     {
       if (rhs->value.f == timestamp)
-      {
-        LM_TMP(("QM: Matching timestamp (%f == %f)", rhs->value.f, timestamp));
         return true;
-      }
 
-      LM_TMP(("QM: Non-matching timestamp (%f vs %f - might need some margin here ...)", rhs->value.f, timestamp));
       return false;
     }
   }
@@ -714,16 +664,13 @@ bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
   {
     double margin = 0.000001;  // What margin should I use?
 
-    LM_TMP(("QM: LHS is a FLOAT of %f", lhsNode->value.f));
     if (rhs->type == QNodeIntegerValue)
     {
-      LM_TMP(("QM: RHS id an INTEGER of %d", rhs->value.i));
       if ((lhsNode->value.f - margin < rhs->value.i) && (lhsNode->value.f + margin > rhs->value.i))
         return true;
     }
     else if (rhs->type == QNodeFloatValue)
     {
-      LM_TMP(("QM: RHS id a FLOAT of %d", rhs->value.f));
       if ((lhsNode->value.f - margin < rhs->value.f) && (lhsNode->value.f + margin > rhs->value.f))
         return true;
     }
@@ -731,10 +678,7 @@ bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
   else if (lhsNode->type == KjString)
   {
     if (rhs->type == QNodeStringValue)
-    {
-      LM_TMP(("QM: Comparing two strings: LHS: '%s' (at %p) and RHS: '%s' (at %p)", lhsNode->value.s, lhsNode->value.s, rhs->value.s, rhs->value.s));
       return (strcmp(lhsNode->value.s, rhs->value.s) == 0);
-    }
   }
   else if (lhsNode->type == KjBoolean)
   {
@@ -753,53 +697,30 @@ bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
 //
 bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
-  if (altP->patchedEntity == NULL)
-    LM_TMP(("QM: no patchTree ..."));
-  else
-    kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
-
-  LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
-  LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
-
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
   //
   if (isTimestamp == true)
   {
-    LM_TMP(("QM: it's a timestamp"));
-
     // lhsNode must be a string, and a valid ISO8601 at that
     if (lhsNode->type != KjString)
-    {
-      LM_TMP(("QM: LHS '%s' is not a KjString", lhsNode->name));
       return false;
-    }
 
-    LM_TMP(("QM: parsing ISO8601 '%s'", lhsNode->value.s));
     double timestamp = parse8601Time(lhsNode->value.s);
-    LM_TMP(("QM: parsed ISO8601, got %f", timestamp));
 
     if (rhs->type == QNodeIntegerValue)
     {
       long long ts = (long long) timestamp;
       if (rhs->value.i < ts)
-      {
-        LM_TMP(("QM: Matching timestamp (%lld < %lld)", rhs->value.i, ts));
         return true;
-      }
 
-      LM_TMP(("QM: Non-matching timestamp (%lld vs %lld)", rhs->value.i, ts));
       return false;
     }
     else if (rhs->type == QNodeFloatValue)
     {
       if (rhs->value.f < timestamp)
-      {
-        LM_TMP(("QM: Matching timestamp (%f < %f)", rhs->value.f, timestamp));
         return true;
-      }
 
-      LM_TMP(("QM: Non-matching timestamp (%f vs %f - might need some margin here ...)", rhs->value.f, timestamp));
       return false;
     }
   }
@@ -817,10 +738,7 @@ bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
   else if (lhsNode->type == KjString)
   {
     if (rhs->type == QNodeStringValue)
-    {
-      LM_TMP(("QM: Comparing two strings: LHS: '%s' and RHS: '%s'", lhsNode->value.s, rhs->value.s));
       return (strcmp(lhsNode->value.s, rhs->value.s) > 0);  // "> 0" means first arg > second arg to strcmp
-    }
   }
   else if (lhsNode->type == KjBoolean)  // true > false ... ?
   {
@@ -839,53 +757,30 @@ bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
 //
 bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
-  if (altP->patchedEntity == NULL)
-    LM_TMP(("QM: no patchTree ..."));
-  else
-    kjTreeLog(altP->patchedEntity, "QM: patchedEntity");
-
-  LM_TMP(("QM: LHS is of type '%s'", kjValueType(lhsNode->type)));
-  LM_TMP(("QM: RHS is of type '%s'", qNodeType(rhs->type)));
-
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
   //
   if (isTimestamp == true)
   {
-    LM_TMP(("QM: it's a timestamp"));
-
     // lhsNode must be a string, and a valid ISO8601 at that
     if (lhsNode->type != KjString)
-    {
-      LM_TMP(("QM: LHS '%s' is not a KjString", lhsNode->name));
       return false;
-    }
 
-    LM_TMP(("QM: parsing ISO8601 '%s'", lhsNode->value.s));
     double timestamp = parse8601Time(lhsNode->value.s);
-    LM_TMP(("QM: parsed ISO8601, got %f", timestamp));
 
     if (rhs->type == QNodeIntegerValue)
     {
       long long ts = (long long) timestamp;
       if (rhs->value.i > ts)
-      {
-        LM_TMP(("QM: Matching timestamp (%lld > %lld)", rhs->value.i, ts));
         return true;
-      }
 
-      LM_TMP(("QM: Non-matching timestamp (%lld vs %lld)", rhs->value.i, ts));
       return false;
     }
     else if (rhs->type == QNodeFloatValue)
     {
       if (rhs->value.f > timestamp)
-      {
-        LM_TMP(("QM: Matching timestamp (%f > %f)", rhs->value.f, timestamp));
         return true;
-      }
 
-      LM_TMP(("QM: Non-matching timestamp (%f vs %f - might need some margin here ...)", rhs->value.f, timestamp));
       return false;
     }
   }
@@ -903,10 +798,7 @@ bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
   else if (lhsNode->type == KjString)
   {
     if (rhs->type == QNodeStringValue)
-    {
-      LM_TMP(("QM: Comparing two strings: LHS: '%s' and RHS: '%s'", lhsNode->value.s, rhs->value.s));
       return (strcmp(lhsNode->value.s, rhs->value.s) < 0);  // "< 0" means first arg < second arg to strcmp
-    }
   }
   else if (lhsNode->type == KjBoolean)  // true > false ... ?
   {
@@ -929,9 +821,6 @@ bool qMatchCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
   // Create the REGEX in subCache - QNode might need a new QNodeValue
   // Here: Use regexec
   //
-  LM_TMP(("QM: LHS is of type '%s' (must be String)", kjValueType(lhsNode->type)));
-  LM_TMP(("QM: RHS is of type '%s' (must be String)", qNodeType(rhs->type)));
-
   LM_W(("Not Implemented"));
   return false;
 }
@@ -944,46 +833,26 @@ bool qMatchCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
 //
 bool qMatch(QNode* qP, OrionldAlteration* altP)
 {
-  LM_TMP(("ALT: Operation: '%s'", qNodeType(qP->type)));
-
   if (qP->type == QNodeOr)
   {
-    // <DEBUG>
-    qPresent(qP, "DEBUG", "OR operation");
-    int children = 0;
-    LM_TMP(("Children of OR operation:"));
-    for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
-    {
-      LM_TMP(("o %d: %s", children, qNodeType(childP->type)));
-      ++children;
-    }
-    // </DEBUG>
-
     // If any of the children is a match, then it's a match
     int childNo = 0;
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
     {
-      LM_TMP(("ALT: OR: checking child %d", childNo));
       if (qMatch(childP, altP) == true)
         return true;
       ++childNo;
     }
-    LM_TMP(("ALT: OR: after checking %d children - no match", childNo));
   }
   else if (qP->type == QNodeAnd)
   {
     // If ALL of the children are a match, then it's a match
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
     {
-      LM_TMP(("ALT: Recursive call for AND item"));
       if (qMatch(childP, altP) == false)
-      {
-        LM_TMP(("ALT: The AND is a No-Match"));
         return false;
-      }
     }
 
-    LM_TMP(("ALT: The AND is a Match"));
     return true;
   }
   else
@@ -998,10 +867,8 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     // Anyway, the attribute/sub-attribute must exist.
     // If it does not, then the result is always "false" (except for the case "q=!P1", of course :))
     //
-    LM_TMP(("QM: lhs->value.v: %s", lhs->value.v));
     bool     isTimestamp = false;
     KjNode*  lhsNode     = kjNavigate2(altP->patchedEntity, lhs->value.v, &isTimestamp);
-    LM_TMP(("QM: lhsNode at %p", lhsNode));
 
     //
     // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
@@ -1046,8 +913,6 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 {
   OrionldAlterationMatch*  matchList = NULL;
   int                      matches   = 0;
-  int                      altIx     = 0;  // DEBUG
-  int                      subIx     = 0;  // DEBUG
 
   //
   // Loop over each alteration, and check ALL SUBSCRIPTIONS in the cache for that alteration
@@ -1057,28 +922,27 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   {
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
     {
-      ++subIx;
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
       {
-        LM_TMP(("Sub '%s' - no match due to tenant", subP->subscriptionId));
+        LM(("Sub '%s' - no match due to tenant", subP->subscriptionId));
         continue;
       }
 
       if (subP->isActive == false)
       {
-        LM_TMP(("Sub '%s' - no match due to isActive == false", subP->subscriptionId));
+        LM(("Sub '%s' - no match due to isActive == false", subP->subscriptionId));
         continue;
       }
 
       if (strcmp(subP->status.c_str(), "active") != 0)
       {
-        LM_TMP(("Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
+        LM(("Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
         continue;
       }
 
       if ((subP->expirationTime > 0) && (subP->expirationTime < orionldState.requestTime))
       {
-        LM_TMP(("Sub '%s' - no match due to expiration (now:%f, expired:%f)", subP->subscriptionId, orionldState.requestTime, subP->expirationTime));
+        LM(("Sub '%s' - no match due to expiration (now:%f, expired:%f)", subP->subscriptionId, orionldState.requestTime, subP->expirationTime));
         subP->status   = "expired";
         subP->isActive = false;
         continue;
@@ -1086,7 +950,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       if ((subP->throttling > 0) && ((orionldState.requestTime - subP->lastNotificationTime) < subP->throttling))
       {
-        LM_TMP(("Sub '%s' - no match due to throttling", subP->subscriptionId));
+        LM(("Sub '%s' - no match due to throttling", subP->subscriptionId));
         continue;
       }
 
@@ -1105,19 +969,13 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       // Only done if its an NGSI-LD operation AND if it's an NGSI-LD Subscription (ldContext has a value != "")
       //
       if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->qText != NULL))
-      {
-        LM_TMP(("KZ: ********************** Building qP from: '%s'", subP->qText));
         subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false);
-      }
 
       if (subP->qP != NULL)
       {
-        LM_TMP(("Calling qMatch for subP->qP and altP"));
-        qPresent(subP->qP, "QM", "qP for qMatch");
-
         if (qMatch(subP->qP, altP) == false)
         {
-          LM_TMP(("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
+          LM(("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
           continue;
         }
       }
@@ -1133,8 +991,6 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       //
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
-
-    ++altIx;
   }
 
   *matchesP = matches;

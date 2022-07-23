@@ -1072,15 +1072,12 @@ const char* StringFilterItem::valueTypeName(void)
 */
 static MatchResult stringCompare(char* filterString, const char* attrString)
 {
-  LM_TMP(("Comparing '%s' and '%s'", attrString, filterString));
   if ((filterString[0] == '%') && (filterString[1] == '2') && (filterString[2] == '2'))
   {
     int len = strlen(filterString);
 
-    LM_TMP(("Comparing '%s' and '%22'", &filterString[len - 3]));
     if (strcmp(&filterString[len - 3], "%22") == 0)
     {
-      LM_TMP(("Comparing '%s' and '%s' (%d chars)", &filterString[3], attrString, len - 6));
       if (strncmp(&filterString[3], attrString, len - 6) == 0)
         return MrMatch;
     }

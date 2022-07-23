@@ -173,7 +173,6 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
     }
 
     outP[outIx] = 0;
-    LM_TMP(("So far: '%s'", outP));
   }
 
   outP[outIx] = 0;

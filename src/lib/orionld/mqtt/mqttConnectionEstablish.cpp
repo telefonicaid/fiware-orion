@@ -42,7 +42,7 @@ bool mqttConnectionEstablish(bool mqtts, const char* username, const char* passw
   {
     // Already connected
     mqP->connections += 1;
-    LM_TMP(("Already connected. Connections: %d", mqP->connections));
+    LM(("Already connected. Connections: %d", mqP->connections));
     return true;
   }
 

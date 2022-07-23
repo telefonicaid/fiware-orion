@@ -111,8 +111,6 @@ static void* workerFunc(void* pSyncQ)
       bool                 ngsildSubscription = false;
       CachedSubscription*  subP               = subCacheItemLookup(tenant, subscriptionId);
 
-      LM_TMP(("MQTT: params->protocol == '%s'", params->protocol));
-
       if ((subP != NULL) && (subP->ldContext != ""))
         ngsildSubscription = true;
 
@@ -141,7 +139,6 @@ static void* workerFunc(void* pSyncQ)
 
       int r = 0;
 
-      LM_TMP(("MQTT: params->protocol: '%s'", params->protocol.c_str()));
       if (simulatedNotification)
       {
         LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
@@ -149,7 +146,6 @@ static void* workerFunc(void* pSyncQ)
       }
       else if (params->protocol == "mqtt")  // Notification to be sent via MQTT broker
       {
-        LM_TMP(("MQTT: Sending MQTT notification"));
         char* topic = (char*) params->resource.c_str();
 
         r = mqttNotification(params->ip.c_str(),
@@ -167,7 +163,6 @@ static void* workerFunc(void* pSyncQ)
       }
       else // Send HTTP notification
       {
-        LM_TMP(("MQTT: Sending HTTP notification"));
         std::string out;
 
         if (ngsildSubscription == false)

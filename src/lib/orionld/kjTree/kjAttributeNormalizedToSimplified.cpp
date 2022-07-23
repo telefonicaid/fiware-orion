@@ -49,13 +49,9 @@ void kjAttributeNormalizedToSimplified(KjNode* attrP, const char* lang)
   if (valueP == NULL) valueP = objectP;
   if (valueP == NULL) valueP = languageMapP;
 
-  LM_TMP(("In kjAttributeNormalizedToSimplified"));
-
   if (valueP != NULL)
   {
     attrP->type  = valueP->type;
     attrP->value = valueP->value;
   }
-  else
-    LM_TMP(("Nothing done - no value field found"));
 }

@@ -155,7 +155,6 @@ static bool entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
 static bool entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
 {
   bson_append_regex(mongoFilterP, "_id.id", 6, idPattern, "m");
-  LM_TMP(("Added REGEX for entity ID: '%s'", idPattern));
   return true;
 }
 
@@ -173,9 +172,6 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 
   bson_init(&exists);
   bson_append_int32(&exists, "$exists", 7, 1);
-
-  LM_TMP(("GEO: geojsonGeometry: '%s'", geojsonGeometry));
-  LM_TMP(("GEO: geojsonGeometryToProjection: %s", (geojsonGeometryToProjection == true)? "true" : "false"));
 
   //
   // Remember, an attribute may be either in "attrs", or "@datasets", or both ...
@@ -215,10 +211,8 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 
     bson_destroy(&attrExists);
 
-    LM_TMP(("GEO: Added '%s' to projection", path));
     if ((geojsonGeometry != NULL) && (strcmp(attrList->array[ix], geojsonGeometry) == 0))
     {
-      LM_TMP(("GEO: ... which is the geometryproperty - no need to add it later"));
       geojsonGeometryToProjection = false;  // Already present - no need to add to projection
     }
   }
@@ -249,7 +243,6 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
     }
 
     bson_destroy(&attrExists);
-    LM_TMP(("GEO: Added '%s' to projection", path));
   }
 
   bson_append_array(mongoFilterP, "$or", 3, &array);
@@ -260,7 +253,6 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
     int len = snprintf(path, sizeof(path) - 1, "attrs.%s", geojsonGeometry);
     dotForEq(&path[6]);
     bson_append_bool(projectionP, path, len, true);
-    LM_TMP(("GEO: Added '%s' to projection - needs to be excluded from 'properties' later!", path));
     orionldState.geoPropertyFromProjection = true;
 
     // What about the dataset ... ?
@@ -311,7 +303,6 @@ static bool geoPropertyDbPath(char* geoPropertyPath, int geoPropertyPathSize, co
 
   *actualLen = len + 6;
 
-  LM_TMP(("geoPropertyPath: '%s' (len: %d)", geoPropertyPath, *actualLen));
   return true;
 }
 
@@ -362,7 +353,6 @@ static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
   if (geoInfoP->minDistance > 0)    bson_append_int32(&near, "$minDistance", 12, geoInfoP->minDistance);
   if (geoInfoP->maxDistance > 0)    bson_append_int32(&near, "$maxDistance", 12, geoInfoP->maxDistance);
 
-  LM_TMP(("GEO: $nearSphere"));
   bson_append_document(&location, "$nearSphere", 11, &near);
 
   char geoPropertyPath[512];
@@ -726,12 +716,6 @@ static bool geoContainsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 //
 static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
 {
-  LM_TMP(("GEO: geometry:    '%s'", orionldGeometryToString(geoInfoP->geometry)));
-  LM_TMP(("GEO: georel:      '%s'", orionldGeorelToString(geoInfoP->georel)));
-  LM_TMP(("GEO: maxDistance:  %d",  geoInfoP->maxDistance));
-  LM_TMP(("GEO: minDistance:  %d",  geoInfoP->minDistance));
-  LM_TMP(("GEO: geoProperty: '%s'", geoInfoP->geoProperty));
-
   switch (geoInfoP->georel)
   {
   case GeorelNear:        return geoNearFilter(mongoFilterP,       geoInfoP);
@@ -909,8 +893,7 @@ KjNode* mongocEntitiesQuery
 #if 1
     char* filterString  = bson_as_json(&mongoFilter, NULL);
     char* optionsString = bson_as_json(&options, NULL);
-    LM_TMP(("GEOJSON: Running the query with filter '%s'", filterString));
-    LM_TMP(("GEOJSON: Running the query with options '%s'", optionsString));
+
     bson_free(filterString);
     bson_free(optionsString);
 #endif
@@ -949,7 +932,6 @@ KjNode* mongocEntitiesQuery
       else
         LM_E(("GEO: Database Error (%s: %s)", title, detail));
     }
-    LM_TMP(("Got %d hits on the query", hits));
 
     bson_error_t error;
     if (mongoc_cursor_error(mongoCursorP, &error) == true)

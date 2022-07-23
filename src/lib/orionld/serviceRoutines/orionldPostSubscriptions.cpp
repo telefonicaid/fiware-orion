@@ -104,8 +104,6 @@ bool orionldPostSubscriptions(void)
     return false;
   }
 
-  LM_TMP(("MQTT: After pCheckSubscription: mqtt is %s", (mqtt == true)? "true" : "false"));
-
   // Subscription id special treats
   if (subIdP != NULL)
   {
@@ -148,13 +146,6 @@ bool orionldPostSubscriptions(void)
   {
     ldqNodeP->name    = (char*) "ldQ";
     ldqNodeP->value.s = qRenderedForDb;
-
-    LM_TMP(("LL: qTree:               %p", qTree));
-    LM_TMP(("LL: qRenderedForDb:      %s", qRenderedForDb));
-    LM_TMP(("LL: Valid for NGSIv2:    %s", K_FT(qValidForV2)));
-    LM_TMP(("LL: Metadata for NGSIv2: %s", K_FT(qIsMq)));
-    LM_TMP(("qText: %s", qRenderedForDb));
-    qPresent(qTree, "KZ", "Q-Tree for subscription");
 
     // We robbed the "q" for "ldQ", need to add "q" and "mq" now - for NGSIv2
     KjNode* qNode;
@@ -234,12 +225,6 @@ bool orionldPostSubscriptions(void)
     //
     // Establish connection with MQTT broker
     //
-    LM_TMP(("MQTT: mqtts:        %s", K_FT(mqtts)));
-    LM_TMP(("MQTT: mqttUser:     %s", mqttUser));
-    LM_TMP(("MQTT: mqttPassword: %s", mqttPassword));
-    LM_TMP(("MQTT: mqttHost:     %s", mqttHost));
-    LM_TMP(("MQTT: mqttPort:     %d", mqttPort));
-    LM_TMP(("MQTT: mqttVersion:  %s", mqttVersion));
     if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
     {
       orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);

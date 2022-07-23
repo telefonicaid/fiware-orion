@@ -428,8 +428,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   bool                             blackList
 )
 {
-    LM_TMP(("MQTT: httpInfo.url == '%s'", httpInfo.url.c_str()));
-
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 #ifdef ORIONLD
@@ -546,8 +544,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string  uriPath;
     std::string  protocol;
 
-    LM_TMP(("MQTT: httpInfo.url == '%s'", httpInfo.url.c_str()));
-
     if (strncmp(httpInfo.url.c_str(), "mqtt", 4) == 0)
     {
       host     = subP->httpInfo.mqtt.host;
@@ -560,8 +556,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
       return paramsV;  //empty vector
     }
-
-    LM_TMP(("MQTT: Protocol: '%s'", protocol.c_str()));
 
     /* Set Content-Type */
     char* contentType;

@@ -212,9 +212,7 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
   //
   // All OK - let's compose ...
   //
-  LM_TMP(("KZ: Expanding attr '%s'", attrNameP));
   char* longNameP = orionldAttributeExpand(orionldState.contextP, attrNameP, true, NULL);
-  LM_TMP(("KZ: Expanded '%s'", longNameP));
 
   //
   // Now 'longNameP' needs to be adjusted for the DB model - that changes '.' for '=' in the database.
@@ -258,8 +256,6 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
     }
   }
 
-  LM_TMP(("QM: Case No: %d", caseNo));
-
   if (forDb)
   {
     if (caseNo == 1)
@@ -276,12 +272,8 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
     // If observedAt, createdAt, modifiedAt, unitCode, ...   No ".value" must be appended
     if (caseNo == 3)
     {
-      LM_TMP(("Q: case 3 for attr '%s', sub-attr: '%s'", longName, mdNameP));
       if ((strcmp(mdNameP, "observedAt") == 0) || (strcmp(mdNameP, "modifiededAt") == 0) || (strcmp(mdNameP, "createdAt") == 0))
-      {
-        LM_TMP(("Q: case 5 !"));
         caseNo = 5;
-      }
     }
 
     if (caseNo == 1)

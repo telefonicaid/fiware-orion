@@ -187,13 +187,7 @@ bool pCheckSubscription
       PCHECK_DUPLICATE(qP, subItemP, 0, NULL, SubscriptionQPath, 400);
       PCHECK_STRING(qP, 0, NULL, SubscriptionQPath, 400);
 
-      LM_TMP(("KZ: Calling qBuild(q='%s')", qP->value.s));
-      LM_TMP(("KZ: Need to expand the q so it looks like it does when it comes from the database before calling qBuild"));
       *qTreeP = qBuild(qP->value.s, qTextP, qValidForV2P, qIsMqP, true);  // 5th parameter: qToDbModel == true
-      LM_TMP(("KZ: qTreeP:              %p", *qTreeP));
-      LM_TMP(("KZ: qTextP:              %s", *qTextP));
-      LM_TMP(("KZ: Valid for NGSIv2:    %s", K_FT(*qValidForV2P)));
-      LM_TMP(("KZ: Metadata for NGSIv2: %s", K_FT(*qIsMqP)));
       *qNodeP = qP;
 
       if (*qTreeP == NULL)
@@ -218,7 +212,6 @@ bool pCheckSubscription
     }
     else if (strcmp(subItemP->name, "notification") == 0)
     {
-      LM_TMP(("MQTT: Checking the 'notification' part of the subscription"));
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       PCHECK_DUPLICATE(notificationP,  subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       if (pCheckNotification(notificationP, false, uriPP, notifierInfoPP, mqttChangeP) == false)

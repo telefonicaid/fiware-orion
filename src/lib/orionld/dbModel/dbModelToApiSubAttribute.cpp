@@ -96,8 +96,6 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
 //
 KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
 {
-  LM_TMP(("Treating sub-attribute '%s'", dbSubAttributeP->name));
-
   if (strcmp(dbSubAttributeP->name, "observedAt") == 0)
     return dbModelToObservedAt(dbSubAttributeP);
   else if (strcmp(dbSubAttributeP->name, "unitCode") == 0)
@@ -125,7 +123,6 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Render
     // Might be key-values
     if ((sysAttrs == false) && ((subAttrType == Property) || (subAttrType == GeoProperty)))
     {
-      LM_TMP(("CONCISE + NOT sysAttrs + [Geo]Property => SIMPLIFIED"));
       KjNode* valueP = kjLookup(dbSubAttributeP, "value");
 
       kjChildRemove(dbSubAttributeP, valueP);

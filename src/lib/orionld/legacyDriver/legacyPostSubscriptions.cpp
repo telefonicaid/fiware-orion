@@ -61,8 +61,6 @@ bool legacyPostSubscriptions(void)
   std::string          subId;
   OrionError           oError;
 
-  LM_TMP(("KZ: In legacy POST Subscription function - using mongoBackend"));
-
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
   else
@@ -92,11 +90,8 @@ bool legacyPostSubscriptions(void)
   {
     KjNode* uriP = kjLookup(endpointP, "uri");
 
-    LM_TMP(("MQTT: uri: '%s'", uriP->value.s));
-
     if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
     {
-      LM_TMP(("MQTT: it's MQTT"));
       bool            mqtts         = false;
       char*           mqttUser      = NULL;
       char*           mqttPassword  = NULL;
@@ -154,20 +149,12 @@ bool legacyPostSubscriptions(void)
       //
       // Establish connection with MQTT broker
       //
-      LM_TMP(("MQTT: mqtts:        %s", K_FT(mqtts)));
-      LM_TMP(("MQTT: mqttUser:     %s", mqttUser));
-      LM_TMP(("MQTT: mqttPassword: %s", mqttPassword));
-      LM_TMP(("MQTT: mqttHost:     %s", mqttHost));
-      LM_TMP(("MQTT: mqttPort:     %d", mqttPort));
-      LM_TMP(("MQTT: mqttVersion:  %s", mqttVersion));
       if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
       {
         orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
         return false;
       }
     }
-    else
-      LM_TMP(("MQTT: it's HTTP"));
   }
 
   //

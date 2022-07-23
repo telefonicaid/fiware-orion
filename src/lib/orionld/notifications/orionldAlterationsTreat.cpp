@@ -74,8 +74,6 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
     return -1;
   }
 
-  // LM_TMP(("NFY: Read %d bytes of notification: %s", nb, buf));
-
   char* endOfFirstLine = strchr(buf, '\r');
 
   if (endOfFirstLine == NULL)
@@ -93,7 +91,6 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
   while ((nb = read(npP->fd, buf, sizeof(buf) - 1)) > 0)
   {
     buf[nb] = 0;
-    LM_TMP(("NFY: Read a chunk of %d bytes: %s", nb, buf));
   }
 
 
@@ -130,22 +127,19 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
-    LM_TMP(("ALT: Alteration %d:", alterations));
-    LM_TMP(("ALT:   Entity Id:    %s", aP->entityId));
-    LM_TMP(("ALT:   Entity Type:  %s", aP->entityType));
-    LM_TMP(("ALT:   Attributes:   %d", aP->alteredAttributes));
-    // if (aP->patchedEntity != NULL) kjTreeLog(aP->patchedEntity, "ALT:   Patched Entity");
+    LM(("ALT: Alteration %d:", alterations));
+    LM(("ALT:   Entity Id:    %s", aP->entityId));
+    LM(("ALT:   Entity Type:  %s", aP->entityType));
+    LM(("ALT:   Attributes:   %d", aP->alteredAttributes));
 
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
-      OrionldAttributeAlteration* altAttrP = &aP->alteredAttributeV[ix];
-
-      LM_TMP(("ALT:   Attribute        %s", altAttrP->attrName));
-      LM_TMP(("ALT:   Alteration Type: %s", orionldAlterationType(altAttrP->alterationType)));
+      LM(("ALT:   Attribute        %s", aP->alteredAttributeV[ix].attrName));
+      LM(("ALT:   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
     ++alterations;
   }
-  LM_TMP(("ALT: %d Alterations present", alterations));
+  LM(("ALT: %d Alterations present", alterations));
   // ----------------------------  </DEBUG>
 
   OrionldAlterationMatch* matchList;
@@ -164,14 +158,14 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   NotificationPending* notificationList = NULL;
 
-  // <DEBUG>
+#ifdef DEBUG
   int ix = 1;
-  LM_TMP(("XX: %d Matching subscriptions:", matches));
+  LM(("%d Matching subscriptions:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    LM_TMP(("XX:   %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+    LM(("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
   }
-  // </DEBUG>
+#endif
 
 
   //
@@ -203,15 +197,16 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     // Get the group
     OrionldAlterationMatch* groupList = matchList;
     OrionldAlterationMatch* prev      = matchList;
-    LM_TMP(("XX: groupList at %p (next at %p)", groupList, groupList->next));
+
+    LM(("groupList at %p (next at %p)", groupList, groupList->next));
     for (OrionldAlterationMatch* matchP = groupList->next; matchP != NULL; matchP = matchP->next)
     {
-      LM_TMP(("XX: Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
+      LM(("Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
       if (matchP->subP != groupList->subP)
       {
         matchList  = matchP;  // matchList pointing to the first non-matching
         prev->next = NULL;    // Ending the 'groupList'
-        LM_TMP(("Breaking match loop for sub '%s' - next is %p", groupList->subP->subscriptionId, matchList));
+        LM(("Breaking match loop for sub '%s' - next is %p", groupList->subP->subscriptionId, matchList));
         break;
       }
 
@@ -222,12 +217,12 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     // <DEBUG>
     int groupMembers = 0;
-    LM_TMP(("XX: Alterations matching sub '%s':", groupList->subP->subscriptionId));
+    LM(("Alterations matching sub '%s':", groupList->subP->subscriptionId));
     for (OrionldAlterationMatch* matchP = groupList; matchP != NULL; matchP = matchP->next)
     {
       ++groupMembers;
       if (matchP->altAttrP)
-        LM_TMP(("XX  - %s", orionldAlterationType(matchP->altAttrP->alterationType)));
+        LM(("o %s", orionldAlterationType(matchP->altAttrP->alterationType)));
     }
     // </DEBUG>
 
@@ -256,7 +251,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int             startTime  = time(NULL);
   bool            timeout    = false;
 
-  LM_TMP(("Awaiting responses and updating cached subscriptions accordingly"));
   while (timeout == false)
   {
     //
@@ -279,10 +273,8 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     if (fdMax == 0)
       break;
 
-    LM_TMP(("Awaiting responses to the notifications (fdMax: %d)", fdMax));
     struct timeval  tv = { 1, 0 };
     fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
-    LM_TMP(("Got %d from select", fds));
     if (fds == -1)
     {
       if (errno != EINTR)
@@ -291,13 +283,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     while (fds > 0)
     {
-      LM_TMP(("Got %d notification response(s)", fds));
       npP = notificationList;
       while (npP != NULL)
       {
         if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
         {
-          LM_TMP(("SC: Detected a notification response on fd %d", npP->fd));
           if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
             notificationSuccess(npP->subP, notificationTimeAsFloat);
 
@@ -318,7 +308,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     }
   }
 
-  LM_TMP(("Mark all non-mqtt subs for unanswered notifications as timed out if npP->fd != -1"));
   NotificationPending* npP = notificationList;
   while (npP != NULL)
   {

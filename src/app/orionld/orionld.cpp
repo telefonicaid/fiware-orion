@@ -293,7 +293,7 @@ bool            debugCurl    = false;
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define TROE_DESC              "enable TRoE - temporal representation of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
-#define TMPTRACES_DESC         "disable LM_TMP traces"
+#define TMPTRACES_DESC         "disable traces"
 #define TROE_HOST_DESC         "host for troe database db server"
 #define TROE_PORT_DESC         "port for troe database db server"
 #define TROE_HOST_USER         "username for troe database db server"
