@@ -222,6 +222,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+NGSILD-Tenant: captn
 
 
 
@@ -290,6 +291,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:WeatherObserved
+NGSILD-Tenant: captn
 
 
 
@@ -331,6 +333,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+NGSILD-Tenant: captn
 
 
 
@@ -340,6 +343,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+NGSILD-Tenant: captn
 
 
 

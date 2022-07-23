@@ -72,7 +72,7 @@ bool orionldGetContexts(void)
       return false;
     }
 
-    httpHeaderLocationAdd("/ngsi-ld/v1/jsonldContexts/", contextP->id);
+    httpHeaderLocationAdd("/ngsi-ld/v1/jsonldContexts/", contextP->id, NULL);
     return true;
   }
   else if (orionldState.uriParams.url != NULL)

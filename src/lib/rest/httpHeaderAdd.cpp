@@ -37,7 +37,7 @@
 //
 // httpHeaderLocationAdd -
 //
-void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId)
+void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId, const char* tenant)
 {
   char location[512];
 
@@ -47,6 +47,9 @@ void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId)
     snprintf(location, sizeof(location), "%s", uriPathWithSlash);
 
   orionldHeaderAdd(&orionldState.out.headers, HttpLocation, location, 0);
+
+  if (tenant != NULL)
+    orionldHeaderAdd(&orionldState.out.headers, HttpTenant, tenant, 0);
 }
 
 

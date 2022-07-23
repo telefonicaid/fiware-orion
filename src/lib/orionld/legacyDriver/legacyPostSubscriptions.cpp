@@ -192,7 +192,7 @@ bool legacyPostSubscriptions(void)
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
 
   orionldState.httpStatusCode = SccCreated;
-  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str());
+  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str(), orionldState.tenantP->tenant);
 
   return true;
 }

@@ -71,8 +71,7 @@ bool orionldPostContexts(void)
 
   url = orionldContextUrlGenerate(&id);
 
-  OrionldContext*        contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.requestTree);
-
+  OrionldContext* contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.requestTree);
   if (contextP == NULL)
   {
     LM_W(("Unable to create context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
@@ -82,7 +81,7 @@ bool orionldPostContexts(void)
   contextP->createdAt = orionldState.requestTime;
   contextP->usedAt    = orionldState.requestTime;
 
-  httpHeaderLocationAdd(contextP->url, NULL);
+  httpHeaderLocationAdd(contextP->url, NULL, NULL);
 
   orionldContextCachePersist(contextP);
   orionldState.httpStatusCode = 201;

@@ -112,6 +112,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+NGSILD-Tenant: captn
 
 
 
@@ -121,6 +122,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:Car001
+NGSILD-Tenant: captn
 
 
 

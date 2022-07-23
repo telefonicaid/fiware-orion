@@ -279,7 +279,7 @@ bool orionldPostSubscriptions(void)
   }
 
   orionldState.httpStatusCode = 201;
-  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subIdP->value.s);
+  httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subIdP->value.s, orionldState.tenantP->tenant);
 
   return true;
 }

@@ -154,6 +154,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+NGSILD-Tenant: tn1
 
 
 
@@ -193,6 +194,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+NGSILD-Tenant: tn2
 
 
 
@@ -202,6 +204,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+NGSILD-Tenant: tn3
 
 
 
