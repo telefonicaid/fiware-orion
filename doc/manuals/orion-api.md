@@ -1033,6 +1033,25 @@ Note that if a custom payload is used for the notification (the field `payload` 
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.
 
+An empty string value for a header key in the `headers` object will remove that header from 
+notifications. For instance the following configuration:
+
+```
+"httpCustom": { 
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+will remove the `x-auth-token` header in notifications associated to the subscription.
+
+This can be useful to remove headers that Orion will include automatically in notifications.
+For instance:
+
+* To avoid headers included by default in notifications (e.g. `Accept`)
+* To cut the propagation of headers (from updates to notifications), such the
+  aforementioned `x-auth-token`
+
 # API Routes
 
 ## Group API Entry Point

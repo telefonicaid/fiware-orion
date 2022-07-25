@@ -1,7 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
-* [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Datetime support](#datetime-support)
@@ -46,30 +45,6 @@ which means *"increase the value of attribute A by 3"*.
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
-
-[Top](#top)
-
-## Header removal in custom notifications
-
-It is not explicilty said in NGSIv2 specification ("Custom Notifications" section) but an empty
-string value for a header key in the `headers` object will remove that header from notifications.
-For instance the following configuration:
-
-```
-"httpCustom": { 
-   ...
-   "headers": {"x-auth-token": ""}
-}
-```
-
-will remove the `x-auth-token` header in notifications associated to the subscription.
-
-This can be useful to remove headers that Orion will include automatically in notifications.
-For instance:
-
-* To avoid headers included by default in notifications (e.g. `Accept`)
-* To cut the propagation of headers (from updates to notifications), such the
-  aforementioned `x-auth-token`
 
 [Top](#top)
 
