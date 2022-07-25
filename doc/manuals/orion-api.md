@@ -1021,6 +1021,8 @@ Some considerations to take into account:
 * In case the data to notify contains more than one entity, a separate notification (HTTP message)
   is sent for each of the entities (contrary to default behaviour, which is to send all entities in
   the same HTTP message).
+* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
+  custom notifications. This is described in detail in [this section](user/forbidden_characters.md#custom-payload-special-treatment) of the manual.
 
 Note that if a custom payload is used for the notification (the field `payload` is given in the
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header

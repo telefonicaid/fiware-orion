@@ -1,7 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
-* [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
 * [Header removal in custom notifications](#header-removal-in-custom-notifications)
@@ -49,14 +48,6 @@ which means *"increase the value of attribute A by 3"*.
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
-
-[Top](#top)
-
-## Custom payload decoding on notifications
-
-Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-custom notifications. This is described in detail in [this section](forbidden_characters.md#custom-payload-special-treatment)
-of the manual.
 
 [Top](#top)
 
