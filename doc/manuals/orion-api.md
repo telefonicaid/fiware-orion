@@ -289,9 +289,18 @@ Some operations use partial representation of entities:
   * If value is null, then `None` is used.
 
 * Attribute `metadata` may be omitted in requests, meaning that there are no metadata elements
-  associated to the attribute. In responses, this property is set to
-  `{}` if the attribute doesn't have any metadata.
+  associated to the attribute. In responses, this property is set to `{}` if the attribute 
+  doesn't have any metadata. Depending if `overrideMetadata` is used or not, this sentence has
+  two interpretations:
+  * If `overrideMetadata` is not used (default behaviour) it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **which need to be updated**"
+  * If `overrideMetadata` is used it is interpreted as
+  "... meaning that there are no metadata elements associated to the attribute,
+  **as a result of the the attribute update**"
 
+The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
+option are detailed in [this section of the documentation](metadata.md#updating-metadata).
 
 ## Special Attribute Types
 
