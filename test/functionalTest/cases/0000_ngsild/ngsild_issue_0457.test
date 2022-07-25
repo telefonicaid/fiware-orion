@@ -140,6 +140,7 @@ HTTP/1.1 201 Created
 Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: smartmaas001
 
 [
   "urn:ngsi-ld:WeatherObserved:BMP180:21336",

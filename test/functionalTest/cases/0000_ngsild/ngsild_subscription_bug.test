@@ -94,6 +94,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+NGSILD-Tenant: openiot
 
 
 
@@ -103,6 +104,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Blower:bd01
+NGSILD-Tenant: openiot
 
 
 

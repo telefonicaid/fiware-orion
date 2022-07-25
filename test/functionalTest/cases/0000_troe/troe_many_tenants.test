@@ -108,51 +108,61 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t0
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t1
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t2
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t3
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t4
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t5
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t6
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t7
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t8
 
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+NGSILD-Tenant: t9
 
 
 

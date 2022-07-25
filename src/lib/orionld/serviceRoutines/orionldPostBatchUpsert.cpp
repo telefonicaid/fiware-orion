@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
 #include "orionld/common/duplicatedInstances.h"                // duplicatedInstances
+#include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/types/OrionldProblemDetails.h"               // OrionldProblemDetails
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
@@ -573,6 +574,9 @@ bool orionldPostBatchUpsert(void)
     kjChildAdd(orionldState.responseTree, errorsArrayP);
   }
 
+
+  if ((createdArrayP->value.firstChildP != NULL) && (orionldState.tenantP != &tenant0))
+    orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
   mongoRequest.release();
   mongoResponse.release();

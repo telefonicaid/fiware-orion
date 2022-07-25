@@ -59,6 +59,7 @@ extern "C"
 #include "orionld/common/entityLookupById.h"                     // entityLookupById
 #include "orionld/common/removeArrayEntityLookup.h"              // removeArrayEntityLookup
 #include "orionld/common/typeCheckForNonExistingEntities.h"      // typeCheckForNonExistingEntities
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
@@ -380,6 +381,9 @@ bool orionldPostBatchCreate(void)
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);
   }
+
+  if ((orionldState.noDbUpdate == false) && (orionldState.tenantP != &tenant0))
+    orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
   if ((troe == true) && (cloneP != NULL))
   {

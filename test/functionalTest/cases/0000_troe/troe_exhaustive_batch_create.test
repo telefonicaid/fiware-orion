@@ -971,6 +971,7 @@ HTTP/1.1 201 Created
 Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E2"
@@ -1008,6 +1009,7 @@ HTTP/1.1 207 Multi-Status
 Content-Length: 224
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 {
     "errors": [
@@ -1046,6 +1048,7 @@ HTTP/1.1 201 Created
 Content-Length: 50
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E8",
@@ -1072,6 +1075,7 @@ HTTP/1.1 201 Created
 Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E12",
@@ -1098,6 +1102,7 @@ HTTP/1.1 201 Created
 Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E16",

@@ -153,7 +153,7 @@ bool orionldPostTemporalEntities(void)
   if (troeOk == true)
   {
     if (httpStatusCode == 201)
-      httpHeaderLocationAdd("/ngsi-ld/v1/temporal/entities/", entityId);
+      httpHeaderLocationAdd("/ngsi-ld/v1/temporal/entities/", entityId, orionldState.tenantP->tenant);
 
     orionldState.httpStatusCode = httpStatusCode;
     return true;
