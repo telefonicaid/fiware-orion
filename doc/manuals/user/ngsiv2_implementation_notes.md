@@ -1,7 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
-* [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
