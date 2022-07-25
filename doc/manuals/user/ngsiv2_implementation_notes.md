@@ -1,8 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
-* [Option to disable custom notifications](#option-to-disable-custom-notifications)
-* [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
 * [Header removal in custom notifications](#header-removal-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
 * [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
@@ -48,29 +46,6 @@ which means *"increase the value of attribute A by 3"*.
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
-
-[Top](#top)
-
-## Option to disable custom notifications
-
-Orion can be configured to disable custom notifications, using the `-disableCustomNotifications` [CLI parameter](../admin/cli.md).
-
-In this case:
-
-* `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
-* No `${...}` macro substitution is performed.
-
-[Top](#top)
-
-## Non-modifiable headers in custom notifications
-
-The following headers cannot be overwritten in custom notifications:
-
-* `Fiware-Correlator`
-* `Ngsiv2-AttrsFormat`
-
-Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
-ignored.
 
 [Top](#top)
 

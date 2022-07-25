@@ -963,14 +963,15 @@ NGSIv2 clients can customize HTTP notification messages using a simple template 
 to be templatized:
 
 * `url`
-* `headers` (both header name and value can be templatized)
+* `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
+  `Ngsiv2-AttrsFormat` headers cannot be overwritten in custom notifications. Any attempt of 
+  doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
 * `qs` (both parameter name and value can be templatized)
 * `payload`
 
 The fifth field `method`, lets the NGSIv2 clients select the HTTP method to be used for delivering
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
-
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
 
@@ -1023,6 +1024,10 @@ Some considerations to take into account:
   the same HTTP message).
 * Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
   custom notifications. This is described in detail in [this section](user/forbidden_characters.md#custom-payload-special-treatment) of the manual.
+* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
+  [CLI parameter](../admin/cli.md). In this case:
+  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
+  * No `${...}` macro substitution is performed.
 
 Note that if a custom payload is used for the notification (the field `payload` is given in the
 corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
