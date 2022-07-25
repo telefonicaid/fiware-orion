@@ -1,6 +1,5 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
-* [Forbidden characters](#forbidden-characters)
 * [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Metadata update semantics](#metadata-update-semantics)
 * [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
@@ -32,23 +31,6 @@
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
-
-## Forbidden characters
-
-From "Field syntax restrictions" section at NGSIv2 specification:
-
-> In addition to the above rules, given NGSIv2 server implementations could add additional
-> syntactical restrictions in those or other fields, e.g., to avoid cross script injection attacks.
-
-The additional restrictions that apply to Orion are the ones describe in the
-[forbidden characters](forbidden_characters.md) section of the manual.
-
-Note that you can use "TextUnrestricted" attribut type (and special attribute type beyond
-the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
-in the attribute value. However, it could have security implications (possible script
-injections attacks) so use it at your own risk!
-
-[Top](#top)
 
 ## Update operators for attribute values
 

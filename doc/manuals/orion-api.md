@@ -405,6 +405,14 @@ The rules are:
 In addition to the above rules, given NGSIv2 server implementations could add additional syntactical
 restrictions in those or other fields, e.g., to avoid cross script injection attacks.
 
+The additional restrictions that apply to Orion are the ones describe in the
+[forbidden characters](forbidden_characters.md) section of the manual.
+
+Note that you can use `TextUnrestricted` attribute type (and special attribute type beyond
+the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
+in the attribute value. However, it could have security implications (possible script
+injections attacks) so use it at your own risk!
+
 In case a client attempts to use a field that is invalid from a syntax point of view, the client
 gets a "Bad Request" error response, explaining the cause.
 
