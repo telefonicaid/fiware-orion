@@ -343,7 +343,15 @@ The list of builtin attributes is as follows:
 * `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How the server
   controls entity expiration is an implementation specific aspect.
 
-Like regular attributes, they can be used in `q` filters and in `orderBy`.
+* `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with 
+the [subscriptions based in alteration type](subscriptions_alttype.md) feature. This attribute
+  can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
+   * `entityCreate` if the update that triggers the notification is a entity creation operation 
+   * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+   * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
+   * `entityDelete` if the update that triggers the notification was a entity delete operation
+
+Like regular attributes, they can be used in `q` filters and in `orderBy` (`alterationType` is not included).
 However, they cannot be used in resource URLs.
 
 ## Special Metadata Types
