@@ -48,65 +48,6 @@ context. More detail in [specific documentation](update_operators.md).
 
 [Top](#top)
 
-## Limit to attributes for entity location
-
-From "Geospatial properties of entities" section at NGSIv2 specification:
-
-> Client applications are responsible for defining which entity attributes convey geospatial properties
-> (by providing an appropriate NGSI attribute type). Typically this is an entity attribute named `location`,
-> but nothing prevents use cases where an entity contains more than one geospatial attribute. For instance,
-> locations specified at different granularity levels or provided by different location methods with different
-> accuracy. Nonetheless, it is noteworthy that spatial properties need special indexes which can be under resource
-> constraints imposed by backend databases. Thus, implementations may raise errors when spatial index limits are
-> exceeded. The recommended HTTP status code for those situations is `413`, *Request entity too large*, and the
-> reported error on the response payload must be `NoResourcesAvailable`.
-
-In the case of Orion, that limit is one (1) attribute.
-
-However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
-location (more detail in [this section of the documentation](#ignoretype-metadata)). This disables Orion
-interpretation of that attribute as a location, so it doesn't count towards the limit.
-
-For instance:
-
-```
-{
-  "id": "Hospital1",
-  "type": "Hospital",
-  ...
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [ -3.68666, 40.48108 ]
-    },
-    "type": "geo:json"
-  },
-  "serviceArea": {
-    "value": {
-      "type": "Polygon",
-      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
-    },
-    "type": "geo:json",
-    "metadata": {
-      "ignoreType":{
-        "value": true,
-        "type": "Boolean"
-      }
-    }
-  }
-}
-```
-
-Both attributes are of type `geo:json`, but `serviceArea` uses `ignoreType` metadata to `true` so the limit 
-of one non-informative location is not overpassed.
-
-If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
-is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
-the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
-part in geo-queries.
-
-[Top](#top)
-
 ## Supported GeoJSON types in `geo:json` attributes
 
 NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
