@@ -1128,6 +1128,11 @@ Content-Length: 31
 The temperature is 23.4 degrees
 ```
 
+If `payload` is set to `null`, then the notifications associated to that subscription will not 
+include any payload (i.e. content-length 0 notifications). Note this is not the same than using 
+`payload` set to `""` or omitting the field. In that case, the notification will be sent using 
+the NGSIv2 normalized format.
+
 As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
 used to generate JSON-based payloads. For instance:
 
@@ -1142,7 +1147,7 @@ used to generate JSON-based payloads. For instance:
 }
 ```
 
-Some notes to take into account when using `json`instead of `payload`:
+Some notes to take into account when using `json` instead of `payload`:
 
 * The value of the `json` field must be an array or object. Although a simple string or number is
   also a valid JSON, these cases are not supported.

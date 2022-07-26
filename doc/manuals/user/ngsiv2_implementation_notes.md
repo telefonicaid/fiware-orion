@@ -7,7 +7,6 @@
 * [`actionType` metadata](#actiontype-metadata)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
-* [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
@@ -181,16 +180,6 @@ Orion supports the `alterationTypes` field to specify under which alterations (e
 modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
-
-[Top](#top)
-
-## Custom notifications without payload
-
-If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
-associated to that subscription will not include any payload (i.e. content-length 0 notifications).
-
-Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
-the notification will be sent using the NGSIv2 normalized format.
 
 [Top](#top)
 
