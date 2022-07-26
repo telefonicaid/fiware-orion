@@ -1064,9 +1064,9 @@ are aware of the format without needing to process the notification payload.
 
 ## Custom Notifications
 
-NGSIv2 clients can customize HTTP notification messages using a simple template mechanism. The
+NGSIv2 clients can customize notification messages using a simple template mechanism. The
 `notification.httpCustom` property of a subscription allows to specify the following fields
-to be templatized:
+to be templatized when using HTTP notifications:
 
 * `url`
 * `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
@@ -1074,10 +1074,12 @@ to be templatized:
   doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
 * `qs` (both parameter name and value can be templatized)
 * `payload`
-
-The fifth field `method`, lets the NGSIv2 clients select the HTTP method to be used for delivering
+* `method`, lets the NGSIv2 clients select the HTTP method to be used for delivering
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
+
+Regarding the MQTT notifications, the `mqttCustom` is used instead of `httpCustom`. This
+topic is described with more detail [in this specific document](user/mqtt_notifications.md).
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
 

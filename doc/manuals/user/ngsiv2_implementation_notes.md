@@ -7,7 +7,6 @@
 * [`actionType` metadata](#actiontype-metadata)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
-* [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
@@ -180,14 +179,6 @@ Orion supports the `alterationTypes` field to specify under which alterations (e
 modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
-
-[Top](#top)
-
-## MQTT notifications
-
-Apart from the `http` and `httpCustom` fields withint `notification` object in subscription described
-in the NGISv2 specification, Orion also supports `mqtt` and `mqttCustom` for MQTT notifications. This
-topic is described with more detail [in this specific document](mqtt_notifications.md).
 
 [Top](#top)
 
