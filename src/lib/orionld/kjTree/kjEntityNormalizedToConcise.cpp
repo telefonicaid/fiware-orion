@@ -86,7 +86,7 @@ void kjEntityNormalizedToConcise(KjNode* treeP, const char* lang)
         // The value (not languageMap anymore is a string, looked up by langStringExtract
         //
         char* pickedLanguage;
-        char* langString = langStringExtract(valueP, lang, &pickedLanguage);
+        char* langString = langStringExtract(valueP, lang, &pickedLanguage);  // FIXME: use langItemPick instead - can be array as well !
 
         valueP->name    = (char*) "value";
         valueP->type    = KjString;

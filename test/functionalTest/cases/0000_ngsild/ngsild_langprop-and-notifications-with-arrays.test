@@ -327,7 +327,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 08. Dump/Reset accumulator - see one notification for S2, with L2 as a normal Property
 ======================================================================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
-Content-Length: 377
+Content-Length: 293
 User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -338,24 +338,13 @@ Ngsild-Attribute-Format: Normalized
     "data": [
         {
             "L2": {
-                "languageMap": {
-                    "en": [
-                        "English",
-                        "Spanish",
-                        "Swedish"
-                    ],
-                    "es": [
-                        "ingles",
-                        "castellano",
-                        "sueco"
-                    ],
-                    "sv": [
-                        "engelska",
-                        "spanska",
-                        "svenska"
-                    ]
-                },
-                "type": "LanguageProperty"
+                "lang": "en",
+                "type": "Property",
+                "value": [
+                    "English",
+                    "Spanish",
+                    "Swedish"
+                ]
             },
             "id": "urn:ngsi-ld:entities:E2",
             "type": "T"

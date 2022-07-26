@@ -100,7 +100,7 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
 }
 
 
-#if 0
+
 // -----------------------------------------------------------------------------
 //
 // matchLookup -
@@ -112,40 +112,55 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
 //   * matchP             an item in the 'matchList' - those already programmed for notification
 //   * itemP              the candidate
 //
-bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* itemP)
+static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* itemP)
 {
-  CachedSubscription* subP = matchP->subP;
-
-  while ((matchP != NULL) && (matchP->subP == subP))  // matchP is an item in the 'matchList' - those already programmed for notification
+#if 0
+  // <DEBUG>
+  LM(("Match List:"));
+  for (OrionldAlterationMatch* mP = matchP; mP != NULL; mP = mP->next)
   {
-    if (strcmp(matchP->altP->entityId, itemP->altP->entityId) == 0)
+    if (matchP->altAttrP)
+      LM(("o %p: %s %s", mP, mP->subP->subscriptionId, mP->altAttrP->alterationType));
+    else
+      LM(("o %p: %s (no attr)", mP, mP->subP->subscriptionId));
+  }
+  LM(("Compare with:"));
+  if (itemP->altAttrP)
+    LM(("o %p: %s %s", itemP, itemP->subP->subscriptionId, itemP->altAttrP->alterationType));
+  else
+    LM(("o %p: %s (no attr)", itemP, itemP->subP->subscriptionId));
+  // </DEBUG>
+#endif
+
+  while (matchP != NULL)
+  {
+    if (itemP->subP == matchP->subP)  // Same subscription - might be a match
     {
-      // Same entity - is it the same reason too?
-      OrionldAlterationType inListAlterationType = matchP->altAttrP->alterationType;
-      OrionldAlterationType candidate            = itemP->altAttrP->alterationType;
-
-      //
-      // Match if
-      //   - EntityDeleted            & EntityDeleted
-      //   - AttributeDeleted         & AttributeDeleted
-      //   - Any other AlterationType & Any other AlterationType
-      //
-
-      if      (inListAlterationType == EntityDeleted)    { if (candidate == EntityDeleted)    return true; }
-      else if (inListAlterationType == AttributeDeleted) { if (candidate == AttributeDeleted) return true; }
-      else
+      if ((matchP->altAttrP == NULL) && (itemP->altAttrP == NULL))
       {
-        if ((candidate != EntityDeleted) && (candidate != AttributeDeleted))
+        LM(("Already there *********** 1"));
+        return true;
+      }
+      else if ((matchP->altAttrP != NULL) && (itemP->altAttrP != NULL))
+      {
+        OrionldAlterationType inListAlterationType = matchP->altAttrP->alterationType;
+        OrionldAlterationType candidate            = itemP->altAttrP->alterationType;
+
+        if (inListAlterationType == candidate)
+        {
+          LM(("Already there *************** 2"));
           return true;
+        }
       }
     }
 
     matchP = matchP->next;
   }
 
+  LM(("No Match - must keep it"));
   return false;
 }
-#endif
+
 
 
 // -----------------------------------------------------------------------------
@@ -185,7 +200,7 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 //
 // matchToMatchList -
 //
-static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, OrionldAttributeAlteration* aaP)
+static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, OrionldAttributeAlteration* aaP, int* matchesP)
 {
   OrionldAlterationMatch* amP = (OrionldAlterationMatch*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlterationMatch));
   amP->altP     = altP;
@@ -194,11 +209,21 @@ static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchLis
 
   if (matchList == NULL)
   {
-    matchList = amP;
-    amP->next = NULL;
+    matchList  = amP;
+    amP->next  = NULL;
+    *matchesP += 1;
   }
   else
-    matchList = matchListInsert(matchList, amP);  // Items in matchList are grouped by their subP
+  {
+    // Already there? - look up the existing subs in matchList to make sure we don't get any duplicates
+    if (matchLookup(matchList, amP) == false)
+    {
+      matchList  = matchListInsert(matchList, amP);
+      *matchesP += 1;
+    }
+    else
+      LM(("Not adding match as it is already covered"));
+  }
 
   return matchList;
 }
@@ -223,10 +248,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[EntityModified] == true)
-    {
-      matchList = matchToMatchList(matchList, subP, altP, NULL);
-      ++matches;
-    }
+      matchList = matchToMatchList(matchList, subP, altP, NULL, &matches);
     else
       LM(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
   }
@@ -255,8 +277,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
       continue;
     }
 
-    matchList = matchToMatchList(matchList, subP, altP, aaP);
-    ++matches;
+    matchList = matchToMatchList(matchList, subP, altP, aaP, &matches);
   }
 
   if (matches == 0)
