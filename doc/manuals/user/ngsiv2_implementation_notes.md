@@ -5,7 +5,6 @@
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
-* [`ignoreType` metadata](#ignoretype-metadata)
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -169,26 +168,6 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-[Top](#top)
-
-## `ignoreType` metadata
-
-Apart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
-Orion implements the `ignoreType` metadata.
-
-When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
-semantics associated to the attribute type. Note that Orion ignored attribute type in general so
-this metadata is not needed most of the cases, but there are two cases in which attribute
-type has an special semantic for Orion (check NGSIv2 specification for details):
-
-* `DateTime`
-* Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
-
-At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
-mechanism to overcome the limit of only one geo-location per entity (more details
-in [this section of the documentation](#limit-to-attributes-for-entity-location). Support
-for `ignoreType` in `DateTime` may come in the future.
 
 [Top](#top)
 

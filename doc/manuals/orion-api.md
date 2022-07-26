@@ -373,6 +373,18 @@ meaning:
 }
 ```
 
+* `ignoreType`: When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+semantics associated to the attribute type. Note that Orion ignored attribute type in general so
+this metadata is not needed most of the cases, but there are two cases in which attribute
+type has an special semantic for Orion:
+   * `DateTime`
+   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+
+At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
+mechanism to overcome the limit of only one geo-location per entity (more details
+in [Geospatial properties of entities](##geospatial-properties-of-entities) section). Support
+for `ignoreType` in `DateTime` may come in the future.
+
 ## Builtin Metadata
 
 Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
