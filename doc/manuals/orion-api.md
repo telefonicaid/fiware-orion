@@ -1082,11 +1082,20 @@ HEAD, OPTIONS, TRACE, and CONNECT.
 Macro substitution for templates is based on the syntax `${..}`. In particular:
 
 * `${id}` is replaced by the `id` of the entity
-* `${type}` is replaced by the `type` of the entity
+* `${type}` is replaced by the `type` of the entity 
+* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
+  update request triggering the subscription.
+* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
+  update request triggering the subscription.
+* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
+  update request triggering the subscription.
 * Any other `${token}` is replaced by the value of the attribute whose name is `token` or with
   an empty string if the attribute is not included in the notification. If the value is a number,
   a bool or null then its string representation is used. If the value is a JSON array or object
   then its JSON representation as string is used.
+
+In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or 
+`${authToken}`  (e.g. an attribute which name is `service`) then the attribute value takes precedence.
 
 Example:
 

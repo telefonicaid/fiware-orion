@@ -7,7 +7,6 @@
 * [`actionType` metadata](#actiontype-metadata)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
-* [Custom notification extra macros](#custom-notification-extra-macros)
 * [Custom notification with JSON payload](#custom-notification-with-json-payload)
 * [Custom notifications without payload](#custom-notifications-without-payload)
 * [MQTT notifications](#mqtt-notifications)
@@ -183,23 +182,6 @@ Orion supports the `alterationTypes` field to specify under which alterations (e
 modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
-
-[Top](#top)
-
-## Custom notification extra macros
-
-Apart from the `${...}` macros described in "Custom Notifications" section in the NGSIv2
-specification, the following ones can be used:
-
-* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
-  update request triggering the subscription.
-* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
-  update request triggering the subscription.
-* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
-  update request triggering the subscription.
-
-In the rare case an attribute was named in the same way of the above (e.g. an attribute which
-name is `service`) then the attribute value takes precedence.
 
 [Top](#top)
 
