@@ -484,6 +484,21 @@ The value of `orderBy` can be:
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
 
+How each type is ordered with regard to other types is an implementation aspect. In the case of Orion,
+we use the same criteria as the one used by the underlying implementation (MongoDB). See
+[the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
+for details.
+
+From lowest to highest:
+
+1. Null
+2. Number
+3. String
+4. Object
+5. Array
+6. Boolean
+
+
 ## Error Responses
 
 If present, the error payload is a JSON object including the following fields:

@@ -5,7 +5,6 @@
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
-* [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 * [Custom notification extra macros](#custom-notification-extra-macros)
@@ -168,29 +167,6 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-[Top](#top)
-
-## Ordering between different attribute value types
-
-From NGISv2 specification "Ordering Results" section:
-
-> Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify 
-> the attributes or properties to be used as criteria when ordering results
-
-It is an implementation aspect how each type is ordered with regard to other types. In the case of Orion,
-we use the same criteria as the one used by the underlying implementation (MongoDB). See
-[the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
-for details.
-
-From lowest to highest:
-
-1. Null
-2. Number
-3. String
-4. Object
-5. Array
-6. Boolean
 
 [Top](#top)
 
