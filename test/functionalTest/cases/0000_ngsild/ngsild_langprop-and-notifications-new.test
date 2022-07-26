@@ -38,6 +38,8 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 04. GET subscription S2 - see lang=en
 # 05. Create an Entity E1 with a language-property L1
 # 06. Dump/Reset accumulator - see one notification for S1, with L1 as a LanguageProperty
+# 07. Create an Entity E2 with a language-property L2
+# 08. Dump/Reset accumulator - see one notification for S2, with L2 as a Property in English
 #
 
 echo "01. Create a subscription S1 on E1 and attribute L1, without 'lang'"
@@ -128,6 +130,34 @@ accumulatorDump
 accumulatorReset
 echo
 echo
+
+
+echo "07. Create an Entity E2 with a language-property L2"
+echo "==================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "L2": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "english",
+      "es": "ingles",
+      "sv": "engelska"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump/Reset accumulator - see one notification for S2, with L2 as a Property in English"
+echo "=========================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
 
 
 --REGEXPECT--
@@ -269,6 +299,45 @@ Ngsild-Attribute-Format: Normalized
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "202REGEX(.*)",
     "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+07. Create an Entity E2 with a language-property L2
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+
+
+
+08. Dump/Reset accumulator - see one notification for S2, with L2 as a Property in English
+==========================================================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 271
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L2": {
+                "lang": "en",
+                "type": "Property",
+                "value": "english"
+            },
+            "id": "urn:ngsi-ld:entities:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
     "type": "Notification"
 }
 =======================================

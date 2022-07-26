@@ -41,7 +41,7 @@ extern "C"
 //
 // langStringExtract -
 //
-// FIXME: merge this function with langValueFix
+// FIXME: merge all three functions from this file!!!
 //
 char* langStringExtract(KjNode* languageMapP, const char* lang, char** pickedLanguageP)
 {
@@ -88,3 +88,84 @@ KjNode* langItemPick(KjNode* languageMapP, const char* attrName, const char* lan
   langItemP->name = kaStrdup(&orionldState.kalloc, attrName);
   return langItemP;
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// langValueFix -
+//
+void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang)
+{
+  // Special case - URI param lang is set and it's a LanguageProperty
+  KjNode* langValueNodeP = kjLookup(valueP, lang);
+
+  if (langValueNodeP == NULL)
+    langValueNodeP = kjLookup(valueP, "@none");   // If present, the key '@none' is the default language
+  if (langValueNodeP == NULL)
+    langValueNodeP = kjLookup(valueP, "en");      // Pick English as default if the desired language is not found and @none also not
+  if (langValueNodeP == NULL)
+    langValueNodeP = valueP->value.firstChildP;   // If English is also not found, just take the first one
+
+  if (langValueNodeP == NULL)
+  {
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      valueP->type      = KjString;
+      valueP->value.s   = (char*) "empty languageMap ...";
+    }
+    else
+    {
+      attrP->type      = KjString;
+      attrP->value.s   = (char*) "empty languageMap ...";
+    }
+  }
+  else if (langValueNodeP->type == KjString)
+  {
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      valueP->type      = KjString;
+      valueP->value.s   = langValueNodeP->value.s;
+    }
+    else
+    {
+      attrP->type      = KjString;
+      attrP->value.s   = langValueNodeP->value.s;
+    }
+  }
+  else  // It's an array
+  {
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      valueP->type                       = KjArray;
+      valueP->value.firstChildP          = langValueNodeP->value.firstChildP;
+      valueP->lastChild                  = langValueNodeP->lastChild;
+    }
+    else
+    {
+      attrP->type                       = KjArray;
+      attrP->value.firstChildP          = langValueNodeP->value.firstChildP;
+      attrP->lastChild                  = langValueNodeP->lastChild;
+    }
+
+    langValueNodeP->value.firstChildP = NULL;
+    langValueNodeP->lastChild         = NULL;
+  }
+
+  if (orionldState.uriParamOptions.keyValues == false)
+  {
+    if (langValueNodeP != NULL)
+    {
+      // Picked Language as sub-attr
+      KjNode* langNameNodeP = kjString(orionldState.kjsonP, "lang", langValueNodeP->name);
+      kjChildAdd(attrP, langNameNodeP);
+    }
+
+    // Transform to Property
+    typeP->value.s  = (char*) "Property";
+    valueP->name    = (char*) "value";
+  }
+}
+
+
+

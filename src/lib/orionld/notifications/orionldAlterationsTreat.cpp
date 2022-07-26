@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -36,7 +37,6 @@ extern "C"
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
 #include "orionld/notifications/notificationSuccess.h"           // notificationSuccess
@@ -95,6 +95,29 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 
 
   return 0;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldAlterationName - FIXME: Move to orionld/types/OrionldAlteration.cpp
+//
+const char* orionldAlterationName(OrionldAlterationType alterationType)
+{
+  switch (alterationType)
+  {
+  case EntityCreated:                return "EntityCreated";
+  case EntityDeleted:                return "EntityDeleted";
+  case EntityModified:               return "EntityModified";
+  case AttributeAdded:               return "AttributeAdded";
+  case AttributeDeleted:             return "AttributeDeleted";
+  case AttributeValueChanged:        return "AttributeValueChanged";
+  case AttributeMetadataChanged:     return "AttributeMetadataChanged";
+  case AttributeModifiedAtChanged:   return "AttributeModifiedAtChanged";
+  }
+
+  return "Unclear Reason";
 }
 
 
@@ -163,7 +186,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   LM(("%d Matching subscriptions:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    LM(("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+    if (matchP->altAttrP != NULL)
+      LM(("o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
+    else
+      LM(("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+    ++ix;
   }
 #endif
 
@@ -189,58 +216,23 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   kTimeGet(&notificationTime);
   notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
 
-  //
-  // Sorting matches into groups and sending notifications
-  //
-  while (matchList != NULL)
+  for (OrionldAlterationMatch* mAltP = matchList; mAltP != NULL; mAltP = mAltP->next)
   {
-    // Get the group
-    OrionldAlterationMatch* groupList = matchList;
-    OrionldAlterationMatch* prev      = matchList;
-
-    LM(("groupList at %p (next at %p)", groupList, groupList->next));
-    for (OrionldAlterationMatch* matchP = groupList->next; matchP != NULL; matchP = matchP->next)
-    {
-      LM(("Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
-      if (matchP->subP != groupList->subP)
-      {
-        matchList  = matchP;  // matchList pointing to the first non-matching
-        prev->next = NULL;    // Ending the 'groupList'
-        LM(("Breaking match loop for sub '%s' - next is %p", groupList->subP->subscriptionId, matchList));
-        break;
-      }
-
-      prev = matchP;
-      if (matchP->next == NULL)
-        matchList = NULL;
-    }
-
-    // <DEBUG>
-    int groupMembers = 0;
-    LM(("Alterations matching sub '%s':", groupList->subP->subscriptionId));
-    for (OrionldAlterationMatch* matchP = groupList; matchP != NULL; matchP = matchP->next)
-    {
-      ++groupMembers;
-      if (matchP->altAttrP)
-        LM(("o %s", orionldAlterationType(matchP->altAttrP->alterationType)));
-    }
-    // </DEBUG>
-
-    int fd = notificationSend(groupList, notificationTimeAsFloat);
+    LM(("Sending notification for OrionldAlterationMatch at %p (patchedEntity at %p)", mAltP, mAltP->altP->patchedEntity));
+    //
+    // Neeed to clone the "patched entity", there might be more notifications wit the same "patched entity"
+    //
+    int fd = notificationSend(mAltP, notificationTimeAsFloat);
     if (fd != -1)
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
-      npP->subP = groupList->subP;
+      npP->subP = mAltP->subP;
       npP->fd   = fd;
       npP->next = notificationList;
       notificationList = npP;
     }
-
-    if (groupList == matchList)
-      break;
   }
-
 
   //
   // Awaiting responses and updating subscriptions accordingly (in sub cache)

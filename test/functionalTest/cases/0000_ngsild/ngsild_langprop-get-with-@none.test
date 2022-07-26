@@ -237,7 +237,7 @@ Date: REGEX(.*)
 08. Dump accumulator, see one notification with the Default language for L
 ==========================================================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
-Content-Length: 413
+Content-Length: 359
 User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -248,13 +248,9 @@ Ngsild-Attribute-Format: Normalized
     "data": [
         {
             "L": {
-                "languageMap": {
-                    "@none": "Default",
-                    "en": "English",
-                    "es": "Spanish",
-                    "sv": "Swedish"
-                },
-                "type": "LanguageProperty"
+                "lang": "@none",
+                "type": "Property",
+                "value": "Default"
             },
             "id": "urn:ngsi-ld:T:E1",
             "trigger": {

@@ -1,0 +1,1044 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscriptions with 'lang' - notifications with Language Property (strings+arrays)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# Subscriptions with "lang": "es"
+# * 3 Subs with Normalized/Concise/Simplified + Create:
+#   - LangProperty::languageMap: { "@none": "yes", "en": "no", "se": "no" }: see '@none' (default)
+#   - LangProperty::languageMap: { "se": "no", "en": "yes" }:                see 'en'    (second default)
+#   - LangProperty::languageMap: { "se": "yes", "sk": "no" }:                see 'se'    (first item if no default found)
+#   - LangProperty::languageMap: { "@none": "no", "en": "no", "es": "yes" }: see 'es'    (what was asked for)
+# * Same same, but the languageMap RHS as ARRAYS
+# 
+# 01. Create sub S1 with format=Normalized and "lang": "es"
+# 02. Create sub S2 with format=Concise and "lang": "es"
+# 03. Create sub S2 with format=Simplified and "lang": "es"
+# 
+# 04. Create Entity with a LanguageProperty with a languageMap: { "@none": "yes", "en": "no", "se": "no" }: see "@none" (default)
+# 05. Create Entity with a LanguageProperty with a languageMap: { "se": "no", "en": "yes" }: see "en" (second default)
+# 06. Create Entity with a LanguageProperty with a languageMap: { "se": "yes", "sk": "no" }: see "se" (first item if no default found)
+# 07. Create Entity with a LanguageProperty with a languageMap: { "@none": "no", "en": "no", "es": "yes" }: see "es" (what was asked for)
+# 
+# 08. Create Entity with a LanguageProperty with a languageMap: { "@none": ["yes"], "en": ["no"], "se": ["no"] }: see "@none" (default)
+# 09. Create Entity with a LanguageProperty with a languageMap: { "se": ["no"], "en": ["yes"] }: see "en" (second default)
+# 10. Create Entity with a LanguageProperty with a languageMap: { "se": ["yes"], "sk": ["no"] }: see "se" (first item if no default found)
+# 11. Create Entity with a LanguageProperty with a languageMap: { "@none": ["no"], "en": ["no"], "es": ["yes"] }: see "es" (what was asked for)
+# 
+
+echo '01. Create sub S1 with format=Normalized and "lang": "es"'
+echo '========================================================='
+payload='{
+  "id": "urn:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "lang": "es"  
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. Create sub S2 with format=Concise and "lang": "es"'
+echo '======================================================'
+payload='{
+  "id": "urn:subs:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "format": "concise",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "lang": "es"  
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Create sub S2 with format=Simplified and "lang": "es"'
+echo '========================================================='
+payload='{
+  "id": "urn:subs:S3",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "lang": "es"  
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '04. Create Entity with a LanguageProperty with a languageMap: { "@none": "yes", "en": "no", "se": "no" }: see "@none" (default)'
+echo '==============================================================================================================================='
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "L": { "languageMap": { "@none": "yes", "en": "no", "se": "no" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '04b. Dump/Reset Accumulator'
+echo '==========================='
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '05. Create Entity with a LanguageProperty with a languageMap: { "se": "no", "en": "yes" }: see "en" (second default)'
+echo '===================================================================================================================='
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "L": { "languageMap": { "se": "no", "en": "yes" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05b. Dump/Reset Accumulator"
+echo "==========================="
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '06. Create Entity with a LanguageProperty with a languageMap: { "se": "yes", "sk": "no" }: see "se" (first item if no default found)'
+echo '===================================================================================================================================='
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "L": { "languageMap": { "se": "yes", "sk": "no" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06b. Dump/Reset Accumulator"
+echo "==========================="
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '07. Create Entity with a LanguageProperty with a languageMap: { "@none": "no", "en": "no", "es": "yes" }: see "es" (what was asked for)'
+echo '======================================================================================================================================='
+payload='{
+  "id": "urn:E4",
+  "type": "T",
+  "L": { "languageMap": { "@none": "no", "en": "no", "es": "yes" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07b. Dump/Reset Accumulator"
+echo "==========================="
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '08. Create Entity with a LanguageProperty with a languageMap: { "@none": ["yes"], "en": ["no"], "se": ["no"] }: see "@none" (default)'
+echo '====================================================================================================================================='
+payload='{
+  "id": "urn:E5",
+  "type": "T",
+  "L": { "languageMap": { "@none": ["yes", "yeah!"], "en": ["no", "not at all"], "se": ["nej", "Aa nej!"] } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '08b. Dump/Reset Accumulator'
+echo '==========================='
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '09. Create Entity with a LanguageProperty with a languageMap: { "se": ["no"], "en": ["yes"] }: see "en" (second default)'
+echo '========================================================================================================================'
+payload='{
+  "id": "urn:E6",
+  "type": "T",
+  "L": { "languageMap": { "se": ["nej", "inte alls"], "en": ["yes", "definitely"] } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '09b. Dump/Reset Accumulator'
+echo '==========================='
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '10. Create Entity with a LanguageProperty with a languageMap: { "se": ["yes"], "sk": ["no"] }: see "se" (first item if no default found)'
+echo '========================================================================================================================================'
+payload='{
+  "id": "urn:E7",
+  "type": "T",
+  "L": { "languageMap": { "se": ["yes"], "sk": ["no"] } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '10b. Dump/Reset Accumulator'
+echo '==========================='
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '11. Create Entity with a LanguageProperty with a languageMap: { "@none": ["no"], "en": ["no"], "es": ["yes"] }: see "es" (what was asked for)'
+echo '============================================================================================================================================='
+payload='{
+  "id": "urn:E8",
+  "type": "T",
+  "L": { "languageMap": { "@none": ["no"], "en": ["no"], "es": ["yes"] } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '11b. Dump/Reset Accumulator'
+echo '==========================='
+sleep .5
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub S1 with format=Normalized and "lang": "es"
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:subs:S1
+
+
+
+02. Create sub S2 with format=Concise and "lang": "es"
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:subs:S2
+
+
+
+03. Create sub S2 with format=Simplified and "lang": "es"
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:subs:S3
+
+
+
+04. Create Entity with a LanguageProperty with a languageMap: { "@none": "yes", "en": "no", "se": "no" }: see "@none" (default)
+===============================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 209
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": "yes",
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 234
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "@none",
+                "value": "yes"
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 252
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "@none",
+                "type": "Property",
+                "value": "yes"
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+05. Create Entity with a LanguageProperty with a languageMap: { "se": "no", "en": "yes" }: see "en" (second default)
+====================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+05b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 209
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": "yes",
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 231
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "en",
+                "value": "yes"
+            },
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 249
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "en",
+                "type": "Property",
+                "value": "yes"
+            },
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+06. Create Entity with a LanguageProperty with a languageMap: { "se": "yes", "sk": "no" }: see "se" (first item if no default found)
+====================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+06b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 209
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": "yes",
+            "id": "urn:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 231
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "se",
+                "value": "yes"
+            },
+            "id": "urn:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 249
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "se",
+                "type": "Property",
+                "value": "yes"
+            },
+            "id": "urn:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+07. Create Entity with a LanguageProperty with a languageMap: { "@none": "no", "en": "no", "es": "yes" }: see "es" (what was asked for)
+=======================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E4
+
+
+
+07b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 209
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": "yes",
+            "id": "urn:E4",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 231
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "es",
+                "value": "yes"
+            },
+            "id": "urn:E4",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 249
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "es",
+                "type": "Property",
+                "value": "yes"
+            },
+            "id": "urn:E4",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+08. Create Entity with a LanguageProperty with a languageMap: { "@none": ["yes"], "en": ["no"], "se": ["no"] }: see "@none" (default)
+=====================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E5
+
+
+
+08b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 219
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": [
+                "yes",
+                "yeah!"
+            ],
+            "id": "urn:E5",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 244
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "@none",
+                "value": [
+                    "yes",
+                    "yeah!"
+                ]
+            },
+            "id": "urn:E5",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 262
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "@none",
+                "type": "Property",
+                "value": [
+                    "yes",
+                    "yeah!"
+                ]
+            },
+            "id": "urn:E5",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+09. Create Entity with a LanguageProperty with a languageMap: { "se": ["no"], "en": ["yes"] }: see "en" (second default)
+========================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E6
+
+
+
+09b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 224
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": [
+                "yes",
+                "definitely"
+            ],
+            "id": "urn:E6",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 246
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "en",
+                "value": [
+                    "yes",
+                    "definitely"
+                ]
+            },
+            "id": "urn:E6",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 264
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "en",
+                "type": "Property",
+                "value": [
+                    "yes",
+                    "definitely"
+                ]
+            },
+            "id": "urn:E6",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+10. Create Entity with a LanguageProperty with a languageMap: { "se": ["yes"], "sk": ["no"] }: see "se" (first item if no default found)
+========================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E7
+
+
+
+10b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 211
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": [
+                "yes"
+            ],
+            "id": "urn:E7",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 233
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "se",
+                "value": [
+                    "yes"
+                ]
+            },
+            "id": "urn:E7",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 251
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "se",
+                "type": "Property",
+                "value": [
+                    "yes"
+                ]
+            },
+            "id": "urn:E7",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+11. Create Entity with a LanguageProperty with a languageMap: { "@none": ["no"], "en": ["no"], "es": ["yes"] }: see "es" (what was asked for)
+=============================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E8
+
+
+
+11b. Dump/Reset Accumulator
+===========================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+Content-Length: 211
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "L": [
+                "yes"
+            ],
+            "id": "urn:E8",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S3",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+Content-Length: 233
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "es",
+                "value": [
+                    "yes"
+                ]
+            },
+            "id": "urn:E8",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+Content-Length: 251
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L": {
+                "lang": "es",
+                "type": "Property",
+                "value": [
+                    "yes"
+                ]
+            },
+            "id": "urn:E8",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
