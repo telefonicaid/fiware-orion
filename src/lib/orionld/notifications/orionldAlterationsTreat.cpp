@@ -103,7 +103,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 //
 // orionldAlterationName - FIXME: Move to orionld/types/OrionldAlteration.cpp
 //
-static const char* orionldAlterationName(OrionldAlterationType alterationType)
+const char* orionldAlterationName(OrionldAlterationType alterationType)
 {
   switch (alterationType)
   {
