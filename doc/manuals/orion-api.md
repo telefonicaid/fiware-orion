@@ -309,8 +309,9 @@ server in an opaque way. Nonetheless, the types described below are used to conv
 meaning:
 
 * `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the query
-  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For instance
-  (only the referred entity attribute is shown):
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. A `DateTime` attribute
+  with `null` value will not be taken into account in filters, i.e. `GET /v2/entities?q=T>2021-04-21`. 
+  For instance (only the referred entity attribute is shown):
 
 ```
 {
@@ -322,7 +323,9 @@ meaning:
 ```
 
 * `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
-  related with entity location. See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
+  related with entity location. Attributes with `null` value will not be taken into account in 
+  geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
+  See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
 
 ## Builtin Attributes
 
@@ -361,7 +364,8 @@ server in an opaque way. Nonetheless, the types described below are used to conv
 meaning:
 
 * `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
-  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For instance
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. A `DateTime` 
+  metadata with `null` value will not be taken into account in filters. For instance
   (only the referred attribute metadata is shown):
 
 ```
