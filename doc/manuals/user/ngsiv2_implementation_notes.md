@@ -2,7 +2,6 @@
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Subscription payload validations](#subscription-payload-validations)
-* [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -67,31 +66,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
-
-[Top](#top)
-
-## Ambiguous subscription status `failed` not used
-
-NGSIv2 specification describes `failed` value for `status` field in subscriptions:
-
-> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
-> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
-
-Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
-
-* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
-  upon entity updates) which last notification sent was failed
-* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
-  upon entity update) which was active in the past and which last notification sent in the time it was
-  active was failed
-
-In other words, looking to status `failed` is not possible to know if the subscription is currently
-active or inactive.
-
-Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
-if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
-`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
-the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
 
 [Top](#top)
 

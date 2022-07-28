@@ -39,6 +39,7 @@
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 - [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
     - [`actionType` metadata](#actiontype-metadata)
+    - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -1484,6 +1485,29 @@ From original NGSIv2 specification section "Builtin metadata", regarding `action
 Current Orion implementation supports `update` and `append`. The `delete` case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
 
+## Ambiguous subscription status `failed` not used
+
+The original NGSIv2 specification describes `failed` value for `status` field in subscriptions:
+
+> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
+> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
+
+Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
+
+* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
+  upon entity updates) which last notification sent was failed
+* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
+  upon entity update) which was active in the past and which last notification sent in the time it was
+  active was failed
+
+In other words, looking to status `failed` is not possible to know if the subscription is currently
+active or inactive.
+
+Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
+`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
+the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
+
 # API Routes
 
 ## Group API Entry Point
@@ -2555,7 +2579,7 @@ A subscription is represented by a JSON object with the following fields:
 | [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`. Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". |
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
@@ -2991,7 +3015,7 @@ A context registration is represented by a JSON object with the following fields
 | `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
 | [`provider`](#registrationprovider)              |          | object | Object that describes the context source registered.                                                                                                                                        |
 | [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
-| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`, `expired` or `failed`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
+| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`or `expired`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
 | `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
 | [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
