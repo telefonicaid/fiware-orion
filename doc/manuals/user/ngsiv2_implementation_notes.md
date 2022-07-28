@@ -1,7 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
-* [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
@@ -35,52 +34,6 @@ which means *"increase the value of attribute A by 3"*.
 This functionality is usefeul to reduce the complexity of applications and avoid
 race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
-
-[Top](#top)
-
-## Datetime support
-
-From "Special Attribute Types" section at NGSIv2 specification:
-
-> DateTime: identifies dates, in ISO8601 format. These attributes can be used with the query operators greater-than,
-> less-than, greater-or-equal, less-or-equal and range.
-
-The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
-
-* Datetimes are composed of date, time and timezone designator, in one of the following patterns:
-    * `<date>`
-    * `<date>T<time>`
-    * `<date>T<time><timezone>`
-    * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
-      it follows the combined date and time".*
-* Regarding `<date>` it must follow the pattern: `YYYY-MM-DD`
-    * `YYYY`: year (four digits)
-    * `MM`: month (two digits)
-    * `DD`: day (two digits)
-* Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-    * `hh:mm:ss.sss` or `hhmmss.sss`.
-    * `hh:mm:ss` or `hhmmss`. Milliseconds are set to `000` in this case.
-    * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
-    * `hh`. Minutes and seconds are set to `00` in this case.
-    * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
-* Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
-    * `Z`
-    * `±hh:mm`
-    * `±hhmm`
-    * `±hh`
-* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
-  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
-  assume timezone `Z` when timezone designator is omitted.
-
-Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
-Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
-etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
-about this)).
-
-In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
-clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
-
-The string "ISO8601" as type for attributes and metadata is also supported. The effect is the same as when using "DateTime".
 
 [Top](#top)
 
