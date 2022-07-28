@@ -3,7 +3,6 @@
 * [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
-* [Oneshot subscriptions](#oneshot-subscriptions)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
@@ -82,12 +81,6 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-[Top](#top)
-
-## Oneshot subscriptions
-
-Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
 [Top](#top)
 
