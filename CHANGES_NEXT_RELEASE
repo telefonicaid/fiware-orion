@@ -1,49 +1,52 @@
-* Issue #280   Complete removal of ConnectionInfo (Refactor + Performance)
+Fixed Issues:
 * Issue #954   Broker crashes with too big attribute values (Orion-LD's limit for the size of an attribute value is 64k right now)
 * Issue #986   Username and Password for the mongo C driver connection to the MongoDB server
 * Issue #990   mongo::Timestamp support
 * Issue #989   Deprecated bson_append_symbol still in use - change for bson_append_utf8
-* Issue #992   More reliable (100% I'd say) implementation of existence check of entities (mongoEntityExists)
+* Issue #992   Better implementation of existence check of entities (mongoEntityExists)
 * Issue #1010  Fixed bug related to parsing ISO8601 DateTime strings
 * Issue #1016  Fixed bug related to wrong context in response when input context is an array with a single URL
-* Issue #280   Support for @type in the context
 * Issue #1015  Implemented 'Concise Input Format' support for all entity/attribute create/update endpoints
 * Issue #1030  Implemented 'Concise Output Format' support for GET /entities/{entityId} and GET /entities
 * Issue #1015  Implemented 'Concise Output Format' support for Notifications
 * Issue #1033  Fixed a bug about Concise GeoJSON returning an Invalid Geometry
 * Issue #1034  Fixed a bug about Array Reduction and Concise Attribute Format
-* Issue #280   Implemented the new PATCH /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
-* Issue #280   URI parameter options=simplified as an alias to options=keyValues
-* Issue #280   Support for URI parameter 'observedAt' for PATCH /entities/{entityId} in combination with options=keyValues - update existing observedAt sub-attributes
-* Issue #280   Implemented support for the OPTIONS method for all NGSI-LD API endpoints
 * Issue #1045  Fixed bug related to TRoE and creation of entity without attributes
-* Issue #280   TRoE support for PATCH /entities/{entityId} - quite untested
 * Issue #1064  Can't forbid '#' in attribute names as it often expands with a hash and we support already expanded attribute names in the payload body
-* Issue #280   Fixed 'notifierInfo' and 'receiverInfo' for subscriptions
-* Issue #280   Notifications for PATCH /entities/{entityId} - quite untested
-* Issue #280   Implemented the new PUT /entities/{entityId} - it's "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
-* Issue #280   Highly Experimental implementation of LanguageProperty attributes - works only for POST /entities and GET /entities/{entityId}
-* Issue #280   Implemented a new POST /entities - also "experimental" - still doesn't do notifications, datasetId, TRoE, nor Forwarding
-* Issue #280   Post Query: "type": "Query" is mandatory in highest level of payload body
+* Issue #903   SSL connection, etc for mongoc - NOTE: not for legacy driver - only the new, experimental API endpoints (needs testing)
+* Issue #1151  GET /entities?id=X is NO LONGER translated to GET /entities/X - that was a BAD IDEA
 * Issue #280   POST Query was broken - fixed it, including correct treatment of language properties
-* Issue #280   Subscription creation using the new mongo driver (experimental)
-* Issue #280   Common functions for Getting and Listing tenants now using the new mongo driver
-* Issue #280   Common functions for Geo indices now using the new mongo driver
-* Issue #280   Common function for creation of the _id.id entities index now using the new mongo driver
-* Issue #280   Using the tenant list when populating the subscription cache instead of querying the database (less Mongo C++ Legacy driver usage)
-* Issue #280   GET /subscriptions/{subId} now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
-* Issue #280   GET /subscriptions now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
-* Issue #280   Subscription Cache now uses mongoc and not the old legacy driver (-experimental)
-* Issue #280   Subscription Cache Counters are now updated using mongoc and not the old legacy driver (-experimental)
-* Issue #280   DELETE subscriptions/{subId} now uses the new mongoc driver (if experimental is set)
-* Issue #280   PATCH subscriptions/{subId} now uses the new mongoc driver
 * Issue #280   Timestamp support in RANGE in 'q' for subscriptions
 * Issue #280   Support for NOT EQ for range in 'q' for subscriptions
-* Issue #280   Complete new implementation of GET /entities, using mongoc and no mongoBackend
-* Issue #280   Reimplemented /entities/{entityId} to use mongoc and not mongoBackend
-* Issue #903   SSL connection, etc for mongoc - NOTE: not for legacy driver - only the new, experimental API endpoints
-* Issue #280   Support for Prometheus metrics
-* Issue #1151  GET /entities?id=X is NO LONGER translated to GET /entities/X - that was a BAD IDEA
-* Issue #280   Prometheus counters for notification (total+failed)
 * Issue #280   New URI param "?local=true", to GET only local entities in GET /entities
+* Issue #280   Support for Prometheus metrics (4 counters for now)
 * Issue #280   Adding tenant to response wherever Location is present
+
+New Features:
+* Concise input/output format - more compact but still lossless - see NGSI-LD API spec v1.6.1 for details
+* URI parameter options=simplified as an alias to options=keyValues
+* Support for the OPTIONS method for all NGSI-LD API endpoints
+* 'notifierInfo' and 'receiverInfo' for subscriptions
+
+Replacing the deprecated MongoDB C++ Legacy driver with the newest MongoDB driver (mongoc v1.22.0):
+* Common functions for Getting and Listing tenants now use the new mongo driver
+* Common functions for Geo indices now use the new mongo driver
+* Common function for creation of the _id.id entities index now uses the new mongo driver
+* Using the tenant list when populating the subscription cache instead of querying the database (less Mongo C++ Legacy driver usage)
+* GET /subscriptions/{subId} now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
+* GET /subscriptions now uses the subscription cache and no database access is done (less Mongo C++ Legacy driver usage)
+* Subscription Cache now uses mongoc and not the old legacy driver
+* Subscription Cache Counters are now updated using mongoc and not with the old legacy driver
+* PATCH subscriptions/{subId} now uses the new mongoc driver
+
+Experimental Features (to turn on - start the broker with `-experimental`):
+* Fresh implementations of services using 'mongoc' (the new MongoDB driver) instead of mongoBackend+Legacy driver:
+  * PUT    /entities/{entityId}     (not supported if -experimental is not set)
+  * PATCH  /entities/{entityId}     (not supported if -experimental is not set)
+  * POST   /entities                (two versions: legacy and mongoc)
+  * GET    /entities                (two versions: legacy and mongoc)
+  * GET    /entities/{entityId}     (two versions: legacy and mongoc)
+  * POST   /subscriptions           (two versions: legacy and mongoc)
+  * DELETE /subscriptions/{subId}   (two versions: legacy and mongoc)
+* Support for LanguageProperty attributes
+* Support for URI parameter 'observedAt' for PATCH /entities/{entityId} in combination with options=keyValues - update existing observedAt sub-attributes
