@@ -126,6 +126,7 @@ static void* workerFunc(void* pSyncQ)
       //
       strcpy(transactionId, params->transactionId);
 
+      LM(("1178: protocol: '%s'", params->protocol.c_str()));
       LM_T(LmtNotifier, ("worker sending '%s' message to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
                          params->protocol.c_str(),
                          params->ip.c_str(),
@@ -148,6 +149,7 @@ static void* workerFunc(void* pSyncQ)
       {
         char* topic = (char*) params->resource.c_str();
 
+        LM(("1178: Sending MQTT Notification"));
         r = mqttNotification(params->ip.c_str(),
                              params->port,
                              topic,
@@ -168,6 +170,7 @@ static void* workerFunc(void* pSyncQ)
         if (ngsildSubscription == false)
           subscriptionId = NULL;
 
+        LM(("1178: Sending HTTP Notification"));
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,

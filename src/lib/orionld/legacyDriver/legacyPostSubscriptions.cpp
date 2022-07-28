@@ -75,8 +75,16 @@ bool legacyPostSubscriptions(void)
   sub.throttling          = -1;  // 0?
   sub.timeInterval        = -1;  // 0?
 
-  char*    subIdP    = NULL;
-  KjNode*  endpointP = NULL;
+  char*           subIdP        = NULL;
+  KjNode*         endpointP     = NULL;
+  bool            mqtt          = false;
+  bool            mqtts         = false;
+  char*           mqttUser      = NULL;
+  char*           mqttPassword  = NULL;
+  char*           mqttHost      = NULL;
+  unsigned short  mqttPort      = 0;
+  char*           mqttVersion   = NULL;
+  char*           mqttTopic     = NULL;
 
   // kjTreeToSubscription does the pCheckSubscription stuff ... for now ...
   if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
@@ -90,17 +98,13 @@ bool legacyPostSubscriptions(void)
   {
     KjNode* uriP = kjLookup(endpointP, "uri");
 
-    if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
+    LM(("1178: uri: '%s'", uriP->value.s));
+    if ((strncmp(uriP->value.s, "mqtt://", 7) == 0) || (strncmp(uriP->value.s, "mqtts://", 8) == 0))
     {
-      bool            mqtts         = false;
-      char*           mqttUser      = NULL;
-      char*           mqttPassword  = NULL;
-      char*           mqttHost      = NULL;
-      unsigned short  mqttPort      = 0;
-      char*           mqttTopic     = NULL;
       char*           detail        = NULL;
       char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
 
+      LM(("1178: parsing MQTT url: '%s'", uriP->value.s));
       if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
       {
         orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
@@ -118,7 +122,6 @@ bool legacyPostSubscriptions(void)
       //
       // Get MQTT-Version from notification:endpoint:notifierInfo Array, "key == MQTT-Version"
       //
-      char*   mqttVersion   = NULL;
       int     mqttQoS;
       KjNode* notifierInfoP = kjLookup(endpointP, "notifierInfo");
 
@@ -145,15 +148,7 @@ bool legacyPostSubscriptions(void)
         }
       }
 
-
-      //
-      // Establish connection with MQTT broker
-      //
-      if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
-      {
-        orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
-        return false;
-      }
+      mqtt = true;
     }
   }
 
@@ -175,6 +170,19 @@ bool legacyPostSubscriptions(void)
     }
   }
 
+  if (mqtt)
+  {
+    //
+    // Establish connection with MQTT broker
+    //
+    LM(("1178: Establishing connection with the MQTT broker"));
+    if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
+    {
+      orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);
+      return false;
+    }
+  }
+
   //
   // Create the subscription
   //
@@ -189,7 +197,9 @@ bool legacyPostSubscriptions(void)
                                   orionldState.correlator,
                                   sub.ldContext,
                                   sub.lang);
+  //
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
+  //        Disconnect from MQTT broker if needed
 
   orionldState.httpStatusCode = SccCreated;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str(), orionldState.tenantP->tenant);
