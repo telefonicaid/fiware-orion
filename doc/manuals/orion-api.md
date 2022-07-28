@@ -20,6 +20,7 @@
     - [Builtin Attributes](#builtin-attributes)
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
+    - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
     - [Field syntax restrictions](#field-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
@@ -1296,7 +1297,7 @@ For instance:
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
 
-# Subscriptions based in alteration type
+## Subscriptions based in alteration type
 
 By default, a subscription is triggered (i.e. the notification associated to it is sent) when
 the triggered condition (expressed in the `subject` and `conditions` fields of the subscription, e.g.
