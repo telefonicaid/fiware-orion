@@ -40,6 +40,7 @@
 - [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
     - [`actionType` metadata](#actiontype-metadata)
     - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
+    - [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -1507,6 +1508,11 @@ Thus, `failed` is not used by Orion Context Broker and the status of the subscri
 if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
 `inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
 the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
+
+## `keyValues` not supported in `POST /v2/op/notify`
+
+The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation described in the 
+original NGSIv2 specification. If you attempt to use it you would get a 400 Bad Request error.
 
 # API Routes
 
@@ -3538,18 +3544,6 @@ Example:
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
 It is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
-
-_**Request query parameters**_
-
-| Parameter | Optional | Type   | Description         | Example     |
-|-----------|----------|--------|---------------------|-------------|
-| `options` | ✓        | string | Options dictionary. | `keyValues` |
-
-The values that `options` parameter can have for this specific request are:
-
-| Options     | Description                                                                                      |
-|-------------|--------------------------------------------------------------------------------------------------|
-| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 
 _**Request headers**_
 

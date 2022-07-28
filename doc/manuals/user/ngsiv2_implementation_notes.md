@@ -3,7 +3,6 @@
 * [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Subscription payload validations](#subscription-payload-validations)
 * [Registrations](#registrations)
-* [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -100,13 +99,6 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
-
-[Top](#top)
-
-## `keyValues` not supported in `POST /v2/op/notify`
-
-The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation. If you attempt
-to use it you would get a 400 Bad Request error.
 
 [Top](#top)
 
