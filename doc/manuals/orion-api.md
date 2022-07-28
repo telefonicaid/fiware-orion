@@ -41,6 +41,7 @@
     - [`actionType` metadata](#actiontype-metadata)
     - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
     - [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
+    - [Registration implementation differences](#registration-implementation-differences)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -92,7 +93,6 @@
             - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
         - [Registration By ID](#registration-by-id)
             - [Retrieve Registration [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
-            - [Update Registration [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
             - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
     - [Batch Operations](#batch-operations)
         - [Update operation](#update-operation)
@@ -1513,6 +1513,22 @@ the subscription failed in its last notification or not (i.e. checking that `fai
 
 The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation described in the 
 original NGSIv2 specification. If you attempt to use it you would get a 400 Bad Request error.
+
+## Registration implementation differences
+
+Orion implements registration management as described in the NGSIv2 specification, except
+for the following aspects:
+
+* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
+  directly. I.e., updates must be done deleting and re-creating the registration. Please
+  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
+* `idPattern` is supported but only for the exact regular expression `.*`
+* `typePattern` is not implemented.
+* The `expression` field (within `dataProvided`) is not supported. The field is simply
+  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
+* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
+  but the registration is always active, even when the value is `inactive`. Please see
+  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
 
 # API Routes
 
@@ -3021,7 +3037,7 @@ A context registration is represented by a JSON object with the following fields
 | `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
 | [`provider`](#registrationprovider)              |          | object | Object that describes the context source registered.                                                                                                                                        |
 | [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
-| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`or `expired`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
+| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`or `expired`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. Due to implementation reasons, `inactive` status is not supported. See more infomration in [Registration implementation differences](#registration-implementation-differences) section |
 | `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
 | [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
@@ -3040,9 +3056,9 @@ The `dataProvided` field contains the following subfields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> or <code>typePattern</code>: Type or pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities (only `.*` expression supported at this time(see this [section](#registration-implementation-differences))). Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> Type of the affected entities. If omitted, it means "any entity type".</li></ul> |
 | `attrs`        |          | array | List of attributes to be provided (if not specified, all attributes). |
-| `expression`   |          | object | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the [Geographical queries](#geographical-queries) section. </li><li><code>geometry</code>: Any of the supported geometries as specified by the [Geographical queries](#geographical-queries) section.</li> <li><code>coords</code>: String representation of coordinates as specified by the [Geographical queries](#geographical-queries)section.</li></ul> |
+| `expression`   |          | object | Due to implementation reasons, this filed is ignored. See [Registration implementation differences](#registration-implementation-differences) section |
 
 #### `registration.forwardingInformation`
 
@@ -3255,45 +3271,6 @@ Example:
       }
 }      
 ```
-
-#### Update Registration [PATCH /v2/registrations/{registrationId}]
-
-Only the fields included in the request are updated in the registration.
-
-_**Request URL parameters**_
-
-This parameter is part of the URL request. It is mandatory. 
-
-| Parameter        | Type   | Description                          | Example                    |
-|------------------|--------|--------------------------------------|----------------------------|
-| `registrationId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
-
-_**Request headers**_
-
-| Header               | Optional | Description                                                                                    | Example            |
-|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
-| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
-
-_**Request payload**_
-
-The payload is a JSON object containing the fields to be modified of the registration following the JSON registration 
-representation format (described in ["Registration payload datamodel](#registration-payload-datamodel) section).
-
-Example:
-
-```json
-{
-    "expires": "2017-10-04T00:00:00"
-}
-```
-
-_**Response code**_
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
 
 #### Delete Registration [DELETE /v2/registrations/{registrationId}]
 

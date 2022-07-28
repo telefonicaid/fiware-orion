@@ -70,20 +70,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 ## Registrations
 
-Orion implements registration management as described in the NGSIv2 specification, except
-for the following aspects:
-
-* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
-  directly. I.e., updates must be done deleting and re-creating the registration. Please
-  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` is supported but only for the exact regular expression `.*`
-* `typePattern` is not implemented.
-* The `expression` field (within `dataProvided`) is not supported. The field is simply
-  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
-* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
-  but the registration is always active, even when the value is `inactive`. Please see
-  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
-
 According to NGSIv2 specification:
 
 > A NGSIv2 server implementation may implement query or update forwarding to context information sources.
