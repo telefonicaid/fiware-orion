@@ -98,7 +98,7 @@ void Notifier::sendNotifyContextRequest
 {
   pthread_t                         tid;
 
-
+  LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,
@@ -255,6 +255,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       return paramsV;  // empty vector
     }
 
+    LM(("1178: url: '%s'", url.c_str()));
 
     //
     // 3. Payload
@@ -435,6 +436,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     char*                             toFree  = NULL;
 #endif
 
+    LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
+
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {
       // Default verb/method (or the one in case of disabled custom notifications) is POST
@@ -544,12 +547,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string  uriPath;
     std::string  protocol;
 
+    LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
     if (strncmp(httpInfo.url.c_str(), "mqtt", 4) == 0)
     {
       host     = subP->httpInfo.mqtt.host;
       port     = subP->httpInfo.mqtt.port;
       uriPath  = subP->httpInfo.mqtt.topic;
       protocol = (char*) ((subP->httpInfo.mqtt.mqtts == false)? "mqtt" : "mqtts");
+      LM(("1178: protocol: '%s'", protocol.c_str()));
     }
     else if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
     {
@@ -566,6 +571,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     SenderThreadParams*  params = new SenderThreadParams();
 
+    LM(("1178: protocol: '%s'", protocol.c_str()));
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
@@ -656,6 +662,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
 #endif
 
+    LM(("1178: protocol: '%s'", params->protocol.c_str()));
     paramsV->push_back(params);
     return paramsV;
 }
