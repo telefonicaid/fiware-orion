@@ -462,6 +462,38 @@ The list of builtin metadata is as follows:
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
+## User attributes or metadata matching builtin name
+
+(The content of this section applies to all builtins except `dateExpires` attribute. Check the document
+[on transient entities](user/transient_entities.md) for specific information about `dateExpires`).
+
+First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an 
+NGSIv2 builtin**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
+"Metadata names restrictions" sections in the specification).
+
+However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
+account the following considerations:
+
+* You can create/update attributes and/or metadata which name is the same of a NGSIv2 builtin.
+  Orion will let you do so.
+* User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
+  or subscription. For instance, if you created a `dateModified` attribute with value
+  "2050-01-01" in entity E1, then `GET /v2/entities/E1` will retrieve it. You don't need to use
+  `?attrs=dateModified`.
+* When rendered (in response to GET operations or in notifications) the user defined attribute/metadata
+  will take preference over the builtin even when declared explicitly. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?attrs=dateModified` you will get "2050-01-01".
+* However, filtering (i.e. `q` or `mq`) is based on the value of the builtin. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?q=dateModified>2049-12-31` you will get no entity. It happens that "2050-01-01" is
+  greater than "2049-12-31" but the date you modified the entity (some date in 2018 or 2019 maybe) will
+  not be greater than "2049-12-31". Note this is somehow inconsistent (i.e. user defined takes preference
+  in rendering but not in filtering) and may change in the future.
+
+For further information about builtin attribute and metadata names you can check the respective sections 
+[Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
+
 ## Field syntax restrictions
 
 Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
@@ -506,7 +538,9 @@ The following strings must not be used as attribute names:
 * `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
   center point.
 
-* Builtin attribute names (see specific section on [Builtin Attributes](#builtin-attributes))
+* Builtin attribute names. It is possible to use the same attribute names but it is totally discouraged. 
+Check [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name) 
+section of this documentation.
 
 * `*`, as it has a special meaning as "all the custom/user attributes" (see section on
   [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
@@ -515,7 +549,9 @@ The following strings must not be used as attribute names:
 
 The following strings must not be used as metadata names:
 
-* Builtin metadata names (see specific section on [Builtin Metadata](#builtin-metadata))
+* Builtin metadata names. It is possible to use the same metadata names but it is totally discouraged. 
+Check [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name) 
+section of this documentation.
 
 * `*`, as it has a special meaning as "all the custom/user metadata" (see section on
   [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
