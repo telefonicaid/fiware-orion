@@ -37,6 +37,7 @@
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
+- [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -1466,6 +1467,11 @@ is `["entityCreate", "entityChange"]`.
 
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).
+
+# Differences regarding the original NGSIv2 spec
+
+This section contains the topics that, due to implementation decision, the behaviour is differs from the described in the 
+original NGSIv2 specification.
 
 # API Routes
 
