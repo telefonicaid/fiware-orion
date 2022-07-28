@@ -3,7 +3,6 @@
 * [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
-* [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
@@ -81,76 +80,6 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-[Top](#top)
-
-## Covered subscriptions
-
-The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
-notification when subscription is triggered. By default Orion only notifies attributes that exist
-in the entity. For instance, if subscription is this way:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ]
-}
-```
-
-but the entity only has `temperature` and `humidity` attributes, then `brightness` attribute is not included
-in notifications.
-
-This default behaviour can be changed using the `covered` field set to `true` this way:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ],
-  "covered": true
-}
-```
-
-in which case all attributes are included in the notification, no matter if they exist or not in the
-entity. For these attributes that don't exist (`brightness` in this example) the `null`
-value (of type `"None"`) is used.
-
-In the case of custom notifications, if `covered` is set to `true` then `null` will be use to replace `${...}`
-for non existing attributes (the default behaviour when `covered` is not set to `true` is to replace by the
-empty string the non existing attributes).
-
-We use the term "covered" in the sense the notification "covers" completely all the attributes
-in the `notification.attrs` field. It can be useful for those notification endpoints that are
-not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
-in every received notification.
-
-Note that covered subscriptions need an explicit list of `attrs` in `notification`. Thus, the following
-case is not valid:
-
-```
-"notification": {
-  ...
-  "attrs": [],
-  "covered": true
-}
-```
-
-And if you try to create/update a subscription with that you will get a 400 Bad Request error like this:
-
-```
-{
-    "description": "covered true cannot be used if notification attributes list is empty",
-    "error": "BadRequest"
-}
-```
-
 
 [Top](#top)
 
