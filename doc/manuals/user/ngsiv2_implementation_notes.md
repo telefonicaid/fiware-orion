@@ -4,7 +4,6 @@
 * [Subscription payload validations](#subscription-payload-validations)
 * [`actionType` metadata](#actiontype-metadata)
 * [Oneshot subscriptions](#oneshot-subscriptions)
-* [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
@@ -89,16 +88,6 @@ supported upon completion of [this issue](https://github.com/telefonicaid/fiware
 ## Oneshot subscriptions
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
-
-[Top](#top)
-
-## Subscriptions based in alteration type
-
-Apart from the sub-fields allowed in subscriptions `conditions` field according to NGSIv2 specifiction,
-Orion supports the `alterationTypes` field to specify under which alterations (entity creation, entity
-modification, etc.) the subscription is triggered.
-
-Please find details in [this specific documentation](subscriptions_alttype.md)
 
 [Top](#top)
 
