@@ -2,7 +2,6 @@
 
 * [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Subscription payload validations](#subscription-payload-validations)
-* [`actionType` metadata](#actiontype-metadata)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
@@ -68,18 +67,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
-
-[Top](#top)
-
-## `actionType` metadata
-
-From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
-
-> Its value depend on the request operation type: `update` for updates,
-> `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-Current Orion implementation supports "update" and "append". The "delete" case will be
-supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
 
 [Top](#top)
 

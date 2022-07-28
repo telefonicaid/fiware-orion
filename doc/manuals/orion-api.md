@@ -38,6 +38,7 @@
     - [Custom Notifications](#custom-notifications)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 - [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
+    - [`actionType` metadata](#actiontype-metadata)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -1472,6 +1473,16 @@ The particular alteration type can be got in notifications using the
 
 This section contains the topics that, due to implementation decision, the behaviour is differs from the described in the 
 original NGSIv2 specification.
+
+## `actionType` metadata
+
+From original NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
+
+> Its value depend on the request operation type: `update` for updates,
+> `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Current Orion implementation supports `update` and `append`. The `delete` case will be
+supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
 
 # API Routes
 
