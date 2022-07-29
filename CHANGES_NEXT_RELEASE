@@ -39,14 +39,16 @@ Replacing the deprecated MongoDB C++ Legacy driver with the newest MongoDB drive
 * Subscription Cache Counters are now updated using mongoc and not with the old legacy driver
 * PATCH subscriptions/{subId} now uses the new mongoc driver
 
-Experimental Features (to turn on - start the broker with `-experimental`):
+Experimental Features (to turn on - start the broker with `-experimental`).
+Note that this is experimental implementations, not yet thoroughly tested.
+_They all pass the basic functional tests, and seem to work just find, but, no promises made._
 * Fresh implementations of services using 'mongoc' (the new MongoDB driver) instead of mongoBackend+Legacy driver:
-  * PUT    /entities/{entityId}     (not supported if -experimental is not set)
-  * PATCH  /entities/{entityId}     (not supported if -experimental is not set)
-  * POST   /entities                (two versions: legacy and mongoc)
-  * GET    /entities                (two versions: legacy and mongoc)
-  * GET    /entities/{entityId}     (two versions: legacy and mongoc)
-  * POST   /subscriptions           (two versions: legacy and mongoc)
-  * DELETE /subscriptions/{subId}   (two versions: legacy and mongoc)
+  * PUT    /entities/{entityId}     (not supported if -experimental is not used)
+  * PATCH  /entities/{entityId}     (not supported if -experimental is not used)
+  * POST   /entities                (two versions: legacy and mongoc - mongoc version if -experimental is used)
+  * GET    /entities                (two versions: legacy and mongoc - mongoc version if -experimental is used)
+  * GET    /entities/{entityId}     (two versions: legacy and mongoc - mongoc version if -experimental is used)
+  * POST   /subscriptions           (two versions: legacy and mongoc - mongoc version if -experimental is used)
+  * DELETE /subscriptions/{subId}   (two versions: legacy and mongoc - mongoc version if -experimental is used)
 * Support for LanguageProperty attributes
 * Support for URI parameter 'observedAt' for PATCH /entities/{entityId} in combination with options=keyValues - update existing observedAt sub-attributes
