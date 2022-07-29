@@ -29,6 +29,8 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 #include "cache/subCache.h"
+#include "orionld/common/orionldState.h"
+#include "orionld/mqtt/mqttNotification.h"
 
 
 
@@ -39,6 +41,13 @@
 void* startSenderThread(void* p)
 {
   std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
+
+  // Initialize kjson and kalloc libs - needed for MQTT
+  orionldStateInit(NULL);
+  orionldState.kjson.spacesPerIndent    = 0;
+  orionldState.kjson.stringBeforeColon  = (char*) "";
+  orionldState.kjson.stringAfterColon   = (char*) "";
+  orionldState.kjson.nlString           = (char*) "";
 
   for (unsigned ix = 0; ix < paramsV->size(); ix++)
   {
@@ -58,27 +67,49 @@ void* startSenderThread(void* p)
 
     if (!simulatedNotification)
     {
-      std::string  out;
-      int          r;
+      int r;
 
-      r = httpRequestSend(params->ip,
-                          params->port,
-                          params->protocol,
-                          params->verb,
-                          params->tenant.c_str(),
-                          params->servicePath,
-                          params->xauthToken.c_str(),
-                          params->resource,
-                          params->content_type,
-                          params->content,
-                          params->fiwareCorrelator,
-                          params->renderFormat,
-                          NOTIFICATION_WAIT_MODE,
-                          &out,
-                          params->extraHeaders,
-                          "",
-                          -1,
-                          params->subscriptionId.c_str());  // Subscription ID as URL param
+      if (strncmp(params->protocol.c_str(), "mqtt", 4) != 0)  // Not MQTT, must be HTTP
+      {
+        std::string  out;
+
+        LM(("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
+        r = httpRequestSend(params->ip,
+                            params->port,
+                            params->protocol,
+                            params->verb,
+                            params->tenant.c_str(),
+                            params->servicePath,
+                            params->xauthToken.c_str(),
+                            params->resource,
+                            params->content_type,
+                            params->content,
+                            params->fiwareCorrelator,
+                            params->renderFormat,
+                            NOTIFICATION_WAIT_MODE,
+                            &out,
+                            params->extraHeaders,
+                            "",
+                            -1,
+                            params->subscriptionId.c_str());  // Subscription ID as URL param
+      }
+      else
+      {
+        char* topic = (char*) params->resource.c_str();
+
+        LM(("Sending MQTT Notification for subscription '%s'", params->subscriptionId.c_str()));
+        r = mqttNotification(params->ip.c_str(),
+                             params->port,
+                             topic,
+                             params->content.c_str(),
+                             params->content_type.c_str(),
+                             params->mqttQoS,
+                             params->mqttUserName,
+                             params->mqttPassword,
+                             params->mqttVersion,
+                             params->xauthToken.c_str(),
+                             params->extraHeaders);
+      }
 
       if (params->toFree != NULL)
       {
