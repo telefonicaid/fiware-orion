@@ -604,16 +604,12 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
     int             rc         = pQNotifier->start();
 
     if (rc != 0)
-    {
-      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
-    }
+      LM_X(1, ("Runtime Error starting notification queue workers (%d)", rc));
 
     pNotifier = pQNotifier;
   }
   else
-  {
     pNotifier = new Notifier();
-  }
 
   /* Set notifier object (singleton) */
   setNotifier(pNotifier);
@@ -703,51 +699,31 @@ static SemOpType policyGet(std::string mutexPolicy)
 *
 * notificationModeParse -
 */
-static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+static void notificationModeParse(char* notificationMode, int* pQueueSize, int* pNumThreads)
 {
-  char* mode;
-  char* first_colon;
-  int   flds_num;
-  errno = 0;
-  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
-  // cppcheck-suppress invalidscanf
-  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
-  if (errno != 0)
+  if (strncmp(notificationMode, "threadpool", 10) == 0)
   {
-    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
-  }
-  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
-  {
-    if (*pQueueSize <= 0)
+    if (notificationMode[10] == 0)
     {
-      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+      *pQueueSize  = DEFAULT_NOTIF_QS;
+      *pNumThreads = DEFAULT_NOTIF_TN;
+      return;
     }
-    if (*pNumThreads <= 0)
+    else if (notificationMode[10] == ':')
     {
-      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+      notificationMode[10] = 0;
+      char* colon2 = strchr(&notificationMode[11], ':');
+
+      if (colon2 == NULL)
+        LM_X(1, ("Invalid notificationMode (first colon found, second is missing)"));
+      *pQueueSize  = atoi(&notificationMode[11]);
+      *pNumThreads = atoi(&colon2[1]);
     }
+    else
+      LM_X(1, ("Invalid notificationMode '%s'", notificationMode));
   }
-  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
-  {
-    *pQueueSize = DEFAULT_NOTIF_QS;
-    *pNumThreads = DEFAULT_NOTIF_TN;
-  }
-  else if (!(
-             flds_num == 1 &&
-             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
-             ))
-  {
-    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
-  }
-
-  // get rid of params, if any, in notifModeArg
-  first_colon = strchr(notifModeArg, ':');
-  if (first_colon != NULL)
-  {
-    *first_colon = '\0';
-  }
-
-  free(mode);
+  else if ((strcmp(notificationMode, "transient") != 0) && (strcmp(notificationMode, "persistent") != 0))
+    LM_X(1, ("Invalid notificationMode '%s'", notificationMode));
 }
 
 
