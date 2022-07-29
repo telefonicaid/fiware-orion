@@ -1,0 +1,219 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications via MQTT using the sender thread (notificationMode transient)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -notificationMode transient
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic example_mosquitto_topic
+
+--SHELL--
+
+#
+# 01. Create an entity age01_Car, to later be patched to match S1
+# 02. Create subscription S1 with MQTT broker as endpoint 
+# 03. PATCH E1 to match S1
+# 04. Dump the MQTT test client and see one notification
+#
+
+echo "01. Create an entity age01_Car, to later be patched to match S1"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:Device:age01_Car",
+  "type": "Device",
+  "Accelerate_info": {
+    "type": "Property",
+    "value": {
+      "@type": "commandResult",
+      "@value": " "
+    }
+  },
+  "Accelerate_status": {
+    "type": "Property",
+    "value": {
+      "@type": "commandStatus",
+      "@value": "UNKNOWN"
+    }
+  },
+  "Acceleration": {
+    "type": "Property",
+    "value": 0
+  },
+  "EngineStopped": {
+    "type": "Property",
+    "value": true
+  },
+  "Engine_Oxigen": {
+    "type": "Property",
+    "value": 219
+  },
+  "Engine_Temperature": {
+    "type": "Property",
+    "value": 20
+  },
+  "Error_info": {
+    "type": "Property",
+    "value": {
+      "@type": "commandResult",
+      "@value": " "
+    }
+  },
+  "Error_status": {
+    "type": "Property",
+    "value": {
+      "@type": "commandStatus",
+      "@value": "UNKNOWN"
+    }
+  },
+  "Stop_info": {
+    "type": "Property",
+    "value": {
+      "@type": "commandResult",
+      "@value": " "
+    }
+  },
+  "Stop_status": {
+    "type": "Property",
+    "value": {
+      "@type": "commandStatus",
+      "@value": "UNKNOWN"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription S1 with MQTT broker as endpoint"
+echo "======================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscription:S1",
+  "type": "Subscription",
+  "name": "Car-Subscription",
+  "description": "Car subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Device:age01_Car",
+      "type": "Device"
+    }
+  ],
+  "watchedAttributes": [
+    "Engine_Oxigen",
+    "Engine_Temperature"
+  ],
+  "notification": {
+    "attributes": [
+      "Engine_Oxigen",
+      "Engine_Temperature"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/example_mosquitto_topic"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. PATCH E1 to match S1"
+echo "========================"
+payload='{
+  "Engine_Oxigen": {
+    "type": "Property",
+    "value": 220
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Device:age01_Car/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. Dump the MQTT test client and see one notification"
+echo "======================================================"
+mqttTestClientDump example_mosquitto_topic
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity age01_Car, to later be patched to match S1
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Device:age01_Car
+
+
+
+02. Create subscription S1 with MQTT broker as endpoint
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:S1
+
+
+
+03. PATCH E1 to match S1
+========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Dump the MQTT test client and see one notification
+======================================================
+Notifications: 1
+{
+  "body": {
+    "data": [
+      {
+        "Engine_Oxigen": 220,
+        "Engine_Temperature": 20,
+        "id": "urn:ngsi-ld:Device:age01_Car",
+        "type": "Device"
+      }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:S1",
+    "type": "Notification"
+  },
+  "metadata": {
+    "Content-Type": "application/json",
+    "Link": "REGEX(.*)"
+  }
+}
+=======================================
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+mqttTestClientStop example_mosquitto_topic

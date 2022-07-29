@@ -24,8 +24,8 @@
 HTTP-Tenant update and query
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DB_NAME} t_03
-dbInit ${CB_DB_NAME} t_04
+dbInit CB t_03
+dbInit CB t_04
 brokerStart CB 0-255 IPV4 -multiservice
 
 --SHELL--
@@ -242,5 +242,5 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 brokerStop CB
 dbDrop CB
-dbDrop ${CB_DB_NAME} t_03
-dbDrop ${CB_DB_NAME} t_04
+dbDrop CB t_03
+dbDrop CB t_04
