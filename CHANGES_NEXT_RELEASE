@@ -21,6 +21,7 @@ Fixed Issues:
 * Issue #280   New URI param "?local=true", to GET only local entities in GET /entities
 * Issue #280   Support for Prometheus metrics (4 counters for now)
 * Issue #280   Adding tenant to response wherever Location is present
+* Issue #1178  MQTT notifications also when "-notificationMode != threadpool"
 
 New Features:
 * Concise input/output format - more compact but still lossless - see NGSI-LD API spec v1.6.1 for details

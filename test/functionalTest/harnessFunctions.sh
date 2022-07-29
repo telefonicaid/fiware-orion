@@ -574,7 +574,7 @@ function brokerStart()
     elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
     then
       notificationModeGiven=TRUE
-      xParams="$xParams $1 $2"
+      xParams="$xParams -notificationMode $2"
       shift
     else
       xParams=$xParams' '$1
