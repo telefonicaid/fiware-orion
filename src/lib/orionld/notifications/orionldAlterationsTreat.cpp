@@ -26,7 +26,6 @@ extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -218,10 +217,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
   for (OrionldAlterationMatch* mAltP = matchList; mAltP != NULL; mAltP = mAltP->next)
   {
-    LM(("Sending notification for OrionldAlterationMatch at %p (patchedEntity at %p)", mAltP, mAltP->altP->patchedEntity));
-    //
-    // Neeed to clone the "patched entity", there might be more notifications wit the same "patched entity"
-    //
     int fd = notificationSend(mAltP, notificationTimeAsFloat);
     if (fd != -1)
     {

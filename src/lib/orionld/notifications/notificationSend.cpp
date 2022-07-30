@@ -23,7 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strlen
-#include <sys/uio.h>                                             // writev
+#include <sys/uio.h>                                             // writev, iovec
 #include <sys/select.h>                                          // select
 
 #include <string>                                                // std::string (all because of receiverInfo!!!)
@@ -45,16 +45,16 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
-#include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/langStringExtract.h"                    // langStringExtract
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
+#include "orionld/notifications/httpNotify.h"                    // httpNotify
+#include "orionld/notifications/httpsNotify.h"                   // httpsNotify
 #include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
-#include "orionld/notifications/notificationFailure.h"           // notificationFailure
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -556,7 +556,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   //
   // Payload Body
   //
-  KjNode*            notificationP    = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
+  KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
 
   if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
     notificationDataToGeoJson(notificationP);
@@ -753,34 +753,12 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   ioVecLen = headerIx + 1;
 
   //
-  // Now, the message is ready, is this an HTTP notification?
-  // If it's MQTT, then something very different will have to be done instead !
+  // The message is ready - just need to be sent
   //
-  if (strcmp(mAltP->subP->protocol, "mqtt") == 0)
-    return mqttNotify(mAltP->subP, ioVec, ioVecLen);
+  if      (strcmp(mAltP->subP->protocol, "http")  == 0)    return httpNotify(mAltP->subP, ioVec, ioVecLen, timestamp);
+  else if (strcmp(mAltP->subP->protocol, "https") == 0)    return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp);
+  else if (strcmp(mAltP->subP->protocol, "mqtt")  == 0)    return mqttNotify(mAltP->subP, ioVec, ioVecLen);  // timestamp ... ?
 
-  // Connect
-  int fd = orionldServerConnect(mAltP->subP->ip, mAltP->subP->port);
-
-  if (fd == -1)
-  {
-    LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
-    notificationFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
-    return -1;
-  }
-
-  // Send
-  int nb;
-  if ((nb = writev(fd, ioVec, ioVecLen)) == -1)
-  {
-    close(fd);
-
-    LM_E(("Internal Error (unable to send to server for notification for subscription '%s' (fd: %d): %s", mAltP->subP->subscriptionId, fd, strerror(errno)));
-    notificationFailure(mAltP->subP, "Unable to write to notification endpoint", timestamp);
-    return -1;
-  }
-
-  LM(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
-  LM(("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, mAltP->subP->ip, mAltP->subP->port, mAltP->subP->subscriptionId));
-  return fd;
+  LM_W(("Unsupported protocol for notifications: '%s'", mAltP->subP->protocol));
+  return -1;
 }
