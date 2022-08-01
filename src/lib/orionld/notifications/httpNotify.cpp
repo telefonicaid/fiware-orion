@@ -40,7 +40,7 @@
 int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp)
 {
   // Connect
-  LM(("Connecting to notification receptor for '%s' notification", cSubP->protocol));
+  LM(("Connecting to notification receptor for '%s' notification", cSubP->protocolString));
   int fd = orionldServerConnect(cSubP->ip, cSubP->port);
 
   if (fd == -1)

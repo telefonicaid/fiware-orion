@@ -78,7 +78,7 @@ bool orionldDeleteSubscription(void)
   else
   {
     // If MQTT subscription - disconnect from mqtt broker
-    if (strcmp(cSubP->protocol, "mqtt") == 0)
+    if (cSubP->protocol == MQTT)
     {
       MqttInfo* mqttP = &cSubP->httpInfo.mqtt;
       mqttDisconnect(mqttP->host, mqttP->port, mqttP->username, mqttP->password, mqttP->version);

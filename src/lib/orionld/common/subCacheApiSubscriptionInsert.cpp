@@ -246,11 +246,12 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
       if (uriP)  // pCheckSubscription already ensures "uri" is present !!!
       {
         cSubP->httpInfo.url = uriP->value.s;
-        cSubP->url = strdup(uriP->value.s);  // urlParse destroys the input
-        urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+        cSubP->url          = strdup(uriP->value.s);  // urlParse destroys the input
+        urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
+        cSubP->protocol     = protocolFromString(cSubP->protocolString);
       }
 
-      if (strcmp(cSubP->protocol, "mqtt") == 0)
+      if (cSubP->protocol == MQTT)
       {
         char            url[512];
         bool            mqtts         = false;

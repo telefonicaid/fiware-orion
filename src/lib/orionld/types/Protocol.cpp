@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPSNOTIFY_H_
-#define SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPSNOTIFY_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,17 +22,22 @@
 *
 * Author: Ken Zangelin
 */
-#include <sys/uio.h>                                             // iovec
-#include <curl/curl.h>                                           // CURL
+#include <string.h>                                  // strcmp
 
-#include "cache/CachedSubscription.h"                            // CachedSubscription
+#include "orionld/types/Protocol.h"                  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// httpsNotify -
+// protocolFromString -
 //
-extern int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp, CURL** curlHandlePP);
+Protocol protocolFromString(const char* protocolString)
+{
+  if      (strcmp(protocolString, "http")  == 0)    return HTTP;
+  else if (strcmp(protocolString, "https") == 0)    return HTTPS;
+  else if (strcmp(protocolString, "mqtt")  == 0)    return MQTT;
+  else if (strcmp(protocolString, "mqtts") == 0)    return MQTTS;
 
-#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPSNOTIFY_H_
+  return NO_PROTOCOL;
+}

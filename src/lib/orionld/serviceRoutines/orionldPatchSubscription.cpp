@@ -388,11 +388,12 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
     {
       if (cSubP->url != NULL)
         free(cSubP->url);
-      cSubP->url      = url;  // Only ... it's already destroyed by 'urlParse' - need it to free up later
-      cSubP->protocol = protocol;
-      cSubP->ip       = ip;
-      cSubP->port     = port;
-      cSubP->rest     = rest;
+      cSubP->url            = url;  // Only ... it's already destroyed by 'urlParse' - need it to free up later
+      cSubP->protocolString = protocol;
+      cSubP->ip             = ip;
+      cSubP->port           = port;
+      cSubP->rest           = rest;
+      cSubP->protocol       = protocolFromString(cSubP->protocolString);
     }
     else
     {

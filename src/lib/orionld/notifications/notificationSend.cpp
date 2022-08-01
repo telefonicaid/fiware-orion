@@ -25,6 +25,7 @@
 #include <string.h>                                              // strlen
 #include <sys/uio.h>                                             // writev, iovec
 #include <sys/select.h>                                          // select
+#include <curl/curl.h>                                           // curl
 
 #include <string>                                                // std::string (all because of receiverInfo!!!)
 #include <map>                                                   // std::map    (all because of receiverInfo!!!)
@@ -542,7 +543,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //   size_t iov_len;     /* Number of bytes to transfer */
 // };
 //
-int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
+int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** curlHandlePP)
 {
   bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
@@ -755,9 +756,9 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   //
   // The message is ready - just need to be sent
   //
-  if      (strcmp(mAltP->subP->protocol, "http")  == 0)    return httpNotify(mAltP->subP, ioVec, ioVecLen, timestamp);
-  else if (strcmp(mAltP->subP->protocol, "https") == 0)    return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp);
-  else if (strcmp(mAltP->subP->protocol, "mqtt")  == 0)    return mqttNotify(mAltP->subP, ioVec, ioVecLen);  // timestamp ... ?
+  if      (mAltP->subP->protocol == HTTP)    return httpNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
+  else if (mAltP->subP->protocol == HTTPS)   return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp, curlHandlePP);
+  else if (mAltP->subP->protocol == MQTT)    return mqttNotify(mAltP->subP,  ioVec, ioVecLen);  // timestamp ... ?
 
   LM_W(("Unsupported protocol for notifications: '%s'", mAltP->subP->protocol));
   return -1;

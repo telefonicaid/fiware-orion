@@ -310,11 +310,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   // IP, port and rest
   cSubP->url = strdup(cSubP->httpInfo.url.c_str());
-  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  cSubP->protocol = protocolFromString(cSubP->protocolString);
 
   // q
   cSubP->qText = sub.hasField("ldQ")? strdup(getStringFieldF(&sub, "ldQ")) : NULL;
-  // LM(("KZ: qText: '%s'", cSubP->qText));
+
 
   //
   // To create the QNode tree (only used by the "new native NGSI-LD" notifications,

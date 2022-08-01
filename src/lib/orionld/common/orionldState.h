@@ -30,6 +30,7 @@
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 #include <microhttpd.h>                                          // MHD_Connection
 #include <bson/bson.h>                                           // bson_error_t
+#include <curl/curl.h>                                           // CURLM
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -372,7 +373,7 @@ typedef struct OrionldConnectionState
   OrionldNotificationInfo notificationInfo[16];  // Old
   bool                    notify;                // Old
   OrionldAlteration*      alterations;
-
+  CURLM*                  multiP;                // curl multi api
 
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;
