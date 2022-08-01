@@ -1,1 +1,4 @@
-* Issue #280    Implemented support for HTTPS notifications for the new implementation (experimental)
+* Issue #280  Implemented support for HTTPS notifications for the new implementation (experimental)
+* Issue #280  Persisting counters and timestamps of subscriptions from the subscription cache in the database
+* Issue #280  New CLI option: -cSubCounters - number of subscription counter updates before flushing from sub-cache to DB (0: never, 1: always)
+* Issue #280  Bug fix: getting lastNotification, lastSuccess, lastFailure from DB in when refreshing the subscription cache
