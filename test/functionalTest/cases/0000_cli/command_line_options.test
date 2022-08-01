@@ -96,5 +96,6 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-noNotifyFalseUpdate' (turn off notifications on non-updates)]
                 [option '-experimental' (enable experimental implementation - use at own risk - see release notes of Orion-LD v1.1.0)]
                 [option '-mongocOnly' (enable experimental implementation + turn off mongo legacy driver)]
+                [option '-cSubCounters' <number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)>]
 
 --TEARDOWN--
