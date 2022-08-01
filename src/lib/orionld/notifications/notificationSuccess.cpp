@@ -28,6 +28,7 @@
 
 #include "orionld/common/orionldState.h"                            // promNotifications
 #include "orionld/prometheus/promCounterIncrease.h"                 // promCounterIncrease
+#include "orionld/mongoc/mongocSubCountersUpdate.h"                 // mongocSubCountersUpdate
 #include "orionld/notifications/notificationSuccess.h"              // Own interface
 
 
@@ -42,8 +43,22 @@ void notificationSuccess(CachedSubscription* subP, const double timestamp)
   subP->lastNotificationTime  = timestamp;
   subP->consecutiveErrors     = 0;
   subP->count                += 1;
-
-  // Write to DB ... ?
+  subP->dirty                += 1;
 
   promCounterIncrease(promNotifications);
+
+  LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
+  //
+  // Flush to DB?
+  // - If subP->dirty (number of counter updates since last flush) >= cSubCounters
+  //   - AND cSubCounters != 0
+  //
+  if ((cSubCounters != 0) && (subP->dirty >= cSubCounters))
+  {
+    LM(("SUBC: Calling mongocSubCountersUpdate"));
+    mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, false, true);
+    subP->dirty    = 0;
+    subP->dbCount += subP->count;
+    subP->count    = 0;
+  }
 }

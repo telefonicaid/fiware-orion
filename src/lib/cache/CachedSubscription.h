@@ -119,6 +119,7 @@ struct CachedSubscription
   double                      lastSuccess;           // timestamp of last successful notification
   int                         consecutiveErrors;     // Not in DB
   char                        lastErrorReason[128];  // Not in DB
+  int                         dirty;
 
   double                      createdAt;
   double                      modifiedAt;

@@ -560,6 +560,7 @@ extern char              userAgentHeader[64];      // From notificationSend.cpp
 extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
+extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 
 
 

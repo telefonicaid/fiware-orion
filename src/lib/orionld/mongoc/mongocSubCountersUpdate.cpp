@@ -58,6 +58,7 @@ void mongocSubCountersUpdate
   double               lastNotificationTime,
   double               lastFailure,
   double               lastSuccess,
+  bool                 forcedToPause,
   bool                 ngsild
 )
 {
@@ -99,13 +100,24 @@ void mongocSubCountersUpdate
 
   if (deltaCount > 0)
     bson_append_document(&request, "$inc", 4, &count);
+
+  if (forcedToPause == true)
+  {
+    bson_t status;
+    bson_init(&status);
+    bson_append_utf8(&status, "status", 6, "inactive", 8);
+    bson_append_document(&request, "$set", 4, &status);
+    bson_destroy(&status);
+  }
+
   bson_append_document(&request, "$max", 4, &max);
 
+  LM(("SUBC: Calling mongoc_collection_update_one(%s)", cSubP->subscriptionId));
   bool b = mongoc_collection_update_one(orionldState.mongoc.subscriptionsP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {
     bson_error_t* errP = &orionldState.mongoc.error;
-    LM_E(("mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, errP->domain, errP->code, errP->message));
+    LM_E(("SUBC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, errP->domain, errP->code, errP->message));
   }
 
   bson_destroy(&reply);
