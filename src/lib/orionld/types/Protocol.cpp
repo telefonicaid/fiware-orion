@@ -34,10 +34,11 @@
 //
 Protocol protocolFromString(const char* protocolString)
 {
-  if      (strcmp(protocolString, "http")  == 0)    return HTTP;
-  else if (strcmp(protocolString, "https") == 0)    return HTTPS;
-  else if (strcmp(protocolString, "mqtt")  == 0)    return MQTT;
-  else if (strcmp(protocolString, "mqtts") == 0)    return MQTTS;
+  if      ((protocolString == NULL) || (protocolString[0] == 0))  return HTTP;  // No protocol - HTTP is assumed
+  else if (strcmp(protocolString, "http")  == 0)                  return HTTP;
+  else if (strcmp(protocolString, "https") == 0)                  return HTTPS;
+  else if (strcmp(protocolString, "mqtt")  == 0)                  return MQTT;
+  else if (strcmp(protocolString, "mqtts") == 0)                  return MQTTS;
 
   return NO_PROTOCOL;
 }
