@@ -378,8 +378,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
       if (activeNotifications > 0)
       {
-        LM(("Calling curl_multi_poll"));
-        cm = curl_multi_poll(orionldState.multiP, NULL, 0, 1000, NULL);
+        //
+        // The curl library of the UBI base image doesn't have "curl_multi_poll".
+        // Using curl_multi_wait instead.
+        // For now, at least
+        //
+        LM(("Calling curl_multi_wait"));
+        cm = curl_multi_wait(orionldState.multiP, NULL, 0, 1000, NULL);
         if (cm != 0)
           LM_E(("curl_multi_poll error %d", cm));
       }
