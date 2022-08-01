@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
-#define SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_PROTOCOL_H_
+#define SRC_LIB_ORIONLD_TYPES_PROTOCOL_H_
 
 /*
 *
@@ -25,16 +25,28 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>                                           // curl
-
-#include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration
 
 
 
 // -----------------------------------------------------------------------------
 //
-// notificationSend -
+// Protocol -
 //
-extern int notificationSend(OrionldAlterationMatch* altP, double timestamp, CURL** curlHandlePP);
+typedef enum Protocol
+{
+  NO_PROTOCOL,
+  HTTP,
+  HTTPS,
+  MQTT,
+  MQTTS
+} Protocol;
 
-#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// protocolFromString -
+//
+extern Protocol protocolFromString(const char* protocolString);
+
+#endif  // SRC_LIB_ORIONLD_TYPES_PROTOCOL_H_

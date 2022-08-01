@@ -27,6 +27,8 @@ SET (SOURCES
     notificationDataToGeoJson.cpp
     notificationSuccess.cpp
     notificationFailure.cpp
+    httpNotify.cpp
+    httpsNotify.cpp
 )
 
 # Include directories

@@ -105,7 +105,7 @@ static const char* headerName[7] = {
 //
 // curlDebug
 //
-static int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, void* userptr)
+int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, void* userptr)
 {
   switch (type)
   {

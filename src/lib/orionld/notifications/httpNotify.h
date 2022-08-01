@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
-#define SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
+#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_
+#define SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_
 
 /*
 *
@@ -25,16 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>                                           // curl
+#include <sys/uio.h>                                             // iovec
 
-#include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration
+#include "cache/CachedSubscription.h"                            // CachedSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// notificationSend -
+// httpNotify - send a notification over http
 //
-extern int notificationSend(OrionldAlterationMatch* altP, double timestamp, CURL** curlHandlePP);
+extern int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp);
 
-#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
+#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_

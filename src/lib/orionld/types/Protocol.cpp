@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
-#define SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,16 +22,23 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>                                           // curl
+#include <string.h>                                  // strcmp
 
-#include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration
+#include "orionld/types/Protocol.h"                  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// notificationSend -
+// protocolFromString -
 //
-extern int notificationSend(OrionldAlterationMatch* altP, double timestamp, CURL** curlHandlePP);
+Protocol protocolFromString(const char* protocolString)
+{
+  if      ((protocolString == NULL) || (protocolString[0] == 0))  return HTTP;  // No protocol - HTTP is assumed
+  else if (strcmp(protocolString, "http")  == 0)                  return HTTP;
+  else if (strcmp(protocolString, "https") == 0)                  return HTTPS;
+  else if (strcmp(protocolString, "mqtt")  == 0)                  return MQTT;
+  else if (strcmp(protocolString, "mqtts") == 0)                  return MQTTS;
 
-#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_
+  return NO_PROTOCOL;
+}

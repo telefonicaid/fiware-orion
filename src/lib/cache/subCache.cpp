@@ -957,7 +957,8 @@ void subCacheItemInsert
   // IP, port and rest
   //
   cSubP->url = strdup(httpInfo.url.c_str());
-  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  cSubP->protocol = protocolFromString(cSubP->protocolString);
 
   //
   // String filters

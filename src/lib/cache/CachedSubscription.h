@@ -34,6 +34,7 @@
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "orionld/q/QNode.h"                                 // QNode
 #include "orionld/context/OrionldContext.h"                  // OrionldContext
+#include "orionld/types/Protocol.h"                          // Protocol
 #include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
 
 
@@ -82,11 +83,12 @@ struct CachedSubscription
   char*                       description;
   std::string                 name;
 
-  char*                       url;       // Copy of httpInfo.url (parsed and destroyed) - allocated and must be freed
-  char*                       protocol;  // pointing to 'protocol' part of 'url'
-  char*                       ip;        // pointing to 'ip' part of 'url'
-  unsigned short              port;      // port, as parsed from 'url'
-  char*                       rest;      // pointing to 'rest' part of 'url'
+  char*                       url;             // Copy of httpInfo.url (parsed and destroyed) - allocated and must be freed
+  char*                       protocolString;  // pointing to 'protocol' part of 'url'
+  char*                       ip;              // pointing to 'ip' part of 'url'
+  unsigned short              port;            // port, as parsed from 'url'
+  char*                       rest;            // pointing to 'rest' part of 'url'
+  Protocol                    protocol;
 
   std::vector<EntityInfo*>    entityIdInfos;
   std::vector<std::string>    attributes;

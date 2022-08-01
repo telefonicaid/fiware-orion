@@ -1003,7 +1003,12 @@ function accumulator3Count()
 #
 function accumulatorReset()
 {
-  curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+  if [ "$1" == "HTTPS" ]
+  then
+    curl -k https://localhost:${LISTENER_PORT}/reset -s -S -X POST
+  else
+    curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+  fi
 }
 
 
