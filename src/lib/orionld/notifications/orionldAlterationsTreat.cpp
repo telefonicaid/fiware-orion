@@ -399,6 +399,16 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM(("Notification Host: '%s'", npP->subP->ip));
       LM(("Notification Result for subscription '%s': CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
       LM(("Update Counters for subscription '%s'", npP->subP->subscriptionId));
+
+      if (msgP->data.result == 0)
+        notificationSuccess(npP->subP, notificationTimeAsFloat);
+      else
+      {
+        char errorString[512];
+
+        snprintf(errorString, sizeof(errorString), "CURL Error %d: %s", msgP->data.result, curl_easy_strerror(msgP->data.result));
+        notificationFailure(npP->subP, errorString, notificationTimeAsFloat);
+      }
     }
   }
 }
