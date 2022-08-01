@@ -1,0 +1,523 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Counters and timestamps for MQTT notifications
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities
+
+--SHELL--
+
+#
+# 01. Create subscription S1, on entity type T
+# 02. Create a matching entity E1
+# 03. GET S1, see lastSuccess, lastNotification, and timesSent==1
+# 04. See S1 in mongo - see timesSent==0, as no dump has been done yet
+# 05. Create a matching entity E2
+# 06. Create a matching entity E3
+# 07. Create a matching entity E4
+# 08. GET S1, see lastSuccess, lastNotification, and timesSent==4
+# 10. Create a matching entity E5
+# 11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
+# 12. See S1 in mongo - see count==5, as the dump has been done
+# 13. Restart broker
+# 14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
+# 17. Create a matching entity E6
+# 18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==6
+#
+
+
+echo "01. Create subscription S1, on entity type T"
+echo "============================================"
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a matching entity E1"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET S1, see lastSuccess, lastNotification, and timesSent==1"
+echo "==============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+echo
+echo
+
+
+echo "04. See S1 in mongo - see timesSent==0, as no dump has been done yet"
+echo "===================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "05. Create a matching entity E2"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:T:E2",
+  "type": "T",
+  "P": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Create a matching entity E3"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:T:E3",
+  "type": "T",
+  "P": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Create a matching entity E4"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:T:E4",
+  "type": "T",
+  "P": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GET S1, see lastSuccess, lastNotification, and timesSent==4"
+echo "==============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+echo
+echo
+
+
+echo "10. Create a matching entity E5 - notification will fail"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E5",
+  "type": "T",
+  "P": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5"
+echo "============================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+echo
+echo
+
+
+echo "12. See S1 in mongo - see count==5, as the dump has been done"
+echo "============================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "13. Restart broker"
+echo "=================="
+brokerStop
+sleep .5
+brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+echo
+echo
+
+
+echo "14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5"
+echo "============================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+echo
+echo
+
+
+echo "17. Create a matching entity E6"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:T:E6",
+  "type": "T",
+  "P": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7"
+echo "============================================================================"
+sleep .5
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription S1, on entity type T
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. Create a matching entity E1
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+
+
+
+03. GET S1, see lastSuccess, lastNotification, and timesSent==1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 370
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+04. See S1 in mongo - see timesSent==0, as no dump has been done yet
+====================================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"reference" : "mqtt://localhost:1883/entities",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+05. Create a matching entity E2
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E2
+
+
+
+06. Create a matching entity E3
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E3
+
+
+
+07. Create a matching entity E4
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E4
+
+
+
+08. GET S1, see lastSuccess, lastNotification, and timesSent==4
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 370
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 4
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+10. Create a matching entity E5 - notification will fail
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E5
+
+
+
+11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 370
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 5
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+12. See S1 in mongo - see count==5, as the dump has been done
+=============================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"reference" : "mqtt://localhost:1883/entities",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"count" : NumberLong(5),
+	"lastNotification" : REGEX(.*),
+	"lastSuccess" : REGEX(.*)
+}
+bye
+
+
+13. Restart broker
+==================
+
+
+14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 370
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 5
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+17. Create a matching entity E6
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E6
+
+
+
+18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 370
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)",
+        "lastSuccess": "202REGEX(.*)",
+        "status": "ok",
+        "timesSent": 6
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
