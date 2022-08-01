@@ -40,6 +40,7 @@ extern void mongocSubCountersUpdate
   double               lastNotificationTime,
   double               lastFailure,
   double               lastSuccess,
+  bool                 forcedToPause,
   bool                 ngsild
 );
 
