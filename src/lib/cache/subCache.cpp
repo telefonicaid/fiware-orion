@@ -904,6 +904,7 @@ void subCacheItemInsert
   cSubP->lastFailure           = 0;  // Or, does this come from DB ?
   cSubP->consecutiveErrors     = 0;
   cSubP->lastErrorReason[0]    = 0;
+  cSubP->dirty                 = 0;
 
   //
   // The three 'q's
@@ -1347,7 +1348,7 @@ void subCacheSync(void)
     if (cssP != NULL)
     {
       if (experimental == true)
-        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, cssP->ngsild);
+        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, false, cssP->ngsild);
       else
       {
         std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
