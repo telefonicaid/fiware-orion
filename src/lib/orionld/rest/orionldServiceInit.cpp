@@ -85,6 +85,7 @@
 #include "orionld/troe/troePatchAttribute.h"                         // troePatchAttribute
 #include "orionld/troe/troePatchEntity.h"                            // troePatchEntity
 #include "orionld/troe/troePatchEntity2.h"                           // troePatchEntity2
+#include "orionld/troe/troePutEntity.h"                              // troePutEntity
 #include "orionld/troe/troePostBatchCreate.h"                        // troePostBatchCreate
 #include "orionld/troe/troePostBatchUpsert.h"                        // troePostBatchUpsert
 #include "orionld/troe/troePostBatchUpdate.h"                        // troePostBatchUpdate
@@ -469,6 +470,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
       serviceP->troeRoutine = troePatchEntity;
     else if (serviceP->serviceRoutine == orionldPatchEntity2)
       serviceP->troeRoutine = troePatchEntity2;
+    else if (serviceP->serviceRoutine == orionldPutEntity)
+      serviceP->troeRoutine = troePutEntity;
     else if (serviceP->serviceRoutine == orionldPostBatchCreate)
       serviceP->troeRoutine = troePostBatchCreate;
     else if (serviceP->serviceRoutine == orionldPostBatchUpsert)

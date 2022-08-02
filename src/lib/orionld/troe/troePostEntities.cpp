@@ -52,6 +52,14 @@ bool troePostEntities(void)
   char*    entityType  = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
   KjNode*  entityP     = orionldState.requestTree;
 
+  if (entityId == NULL)
+  {
+    entityId = orionldState.wildcard[0];  // troePutEntity passes the Entity ID via wildcards
+
+    if (entityId == NULL)
+      LM_RE(false, ("No entity ID"));
+  }
+
   //
   // orionldPostTemporalEntities/orionldPostEntities does all the expansion
   //
