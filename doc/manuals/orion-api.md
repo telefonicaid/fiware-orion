@@ -294,10 +294,10 @@ Some operations use partial representation of entities:
   * If `overrideMetadata` is used, it means there are no metadata elements associated to the attribute,
   *as a result of the the attribute update*"
 
-* In responses, this `metadata` is set to `{}` if the attribute doesn't have any metadata. 
+* In responses, `metadata` is set to `{}` if the attribute doesn't have any metadata. 
 
 The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
-option are detailed in [this section of the documentation](metadata.md#updating-metadata).
+option are detailed in [this section of the documentation](#updating-metadata).
 
 ## Special Attribute Types
 
