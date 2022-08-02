@@ -229,6 +229,28 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_ARRAY_OF_STRING -
+//
+#define PCHECK_ARRAY_OF_STRING(kNodeP, _type, _title, detail, status)                        \
+do                                                                                           \
+{                                                                                            \
+  for (KjNode* itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)        \
+  {                                                                                          \
+    if (itemP->type != KjString)                                                             \
+    {                                                                                        \
+      int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                   \
+      const char* title = (_title == NULL)? "Non-String item in String-Array"  : _title;     \
+                                                                                             \
+      orionldError((OrionldResponseErrorType) type, title, detail, status);                  \
+      return false;                                                                          \
+    }                                                                                        \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // PCHECK_URI -
 //
 #define PCHECK_URI(uri, mustBeUri, _type, _title, detail, status)                            \

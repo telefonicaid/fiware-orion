@@ -29,6 +29,7 @@ SET (SOURCES
     OrionldAlteration.cpp
     KeyValue.cpp
     OrionldResponseErrorType.cpp
+    RegistrationMode.cpp
 )
 
 # Include directories
