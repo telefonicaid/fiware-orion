@@ -32,7 +32,7 @@
 //
 // registrationMode -
 //
-RegistrationMode registrationMode(const char* stringMode)        
+RegistrationMode registrationMode(const char* stringMode)
 {
   if      (strcmp(stringMode, "exclusive") == 0) return RegModeExclusive;
   else if (strcmp(stringMode, "inclusive") == 0) return RegModeInclusive;

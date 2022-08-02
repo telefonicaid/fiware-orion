@@ -59,6 +59,7 @@ ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), 
   bzero(&location, sizeof(location));
   bzero(&observationSpace, sizeof(observationSpace));
   bzero(&operationSpace, sizeof(operationSpace));
+  bzero(tenant, sizeof(tenant));
   properties = NULL;
   createdAt  = -1;
   modifiedAt = -1;

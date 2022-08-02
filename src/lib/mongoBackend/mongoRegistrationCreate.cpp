@@ -28,7 +28,6 @@
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 #include "orionld/types/OrionldTenant.h"            // OrionldTenant
 
@@ -103,10 +102,9 @@ static void setName(const std::string& name, mongo::BSONObjBuilder* bobP)
 static void setTenant(const std::string& tenant, mongo::BSONObjBuilder* bobP)
 {
   if (tenant != "")
-  {
     bobP->append("tenant", tenant);
-  }
 }
+
 
 
 /* ****************************************************************************
