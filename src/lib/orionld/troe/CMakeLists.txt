@@ -28,6 +28,7 @@ SET (SOURCES
     troePatchAttribute.cpp
     troePatchEntity.cpp
     troePatchEntity2.cpp
+    troePutEntity.cpp
     troePostBatchCreate.cpp
     troePostBatchDelete.cpp
     troePostBatchUpdate.cpp
