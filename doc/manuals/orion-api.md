@@ -374,7 +374,7 @@ meaning:
 }
 ```
 
-* `ignoreType`: When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+* `ignoreType`: when `ignoreType` with value `true` is added to an attribute, Orion will ignore the
 semantics associated to the attribute type. Note that Orion ignored attribute type in general so
 this metadata is not needed most of the cases, but there are two cases in which attribute
 type has an special semantic for Orion:
