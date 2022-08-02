@@ -383,7 +383,7 @@ type has an special semantic for Orion:
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
-in [Geospatial properties of entities](##geospatial-properties-of-entities) section). Support
+in [Geospatial properties of entities](#geospatial-properties-of-entities) section). Support
 for `ignoreType` in `DateTime` may come in the future.
 
 ## Builtin Metadata
