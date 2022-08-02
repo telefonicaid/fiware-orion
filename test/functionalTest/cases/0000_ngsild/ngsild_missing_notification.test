@@ -163,6 +163,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
+NGSILD-Tenant: openiot
 
 
 
@@ -172,6 +173,7 @@ HTTP/1.1 201 Created
 Content-Length: 37
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: openiot
 
 [
     "urn:ngsi-ld:Device:temperature002"

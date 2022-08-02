@@ -69,11 +69,6 @@ static bool geoCheck(OrionldGeoInfo* geoInfoP)
       (orionldState.uriParams.coordinates != NULL) ||
       (orionldState.uriParams.geoproperty != NULL))
   {
-    // LM_TMP(("GEO: geometry:    '%s'", orionldState.uriParams.geometry));
-    // LM_TMP(("GEO: georel:      '%s'", orionldState.uriParams.georel));
-    // LM_TMP(("GEO: coordinates:  %s",  orionldState.uriParams.coordinates));
-    // LM_TMP(("GEO: geoProperty: '%s'", orionldState.uriParams.geoproperty));
-
     //
     // geometry
     //
@@ -234,11 +229,9 @@ static KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, boo
   if ((geometryNodeP != NULL) && (geometryNodeP->type == KjObject))
   {
     geometryP = kjLookup(geometryNodeP, "value");
-    LM_TMP(("GEO: geometry value at %p", geometryP));
     if (geometryP == NULL)
     {
       // "value" not found ... can it be Simplified format?
-      LM_TMP(("GEO: 'value' not found - using geometryNodeP"));
       geometryP = geometryNodeP;
     }
 
@@ -295,6 +288,44 @@ bool orionldGetEntities(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntities();
 
+  //
+  // URI param validity check
+  //
+  char*                 id             = orionldState.uriParams.id;
+  char*                 type           = orionldState.uriParams.type;
+  char*                 idPattern      = orionldState.uriParams.idPattern;
+  char*                 q              = orionldState.uriParams.q;
+  char*                 attrs          = orionldState.uriParams.attrs;
+  char*                 geometry       = orionldState.uriParams.geometry;
+  bool                  local          = orionldState.uriParams.local;
+
+  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL) && (local == false))
+  {
+    orionldError(OrionldBadRequestData,
+                 "Too broad query",
+                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
+                 400);
+
+    return false;
+  }
+
+
+  //
+  // If ONE or ZERO types in URI param 'type', the prepared array isn't used, just a simple char-pointer (named "type")
+  //
+  if      (orionldState.in.typeList.items == 0) type = (char*) ".*";
+  else if (orionldState.in.typeList.items == 1) type = orionldState.in.typeList.array[0];
+
+  //
+  // ID-list and Type-list at the same time is not supported
+  //
+  if ((orionldState.in.idList.items > 1) && (orionldState.in.typeList.items > 1))
+  {
+    LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
+    orionldError(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted", 400);
+    return false;
+  }
+
   OrionldGeoInfo geoInfo;
   if (geoCheck(&geoInfo) == false)
     return false;
@@ -308,17 +339,12 @@ bool orionldGetEntities(void)
   }
 
   // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
-  char* idPattern = orionldState.uriParams.idPattern;
   if ((orionldState.in.idList.items > 0) && (idPattern != NULL))
     idPattern = NULL;
 
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
-
-  // LM_TMP(("GEOJSON: attrs URI param:            %s", orionldState.uriParams.attrs));
-  // LM_TMP(("GEOJSON: geometryProperty URI param: %s", geojsonGeometryLongName));
-  // LM_TMP(("GEOJSON: Calling mongocEntitiesQuery"));
 
   int64_t       count;
   KjNode*       dbEntityArray = mongocEntitiesQuery(&orionldState.in.typeList,

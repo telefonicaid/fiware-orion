@@ -35,6 +35,6 @@
 //
 // mqttNotify -
 //
-extern int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize);
+extern int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, double timestamp);
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTNOTIFY_H_

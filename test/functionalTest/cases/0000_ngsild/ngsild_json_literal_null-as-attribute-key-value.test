@@ -1,0 +1,155 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Using the JSON NULL Literal as RHS for an attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Creation of entity E1 with a property P1 whose RHS is a JSON NULL Literal, and a P2 == 1
+# 02. GET E1 and see the value of P1 as a JSON NULL Literal
+# 03. PATCH P2 and set its value to a JSON NULL Literal
+# 04. GET E1 and see the value of P2 also as a JSON NULL Literal
+#
+
+echo "01. Creation of entity E1 with a property P1 whose RHS is a JSON NULL Literal, and a P2 == 1"
+echo "============================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "@type": "@json",
+    "@value": null
+  },
+  "P2": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET E1 and see the value of P1 as a JSON NULL Literal"
+echo "========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "03. PATCH P2 and set its value to a JSON NULL Literal"
+echo "====================================================="
+payload='{
+  "P2": {
+    "@type": "@json",
+    "@value": null
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. GET E1 and see the value of P2 also as a JSON NULL Literal"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Creation of entity E1 with a property P1 whose RHS is a JSON NULL Literal, and a P2 == 1
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. GET E1 and see the value of P1 as a JSON NULL Literal
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": {
+            "@type": "@json",
+            "@value": null
+        }
+    },
+    "P2": {
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+03. PATCH P2 and set its value to a JSON NULL Literal
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. GET E1 and see the value of P2 also as a JSON NULL Literal
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 156
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": {
+            "@type": "@json",
+            "@value": null
+        }
+    },
+    "P2": {
+        "type": "Property",
+        "value": {
+            "@type": "@json",
+            "@value": null
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

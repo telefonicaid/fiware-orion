@@ -83,6 +83,15 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   KjNode* createdAtP         = kjLookup(apiSubscriptionP, "createdAt");
   KjNode* modifiedAtP        = kjLookup(apiSubscriptionP, "modifiedAt");
   KjNode* dbCountP           = kjLookup(apiSubscriptionP, "count");
+  KjNode* lastNotificationP  = kjLookup(apiSubscriptionP, "lastNotification");
+  KjNode* lastSuccessP       = kjLookup(apiSubscriptionP, "lastSuccess");
+  KjNode* lastFailureP       = kjLookup(apiSubscriptionP, "lastFailure");
+
+  // Fixing false alarms for q and mq
+  if ((qP != NULL) && (qP->value.s != NULL) && (qP->value.s[0] == 0))
+    qP = NULL;
+  if ((mqP != NULL) && (mqP->value.s != NULL) && (mqP->value.s[0] == 0))
+    mqP = NULL;
 
   if (subscriptionIdP == NULL)
     subscriptionIdP = kjLookup(apiSubscriptionP, "id");
@@ -100,6 +109,15 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     cSubP->dbCount = dbCountP->value.i;
   else
     cSubP->dbCount = 0;
+
+  if (lastNotificationP != NULL)
+    cSubP->lastNotificationTime = lastNotificationP->value.f;
+
+  if (lastSuccessP != NULL)
+    cSubP->lastSuccess = lastSuccessP->value.f;
+
+  if (lastFailureP != NULL)
+    cSubP->lastFailure = lastFailureP->value.f;
 
   if (descriptionP != NULL)
     cSubP->description = strdup(descriptionP->value.s);
@@ -246,11 +264,12 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
       if (uriP)  // pCheckSubscription already ensures "uri" is present !!!
       {
         cSubP->httpInfo.url = uriP->value.s;
-        cSubP->url = strdup(uriP->value.s);  // urlParse destroys the input
-        urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+        cSubP->url          = strdup(uriP->value.s);  // urlParse destroys the input
+        urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
+        cSubP->protocol     = protocolFromString(cSubP->protocolString);
       }
 
-      if (strcmp(cSubP->protocol, "mqtt") == 0)
+      if (cSubP->protocol == MQTT)
       {
         char            url[512];
         bool            mqtts         = false;
@@ -323,18 +342,14 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   {
     std::string errorString;
     if (cSubP->expression.stringFilter.parse(qP->value.s, &errorString) == false)
-    {
-      LM_E(("Subscription '%s': invalid 'q': %s", qP->value.s, cSubP->subscriptionId));
-    }
+      LM_E(("Subscription '%s': invalid 'q': '%s'", cSubP->subscriptionId, qP->value.s));
   }
 
   if (mqP != NULL)
   {
     std::string errorString;
     if (cSubP->expression.mdStringFilter.parse(mqP->value.s, &errorString) == false)
-    {
-      LM_E(("Subscription '%s': invalid 'mq': %s", mqP->value.s, cSubP->subscriptionId));
-    }
+      LM_E(("Subscription '%s': invalid 'mq': '%s'", cSubP->subscriptionId, mqP->value.s));
   }
 
   if (createdAtP != NULL)

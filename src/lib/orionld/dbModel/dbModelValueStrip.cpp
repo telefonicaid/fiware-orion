@@ -58,6 +58,4 @@ void dbModelValueStrip(KjNode* nodeP)
     }
     *to = 0;
   }
-
-  LM_TMP(("KZ: .value-fixed qText: '%s'", nodeP->value.s));
 }

@@ -186,7 +186,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   cSubP->httpInfo.fill(&sub);
 
-
   //
   // 04.3 expression
   //
@@ -205,11 +204,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         {
           char* q = (char*) cSubP->expression.q.c_str();
 
-          // LM_TMP(("QOR: q == '%s'", q));
+          // LM(("QOR: q == '%s'", q));
 
           if (strchr(q, '|') != NULL)
           {
-            // LM_TMP(("QOR: Subscription::q contains an OR - NGSIv2 doesn't support that - only NGSI-LD"));
+            // LM(("QOR: Subscription::q contains an OR - NGSIv2 doesn't support that - only NGSI-LD"));
             q = (char*) "P;!P";
           }
 
@@ -221,7 +220,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
             return -5;
           }
 
-          // LM_TMP(("QOR: q == '%s'", cSubP->expression.q.c_str()));
+          // LM(("QOR: q == '%s'", cSubP->expression.q.c_str()));
         }
       }
 
@@ -232,7 +231,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
         if (cSubP->expression.mq != "")
         {
-          // LM_TMP(("cSubP->expression.mq == '%s'", cSubP->expression.mq.c_str()));
+          // LM(("cSubP->expression.mq == '%s'", cSubP->expression.mq.c_str()));
           if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
           {
             LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));
@@ -311,11 +310,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   // IP, port and rest
   cSubP->url = strdup(cSubP->httpInfo.url.c_str());
-  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  cSubP->protocol = protocolFromString(cSubP->protocolString);
 
   // q
   cSubP->qText = sub.hasField("ldQ")? strdup(getStringFieldF(&sub, "ldQ")) : NULL;
-  // LM_TMP(("KZ: qText: '%s'", cSubP->qText));
+
 
   //
   // To create the QNode tree (only used by the "new native NGSI-LD" notifications,

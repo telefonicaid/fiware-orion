@@ -1068,6 +1068,30 @@ const char* StringFilterItem::valueTypeName(void)
 
 /* ****************************************************************************
 *
+* stringCompare -
+*/
+static MatchResult stringCompare(char* filterString, const char* attrString)
+{
+  if ((filterString[0] == '%') && (filterString[1] == '2') && (filterString[2] == '2'))
+  {
+    int len = strlen(filterString);
+
+    if (strcmp(&filterString[len - 3], "%22") == 0)
+    {
+      if (strncmp(&filterString[3], attrString, len - 6) == 0)
+        return MrMatch;
+    }
+  }
+  else if (strcmp(attrString, filterString) == 0)
+    return MrMatch;
+
+  return MrNoMatch;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::matchEquals(Metadata*) -
 */
 MatchResult StringFilterItem::matchEquals(Metadata* mdP)
@@ -1157,12 +1181,7 @@ MatchResult StringFilterItem::matchEquals(Metadata* mdP)
     }
   }
   else if (valueType == SfvtString)
-  {
-    if (mdP->stringValue != stringValue)
-    {
-      return MrNoMatch;
-    }
-  }
+    return stringCompare((char*) stringValue.c_str(), mdP->stringValue.c_str());
   else if (valueType == SfvtNull)
   {
     if (mdP->valueType != orion::ValueTypeNull)
@@ -1387,12 +1406,7 @@ MatchResult StringFilterItem::matchEquals(ContextAttribute* caP)
     }
   }
   else if (valueType == SfvtString)
-  {
-    if (caP->stringValue != stringValue)
-    {
-      return MrNoMatch;
-    }
-  }
+    return stringCompare((char*) stringValue.c_str(), caP->stringValue.c_str());
   else if (valueType == SfvtNull)
   {
     if (caP->valueType != orion::ValueTypeNull)

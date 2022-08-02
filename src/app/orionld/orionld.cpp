@@ -168,7 +168,7 @@ char            dbHost[1024];
 char            rplSet[64];
 char            dbName[64];
 char            dbUser[64];
-char            dbPwd[64];
+char            dbPwd[512];
 char            dbAuthDb[64];
 char            dbAuthMechanism[64];
 bool            dbSSL;
@@ -231,6 +231,7 @@ bool            noswap;
 bool            experimental = false;
 bool            mongocOnly   = false;
 bool            debugCurl    = false;
+int             cSubCounters;
 
 
 
@@ -293,7 +294,7 @@ bool            debugCurl    = false;
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define TROE_DESC              "enable TRoE - temporal representation of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
-#define TMPTRACES_DESC         "disable LM_TMP traces"
+#define TMPTRACES_DESC         "disable traces"
 #define TROE_HOST_DESC         "host for troe database db server"
 #define TROE_PORT_DESC         "port for troe database db server"
 #define TROE_HOST_USER         "username for troe database db server"
@@ -305,7 +306,7 @@ bool            debugCurl    = false;
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
-#define EXPERIMENTAL_DESC      "enable experimental implementation"
+#define EXPERIMENTAL_DESC      "enable experimental implementation - use at own risk - see release notes of Orion-LD v1.1.0"
 #define MONGOCONLY_DESC        "enable experimental implementation + turn off mongo legacy driver"
 #define DBAUTHDB_DESC          "database used for authentication"
 #define DBAUTHMECHANISM_DESC   "database authentication mechanism (either SCRAM-SHA-1 or SCRAM-SHA-256)"
@@ -313,6 +314,7 @@ bool            debugCurl    = false;
 #define DBCERTFILE_DESC        "path to TLS certificate file"
 #define DBURI_DESC             "complete URI for database connection"
 #define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
+#define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
 
 
 
@@ -392,8 +394,9 @@ PaArgument paArgs[] =
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
   { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
-  { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaHid,  false,           false,  true,             EXPERIMENTAL_DESC        },
+  { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaOpt,  false,           false,  true,             EXPERIMENTAL_DESC        },
   { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
+  { "-cSubCounters",          &cSubCounters,            "CSUB_COUNTERS",             PaInt,     PaOpt,  20,              0,      PaNL,             CSUBCOUNTERS_DESC        },
   { "-debugCurl",             &debugCurl,               "DEBUG_CURL",                PaBool,    PaHid,  false,           false,  true,             DEBUG_CURL_DESC          },
 
   PA_END_OF_ARGS
@@ -604,16 +607,12 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
     int             rc         = pQNotifier->start();
 
     if (rc != 0)
-    {
-      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
-    }
+      LM_X(1, ("Runtime Error starting notification queue workers (%d)", rc));
 
     pNotifier = pQNotifier;
   }
   else
-  {
     pNotifier = new Notifier();
-  }
 
   /* Set notifier object (singleton) */
   setNotifier(pNotifier);
@@ -703,51 +702,31 @@ static SemOpType policyGet(std::string mutexPolicy)
 *
 * notificationModeParse -
 */
-static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+static void notificationModeParse(char* notificationMode, int* pQueueSize, int* pNumThreads)
 {
-  char* mode;
-  char* first_colon;
-  int   flds_num;
-  errno = 0;
-  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
-  // cppcheck-suppress invalidscanf
-  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
-  if (errno != 0)
+  if (strncmp(notificationMode, "threadpool", 10) == 0)
   {
-    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
-  }
-  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
-  {
-    if (*pQueueSize <= 0)
+    if (notificationMode[10] == 0)
     {
-      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+      *pQueueSize  = DEFAULT_NOTIF_QS;
+      *pNumThreads = DEFAULT_NOTIF_TN;
+      return;
     }
-    if (*pNumThreads <= 0)
+    else if (notificationMode[10] == ':')
     {
-      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+      notificationMode[10] = 0;
+      char* colon2 = strchr(&notificationMode[11], ':');
+
+      if (colon2 == NULL)
+        LM_X(1, ("Invalid notificationMode (first colon found, second is missing)"));
+      *pQueueSize  = atoi(&notificationMode[11]);
+      *pNumThreads = atoi(&colon2[1]);
     }
+    else
+      LM_X(1, ("Invalid notificationMode '%s'", notificationMode));
   }
-  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
-  {
-    *pQueueSize = DEFAULT_NOTIF_QS;
-    *pNumThreads = DEFAULT_NOTIF_TN;
-  }
-  else if (!(
-             flds_num == 1 &&
-             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
-             ))
-  {
-    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
-  }
-
-  // get rid of params, if any, in notifModeArg
-  first_colon = strchr(notifModeArg, ':');
-  if (first_colon != NULL)
-  {
-    *first_colon = '\0';
-  }
-
-  free(mode);
+  else if ((strcmp(notificationMode, "transient") != 0) && (strcmp(notificationMode, "persistent") != 0))
+    LM_X(1, ("Invalid notificationMode '%s'", notificationMode));
 }
 
 

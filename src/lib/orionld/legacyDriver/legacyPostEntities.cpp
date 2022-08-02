@@ -345,7 +345,7 @@ bool legacyPostEntities(void)
 
   orionldState.httpStatusCode = 201;
 
-  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId);
+  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
 
   if (cloneForTroeP != NULL)
     orionldState.requestTree = cloneForTroeP;

@@ -31,16 +31,13 @@ brokerStart CB 31
 --SHELL--
 
 #
-# NOTE: never mind that the requests 01 and 03 fail - the URI Arg parsing is done long before the
-#       error is discovered by the broker and does not alter the test results.
-#
-# 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
+# 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays
 # 02. GET Entity with 'id=' - no value for id
 # 03. GET Entities without URI params - too broad request
 #
 
-echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values"
-echo "==============================================================================================="
+echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays"
+echo "================================================================================================================"
 orionCurl --url "/ngsi-ld/v1/entities?id=urn:E1,urn:E2,urn:E3&type=T1,T2,T3&idPattern=E.*&attrs=A1,A2,A3"
 echo
 echo
@@ -62,16 +59,16 @@ echo
 
 
 --REGEXPECT--
-01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
-===============================================================================================
+01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays
+================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 138
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "id, idPattern",
-    "title": "Incompatible parameters",
+    "detail": "Not Permitted",
+    "title": "URI params /id/ and /type/ are both lists",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -93,12 +90,12 @@ Date: REGEX(.*)
 03. GET Entities without URI params - too broad request
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 183
+Content-Length: 195
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
+    "detail": "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
     "title": "Too broad query",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

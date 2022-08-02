@@ -73,7 +73,14 @@ void kjEntityNormalizedToSimplified(KjNode* treeP, const char* lang)
       if (lang != NULL)
       {
         char* pickedLanguage;
-        char* langString = langStringExtract(valueP, lang, &pickedLanguage);
+        //
+        // FIXME
+        // langStringExtract should not be used - the RHS might be an Array
+        // Somehow this works anyweay. If Array, we don't enter here and langStringExtract
+        // is only called if RHS is a String.
+        // Need to understand this and clean it up
+        //
+        char* langString = langStringExtract(valueP, lang, &pickedLanguage);  // FIXME: use langItemPick instead - can be array as well !
 
         valueP->type     = KjString;
         valueP->value.s  = langString;

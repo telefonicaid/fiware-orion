@@ -23,8 +23,9 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strlen
-#include <sys/uio.h>                                             // writev
+#include <sys/uio.h>                                             // writev, iovec
 #include <sys/select.h>                                          // select
+#include <curl/curl.h>                                           // curl
 
 #include <string>                                                // std::string (all because of receiverInfo!!!)
 #include <map>                                                   // std::map    (all because of receiverInfo!!!)
@@ -45,15 +46,16 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
-#include "orionld/common/orionldServerConnect.h"                 // orionldServerConnect
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/langStringExtract.h"                    // langStringExtract
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
+#include "orionld/notifications/httpNotify.h"                    // httpNotify
+#include "orionld/notifications/httpsNotify.h"                   // httpsNotify
 #include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
-#include "orionld/notifications/notificationFailure.h"           // notificationFailure
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -95,29 +97,43 @@ static __thread char body[4 * 1024];
 // 2. Knowing the type, find the value ("value", "object", or "languageMap")
 // 3. Make the value node the RHS of the attribute
 //
-static void attributeToSimplified(KjNode* attrP)
+static void attributeToSimplified(KjNode* attrP, const char* lang)
 {
+  bool languangeMap = false;
+
   // Get the attribute type
   KjNode* attrTypeP = kjLookup(attrP, "type");
-  if (attrTypeP == NULL)
-    LM_RVE(("Attribute '%s' has no type", attrP->name));
-  if (attrTypeP->type != KjString)
-    LM_RVE(("Attribute '%s' has a type that is not a JSON String", attrP->name));
+  if (attrTypeP       == NULL)      LM_RVE(("Attribute '%s' has no type", attrP->name));
+  if (attrTypeP->type != KjString)  LM_RVE(("Attribute '%s' has a type that is not a JSON String", attrP->name));
 
   // Get the value
   char* valueFieldName = (char*) "value";
   if (strcmp(attrTypeP->value.s, "Relationship") == 0)
     valueFieldName = (char*) "object";
   else if (strcmp(attrTypeP->value.s, "LanguageProperty") == 0)
+  {
+    languangeMap = true;
     valueFieldName = (char*) "languageMap";
+  }
 
   KjNode* valueP = kjLookup(attrP, valueFieldName);
 
   if (valueP == NULL)
     LM_RVE(("Attribute '%s' has no value '%s'", attrP->name, valueFieldName));
 
-  attrP->type  = valueP->type;
-  attrP->value = valueP->value;
+  if ((languangeMap == true) && (lang[0] != 0))
+  {
+    char*   pickedLanguage;  // Not used (Simplified), but langStringExtract needs it
+    KjNode* langNodeP = langItemPick(valueP, attrP->name, lang, &pickedLanguage);
+
+    attrP->value       = langNodeP->value;
+    attrP->type        = langNodeP->type;
+  }
+  else
+  {
+    attrP->type  = valueP->type;
+    attrP->value = valueP->value;
+  }
 }
 
 
@@ -129,7 +145,7 @@ static void attributeToSimplified(KjNode* attrP)
 // 1. Find and remove the type
 // 2. If only one item left and it's "value" - Simplified
 //
-static void attributeToConcise(KjNode* attrP, bool* simplifiedP)
+static void attributeToConcise(KjNode* attrP, bool* simplifiedP, const char* lang)
 {
   // Get the attribute type and remove it
   KjNode* attrTypeP = kjLookup(attrP, "type");
@@ -139,7 +155,21 @@ static void attributeToConcise(KjNode* attrP, bool* simplifiedP)
     LM_RVE(("Attribute '%s' has a type that is not a JSON String", attrP->name));
 
   kjChildRemove(attrP, attrTypeP);
-  LM_TMP(("CONCISE: Just removed type '%s'", attrTypeP->value.s));
+
+  if ((lang[0] != 0) && (strcmp(attrTypeP->value.s, "LanguageProperty") == 0))
+  {
+    KjNode* valueP    = kjLookup(attrP, "languageMap");
+    char*   pickedLanguage;  // Name of the picked language
+    KjNode* langNodeP = langItemPick(valueP, attrP->name, lang, &pickedLanguage);
+
+    valueP->value       = langNodeP->value;
+    valueP->type        = langNodeP->type;
+    valueP->name        = (char*) "value";
+
+    KjNode* langP   = kjString(orionldState.kjsonP, "lang", pickedLanguage);
+    kjChildAdd(attrP, langP);
+    return;
+  }
 
   if ((strcmp(attrTypeP->value.s, "Property") != 0) && (strcmp(attrTypeP->value.s, "GeoProperty") != 0))
     return;
@@ -157,14 +187,125 @@ static void attributeToConcise(KjNode* attrP, bool* simplifiedP)
 
 // -----------------------------------------------------------------------------
 //
-// entityFix -
+// attributeToNormalized -
 //
-void entityFix(KjNode* entityP, CachedSubscription* subP)
+static void attributeToNormalized(KjNode* attrP, const char* lang)
 {
-  kjTreeLog(entityP, "Fixing Entity");
+  KjNode* attrTypeP = kjLookup(attrP, "type");
 
+  //
+  // LanguageProperty and 'lang'
+  //
+  LM(("KZ: attributeToNormalized: lang == '%s'", lang));
+  if (attrTypeP != NULL)
+  {
+    LM(("KZ: attrTypeP at %p (%s)", attrTypeP, attrTypeP->value.s));
+    if ((lang[0] != 0) && (strcmp(attrTypeP->value.s, "LanguageProperty")  == 0))
+    {
+      KjNode* valueP = kjLookup(attrP, "languageMap");
+      LM(("KZ: languageMap at %p", valueP));
+      if (valueP != NULL)
+      {
+        char*   pickedLanguage;  // Name of the picked language
+        KjNode* langNodeP = langItemPick(valueP, attrP->name, lang, &pickedLanguage);
+
+        LM(("KZ: langNodeP at %p", langNodeP));
+        LM(("KZ: pickedLanguage: '%s'", pickedLanguage));
+        valueP->value       = langNodeP->value;
+        valueP->type        = langNodeP->type;
+
+        // Change type form 'LanguageProperty' to 'Property'
+        attrTypeP->value.s = (char*) "Property";
+
+        // Change "languageMap" to "value" for the value
+        valueP->name = (char*) "value";
+
+        KjNode* langP = kjString(orionldState.kjsonP, "lang", pickedLanguage);
+        kjChildAdd(attrP, langP);
+        LM(("KZ: Added lang '%s' to attr '%s'", pickedLanguage, attrP->name));
+      }
+    }
+    else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
+    {
+      LM(("KZ: it's a relationship ... change name from 'value' to 'object'?    OR, is that done already?"));
+    }
+  }
+}
+
+
+
+static void attributeFix(KjNode* attrP, CachedSubscription* subP)
+{
   bool simplified = (subP->renderFormat == RF_KEYVALUES);
   bool concise    = (subP->renderFormat == RF_CONCISE);
+
+  // Never mind "location", "observationSpace", and "operationSpace"
+  // It is probably faster to lookup their alias (and get the same back) as it is to
+  // do three string-comparisons in every loop
+  //
+  eqForDot(attrP->name);
+  attrP->name = orionldContextItemAliasLookup(subP->contextP, attrP->name, NULL, NULL);
+
+  bool asSimplified = false;
+  kjTreeLog(attrP, "Attribute BEFORE");
+  if (simplified)
+  {
+    LM(("Calling attributeToSimplified"));
+    attributeToSimplified(attrP, subP->lang.c_str());
+  }
+  else if (concise)
+  {
+    LM(("Calling attributeToConcise"));
+    attributeToConcise(attrP, &asSimplified, subP->lang.c_str());
+  }
+  else  // normalized
+  {
+    LM(("Calling attributeToNormalized"));
+    attributeToNormalized(attrP, subP->lang.c_str());
+  }
+  kjTreeLog(attrP, "Attribute AFTER");
+
+  if ((asSimplified == false) && (simplified == false))
+  {
+    LM(("Not Simplified. Attribute %s's RHS is of type '%s'", attrP->name, kjValueType(attrP->type)));
+    //
+    // Here we're "in subAttributeFix"
+    //
+    for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
+    {
+      LM(("attr '%s'", attrP->name));
+      LM(("saP is a JSON %s, at %p", kjValueType(saP->type), saP));
+      LM(("saP->name at %p", saP->name));
+      LM(("KZ: Treating '%s' field of attr '%s", saP->name, attrP->name));
+      if (strcmp(saP->name, "value")       == 0) continue;
+      if (strcmp(saP->name, "object")      == 0) continue;
+      if (strcmp(saP->name, "languageMap") == 0) continue;
+      if (strcmp(saP->name, "type")        == 0) continue;
+      if (strcmp(saP->name, "observedAt")  == 0) continue;
+      if (strcmp(saP->name, "unitCode")    == 0) continue;
+
+      eqForDot(saP->name);
+      saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
+
+      if (subP->renderFormat == RF_KEYVALUES)
+        attributeToSimplified(saP, subP->lang.c_str());
+      else if (subP->renderFormat == RF_CONCISE)
+        attributeToConcise(saP, &asSimplified, subP->lang.c_str());  // asSimplified is not used down here
+      else
+        LM(("KZ: subAttributeToNormalized"));
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityFix -
+//
+KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
+{
+  KjNode* entityP = kjClone(orionldState.kjsonP, originalEntityP);
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -174,79 +315,14 @@ void entityFix(KjNode* entityP, CachedSubscription* subP)
     // compaction of the value of 'type' for the Entity
     if (strcmp(attrP->name, "type") == 0)
     {
-      LM_TMP(("KZ orionldContextItemAliasLookup(contextP:%p, type:'%s')", subP->contextP, attrP->value.s));
       attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);
       continue;
     }
 
-
-    //
-    // Here we're "in attributeFix"
-    //
-
-    //
-    // Never mind "location", "observationSpace", and "operationSpace"
-    // It is probably faster to lookup their alias (and get the same back) as it is to
-    // do three string-comparisons in every loop
-    //
-    eqForDot(attrP->name);
-    attrP->name = orionldContextItemAliasLookup(subP->contextP, attrP->name, NULL, NULL);
-
-    bool asSimplified = false;
-    if (simplified)
-    {
-      attributeToSimplified(attrP);
-      continue;
-    }
-    else if (concise)
-      attributeToConcise(attrP, &asSimplified);
-    else  // normalized
-    {
-      //
-      // Changing "value" back to "object" / "languageMap"
-      // Though, this should have been done long before!
-      //
-      KjNode* attrTypeP = kjLookup(attrP, "type");
-
-      if ((attrTypeP != NULL) && (attrTypeP->type == KjString))
-      {
-        KjNode* valueP = kjLookup(attrP, "value");
-
-        if (valueP != NULL)
-        {
-          if (strcmp(attrTypeP->value.s, "LanguageMap") == 0)
-            valueP->name = (char*) "langeuageMap";
-          else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
-            valueP->name = (char*) "object";
-        }
-      }
-    }
-
-    if (asSimplified == false)
-    {
-      //
-      // Here we're "in subAttributeFix"
-      //
-
-      for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
-      {
-        if (strcmp(saP->name, "value")       == 0) continue;
-        if (strcmp(saP->name, "object")      == 0) continue;
-        if (strcmp(saP->name, "languageMap") == 0) continue;
-        if (strcmp(saP->name, "type")        == 0) continue;
-        if (strcmp(saP->name, "observedAt")  == 0) continue;
-        if (strcmp(saP->name, "unitCode")    == 0) continue;
-
-        eqForDot(saP->name);
-        saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
-
-        if (subP->renderFormat == RF_KEYVALUES)
-          attributeToSimplified(saP);
-        else if (subP->renderFormat == RF_CONCISE)
-          attributeToConcise(saP, &asSimplified);  // asSimplified is not used down here
-      }
-    }
+    attributeFix(attrP, subP);
   }
+
+  return entityP;
 }
 
 
@@ -388,7 +464,7 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
   kjChildAdd(notificationP, notifiedAtNodeP);
   kjChildAdd(notificationP, dataNodeP);
 
-  entityFix(entityP, subP);
+  entityP = entityFix(entityP, subP);
   kjChildAdd(dataNodeP, entityP);
 
   if (subP->httpInfo.mimeType == JSONLD)  // Add @context to the entity
@@ -408,8 +484,6 @@ KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
 //
 static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP)
 {
-  LM_TMP(("Filter out attrs according to mAltP->subP->attributes"));
-
   KjNode* filteredEntityP = kjObject(orionldState.kjsonP, NULL);
   KjNode* attrP           = apiEntityP->value.firstChildP;
   KjNode* next;
@@ -431,7 +505,6 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
       {
         const char* attrName = mAltP->subP->attributes[ix].c_str();
 
-        LM_TMP(("XY: Comparing '%s' and '%s'", dotName, attrName));
         if (strcmp(dotName, attrName) == 0)
         {
           clone = true;
@@ -470,15 +543,10 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //   size_t iov_len;     /* Number of bytes to transfer */
 // };
 //
-int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
+int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** curlHandlePP)
 {
-  LM_TMP(("KZ: Subscription '%s': renderFormat: '%s'", mAltP->subP->subscriptionId, renderFormatToString(mAltP->subP->renderFormat)));
-  LM_TMP(("KZ: contextP at %p", mAltP->subP->contextP));
-  kjTreeLog(mAltP->altP->patchedEntity, "patchedEntity");
   bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
   KjNode* apiEntityP = mAltP->altP->patchedEntity;
-
-  LM_TMP(("Subscription '%s' is a match for update of entity '%s'", mAltP->subP->subscriptionId, mAltP->altP->entityId));
 
   //
   // Filter out unwanted attributes, if so requested (by the Subscription)
@@ -486,12 +554,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
   if (mAltP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, mAltP);
 
-  LM_TMP(("GEO: sub::accept: %s", mimeTypeToString(mAltP->subP->httpInfo.mimeType)));
-
   //
   // Payload Body
   //
-  KjNode*            notificationP    = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
+  KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
 
   if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
     notificationDataToGeoJson(notificationP);
@@ -673,7 +739,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
     ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
     ioVec[headerIx].iov_base = buf;
     ++headerIx;
-    LM_TMP(("HttpInfo header '%s': '%s'", key, value));
   }
 
   // Empty line delimiting HTTP Headers and Payload Body
@@ -688,46 +753,13 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp)
 
   ioVecLen = headerIx + 1;
 
-  // <DEBUG>
-  int len = 0;
-  LM_TMP(("Notification (%d iovecs):", ioVecLen));
-  for (int ix = 0; ix < ioVecLen; ix++)
-  {
-    LM_TMP((" %d/%d %s", ioVec[ix].iov_len, strlen((char*) ioVec[ix].iov_base), (char*) ioVec[ix].iov_base));
-    len += ioVec[ix].iov_len;
-  }
-  // </DEBUG>
-
   //
-  // Now, the message is ready, is this an HTTP notification?
-  // If it's MQTT, then something very different will have to be done instead !
+  // The message is ready - just need to be sent
   //
-  if (strcmp(mAltP->subP->protocol, "mqtt") == 0)
-    return mqttNotify(mAltP->subP, ioVec, ioVecLen);
+  if      (mAltP->subP->protocol == HTTP)    return httpNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
+  else if (mAltP->subP->protocol == HTTPS)   return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp, curlHandlePP);
+  else if (mAltP->subP->protocol == MQTT)    return mqttNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
 
-  // Connect
-  LM_TMP(("Connecting to %s:%d", mAltP->subP->ip, mAltP->subP->port));
-  int fd = orionldServerConnect(mAltP->subP->ip, mAltP->subP->port);
-
-  if (fd == -1)
-  {
-    LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", mAltP->subP->subscriptionId, strerror(errno)));
-    notificationFailure(mAltP->subP, "Unable to connect to notification endpoint", timestamp);
-    return -1;
-  }
-  LM_TMP(("Connected to %s:%d on fd %d", mAltP->subP->ip, mAltP->subP->port, fd));
-
-  // Send
-  int nb;
-  if ((nb = writev(fd, ioVec, ioVecLen)) == -1)
-  {
-    close(fd);
-
-    LM_E(("Internal Error (unable to send to server for notification for subscription '%s' (fd: %d): %s", mAltP->subP->subscriptionId, fd, strerror(errno)));
-    notificationFailure(mAltP->subP, "Unable to write to notification endpoint", timestamp);
-    return -1;
-  }
-
-  LM_TMP(("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, mAltP->subP->ip, mAltP->subP->port, mAltP->subP->subscriptionId));
-  return fd;
+  LM_W(("Unsupported protocol for notifications: '%s'", mAltP->subP->protocol));
+  return -1;
 }

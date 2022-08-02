@@ -25,7 +25,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldAlteration.h"                      // OrionldAlterationMatch, OrionldAlteration
+#include <curl/curl.h>                                           // curl
+
+#include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration
 
 
 
@@ -33,6 +35,6 @@
 //
 // notificationSend -
 //
-extern int notificationSend(OrionldAlterationMatch* altP, double timestamp);
+extern int notificationSend(OrionldAlterationMatch* altP, double timestamp, CURL** curlHandlePP);
 
 #endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONSEND_H_

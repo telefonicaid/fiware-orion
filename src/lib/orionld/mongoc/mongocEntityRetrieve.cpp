@@ -41,11 +41,13 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/performance.h"                          // PERFORMANCE
+#include "orionld/common/langStringExtract.h"                    // langValueFix
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"          // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocEntityRetrieve.h"                 // Own interface
 
 
@@ -93,8 +95,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
 {
   if (keyValues == true)
   {
-    KjNode*  typeP    = kjLookup(attrP, "type");
-    KjNode*  valueP;
+    KjNode* typeP = kjLookup(attrP, "type");
 
     if (typeP == NULL)
     {
@@ -111,7 +112,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     // FIXME: Here I need to know what to look for!!!
     //        "value" or "object"
     //
-    valueP = kjLookup(attrP, "value");
+    KjNode* valueP = kjLookup(attrP, "value");
     if (valueP == NULL)
       valueP = kjLookup(attrP, "object");
 
@@ -121,28 +122,16 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
       valueP = kjString(orionldState.kjsonP, "value", "Internal Error - attribute value lost");
     }
 
-    if ((lang == NULL) || (strcmp(typeP->value.s, "LanguageProperty") != 0))
+    bool isLanguageProperty = (strcmp(typeP->value.s, "LanguageProperty") == 0);
+    if ((isLanguageProperty == false) || (lang == NULL))
     {
-      // Inherit the value field
+      // Just inherit the value field
       attrP->type      = valueP->type;
       attrP->value     = valueP->value;
       attrP->lastChild = valueP->lastChild;
     }
     else
-    {
-      // Special case - URI param lang is set and it's a LanguageProperty
-      KjNode* langValueNodeP = kjLookup(valueP, lang);
-
-      if (langValueNodeP == NULL)
-        langValueNodeP = kjLookup(valueP, "en");   // Pick English as default if the desired language is not found
-      if (langValueNodeP == NULL)
-        langValueNodeP = valueP->value.firstChildP;  // If English is also not found, just take the first one
-
-      char* value = (langValueNodeP != NULL)? langValueNodeP->value.s : (char*) "empty languageMap ...";
-
-      attrP->type      = KjString;
-      attrP->value.s   = value;
-    }
+      langValueFix(attrP, valueP, typeP, lang);
   }
   else if (sysAttrs == false)
   {
@@ -155,8 +144,12 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (modifiedAtP != NULL)
       kjChildRemove(attrP, modifiedAtP);
 
+    kjTreeLog(attrP, "KZ: attr");
     for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
     {
+      if (mdP->type != KjObject)
+        continue;
+
       createdAtP  = kjLookup(mdP, "createdAt");
       modifiedAtP = kjLookup(mdP, "modifiedAt");
 
@@ -257,35 +250,7 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 
     // If the language is asked for, then the LanguageProperty is converted into a normal property ...
     if (lang != NULL)
-    {
-      KjNode* langValueNodeP   = kjLookup(languageMapP, lang);
-      char*   stringValue      = NULL;
-
-      if (langValueNodeP == NULL)
-      {
-        langValueNodeP = kjLookup(languageMapP, "en");         // Pick English as default if the desired language is not found
-        if (langValueNodeP == NULL)
-          langValueNodeP = languageMapP->value.firstChildP;    // If English is also not found, just take the first one
-      }
-
-      char* langName = (char*) "none";
-      if (langValueNodeP != NULL)
-      {
-        stringValue = langValueNodeP->value.s;
-        langName    = langValueNodeP->name;
-      }
-      else
-        stringValue = (char*) "empty languageMap ...";
-
-      // Convert the LanguageProperty into a normal Property
-      typeP->value.s        = (char*) "Property";
-      languageMapP->type    = KjString;
-      languageMapP->value.s = stringValue;
-
-      // Picked Language as sub-attr
-      KjNode* langNameNodeP = kjString(orionldState.kjsonP, "lang", langName);
-      kjChildAdd(attrP, langNameNodeP);
-    }
+      langValueFix(attrP, languageMapP, typeP, lang);
     else
       languageMapP->name = (char*) "languageMap";
   }
@@ -404,9 +369,9 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 
 // ----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityRetrieve -
+// mongocEntityRetrieve -
 //
-// FIXME: Only do DB stuff - for dbModrel stuff use dbModelToApiEntity()
+// FIXME: Only do DB stuff - for dbModel stuff use dbModelToApiEntity()
 //
 // PARAMETERS
 //   entityId        ID of the entity to be retrieved
@@ -474,12 +439,9 @@ KjNode* mongocEntityRetrieve
   // => I will need a semaphore to protect the data ... :(((
   //    ... as many simultaneous requests may be active at one single point in time
   //
-  LM_TMP(("MC: Calling mongoc_cursor_next"));
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    LM_TMP(("MC: got a response - calling mongocKjTreeFromBson"));
     dbTree = mongocKjTreeFromBson(mongoDocP, &title, &details);
-    LM_TMP(("MC: mongocKjTreeFromBson returned a tree at %p", dbTree));
     break;  // Just using the first one - can't be no more than one ()!
   }
 
@@ -674,30 +636,9 @@ KjNode* mongocEntityRetrieve
 
     if (special == false)
     {
-      char* attrName            = kaStrdup(&orionldState.kalloc, attrP->name);
-      bool  valueMayBeCompacted = false;
+      char* attrName = kaStrdup(&orionldState.kalloc, attrP->name);
       eqForDot(attrName);
-
-      attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrName, &valueMayBeCompacted, NULL);
-
-      if (valueMayBeCompacted == true)
-      {
-        KjNode* valueP = kjLookup(attrP, "value");
-
-        if (valueP != NULL)
-        {
-          if (valueP->type == KjString)
-            valueP->value.s = orionldContextItemAliasLookup(orionldState.contextP, valueP->value.s, NULL, NULL);
-          else if (valueP->type == KjArray)
-          {
-            for (KjNode* arrItemP = valueP->value.firstChildP; arrItemP != NULL; arrItemP = arrItemP->next)
-            {
-              if (arrItemP->type == KjString)
-                arrItemP->value.s = orionldContextItemAliasLookup(orionldState.contextP, arrItemP->value.s, NULL, NULL);
-            }
-          }
-        }
-      }
+      attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrName, NULL, NULL);
     }
 
     if (attrP->type == KjObject)

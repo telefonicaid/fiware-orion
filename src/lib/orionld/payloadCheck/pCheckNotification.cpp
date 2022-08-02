@@ -85,6 +85,7 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
       PCHECK_DUPLICATE(endpointP, nItemP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       PCHECK_OBJECT(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
       PCHECK_OBJECT_EMPTY(endpointP, 0, NULL, SubscriptionNotificationEndpointPath, 400);
+
       if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP, mqttChangeP) == false)
         return false;
     }

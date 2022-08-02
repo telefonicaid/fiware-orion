@@ -105,40 +105,40 @@ static const char* headerName[7] = {
 //
 // curlDebug
 //
-static int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, void* userptr)
+int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, void* userptr)
 {
   switch (type)
   {
   case CURLINFO_TEXT:
-    LM_TMP(("CURL: %s", data));
+    LM(("CURL: %s", data));
     break;
 
   case CURLINFO_HEADER_OUT:
-    LM_TMP(("CURL: Send header"));
+    LM(("CURL: Send header"));
     break;
 
   case CURLINFO_DATA_OUT:
-    LM_TMP(("CURL: Send data"));
+    LM(("CURL: Send data"));
     break;
 
   case CURLINFO_SSL_DATA_OUT:
-    LM_TMP(("CURL: Send SSL data"));
+    LM(("CURL: Send SSL data"));
     break;
 
   case CURLINFO_HEADER_IN:
-    LM_TMP(("CURL: Recv header"));
+    LM(("CURL: Recv header"));
     break;
 
   case CURLINFO_DATA_IN:
-    LM_TMP(("CURL: Recv data"));
+    LM(("CURL: Recv data"));
     break;
 
   case CURLINFO_SSL_DATA_IN:
-    LM_TMP(("CURL: Recv SSL data"));
+    LM(("CURL: Recv SSL data"));
     break;
 
   default:
-    LM_TMP(("CURL: type &d", type));
+    LM(("CURL: type &d", type));
     break;
   }
 

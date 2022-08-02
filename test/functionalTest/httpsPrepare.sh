@@ -26,7 +26,7 @@ function usage()
 {
   fileName=$(basename $0)
   echo $fileName "[--keyFileName (name of key file)] [--certFileName (name of certificate file)]"
-  echo "                [--country (country)] [--state (state)] [--city (city)] [--company (company)] [--unit (unit)] [--name (name)] [--email (email)]"
+  echo "                [--country (country)] [--state (state)] [--city (city)] [--company (company)] [--unit (unit)] [--name (name)] [--email (email)] [--size (size)]"
   echo
   echo "  The last seven options are input for the creation of the certificate and they all have 'decent' default values."
   exit $1
@@ -43,7 +43,7 @@ company="Telefonica"
 unit="I+D"
 name="localhost"
 email="noone@nowhere.com"
-
+size=2048
 
 while [ "$#" != 0 ]
 do
@@ -56,6 +56,7 @@ do
   elif [ "$1" == "--unit" ];         then unit=$2;         shift;
   elif [ "$1" == "--name" ];         then name=$2;         shift;
   elif [ "$1" == "--email" ];        then email=$2;        shift;
+  elif [ "$1" == "--size" ];         then size=$2;         shift;
   else
     echo $0: bad parameter/option: "'"${1}"'";
     usage 1
@@ -67,5 +68,5 @@ done
 
 OPTIONS="/C="$country"/ST="$state"/L="$city"/O="$company"/OU="$unit"/CN="$name"/"
 
-openssl genrsa -out "$keyFileName" 1024 > /dev/null 2>&1
+openssl genrsa -out "$keyFileName" $size > /dev/null 2>&1
 openssl req -days 365 -out "$certFileName" -new -x509 -key "$keyFileName" -subj "$OPTIONS" > /dev/null 2>&1

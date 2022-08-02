@@ -42,8 +42,9 @@ extern "C"
 //
 static void pgConnectionPoolPresent(PgConnectionPool* poolP)
 {
-  LM_TMP(("PGPOOL: Postgres Connection Pool for DB '%s'", poolP->db));
-  LM_TMP(("PGPOOL:   Size of pool:   %d", poolP->items));
+#ifdef DEBUG
+  LM(("PGPOOL: Postgres Connection Pool for DB '%s'", poolP->db));
+  LM(("PGPOOL:   Size of pool:   %d", poolP->items));
 
   for (int ix = 0; ix < poolP->items; ix++)
   {
@@ -52,12 +53,13 @@ static void pgConnectionPoolPresent(PgConnectionPool* poolP)
 
     PgConnection* cP = poolP->connectionV[ix];
 
-    LM_TMP(("PGPOOL:  Connection %d:", ix));
-    LM_TMP(("PGPOOL:    busy:       %s", K_FT(cP->busy)));
-    LM_TMP(("PGPOOL:    uses:       %d", cP->uses));
-    LM_TMP(("PGPOOL:    connection: %p", cP->connectionP));
-    LM_TMP(("PGPOOL:"));
+    LM(("PGPOOL:  Connection %d:", ix));
+    LM(("PGPOOL:    busy:       %s", K_FT(cP->busy)));
+    LM(("PGPOOL:    uses:       %d", cP->uses));
+    LM(("PGPOOL:    connection: %p", cP->connectionP));
+    LM(("PGPOOL:"));
   }
+#endif
 }
 
 

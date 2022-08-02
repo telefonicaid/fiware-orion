@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/performance.h"                        // PERFORMANCE
 #include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/common/langStringExtract.h"                  // langValueFix
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
@@ -83,7 +84,7 @@ static bool geoPropertyInAttrs(char** attrsV, int attrsCount, const char* geoPro
 //
 static void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
 {
-  // Loop over attributes, if "languageMap" is present . pick the language and convert to Property
+  // Loop over attributes, if "languageMap" is present - pick the language and convert to Property
   for (KjNode* attrP = apiEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (attrP->type != KjObject)  // type, id, ...  but also an attribute with datasetId ...
@@ -93,55 +94,8 @@ static void apiEntityLanguageProps(KjNode* apiEntityP, const char* lang)
     if (languageMapP == NULL)
       continue;
 
-    // Find the language item inside the languageMap
-    KjNode* langItemP   = kjLookup(languageMapP, lang);
-    char*   stringValue = NULL;
-    char*   langChosen  = (char*) lang;
-
-    if (langItemP == NULL)
-    {
-      langItemP  = kjLookup(languageMapP, "en");    // English is the default if 'lang' is not present
-      if (langItemP != NULL) langChosen = (char*) "en";
-    }
-
-    if (langItemP == NULL)
-    {
-      langItemP = languageMapP->value.firstChildP;  // If English also not present, just pick the first one
-      if (langItemP != NULL) langChosen = langItemP->name;
-    }
-
-    if (langItemP == NULL)
-    {
-      stringValue = (char*) "empty languageMap";  // If there is no item at all inside the language map, use "empty languageMap"
-      langChosen  = (char*) "none";
-    }
-    else
-      stringValue = langItemP->value.s;
-
-
-    // Lookup the type node and change it to "Property"
     KjNode* typeP = kjLookup(attrP, "type");
-    if (typeP != NULL)
-      typeP->value.s = (char*) "Property";
-
-    // Change name of "languageMap" to "value"
-    languageMapP->name = (char*) "value";
-
-    // Change JSON type to "String" - it was an object
-    languageMapP->type = KjString;
-
-    // Give it its new value
-    languageMapP->value.s = stringValue;
-
-    // NULL out the lastChild
-    languageMapP->lastChild = NULL;
-
-    // Now add the language chosen, if any
-    if (langItemP != NULL)
-    {
-      KjNode* langItemP = kjString(orionldState.kjsonP, "lang", langChosen);
-      kjChildAdd(attrP, langItemP);
-    }
+    langValueFix(attrP, languageMapP, typeP, lang);
   }
 }
 
@@ -188,6 +142,7 @@ bool legacyGetEntities(void)
   char*                 geometry       = orionldState.uriParams.geometry;
   char*                 georel         = orionldState.uriParams.georel;
   char*                 coordinates    = orionldState.uriParams.coordinates;
+  bool                  local          = orionldState.uriParams.local;
   char*                 lang           = orionldState.uriParams.lang;
   bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   bool                  concise        = orionldState.uriParamOptions.concise;
@@ -198,24 +153,15 @@ bool legacyGetEntities(void)
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
 
-  LM_TMP(("Legacy Function"));
-
-  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
+  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL) && (local == false))
   {
     orionldError(OrionldBadRequestData,
                  "Too broad query",
-                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
+                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
                  400);
 
     return false;
   }
-
-  if ((idPattern != NULL) && (id != NULL))
-  {
-    orionldError(OrionldBadRequestData, "Incompatible parameters", "id, idPattern", 400);
-    return false;
-  }
-
 
   //
   // If any of "geometry", "georel" and "coordinates" is present, they must all be present
@@ -417,6 +363,7 @@ bool legacyGetEntities(void)
 
   PERFORMANCE(mongoBackendStart);
   std::vector<std::string>  servicePathV;
+
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
                                                   orionldState.tenantP,

@@ -75,7 +75,6 @@ bool mongocTenantExists(const char* tenantName)
   if (b == false)
     LM_RE(false, ("Database Error ()", mcError.message));
 
-  LM_TMP(("mongoc_client_read_command_with_opts worked"));
   char*   title;
   char*   detail;
   KjNode* responseP = mongocKjTreeFromBson(&reply, &title, &detail);
@@ -106,12 +105,8 @@ bool mongocTenantExists(const char* tenantName)
       continue;
 
     if (strcmp(nameP->value.s, fullDbName) == 0)
-    {
-      LM_TMP(("Found DB '%s'", fullDbName));
       return true;
-    }
   }
 
-  LM_TMP(("Did not find DB '%s'", fullDbName));
   return false;
 }

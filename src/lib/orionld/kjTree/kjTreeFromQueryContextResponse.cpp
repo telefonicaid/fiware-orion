@@ -46,6 +46,7 @@ extern "C"
 #include "orionld/common/langStringExtract.h"                  // langStringExtract
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
@@ -276,9 +277,14 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
             return NULL;
           }
 
-          char* pickedLanguage;
-          char* langString = langStringExtract(langValueP, lang, &pickedLanguage);
-          aTop = kjString(orionldState.kjsonP, attrName, langString);
+          char*   pickedLanguage;
+          KjNode* langValueNodeP = langItemPick(langValueP, attrName, lang, &pickedLanguage);
+
+          if (langValueNodeP->type == KjString)
+            aTop = kjString(orionldState.kjsonP, attrName, langValueNodeP->value.s);
+          else  // langValueP->type == KjArray
+            aTop = langValueNodeP;
+          kjTreeLog(aTop, "KZ: aTop");
         }
         else
         {
@@ -327,6 +333,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
         }
 
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
+        kjTreeLog(top, "KZ: top with aTop inside");
       }
       else  // Normalized   AND    Concise  - concise is dealt with later!
       {
@@ -577,5 +584,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
     }
   }
 
+  kjTreeLog(root, "KZ: root with top and aTop inside");
   return root;
 }

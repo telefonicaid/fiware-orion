@@ -30,6 +30,7 @@
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 #include <microhttpd.h>                                          // MHD_Connection
 #include <bson/bson.h>                                           // bson_error_t
+#include <curl/curl.h>                                           // CURLM
 
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
@@ -66,7 +67,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v1.0.1"
+#define ORIONLD_VERSION "post-v1.1.0"
 
 
 
@@ -160,6 +161,7 @@ typedef struct OrionldUriParams
   char*     languageproperties;
   char*     observedAt;
   char*     lang;
+  bool      local;
 
   double    observedAtAsDouble;
   uint64_t  mask;
@@ -371,7 +373,7 @@ typedef struct OrionldConnectionState
   OrionldNotificationInfo notificationInfo[16];  // Old
   bool                    notify;                // Old
   OrionldAlteration*      alterations;
-
+  CURLM*                  multiP;                // curl multi api
 
   OrionldPrefixCache      prefixCache;
   OrionldResponseBuffer   httpResponse;
@@ -557,6 +559,8 @@ extern int               maxAge;                   // From orionld.cpp (CORS)
 extern char              userAgentHeader[64];      // From notificationSend.cpp
 extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
 extern bool              debugCurl;                // From orionld.cpp
+extern bool              noCache;                  // From orionld.cpp
+extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 
 
 

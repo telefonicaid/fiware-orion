@@ -46,7 +46,7 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int 
 {
   if (tree == NULL)
   {
-    LM_TMP(("%s[%d]: %s: NULL Tree", fileName, lineNo, msg));
+    LM(("%s[%d]: %s: NULL Tree", fileName, lineNo, msg));
     return;
   }
 
@@ -61,7 +61,7 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int 
     {
       bzero(buf, bufSize);
       kjFastRender(tree, buf);
-      LM_TMP(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
+      LM(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
     }
   }
 }

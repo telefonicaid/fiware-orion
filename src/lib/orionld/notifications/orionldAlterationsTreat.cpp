@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <curl/curl.h>                                           // CURL
+
 extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
@@ -36,7 +38,6 @@ extern "C"
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
 #include "orionld/notifications/notificationSuccess.h"           // notificationSuccess
@@ -53,6 +54,7 @@ typedef struct NotificationPending
 {
   CachedSubscription*          subP;
   int                          fd;
+  CURL*                        curlHandleP;
   struct NotificationPending*  next;
 } NotificationPending;
 
@@ -74,8 +76,6 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
     return -1;
   }
 
-  // LM_TMP(("NFY: Read %d bytes of notification: %s", nb, buf));
-
   char* endOfFirstLine = strchr(buf, '\r');
 
   if (endOfFirstLine == NULL)
@@ -93,11 +93,50 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
   while ((nb = read(npP->fd, buf, sizeof(buf) - 1)) > 0)
   {
     buf[nb] = 0;
-    LM_TMP(("NFY: Read a chunk of %d bytes: %s", nb, buf));
   }
 
 
   return 0;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldAlterationName - FIXME: Move to orionld/types/OrionldAlteration.cpp
+//
+const char* orionldAlterationName(OrionldAlterationType alterationType)
+{
+  switch (alterationType)
+  {
+  case EntityCreated:                return "EntityCreated";
+  case EntityDeleted:                return "EntityDeleted";
+  case EntityModified:               return "EntityModified";
+  case AttributeAdded:               return "AttributeAdded";
+  case AttributeDeleted:             return "AttributeDeleted";
+  case AttributeValueChanged:        return "AttributeValueChanged";
+  case AttributeMetadataChanged:     return "AttributeMetadataChanged";
+  case AttributeModifiedAtChanged:   return "AttributeModifiedAtChanged";
+  }
+
+  return "Unclear Reason";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationLookupByCurlHandle -
+//
+static NotificationPending* notificationLookupByCurlHandle(NotificationPending* notificationList, CURL* curlHandleP)
+{
+  for (NotificationPending* npP = notificationList; npP != NULL; npP = npP->next)
+  {
+    if (npP->curlHandleP == curlHandleP)
+      return npP;
+  }
+
+  return NULL;
 }
 
 
@@ -130,22 +169,19 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
-    LM_TMP(("ALT: Alteration %d:", alterations));
-    LM_TMP(("ALT:   Entity Id:    %s", aP->entityId));
-    LM_TMP(("ALT:   Entity Type:  %s", aP->entityType));
-    LM_TMP(("ALT:   Attributes:   %d", aP->alteredAttributes));
-    // if (aP->patchedEntity != NULL) kjTreeLog(aP->patchedEntity, "ALT:   Patched Entity");
+    LM(("ALT: Alteration %d:", alterations));
+    LM(("ALT:   Entity Id:    %s", aP->entityId));
+    LM(("ALT:   Entity Type:  %s", aP->entityType));
+    LM(("ALT:   Attributes:   %d", aP->alteredAttributes));
 
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
-      OrionldAttributeAlteration* altAttrP = &aP->alteredAttributeV[ix];
-
-      LM_TMP(("ALT:   Attribute        %s", altAttrP->attrName));
-      LM_TMP(("ALT:   Alteration Type: %s", orionldAlterationType(altAttrP->alterationType)));
+      LM(("ALT:   Attribute        %s", aP->alteredAttributeV[ix].attrName));
+      LM(("ALT:   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
     ++alterations;
   }
-  LM_TMP(("ALT: %d Alterations present", alterations));
+  LM(("ALT: %d Alterations present", alterations));
   // ----------------------------  </DEBUG>
 
   OrionldAlterationMatch* matchList;
@@ -164,14 +200,18 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   NotificationPending* notificationList = NULL;
 
-  // <DEBUG>
+#ifdef DEBUG
   int ix = 1;
-  LM_TMP(("XX: %d Matching subscriptions:", matches));
+  LM(("%d Matching subscriptions:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    LM_TMP(("XX:   %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+    if (matchP->altAttrP != NULL)
+      LM(("o %d/%d Subscription '%s' (url: %s), due to '%s'", ix, matches, matchP->subP->subscriptionId, matchP->subP->url, orionldAlterationName(matchP->altAttrP->alterationType)));
+    else
+      LM(("o %d/%d Subscription '%s' (url: %s)", ix, matches, matchP->subP->subscriptionId, matchP->subP->url));
+    ++ix;
   }
-  // </DEBUG>
+#endif
 
 
   //
@@ -195,60 +235,41 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   kTimeGet(&notificationTime);
   notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
 
-  //
-  // Sorting matches into groups and sending notifications
-  //
-  while (matchList != NULL)
+  for (OrionldAlterationMatch* mAltP = matchList; mAltP != NULL; mAltP = mAltP->next)
   {
-    // Get the group
-    OrionldAlterationMatch* groupList = matchList;
-    OrionldAlterationMatch* prev      = matchList;
-    LM_TMP(("XX: groupList at %p (next at %p)", groupList, groupList->next));
-    for (OrionldAlterationMatch* matchP = groupList->next; matchP != NULL; matchP = matchP->next)
-    {
-      LM_TMP(("XX: Subscription '%s' vs '%s'", matchP->subP->subscriptionId, groupList->subP->subscriptionId));
-      if (matchP->subP != groupList->subP)
-      {
-        matchList  = matchP;  // matchList pointing to the first non-matching
-        prev->next = NULL;    // Ending the 'groupList'
-        LM_TMP(("Breaking match loop for sub '%s' - next is %p", groupList->subP->subscriptionId, matchList));
-        break;
-      }
-
-      prev = matchP;
-      if (matchP->next == NULL)
-        matchList = NULL;
-    }
-
-    // <DEBUG>
-    int groupMembers = 0;
-    LM_TMP(("XX: Alterations matching sub '%s':", groupList->subP->subscriptionId));
-    for (OrionldAlterationMatch* matchP = groupList; matchP != NULL; matchP = matchP->next)
-    {
-      ++groupMembers;
-      if (matchP->altAttrP)
-        LM_TMP(("XX  - %s", orionldAlterationType(matchP->altAttrP->alterationType)));
-    }
-    // </DEBUG>
-
-    int fd = notificationSend(groupList, notificationTimeAsFloat);
+    CURL* curlHandleP;
+    int fd = notificationSend(mAltP, notificationTimeAsFloat, &curlHandleP);  // curl handle as output param?
     if (fd != -1)
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
-      npP->subP = groupList->subP;
-      npP->fd   = fd;
-      npP->next = notificationList;
+      npP->subP        = mAltP->subP;
+      npP->fd          = fd;
+      npP->curlHandleP = curlHandleP;
+
+      npP->next        = notificationList;
       notificationList = npP;
     }
-
-    if (groupList == matchList)
-      break;
   }
 
+  // Start HTTPS notifications
+  bool curlError = false;
+  if (orionldState.multiP != NULL)
+  {
+    int        activeNotifications;
+    CURLMcode  cm;
+
+    LM(("Starting HTTPS notifications"));
+    cm = curl_multi_perform(orionldState.multiP, &activeNotifications);
+    if (cm != 0)
+    {
+      LM_E(("curl_multi_perform: error %d", cm));
+      curlError = true;
+    }
+  }
 
   //
-  // Awaiting responses and updating subscriptions accordingly (in sub cache)
+  // Await HTTP responses and update subscriptions accordingly (in sub cache)
   //
   int             fds;
   fd_set          rFds;
@@ -256,19 +277,18 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int             startTime  = time(NULL);
   bool            timeout    = false;
 
-  LM_TMP(("Awaiting responses and updating cached subscriptions accordingly"));
   while (timeout == false)
   {
+    NotificationPending* npP = notificationList;
+
     //
     // Set File Descriptors for the select
     //
-    NotificationPending* npP = notificationList;
-
     fdMax = 0;
     FD_ZERO(&rFds);
     while (npP != NULL)
     {
-      if (npP->fd != -1)
+      if (npP->fd >= 0)  // Only HTTP notifications
       {
         FD_SET(npP->fd, &rFds);
         fdMax = MAX(fdMax, npP->fd);
@@ -279,10 +299,8 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     if (fdMax == 0)
       break;
 
-    LM_TMP(("Awaiting responses to the notifications (fdMax: %d)", fdMax));
     struct timeval  tv = { 1, 0 };
     fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
-    LM_TMP(("Got %d from select", fds));
     if (fds == -1)
     {
       if (errno != EINTR)
@@ -291,13 +309,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     while (fds > 0)
     {
-      LM_TMP(("Got %d notification response(s)", fds));
       npP = notificationList;
       while (npP != NULL)
       {
-        if ((npP->fd != -1) && (FD_ISSET(npP->fd, &rFds)))
+        if ((npP->fd >= 0) && (FD_ISSET(npP->fd, &rFds)))
         {
-          LM_TMP(("SC: Detected a notification response on fd %d", npP->fd));
           if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
             notificationSuccess(npP->subP, notificationTimeAsFloat);
 
@@ -318,14 +334,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     }
   }
 
-  LM_TMP(("Mark all non-mqtt subs for unanswered notifications as timed out if npP->fd != -1"));
   NotificationPending* npP = notificationList;
   while (npP != NULL)
   {
-    if (npP->fd != -1)
+    if (npP->fd >= 0)
     {
       // No response
-      if (strncmp(npP->subP->protocol, "mqtt", 4) != 0)
+      if (strncmp(npP->subP->protocolString, "mqtt", 4) != 0)
       {
         notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
         close(npP->fd);
@@ -334,5 +349,71 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     }
 
     npP = npP->next;
+  }
+
+  if (curlError == true)
+  {
+    LM_E(("Something went wrong with the HTTPS notifications"));
+    return;
+  }
+
+  // Await HTTPS notification responses
+  if (orionldState.multiP != NULL)
+  {
+    int activeNotifications = 1;
+
+    while (activeNotifications != 0)
+    {
+      CURLMcode  cm;
+
+      cm = curl_multi_perform(orionldState.multiP, &activeNotifications);
+      if (cm != 0)
+      {
+        LM_E(("curl_multi_perform: error %d", cm));
+        curlError = true;
+        break;
+      }
+      else
+        LM(("%d HTTPS notifications are still active", activeNotifications));
+
+      if (activeNotifications > 0)
+      {
+        //
+        // The curl library of the UBI base image doesn't have "curl_multi_poll".
+        // Using curl_multi_wait instead.
+        // For now, at least
+        //
+        LM(("Calling curl_multi_wait"));
+        cm = curl_multi_wait(orionldState.multiP, NULL, 0, 1000, NULL);
+        if (cm != 0)
+          LM_E(("curl_multi_poll error %d", cm));
+      }
+    }
+
+    // Read the results of the notifications
+    CURLMsg* msgP;
+    int      msgsLeft;
+
+    LM(("Reading out the results of the notifications"));
+    while ((msgP = curl_multi_info_read(orionldState.multiP, &msgsLeft)) != NULL)
+    {
+      if (msgP->msg != CURLMSG_DONE)
+        continue;
+
+      NotificationPending* npP = notificationLookupByCurlHandle(notificationList, msgP->easy_handle);
+      LM(("Notification Host: '%s'", npP->subP->ip));
+      LM(("Notification Result for subscription '%s': CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
+      LM(("Update Counters for subscription '%s'", npP->subP->subscriptionId));
+
+      if (msgP->data.result == 0)
+        notificationSuccess(npP->subP, notificationTimeAsFloat);
+      else
+      {
+        char errorString[512];
+
+        snprintf(errorString, sizeof(errorString), "CURL Error %d: %s", msgP->data.result, curl_easy_strerror(msgP->data.result));
+        notificationFailure(npP->subP, errorString, notificationTimeAsFloat);
+      }
+    }
   }
 }

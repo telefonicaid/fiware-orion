@@ -49,7 +49,7 @@ class ConnectionInfo;
 //
 // httpHeaderLocationAdd -
 //
-extern void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId);
+extern void httpHeaderLocationAdd(const char* uriPathWithSlash, const char* entityId, const char* tenant);
 
 
 

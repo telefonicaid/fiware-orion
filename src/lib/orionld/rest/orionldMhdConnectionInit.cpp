@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
+#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
@@ -378,15 +379,37 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
 
 // -----------------------------------------------------------------------------
 //
+// pCheckTenantName -
+//
+bool pCheckTenantName(const char* dbName)
+{
+  size_t len = strlen(dbName);
+
+  if (len > 52)
+  {
+    orionldError(OrionldBadRequestData, "Invalid tenant name", "Tenant name too long (maximum is set to 52 characters)", 400);
+    return false;
+  }
+
+  if (strcspn(dbName, "/. \"\\$") != len)
+  {
+    orionldError(OrionldBadRequestData, "Invalid tenant name", "Invalid character for a mongo database name", 400);
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldHttpHeaderReceive -
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (strcmp(key, "Orionld-Legacy") == 0)
-  {
     orionldState.in.legacy = (char*) value;
-    LM_TMP(("Got header '%s' = '%s'", key, value));
-  }
   else if (strcmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));
@@ -433,9 +456,26 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   {
     if (multitenancy == true)  // Has the broker been started with multi-tenancy enabled (it's disabled by default)
     {
-      toLowercase((char*) value);
-      orionldState.tenantName = (char*) value;  // FIXME: Deprecate this field
-      orionldState.in.tenant  = (char*) value;
+      if (pCheckTenantName(value) == false)
+        return MHD_YES;
+
+      toLowercase((char*) value);  // All tenants are lowercase - mongo decides that
+
+      // Tenant already given?
+      if (orionldState.tenantName != NULL)
+      {
+        if (strcmp(orionldState.tenantName, value) != 0)
+        {
+          orionldError(OrionldBadRequestData, "HTTP header duplication", "Tenant set twice (or perhaps both Fiware-Service and NGSILD-Tenant?)", 400);
+          return MHD_YES;
+        }
+      }
+      else
+      {
+        orionldState.tenantName = (char*) value;  // FIXME: Deprecate this field
+        orionldState.in.tenant  = (char*) value;
+        orionldState.tenantP    = orionldTenantLookup(orionldState.tenantName);
+      }
     }
     else
     {
@@ -802,6 +842,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     orionldState.uriParams.level = (char*) value;
   }
+  else if (strcmp(key, "local") == 0)
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.local = true;
+  }
   else if (strcmp(key, "entity::type") == 0)  // Is NGSIv1 ?entity::type=X the same as NGSIv2 ?type=X ?
   {
     orionldState.uriParams.type = (char*) value;
@@ -888,7 +933,7 @@ MHD_Result orionldMhdConnectionInit
   ++requestNo;
 
   // if ((requestNo % 100 == 0) || (requestNo == 1))
-  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
+  LM(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 2. Prepare orionldState
@@ -933,6 +978,13 @@ MHD_Result orionldMhdConnectionInit
       orionldError(OrionldBadRequestData, "Invalid URL PATH", "Double Slash", 400);
       return MHD_YES;
     }
+  }
+
+  // 2. NGSI-LD requests don't support the broker to be started with -noCache
+  if (noCache == true)
+  {
+    orionldError(OrionldBadRequestData, "Not Implemented", "Running without Subscription Cache is not implemented for NGSI-LD requests", 501);
+    return MHD_YES;
   }
 
   // 3. Check invalid verb

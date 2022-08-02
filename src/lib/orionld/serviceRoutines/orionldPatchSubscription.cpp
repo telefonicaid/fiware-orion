@@ -388,11 +388,12 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
     {
       if (cSubP->url != NULL)
         free(cSubP->url);
-      cSubP->url      = url;  // Only ... it's already destroyed by 'urlParse' - need it to free up later
-      cSubP->protocol = protocol;
-      cSubP->ip       = ip;
-      cSubP->port     = port;
-      cSubP->rest     = rest;
+      cSubP->url            = url;  // Only ... it's already destroyed by 'urlParse' - need it to free up later
+      cSubP->protocolString = protocol;
+      cSubP->ip             = ip;
+      cSubP->port           = port;
+      cSubP->rest           = rest;
+      cSubP->protocol       = protocolFromString(cSubP->protocolString);
     }
     else
     {
@@ -602,7 +603,6 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
 //
 static bool mqttInfoFromDbTree(KjNode* dbSubscriptionP, KjNode* uriP, MqttInfo* miP)
 {
-  LM_TMP(("URI: '%s'", uriP->value.s));
   char* uri = kaStrdup(&orionldState.kalloc, uriP->value.s);
   char* detail     = NULL;
   char* usernameP  = NULL;
@@ -610,20 +610,16 @@ static bool mqttInfoFromDbTree(KjNode* dbSubscriptionP, KjNode* uriP, MqttInfo* 
   char* hostP      = NULL;
   char* topicP     = NULL;
 
-  LM_TMP(("Calling mqttParse"));
   if (mqttParse(uri, &miP->mqtts, &usernameP, &passwordP, &hostP, &miP->port, &topicP, &detail) == false)
   {
     orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
     return false;
   }
-  LM_TMP(("After mqttParse"));
 
   if (usernameP != NULL) strncpy(miP->username, usernameP, sizeof(miP->username) - 1);
   if (passwordP != NULL) strncpy(miP->password, passwordP, sizeof(miP->password) - 1);
   if (hostP     != NULL) strncpy(miP->host,     hostP,     sizeof(miP->host)     - 1);
   if (topicP    != NULL) strncpy(miP->topic,    topicP,    sizeof(miP->topic)    - 1);
-
-  LM_TMP(("Topic: '%s'", miP->topic));
 
   KjNode* notifierInfoP = kjLookup(dbSubscriptionP, "notifierInfo");
   if (notifierInfoP)
@@ -649,10 +645,9 @@ static bool mqttConnectFromInfo(MqttInfo* miP)
   bool b;
 
   b = mqttConnectionEstablish(miP->mqtts, miP->username, miP->password, miP->host, miP->port, miP->version);
-  LM_TMP(("Connected to MQTT broker at %s:%d", miP->host, miP->port));
 
   if (b == false)
-    LM_RE(false, ("Unable to connect to MQTT broker %s:%s", miP->host, miP->port));
+    LM_RE(false, ("Unable to connect to MQTT broker %s:%d", miP->host, miP->port));
 
   return true;
 }
@@ -666,7 +661,6 @@ static bool mqttConnectFromInfo(MqttInfo* miP)
 static void mqttDisconnectFromInfo(MqttInfo* miP)
 {
   mqttDisconnect(miP->host, miP->port, miP->username, miP->password, miP->version);
-  LM_TMP(("Disconnected from MQTT broker at %s:%d", miP->host, miP->port));
 }
 
 

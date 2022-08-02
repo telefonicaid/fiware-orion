@@ -574,7 +574,7 @@ function brokerStart()
     elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
     then
       notificationModeGiven=TRUE
-      xParams="$xParams $1 $2"
+      xParams="$xParams -notificationMode $2"
       shift
     else
       xParams=$xParams' '$1
@@ -1003,7 +1003,12 @@ function accumulator3Count()
 #
 function accumulatorReset()
 {
-  curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+  if [ "$1" == "HTTPS" ]
+  then
+    curl -k https://localhost:${LISTENER_PORT}/reset -s -S -X POST
+  else
+    curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+  fi
 }
 
 
@@ -1690,7 +1695,7 @@ function urlencode
 #
 function orionldMetrics
 {
-  sleep .5
+  sleep 1
   curl localhost:8000/metrics --silent | egrep -v '^#' | egrep -v '^process_' | egrep -v '^$'
 }
 

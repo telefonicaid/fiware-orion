@@ -98,6 +98,7 @@ void Notifier::sendNotifyContextRequest
 {
   pthread_t                         tid;
 
+  LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,
@@ -253,7 +254,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       // Warning already logged in macroSubstitute()
       return paramsV;  // empty vector
     }
-
 
     //
     // 3. Payload
@@ -433,6 +433,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     CachedSubscription*               subP    = NULL;
     char*                             toFree  = NULL;
 #endif
+
+    LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {

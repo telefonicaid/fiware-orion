@@ -45,7 +45,6 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
@@ -114,14 +113,12 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
         return false;
       }
 
-      LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
       if (parse8601Time(attrP->value.s) == -1)
       {
         //
         // Deletion?
         // Should only be valid for merge+patch ops ...
         //
-        LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
         if (strcmp(attrP->value.s, "urn:ngsi-ld:null") == 0)
         {
           attrP->type = KjNull;
@@ -447,13 +444,28 @@ bool pCheckLanguageMap(KjNode* languageMapP, const char* attrName)
 
   for (KjNode* langItemP = languageMapP->value.firstChildP; langItemP != NULL; langItemP = langItemP->next)
   {
-    PCHECK_STRING(langItemP, 0, "Items of the value of a LanguageProperty attribute must be JSON Strings", attrName, 400);
-
-    // Check the key-value pair for either key or value EMPTY
-    if ((langItemP->name[0] == 0) || (langItemP->value.s[0] == 0))
+    // Check the key-value pair for empty KEY
+    if (langItemP->name[0] == 0)
     {
-      orionldError(OrionldBadRequestData, "An item of the value (languageMap) of a LanguageProperty has an empty string", attrName, 400);
+      orionldError(OrionldBadRequestData, "A key of the languageMap of a LanguageProperty is an empty string", attrName, 400);
       return false;
+    }
+
+    if (langItemP->type == KjString)
+    {
+      PCHECK_STRING_EMPTY(langItemP, 0, "Items of a value array of a LanguageProperty attribute cannot be an empty JSON String", attrName, 400);
+    }
+    else if (langItemP->type == KjArray)
+    {
+      for (KjNode* langValueP = langItemP->value.firstChildP; langValueP != NULL; langValueP = langValueP->next)
+      {
+        PCHECK_STRING(langValueP, 0, "Items of a value array of a LanguageProperty attribute must be JSON String", attrName, 400);
+        PCHECK_STRING_EMPTY(langValueP, 0, "Items of a value array of a LanguageProperty attribute cannot be an empty JSON String", attrName, 400);
+      }
+    }
+    else
+    {
+      PCHECK_STRING_OR_ARRAY(langItemP, 0, "Items of the value of a LanguageProperty attribute must be JSON String or Array of String", attrName, 400);
     }
   }
 
@@ -736,6 +748,35 @@ bool deletionWithoutTypePresent
 
 // -----------------------------------------------------------------------------
 //
+// isJsonLiteral -
+//
+// FIXME: move to its own module
+//
+static bool isJsonLiteral(KjNode* attrP, KjNode* typeP)
+{
+  if (typeP == NULL)
+  {
+    typeP = kjLookup(attrP, "@type");
+    if (typeP == NULL)
+      return false;
+  }
+  else if (strcmp(typeP->name, "@type") != 0)
+    return false;
+
+  if (strcmp(typeP->value.s, "@json") != 0)
+    return false;
+
+  // Must have an @value also
+  if (kjLookup(attrP, "@value") == NULL)
+    return false;
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckAttributeObject -
 //
 // - if "type" is present inside the object:
@@ -801,6 +842,25 @@ static bool pCheckAttributeObject
       {
         attributeType = GeoProperty;
         geoJsonValue  = true;
+      }
+      else if (isJsonLiteral(attrP, typeP) == true)
+      {
+        KjNode* typeP  = kjString(orionldState.kjsonP, "type", "Property");
+        KjNode* valueP = kjObject(orionldState.kjsonP, "value");
+
+        // Steal children from attrP and put them in valueP
+        valueP->value.firstChildP = attrP->value.firstChildP;
+        valueP->lastChild         = attrP->lastChild;
+
+        // valueP stole the entire RHS - now empty the RHS of attrP
+        attrP->value.firstChildP = NULL;
+        attrP->lastChild         = NULL;
+
+        // Finally, add typeP and valueP to attrP
+        kjChildAdd(attrP, typeP);
+        kjChildAdd(attrP, valueP);
+
+        return true;
       }
       else
       {
@@ -884,18 +944,14 @@ static bool pCheckAttributeObject
   KjNode* fieldP = attrP->value.firstChildP;
   KjNode* next;
 
-  kjTreeLog(attrP, "GEO: Looping over all attribute fields");
   while (fieldP != NULL)
   {
     next = fieldP->next;
 
     if ((fieldP->type == KjString) && (strcmp(fieldP->value.s, "urn:ngsi-ld:null") == 0))
-    {
       fieldP->type = KjNull;
-      LM_TMP(("OBS: Field '%s' marked for deletion", fieldP->name));
-    }
 
-    if (fieldP->type == KjNull)  // JSON-LD null
+    if (fieldP->type == KjNull)
     {
       if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
       {
@@ -994,11 +1050,8 @@ static bool pCheckAttributeObject
     fieldP = next;
   }
 
-  kjTreeLog(attrP, "GEO: attr after");
   if (attributeType == GeoProperty)
   {
-    LM_TMP(("GEO: %s is a geo property", attrP->name));
-
     if (pCheckGeoProperty(attrP) == false)
     {
       LM_W(("pCheckGeoProperty flagged an error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
@@ -1172,8 +1225,6 @@ bool pCheckAttribute
   }
 
   // "Direct" Deletion?
-  if (attrP->type == KjString)
-    LM_TMP(("OBS: attrP->value.s == '%s'", attrP->value.s));
   if ((attrP->type == KjString) && (strcmp(attrP->value.s, "urn:ngsi-ld:null") == 0))
   {
     attrP->type = KjNull;

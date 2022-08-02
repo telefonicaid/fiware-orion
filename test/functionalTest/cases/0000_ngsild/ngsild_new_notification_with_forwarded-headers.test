@@ -100,6 +100,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+NGSILD-Tenant: t1
 
 
 
@@ -109,6 +110,7 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+NGSILD-Tenant: t1
 
 
 

@@ -59,10 +59,7 @@ extern "C"
 bool orionldPostEntities(void)
 {
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
-  {
-    LM_TMP(("********** Running Legacy version of orionldPostEntities"));
     return legacyPostEntities();
-  }
 
   char*    entityId;
   char*    entityType;
@@ -170,7 +167,7 @@ bool orionldPostEntities(void)
 
   // All good
   orionldState.httpStatusCode = 201;
-  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId);
+  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
 
   if (cloneForTroeP != NULL)
     orionldState.requestTree = cloneForTroeP;

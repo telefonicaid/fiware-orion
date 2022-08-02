@@ -187,13 +187,7 @@ bool pCheckSubscription
       PCHECK_DUPLICATE(qP, subItemP, 0, NULL, SubscriptionQPath, 400);
       PCHECK_STRING(qP, 0, NULL, SubscriptionQPath, 400);
 
-      LM_TMP(("KZ: Calling qBuild(q='%s')", qP->value.s));
-      LM_TMP(("KZ: Need to expand the q so it looks like it does when it comes from the database before calling qBuild"));
       *qTreeP = qBuild(qP->value.s, qTextP, qValidForV2P, qIsMqP, true);  // 5th parameter: qToDbModel == true
-      LM_TMP(("KZ: qTreeP:              %p", *qTreeP));
-      LM_TMP(("KZ: qTextP:              %s", *qTextP));
-      LM_TMP(("KZ: Valid for NGSIv2:    %s", K_FT(*qValidForV2P)));
-      LM_TMP(("KZ: Metadata for NGSIv2: %s", K_FT(*qIsMqP)));
       *qNodeP = qP;
 
       if (*qTreeP == NULL)

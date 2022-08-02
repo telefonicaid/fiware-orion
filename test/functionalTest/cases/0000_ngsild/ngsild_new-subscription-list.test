@@ -21,20 +21,25 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creation and DB Contebt
+Subscription Creation and DB Content
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+dbInit CB t1
+brokerStart CB 0 IPv4 -experimental -multiservice
 
 --SHELL--
 
 #
-# 01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../50
-# 02. GET subscriptions - see the first 20
-# 03. GET subscriptions with limit 5 - see the first 5
-# 04. GET subscriptions with limit 5 and offset 25, see subs 25-29
+# 01. Create 50 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../50, on the default tenant
+# 02. Create 40 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../40, on tenant t1
+# 03. GET subscriptions - see the first 20
+# 04. GET subscriptions with limit 5 - see the first 5
+# 05. GET subscriptions with limit 5 and offset 25, see subs 25-29
+# 06. GET subscriptions count with limit 0 - see HTTP header (NGSILD-Results-Count) and empty subscription array
+# 07. GET subscriptions count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array
+# 08. GET subscriptions from tenant t1, with offset 36 - see 4 subs
 #
 
 
@@ -103,37 +108,108 @@ echo
 echo
 
 
-echo "02. GET subscriptions - see the first 20"
+echo "02. Create 40 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../40, on tenant t1"
+echo "========================================================================================"
+subNo=1
+
+while [ $subNo -le 40 ]
+do
+    subNoWithZeroes=$(printf "%04d" $subNo)
+    subId=urn:ngsi-ld:Subscription:sub$subNoWithZeroes
+    name="Test subscription "$subNoWithZeroes
+    description="Description of Test subscription "$subNoWithZeroes
+    payload='{
+      "id": "'$subId'",
+      "type": "Subscription",
+      "name": "'$name'",
+      "description": "'$description'",
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E01",
+          "type": "T1"
+        },
+        {
+          "id": "http://a.b.c/E02",
+          "type": "T2"
+        },
+        {
+          "idPattern": ".*E03.*",
+          "type": "T3"
+        }
+      ],
+      "watchedAttributes": [ "P2" ],
+      "q": "P2>10",
+      "geoQ": {
+        "geometry": "Point",
+        "coordinates": "[1,2]",
+        "georel": "near;maxDistance==10"
+      },
+      "isActive": false,
+      "notification": {
+        "attributes": [ "P1", "P2", "A3" ],
+        "format": "keyValues",
+        "endpoint": {
+          "uri": "http://valid.url/url",
+          "accept": "application/ld+json"
+        },
+        "status": "ignored",
+        "timesSent": "ignored",
+        "lastNotification": "ignored",
+        "lastFailure": "ignored",
+        "lastSuccess": "ignored"
+      },
+      "expiresAt": "2028-12-31T10:00:00",
+      "throttling": 5,
+      "status": "to be ignored - read-only",
+      "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "createdAt": "ignored",
+      "modifiedAt": "ignored"
+    }'
+    orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json" -H "NGSILD-Tenant: t1"
+    subNo=$subNo+1
+  done
+echo
+echo
+
+
+echo "03. GET subscriptions - see the first 20"
 echo "========================================"
 orionCurl --url /ngsi-ld/v1/subscriptions -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "03. GET subscriptions with limit 5 - see the first 5"
+echo "04. GET subscriptions with limit 5 - see the first 5"
 echo "===================================================="
 orionCurl --url /ngsi-ld/v1/subscriptions?limit=5 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "04. GET subscriptions with limit 5 and offset 25, see subs 25-29"
+echo "05. GET subscriptions with limit 5 and offset 25, see subs 25-29"
 echo "================================================================"
 orionCurl --url '/ngsi-ld/v1/subscriptions?limit=5&offset=25' -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "05. GET subscriptions count with limit 0 - see HTTP header (NGSILD-Results-Count) and empty subscription array"
+echo "06. GET subscriptions count with limit 0 - see HTTP header (NGSILD-Results-Count) and empty subscription array"
 echo "=============================================================================================================="
 orionCurl --url '/ngsi-ld/v1/subscriptions?limit=0&count=true'
 echo
 echo
 
 
-echo "06. GET subscriptions count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array"
+echo "07. GET subscriptions count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array"
 echo "============================================================================================================================="
 orionCurl --url '/ngsi-ld/v1/subscriptions?limit=1&count=true&options=sysAttrs'
+echo
+echo
+
+
+echo "08. GET subscriptions from tenant t1, with offset 36 - see 4 subs"
+echo "================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions?offset=36&count=true' -H "NGSILD-Tenant: t1" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -393,7 +469,251 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0050
 
 
 
-02. GET subscriptions - see the first 20
+02. Create 40 subscriptions, with ids urn:ngsi-ld:Subscription:1/2/3.../40, on tenant t1
+========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0001
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0002
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0003
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0004
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0005
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0006
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0007
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0008
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0009
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0010
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0011
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0012
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0013
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0014
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0015
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0016
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0017
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0018
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0019
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0020
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0021
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0022
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0023
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0024
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0025
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0026
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0027
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0028
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0029
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0030
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0031
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0032
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0033
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0034
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0035
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0036
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0037
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0038
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0039
+NGSILD-Tenant: t1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0040
+NGSILD-Tenant: t1
+
+
+
+03. GET subscriptions - see the first 20
 ========================================
 HTTP/1.1 200 OK
 Content-Length: 13321
@@ -1405,7 +1725,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 ]
 
 
-03. GET subscriptions with limit 5 - see the first 5
+04. GET subscriptions with limit 5 - see the first 5
 ====================================================
 HTTP/1.1 200 OK
 Content-Length: 3331
@@ -1667,7 +1987,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 ]
 
 
-04. GET subscriptions with limit 5 and offset 25, see subs 25-29
+05. GET subscriptions with limit 5 and offset 25, see subs 25-29
 ================================================================
 HTTP/1.1 200 OK
 Content-Length: 3331
@@ -1929,7 +2249,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 ]
 
 
-05. GET subscriptions count with limit 0 - see HTTP header (NGSILD-Results-Count) and empty subscription array
+06. GET subscriptions count with limit 0 - see HTTP header (NGSILD-Results-Count) and empty subscription array
 ==============================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -1940,7 +2260,7 @@ NGSILD-Results-Count: 50
 []
 
 
-06. GET subscriptions count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array
+07. GET subscriptions count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array
 =============================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 860
@@ -2005,6 +2325,220 @@ NGSILD-Results-Count: 50
 ]
 
 
+08. GET subscriptions from tenant t1, with offset 36 - see 4 subs
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 2665
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 40
+
+[
+    {
+        "description": "Description of Test subscription 0037",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "T3"
+            }
+        ],
+        "expiresAt": "2028-12-31T10:00:00.000Z",
+        "geoQ": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0037",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "P1",
+                "P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "q": "P2>10",
+        "status": "paused",
+        "subscriptionName": "Test subscription 0037",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0038",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "T3"
+            }
+        ],
+        "expiresAt": "2028-12-31T10:00:00.000Z",
+        "geoQ": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0038",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "P1",
+                "P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "q": "P2>10",
+        "status": "paused",
+        "subscriptionName": "Test subscription 0038",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0039",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "T3"
+            }
+        ],
+        "expiresAt": "2028-12-31T10:00:00.000Z",
+        "geoQ": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0039",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "P1",
+                "P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "q": "P2>10",
+        "status": "paused",
+        "subscriptionName": "Test subscription 0039",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "P2"
+        ]
+    },
+    {
+        "description": "Description of Test subscription 0040",
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:E01",
+                "type": "T1"
+            },
+            {
+                "id": "http://a.b.c/E02",
+                "type": "T2"
+            },
+            {
+                "idPattern": ".*E03.*",
+                "type": "T3"
+            }
+        ],
+        "expiresAt": "2028-12-31T10:00:00.000Z",
+        "geoQ": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "geometry": "Point",
+            "georel": "near;maxDistance==10"
+        },
+        "id": "urn:ngsi-ld:Subscription:sub0040",
+        "isActive": false,
+        "notification": {
+            "attributes": [
+                "P1",
+                "P2",
+                "A3"
+            ],
+            "endpoint": {
+                "accept": "application/ld+json",
+                "uri": "http://valid.url/url"
+            },
+            "format": "keyValues",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "q": "P2>10",
+        "status": "paused",
+        "subscriptionName": "Test subscription 0040",
+        "throttling": 5,
+        "type": "Subscription",
+        "watchedAttributes": [
+            "P2"
+        ]
+    }
+]
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+dbDrop CB t1

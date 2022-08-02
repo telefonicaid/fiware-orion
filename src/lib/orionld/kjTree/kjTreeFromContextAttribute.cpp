@@ -66,12 +66,30 @@ static void langFixSimplified(KjNode* languageMapP, const char* lang)
 {
   KjNode* valueP = kjLookup(languageMapP, lang);
   if (valueP == NULL)
+    valueP = kjLookup(languageMapP, "@none");
+  if (valueP == NULL)
     valueP = kjLookup(languageMapP, "en");
   if (valueP == NULL)
     valueP = languageMapP->value.firstChildP;
 
-  languageMapP->type     = KjString;
-  languageMapP->value.s  = (valueP != NULL)? valueP->value.s : (char*) "empty languageMap";
+  if (valueP == NULL)
+  {
+    languageMapP->type     = KjString;
+    languageMapP->value.s  = (char*) "empty languageMap";
+  }
+  else if (valueP->type == KjString)
+  {
+    languageMapP->type     = KjString;
+    languageMapP->value.s  = valueP->value.s;
+  }
+  else  // Array
+  {
+    languageMapP->type               = KjArray;
+    languageMapP->value.firstChildP  = valueP->value.firstChildP;
+    languageMapP->lastChild          = valueP->lastChild;
+    valueP->value.firstChildP        = NULL;
+    valueP->lastChild                = NULL;
+  }
 }
 
 
@@ -84,12 +102,30 @@ static void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP
 {
   KjNode* valueP = kjLookup(languageMapP, lang);
   if (valueP == NULL)
+    valueP = kjLookup(languageMapP, "@none");
+  if (valueP == NULL)
     valueP = kjLookup(languageMapP, "en");
   if (valueP == NULL)
     valueP = languageMapP->value.firstChildP;
 
-  languageMapP->type     = KjString;
-  languageMapP->value.s  = (valueP != NULL)? valueP->value.s : (char*) "empty languageMap";
+  if (valueP == NULL)
+  {
+    languageMapP->type     = KjString;
+    languageMapP->value.s  = (char*) "empty languageMap";
+  }
+  else if (valueP->type == KjString)
+  {
+    languageMapP->type     = KjString;
+    languageMapP->value.s  = valueP->value.s;
+  }
+  else  // Array
+  {
+    languageMapP->type              = KjArray;
+    languageMapP->value.firstChildP = valueP->value.firstChildP;
+    languageMapP->lastChild         = valueP->lastChild;
+    valueP->value.firstChildP       = NULL;
+    valueP->lastChild               = NULL;
+  }
 
   languageMapP->name = (char*) "value";
   typeP->value.s     = (char*) "Property";
@@ -109,8 +145,6 @@ static void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP
 //
 KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, const char* lang, char** detailsP)
 {
-  LM_TMP(("LANG: Attribute: '%s', type: '%s', lang at: '%p'", caP->name.c_str(), caP->type.c_str(), lang));
-
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
 

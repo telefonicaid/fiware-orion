@@ -1,0 +1,106 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URI params in orionldState
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays
+# 02. GET Entity with 'id=' - no value for id
+# 03. GET Entities without URI params - too broad request
+#
+
+echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays"
+echo "================================================================================================================"
+orionCurl --url "/ngsi-ld/v1/entities?id=urn:E1,urn:E2,urn:E3&type=T1,T2,T3&idPattern=E.*&attrs=A1,A2,A3"
+echo
+echo
+
+
+
+echo "02. GET Entity with 'id=' - no value for id"
+echo "==========================================="
+orionCurl --url "/ngsi-ld/v1/entities?id="
+echo
+echo
+
+
+echo "03. GET Entities without URI params - too broad request"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Not Permitted",
+    "title": "URI params /id/ and /type/ are both lists",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. GET Entity with 'id=' - no value for id
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Empty right-hand-side for a URI parameter",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GET Entities without URI params - too broad request
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 195
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
+    "title": "Too broad query",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

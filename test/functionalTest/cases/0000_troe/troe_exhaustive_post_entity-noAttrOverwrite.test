@@ -523,6 +523,7 @@ HTTP/1.1 201 Created
 Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
+NGSILD-Tenant: t1
 
 [
     "urn:ngsi-ld:entity:E2",

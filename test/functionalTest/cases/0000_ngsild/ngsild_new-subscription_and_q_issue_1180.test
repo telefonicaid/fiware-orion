@@ -1,0 +1,262 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscriptions with q-filter over string value
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create subscription S1 with a q over a property that is a string
+# 02. See S1 in mongo
+# 03. GET S1 - see q with %22
+# 04. GET all subscriptions - see S1:q with %22
+# 05. Create a matching entity
+# 06. Dump accumulator
+#
+
+
+echo "01. Create subscription S1 with a q over a property that is a string"
+echo "===================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "q": "P==%22STRING%22",
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See S1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET S1 - see q with %22"
+echo "==========================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1'
+echo
+echo
+
+
+echo "04. GET all subscriptions - see S1:q with %22"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/
+echo
+echo
+
+
+echo "05. Create a matching entity"
+echo "============================"
+payload='{
+  "id": "urn:E1",
+  "type": "T1",
+  "P": "STRING"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator"
+echo "===================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription S1 with a q over a property that is a string
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. See S1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P.value==%22STRING%22",
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P.value==%22STRING%22",
+		"mq" : ""
+	},
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+03. GET S1 - see q with %22
+===========================
+HTTP/1.1 200 OK
+Content-Length: 290
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T1"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "P==%22STRING%22",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+04. GET all subscriptions - see S1:q with %22
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 292
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "entities": [
+            {
+                "type": "T1"
+            }
+        ],
+        "id": "urn:ngsi-ld:subscriptions:S1",
+        "isActive": true,
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://127.0.0.1:9997/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "q": "P==%22STRING%22",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+05. Create a matching entity
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Dump accumulator
+====================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 258
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P": {
+                "type": "Property",
+                "value": "STRING"
+            },
+            "id": "urn:E1",
+            "type": "T1"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

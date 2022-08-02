@@ -40,6 +40,8 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/notifications/notificationSuccess.h"         // notificationSuccess
+#include "orionld/notifications/notificationFailure.h"         // notificationFailure
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttConnectionAdd.h"                    // mqttConnectionAdd
@@ -94,7 +96,6 @@ static KjNode* headersParse(struct iovec* ioVec, int ioVecSize, CachedSubscripti
 
     // The end of the line is \r\n - let's remove that
     header[headerLen - 2] = 0;
-    LM_TMP(("headersParse: '%s'", header));
 
     char* colonP = strchr(header, ':');
     if (colonP == NULL)
@@ -124,9 +125,8 @@ static KjNode* headersParse(struct iovec* ioVec, int ioVecSize, CachedSubscripti
 //
 // mqttNotify -
 //
-int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
+int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, double timestamp)
 {
-  LM_TMP(("MQTT Notification"));
   //
   // The headers and the body comes already rendered inside ioVec
   // That is perfect for the payload body, that would need to be rendered otherwise.
@@ -137,7 +137,11 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   //
   KjNode*  metadata = headersParse(ioVec, ioVecSize, cSubP);
   if (metadata == NULL)
+  {
+    orionldError(OrionldInternalError, "Internal Error", "headersParse failed", 500);
+    notificationFailure(cSubP, "Error parsing headers", timestamp);
     return 1;
+  }
 
   int      headersLen = kjFastRenderSize(metadata);                      // Approximate
   int      totalLen   = headersLen + ioVec[ioVecSize - 1].iov_len + 10;  // Approximate
@@ -146,6 +150,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   if (buf == NULL)
   {
     orionldError(OrionldInternalError, "kaAlloc failed", "out of memory?", 500);
+    notificationFailure(cSubP, "Out of memory", timestamp);
     return 2;
   }
 
@@ -154,10 +159,10 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   int dataStart = strlen(buf);
 
   char* body = (char*) ioVec[ioVecSize - 1].iov_base;
-  LM_TMP(("body: %s", body));
+
   int bodyLen  = snprintf(&buf[dataStart], totalLen - dataStart, ",\"body\":%s}", (char*) body);
   totalLen = dataStart + bodyLen;
-  LM_TMP(("Complete rendered message: %s", buf));
+
   MqttInfo*                 mqttP             = &cSubP->httpInfo.mqtt;
   MqttConnection*           mqttConnectionP   = mqttConnectionLookup(mqttP->host, mqttP->port, mqttP->username, mqttP->password, mqttP->version);
   MQTTClient_message        mqttMsg           = MQTTClient_message_initializer;
@@ -169,6 +174,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
     if (mqttConnectionP == NULL)
     {
       orionldError(OrionldInternalError, "MQTT Broker Problem", "unable to connect to the MQTT broker", 500);
+      notificationFailure(cSubP, "Unable to connect to the MQTT broker", timestamp);
       return 3;
     }
   }
@@ -178,7 +184,6 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   mqttMsg.qos        = mqttP->qos;
   mqttMsg.retained   = 0;
 
-  LM_TMP(("Publishing MQTT message on topic '%s'", mqttP->topic));
   MQTTClient_publishMessage(mqttConnectionP->client, mqttP->topic, &mqttMsg, &mqttToken);
 
   extern int  mqttTimeout;  // From mqttNotification.cpp - should be a CLI
@@ -187,8 +192,11 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   {
     LM_E(("Internal Error (MQTT waitForCompletion error %d)", rc));
     orionldError(OrionldInternalError, "MQTT Broker Problem", "MQTT waitForCompletion error", 500);
+    notificationFailure(cSubP, "MQTT waitForCompletion error", timestamp);
     return 4;
   }
+
+  notificationSuccess(cSubP, timestamp);
 
   return 0;
 }

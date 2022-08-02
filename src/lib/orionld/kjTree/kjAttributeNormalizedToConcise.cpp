@@ -48,8 +48,6 @@ void kjAttributeNormalizedToConcise(KjNode* attrP, const char* lang)
   OrionldAttributeType attrType = NoAttributeType;
   KjNode*              typeP    = kjLookup(attrP, "type");
 
-  LM_TMP(("In kjAttributeNormalizedToConcise"));
-
   if (typeP == NULL)
     LM_RVE(("The attribute '%s' doesn't have an attribute type", attrP->name));
   if (typeP->type != KjString)

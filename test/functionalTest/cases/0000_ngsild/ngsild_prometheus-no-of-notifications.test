@@ -45,7 +45,7 @@ accumulatorStart
 # NOTE:
 #   I need to sleep a little, before asking for metrics - give some time for the notifications.
 #   Remember - the broker responds to the create/update request before notifications are actually sent
-#   - NEVER MIND - the sleep in backed info 'orionldMetrics()'
+#   - NEVER MIND - the sleep in baked into 'orionldMetrics()'
 #
 
 echo "01. Create a subscription S1 for accumulator on entity E1, attrs A1 and A2"

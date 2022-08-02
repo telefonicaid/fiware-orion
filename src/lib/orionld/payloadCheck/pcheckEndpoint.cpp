@@ -56,8 +56,20 @@ bool pcheckEndpoint(KjNode* endpointP, bool patch, KjNode** uriPP, KjNode** noti
       DUPLICATE_CHECK(uriP, "endpoint::uri", epItemP);
       STRING_CHECK(uriP, "endpoint::uri");
       URI_CHECK(uriP->value.s, "endpoint::uri", true);
-      if (strncmp(uriP->value.s, "mqtt", 4) == 0)
+
+      LM(("1178: uri: '%s'", uriP->value.s));
+      if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
+      {
         *mqttChangeP = true;
+        LM(("1178: it's an MQTT subscription"));
+      }
+      else if (strncmp(uriP->value.s, "mqtts://", 8) == 0)
+      {
+        orionldError(OrionldOperationNotSupported, "Not Implemented", "MQTT notifications witn mqtts is not implemented", 501);
+        return false;
+      }
+      else
+        LM(("1178: it's NOT an MQTT subscription"));
     }
     else if (strcmp(epItemP->name, "accept") == 0)
     {

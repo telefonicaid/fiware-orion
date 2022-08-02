@@ -200,14 +200,11 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
 
   // q
   const char* q = (subscriptionP->ldQ != "")? subscriptionP->ldQ.c_str() : subscriptionP->subject.condition.expression.q.c_str();
-  LM_TMP(("KZ: subscriptionP->ldQ: '%s'", subscriptionP->ldQ.c_str()));
-  LM_TMP(("KZ: q: '%s'", q));
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
     dbModelValueStrip(nodeP);
     qAliasCompact(nodeP, true);
-    LM_TMP(("KZ: q after qAliasCompact: '%s'", nodeP->value.s));
     kjChildAdd(topP, nodeP);
   }
 

@@ -30,6 +30,7 @@
 
 #include "orionld/common/orionldState.h"                            // promNotifications, promNotificationsFailed
 #include "orionld/prometheus/promCounterIncrease.h"                 // promCounterIncrease
+#include "orionld/mongoc/mongocSubCountersUpdate.h"                 // mongocSubCountersUpdate
 #include "orionld/notifications/notificationFailure.h"              // Own interface
 
 
@@ -40,24 +41,42 @@
 //
 void notificationFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
 {
-  LM_TMP(("SC: Updating counters and timestamps after failed notification"));
+  bool forcedToPause = false;
+
   subP->lastNotificationTime  = timestamp;
   subP->lastFailure           = timestamp;
   subP->consecutiveErrors    += 1;
   subP->count                += 1;
+  subP->dirty                += 1;
 
   strncpy(subP->lastErrorReason, errorReason, sizeof(subP->lastErrorReason) - 1);
 
   // Force the subscription into "paused" due to too many consecutive errors
   if (subP->consecutiveErrors >= 3)
   {
+    LM(("SUBC: Force the subscription into PAUSE due to 3 consecutive errors"));
     subP->isActive = false;
     subP->status   = "paused";
-    // FIXME: Write to DB !!!
+    forcedToPause  = true;
   }
-
-  // Write to DB ... ?
 
   promCounterIncrease(promNotifications);
   promCounterIncrease(promNotificationsFailed);
+
+  LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
+
+  //
+  // Flush to DB?
+  // - If forcedToPause
+  // - If subP->dirty (number of counter updates since last flush) >= cSubCounters
+  //   - AND cSubCounters != 0
+  //
+  if (((cSubCounters != 0) && (subP->dirty >= cSubCounters)) || (forcedToPause == true))
+  {
+    LM(("SUBC: Calling mongocSubCountersUpdate"));
+    mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, forcedToPause, true);
+    subP->dirty    = 0;
+    subP->dbCount += subP->count;
+    subP->count    = 0;
+  }
 }

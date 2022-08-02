@@ -126,17 +126,6 @@ static void* workerFunc(void* pSyncQ)
       //
       strcpy(transactionId, params->transactionId);
 
-      LM_T(LmtNotifier, ("worker sending '%s' message to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-                         params->protocol.c_str(),
-                         params->ip.c_str(),
-                         params->port,
-                         params->verb.c_str(),
-                         params->tenant.c_str(),
-                         params->servicePath.c_str(),
-                         params->xauthToken.c_str(),
-                         params->resource.c_str(),
-                         params->content_type.c_str()));
-
       int r = 0;
 
       if (simulatedNotification)
@@ -148,6 +137,7 @@ static void* workerFunc(void* pSyncQ)
       {
         char* topic = (char*) params->resource.c_str();
 
+        LM(("Sending MQTT Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = mqttNotification(params->ip.c_str(),
                              params->port,
                              topic,
@@ -168,6 +158,7 @@ static void* workerFunc(void* pSyncQ)
         if (ngsildSubscription == false)
           subscriptionId = NULL;
 
+        LM(("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,

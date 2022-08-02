@@ -35,14 +35,14 @@ brokerStart CB 0-255 IPv4 -multiservice
 
 #
 # 01. Get the list of geo-indexes
-# 02. Create an entity E1 with three GeoProperties in the default tenant
+# 02. Create an entity E1 with three GeoProperties on default tenant
 # 03. Get the list of geo-indexes
-# 04. Create an entity E1 with two GeoProperties in the tenant tn1
+# 04. Create an entity E1 with two GeoProperties on tenant tn1
 # 05. Get the list of geo-indexes
 # 06. Kill the broker and restart it
 # 07. Get the list of geo-indexes
-# 08. Create an entity E2 without GeoProperties in the tenant tn2
-# 09. Create an entity E2 with one GeoProperty in the tenant tn3
+# 08. Create an entity E2 without GeoProperties on tenant tn2
+# 09. Create an entity E2 with one GeoProperty on tenant tn3
 # 10. Get the list of geo-indexes
 #
 
@@ -53,8 +53,8 @@ echo
 echo
 
 
-echo "02. Create an entity E1 with three GeoProperties in the default tenant"
-echo "======================================================================"
+echo "02. Create an entity E1 with three GeoProperties on default tenant"
+echo "=================================================================="
 payload='{
   "id": "urn:ngsi-ld:entity:E1",
   "type": "T1",
@@ -92,8 +92,8 @@ echo
 echo
 
 
-echo "04. Create an entity E1 with two GeoProperties in the tenant tn1"
-echo "================================================================"
+echo "04. Create an entity E1 with two GeoProperties on tenant tn1"
+echo "============================================================"
 payload='{
   "id": "urn:ngsi-ld:entity:E1",
   "type": "T1",
@@ -139,8 +139,8 @@ echo
 echo
 
 
-echo "08. Create an entity E2 without GeoProperties in the tenant tn2"
-echo "==============================================================="
+echo "08. Create an entity E2 without GeoProperties on tenant tn2"
+echo "==========================================================="
 payload='{
   "id": "urn:ngsi-ld:entity:E2",
   "type": "T1",
@@ -154,8 +154,8 @@ echo
 echo
 
 
-echo "09. Create an entity E2 with one GeoProperty in the tenant tn3"
-echo "=============================================================="
+echo "09. Create an entity E2 with one GeoProperty on tenant tn3"
+echo "=========================================================="
 payload='{
   "id": "urn:ngsi-ld:entity:E2",
   "type": "T1",
@@ -191,8 +191,8 @@ Date: REGEX(.*)
 
 
 
-02. Create an entity E1 with three GeoProperties in the default tenant
-======================================================================
+02. Create an entity E1 with three GeoProperties on default tenant
+==================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -225,12 +225,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 
 
-04. Create an entity E1 with two GeoProperties in the tenant tn1
-================================================================
+04. Create an entity E1 with two GeoProperties on tenant tn1
+============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+NGSILD-Tenant: tn1
 
 
 
@@ -304,21 +305,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 
 
-08. Create an entity E2 without GeoProperties in the tenant tn2
-===============================================================
+08. Create an entity E2 without GeoProperties on tenant tn2
+===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+NGSILD-Tenant: tn2
 
 
 
-09. Create an entity E2 with one GeoProperty in the tenant tn3
-==============================================================
+09. Create an entity E2 with one GeoProperty on tenant tn3
+==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+NGSILD-Tenant: tn3
 
 
 

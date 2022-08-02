@@ -176,7 +176,7 @@ bool EntityInfo::match
   }
   else
   {
-    LM_TMP(("No match due to Entity ID"));
+    LM(("No match due to Entity ID"));
     matchedId = false;
   }
 
@@ -191,7 +191,7 @@ bool EntityInfo::match
     }
     else if ((type != "")  && (entityType != "") && (entityType != type))
     {
-      LM_TMP(("No match due to Entity Type"));
+      LM(("No match due to Entity Type"));
       matchedType = false;
     }
     else
@@ -443,21 +443,21 @@ static bool subMatch
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
         // No match due to tenant I
-        LM_TMP(("No match due to tenant I"));
+        LM(("No match due to tenant I"));
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
         // No match due to tenant II
-        LM_TMP(("No match due to tenant II"));
+        LM(("No match due to tenant II"));
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
       // No match due to tenant III
-      LM_TMP(("No match due to tenant III"));
+      LM(("No match due to tenant III"));
       return false;
     }
   }
@@ -465,7 +465,7 @@ static bool subMatch
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
     // No match due to servicePath
-    LM_TMP(("No match due to servicePath"));
+    LM(("No match due to servicePath"));
     return false;
   }
 
@@ -479,7 +479,7 @@ static bool subMatch
   if (!attributeMatch(cSubP, attrV))
   {
     // No match due to attributes
-    LM_TMP(("No match due to attributes"));
+    LM(("No match due to attributes"));
     return false;
   }
 
@@ -850,7 +850,6 @@ void subCacheItemInsert
   //
   CachedSubscription* cSubP = new CachedSubscription();
 
-
   //
   // First the non-complex values
   //
@@ -905,6 +904,7 @@ void subCacheItemInsert
   cSubP->lastFailure           = 0;  // Or, does this come from DB ?
   cSubP->consecutiveErrors     = 0;
   cSubP->lastErrorReason[0]    = 0;
+  cSubP->dirty                 = 0;
 
   //
   // The three 'q's
@@ -958,7 +958,8 @@ void subCacheItemInsert
   // IP, port and rest
   //
   cSubP->url = strdup(httpInfo.url.c_str());
-  urlParse(cSubP->url, &cSubP->protocol, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
+  cSubP->protocol = protocolFromString(cSubP->protocolString);
 
   //
   // String filters
@@ -1158,15 +1159,15 @@ void debugSubCache(const char* prefix, const char* title)
 {
   CachedSubscription* subP = subCache.head;
 
-  LM_TMP(("%s%s", prefix, title));
+  LM(("%s%s", prefix, title));
   while (subP != NULL)
   {
-    LM_TMP(("%s  * Subscription %s:",       prefix, subP->subscriptionId));
-    LM_TMP(("%s    - lastNotification: %f", prefix, subP->lastNotificationTime));
-    LM_TMP(("%s    - lastSuccess:      %f", prefix, subP->lastSuccess));
-    LM_TMP(("%s    - lastFailure:      %f", prefix, subP->lastFailure));
-    LM_TMP(("%s    - timesSent:        %d", prefix, subP->count));
-    LM_TMP(("%s", prefix));
+    LM(("%s  * Subscription %s:",       prefix, subP->subscriptionId));
+    LM(("%s    - lastNotification: %f", prefix, subP->lastNotificationTime));
+    LM(("%s    - lastSuccess:      %f", prefix, subP->lastSuccess));
+    LM(("%s    - lastFailure:      %f", prefix, subP->lastFailure));
+    LM(("%s    - timesSent:        %d", prefix, subP->count));
+    LM(("%s", prefix));
 
     subP = subP->next;
   }
@@ -1270,7 +1271,6 @@ void subCacheSync(void)
   //
   CachedSubscription* cSubP = subCache.head;
 
-  LM_TMP(("SC: Synchronizing the subscription cache"));
   while (cSubP != NULL)
   {
     //
@@ -1348,7 +1348,7 @@ void subCacheSync(void)
     if (cssP != NULL)
     {
       if (experimental == true)
-        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, cssP->ngsild);
+        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, false, cssP->ngsild);
       else
       {
         std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
