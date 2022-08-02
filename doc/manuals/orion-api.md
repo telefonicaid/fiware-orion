@@ -344,7 +344,7 @@ The list of builtin attributes is as follows:
   controls entity expiration is an implementation specific aspect.
 
 * `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with 
-the [subscriptions based in alteration type](subscriptions_alttype.md) feature. This attribute
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
   can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
    * `entityCreate` if the update that triggers the notification is a entity creation operation 
    * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
