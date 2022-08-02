@@ -40,6 +40,8 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/notifications/notificationSuccess.h"         // notificationSuccess
+#include "orionld/notifications/notificationFailure.h"         // notificationFailure
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttConnectionAdd.h"                    // mqttConnectionAdd
@@ -123,7 +125,7 @@ static KjNode* headersParse(struct iovec* ioVec, int ioVecSize, CachedSubscripti
 //
 // mqttNotify -
 //
-int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
+int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, double timestamp)
 {
   //
   // The headers and the body comes already rendered inside ioVec
@@ -135,7 +137,11 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   //
   KjNode*  metadata = headersParse(ioVec, ioVecSize, cSubP);
   if (metadata == NULL)
+  {
+    orionldError(OrionldInternalError, "Internal Error", "headersParse failed", 500);
+    notificationFailure(cSubP, "Error parsing headers", timestamp);
     return 1;
+  }
 
   int      headersLen = kjFastRenderSize(metadata);                      // Approximate
   int      totalLen   = headersLen + ioVec[ioVecSize - 1].iov_len + 10;  // Approximate
@@ -144,6 +150,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   if (buf == NULL)
   {
     orionldError(OrionldInternalError, "kaAlloc failed", "out of memory?", 500);
+    notificationFailure(cSubP, "Out of memory", timestamp);
     return 2;
   }
 
@@ -167,6 +174,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
     if (mqttConnectionP == NULL)
     {
       orionldError(OrionldInternalError, "MQTT Broker Problem", "unable to connect to the MQTT broker", 500);
+      notificationFailure(cSubP, "Unable to connect to the MQTT broker", timestamp);
       return 3;
     }
   }
@@ -184,8 +192,11 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize)
   {
     LM_E(("Internal Error (MQTT waitForCompletion error %d)", rc));
     orionldError(OrionldInternalError, "MQTT Broker Problem", "MQTT waitForCompletion error", 500);
+    notificationFailure(cSubP, "MQTT waitForCompletion error", timestamp);
     return 4;
   }
+
+  notificationSuccess(cSubP, timestamp);
 
   return 0;
 }

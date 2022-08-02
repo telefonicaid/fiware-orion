@@ -647,7 +647,7 @@ static bool mqttConnectFromInfo(MqttInfo* miP)
   b = mqttConnectionEstablish(miP->mqtts, miP->username, miP->password, miP->host, miP->port, miP->version);
 
   if (b == false)
-    LM_RE(false, ("Unable to connect to MQTT broker %s:%s", miP->host, miP->port));
+    LM_RE(false, ("Unable to connect to MQTT broker %s:%d", miP->host, miP->port));
 
   return true;
 }
