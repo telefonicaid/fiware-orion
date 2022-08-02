@@ -485,8 +485,8 @@ The value of `orderBy` can be:
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
 
-How each type is ordered with regard to other types is an implementation aspect. In the case of Orion,
-we use the same criteria as the one used by the underlying implementation (MongoDB). See
+With regards of the ordering of attributes which values belong to several JSON types, Orion 
+uses the same criteria as the one used by the underlying implementation (MongoDB). See
 [the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
 for details.
 
