@@ -583,7 +583,7 @@ Client applications are responsible for defining which entity attributes convey 
 properties (by providing an appropriate NGSI attribute type). Typically this is an entity attribute
 named `location`, but nothing prevents use another different name for the geospatial attribute. 
 
-Orion limits the number of geospatial attributes is limited to one (1) attribute due to
+Orion limits the number of geospatial attributes to one (1) attribute due to
 resource constraints imposed by backend databases. If additional use attempts to create additional 
 location attributes, Orion rises an error `413`, *Request entity too large*, and
 the reported error on the response payload is `NoResourcesAvailable`.
