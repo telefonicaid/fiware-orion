@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjChildRemove, kjChildAdd
+#include "kjson/kjClone.h"                                     // kjClone
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
@@ -36,11 +37,10 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
-#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
+#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
@@ -91,7 +91,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
 
     for (KjNode* infoNodeP = informationItemP->value.firstChildP; infoNodeP != NULL; infoNodeP = infoNodeP->next)
     {
-      if (SCOMPARE9(infoNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
+      if (strcmp(infoNodeP->name, "entities") == 0)
       {
         DUPLICATE_CHECK(entitiesP, "Registration::information::entities", infoNodeP);
         if (infoNodeP->value.firstChildP == NULL)
@@ -103,7 +103,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         if (kjTreeToEntIdVector(infoNodeP, &regP->dataProvided.entities) == false)
           return false;  // orionldError is invoked by kjTreeToEntIdVector
       }
-      else if (SCOMPARE11(infoNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
+      else if (strcmp(infoNodeP->name, "properties") == 0)
       {
         DUPLICATE_CHECK(propertiesP, "Registration::information::properties", infoNodeP);
         if (infoNodeP->value.firstChildP == NULL)
@@ -120,7 +120,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
           regP->dataProvided.propertyV.push_back(propP->value.s);
         }
       }
-      else if (SCOMPARE14(infoNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
+      else if (strcmp(infoNodeP->name, "relationships") == 0)
       {
         DUPLICATE_CHECK(relationshipsP, "Registration::information::relationships", infoNodeP);
 
@@ -174,6 +174,12 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   KjNode*  observationSpaceP         = NULL;
   KjNode*  operationSpaceP           = NULL;
   KjNode*  expiresP                  = NULL;
+  KjNode*  scopeP                    = NULL;
+  KjNode*  modeP                     = NULL;
+  KjNode*  operationsP               = NULL;
+  KjNode*  refreshRateP              = NULL;
+  KjNode*  managementP               = NULL;
+  KjNode*  tenantP                   = NULL;
 
   if (orionldState.payloadIdNode == NULL)
   {
@@ -230,13 +236,13 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   {
     next = kNodeP->next;
 
-    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    if ((strcmp(kNodeP->name, "name") == 0) || (strcmp(kNodeP->name, "registrationName") == 0))
     {
       DUPLICATE_CHECK(nameP, "Registration::name", kNodeP);
       STRING_CHECK(kNodeP, "Registration::name");
       regP->name = nameP->value.s;
     }
-    else if (SCOMPARE12(kNodeP->name, 'd', 'e', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 0))
+    else if (strcmp(kNodeP->name, "description") == 0)
     {
       DUPLICATE_CHECK(descriptionP, "Registration::description", kNodeP);
       STRING_CHECK(kNodeP, "Registration::description");
@@ -244,7 +250,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       regP->description         = descriptionP->value.s;
       regP->descriptionProvided = true;
     }
-    else if (SCOMPARE12(kNodeP->name, 'i', 'n', 'f', 'o', 'r', 'm', 'a', 't', 'i', 'o', 'n', 0))
+    else if (strcmp(kNodeP->name, "information") == 0)
     {
       DUPLICATE_CHECK(informationP, "Registration::information", kNodeP);
       ARRAY_CHECK(kNodeP, "Registration::information");
@@ -253,31 +259,31 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       if (kjTreeToRegistrationInformation(kNodeP, regP) == false)
         return false;
     }
-    else if (SCOMPARE20(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
+    else if (strcmp(kNodeP->name, "observationInterval") == 0)
     {
       DUPLICATE_CHECK(observationIntervalP, "Registration::observationInterval", kNodeP);
       OBJECT_CHECK(kNodeP, "Registration::observationInterval");
       kjTreeToTimeInterval(kNodeP, &regP->observationInterval);
     }
-    else if (SCOMPARE19(kNodeP->name, 'm', 'a', 'n', 'a', 'g', 'e', 'm', 'e', 'n', 't', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
+    else if (strcmp(kNodeP->name, "managementInterval") == 0)
     {
       DUPLICATE_CHECK(managementIntervalP, "Registration::managementInterval", kNodeP);
       OBJECT_CHECK(kNodeP, "Registration::managementInterval");
       kjTreeToTimeInterval(kNodeP, &regP->managementInterval);
     }
-    else if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+    else if (strcmp(kNodeP->name, "location") == 0)
     {
       DUPLICATE_CHECK(locationP, "Registration::location", kNodeP);
       OBJECT_CHECK(locationP, "Registration::location");
       kjTreeToGeoLocation(kNodeP, &regP->location);
     }
-    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
+    else if (strcmp(kNodeP->name, "observationSpace") == 0)
     {
       DUPLICATE_CHECK(observationSpaceP, "Registration::observationSpace", kNodeP);
       OBJECT_CHECK(observationSpaceP, "Registration::observationSpace");
       kjTreeToGeoLocation(kNodeP, &regP->observationSpace);
     }
-    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
+    else if (strcmp(kNodeP->name, "operationSpace") == 0)
     {
       DUPLICATE_CHECK(operationSpaceP, "Registration::operationSpace", kNodeP);
       OBJECT_CHECK(operationSpaceP, "Registration::operationSpace");
@@ -289,20 +295,73 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       STRING_CHECK(kNodeP, "Registration::expiresAt");
       DATETIME_CHECK(expiresP->value.s, regP->expires, "Registration::expiresAt");
     }
-    else if (SCOMPARE9(kNodeP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
+    else if (strcmp(kNodeP->name, "endpoint") == 0)
     {
       DUPLICATE_CHECK(endpointP, "Registration::endpoint", kNodeP);
       STRING_CHECK(kNodeP, "Registration::endpoint");
 
       regP->provider.http.url = endpointP->value.s;
     }
-    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
+    else if (strcmp(kNodeP->name, "scope") == 0)
+    {
+      PCHECK_DUPLICATE(scopeP, kNodeP, 0, NULL, "Registration::scope", 400);
+      PCHECK_STRING(scopeP, 0, NULL, "Registration::scope", 400);
+      PCHECK_STRING_EMPTY(scopeP, 0, NULL, "Registration::scope", 400);
+      regP->scope = kjClone(NULL, scopeP);
+    }
+    else if (strcmp(kNodeP->name, "mode") == 0)
+    {
+      PCHECK_DUPLICATE(modeP, kNodeP, 0, NULL, "Registration::mode", 400);
+      PCHECK_STRING(modeP, 0, NULL, "Registration::mode", 400);
+      PCHECK_STRING_EMPTY(modeP, 0, NULL, "Registration::mode", 400);
+
+      regP->mode = registrationMode(modeP->value.s);
+      if (regP->mode == RegModeNone)
+      {
+        orionldError(OrionldBadRequestData, "invalid value for Registration::mode", modeP->value.s, 400);
+        return false;
+      }
+    }
+    else if (strcmp(kNodeP->name, "operations") == 0)
+    {
+      PCHECK_DUPLICATE(operationsP, kNodeP, 0, NULL, "Registration::operations", 400);
+      PCHECK_ARRAY(operationsP, 0, NULL, "Registration::operations", 400);
+      PCHECK_ARRAY_EMPTY(operationsP, 0, NULL, "Registration::operations", 400);
+      PCHECK_ARRAY_OF_STRING(operationsP, 0, NULL, "Registration::operations", 400);
+      regP->operations = kjClone(NULL, operationsP);
+    }
+    else if (strcmp(kNodeP->name, "refreshRate") == 0)
+    {
+      PCHECK_DUPLICATE(refreshRateP, kNodeP, 0, NULL, "Registration::refreshRate", 400);
+      PCHECK_STRING(refreshRateP, 0, NULL, "Registration::refreshRate", 400);
+      // regP->refreshRate = iso8601Duration(refreshRate->value.s);
+      regP->refreshRate = 7.3;
+    }
+    else if (strcmp(kNodeP->name, "management") == 0)
+    {
+      PCHECK_DUPLICATE(managementP, kNodeP, 0, NULL, "Registration::management", 400);
+      PCHECK_OBJECT(managementP, 0, NULL, "Registration::management", 400);
+      PCHECK_OBJECT_EMPTY(managementP, 0, NULL, "Registration::management", 400);
+      regP->management = kjClone(NULL, managementP);
+    }
+    else if (strcmp(kNodeP->name, "createdAt") == 0)
     {
       // Ignored - read-only
     }
-    else if (SCOMPARE11(kNodeP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
+    else if (strcmp(kNodeP->name, "modifiedAt") == 0)
     {
       // Ignored - read-only
+    }
+    else if (strcmp(kNodeP->name, "tenant") == 0)
+    {
+      PCHECK_DUPLICATE(tenantP, kNodeP, 0, NULL, "Registration::tenant", 400);
+      PCHECK_STRING(tenantP, 0, NULL, "Registration::tenant", 400);
+      if (strlen(tenantP->value.s) > sizeof(regP->tenant) - 1)
+      {
+        orionldError(OrionldBadRequestData, "String field too long", "Registration::tenant", 400);
+        return false;
+      }
+      strncpy(regP->tenant, tenantP->value.s, sizeof(regP->tenant) - 1);
     }
     else
     {

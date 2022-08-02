@@ -30,10 +30,9 @@
 
 #include "apiTypesV2/EntID.h"
 
-#ifdef ORIONLD
-#include "orionld/types/OrionldTimeInterval.h"
-#include "orionld/types/OrionldGeoLocation.h"
-#endif
+#include "orionld/types/OrionldTimeInterval.h"             // OrionldTimeInterval
+#include "orionld/types/OrionldGeoLocation.h"              // OrionldGeoLocation
+#include "orionld/types/RegistrationMode.h"                // RegistrationMode
 
 
 
@@ -130,6 +129,7 @@ struct DataProvided
 
 
 
+
 /* ****************************************************************************
 *
 * Registration -
@@ -157,6 +157,12 @@ struct Registration
   OrionldGeoLocation    observationSpace;
   OrionldGeoLocation    operationSpace;
   KjNode*               properties;
+  double                refreshRate;
+  KjNode*               scope;
+  RegistrationMode      mode;
+  KjNode*               operations;
+  KjNode*               management;
+  char                  tenant[64];
 #endif
 
   Registration();

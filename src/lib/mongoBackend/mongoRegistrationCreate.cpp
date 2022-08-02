@@ -28,7 +28,6 @@
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 #include "orionld/types/OrionldTenant.h"            // OrionldTenant
 
@@ -92,6 +91,18 @@ static void setName(const std::string& name, mongo::BSONObjBuilder* bobP)
   {
     bobP->append(REG_NAME, name);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* setTenant -
+*/
+static void setTenant(const std::string& tenant, mongo::BSONObjBuilder* bobP)
+{
+  if (tenant != "")
+    bobP->append("tenant", tenant);
 }
 
 
@@ -321,6 +332,7 @@ void mongoRegistrationCreate
 
   setDescription(regP->description, &bob);
   setName(regP->name, &bob);
+  setTenant(regP->tenant, &bob);
   setExpiration(regP->expires, &bob);
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
