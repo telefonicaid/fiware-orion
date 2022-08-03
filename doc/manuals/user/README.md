@@ -20,7 +20,6 @@
   * [Entity service paths](service_path.md)
   * [Update action types](update_action_types.md)
   * [Context broker federation](federation.md)
-  * [Forbidden characters](forbidden_characters.md)
   * [Using regular expressions](regex.md)
   * [Oneshot subscriptions](oneshot_subscription.md)
   * [Subscriptions based in alteration type](subscriptions_alttype.md)

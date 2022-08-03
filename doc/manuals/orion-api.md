@@ -21,7 +21,8 @@
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
     - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
-    - [Field syntax restrictions](#field-syntax-restrictions)
+    - [General syntax restrictions](#general-syntax-restrictions)
+    - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
     - [Ordering Results](#ordering-results)
@@ -36,6 +37,7 @@
     - [Oneshot Subscription](#oneshot-subscription)
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
+      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
@@ -293,18 +295,15 @@ Some operations use partial representation of entities:
   * If value is null, then `None` is used.
 
 * Attribute `metadata` may be omitted in requests, meaning that there are no metadata elements
-  associated to the attribute. In responses, this property is set to `{}` if the attribute 
-  doesn't have any metadata. Depending if `overrideMetadata` is used or not, this sentence has
-  two interpretations:
-  * If `overrideMetadata` is not used (default behaviour) it is interpreted as
-  "... meaning that there are no metadata elements associated to the attribute,
-  **which need to be updated**"
-  * If `overrideMetadata` is used it is interpreted as
-  "... meaning that there are no metadata elements associated to the attribute,
-  **as a result of the the attribute update**"
+  associated to the attribute. What "associated" means depends on `overrideMetadata`:
+  * If `overrideMetadata` is not used (default behaviour), it means there are no metadata elements associated to the attribute, *which need to be updated*
+  * If `overrideMetadata` is used, it means there are no metadata elements associated to the attribute,
+  *as a result of the the attribute update*"
+
+* In responses, `metadata` is set to `{}` if the attribute doesn't have any metadata. 
 
 The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
-option are detailed in [this section of the documentation](metadata.md#updating-metadata).
+option are detailed in [this section of the documentation](#updating-metadata).
 
 ## Datetime support
 
@@ -386,6 +385,20 @@ meaning:
   geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
   See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
 
+* `TextUnrestricted`: this attribute type allows to skip [syntax restrictions](#general-syntax-restrictions) checkings in the attribute 
+   value. However, it could have security implications (possible script injections attacks) so use 
+   it at your own risk!. For instance (only the referred entity attribute is shown):
+
+
+```json
+{
+  "forbiddenAttr": {
+   "type": "TextUnrestricted",
+   "value": "I'"'"'am a unrestricted (and I'"'"'m using forbidden chars)"
+  }
+}
+```
+
 ## Builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
@@ -406,14 +419,15 @@ The list of builtin attributes is as follows:
   controls entity expiration is an implementation specific aspect.
 
 * `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with 
-the [subscriptions based in alteration type](#subscriptions-based-in-alteration-type) feature. This attribute
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
+
   can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
    * `entityCreate` if the update that triggers the notification is a entity creation operation 
    * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
    * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
    * `entityDelete` if the update that triggers the notification was a entity delete operation
 
-Like regular attributes, they can be used in `q` filters and in `orderBy` (`alterationType` is not included).
+Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
 
 ## Special Metadata Types
@@ -426,7 +440,7 @@ meaning:
   operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
   check the section [Datetime support](#datetime-support) of this documentation.
 
-* `ignoreType`: When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+* `ignoreType`: when `ignoreType` with value `true` is added to an attribute, Orion will ignore the
 semantics associated to the attribute type. Note that Orion ignored attribute type in general so
 this metadata is not needed most of the cases, but there are two cases in which attribute
 type has an special semantic for Orion:
@@ -435,7 +449,7 @@ type has an special semantic for Orion:
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
-in [Geospatial properties of entities](##geospatial-properties-of-entities) section). Support
+in [Geospatial properties of entities](#geospatial-properties-of-entities) section). Support
 for `ignoreType` in `DateTime` may come in the future.
 
 ## Builtin Metadata
@@ -464,6 +478,7 @@ The list of builtin metadata is as follows:
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
+
 
 ## User attributes or metadata matching builtin name
 
@@ -497,7 +512,55 @@ account the following considerations:
 For further information about builtin attribute and metadata names you can check the respective sections 
 [Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
 
-## Field syntax restrictions
+## General syntax restrictions
+
+In order to avoid script injections attack in some circumstances (e.g.
+cross domain to co-located web servers in the same hot that CB) the
+following characters are forbidden in any request:
+
+-   &lt;
+-   &gt;
+-   "
+-   '
+-   =
+-   ;
+-   (
+-   )
+
+Any attempt of using them will result in a 400 Bad Request response
+like this:
+
+    {
+        "error": "BadRequest",
+        "description": "Invalid characters in attribute type"
+    }
+
+If your application needs to use these characters, you should encode it
+using a scheme not including forbidden characters before sending the
+request to Orion. 
+
+[URL encoding](http://www.degraeve.com/reference/urlencoding.php) is
+a valid way of encoding. However, we don't recommend its usage for
+fields that may appear in API URL (such as entity id or attribute names)
+due to it would need to encode the "%" character itself. For instance,
+if we would want to use "E<01>" as entity id, its URL encode would be:
+"E%3C01%3E".
+
+In order to use this entity ID in URL (e.g. a retrieve entity info operation)
+the following will be used (note that "%25" is the encoding for "%").
+
+```
+GET /v2/entities/E%253C01%253E
+```
+
+There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
+
+* URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
+* URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
+* URL parameter `georel` and `coords` allow `;`
+* Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
+
+## Identifiers syntax restrictions
 
 Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
 These rules apply to:
@@ -516,19 +579,9 @@ The rules are:
 * Maximum field length is 256 characters.
 * Minimum field length is 1 character.
 
-In addition to the above rules, given NGSIv2 server implementations could add additional syntactical
-restrictions in those or other fields, e.g., to avoid cross script injection attacks.
+In addition, the [General syntax restrictions](#general-syntax-restrictions) also apply to NGSIv2 identifiers.
 
-The additional restrictions that apply to Orion are the ones describe in the
-[forbidden characters](forbidden_characters.md) section of the manual.
-
-Note that you can use `TextUnrestricted` attribute type (and special attribute type beyond
-the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
-in the attribute value. However, it could have security implications (possible script
-injections attacks) so use it at your own risk!
-
-In case a client attempts to use a field that is invalid from a syntax point of view, the client
-gets a "Bad Request" error response, explaining the cause.
+In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
 ## Attribute names restrictions
 
@@ -573,8 +626,8 @@ The value of `orderBy` can be:
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
 
-How each type is ordered with regard to other types is an implementation aspect. In the case of Orion,
-we use the same criteria as the one used by the underlying implementation (MongoDB). See
+With regards of the ordering of attributes which values belong to several JSON types, Orion 
+uses the same criteria as the one used by the underlying implementation (MongoDB). See
 [the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
 for details.
 
@@ -636,7 +689,7 @@ Two different syntaxes must be supported by compliant implementations:
   complex geospatial shapes, for instance
   [multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
 
-Current implementation, (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of `GeoJSON` representations, supporting only the following types:
+Current implementation (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of `GeoJSON` representations, supporting only the following types:
 
 * Point
 * MultiPoint
@@ -670,10 +723,10 @@ if you try to use them.
 Client applications are responsible for defining which entity attributes convey geospatial
 properties (by providing an appropriate NGSI attribute type). Typically this is an entity attribute
 named `location`, but nothing prevents use another different name for the geospatial attribute. 
-In the case of Orion, the number of geospatial attributes is limited to one (1) attribute due to
-resource constraints imposed by backend databases.
 
-When spatial index limits are exceeded, Orion rises an error `413`, *Request entity too large*, and
+Orion limits the number of geospatial attributes to one (1) attribute due to
+resource constraints imposed by backend databases. If additional use attempts to create additional 
+location attributes, Orion rises an error `413`, *Request entity too large*, and
 the reported error on the response payload is `NoResourcesAvailable`.
 
 However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
@@ -1281,9 +1334,11 @@ are aware of the format without needing to process the notification payload.
 
 ## Custom Notifications
 
-NGSIv2 clients can customize notification messages using a simple template mechanism. The
-`notification.httpCustom` property of a subscription allows to specify the following fields
-to be templatized when using HTTP notifications:
+NGSIv2 clients can customize notification messages using a simple template mechanism when
+`notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
+depends on the protocol type.
+
+In case of `httpCustom`:
 
 * `url`
 * `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
@@ -1295,8 +1350,10 @@ to be templatized when using HTTP notifications:
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
 
-Regarding the MQTT notifications, the `mqttCustom` is used instead of `httpCustom`. This
-topic is described with more detail [in this specific document](user/mqtt_notifications.md).
+In case of `mqttCustom`:
+
+* `payload`
+* `topic`
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
 
@@ -1382,8 +1439,8 @@ Some notes to take into account when using `json` instead of `payload`:
     `"t": "10"` if `temperature` attribute is a string.
   * If the attribute doesn't exist in the entity, then `null` value is used
 * URL automatic decoding applied to `payload` and `headers` fields (described
-  [here](forbidden_characters.md#custom-payload-and-headers-special-treatment)) is not applied
-  to `json` field.
+  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)) 
+  is not applied to `json` field.
 * `payload` and `json` cannot be used at the same time
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
 
@@ -1397,7 +1454,8 @@ Some considerations to take into account when using custom notifications:
   is sent for each of the entities (contrary to default behaviour, which is to send all entities in
   the same HTTP message).
 * Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in [this section](user/forbidden_characters.md#custom-payload-special-treatment) of the manual.
+  custom notifications. This is described in detail in 
+  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
 * Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
   [CLI parameter](../admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
@@ -1425,6 +1483,51 @@ For instance:
 * To avoid headers included by default in notifications (e.g. `Accept`)
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
+
+### Custom payload and headers special treatment
+
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
+`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
+in `httpCustom.headers`.
+
+However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
+of `httpCustom.headers` are decoded.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain",
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+Note that the above payload value is the URL encoded version of this string:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
+`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+
+Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json 
+Content-Length: 65
+
+the value of the "temperature" attribute (of type Number) is 23.4
+```
 
 ## Subscriptions based in alteration type
 
