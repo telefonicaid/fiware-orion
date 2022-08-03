@@ -20,6 +20,7 @@
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
     - [Field syntax restrictions](#field-syntax-restrictions)
+      - [Field syntax restrictions exceptions](#field-syntax-restrictions-exceptions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
     - [Ordering Results](#ordering-results)
@@ -33,6 +34,7 @@
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
+      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -324,6 +326,20 @@ meaning:
   geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
   See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
 
+* `TextUnrestricted`: this attribute allows to skip forbidden characters checkings in the attribute 
+   value. However, it could have security implications (possible script injections attacks) so use 
+   it at your own risk!. For instance (only the referred entity attribute is shown):
+
+
+```json
+{
+  "forbiddenAttr": {
+   "type": "TextUnrestricted",
+   "value": "I'"'"'am a unrestricted (and I'"'"'m using forbidden chars)"
+  }
+}
+```
+
 ## Builtin Attributes
 
 There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
@@ -428,23 +444,62 @@ These rules apply to:
 The rules are:
 
 * Allowed characters are the ones in the plain ASCII set, except the following ones:
-  control characters, whitespace, `&`, `?`, `/` and `#`.
+    * control characters
+    * whitespace
+    * `>`
+    * `<`
+    * `"`
+    * `'`
+    * `=`
+    * `;`
+    * `(`
+    * `)`
+    * `&`
+    * `?`
+    * `/`
+    * `#`
 * Maximum field length is 256 characters.
 * Minimum field length is 1 character.
 
-In addition to the above rules, given NGSIv2 server implementations could add additional syntactical
-restrictions in those or other fields, e.g., to avoid cross script injection attacks.
+Any attempt of using them will result in a 400 Bad Request response
+like this:
 
-The additional restrictions that apply to Orion are the ones describe in the
-[forbidden characters](forbidden_characters.md) section of the manual.
+    {
+        "error": "BadRequest",
+        "description": "Invalid characters in attribute type"
+    }
 
-Note that you can use `TextUnrestricted` attribute type (and special attribute type beyond
-the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
-in the attribute value. However, it could have security implications (possible script
-injections attacks) so use it at your own risk!
+If your application needs to use these characters, you should encode it
+using a scheme not including forbidden characters before sending the
+request to Orion. 
 
-In case a client attempts to use a field that is invalid from a syntax point of view, the client
-gets a "Bad Request" error response, explaining the cause.
+[URL encoding](http://www.degraeve.com/reference/urlencoding.php) is
+a valid way of encoding. However, we don't recommend its usage for
+fields that may appear in API URL (such as entity id or attribute names)
+due to it would need to encode the "%" character itself. For instance,
+if we would want to use "E<01>" as entity id, its URL encode would be:
+"E%3C01%3E".
+
+In order to use this entity ID in URL (e.g. a retrieve entity info operation)
+the following will be used (note that "%25" is the encoding for "%").
+
+```
+GET /v2/entities/E%253C01%253E
+```
+
+Note that you can use `TextUnrestricted` attribute type as described in 
+[Special attribute types](#special-attribute-types) section in order to use forbidden characters in 
+the attribute value. However, it could have security implications (possible script injections attacks) 
+so use it at your own risk!
+
+### Field syntax restrictions exceptions
+
+There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
+
+* URL parameter `q` allows the special characters needed by the Simple Query Language
+* URL parameter `mq` allows the special characters needed by the Simple Query Language
+* URL parameter `georel` and `coords` allow `;`
+* Whichever attribute value which uses `TextUnrestricted` as attribute type.
 
 ## Attribute names restrictions
 
@@ -1166,8 +1221,8 @@ Some notes to take into account when using `json` instead of `payload`:
     `"t": "10"` if `temperature` attribute is a string.
   * If the attribute doesn't exist in the entity, then `null` value is used
 * URL automatic decoding applied to `payload` and `headers` fields (described
-  [here](forbidden_characters.md#custom-payload-and-headers-special-treatment)) is not applied
-  to `json` field.
+  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)) 
+  is not applied to `json` field.
 * `payload` and `json` cannot be used at the same time
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
 
@@ -1181,7 +1236,8 @@ Some considerations to take into account when using custom notifications:
   is sent for each of the entities (contrary to default behaviour, which is to send all entities in
   the same HTTP message).
 * Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in [this section](user/forbidden_characters.md#custom-payload-special-treatment) of the manual.
+  custom notifications. This is described in detail in 
+  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
 * Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
   [CLI parameter](../admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
@@ -1209,6 +1265,53 @@ For instance:
 * To avoid headers included by default in notifications (e.g. `Accept`)
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
+
+### Custom payload and headers special treatment
+
+Forbidden characters restrictions described in [Field syntax restrictions](#field-syntax-restrictions) 
+section als apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
+POST /v2/subscription or GET /v2/subscriptions. The same restrictions apply to the header values
+in `httpCustom.headers`.
+
+However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
+of `httpCustom.headers` are decoded.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain",
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+Note that the above payload value is the URL encoded version of this string:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
+`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+
+Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json 
+Content-Length: 65
+
+the value of the "temperature" attribute (of type Number) is 23.4
+```
+
 
 # API Routes
 
