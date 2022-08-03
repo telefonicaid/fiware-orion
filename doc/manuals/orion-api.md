@@ -27,6 +27,23 @@
     - [Metadata names restrictions](#metadata-names-restrictions)
     - [Ordering Results](#ordering-results)
     - [Error Responses](#error-responses)
+    - [Update operators for attribute values](#update-operators-for-attribute-values)
+        - [Supported operators](#supported-operators)
+           - [`$inc`](#inc)
+           - [`$mul`](#mul)
+           - [`$min`](#min)
+           - [`$max`](#max)
+           - [`$push`](#push)
+           - [`$addToSet`](#addtoset)
+           - [`$pull`](#pull)
+           - [`$pullAll`](#pullall)
+           - [`$set`](#set)
+           - [`$unset`](#unset)
+           - [`$unset`](#unset)
+           - [Combining `$set` and `$unset`](#combining-set-and-unset)
+        - [How Orion deals with operators](#how-orion-deals-with-operators)
+        - [Current limitations](#current-limitations)
+           - [Create or replace entities](#create-or-replace-entities)
     - [Geospatial properties of entities](#geospatial-properties-of-entities)
         - [Simple Location Format](#simple-location-format)
         - [GeoJSON](#geojson)
@@ -671,6 +688,425 @@ NGSIv2 `error` reporting is as follows:
   + HTTP 411 Length Required corresponds to `ContentLengthRequired` (`411`)
   + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
   + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
+
+## Update operators for attribute values
+
+Some attribute value updates has special semantics, beyond the ones described in the
+NGSIv2 specification. In particular we can do requests like this one:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+which means *"increase the value of attribute A by 3"*.
+
+This functionality is useful to reduce the complexity of applications and avoid
+race conditions in applications that access simultaneously to the same piece of
+context. More detail in [specific documentation](user/update_operators.md).
+
+### Supported operators
+
+Orion update operators are based on a subset of the ones implemented by MongoDB
+(described [here](https://docs.mongodb.com/manual/reference/operator/update/)). The 
+complete set of operators supported by Orion are the following:
+
+| Operator                 | Previous attr value     | Operation                          | Final value                     |
+|--------------------------|-------------------------|------------------------------------|---------------------------------|
+| [`$inc`](#inc)           | `"value":2`             | `value: { "$inc":2}`               | `"value":4`                     |
+| [`$mul`](#mul)           | `"value":3`             | `value: { "$mul":2}`               | `"value":6`                     |
+| [`$min`](#min)           | `"value":2`             | `value: { "$min":1}`               | `"value":1`                     |
+| [`$max`](#max)           | `"value":2`             | `value: { "$max":10}`              | `"value":10`                    |
+| [`$push`](#push)         | `"value":[1,2,3]`       | `value: { "$push":3}`              | `"value":[1,2,3,3]`             |
+| [`$addToSet`](#addtoset) | `"value":[1,2,3]`       | `value: { "$addToSet":4}`          | `"value":[1,2,3,4]`             |
+| [`$pull`](#pull)         | `"value":[1,2,3]`       | `value: { "$pull":2}`              | `"value":[1,3]`                 |
+| [`$pullAll`](#pullAll)   | `"value":[1,2,3]`       | `value: { "$pullAll":[2,3]}`       | `"value":[1]`                   |
+| [`$set`](#set)           | `"value":{"X":1,"Y":2}` | `value: { "$set":{"Y":20,"Z":30}}` | `"value":{"X":1,"Y":20,"Z":30}` |
+| [`$unset`](#unset)       | `"value":{"X":1,"Y":2}` | `value: { "$unset":{"X":1}}`       | `"value":{"Y":2}`               |
+
+A description of each one follows.
+
+#### `$inc`
+
+Increase by a given value.
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 2 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 12.
+
+This operator only accept numeric values (either positive or negative, integer or decimal).
+
+#### `$mul`
+
+Multiply by a given value
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$mul": 2 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 20.
+
+This operator only accept numeric values (either positive or negative, integer or decimal).
+
+#### `$min`
+
+Updates value if current value is greater than the one provides.
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$min": 2 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 2. However, the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$min": 20 },
+  "type": "Number"
+}
+```
+
+would not change attribute value.
+
+Apart from numbers, other value types are supported (eg, strings).
+
+#### `$max`
+
+Updates value if current value is lesser than the one provides.
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$max": 12 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 12. However, the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$max": 4 },
+  "type": "Number"
+}
+```
+
+would not change attribute value.
+
+Apart from numbers, other value types are supported (eg, strings).
+
+#### `$push`
+
+To be used with attributes which value is an array, add an item to the array.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$push": 3 },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 2, 3, 3]`
+
+#### `$addToSet`
+
+Similar to push but avoids duplications.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$addToSet": 4 },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 2, 3, 4]`. However, the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$addToSet": 3 },
+  "type": "Array"
+}
+```
+
+would not change attribute value.
+
+#### `$pull`
+
+To be used with attributes which value is an array, removes all occurrences of the item
+passed as parameter.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$pull": 2 },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 3]`.
+
+#### `$pullAll`
+
+To be used with attributes which value is an array. The parameter is also an array. All
+the occurrences of any of the members of the array used as parameter are removed.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$pullAll": [2, 3] },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1]`.
+
+#### `$set`
+
+To be used with attributes which value is an object to add/update a sub-key in the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"X": 1, "Y": 20, "Z": 30}`.
+
+For consistence, `$set` can be used with values that are not an object, such as:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": "foo" },
+  "type": "Object"
+}
+```
+
+which has the same effect than a regular update, i.e.:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": "foo",
+  "type": "Object"
+}
+```
+
+We don't recommend this usage, as the regular update is simpler.
+
+Some additional notes:
+
+* `$set` will work if the previous attribute value is an empty object (i.e. `{}`)
+* `$set` will work if the attribute doesn't previously exist in the entity (although the entity
+  itself has to exist, as explained [here](#create-or-replace-entities))
+* `$set` will not work if the previous value of the attribute is not an object (i.e. a context
+  string like `"foo"`). An `InternalServerError` will be raised in this case.
+
+#### `$unset`
+
+To be used with attributes which value is an object to remove a sub-key from the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"Y": 2}`.
+
+The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommented
+for simplicity but the following request would also work and would be equivalent to the one above:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": null} },
+  "type": "Object"
+}
+```
+
+Note that if the value of `$unset` is not an object, it will be ignored. Not existing sub-keys
+are also ignored.
+
+#### Combining `$set` and `$unset`
+
+You can combine the usage of `$set` and `$unset` in the same attribute update.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"Y": 20}`.
+
+The sub-keys in the `$set` value cannot be at the same time in the `$unset` value or
+the other way around. For instance the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would result in error.
+
+### How Orion deals with operators
+
+Orion doesn't execute the operation itself, but pass it to MongoDB, which is the one actually
+executing in the attribute value stored in the database. Thus, the execution semantics are the
+ones described in [MongoDB documentation](https://docs.mongodb.com/manual/reference/operator/update/)
+for the equivalent operands.
+
+If the operation results in error at MongoDB level, the error is progressed as is as a
+500 Internal Error in the client response. For instance, `$inc` operator only support numerical values in
+MongoDB. So if we send this request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": "foo" },
+  "type": "Number"
+}
+```
+
+The result would be this error:
+
+```
+500 Internal Server Error
+
+{"error":"InternalServerError","description":"Database Error &#40;collection: orion.entities - update&#40;&#41;: &lt;{ &quot;_id.id&quot; : &quot;E&quot;, &quot;_id.type&quot; : &quot;T&quot;, &quot;_id.servicePath&quot; : &quot;/&quot; },{ &quot;$set&quot; : { &quot;attrs.A.type&quot; : &quot;Number&quot;, &quot;attrs.A.mdNames&quot; : [  ], &quot;attrs.A.creDate&quot; : 1631801113.0986146927, &quot;attrs.A.modDate&quot; : 1631801407.5359125137, &quot;modDate&quot; : 1631801407.5359227657, &quot;lastCorrelator&quot; : &quot;cbe6923c-16f7-11ec-977e-000c29583ca5&quot; }, &quot;$unset&quot; : { &quot;attrs.A.md&quot; : 1, &quot;location&quot; : 1, &quot;expDate&quot; : 1 }, &quot;$inc&quot; : { &quot;attrs.A.value&quot; : &quot;foo&quot; } }&gt; - exception: Cannot increment with non-numeric argument: {attrs.A.value: &quot;foo&quot;}&#41;"}
+```
+
+which decoded is:
+
+```
+"error":"InternalServerError","description":"Database Error (collection: orion.entities - update(): <{ "_id.id" : "E", "_id.type" : "T", "_id.servicePath" : "/" },{ "$set" : { "attrs.A.type" : "Number", "attrs.A.mdNames" : [  ], "attrs.A.creDate" : 1631801113.0986146927, "attrs.A.modDate" : 1631801407.5359125137, "modDate" : 1631801407.5359227657, "lastCorrelator" : "cbe6923c-16f7-11ec-977e-000c29583ca5" }, "$unset" : { "attrs.A.md" : 1, "location" : 1, "expDate" : 1 }, "$inc" : { "attrs.A.value" : "foo" } }> - exception: Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
+```
+
+and if we look at the end, we can see the error reported by MongoDB:
+
+```
+Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
+```
+
+In addition, note that Orion assumes that the value for the attribute in the request
+is a JSON object which just one key (the operator). If you do a weird thing something like this:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": {
+    "x": 1
+    "$inc": 1,
+    "$mul": 10
+  },
+  "type": "Number"
+}
+```
+
+you will get (randomly, in principle) one among this ones:
+
+* A gets increased its value by 1
+* A gets multiply its value by 10
+* A gets is value updated to (literally) this JSON object: `{ "x": 1, "$inc": 1, "$mul": 10 }`
+
+So be careful of avoiding these situations.
+
+The only exception to "use only one operator" rule is the case of `$set` and
+`$unset`, that can be used together [as described above](#combining-set-and-unset).
+
+### Current limitations
+
+#### Create or replace entities
+
+Update operators cannot be used in entity creation or replace operations. For instance if
+you create an entity this way:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}
+```
+
+the attribute A in the just created entity will have as value (literally) this JSON object: `{ "$inc": 2 }`.
+
+However, note that the case of adding new attributes to existing entities will work. For instance if
+we already have an entity E with attributes A and B and we append C this way:
+
+```
+POST /v2/entities/E
+{
+  "C": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}
+```
+
+then C will be created with value `2`.
 
 ## Geospatial properties of entities
 
