@@ -1,54 +1,21 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
-* [Forbidden characters](#forbidden-characters)
 * [Update operators for attribute values](#update-operators-for-attribute-values)
-* [Metadata update semantics](#metadata-update-semantics)
-* [Custom payload decoding on notifications](#custom-payload-decoding-on-notifications)
-* [Option to disable custom notifications](#option-to-disable-custom-notifications)
-* [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
-* [Header removal in custom notifications](#header-removal-in-custom-notifications)
-* [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
-* [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
 * [Subscription payload validations](#subscription-payload-validations)
-* [`alterationType` attribute](#alterationtype-attribute)
 * [`actionType` metadata](#actiontype-metadata)
-* [`ignoreType` metadata](#ignoretype-metadata)
-* [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Oneshot subscriptions](#oneshot-subscriptions)
 * [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
-* [Custom notification extra macros](#custom-notification-extra-macros)
-* [Custom notification with JSON payload](#custom-notification-with-json-payload)
-* [Custom notifications without payload](#custom-notifications-without-payload)
-* [MQTT notifications](#mqtt-notifications)
 * [Covered subscriptions](#covered-subscriptions)
 * [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
 * [Registrations](#registrations)
-* [`null` support in DateTime and geolocation types](#null-support-in-datetime-and-geolocation-types)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
-
-## Forbidden characters
-
-From "Field syntax restrictions" section at NGSIv2 specification:
-
-> In addition to the above rules, given NGSIv2 server implementations could add additional
-> syntactical restrictions in those or other fields, e.g., to avoid cross script injection attacks.
-
-The additional restrictions that apply to Orion are the ones describe in the
-[forbidden characters](forbidden_characters.md) section of the manual.
-
-Note that you can use "TextUnrestricted" attribut type (and special attribute type beyond
-the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
-in the attribute value. However, it could have security implications (possible script
-injections attacks) so use it at your own risk!
-
-[Top](#top)
 
 ## Update operators for attribute values
 
@@ -70,180 +37,6 @@ race conditions in applications that access simultaneously to the same piece of
 context. More detail in [specific documentation](update_operators.md).
 
 [Top](#top)
-
-## Metadata update semantics
-
-The metadata update semantics used by Orion Context Broker (and the
-related `overrideMetadata` option are detailed in
-[this section of the documentation](metadata.md#updating-metadata).
-
-Moreover, from NGSIv2 specification section "Partial Representations":
-
-> Attribute `metadata` may be omitted in requests, meaning that there are no metadata
-> elements associated to the attribute.
-
-Depending if `overrideMetadata` is used or not, this sentence has two interpretations:
-
-* If `overrideMetadata` is not used (default behaviour) it is interpreted as
-  "... meaning that there are no metadata elements associated to the attribute,
-  **which need to be updated**"
-* If `overrideMetadata` is used it is interpreted as
-  "... meaning that there are no metadata elements associated to the attribute,
-  **as a result of the the attribute update**"
-
-[Top](#top)
-
-## Custom payload decoding on notifications
-
-Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-custom notifications. This is described in detail in [this section](forbidden_characters.md#custom-payload-special-treatment)
-of the manual.
-
-[Top](#top)
-
-## Option to disable custom notifications
-
-Orion can be configured to disable custom notifications, using the `-disableCustomNotifications` [CLI parameter](../admin/cli.md).
-
-In this case:
-
-* `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
-* No `${...}` macro substitution is performed.
-
-[Top](#top)
-
-## Non-modifiable headers in custom notifications
-
-The following headers cannot be overwritten in custom notifications:
-
-* `Fiware-Correlator`
-* `Ngsiv2-AttrsFormat`
-
-Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be
-ignored.
-
-[Top](#top)
-
-## Header removal in custom notifications
-
-It is not explicilty said in NGSIv2 specification ("Custom Notifications" section) but an empty
-string value for a header key in the `headers` object will remove that header from notifications.
-For instance the following configuration:
-
-```
-"httpCustom": { 
-   ...
-   "headers": {"x-auth-token": ""}
-}
-```
-
-will remove the `x-auth-token` header in notifications associated to the subscription.
-
-This can be useful to remove headers that Orion will include automatically in notifications.
-For instance:
-
-* To avoid headers included by default in notifications (e.g. `Accept`)
-* To cut the propagation of headers (from updates to notifications), such the
-  aforementioned `x-auth-token`
-
-[Top](#top)
-
-## Limit to attributes for entity location
-
-From "Geospatial properties of entities" section at NGSIv2 specification:
-
-> Client applications are responsible for defining which entity attributes convey geospatial properties
-> (by providing an appropriate NGSI attribute type). Typically this is an entity attribute named `location`,
-> but nothing prevents use cases where an entity contains more than one geospatial attribute. For instance,
-> locations specified at different granularity levels or provided by different location methods with different
-> accuracy. Nonetheless, it is noteworthy that spatial properties need special indexes which can be under resource
-> constraints imposed by backend databases. Thus, implementations may raise errors when spatial index limits are
-> exceeded. The recommended HTTP status code for those situations is `413`, *Request entity too large*, and the
-> reported error on the response payload must be `NoResourcesAvailable`.
-
-In the case of Orion, that limit is one (1) attribute.
-
-However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
-location (more detail in [this section of the documentation](#ignoretype-metadata)). This disables Orion
-interpretation of that attribute as a location, so it doesn't count towards the limit.
-
-For instance:
-
-```
-{
-  "id": "Hospital1",
-  "type": "Hospital",
-  ...
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [ -3.68666, 40.48108 ]
-    },
-    "type": "geo:json"
-  },
-  "serviceArea": {
-    "value": {
-      "type": "Polygon",
-      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
-    },
-    "type": "geo:json",
-    "metadata": {
-      "ignoreType":{
-        "value": true,
-        "type": "Boolean"
-      }
-    }
-  }
-}
-```
-
-Both attributes are of type `geo:json`, but `serviceArea` uses `ignoreType` metadata to `true` so the limit 
-of one non-informative location is not overpassed.
-
-If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
-is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
-the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
-part in geo-queries.
-
-[Top](#top)
-
-## Supported GeoJSON types in `geo:json` attributes
-
-NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
-`geo:json` attributes. However, the current implementation in Orion (based in
-the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces
-some limitations.
-
-We have successfully tested the following types:
-
-* Point
-* MultiPoint
-* LineString
-* MultiLineString
-* Polygon
-* MultiPolygon
-
-More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
-
-The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
-use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
-the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
-
-* the `geometry` field, in the case of `Feature`
-* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
-
-Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
-creation/updating time. However, from the point of view of normalization with other `geo:json` types,
-it has been decided to return only the `geometry` part. In the future, maybe a flag to return
-the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
-Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
-[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
-
-With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
-`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
-
-The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
-if you try to use them.
 
 ## Datetime support
 
@@ -360,25 +153,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 [Top](#top)
 
-## `alterationType` attribute
-
-Apart from the attributes described in the "Builtin Attributes" section in the NGSIv2 specification,
-Orion implements the `alterationType` attribute.
-
-This attribute can be used only in notifications (in queries such `GET /v2/entities?attrs=alterationType`
-is ignored) and can take the following values:
-
-* `entityCreate` if the update that triggers the notification is a entity creation operation
-* `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
-* `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
-* `entityDelete` if the update that triggers the notification was a entity delete operation
-
-The type of this attribute is `Text`
-
-This builtin attribute is related with the [subscriptions based in alteration type](subscriptions_alttype.md) feature.
-
-[Top](#top)
-
 ## `actionType` metadata
 
 From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
@@ -388,49 +162,6 @@ From NGSIv2 specification section "Builtin metadata", regarding `actionType` met
 
 Current Orion implementation supports "update" and "append". The "delete" case will be
 supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-[Top](#top)
-
-## `ignoreType` metadata
-
-Apart from the metadata described in the "Builtin metadata" section in the NGSIv2 specification,
-Orion implements the `ignoreType` metadata.
-
-When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
-semantics associated to the attribute type. Note that Orion ignored attribute type in general so
-this metadata is not needed most of the cases, but there are two cases in which attribute
-type has an special semantic for Orion (check NGSIv2 specification for details):
-
-* `DateTime`
-* Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
-
-At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
-mechanism to overcome the limit of only one geo-location per entity (more details
-in [this section of the documentation](#limit-to-attributes-for-entity-location). Support
-for `ignoreType` in `DateTime` may come in the future.
-
-[Top](#top)
-
-## Ordering between different attribute value types
-
-From NGISv2 specification "Ordering Results" section:
-
-> Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify 
-> the attributes or properties to be used as criteria when ordering results
-
-It is an implementation aspect how each type is ordered with regard to other types. In the case of Orion,
-we use the same criteria as the one used by the underlying implementation (MongoDB). See
-[the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
-for details.
-
-From lowest to highest:
-
-1. Null
-2. Number
-3. String
-4. Object
-5. Array
-6. Boolean
 
 [Top](#top)
 
@@ -447,80 +178,6 @@ Orion supports the `alterationTypes` field to specify under which alterations (e
 modification, etc.) the subscription is triggered.
 
 Please find details in [this specific documentation](subscriptions_alttype.md)
-
-[Top](#top)
-
-## Custom notification extra macros
-
-Apart from the `${...}` macros described in "Custom Notifications" section in the NGSIv2
-specification, the following ones can be used:
-
-* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
-  update request triggering the subscription.
-* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
-  update request triggering the subscription.
-* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
-  update request triggering the subscription.
-
-In the rare case an attribute was named in the same way of the above (e.g. an attribute which
-name is `service`) then the attribute value takes precedence.
-
-[Top](#top)
-
-## Custom notification with JSON payload
-
-As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
-used to generate JSON-based payloads. For instance:
-
-```
-"httpCustom": {
-   ...
-   "json": {
-     "t": "${temperature}",
-     "h": [ "${humidityMin}", "${humidityMax}" ],
-     "v": 4
-   }
-}
-```
-
-Some notes to take into account:
-
-* The value of the `json` field must be an array or object. Although a simple string or number is
-  also a valid JSON, these cases are not supported.
-* The macro replacement logic works the same way than in `payload` case, with the following
-  considerations:
-  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
-  * The value of the JSON object or JSON array item in which the macro is used has to match
-    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
-    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
-    will not work
-  * It takes into account the nature of the attribute value to be replaced. For instance,
-    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
-    `"t": "10"` if `temperature` attribute is a string.
-  * If the attribute doesn't exist in the entity, then `null` value is used
-* URL automatic decoding applied to `payload` and `headers` fields (described
-  [here](forbidden_characters.md#custom-payload-and-headers-special-treatment)) is not applied
-  to `json` field.
-* `payload` and `json` cannot be used at the same time
-* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
-
-[Top](#top)
-
-## Custom notifications without payload
-
-If `payload` is set to `null` within `httpCustom` field in custom notifcations, then the notifications
-associated to that subscription will not include any payload (i.e. content-length 0 notifications).
-
-Note this is not the same than using `payload` set to `""` or omitting the field. In that case,
-the notification will be sent using the NGSIv2 normalized format.
-
-[Top](#top)
-
-## MQTT notifications
-
-Apart from the `http` and `httpCustom` fields withint `notification` object in subscription described
-in the NGISv2 specification, Orion also supports `mqtt` and `mqttCustom` for MQTT notifications. This
-topic is described with more detail [in this specific document](mqtt_notifications.md).
 
 [Top](#top)
 
@@ -650,30 +307,6 @@ Orion implements an additional field `legacyForwarding` (within `provider`) not 
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
-
-[Top](#top)
-
-## `null` support in DateTime and geolocation types
-
-According to NGSIv2 specification:
-
-* `DateTime` attributes and metadata: has to be strings in in ISO8601 format
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`: attributes has to follow specific formatting rules
-  (defined in the "Geospatial properties of entities section)
-
-It is not clear in the NGSIv2 specification if the `null` value is supported in these cases or not.
-Just to be clear, Orion supports that possibility.
-
-With regards to `DateTime` attributes and metadata:
-
-* A `DateTime` attribute or metadata with `null` value will not be taken into account in filters, i.e.
-  `GET /v2/entities?q=T>2021-04-21`
-
-With regards to `geo:` attributes:
-
-* A `geo:` attribute with `null` value will not be taken into account in geo-queries, i.e. the entity will
-  not be returned as a result of geo-query
-* `geo:` attributes with `null` value doesn't count towards [the limit of one](#limit-to-attributes-for-entity-location)
 
 [Top](#top)
 
