@@ -19,8 +19,8 @@
     - [Builtin Attributes](#builtin-attributes)
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
-    - [Field syntax restrictions](#field-syntax-restrictions)
-      - [Field syntax restrictions exceptions](#field-syntax-restrictions-exceptions)
+    - [General syntax restrictions](#general-syntax-restrictions)
+    - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
     - [Ordering Results](#ordering-results)
@@ -326,7 +326,7 @@ meaning:
   geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
   See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
 
-* `TextUnrestricted`: this attribute allows to skip forbidden characters checkings in the attribute 
+* `TextUnrestricted`: this attribute type allows to skip [syntax restrictions](#general-syntax-restrictions) checkings in the attribute 
    value. However, it could have security implications (possible script injections attacks) so use 
    it at your own risk!. For instance (only the referred entity attribute is shown):
 
@@ -429,37 +429,20 @@ The list of builtin metadata is as follows:
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
-## Field syntax restrictions
+## General syntax restrictions
 
-Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
-These rules apply to:
+In order to avoid script injections attack in some circumstances (e.g.
+cross domain to co-located web servers in the same hot that CB) the
+following characters are forbidden in any request:
 
-* Entity id
-* Entity type
-* Attribute name
-* Attribute type
-* Metadata name
-* Metadata type
-
-The rules are:
-
-* Allowed characters are the ones in the plain ASCII set, except the following ones:
-    * control characters
-    * whitespace
-    * `>`
-    * `<`
-    * `"`
-    * `'`
-    * `=`
-    * `;`
-    * `(`
-    * `)`
-    * `&`
-    * `?`
-    * `/`
-    * `#`
-* Maximum field length is 256 characters.
-* Minimum field length is 1 character.
+-   &lt;
+-   &gt;
+-   "
+-   '
+-   =
+-   ;
+-   (
+-   )
 
 Any attempt of using them will result in a 400 Bad Request response
 like this:
@@ -487,19 +470,35 @@ the following will be used (note that "%25" is the encoding for "%").
 GET /v2/entities/E%253C01%253E
 ```
 
-Note that you can use `TextUnrestricted` attribute type as described in 
-[Special attribute types](#special-attribute-types) section in order to use forbidden characters in 
-the attribute value. However, it could have security implications (possible script injections attacks) 
-so use it at your own risk!
-
-### Field syntax restrictions exceptions
-
 There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
 
-* URL parameter `q` allows the special characters needed by the Simple Query Language
-* URL parameter `mq` allows the special characters needed by the Simple Query Language
+* URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
+* URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
-* Whichever attribute value which uses `TextUnrestricted` as attribute type.
+* Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
+
+## Identifiers syntax restrictions
+
+Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
+These rules apply to:
+
+* Entity id
+* Entity type
+* Attribute name
+* Attribute type
+* Metadata name
+* Metadata type
+
+The rules are:
+
+* Allowed characters are the ones in the plain ASCII set, except the following ones:
+  control characters, whitespace, `&`, `?`, `/` and `#`.
+* Maximum field length is 256 characters.
+* Minimum field length is 1 character.
+
+In addition, the [General syntax restrictions](#general-syntax-restrictions) also apply to NGSIv2 identifiers.
+
+In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
 ## Attribute names restrictions
 
@@ -1268,7 +1267,7 @@ For instance:
 
 ### Custom payload and headers special treatment
 
-Forbidden characters restrictions described in [Field syntax restrictions](#field-syntax-restrictions) 
+Forbidden characters restrictions described in [Field syntax restrictions](#identifiers-syntax-restrictions) 
 section als apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
 POST /v2/subscription or GET /v2/subscriptions. The same restrictions apply to the header values
 in `httpCustom.headers`.
