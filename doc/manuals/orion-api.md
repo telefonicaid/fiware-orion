@@ -1267,9 +1267,8 @@ For instance:
 
 ### Custom payload and headers special treatment
 
-Forbidden characters restrictions described in [Field syntax restrictions](#identifiers-syntax-restrictions) 
-section als apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
-POST /v2/subscription or GET /v2/subscriptions. The same restrictions apply to the header values
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
+`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
 in `httpCustom.headers`.
 
 However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
@@ -1310,7 +1309,6 @@ Content-Length: 65
 
 the value of the "temperature" attribute (of type Number) is 23.4
 ```
-
 
 # API Routes
 
