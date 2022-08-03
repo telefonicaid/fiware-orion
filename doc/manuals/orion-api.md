@@ -351,7 +351,7 @@ the subscriptions based in alteration type features (see [Subscription based in 
    * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
    * `entityDelete` if the update that triggers the notification was a entity delete operation
 
-Like regular attributes, they can be used in `q` filters and in `orderBy` (`alterationType` is not included).
+Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
 
 ## Special Metadata Types
