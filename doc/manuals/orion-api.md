@@ -500,6 +500,8 @@ The list of builtin metadata is as follows:
   was included in the request that triggered the notification. Its value depends on the request operation
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 
+* `location`, which is currently [deprecated](#deprecated.md), but still supported.
+
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
 
@@ -1579,6 +1581,9 @@ After processing the update, the metadata at the attribute `temperature` would b
 
 The rationale behind the "stikyness" of metadata in this default behaviour is described in
 more detail in [this issue at Orion repository](https://github.com/telefonicaid/fiware-orion/issues/4033)
+
+At the moment, NGSIv2 doesn't allow to delete individual metadata elements once introduced.
+However, you can delete all metadata updating the attribute with `metadata` set to `{}`.
 
 ### `overrideMetadata` option
 
@@ -3215,6 +3220,8 @@ Based on the `condition` field, the notification triggering rules are as follow:
   attributes of the entity changes and at the same time `expression` matches.
 * If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
   attributes of the entity changes.
+
+Note that changing the metadata of a given attribute is considered a change even though the attribute value itself hasn't changed.
 
 #### `subscription.notification`
 

@@ -25,7 +25,6 @@ pages:
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'
       - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
-      - 'Attribute Metadata': 'user/metadata.md'
       - 'Filtering': 'user/filtering.md'
       - 'Multi tenancy': 'user/multitenancy.md'
       - 'Entity service paths': 'user/service_path.md'

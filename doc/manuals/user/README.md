@@ -14,7 +14,6 @@
   * [Structured values for attributes](structured_attribute_valued.md)
   * [Update operators for attribute values](update_operators.md)
   * [Context Providers registration and request forwarding](context_providers.md)
-  * [Attribute metadata](metadata.md)
   * [Filtering results](filtering.md)
   * [Multy tenancy](multitenancy.md)
   * [Entity service paths](service_path.md)
