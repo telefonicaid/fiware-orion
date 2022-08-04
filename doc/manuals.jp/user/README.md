@@ -20,7 +20,6 @@
   * [エンティティ・サービス・パス](service_path.md) (Entity service paths)
   * [更新アクション・タイプ](update_action_types.md) (Update action types)
   * [Context broker のフェデレーション](federation.md) (Context broker federation)
-  * [禁止されている文字](forbidden_characters.md) (Forbidden characters)
   * [正規表現の使用](regex.md) (Using regular expressions)
   * [Oneshot サブスクリプション](oneshot_subscription.md)
   * [変更タイプ (alteration type) に基づくサブスクリプション](subscriptions_alttype.md)

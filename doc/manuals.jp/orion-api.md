@@ -19,7 +19,8 @@
     - [組み込み属性 (Builtin Attributes)](#builtin-attributes)
     - [特殊なメタデータ型 (Special Metadata Types)](#special-metadata-types)
     - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
-    - [フィールド構文の制限事項 (Field syntax restrictions)](#field-syntax-restrictions)
+    - [一般的な構文制限](#general-syntax-restrictions)
+    - [識別子の構文制限](#identifiers-syntax-restrictions)
     - [属性名の制限 (Attribute names restrictions)](#attribute-names-restrictions)
     - [メタデータ名の制限 (Metadata names restrictions)](#metadata-names-restrictions)
     - [結果の順序付け (Ordering Results)](#ordering-results)
@@ -33,6 +34,7 @@
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
+      - [カスタム・ペイロードとヘッダの特別な扱い](#custom-payload-and-headers-special-treatment)
 - [API ルート (API Routes)](#api-routes)
     - [API エントリ・ポイント (API Entry Point)](#api-entry-point)
         - [API リソースを取得 [GET /v2]](#retrieve-api-resources-get-v2)
@@ -286,8 +288,16 @@ NGSI では、メタデータにネストされたメタデータが含まれる
     -   値がブーリンの場合は、`Boolean` が使用されます
     -   値がオブジェクトまたは配列の場合、`StructuredValue` が使用されます
     -   値が null の場合、`None` が使用されます
--   属性 `metadata` はリクエストでは省略することができます。つまり、属性に関連付けられたメタデータ要素がありません。
-    レスポンスでは、属性にメタデータがない場合、このプロパティは `{}` に設定されます
+-   属性 `metadata` はリクエストで省略される場合があります。これは、属性に関連付けられたメタデータ要素がないことを
+    意味します。"関連" (associated) が何を意味するかは、`overrideMetadata` によって異なります:
+    -   `overrideMetadata` が使用されていない場合 (デフォルトの動作)、属性に関連付けられたメタデータ要素がないことを
+        意味し、*更新する必要があります*
+    -   `overrideMetadata` が使用されている場合、"*属性の更新の結果として*"、属性に関連付けられたメタデータ要素が
+        ないことを意味します
+-   レスポンスでは、属性にメタデータがない場合、`metadata` は `{}` に設定されます
+
+Orion Context Broker で使用されるメタデータ更新セマンティクス (および関連する `overrideMetadata` オプションについては、
+[ドキュメントのこのセクション](#updating-metadata)で詳しく説明します)。
 
 <a name="special-attribute-types"></a>
 
@@ -296,8 +306,9 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 一般に、ユーザ定義の属性型は有益です。それらは不透明な方法で NGSIv2 サーバによって処理されます。それにもかかわらず、
 以下に説明する型は、特別な意味を伝えるために使用されます:
 
--   `DateTime`: 日付を ISO8601 形式で識別します。これらの属性は、より大きい、未満、以上、以下 および範囲のクエリ演算子で
-    使用できます。たとえば、参照されたエンティティ属性のみが表示されます
+-   `DateTime`: ISO8601 形式で日付を識別します。これらの属性は、クエリ演算子の greater-than, less-than, greater-or-equal,
+    less-or-equal および range で使用できます。`null` 値を持つ `DateTime` 属性は、フィルタでは考慮されません。つまり、
+    `GET /v2/entities?q=T>2021-04-21` です。例 (参照されたエンティティ属性のみが表示されます):
 
 ```
 {
@@ -308,9 +319,22 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 }
 ```
 
--   `geo:point`, `geo:line`, `geo:box`, `geo:polygon`, `geo:json`。これらはエンティティの場所に関連する特別な
-    セマンティクスを持っています。[エンティティの地理空間プロパティ](#geospatial-properties-of-entities)を
+-   `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`。それらには、エンティティの場所に関連する特別な
+    セマンティクスがあります。`null` 値を持つ属性は地理クエリでは考慮されず、エンティティごとに1つの地理空間属性の制限に
+    カウントされません。[エンティティの地理空間プロパティ](#geospatial-properties-of-entities)のセクションを
     参照してください
+-   `TextUnrestricted`: この属性タイプにより、属性値の[構文制限](#general-syntax-restrictions)チェックをスキップできます。
+    ただし、セキュリティ上の問題 (スクリプト・インジェクション攻撃の可能性) がある可能性があるため、自己責任で使用して
+    ください。例 (参照されたエンティティ属性のみが表示されます):
+
+```json
+{
+  "forbiddenAttr": {
+   "type": "TextUnrestricted",
+   "value": "I'"'"'am a unrestricted (and I'"'"'m using forbidden chars)"
+  }
+}
+```
 
 <a name="builtin-attributes"></a>
 
@@ -329,8 +353,18 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 -   `dateModified` (型: `DateTime`): エンティティ変更日。ISO 8601 文字列です
 -   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。サーバがエンティティの有効期限を制御
     する方法は、実装の固有側面です
+-   `alterationType` (タイプ: `Text`): 通知をトリガーする変更を指定します。これは、変更タイプの機能に基づく
+    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを参照)。
+    この属性は通知でのみ使用できます。クエリ (`GET /v2/entities?attrs=alterationType`) を実行しても表示されず、次の値を
+    取ることができます:
+    -   `entityCreate`: 通知をトリガーする更新がエンティティ作成操作の場合
+    -   `entityUpdate`: 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
+    -   `entityChange`: 通知をトリガーする更新が実際の変更を伴う更新であった場合、または実際の変更ではなく `forcedUpdate`
+        が使用された場合
+    -   `entityDelete`: 通知をトリガーする更新がエンティティの削除操作であった場合
 
-通常の属性と同様に、`q` フィルタと `orderBy` で使うことができます。ただし、リソース URLs では使用できません。
+通常の属性と同様に、`q` フィルタと `orderBy` (`alterationType` を除く) で使用できます。
+ただし、リソース URLs では使用できません。
 
 <a name="special-metadata-types"></a>
 
@@ -339,9 +373,9 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で NGSIv2 サーバによって処理されます。
 それでも、以下に説明する型は、特別な意味を伝えるために使用されます:
 
--   `DateTime`:  ISO8601 形式で日付を識別します。このメタデータは、クエリ演算子の より大きい (greater-than), より小さい
-    (less-than), 以上 (greater-or-equal), 以下 (less-or-equal) および 範囲 (range) で使用できます。たとえば (参照される
-    属性メタデータのみが表示されます):
+-   `DateTime`: ISO8601 形式で日付を識別します。このメタデータは、クエリ演算子の greater-than, less-than, greater-or-equal,
+    less-or-equal および range で使用できます。`null` 値を持つ `DateTime` メタデータは、フィルタでは考慮されません。
+    例 (参照された属性メタデータのみが表示されます):
 
 ```
 "metadata": {
@@ -351,6 +385,17 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
       }
 }
 ```
+
+-   `ignoreType`: 値 `true` を持つ `ignoreType` が属性に追加されると、Orion は属性タイプに関連付けられたセマンティクスを
+    無視します。Orion は一般的に属性タイプを無視するため、このメタデータはほとんどの場合必要ありませんが、属性タイプが
+    Orion の特別なセマンティックを持つ 2 つのケースがあることに注意してください:
+    -   `DateTime`
+    -   Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`)
+
+現時点では、'ignoreType' は地理位置情報タイプに対してのみサポートされており、この方法により、エンティティごとに1つの
+地理位置情報のみという制限を克服するメカニズムが可能になります
+(詳細は [エンティティの地理空間プロパティ](#geospatial-properties-of-entities)のセクションを参照)。`DateTime` での
+`ignoreType` のサポートは、将来的に提供される可能性があります。
 
 <a name="builtin-metadata"></a>
 
@@ -376,9 +421,53 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 
 通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs では使用できません。
 
-<a name="field-syntax-restrictions"></a>
+<a name="general-syntax-restrictions"></a>
 
-## フィールド構文の制限事項 (Field syntax restrictions)
+## 一般的な構文制限
+
+一部の状況でスクリプト・インジェクション攻撃を回避するために (たとえば、CB と同じ場所にある Web サーバへの
+クロス・ドメイン)、次の文字はすべてのリクエストで禁止されています:
+
+-   &lt;
+-   &gt;
+-   "
+-   '
+-   =
+-   ;
+-   (
+-   )
+
+それらを使用しようとすると、次のような 400 Bad Request のレスポンスが返されます:
+
+    {
+        "error": "BadRequest",
+        "description": "Invalid characters in attribute type"
+    }
+
+アプリケーションでこれらの文字を使用する必要がある場合は、Orion にリクエストを送信する前に、禁止文字を含まないスキームを
+使用してエンコードする必要があります。
+
+[URL エンコード](http://www.degraeve.com/reference/urlencoding.php) は有効なエンコード方法です。ただし、"%" 文字自体を
+エンコードする必要があるため、API URL (エンティティ ID や属性名など) に表示される可能性のあるフィールドでの使用は
+お勧めしません。 たとえば、"E<01>" をエンティティ ID として使用する場合、その URL エンコードは "E%3C01%3E" になります。
+
+このエンティティ ID を URL で使用するには (エンティティ情報の取得操作など)、次のようにします ("%25" は "%"
+のエンコーディングであることに注意してください)。
+
+```
+GET /v2/entities/E%253C01%253E
+```
+
+上記の制限が適用されない例外的なケースがいくつかあります。 特に、次のフィールドで:
+
+-   URL パラメータ `q` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
+-   URL パラメータ `mq` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
+-   URL パラメータ `georel` と `coords` は `;` を許可します
+-   属性タイプとして `TextUnrestricted` を使用する属性値 ([特別な属性タイプ](#special-attribute-types)のセクションを参照)
+
+<a name="identifiers-syntax-restrictions"></a>
+
+## 識別子の構文制限
 
 NGSIv2 API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
 
@@ -395,11 +484,10 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 -   最大フィールド長は 256文字です
 -   最小フィールド長は 1文字です
 
-上記の規則に加えて、NGSIv2 サーバ実装が与えられれば、それらのフィールドまたは他のフィールドに構文上の制約を追加して、
-たとえばクロス・スクリプト・インジェクション攻撃を回避することができます。
+さらに、[一般的な構文制限](#general-syntax-restrictions) も NGSIv2 識別子に適用されます。
 
-クライアントがシンタックスの観点から無効なフィールドを使用しようとすると、クライアントは原因を説明する、"Bad Request"
-エラー・レスポンスを得ます。
+クライアントが構文の観点から無効なフィールドを使用しようとすると、クライアントは、原因を説明する "Bad Request" エラーの
+レスポンスを受け取ります。
 
 <a name="attribute-names-restrictions"></a>
 
@@ -436,6 +524,19 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 -   カンマで区切られた属性のリストです。組み込み属性、エンティティ id の `id`、エンティティ型の `type` などがあります。
     たとえば、`temperature,!humidity`。結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなどの順序で
     並べられます。フィールド名の前の "!" は、順序が逆になっていることを示します
+
+値が複数の JSON タイプに属する属性の順序に関して、Orion は、基礎となる実装 (MongoDB) で使用される基準と同じ基準を使用します。
+詳細については、[次のリンク](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)を
+参照してください。
+
+最低から最高へ:
+
+1. Null
+2. Number
+3. String
+4. Object
+5. Array
+6. Boolean
 
 <a name="error-responses"></a>
 
@@ -485,14 +586,87 @@ NGSIv2 の `error` レポートは次のとおりです:
     [マルチ・ジオメトリ](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries)
     の表現を可能にします
 
-クライアント・アプリケーションは、適切な NGSI 属性型を提供することによって、どのエンティティ属性がジオスペース属性を
-伝えるかを定義します。通常、これは `location` という名前のエンティティ属性ですが、エンティティが複数の地理空間属性を含む
-ユースケースを妨げるものはありません。たとえば、異なる粒度レベルで指定された場所、または異なる精度でさまざまな
-ロケーション・メソッドによって提供された場所 (location) です。それでも、空間プロパティ (spatial properties) には、
-バックエンド・データベースによって課せられたリソースの制約下にある特別なインデックスが必要であることに注意してください。
-したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性があります。これらの状況に推奨される HTTP
-ステータス・コードは、``413``, *Request entity too large* で、レスポンス・ペイロードで報告されたエラーは、
-``NoResourcesAvailable`` でなければなりません。
+現在の実装 ([MongoDB 機能](https://www.mongodb.com/docs/manual/reference/geojson/)に基づく) では、`GeoJSON`
+表現の使用にいくつかの制限が導入されており、次のタイプのみがサポートされています:
+
+-   Point
+-   MultiPoint
+-   LineString
+-   MultiLineString
+-   Polygon
+-   MultiPolygon
+
+実施されたテストの詳細については、[こちら] (https://github.com/telefonicaid/fiware-orion/issues/3586) を
+参照してください。
+
+タイプ `Feature` および `FeatureCollection` もサポートされていますが、特別な方法でサポートされています。`Feature`
+または `FeatureCollection` を使用して、`geo:json` 属性を作成/更新できます。ただし、属性値が取得されると
+(GET レスポンスまたは通知)、次のコンテンツのみが取得されます:
+
+-   `Feature` の場合は `geometry` フィールド
+-   `FeatureCollection` の場合、`features` 配列の最初の項目の `geometry` フィールド
+
+実際には、Orion は `Feature` または `FeatureCollection` の作成/更新時に使用される完全な値を保存することに注意して
+ください。ただし、他の `geo:json` 型との正規化の観点から、`geometry` 部分のみを返すことにしました。将来的には、完全な
+コンテンツを返すフラグが実装される可能性があります
+(詳細は [この Issue](https://github.com/telefonicaid/fiware-orion/issues/4125) を参照)。`Feature` または
+`FeatureCollection` の特別な処理を無効にするもう1つの方法は、[`ignoreType` メタデータ](#ignoretype-metadata)
+を使用することですが、その場合もエンティティの場所は無視されます。
+
+`FeatureCollection` に関しては、単一の `Feature` が含まれている場合 (つまり、`features` フィールドに要素が1つしかない
+場合) のみ、作成/更新時にのみ受け入れられます。そうしないと、Orion は "Bad Request" エラーを返します。
+
+全くサポートされていない唯一の GeoJSON タイプは `GeometryCollection` です。それらを使用しようとすると、
+"Database Error" が発生します。
+
+クライアント・アプリケーションは、(適切な NGSI 属性タイプを提供することによって) 地理空間プロパティを伝達する
+エンティティ属性を定義する責任があります。通常、これは `location` という名前のエンティティ属性ですが、地理空間属性に
+別の名前を使用することを妨げるものは何もありません。
+
+Orion は、バックエンド・データベースによって課されるリソースの制約により、地理空間属性の数を1つの属性に制限します。
+追加の使用で追加のロケーション属性を作成しようとすると、Orion はエラー `413`、*Request entity too large* を発生させ、
+レスポンス・ペイロードで報告されるエラーは `NoResourcesAvailable` です。
+
+ただし、`ignoreType` メタデータを `true` に設定して、特定の属性に追加の情報ロケーションが含まれていることを意味できます
+(詳細は [ドキュメントのこのセクション](#special-metadata-types) を参照)。これにより、Orion によるその属性の location
+としての解釈が無効になるため、制限にはカウントされません。
+
+例えば:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType":{
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}
+```
+
+どちらの属性も `geo:json` タイプですが、`serviceArea` は `ignoreType` メタデータを `true` に使用するため、
+情報を提供しない1つの場所の制限を超えることはありません。
+
+追加の場所 (locations) がこのように定義されている場合、地理クエリの解決に使用される場所は、`ignoreType` が `true`
+メタデータに設定されていない場所であることを考慮してください (上記の例では `location` 属性)。`ignoreType` を `true`
+に設定して定義されたすべての場所は Orion によって無視され、この意味で地理クエリには影響しません。
 
 <a name="simple-location-format"></a>
 
@@ -894,24 +1068,43 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 
 ## カスタム通知 (Custom Notifications)
 
-NGSIv2 クライアントは、単純なテンプレート・メカニズムを使用して、HTTP 通知メッセージをカスタマイズできます。
-サブスクリプションの `notification.httpCustom` プロパティは、以下のフィールドをテンプレート化するよう指定します:
+NGSIv2 クライアントは、`notification.httpCustom` または `notification.mqttCustom` が使用されている場合、単純な
+テンプレート・メカニズムを使用して通知メッセージをカスタマイズできます。テンプレート化できるフィールドは、プロトコル・
+タイプによって異なります。
+
+`httpCustom` の場合:
 
 -   `url`
--   `headers` (ヘッダ名と値の両方をテンプレート化できます)
+-   `headers` (ヘッダ名と値の両方をテンプレート化できます)。`Fiware-Correlator` および `Ngsiv2-AttrsFormat` ヘッダは
+    カスタム通知で上書きできないことに注意してください。そうしようとする試み
+    (例: `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` は無視されます
 -   `qs` (パラメータ名と値の両方をテンプレート化できます)
 -   `payload`
+-   `method` は、NGSIv2 クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
+    動詞のみを使用できることに注意してください: GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE および CONNECT
 
-5番目のフィールド `method` では、NGSIv2 クライアントが通知の配信に使用する HTTP メソッドを選択できますが、GET, PUT,
-POST, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT などの有効な HTTP 動詞しか使用できないことに注意してください。
+`mqttCustom` の場合:
+
+
+-   `payload`
+-   `topic`
 
 テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に:
 
 -   `${id}` は、エンティティの `id` に置き換えられます
 -   `${type}` は、エンティティの `type` に置き換えられます
+-   `${service}` は、サブスクリプションをトリガーする更新リクエストのサービス (つまり、`Fiware-Service` ヘッダ値)
+    に置き換えられます
+-   `${servicePath}` は、サブスクリプションをトリガーする更新リクエストのサービス パス (つまり、`Fiware-Servicepath`
+    ヘッダ値) に置き換えられます
+-   `${authToken}` は、サブスクリプションをトリガーする更新リクエストで認証トークン (つまり、`x-auth-token` ヘッダ値)
+    に置き換えられます
 -   他の `${token}` は、名前が `token` の属性の値に置き換えられます。属性が通知に含まれていない場合は空文字列に
     置き換えられます。値が数値、bool または null の場合、その文字列表現が使用されます。値が JSON 配列または
     オブジェクトの場合、JSON 表現は文字列として使用されます
+
+まれに、属性が `${service}`, `${servicePath}` または `${authToken}` と同じ方法で命名された場合 (例: `service`
+という名前の属性)、属性値が優先されます。
 
 例:
 
@@ -942,16 +1135,124 @@ Content-Length: 31
 The temperature is 23.4 degrees
 ```
 
-いくつかの考慮事項:
+`payload` が `null` に設定されている場合、そのサブスクリプションに関連付けられている通知にはペイロードが含まれません
+(つまり、コンテンツ長 0 の通知)。これは、`""` に設定された `payload` を使用したり、フィールドを省略したりすることと
+同じではないことに注意してください。その場合、通知は NGSIv2 正規化形式を使用して送信されます。
+
+`httpCustom` または `mqttCustom` の `payload` フィールドの代わりに、`json` フィールドを使用して JSON ベースの
+ペイロードを生成できます。例えば:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+`payload` の代わりに `json` を使用する際に考慮すべきいくつかの注意事項:
+
+-   `json` フィールドの値は、配列またはオブジェクトでなければなりません。単純な文字列または数値も有効な JSON
+    ですが、これらのケースはサポートされていません
+-   マクロ置換ロジックは、次の点を考慮して、`payload` の場合と同じように機能します
+    -   JSON オブジェクトのキー部分では使用できません。つまり、`"${key}": 10` は機能しません
+    -   マクロが使用される JSON オブジェクトまたは JSON 配列アイテムの値は、マクロ式と正確に一致する必要があります。
+        したがって、`"t": "${temperature}"` は機能しますが、`"t": "the temperature is ${temperature}"` または
+        `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"` は機能しません
+    -   置換される属性値の性質を考慮します。たとえば、`"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10`
+        に解決され、`temperature` 属性が文字列の場合は `"t": "10"` に解決されます
+    -   属性がエンティティに存在しない場合は、`null` 値が使用されます
+-   `payload` フィールドと `headers` フィールドに適用される URL 自動デコード
+    ([カスタム・ペイロードとヘッダの特別な処理](#custom-payload-and-headers-special-treats) で説明) は、`json`
+    フィールドには適用されません
+-   `payload` と `json` は同時に使用できません
+-    `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `application/json` に設定されます
+
+カスタム通知を使用する際に考慮すべき考慮事項:
 
 -   NGSIv2 クライアントは、置換後に通知が正しい HTTP メッセージであることを確認する責任があります。たとえば Content-Type
     ヘッダが application/xml の場合、ペイロードは 整形式 XML 文書に対応する必要があります。具体的には、テンプレート
     適用後の結果の URL の形式が誤っている場合、通知は送信されません
 -   通知するデータに複数のエンティティが含まれている場合は、エンティティごとに個別の通知 (HTTP メッセージ) が送信
     されます。デフォルトの動作とは異なり、すべてのエンティティが同じ HTTP メッセージで送信されます
+-   禁止されている文字の制限により、Orion は発信するカスタム通知に追加のデコード・ステップを適用します。これについては、
+    [カスタム・ペイロードとヘッダの特別な処理](#custom-payload-and-headers-special-treats) セクションで詳しく説明して
+    います
+-   Orion は、`-disableCustomNotifications` [CLI パラメータ](admin/cli.md) を使用して、カスタム通知を無効にするように
+    構成できます。この場合:
+    -   `httpCustom` は `http` として解釈されます。つまり、`url` を除くすべてのサブ・フィールドは無視されます
+    -   `${...}` マクロ置換は実行されません
 
 通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
 `Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
+
+`headers` オブジェクトのヘッダ・キーに空の文字列値を指定すると、そのヘッダが通知から削除されます。
+たとえば、次の構成です:
+
+```
+"httpCustom": { 
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダを削除します。
+
+これは、Orion が通知に自動的に含めるヘッダーを削除するのに役立ちます。
+
+例えば：
+-   通知にデフォルトで含まれるヘッダを避けるため (例: `Accept`)
+-   前述の `x-auth-token` などのヘッダの伝播 (更新から通知まで) をカットするため
+
+<a name="custom-payload-and-headers-special-treatment"></a>
+
+### カスタム・ペイロードとヘッダの特別な扱い
+
+[一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
+NGSIv2 API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers`
+のヘッダ値にも同じ制限が適用されます。
+
+ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値に含まれる URL エンコード文字はすべてデコード
+されます。
+
+例：
+
+特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう。
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain",
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+上記のペイロード値は、この文字列の URL エンコードされたバージョンであることに注意してください:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`。
+`"Basic ABC...ABC%3D%3D"` は、この文字列の URL エンコードされたバージョンであることに注意してください:
+`"Basic ABC...ABC=="`.
+
+ここで、NGSIv2 実装がこのサブスクリプションに関連付けられた通知をトリガーすることを考えてみましょう。 通知データは、
+ID が `DC_S1-D41` でタイプが `Room` のエンティティ用で、値が 23.4 の `temperature` という名前の属性が含まれます。
+テンプレートを適用した後の結果の通知は次のようになります:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json 
+Content-Length: 65
+the value of the "temperature" attribute (of type Number) is 23.4
+```
 
 <a name="api-routes"></a>
 

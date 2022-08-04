@@ -1,51 +1,19 @@
 # <a name="top"></a>NGSIv2 実装ノート (NGSIv2 Implementation Notes)
 
-* [禁止されている文字](#forbidden-characters)
 * [属性値の更新演算子](#update-operators-for-attribute-values)
-* [メタデータ更新セマンティクス](#metadata-update-semantics)
-* [通知のカスタムペイロードデコード](#custom-payload-decoding-on-notifications)
-* [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
-* [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
-* [カスタム通知でのヘッダの削除](#header-removal-in-custom-notifications)
-* [エンティティ・ロケーションの属性に制限](#limit-to-attributes-for-entity-location)
-* [`geo:json` 属性でサポートされる GeoJSON タイプ](#supported-geojson-types-in-geojson-attributes)
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
-* [`alterationType` 属性](#alterationtype-attribute)
 * [`actionType` メタデータ](#actiontype-metadata)
-* [`ignoreType` メタデータ](#ignoretype-metadata)
-* [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
-* [カスタム通知の追加マクロ](#custom-notification-extra-macros)
-* [JSON ペイロードを使用したカスタム通知](#custom-notification-with-json-payload)
-* [ペイロードなしのカスタム通知](#custom-notifications-without-payload)
-* [MQTT 通知](#mqtt-notifications)
 * [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
 * [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
 * [レジストレーション](#registrations)
-* [DateTime および geolocation タイプでの `null` サポート](#null-support-in-datetime-and-geolocation-types)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
 
 このドキュメントでは、Orion Context Broker が [NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)で行った具体的な実装について考慮する必要があるいくつかの考慮事項について説明します。
-
-<a name="forbidden-characters"></a>
-## 禁止されている文字
-
-NGSIv2 仕様の "フィールド構文の制限" セクションから :
-
-> 上記のルールに加えて、NGSIv2 サーバの実装では、クロス・スクリプト注入攻撃を避けるために、それらのフィールドまたは他のフィールドに構文上の制限を追加することができます。
-
-Orion に適用される追加の制限事項は、マニュアルの [禁止されている文字](forbidden_characters.md)のセクションに記載されているものです。
-
-属性値で禁止文字のチェックをスキップするために、"TextUnrestricted" 属性タイプ (および
-NGSIv2 仕様で定義されているもの以外の特別な属性タイプ) を使用できることに注意してください。
-ただし、セキュリティ上の問題 (スクリプト・インジェクション攻撃の可能性) がある可能性がある
-ため、自己責任で使用してください!
-
-[トップ](#top)
 
 <a name="update-operators-for-attribute-values"></a>
 
@@ -67,172 +35,6 @@ POST /v2/entities/E/attrs/A
 この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
 アプリケーションの競合状態を回避するために役立ちます。
 詳細は[このドキュメント](update_operators.md)を参照してください。
-
-[トップ](#top)
-
-<a name="metadata-update-semantics"></a>
-## メタデータ更新セマンティクス
-
-Orion Context Broker (および関連する `overrideMetadata` オプション)
-で使用されるメタデータ更新セマンティクスについては、
-[ドキュメントのこのセクション](metadata.md#updating-metadata)
-で詳しく説明しています。
-
-さらに、NGSIv2 仕様セクション "Partial Representations" (部分表現) から:
-
-> 属性 `metadata` はリクエストで省略できます。つまり、属性に関連付けられた
-> メタデータ要素はありません。
-`overrideMetadata` が使用されているかどうかに応じて、この文には2つの解釈があります:
-
-* `overrideMetadata` が使用されていない場合 (デフォルトの動作)、"...属性に
-  関連付けられたメタデータ要素がないことを意味します。**更新する必要があります**"
-  と解釈されます
-* `overrideMetadata` が使用されている場合、"...属性に関連付けられたメタデータ要素が
-  ないことを意味します。**属性の更新の結果として**" と解釈されます
-
-[トップ](#top)
-
-<a name="custom-payload-decoding-on-notifications"></a>
-## 通知でのカスタムペイロードデコード
-
-禁止された文字の制限のために、Orion は発信カスタム通知に追加のデコード・ステップを適用します。これについては、このマニュアルの [このセクション](forbidden_characters.md#custom-payload-special-treatment)で詳しく説明します。
-
-[トップ](#top)
-
-<a name="option-to-disable-custom-notifications"></a>
-## カスタム通知を無効にするオプション
-
-Orion は、`-disableCustomNotifications` [CLI パラメータ](../admin/cli.md)を使用してカスタム通知を無効にするように設定できます。
-
-この場合 :
-
-* `httpCustom` が `http` として解釈されます。すなわち、`url` を除くすべてのサブフィールドは無視されます。
-* マクロ置換 `${...}` は実行されません。
-
-[トップ](#top)
-
-<a name="non-modifiable-headers-in-custom-notifications"></a>
-## カスタム・通知の変更不可能なヘッダ
-
-カスタム・通知で次のヘッダを上書きすることはできません :
-
-* `Fiware-Correlator`
-* `Ngsiv2-AttrsFormat`
-
-そのような試み (例えば `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}`) は無視されます。
-
-[トップ](#top)
-
-<a name="header-removal-in-custom-notifications"></a>
-## カスタム通知でのヘッダの削除
-
-NGSIv2仕様 ("カスタム通知" セクション) で明示的に述べられていませんが、`headers` オブジェクトの
-ヘッダ・キーの文字列値が空の場合、そのヘッダは通知から削除されます。たとえば、次の構成:
-
-```
-"httpCustom": {
-   ...
-   "headers": {"x-auth-token": ""}
-}
-```
-
-サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダが削除されます。
-
-これは、Orion が通知に自動的に含めるヘッダを削除するのに役立ちます。例えば:
-
-* 通知にデフォルトで含まれるヘッダを回避するため (例: `Accept`)
-* 前述の `x-auth-token` などの (更新から通知までの) ヘッダの伝播を削減するため
-
-[トップ](#top)
-
-<a name="limit-to-attributes-for-entity-location"></a>
-## エンティティ・ロケーションの属性に制限
-
-NGSIv2 仕様の "エンティティの地理空間プロパティ" のセクションから :
-
-> クライアントアプリケーションは、(適切な NGSI アトリビュート型を提供することによって) ジオスペース・プロパティを伝えるエンティティ属性を定義する責任があります。通常これは `location` という名前のついたエンティティ属性ですが、エンティティに複数の地理空間属性が含まれているユース・ケースはありません。たとえば、異なる粒度レベルで指定された場所、または異なる精度で異なる場所の方法によって提供された場所です。それにもかかわらず、空間特性には、バックエンド・データベースによって課せられたリソースの制約下にある特別なインデックスが必要であることは注目に値します。したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性があります。これらの状況で推奨される HTTP ステータス・コードは `413` です。リクエスト・エンティティが大きすぎます。また、レスポンス・ペイロードで報告されたエラーは、`NoResourcesAvailable` である必要があります。
-
-Orion の場合、その制限は1つの属性です。
-
-ただし、`ignoreType` メタデータを `true` に設定して、特定の属性に追加の有益なロケーションが含まれるように
-することができます (詳細については、[ドキュメントのこのセクション](#ignoretype-metadata)を参照してください。
-これにより、Orion によるその属性のロケーションとしての解釈が無効になるため、制限にはカウントされません。
-
-例えば:
-
-```
-{
-  "id": "Hospital1",
-  "type": "Hospital",
-  ...
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [ -3.68666, 40.48108 ]
-    },
-    "type": "geo:json"
-  },
-  "serviceArea": {
-    "value": {
-      "type": "Polygon",
-      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
-    },
-    "type": "geo:json",
-    "metadata": {
-      "ignoreType":{
-        "value": true,
-        "type": "Boolean"
-      }
-    }
-  }
-}
-```
-
-どちらの属性もタイプ `geo:json` ですが、`serviceArea` は `ignoreType` メタデータを `true` に使用するため、
-情報を提供しない1つのロケーションの制限を超えません。
-
-この方法で追加ロケーションを定義する場合は、ジオクエリの解決に使用されるロケーションが、 `ignoreType` が
-`true` メタデータ (上記の例では `location` 属性) に設定されていない場所であることを考慮してください。
-`ignoreType` を `true` に設定して定義されたすべてのロケーションは、Orion によって無視され、この意味で、
-ジオクエリには加わりません。
-
-[トップ](#top)
-
-<a name="supported-geojson-types-in-geojson-attributes"></a>
-
-## `geo:json` 属性でサポートされる GeoJSON タイプ
-
-NGSIv2 仕様では、`geo:json` 属性に使用される可能性のある GeoJSON タイプに制限を設定していません。
-ただし、現在の Orion の実装 (MongoDB の機能に基づく) にはいくつかの制限があります。
-
-次のタイプのテストに成功しました :
-
-* Point
-* MultiPoint
-* LineString
-* MultiLineString
-* Polygon
-* MultiPolygon
-
-実施されたテストの詳細については、[こちら](https://github.com/telefonicaid/fiware-orion/issues/3586)をご覧ください。
-
-`Feature` タイプと `FeatureCollection` タイプもサポートされていますが、特別な方法です。`Feature` または `FeatureCollection`
-を使用して、`geo:json` 属性を作成/更新できます。ただし、属性値が取得されると (GET レスポンスまたは通知)、次のコンテンツのみが
-取得されます:
-
-* `Feature` の場合、`geometry` フィールド
-* `FeatureCollection` の場合、`features` 配列の最初のアイテムの `geometry` フィールド
-
-実際には、Orion は `Feature` または `FeatureCollection` の作成/更新時に使用される完全な値を保存することに注意してください。
-ただし、他の `geo:json` タイプでの正規化の観点から、`geometry` 部分のみを返すことが決定されました。将来的には、コンテンツ全体を
-返すフラグが実装される可能性があります (詳細は、[この Issue](https://github.com/telefonicaid/fiware-orion/issues/4125) を参照)。
-`Feature` または `FeatureCollection` の特別な処理を無効にする別の方法は、[`ignoreType` メタデータ](#ignoretype-metadata)
-を使用することですが、その場合、エンティティのロケーション (entity location) も無視されます。
-
-`FeatureCollection` に関しては、単一の `Feature` が含まれている場合 (つまり、`features` フィールドに要素が1つしかない場合) にのみ、
-作成/更新時に受け入れられます。それ以外の場合、Orion は `BadRequest` エラーを返します。
-
-まったくサポートされていない GeoJSON タイプは GeometryCollection だけです。それらを使用しようとすると、"Database Error" が発生します。
 
 [トップ](#top)
 
@@ -334,27 +136,6 @@ Orion が NGSIv2 サブスクリプション・ペイロードで実装する特
 
 [トップ](#top)
 
-<a name="alterationtype-attribute"></a>
-## `alterationType` 属性
-
-NGSIv2 仕様の "組み込み属性" (Builtin Attributes) セクションで説明されている属性から、Orion は
-`alterationType` 属性を実装します。
-
-この属性は通知でのみ使用でき (`GET /v2/entities?attrs=alterationType` などのクエリでは無視されます)、
-次の値をとることができます:
-
-* `entityCreate` 通知をトリガーする更新がエンティティ作成操作の場合
-* `entityUpdate` 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
-* `entityChange` 通知をトリガーする更新が実際の変更を伴う更新であった場合、または、実際の変更ではないが
-  `forcedUpdate` が使用されている更新である場合
-* `entityDelete` 通知をトリガーする更新がエンティティ削除操作であった場合
-
-この属性のタイプは `Text` です。
-
-この組み込み属性は、[変更タイプに基づくサブスクリプション](subscriptions_alttype.md) 機能に関連しています。
-
-[トップ](#top)
-
 <a name="actiontype-metadata"></a>
 ## `actionType` メタデータ
 
@@ -366,48 +147,6 @@ NGSIv2 仕様のセクション "組み込みメタデータ" から `actionType
 
 [トップ](#top)
 
-<a name="ignoretype-metadata"></a>
-## `ignoreType` メタデータ
-
-NGSIv2 仕様の "Builtin metadata" セクションで説明されているメタデータから、Orion は `ignoreType`
-メタデータを実装します。
-
-値が `true` の `ignoreType` が属性に追加されると、Orion は属性タイプに関連付けられたセマンティクスを
-無視します。Orion は一般に属性タイプを無視するため、このメタデータはほとんどの場合必要ありませんが、
-属性タイプに Orion の特別なセマンティクスがある2つのケースがあります (詳細については NGSIv2 仕様を
-確認してください):
-
-* `DateTime`
-* Geo-location タイプ (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
-
-現時点では、`ignoreType` は Geo-location タイプでのみサポートされているため、メカニズムは
-エンティティごとに1つのジオロケーションのみの制限を克服できます (詳細については、
-[ドキュメントのこのセクション](#limit-to-attributes-for-entity-location)を参照)。`DateTime`
-での `ignoreType` のサポートは将来的に行われる可能性があります。
-
-[トップ](#top)
-
-<a name="ordering-between-different-attribute-value-types"></a>
-## 異なる属性値型間の順序付け
-
-NGISv2 仕様 "Ordering Results" セクションから :
-
-> エンティティのリストを取得するオペレーションでは、順序付けの結果を得る際に条件として使用される属性またはプロパティを `orderBy` URI パラメータで指定できます
-
-これは、各型が他の型に関してどのように順序づけられるかの実装アスペクトです。Orion の場合、基本的な実装(MongoDB)で使用されているものと同じ基準を使用します。詳細については、[次のリンク](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)を参照してください。
-
-最低から最高まで :
-
-1. Null
-2. Number
-3. String
-4. Object
-5. Array
-6. Boolean
-
-[Top](#top)
-
-<a name="oneshot-subscriptions"></a>
 ## Oneshot サブスクリプション
 
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
@@ -424,82 +163,6 @@ Orionは `alterationTypes` フィールドをサポートして、サブスク�
 (エンティティの作成、エンティティの変更など) を指定します。
 
 詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
-
-[トップ](#top)
-
-<a name="custom-notification-extra-macros"></a>
-## カスタム通知の追加マクロ
-
-NGSIv2 仕様の "カスタム通知" セクションで説明されている `${...}` マクロとは別に、
-次のマクロを使用できます:
-
-* `${service}` は、サブスクリプションをトリガーする更新リクエストのサービス (つまり、
-  `fiware-service` ヘッダ値) に置き換えられます
-* `${servicePath}` は、サブスクリプションをトリガーする更新リクエストのサービス・パス (つまり、
-  `fiware-servicepath` ヘッダ値) に置き換えられます
-* `${authToken}` は、サブスクリプションをトリガーする更新リクエストの認証トークン (つまり、
-  `x-auth-token` ヘッダ値) に置き換えられます
-
-まれに、属性が上記と同じ方法で名前が付けられた場合 (たとえば、名前が `service` である属性)、
-属性値が優先されます。
-
-[トップ](#top)
-
-<a name="custom-notification-with-json-payload"></a>
-## JSON ペイロードを使用したカスタム通知
-
-`httpCustom` または `mqttCustom` の `payload` フィールドの代わりに、`json` フィールドを使用して JSON
-ベースのペイロードを生成できます。例えば:
-
-```
-"httpCustom": {
-   ...
-   "json": {
-     "t": "${temperature}",
-     "h": [ "${humidityMin}", "${humidityMax}" ],
-     "v": 4
-   }
-}
-```
-
-考慮すべきいくつかの注意事項:
-
-* `json` フィールドの値は配列またはオブジェクトである必要があります。単純な文字列または数値も有効な JSON
-  ですが、これらのケースはサポートされていません
-* マクロ置換ロジックは、次の考慮事項を除いて、`payload` の場合と同じように機能します:
-  * JSON オブジェクトのキー部分では使用できません。つまり、`"${key}":10` は機能しません
-  * マクロが使用される JSON オブジェクトまたは JSON 配列アイテムの値は、マクロ式と正確に一致する必要があります。
-    したがって、`"t": "${temperature}"` は機能しますが、`"t": "the temperature is ${temperature}"` または
-    `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"` は機能しません
-  * 置き換えられる属性値の性質が考慮されます。例えば、
-    `"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10` に解決され、`temperature` 属性が文字列の場合は
-    `"t": "10"` に解決されます
-  * 属性がエンティティに存在しない場合は、`null` 値が使用されます
-* `payload` および `headers` フィールドに適用される URL 自動デコード
-  ([ここ](forbidden_characters.md#custom-payload-and-headers-special-treatment) で説明しています) は、
-  `json` フィールドには適用されません
-* `payload` と `json` を同時に使用することはできません
-* `Content-Type` ヘッダは `application/json` に設定されますが、`headers` フィールドで上書きされる場合を除きます
-
-[トップ](#top)
-
-<a name="custom-notifications-without-payload"></a>
-## ペイロードなしのカスタム通知
-
-カスタム通知の `httpCustom` フィールド内で `payload` が `null` に設定されている場合、そのサブスクリプションに
-関連付けられた通知にはペイロードが含まれません (つまり、conten-length 0 の通知)。
-
-これは、`payload` を `""` に設定したり、フィールドを省略したりすることと同じではないことに注意してください。
-その場合、通知は NGSIv2 正規化形式を使用して送信されます。
-
-[トップ](#top)
-
-<a name="mqtt-notificationsmqtt-notificationsmqtt-notifications"></a>
-## MQTT 通知
-
-NGISv2 仕様で説明されているサブスクリプションの `notification` オブジェクト内の `http` および
-`httpCustom` フィールドとは別に、Orion は MQTT 通知用の `mqtt` および `mqttCustom` もサポートして
-います。このトピックは、[この特定のドキュメント](mqtt_notifications.md)でより詳細に説明されています。
 
 [トップ](#top)
 
@@ -622,31 +285,6 @@ Orion がこのような転送を実装する方法は次のとおりです :
 コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
 
 Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
-
-[Top](#top)
-
-<a name="null-support-in-datetime-and-geolocation-types"></a>
-## DateTime および geolocation タイプでの `null` サポート
-
-NGSIv2仕様によると:
-
-* `DateTime` 属性およびメタデータ: ISO8601 形式の文字列である必要があります
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`: 属性は特定のフォーマット・ルールに
-  従う必要があります ("エンティティの地理空間プロパティ" セクションで定義されています)
-
-これらの場合に `null` 値がサポートされているかどうかは、NGSIv2 仕様では明確ではありません。
-明確にするために、Orion はその可能性をサポートします。
-
-`DateTime` 属性およびメタデータに関して:
-
-* `DateTime` 属性または `null` 値を持つメタデータはフィルターで考慮されません。つまり
-  `GET /v2/entities?q=T>2021-04-21` 
-
-`geo:` 属性に関して:
-
-* `null` 値を持つ `geo:` 属性は、ジオ・クエリでは考慮されません。つまり、ジオ・クエリの結果として
-  エンティティは返されません
-* `null` 値を持つ `geo:` 属性は[属性の制限](#limit-to-attributes-for-entity-location)にはカウントされません
 
 [Top](#top)
 
