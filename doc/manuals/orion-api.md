@@ -53,6 +53,7 @@
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Metadata update semantics](#metadata-update-semantics)
     - [Oneshot Subscription](#oneshot-subscription)
+    - [Covered subscriptions](#covered-subscriptions)
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
       - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
