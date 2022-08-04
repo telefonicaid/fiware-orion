@@ -1,7 +1,5 @@
 # Update operators for attribute values
 
-## Introduction
-
 The usual way of modifying context with Orion is through attribute updates with particular values.
 However, in some cases, it is better to provide an operation to be evaluated on the existing attribute
 value. Let's see it with an example.
