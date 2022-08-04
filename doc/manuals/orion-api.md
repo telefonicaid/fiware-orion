@@ -1645,7 +1645,7 @@ While, in the case of oneshot subscription, the consumer gets notified only one 
 the subscription. Once a notification is triggered, the subscription transitions to `status`: `inactive`. Once in this status, 
 the consumer may update it with `oneshot`∫ to repeat the same behavior (i.e. to get the one time notification again). 
 
-![](user/oneshot_subscription.png "oneshot_subscription.png")
+![](oneshot_subscription.png "oneshot_subscription.png")
 
 * Assuming an entity with id Room1 and type Room already exists in the database. 
 
