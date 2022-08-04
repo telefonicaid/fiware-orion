@@ -59,11 +59,6 @@
     - [Custom Notifications](#custom-notifications)
       - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
-- [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
-    - [`actionType` metadata](#actiontype-metadata)
-    - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
-    - [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
-    - [Registration implementation differences](#registration-implementation-differences)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -123,7 +118,11 @@
             - [Query [POST /v2/op/query]](#query-post-v2opquery)
         - [Notify operation](#notify-operation)
             - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
-
+- [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
+    - [`actionType` metadata](#actiontype-metadata)
+    - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
+    - [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
+    - [Registration implementation differences](#registration-implementation-differences)
 <!-- /TOC -->
 
 # Preface
@@ -2113,65 +2112,6 @@ is `["entityCreate", "entityChange"]`.
 
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).
-
-# Differences regarding the original NGSIv2 spec
-
-This section contains the topics that, due to implementation decision, the behaviour is differs from the described in the 
-original NGSIv2 specification.
-
-## `actionType` metadata
-
-From original NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
-
-> Its value depend on the request operation type: `update` for updates,
-> `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-Current Orion implementation supports `update` and `append`. The `delete` case will be
-supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-## Ambiguous subscription status `failed` not used
-
-The original NGSIv2 specification describes `failed` value for `status` field in subscriptions:
-
-> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
-> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
-
-Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
-
-* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
-  upon entity updates) which last notification sent was failed
-* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
-  upon entity update) which was active in the past and which last notification sent in the time it was
-  active was failed
-
-In other words, looking to status `failed` is not possible to know if the subscription is currently
-active or inactive.
-
-Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
-if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
-`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
-the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
-
-## `keyValues` not supported in `POST /v2/op/notify`
-
-The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation described in the 
-original NGSIv2 specification. If you attempt to use it you would get a 400 Bad Request error.
-
-## Registration implementation differences
-
-Orion implements registration management as described in the NGSIv2 specification, except
-for the following aspects:
-
-* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
-  directly. I.e., updates must be done deleting and re-creating the registration. Please
-  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` is supported but only for the exact regular expression `.*`
-* `typePattern` is not implemented.
-* The `expression` field (within `dataProvided`) is not supported. The field is simply
-  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
-* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
-  but the registration is always active, even when the value is `inactive`. Please see
-  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
 
 # API Routes
 
@@ -4210,3 +4150,62 @@ _**Response code**_
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
+
+# Differences regarding the original NGSIv2 spec
+
+This section contains the topics that, due to implementation decision, the behaviour is differs from the described in the 
+original NGSIv2 specification.
+
+## `actionType` metadata
+
+From original NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
+
+> Its value depend on the request operation type: `update` for updates,
+> `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Current Orion implementation supports `update` and `append`. The `delete` case will be
+supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
+
+## Ambiguous subscription status `failed` not used
+
+The original NGSIv2 specification describes `failed` value for `status` field in subscriptions:
+
+> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
+> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
+
+Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
+
+* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
+  upon entity updates) which last notification sent was failed
+* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
+  upon entity update) which was active in the past and which last notification sent in the time it was
+  active was failed
+
+In other words, looking to status `failed` is not possible to know if the subscription is currently
+active or inactive.
+
+Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
+`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
+the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
+
+## `keyValues` not supported in `POST /v2/op/notify`
+
+The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation described in the 
+original NGSIv2 specification. If you attempt to use it you would get a 400 Bad Request error.
+
+## Registration implementation differences
+
+Orion implements registration management as described in the NGSIv2 specification, except
+for the following aspects:
+
+* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
+  directly. I.e., updates must be done deleting and re-creating the registration. Please
+  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
+* `idPattern` is supported but only for the exact regular expression `.*`
+* `typePattern` is not implemented.
+* The `expression` field (within `dataProvided`) is not supported. The field is simply
+  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
+* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
+  but the registration is always active, even when the value is `inactive`. Please see
+  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
