@@ -239,7 +239,7 @@ or what representation will be provided (rendered) as output.
 An attribute is represented by a JSON object with the following syntax:
 
 * The attribute value is specified by the `value` property, whose value may be any JSON datatype. 
-  Some attribute value updates has special semantics in order to modify the content in the attribute
+  However, some attribute value updates has special semantics in order to modify the content in the attribute
   value based on the current value and an operator (see [Update operators for attribute values](#update-operators-for-attribute-values)
   section).
 
