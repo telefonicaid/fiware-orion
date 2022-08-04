@@ -52,6 +52,7 @@
         - [Query Resolution](#query-resolution)
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Metadata update semantics](#metadata-update-semantics)
+      - [`overrideMetadata` option](#overridemetadata-option)
     - [Oneshot Subscription](#oneshot-subscription)
     - [Covered subscriptions](#covered-subscriptions)
     - [Notification Messages](#notification-messages)
@@ -325,7 +326,7 @@ Some operations use partial representation of entities:
 * In responses, `metadata` is set to `{}` if the attribute doesn't have any metadata. 
 
 The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
-option are detailed in [this section of the documentation](#updating-metadata).
+option are detailed in [this section of the documentation](#metadata-update-semantics).
 
 ## Datetime support
 
@@ -1578,6 +1579,55 @@ After processing the update, the metadata at the attribute `temperature` would b
 
 The rationale behind the "stikyness" of metadata in this default behaviour is described in
 more detail in [this issue at Orion repository](https://github.com/telefonicaid/fiware-orion/issues/4033)
+
+### `overrideMetadata` option
+
+You can override the default behaviour using the `overrideMetadata` option. In that case,
+the metadata in the request replace the previously ones existing in the attribute.
+For instance, with the same initial situation than before, but adding the
+`overrideMetadata` option to the request:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+After processing the update, the metadata at the attribute `temperature` would be:
+
+* `avg`: `25.6` (existing but touched by the request)
+* `accuracy`: `98.7` (metadata added by the request)
+
+Note that `unit` metadata has been removed.
+
+The `overrideMetadata` option can be use also to cleanup the metadata of a given
+attribute omitting the `metadata` field in the request (equivalently, using
+`"metadata":{}`), e.g.:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number"
+}
+```
+
+Note `overrideMetadata` option is ignored in the update attribute value operation
+(e.g. `PUT /v2/entities/E/attrs/temperature/value`) as in that case the operation
+semantics makes explicit that only the value is going to be updated
+(leaving `type` and `metadata` attribute fields untouched).
 
 ## Oneshot Subscription
 
