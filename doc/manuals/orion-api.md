@@ -699,8 +699,7 @@ NGSIv2 `error` reporting is as follows:
 
 ## Update operators for attribute values
 
-Some attribute value updates has special semantics, beyond the ones described in the
-NGSIv2 specification. In particular we can do requests like this one:
+Some attribute value updates has special semantics. In particular we can do requests like this one:
 
 ```
 POST /v2/entities/E/attrs/A
