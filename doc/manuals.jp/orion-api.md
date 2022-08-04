@@ -19,8 +19,8 @@
     - [組み込み属性 (Builtin Attributes)](#builtin-attributes)
     - [特殊なメタデータ型 (Special Metadata Types)](#special-metadata-types)
     - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
-    - [一般的な構文制限](#general-syntax-restrictions)
-    - [識別子の構文制限](#identifiers-syntax-restrictions)
+    - [一般的な構文制限 (General syntax restrictions)](#general-syntax-restrictions)
+    - [識別子の構文制限 (Identifiers syntax restrictions)](#identifiers-syntax-restrictions)
     - [属性名の制限 (Attribute names restrictions)](#attribute-names-restrictions)
     - [メタデータ名の制限 (Metadata names restrictions)](#metadata-names-restrictions)
     - [結果の順序付け (Ordering Results)](#ordering-results)
@@ -34,7 +34,7 @@
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
-      - [カスタム・ペイロードとヘッダの特別な扱い](#custom-payload-and-headers-special-treatment)
+      - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
 - [API ルート (API Routes)](#api-routes)
     - [API エントリ・ポイント (API Entry Point)](#api-entry-point)
         - [API リソースを取得 [GET /v2]](#retrieve-api-resources-get-v2)
@@ -423,7 +423,7 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 
 <a name="general-syntax-restrictions"></a>
 
-## 一般的な構文制限
+## 一般的な構文制限 (General syntax restrictions)
 
 一部の状況でスクリプト・インジェクション攻撃を回避するために (たとえば、CB と同じ場所にある Web サーバへの
 クロス・ドメイン)、次の文字はすべてのリクエストで禁止されています:
@@ -467,7 +467,7 @@ GET /v2/entities/E%253C01%253E
 
 <a name="identifiers-syntax-restrictions"></a>
 
-## 識別子の構文制限
+## 識別子の構文制限 (Identifiers syntax restrictions)
 
 NGSIv2 API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
 
@@ -1209,7 +1209,7 @@ The temperature is 23.4 degrees
 
 <a name="custom-payload-and-headers-special-treatment"></a>
 
-### カスタム・ペイロードとヘッダの特別な扱い
+### カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)
 
 [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
 NGSIv2 API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers`
