@@ -21,8 +21,6 @@
   * [Update action types](update_action_types.md)
   * [Context broker federation](federation.md)
   * [Using regular expressions](regex.md)
-  * [Oneshot subscriptions](oneshot_subscription.md)
-  * [Subscriptions based in alteration type](subscriptions_alttype.md)
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
   * [Docker](docker.md)
