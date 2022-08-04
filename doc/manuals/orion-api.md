@@ -15,12 +15,12 @@
     - [JSON Attribute Representation](#json-attribute-representation)
     - [Simplified Entity Representation](#simplified-entity-representation)
     - [Partial Representations](#partial-representations)
-    - [Datetime support](#datetime-support)
     - [Special Attribute Types](#special-attribute-types)
     - [Builtin Attributes](#builtin-attributes)
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
     - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
+    - [Datetime support](#datetime-support)
     - [General syntax restrictions](#general-syntax-restrictions)
     - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
@@ -328,71 +328,6 @@ Some operations use partial representation of entities:
 The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
 option are detailed in [this section of the documentation](#metadata-update-semantics).
 
-## Datetime support
-
-Orion support DateTime in ISO8601 by using attribute or metadata type `Datetime`. These attributes or metadata can be used with the query operators 
-greater-than, less-than, greater-or-equal, less-or-equal and range.  A `DateTime` attribute with `null` value will not be taken into account in filters, 
-i.e. `GET /v2/entities?q=T>2021-04-21`. 
-
-`DateTime` attribute example (only the referred entity attribute is shown):
-
-```
-{
-  "timestamp": {
-    "value": "2017-06-17T07:21:24.238Z",
-    "type: "DateTime"
-  }
-}
-```
-
-`DateTime` metadata example (only the referred attribute metadata is shown):
-
-```
-"metadata": {
-      "dateCreated": {
-        "value": "2019-09-23T03:12:47.213Z",
-        "type": "DateTime"
-      }
-}
-```
-
-The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
-
-* Datetimes are composed of date, time and timezone designator, in one of the following patterns:
-    * `<date>`
-    * `<date>T<time>`
-    * `<date>T<time><timezone>`
-    * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
-      it follows the combined date and time".*
-* Regarding `<date>` it must follow the pattern: `YYYY-MM-DD`
-    * `YYYY`: year (four digits)
-    * `MM`: month (two digits)
-    * `DD`: day (two digits)
-* Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-    * `hh:mm:ss.sss` or `hhmmss.sss`.
-    * `hh:mm:ss` or `hhmmss`. Milliseconds are set to `000` in this case.
-    * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
-    * `hh`. Minutes and seconds are set to `00` in this case.
-    * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
-* Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
-    * `Z`
-    * `±hh:mm`
-    * `±hhmm`
-    * `±hh`
-* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
-  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
-  assume timezone `Z` when timezone designator is omitted.
-
-Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
-Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
-etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
-about this)).
-
-In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
-clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
-
-The string `ISO8601` as type for attributes and metadata is also supported. The effect is the same as when using `DateTime`.
-
 ## Special Attribute Types
 
 Generally speaking, user-defined attribute types are informative; they are processed by the NGSIv2
@@ -504,7 +439,6 @@ The list of builtin metadata is as follows:
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
-
 ## User attributes or metadata matching builtin name
 
 (The content of this section applies to all builtins except `dateExpires` attribute. Check the document
@@ -536,6 +470,71 @@ account the following considerations:
 
 For further information about builtin attribute and metadata names you can check the respective sections 
 [Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
+
+## Datetime support
+
+Orion support DateTime in ISO8601 by using attribute or metadata type `Datetime`. These attributes or metadata can be used with the query operators 
+greater-than, less-than, greater-or-equal, less-or-equal and range.  A `DateTime` attribute with `null` value will not be taken into account in filters, 
+i.e. `GET /v2/entities?q=T>2021-04-21`. 
+
+`DateTime` attribute example (only the referred entity attribute is shown):
+
+```
+{
+  "timestamp": {
+    "value": "2017-06-17T07:21:24.238Z",
+    "type: "DateTime"
+  }
+}
+```
+
+`DateTime` metadata example (only the referred attribute metadata is shown):
+
+```
+"metadata": {
+      "dateCreated": {
+        "value": "2019-09-23T03:12:47.213Z",
+        "type": "DateTime"
+      }
+}
+```
+
+The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
+
+* Datetimes are composed of date, time and timezone designator, in one of the following patterns:
+    * `<date>`
+    * `<date>T<time>`
+    * `<date>T<time><timezone>`
+    * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
+      it follows the combined date and time".*
+* Regarding `<date>` it must follow the pattern: `YYYY-MM-DD`
+    * `YYYY`: year (four digits)
+    * `MM`: month (two digits)
+    * `DD`: day (two digits)
+* Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
+    * `hh:mm:ss.sss` or `hhmmss.sss`.
+    * `hh:mm:ss` or `hhmmss`. Milliseconds are set to `000` in this case.
+    * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
+    * `hh`. Minutes and seconds are set to `00` in this case.
+    * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
+* Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
+    * `Z`
+    * `±hh:mm`
+    * `±hhmm`
+    * `±hh`
+* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
+  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
+  assume timezone `Z` when timezone designator is omitted.
+
+Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
+Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
+etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
+about this)).
+
+In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
+clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
+
+The string `ISO8601` as type for attributes and metadata is also supported. The effect is the same as when using `DateTime`.
 
 ## General syntax restrictions
 
