@@ -15,17 +15,35 @@
     - [JSON Attribute Representation](#json-attribute-representation)
     - [Simplified Entity Representation](#simplified-entity-representation)
     - [Partial Representations](#partial-representations)
-    - [Datetime support](#datetime-support)
     - [Special Attribute Types](#special-attribute-types)
     - [Builtin Attributes](#builtin-attributes)
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
     - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
-    - [Field syntax restrictions](#field-syntax-restrictions)
+    - [Datetime support](#datetime-support)
+    - [General syntax restrictions](#general-syntax-restrictions)
+    - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
     - [Ordering Results](#ordering-results)
     - [Error Responses](#error-responses)
+    - [Update operators for attribute values](#update-operators-for-attribute-values)
+        - [Supported operators](#supported-operators)
+           - [`$inc`](#inc)
+           - [`$mul`](#mul)
+           - [`$min`](#min)
+           - [`$max`](#max)
+           - [`$push`](#push)
+           - [`$addToSet`](#addtoset)
+           - [`$pull`](#pull)
+           - [`$pullAll`](#pullall)
+           - [`$set`](#set)
+           - [`$unset`](#unset)
+           - [`$unset`](#unset)
+           - [Combining `$set` and `$unset`](#combining-set-and-unset)
+        - [How Orion deals with operators](#how-orion-deals-with-operators)
+        - [Current limitations](#current-limitations)
+           - [Create or replace entities](#create-or-replace-entities)
     - [Geospatial properties of entities](#geospatial-properties-of-entities)
         - [Simple Location Format](#simple-location-format)
         - [GeoJSON](#geojson)
@@ -33,9 +51,13 @@
     - [Geographical Queries](#geographical-queries)
         - [Query Resolution](#query-resolution)
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
+    - [Metadata update semantics](#metadata-update-semantics)
+      - [`overrideMetadata` option](#overridemetadata-option)
     - [Oneshot Subscription](#oneshot-subscription)
+    - [Covered subscriptions](#covered-subscriptions)
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
+      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
 - [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
     - [`actionType` metadata](#actiontype-metadata)
@@ -220,7 +242,10 @@ or what representation will be provided (rendered) as output.
 
 An attribute is represented by a JSON object with the following syntax:
 
-* The attribute value is specified by the `value` property, whose value may be any JSON datatype.
+* The attribute value is specified by the `value` property, whose value may be any JSON datatype. 
+  However, some attribute value updates has special semantics in order to modify the content in the attribute
+  value based on the current value and an operator (see [Update operators for attribute values](#update-operators-for-attribute-values)
+  section).
 
 * The attribute NGSI type is specified by the `type` property, whose value is a string containing
   the NGSI type.
@@ -297,18 +322,158 @@ Some operations use partial representation of entities:
   * If value is null, then `None` is used.
 
 * Attribute `metadata` may be omitted in requests, meaning that there are no metadata elements
-  associated to the attribute. In responses, this property is set to `{}` if the attribute 
-  doesn't have any metadata. Depending if `overrideMetadata` is used or not, this sentence has
-  two interpretations:
-  * If `overrideMetadata` is not used (default behaviour) it is interpreted as
-  "... meaning that there are no metadata elements associated to the attribute,
-  **which need to be updated**"
-  * If `overrideMetadata` is used it is interpreted as
-  "... meaning that there are no metadata elements associated to the attribute,
-  **as a result of the the attribute update**"
+  associated to the attribute. What "associated" means depends on `overrideMetadata`:
+  * If `overrideMetadata` is not used (default behaviour), it means there are no metadata elements associated to the attribute, *which need to be updated*
+  * If `overrideMetadata` is used, it means there are no metadata elements associated to the attribute,
+  *as a result of the the attribute update*"
+
+* In responses, `metadata` is set to `{}` if the attribute doesn't have any metadata. 
 
 The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
-option are detailed in [this section of the documentation](metadata.md#updating-metadata).
+option are detailed in [this section of the documentation](#metadata-update-semantics).
+
+## Special Attribute Types
+
+Generally speaking, user-defined attribute types are informative; they are processed by the NGSIv2
+server in an opaque way. Nonetheless, the types described below are used to convey a special
+meaning:
+
+* `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the query
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
+  check the section [Datetime support](#datetime-support) of this documentation.
+
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+  related with entity location. Attributes with `null` value will not be taken into account in 
+  geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
+  See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
+
+* `TextUnrestricted`: this attribute type allows to skip [syntax restrictions](#general-syntax-restrictions) checkings in the attribute 
+   value. However, it could have security implications (possible script injections attacks) so use 
+   it at your own risk!. For instance (only the referred entity attribute is shown):
+
+
+```json
+{
+  "forbiddenAttr": {
+   "type": "TextUnrestricted",
+   "value": "I'"'"'am a unrestricted (and I'"'"'m using forbidden chars)"
+  }
+}
+```
+
+## Builtin Attributes
+
+There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
+rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
+are just like regular attributes, with name, value and type.
+
+Builtin attributes are not rendered by default. In order to render a specific attribute, add its
+name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+subscription (`attrs` sub-field within `notification`).
+
+The list of builtin attributes is as follows:
+
+* `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
+
+* `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
+
+* `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How the server
+  controls entity expiration is an implementation specific aspect.
+
+* `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with 
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
+
+  can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
+   * `entityCreate` if the update that triggers the notification is a entity creation operation 
+   * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+   * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
+   * `entityDelete` if the update that triggers the notification was a entity delete operation
+
+Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
+However, they cannot be used in resource URLs.
+
+## Special Metadata Types
+
+Generally speaking, user-defined metadata types are informative; they are processed by the NGSIv2
+server in an opaque way. Nonetheless, the types described below are used to convey a special
+meaning:
+
+* `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
+  check the section [Datetime support](#datetime-support) of this documentation.
+
+* `ignoreType`: when `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+semantics associated to the attribute type. Note that Orion ignored attribute type in general so
+this metadata is not needed most of the cases, but there are two cases in which attribute
+type has an special semantic for Orion:
+   * `DateTime`
+   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+
+At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
+mechanism to overcome the limit of only one geo-location per entity (more details
+in [Geospatial properties of entities](#geospatial-properties-of-entities) section). Support
+for `ignoreType` in `DateTime` may come in the future.
+
+## Builtin Metadata
+
+Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
+rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
+are just like regular metadata, with name, value, and type.
+
+Builtin metadata are not rendered by default. In order to render a specific metadata, add its
+name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
+subscription (`metadata` sub-field within `notification`).
+
+The list of builtin metadata is as follows:
+
+* `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
+
+* `dateModified` (type: `DateTime`): attribute modification date as an ISO 8601 string.
+
+* `previousValue` (type: any): only in notifications. The value of this metadata is the previous
+  value (to the request triggering the notification) of the associated attribute. The type of this metadata
+  must be the previous type of the associated attribute. If the type/value of `previousValue` is the same
+  type/value as in the associated attribute, then the attribute has not actually changed its value.
+
+* `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
+  was included in the request that triggered the notification. Its value depends on the request operation
+  type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+* `location`, which is currently [deprecated](#deprecated.md), but still supported.
+
+Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
+
+## User attributes or metadata matching builtin name
+
+(The content of this section applies to all builtins except `dateExpires` attribute. Check the document
+[on transient entities](user/transient_entities.md) for specific information about `dateExpires`).
+
+First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an 
+NGSIv2 builtin**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
+"Metadata names restrictions" sections in the specification).
+
+However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
+account the following considerations:
+
+* You can create/update attributes and/or metadata which name is the same of a NGSIv2 builtin.
+  Orion will let you do so.
+* User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
+  or subscription. For instance, if you created a `dateModified` attribute with value
+  "2050-01-01" in entity E1, then `GET /v2/entities/E1` will retrieve it. You don't need to use
+  `?attrs=dateModified`.
+* When rendered (in response to GET operations or in notifications) the user defined attribute/metadata
+  will take preference over the builtin even when declared explicitly. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?attrs=dateModified` you will get "2050-01-01".
+* However, filtering (i.e. `q` or `mq`) is based on the value of the builtin. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?q=dateModified>2049-12-31` you will get no entity. It happens that "2050-01-01" is
+  greater than "2049-12-31" but the date you modified the entity (some date in 2018 or 2019 maybe) will
+  not be greater than "2049-12-31". Note this is somehow inconsistent (i.e. user defined takes preference
+  in rendering but not in filtering) and may change in the future.
+
+For further information about builtin attribute and metadata names you can check the respective sections 
+[Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
 
 ## Datetime support
 
@@ -327,7 +492,7 @@ i.e. `GET /v2/entities?q=T>2021-04-21`.
 }
 ```
 
-`DateTime` metadata example For instance (only the referred attribute metadata is shown):
+`DateTime` metadata example (only the referred attribute metadata is shown):
 
 ```
 "metadata": {
@@ -375,133 +540,55 @@ clients/receivers may be running in any timezone). This may change in the future
 
 The string `ISO8601` as type for attributes and metadata is also supported. The effect is the same as when using `DateTime`.
 
-## Special Attribute Types
+## General syntax restrictions
 
-Generally speaking, user-defined attribute types are informative; they are processed by the NGSIv2
-server in an opaque way. Nonetheless, the types described below are used to convey a special
-meaning:
+In order to avoid script injections attack in some circumstances (e.g.
+cross domain to co-located web servers in the same hot that CB) the
+following characters are forbidden in any request:
 
-* `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the query
-  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
-  check the section [Datetime support](#datetime-support) of this documentation.
+-   &lt;
+-   &gt;
+-   "
+-   '
+-   =
+-   ;
+-   (
+-   )
 
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
-  related with entity location. Attributes with `null` value will not be taken into account in 
-  geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
-  See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
+Any attempt of using them will result in a 400 Bad Request response
+like this:
 
-## Builtin Attributes
+    {
+        "error": "BadRequest",
+        "description": "Invalid characters in attribute type"
+    }
 
-There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
-rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
-are just like regular attributes, with name, value and type.
+If your application needs to use these characters, you should encode it
+using a scheme not including forbidden characters before sending the
+request to Orion. 
 
-Builtin attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
-subscription (`attrs` sub-field within `notification`).
+[URL encoding](http://www.degraeve.com/reference/urlencoding.php) is
+a valid way of encoding. However, we don't recommend its usage for
+fields that may appear in API URL (such as entity id or attribute names)
+due to it would need to encode the "%" character itself. For instance,
+if we would want to use "E<01>" as entity id, its URL encode would be:
+"E%3C01%3E".
 
-The list of builtin attributes is as follows:
+In order to use this entity ID in URL (e.g. a retrieve entity info operation)
+the following will be used (note that "%25" is the encoding for "%").
 
-* `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
+```
+GET /v2/entities/E%253C01%253E
+```
 
-* `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
+There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
 
-* `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How the server
-  controls entity expiration is an implementation specific aspect.
+* URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
+* URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
+* URL parameter `georel` and `coords` allow `;`
+* Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
-* `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with 
-the [subscriptions based in alteration type](#subscriptions-based-in-alteration-type) feature. This attribute
-  can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
-   * `entityCreate` if the update that triggers the notification is a entity creation operation 
-   * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
-   * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
-   * `entityDelete` if the update that triggers the notification was a entity delete operation
-
-Like regular attributes, they can be used in `q` filters and in `orderBy` (`alterationType` is not included).
-However, they cannot be used in resource URLs.
-
-## Special Metadata Types
-
-Generally speaking, user-defined metadata types are informative; they are processed by the NGSIv2
-server in an opaque way. Nonetheless, the types described below are used to convey a special
-meaning:
-
-* `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
-  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
-  check the section [Datetime support](#datetime-support) of this documentation.
-
-* `ignoreType`: When `ignoreType` with value `true` is added to an attribute, Orion will ignore the
-semantics associated to the attribute type. Note that Orion ignored attribute type in general so
-this metadata is not needed most of the cases, but there are two cases in which attribute
-type has an special semantic for Orion:
-   * `DateTime`
-   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
-
-At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
-mechanism to overcome the limit of only one geo-location per entity (more details
-in [Geospatial properties of entities](##geospatial-properties-of-entities) section). Support
-for `ignoreType` in `DateTime` may come in the future.
-
-## Builtin Metadata
-
-Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
-rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
-are just like regular metadata, with name, value, and type.
-
-Builtin metadata are not rendered by default. In order to render a specific metadata, add its
-name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
-subscription (`metadata` sub-field within `notification`).
-
-The list of builtin metadata is as follows:
-
-* `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
-
-* `dateModified` (type: `DateTime`): attribute modification date as an ISO 8601 string.
-
-* `previousValue` (type: any): only in notifications. The value of this metadata is the previous
-  value (to the request triggering the notification) of the associated attribute. The type of this metadata
-  must be the previous type of the associated attribute. If the type/value of `previousValue` is the same
-  type/value as in the associated attribute, then the attribute has not actually changed its value.
-
-* `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
-  was included in the request that triggered the notification. Its value depends on the request operation
-  type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
-
-## User attributes or metadata matching builtin name
-
-(The content of this section applies to all builtins except `dateExpires` attribute. Check the document
-[on transient entities](user/transient_entities.md) for specific information about `dateExpires`).
-
-First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an 
-NGSIv2 builtin**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
-"Metadata names restrictions" sections in the specification).
-
-However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
-account the following considerations:
-
-* You can create/update attributes and/or metadata which name is the same of a NGSIv2 builtin.
-  Orion will let you do so.
-* User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
-  or subscription. For instance, if you created a `dateModified` attribute with value
-  "2050-01-01" in entity E1, then `GET /v2/entities/E1` will retrieve it. You don't need to use
-  `?attrs=dateModified`.
-* When rendered (in response to GET operations or in notifications) the user defined attribute/metadata
-  will take preference over the builtin even when declared explicitly. For instance, if you created
-  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
-  `GET /v2/entities?attrs=dateModified` you will get "2050-01-01".
-* However, filtering (i.e. `q` or `mq`) is based on the value of the builtin. For instance, if you created
-  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
-  `GET /v2/entities?q=dateModified>2049-12-31` you will get no entity. It happens that "2050-01-01" is
-  greater than "2049-12-31" but the date you modified the entity (some date in 2018 or 2019 maybe) will
-  not be greater than "2049-12-31". Note this is somehow inconsistent (i.e. user defined takes preference
-  in rendering but not in filtering) and may change in the future.
-
-For further information about builtin attribute and metadata names you can check the respective sections 
-[Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
-
-## Field syntax restrictions
+## Identifiers syntax restrictions
 
 Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
 These rules apply to:
@@ -520,19 +607,9 @@ The rules are:
 * Maximum field length is 256 characters.
 * Minimum field length is 1 character.
 
-In addition to the above rules, given NGSIv2 server implementations could add additional syntactical
-restrictions in those or other fields, e.g., to avoid cross script injection attacks.
+In addition, the [General syntax restrictions](#general-syntax-restrictions) also apply to NGSIv2 identifiers.
 
-The additional restrictions that apply to Orion are the ones describe in the
-[forbidden characters](forbidden_characters.md) section of the manual.
-
-Note that you can use `TextUnrestricted` attribute type (and special attribute type beyond
-the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
-in the attribute value. However, it could have security implications (possible script
-injections attacks) so use it at your own risk!
-
-In case a client attempts to use a field that is invalid from a syntax point of view, the client
-gets a "Bad Request" error response, explaining the cause.
+In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
 ## Attribute names restrictions
 
@@ -577,8 +654,8 @@ The value of `orderBy` can be:
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
 
-How each type is ordered with regard to other types is an implementation aspect. In the case of Orion,
-we use the same criteria as the one used by the underlying implementation (MongoDB). See
+With regards of the ordering of attributes which values belong to several JSON types, Orion 
+uses the same criteria as the one used by the underlying implementation (MongoDB). See
 [the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
 for details.
 
@@ -623,6 +700,424 @@ NGSIv2 `error` reporting is as follows:
   + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
   + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
 
+## Update operators for attribute values
+
+Some attribute value updates has special semantics. In particular we can do requests like this one:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+which means *"increase the value of attribute A by 3"*.
+
+This functionality is useful to reduce the complexity of applications and avoid
+race conditions in applications that access simultaneously to the same piece of
+context. More detail in [specific documentation](user/update_operators.md).
+
+### Supported operators
+
+Orion update operators are based on a subset of the ones implemented by MongoDB
+(described [here](https://docs.mongodb.com/manual/reference/operator/update/)). The 
+complete set of operators supported by Orion are the following:
+
+| Operator                 | Previous attr value     | Operation                          | Final value                     |
+|--------------------------|-------------------------|------------------------------------|---------------------------------|
+| [`$inc`](#inc)           | `"value":2`             | `value: { "$inc":2}`               | `"value":4`                     |
+| [`$mul`](#mul)           | `"value":3`             | `value: { "$mul":2}`               | `"value":6`                     |
+| [`$min`](#min)           | `"value":2`             | `value: { "$min":1}`               | `"value":1`                     |
+| [`$max`](#max)           | `"value":2`             | `value: { "$max":10}`              | `"value":10`                    |
+| [`$push`](#push)         | `"value":[1,2,3]`       | `value: { "$push":3}`              | `"value":[1,2,3,3]`             |
+| [`$addToSet`](#addtoset) | `"value":[1,2,3]`       | `value: { "$addToSet":4}`          | `"value":[1,2,3,4]`             |
+| [`$pull`](#pull)         | `"value":[1,2,3]`       | `value: { "$pull":2}`              | `"value":[1,3]`                 |
+| [`$pullAll`](#pullAll)   | `"value":[1,2,3]`       | `value: { "$pullAll":[2,3]}`       | `"value":[1]`                   |
+| [`$set`](#set)           | `"value":{"X":1,"Y":2}` | `value: { "$set":{"Y":20,"Z":30}}` | `"value":{"X":1,"Y":20,"Z":30}` |
+| [`$unset`](#unset)       | `"value":{"X":1,"Y":2}` | `value: { "$unset":{"X":1}}`       | `"value":{"Y":2}`               |
+
+A description of each one follows.
+
+#### `$inc`
+
+Increase by a given value.
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 2 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 12.
+
+This operator only accept numeric values (either positive or negative, integer or decimal).
+
+#### `$mul`
+
+Multiply by a given value
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$mul": 2 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 20.
+
+This operator only accept numeric values (either positive or negative, integer or decimal).
+
+#### `$min`
+
+Updates value if current value is greater than the one provides.
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$min": 2 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 2. However, the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$min": 20 },
+  "type": "Number"
+}
+```
+
+would not change attribute value.
+
+Apart from numbers, other value types are supported (eg, strings).
+
+#### `$max`
+
+Updates value if current value is lesser than the one provides.
+
+For instance, if the preexisting value of attribute A in entity E is 10 the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$max": 12 },
+  "type": "Number"
+}
+```
+
+would change the value of attribute A to 12. However, the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$max": 4 },
+  "type": "Number"
+}
+```
+
+would not change attribute value.
+
+Apart from numbers, other value types are supported (eg, strings).
+
+#### `$push`
+
+To be used with attributes which value is an array, add an item to the array.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$push": 3 },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 2, 3, 3]`
+
+#### `$addToSet`
+
+Similar to push but avoids duplications.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$addToSet": 4 },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 2, 3, 4]`. However, the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$addToSet": 3 },
+  "type": "Array"
+}
+```
+
+would not change attribute value.
+
+#### `$pull`
+
+To be used with attributes which value is an array, removes all occurrences of the item
+passed as parameter.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$pull": 2 },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 3]`.
+
+#### `$pullAll`
+
+To be used with attributes which value is an array. The parameter is also an array. All
+the occurrences of any of the members of the array used as parameter are removed.
+
+For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$pullAll": [2, 3] },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1]`.
+
+#### `$set`
+
+To be used with attributes which value is an object to add/update a sub-key in the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"X": 1, "Y": 20, "Z": 30}`.
+
+For consistence, `$set` can be used with values that are not an object, such as:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": "foo" },
+  "type": "Object"
+}
+```
+
+which has the same effect than a regular update, i.e.:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": "foo",
+  "type": "Object"
+}
+```
+
+We don't recommend this usage, as the regular update is simpler.
+
+Some additional notes:
+
+* `$set` will work if the previous attribute value is an empty object (i.e. `{}`)
+* `$set` will work if the attribute doesn't previously exist in the entity (although the entity
+  itself has to exist, as explained [here](#create-or-replace-entities))
+* `$set` will not work if the previous value of the attribute is not an object (i.e. a context
+  string like `"foo"`). An `InternalServerError` will be raised in this case.
+
+#### `$unset`
+
+To be used with attributes which value is an object to remove a sub-key from the
+object without modifying any other sub-keys.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"Y": 2}`.
+
+The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommented
+for simplicity but the following request would also work and would be equivalent to the one above:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": null} },
+  "type": "Object"
+}
+```
+
+Note that if the value of `$unset` is not an object, it will be ignored. Not existing sub-keys
+are also ignored.
+
+#### Combining `$set` and `$unset`
+
+You can combine the usage of `$set` and `$unset` in the same attribute update.
+
+For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "Y": 2}` the
+following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would change the value of attribute A to `{"Y": 20}`.
+
+The sub-keys in the `$set` value cannot be at the same time in the `$unset` value or
+the other way around. For instance the following request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+would result in error.
+
+### How Orion deals with operators
+
+Orion doesn't execute the operation itself, but pass it to MongoDB, which is the one actually
+executing in the attribute value stored in the database. Thus, the execution semantics are the
+ones described in [MongoDB documentation](https://docs.mongodb.com/manual/reference/operator/update/)
+for the equivalent operands.
+
+If the operation results in error at MongoDB level, the error is progressed as is as a
+500 Internal Error in the client response. For instance, `$inc` operator only support numerical values in
+MongoDB. So if we send this request:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": "foo" },
+  "type": "Number"
+}
+```
+
+The result would be this error:
+
+```
+500 Internal Server Error
+
+{"error":"InternalServerError","description":"Database Error &#40;collection: orion.entities - update&#40;&#41;: &lt;{ &quot;_id.id&quot; : &quot;E&quot;, &quot;_id.type&quot; : &quot;T&quot;, &quot;_id.servicePath&quot; : &quot;/&quot; },{ &quot;$set&quot; : { &quot;attrs.A.type&quot; : &quot;Number&quot;, &quot;attrs.A.mdNames&quot; : [  ], &quot;attrs.A.creDate&quot; : 1631801113.0986146927, &quot;attrs.A.modDate&quot; : 1631801407.5359125137, &quot;modDate&quot; : 1631801407.5359227657, &quot;lastCorrelator&quot; : &quot;cbe6923c-16f7-11ec-977e-000c29583ca5&quot; }, &quot;$unset&quot; : { &quot;attrs.A.md&quot; : 1, &quot;location&quot; : 1, &quot;expDate&quot; : 1 }, &quot;$inc&quot; : { &quot;attrs.A.value&quot; : &quot;foo&quot; } }&gt; - exception: Cannot increment with non-numeric argument: {attrs.A.value: &quot;foo&quot;}&#41;"}
+```
+
+which decoded is:
+
+```
+"error":"InternalServerError","description":"Database Error (collection: orion.entities - update(): <{ "_id.id" : "E", "_id.type" : "T", "_id.servicePath" : "/" },{ "$set" : { "attrs.A.type" : "Number", "attrs.A.mdNames" : [  ], "attrs.A.creDate" : 1631801113.0986146927, "attrs.A.modDate" : 1631801407.5359125137, "modDate" : 1631801407.5359227657, "lastCorrelator" : "cbe6923c-16f7-11ec-977e-000c29583ca5" }, "$unset" : { "attrs.A.md" : 1, "location" : 1, "expDate" : 1 }, "$inc" : { "attrs.A.value" : "foo" } }> - exception: Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
+```
+
+and if we look at the end, we can see the error reported by MongoDB:
+
+```
+Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
+```
+
+In addition, note that Orion assumes that the value for the attribute in the request
+is a JSON object which just one key (the operator). If you do a weird thing something like this:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": {
+    "x": 1
+    "$inc": 1,
+    "$mul": 10
+  },
+  "type": "Number"
+}
+```
+
+you will get (randomly, in principle) one among this ones:
+
+* A gets increased its value by 1
+* A gets multiply its value by 10
+* A gets is value updated to (literally) this JSON object: `{ "x": 1, "$inc": 1, "$mul": 10 }`
+
+So be careful of avoiding these situations.
+
+The only exception to "use only one operator" rule is the case of `$set` and
+`$unset`, that can be used together [as described above](#combining-set-and-unset).
+
+### Current limitations
+
+#### Create or replace entities
+
+Update operators cannot be used in entity creation or replace operations. For instance if
+you create an entity this way:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}
+```
+
+the attribute A in the just created entity will have as value (literally) this JSON object: `{ "$inc": 2 }`.
+
+However, note that the case of adding new attributes to existing entities will work. For instance if
+we already have an entity E with attributes A and B and we append C this way:
+
+```
+POST /v2/entities/E
+{
+  "C": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}
+```
+
+then C will be created with value `2`.
+
 ## Geospatial properties of entities
 
 The geospatial properties of a context entity can be represented by means of regular
@@ -640,7 +1135,7 @@ Two different syntaxes must be supported by compliant implementations:
   complex geospatial shapes, for instance
   [multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
 
-Current implementation, (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of `GeoJSON` representations, supporting only the following types:
+Current implementation (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of `GeoJSON` representations, supporting only the following types:
 
 * Point
 * MultiPoint
@@ -674,10 +1169,10 @@ if you try to use them.
 Client applications are responsible for defining which entity attributes convey geospatial
 properties (by providing an appropriate NGSI attribute type). Typically this is an entity attribute
 named `location`, but nothing prevents use another different name for the geospatial attribute. 
-In the case of Orion, the number of geospatial attributes is limited to one (1) attribute due to
-resource constraints imposed by backend databases.
 
-When spatial index limits are exceeded, Orion rises an error `413`, *Request entity too large*, and
+Orion limits the number of geospatial attributes to one (1) attribute due to
+resource constraints imposed by backend databases. If additional use attempts to create additional 
+location attributes, Orion rises an error `413`, *Request entity too large*, and
 the reported error on the response payload is `NoResourcesAvailable`.
 
 However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
@@ -1043,6 +1538,104 @@ Note that the `attrs` and `metadata` fields can be used also in subscriptions (a
 with the same meaning to specify which attributes (metadata) to include in notifications associated
 to that subscription.
 
+## Metadata update semantics
+
+When an attribute is updated the following rules apply:
+
+* Metadata included in the attribute update request *not previously existing* are added
+  to the attribute
+* Metadata included in the attribute update request *previous existing* are updated
+  in the attribute
+* Existing metadata not included in the request are not touched in the attribute (i.e. they keep the
+  previous value).
+
+For instance, let's consider an attribute `temperature` with metadata `unit` and `avg` which values
+are at the present moment:
+
+* `unit`: `"celsius"`
+* `avg`: `25.4`
+
+and Context Broker receives a request like this:
+
+```
+PUT /v2/entities/E/attrs/temperature
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+After processing the update, the metadata at the attribute `temperature` would be:
+
+* `unit`: `"celsius"` (existing and not touched by the request)
+* `avg`: `25.6` (existing but touched by the request)
+* `accuracy`: `98.7` (metadata added by the request)
+
+The rationale behind the "stikyness" of metadata in this default behaviour is described in
+more detail in [this issue at Orion repository](https://github.com/telefonicaid/fiware-orion/issues/4033)
+
+At the moment, NGSIv2 doesn't allow to delete individual metadata elements once introduced.
+However, you can delete all metadata updating the attribute with `metadata` set to `{}`.
+
+### `overrideMetadata` option
+
+You can override the default behaviour using the `overrideMetadata` option. In that case,
+the metadata in the request replace the previously ones existing in the attribute.
+For instance, with the same initial situation than before, but adding the
+`overrideMetadata` option to the request:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+After processing the update, the metadata at the attribute `temperature` would be:
+
+* `avg`: `25.6` (existing but touched by the request)
+* `accuracy`: `98.7` (metadata added by the request)
+
+Note that `unit` metadata has been removed.
+
+The `overrideMetadata` option can be use also to cleanup the metadata of a given
+attribute omitting the `metadata` field in the request (equivalently, using
+`"metadata":{}`), e.g.:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number"
+}
+```
+
+Note `overrideMetadata` option is ignored in the update attribute value operation
+(e.g. `PUT /v2/entities/E/attrs/temperature/value`) as in that case the operation
+semantics makes explicit that only the value is going to be updated
+(leaving `type` and `metadata` attribute fields untouched).
+
 ## Oneshot Subscription
 
 Oneshot subscription provides an option to subscribe an entity only for one time notification. When consumer creates a subscription 
@@ -1054,7 +1647,7 @@ While, in the case of oneshot subscription, the consumer gets notified only one 
 the subscription. Once a notification is triggered, the subscription transitions to `status`: `inactive`. Once in this status, 
 the consumer may update it with `oneshot`∫ to repeat the same behavior (i.e. to get the one time notification again). 
 
-![](user/oneshot_subscription.png "oneshot_subscription.png")
+![](oneshot_subscription.png "oneshot_subscription.png")
 
 * Assuming an entity with id Room1 and type Room already exists in the database. 
 
@@ -1285,9 +1878,11 @@ are aware of the format without needing to process the notification payload.
 
 ## Custom Notifications
 
-NGSIv2 clients can customize notification messages using a simple template mechanism. The
-`notification.httpCustom` property of a subscription allows to specify the following fields
-to be templatized when using HTTP notifications:
+NGSIv2 clients can customize notification messages using a simple template mechanism when
+`notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
+depends on the protocol type.
+
+In case of `httpCustom`:
 
 * `url`
 * `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
@@ -1299,8 +1894,10 @@ to be templatized when using HTTP notifications:
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
 
-Regarding the MQTT notifications, the `mqttCustom` is used instead of `httpCustom`. This
-topic is described with more detail [in this specific document](user/mqtt_notifications.md).
+In case of `mqttCustom`:
+
+* `payload`
+* `topic`
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
 
@@ -1386,8 +1983,8 @@ Some notes to take into account when using `json` instead of `payload`:
     `"t": "10"` if `temperature` attribute is a string.
   * If the attribute doesn't exist in the entity, then `null` value is used
 * URL automatic decoding applied to `payload` and `headers` fields (described
-  [here](forbidden_characters.md#custom-payload-and-headers-special-treatment)) is not applied
-  to `json` field.
+  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)) 
+  is not applied to `json` field.
 * `payload` and `json` cannot be used at the same time
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
 
@@ -1401,7 +1998,8 @@ Some considerations to take into account when using custom notifications:
   is sent for each of the entities (contrary to default behaviour, which is to send all entities in
   the same HTTP message).
 * Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in [this section](user/forbidden_characters.md#custom-payload-special-treatment) of the manual.
+  custom notifications. This is described in detail in 
+  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
 * Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
   [CLI parameter](../admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
@@ -1429,6 +2027,51 @@ For instance:
 * To avoid headers included by default in notifications (e.g. `Accept`)
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
+
+### Custom payload and headers special treatment
+
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
+`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
+in `httpCustom.headers`.
+
+However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
+of `httpCustom.headers` are decoded.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain",
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+Note that the above payload value is the URL encoded version of this string:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
+`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+
+Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json 
+Content-Length: 65
+
+the value of the "temperature" attribute (of type Number) is 23.4
+```
 
 ## Subscriptions based in alteration type
 
@@ -2638,6 +3281,8 @@ Based on the `condition` field, the notification triggering rules are as follow:
   attributes of the entity changes and at the same time `expression` matches.
 * If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
   attributes of the entity changes.
+
+Note that changing the metadata of a given attribute is considered a change even though the attribute value itself hasn't changed.
 
 #### `subscription.notification`
 

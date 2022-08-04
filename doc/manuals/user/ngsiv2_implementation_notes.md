@@ -1,6 +1,5 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
-* [Update operators for attribute values](#update-operators-for-attribute-values)
 * [Subscription payload validations](#subscription-payload-validations)
 * [Registrations](#registrations)
 * [Deprecated features](#deprecated-features)
@@ -8,27 +7,6 @@
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
-
-## Update operators for attribute values
-
-Some attribute value updates has special semantics, beyond the ones described in the
-NGSIv2 specification. In particular we can do requests like this one:
-
-```
-POST /v2/entities/E/attrs/A
-{
-  "value": { "$inc": 3 },
-  "type": "Number"
-}
-```
-
-which means *"increase the value of attribute A by 3"*.
-
-This functionality is usefeul to reduce the complexity of applications and avoid
-race conditions in applications that access simultaneously to the same piece of
-context. More detail in [specific documentation](update_operators.md).
-
-[Top](#top)
 
 ## Subscription payload validations
 
