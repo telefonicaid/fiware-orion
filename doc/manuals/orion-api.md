@@ -3658,17 +3658,18 @@ _**Response code**_
 ## Registration Operations
 
 A Context Registration allows to bind external context information sources so that they can
-play the role of providers
-of certain subsets (entities, attributes) of the context information space, including those located
-at specific geographical areas.
+play the role of providers of certain subsets (entities, attributes) of the context information space, including those located
+at specific geographical areas. The way in which Orion implements such forwarding is as follows:
 
-A NGSIv2 server implementation may implement query and/or update forwarding to context information sources. In
-particular, some of the following forwarding mechanisms could be implemented (not exhaustive list):
+* `POST /v2/op/query` for query forwarding
+* `POST /v2/op/update` for update forwarding
 
-* Legacy forwarding (based on NGSIv1 operations)
-* NGSI Context Source Forwarding Specification
+More information on forwarding to context information sources can be found in [this specific document](user/context_providers.md).
 
-Please check the corresponding specification in order to get the details.
+Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
+specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
+for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
+not have been migrated yet to NGSIv2, so this mode may prove useful.
 
 ### Registration payload datamodel
 
@@ -3694,6 +3695,7 @@ The `provider` field contains the following subfields:
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `http`         |          | object | It is used to convey parameters for providers that deliver information through the HTTP protocol.(Only protocol supported nowadays). <br>It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpoint must *not* include the protocol specific part (for instance `/v2/entities`). |
 | `supportedForwardingMode`  |          | string | It is used to convey the forwarding mode supported by this context provider. By default `all`. Allowed values are: <ul><li><code>none</code>: This provider does not support request forwarding.</li><li><code>query</code>: This provider only supports request forwarding to query data.</li><li><code>update</code>: This provider only supports request forwarding to update data.</li><li><code>all</code>: This provider supports both query and update forwarding requests. (Default value).</li></ul> |
+|`legacyForwarding`| ✓      | boolean | If `true`, a NGSIv1-based query/update will be used for forwarding the requests of the registration. |
 
 #### `registration.dataProvided`
 

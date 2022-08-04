@@ -46,26 +46,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 
 [Top](#top)
 
-## Registrations
-
-According to NGSIv2 specification:
-
-> A NGSIv2 server implementation may implement query or update forwarding to context information sources.
-
-The way in which Orion implements such forwarding is as follows:
-
-* `POST /v2/op/query` for query forwarding
-* `POST /v2/op/update` for update forwarding
-
-More information on forwarding to context information sources can be found in [this specific document](context_providers.md).
-
-Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
-specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
-not have been migrated yet to NGSIv2, so this mode may prove useful.
-
-[Top](#top)
-
 ## Deprecated features
 
 Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
