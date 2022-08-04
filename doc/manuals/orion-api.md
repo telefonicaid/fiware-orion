@@ -345,7 +345,7 @@ i.e. `GET /v2/entities?q=T>2021-04-21`.
 }
 ```
 
-`DateTime` metadata example For instance (only the referred attribute metadata is shown):
+`DateTime` metadata example (only the referred attribute metadata is shown):
 
 ```
 "metadata": {
