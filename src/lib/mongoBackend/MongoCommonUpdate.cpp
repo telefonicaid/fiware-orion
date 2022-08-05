@@ -1832,7 +1832,7 @@ static bool processOnChangeConditionForUpdateContext
     {
       for (unsigned int jx = 0; jx < attrL.size(); jx++)
       {
-        if (caP->name == attrL[jx] && !caP->skip)
+        if (caP->name == attrL[jx])
         {
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
            * cer.entity destructor does release() on the attrs vector */
@@ -2375,7 +2375,10 @@ static void updateAttrInNotifyCer
 static void deleteAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
-  ContextAttribute*       targetAttr
+  ContextAttribute*       targetAttr,
+  bool                    useDefaultType,
+  const std::string&      actionType,
+  const bool&             overrideMetadata
 )
 {
   for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
@@ -2384,6 +2387,7 @@ static void deleteAttrInNotifyCer
     if (caP->name == targetAttr->name)
     {
       caP->skip = true;
+      caP->actionType = NGSI_MD_ACTIONTYPE_DELETE;
     }
   }
 }
@@ -2561,12 +2565,13 @@ static bool deleteContextAttributeItem
   bool*                     entityModified,
   orion::BSONDate*          dateExpiration,
   ApiVersion                apiVersion,
+  const bool&               overrideMetadata,
   OrionError*               oe
 )
 {
   if (deleteAttribute(attrs, toUnset, attrNamesRemove, targetAttr))
   {
-    deleteAttrInNotifyCer(notifyCerP, targetAttr);
+    deleteAttrInNotifyCer(notifyCerP, targetAttr,  apiVersion == V2, NGSI_MD_ACTIONTYPE_DELETE, overrideMetadata);
     *entityModified = true;
 
     /* Check aspects related with location */
@@ -2745,6 +2750,7 @@ static bool processContextAttributeVector
                                       &entityModified,
                                       dateExpiration,
                                       apiVersion,
+                                      overrideMetadata,
                                       oe))
       {
         return false;
