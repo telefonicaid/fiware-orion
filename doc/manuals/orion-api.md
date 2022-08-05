@@ -3601,8 +3601,8 @@ A Context Registration allows to bind external context information sources so th
 play the role of providers of certain subsets (entities, attributes) of the context information space, including those located
 at specific geographical areas. The way in which Orion implements such forwarding is as follows:
 
-* `POST /v2/op/query` for query forwarding
-* `POST /v2/op/update` for update forwarding
+* [`POST /v2/op/query`](#query-post-v2opquery) for query forwarding
+* [`POST /v2/op/update`](#update-post-v2opupdate) for update forwarding
 
 More information on forwarding to context information sources can be found in [this specific document](user/context_providers.md).
 
