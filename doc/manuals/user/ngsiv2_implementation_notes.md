@@ -1,49 +1,10 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
-* [Subscription payload validations](#subscription-payload-validations)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
-
-## Subscription payload validations
-
-The particular validations that Orion implements on NGSIv2 subscription payloads are the following ones:
-
-* **description**: optional (max length 1024)
-* **subject**: mandatory
-    * **entities**: mandatory
-        * **id** or **idPattern**: one of them is mandatory (but both at the same time is not allowed). id
-            must follow NGSIv2 restrictions for IDs. idPattern must be not empty and a valid regex.
-        * **type** or **typePattern**: optional (but both at the same time is not allowed). type must 
-            follow NGSIv2 restrictions for IDs. type must not be empty. typePattern must be a valid regex, and non-empty.
-    * **condition**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-        * **attrs**: optional (but if present it must be a list; empty list is allowed)
-        * **expression**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-            * **q**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-            * **mq**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-            * **georel**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-            * **geometry**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-            * **coords**: optional (but if present it must be not empty, i.e. `""` is not allowed)
-* **notification**:
-    * **http**: must be present if `httpCustom` is omitted, forbidden otherwise
-        * **url**: mandatory (must be a valid URL)
-    * **httpCustom**: must be present if `http` is omitted, forbidden otherwise
-        * **url**: mandatory (must be not empty)
-        * **headers**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-        * **qs**: optional (but if present it must have a content, i.e. `{}` is not allowed)
-        * **method**: optional (but if present it must be a valid HTTP method)
-        * **payload**: optional (empty string is allowed)
-    * **attrs**: optional (but if present it must be a list; empty list is allowed)
-    * **metadata**: optional (but if present it must be a list; empty list is allowed)
-    * **exceptAttrs**: optional (but it cannot be present if `attrs` is also used; if present it must be a non-empty list)
-    * **attrsFormat**: optional (but if present it must be a valid attrs format keyword)
-* **throttling**: optional (must be an integer)
-* **expires**: optional (must be a date or empty string "")
-* **status**: optional (must be a valid status keyword)
-
-[Top](#top)
 
 ## Deprecated features
 
