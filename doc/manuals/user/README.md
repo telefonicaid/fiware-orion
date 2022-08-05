@@ -23,4 +23,3 @@
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
   * [Docker](docker.md)
-  * [NGSIv2 Implementation Notes](ngsiv2_implementation_notes.md)

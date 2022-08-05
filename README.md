@@ -183,9 +183,6 @@ Reference sections below in order to know more details about the API
     [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook)
     [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook)
     (Apiary)
-    -   See also NGSIv2 implementation notes
-        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
-        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
 
@@ -196,9 +193,6 @@ API Reference Documentation:
 -   FIWARE NGSI v2
     [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
     [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
-    -   See also NGSIv2 implementation notes
-        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
-        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 Orion Reference Documentation:
 
