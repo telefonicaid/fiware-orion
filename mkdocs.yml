@@ -34,7 +34,6 @@ pages:
       - 'Security considerations': 'user/security.md'
       - 'Known limitations': 'user/known_limitations.md'      
       - 'Docker': 'user/docker.md'
-      - 'NGSIv2 Implementation Notes': 'user/ngsiv2_implementation_notes.md'
   - 'Installation & Administration Manual':
       - 'Introduction': 'admin/index.md'
       - 'Installing Orion': 'admin/install.md'

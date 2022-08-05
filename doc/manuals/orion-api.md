@@ -3180,7 +3180,7 @@ A subscription is represented by a JSON object with the following fields:
 | Parameter      | Optional | Type    | Description                                                                                   |
 |----------------|----------|---------|-----------------------------------------------------------------------------------------------|
 | `id`           |          | string  | Subscription unique identifier. Automatically created at creation time.                       |
-| `description`  | ✓        | string  | A free text used by the client to describe the subscription.                                  |
+| `description`  | ✓        | string  | A free text used by the client to describe the subscription. Maximum leght is 1024 character. |
 | [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
@@ -3198,8 +3198,8 @@ A `subject` contains the following subfields:
 
 | Parameter                                    | Optional | Type   | Description                                                                     |
 |----------------------------------------------|----------|--------|---------------------------------------------------------------------------------|
-| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> Id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
-| [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change will trigger condition" |
+| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> These fields should follow the [restrictions for IDs and types](#identifiers-syntax-restrictions), be a valid regex (if pattern), and be not empty. |
+| [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change will trigger condition". If present it must have a content, i.e. `{}` is not allowed. |
 
 #### `subscription.subject.condition`
 
@@ -3207,8 +3207,8 @@ A `condition` contains the following subfields:
 
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
-| `attrs`      | ✓        | array | Array of attribute names that will trigger the notification.                                                                  |
-| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field) |
+| `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and subelements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 
 Based on the `condition` field, the notification triggering rules are as follow:
@@ -3230,7 +3230,7 @@ A `notification` object contains the following subfields:
 
 | Parameter          | Optional          | Type    | Description                                                                                                                                                                       |
 |--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
+| `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
 | `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
@@ -3267,7 +3267,7 @@ A `http` object contains the following subfields:
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. An NGSIv2 compliant server must support the `http` URL schema. Other schemas could also be supported. |
+| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. It must follow a valid URL format. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 #### `subscription.notification.mqtt`
@@ -3288,13 +3288,13 @@ For further information about MQTT notifications, see the specific [MQTT notific
 
 A `httpCustom` object contains the following subfields.
 
-| Parameter | Optional | Type   | Description                                                                                   |
-|-----------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `url`     |          | string | Same as in `http` above.                                                                      |
-| `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages.                         |
-| `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages.                 |
+| Parameter | Optional | Type   | Description                                                                                      |
+|-----------|----------|--------|--------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Same as in `http` above.                                                                         |
+| `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages. Must not be empty.         |
+| `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages. Must not be empty. |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
-| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
+| `payload` | ✓        | string | The payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
@@ -4213,3 +4213,21 @@ for the following aspects:
 * The `expired` value for `status` is not supported. The status is shows as `active` even in the
    registration is actually expired.
 * `legacyForwarding` field (within `provider`) to support forwarding in NGSIv1-based query/update format for legacy Context Providers 
+
+## Deprecated features
+
+During the NGSIv2 specification work, some features were developed but they don't remain in the final version of the specification. However, Orion implemented them at some version and are still supported in order to keep backward compatibility (as [deprecated functionality](../deprecated.md)). They are documented here, although **you are highly encouraged to not use any of them**.
+
+In particular:
+
+* The usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+in stable RC-2016.05 and removed in RC-2016.10) is still supported, e.g. `options=dateModified`. However,
+you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+* `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
+`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
+`append`, `appendStrict`, `update`, `delete` and `replace`.
+
+* `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
+which attributes to include in the response to the query) and unary attribute filter in `q` within
+`expression` (to return only entities which have these attributes). Use them instead.

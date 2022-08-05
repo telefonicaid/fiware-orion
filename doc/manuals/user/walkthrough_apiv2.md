@@ -25,7 +25,7 @@ in the process :).
 
 The walkthrough is based on the NGSIv2 Specification, that can be found
 in Apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
-You should also have a look at the [NGSIv2 implementation notes](ngsiv2_implementation_notes.md).
+You should also have a look at the [Orion API document](../orion-api.md).
 
 The main section is [context management](#context-management). It describes the
 basic context broker functionality for context management (information about entities,
