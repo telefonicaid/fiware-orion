@@ -17,6 +17,8 @@
     - [部分表現 (Partial Representations)](#partial-representations)
     - [特殊な属性型 (Special Attribute Types)](#special-attribute-types)
     - [組み込み属性 (Builtin Attributes)](#builtin-attributes)
+    - [組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
+    - [Datetime サポート](#datetime-support)
     - [特殊なメタデータ型 (Special Metadata Types)](#special-metadata-types)
     - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
     - [一般的な構文制限 (General syntax restrictions)](#general-syntax-restrictions)
@@ -25,6 +27,23 @@
     - [メタデータ名の制限 (Metadata names restrictions)](#metadata-names-restrictions)
     - [結果の順序付け (Ordering Results)](#ordering-results)
     - [エラー・レスポンス (Error Responses)](#error-responses)
+    - [属性値の更新演算子 (Update operators for attribute values)](#update-operators-for-attribute-values)
+        - [サポートされている演算子 (Supported operators)](#supported-operators)
+            - [`$inc`](#inc)
+            - [`$mul`](#mul)
+            - [`$min`](#min)
+            - [`$max`](#max)
+            - [`$push`](#push)
+            - [`$addToSet`](#addtoset)
+            - [`$pull`](#pull)
+            - [`$pullAll`](#pullall)
+            - [`$set`](#set)
+            - [`$unset`](#unset)
+            - [`$unset`](#unset)
+            - [`$set` と `$unset` の組み合わせ](#combining-set-and-unset)
+        - [Orion が演算子を処理する方法](#how-orion-deals-with-operators)
+        - [現在の制限](#current-limitations)
+            - [エンティティの作成または置換](#create-or-replace-entities)
     - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
         - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
         - [GeoJSON](#geojson)
@@ -32,9 +51,14 @@
     - [地理的クエリ (Geographical Queries)](#geographical-queries)
         - [クエリの解決 (Query Resolution)](#query-resolution)
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
+    - [メタデータ更新のセマンティクス (Metadata update semantics)](#metadata-update-semantics)
+      - [`overrideMetadata` オプション](#overridemetadata-option)
+    - [ワンショット・サブスクリプション](#oneshot-subscription)
+    - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
       - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
+    - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
 - [API ルート (API Routes)](#api-routes)
     - [API エントリ・ポイント (API Entry Point)](#api-entry-point)
         - [API リソースを取得 [GET /v2]](#retrieve-api-resources-get-v2)
@@ -222,11 +246,13 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 
 属性は、次の構文を持つ JSON オブジェクトで表されます:
 
--   属性値は、`value` プロパティによって指定され、その値は任意の JSON データ型になります
+-   属性値は `value` プロパティによって指定され、その値は任意の JSON データ型にすることができます。 ただし、一部の
+    属性値の更新には、現在の値と演算子に基づいて属性値の内容を変更するための特別なセマンティクスがあります
+    ([属性値の更新演算子](#update-operators-for-attribute-values)のセクションを参照)
 -   属性 NGSI 型は、`type` プロパティによって指定され、その値は、NGSI 型を含む文字列です
--   属性メタデータは、`metadata` プロパティによって指定されます。その値は、定義されたメタデータ要素ごとのプロパティを含む
-    別の JSON オブジェクトです (プロパティの名前はメタデータ要素の `name` です)。各メタデータ要素は、次のプロパティを
-    保持する JSON オブジェクトで表されます:
+-   属性メタデータは、`metadata` プロパティによって指定されます。その値は、定義されたメタデータ要素ごとのプロパティを
+    含む別の JSON オブジェクトです (プロパティの名前はメタデータ要素の `name` です)。各メタデータ要素は、
+    次のプロパティを保持する JSON オブジェクトで表されます:
     -   `value`: その値には、JSON データ型に対応するメタデータ値が含まれています
     -   `type`: その値には、メタデータの NGSI 型の文字列表現が含まれます
 
@@ -297,7 +323,7 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 -   レスポンスでは、属性にメタデータがない場合、`metadata` は `{}` に設定されます
 
 Orion Context Broker で使用されるメタデータ更新セマンティクス (および関連する `overrideMetadata` オプションについては、
-[ドキュメントのこのセクション](#updating-metadata)で詳しく説明します)。
+[ドキュメントのこのセクション](#metadata-update-semantics)で詳しく説明します)。
 
 <a name="special-attribute-types"></a>
 
@@ -306,19 +332,9 @@ Orion Context Broker で使用されるメタデータ更新セマンティク�
 一般に、ユーザ定義の属性型は有益です。それらは不透明な方法で NGSIv2 サーバによって処理されます。それにもかかわらず、
 以下に説明する型は、特別な意味を伝えるために使用されます:
 
--   `DateTime`: ISO8601 形式で日付を識別します。これらの属性は、クエリ演算子の greater-than, less-than, greater-or-equal,
-    less-or-equal および range で使用できます。`null` 値を持つ `DateTime` 属性は、フィルタでは考慮されません。つまり、
-    `GET /v2/entities?q=T>2021-04-21` です。例 (参照されたエンティティ属性のみが表示されます):
-
-```
-{
-  "timestamp": {
-    "value": "2017-06-17T07:21:24.238Z",
-    "type: "DateTime"
-  }
-}
-```
-
+-   `DateTime`: ISO8601 形式で日付を識別します。これらの属性は、クエリ演算子の greater-than, less-than,
+    greater-or-equal, less-or-equal および range で使用できます。詳細については、このドキュメントの
+    [Datetime サポート](#datetime-support)のセクションを確認してください
 -   `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`。それらには、エンティティの場所に関連する特別な
     セマンティクスがあります。`null` 値を持つ属性は地理クエリでは考慮されず、エンティティごとに1つの地理空間属性の制限に
     カウントされません。[エンティティの地理空間プロパティ](#geospatial-properties-of-entities)のセクションを
@@ -354,13 +370,14 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 -   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。サーバがエンティティの有効期限を制御
     する方法は、実装の固有側面です
 -   `alterationType` (タイプ: `Text`): 通知をトリガーする変更を指定します。これは、変更タイプの機能に基づく
-    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを参照)。
+    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを
+    参照)
     この属性は通知でのみ使用できます。クエリ (`GET /v2/entities?attrs=alterationType`) を実行しても表示されず、次の値を
     取ることができます:
     -   `entityCreate`: 通知をトリガーする更新がエンティティ作成操作の場合
     -   `entityUpdate`: 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
-    -   `entityChange`: 通知をトリガーする更新が実際の変更を伴う更新であった場合、または実際の変更ではなく `forcedUpdate`
-        が使用された場合
+    -   `entityChange`: 通知をトリガーする更新が実際の変更を伴う更新であった場合、または実際の変更ではなく
+        `forcedUpdate` が使用された場合
     -   `entityDelete`: 通知をトリガーする更新がエンティティの削除操作であった場合
 
 通常の属性と同様に、`q` フィルタと `orderBy` (`alterationType` を除く) で使用できます。
@@ -373,19 +390,9 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で NGSIv2 サーバによって処理されます。
 それでも、以下に説明する型は、特別な意味を伝えるために使用されます:
 
--   `DateTime`: ISO8601 形式で日付を識別します。このメタデータは、クエリ演算子の greater-than, less-than, greater-or-equal,
-    less-or-equal および range で使用できます。`null` 値を持つ `DateTime` メタデータは、フィルタでは考慮されません。
-    例 (参照された属性メタデータのみが表示されます):
-
-```
-"metadata": {
-      "dateCreated": {
-        "value": "2019-09-23T03:12:47.213Z",
-        "type": "DateTime"
-      }
-}
-```
-
+-   `DateTime`: ISO8601 形式で日付を識別します。 このメタデータは、クエリ演算子の reater-than, less-than,
+    greater-or-equal, less-or-equal および range で使用できます。詳細については、このドキュメントの
+    [日時サポート](#datetime-support)のセクションを確認してください
 -   `ignoreType`: 値 `true` を持つ `ignoreType` が属性に追加されると、Orion は属性タイプに関連付けられたセマンティクスを
     無視します。Orion は一般的に属性タイプを無視するため、このメタデータはほとんどの場合必要ありませんが、属性タイプが
     Orion の特別なセマンティックを持つ 2 つのケースがあることに注意してください:
@@ -418,8 +425,109 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 -   `actionType` (型: `Text`): 通知のみ。添付されている属性が、通知をトリガーしたリクエストに含まれていた場合に
     含まれます。その値は、リクエスト・オペレーションのタイプによって異なります。更新の場合は `update`、作成の場合は
     `append`、削除の場合は `delete` です。その型は常に `Text` です
+-   現在、[非推奨](#deprecated.md) ですが、まだサポートされています
 
 通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs では使用できません。
+
+<a name="user-attributes-or-metadata-matching-builtin-nam"></a>
+
+## 組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)
+
+(このセクションの内容は、`dateExpires` 属性を除くすべてのビルトインに適用されます。`dateExpires` に関する特定の情報に
+ついては、[一時エンティティに関するドキュメント](user/transient_entities.md) を確認してください)。
+
+まず第一に: **NGSIv2 ビルトインと同じ名前の属性またはメタデータを使用しないことを強くお勧めします**。実際、NGSIv2
+仕様はそれを禁止しています (仕様の "属性名の制限" および "メタデータ名の制限" セクションを確認してください)。
+
+ただし、そのような属性またはメタデータを持たなければならない場合 (おそらく従来の理由により)、次の考慮事項を考慮
+してください:
+
+-   NGSIv2 ビルトインと同じ名前の属性および/またはメタデータを作成/更新できます。Orion がそうさせてくれます
+-   ユーザ定義の属性および/またはメタデータは、GET リクエストまたはサブスクリプションで明示的に宣言する必要なく
+    表示されます。たとえば、エンティティ E1 で値が "2050-01-01" の `dateModified` 属性を作成した場合、
+    `GET /v2/entities/E1` はそれを取得します。`?attrs=dateModified` を使用する必要はありません
+-   (GET 操作へのレスポンスまたは通知で) レンダリングされると、明示的に宣言されている場合でも、ユーザ定義の
+    属性/メタデータがビルトインよりも優先されます。たとえば、エンティティ E1 で値が "2050-01-01" の `dateModified`
+    属性を作成し、`GET /v2/entities?attrs=dateModified` をリクエストすると、"2050-01-01" が取得されます
+-   ただし、フィルタリング (つまり、`q` または `mq`) は、ビルトインの値に基づいています。たとえば、エンティティ E1
+    で値が "2050-01-01" の `dateModified` 属性を作成し、`GET /v2/entities?q=dateModified>2049-12-31` をリクエスト
+    すると、エンティティは取得されません。"2050-01-01" は "2049-12-31" よりも大きくなりますが、エンティティを変更した
+    日付 (2018年 または 2019年の日付) は "2049-12-31" よりも大きくなりません。これは何らかの形で一貫性がないことに注意
+    してください (つまり、ユーザ定義はレンダリングでは優先されますが、フィルタリングでは優先されません)、
+    将来変更される可能性があります
+
+組み込み属性とメタデータ名の詳細については、それぞれのセクション [組み込み属性](#builtin-attributes)と
+[組み込みメタデータ](#builtin-metadata) を確認してください。
+
+<a name="datetime-support"></a>
+
+## Datetime サポート
+
+Orion は、属性またはメタデータ型 `Datetime` を使用して ISO8601 の DateTime をサポートします。これらの属性または
+メタデータは、より大きい、より小さい、より大きいか等しい、より小さいか等しい、および範囲のクエリ演算子で編集されます。
+DateTime 属性 `null` の値はフィルタで考慮されません。つまり、`GET /v2/entities?q=T>2021-04-21` です。
+
+`DateTime` 属性の例 (参照されるエンティティ属性のみが示されています):
+
+```
+{
+  "timestamp": {
+    "value": "2017-06-17T07:21:24.238Z",
+    "type: "DateTime"
+  }
+}
+```
+
+`DateTime` メタデータの例 (参照された属性メタデータのみが表示されます):
+
+```
+"metadata": {
+      "dateCreated": {
+        "value": "2019-09-23T03:12:47.213Z",
+        "type": "DateTime"
+      }
+}
+```
+
+属性の作成/更新時、または `q` および `mq` フィルタで使用する場合は、次の考慮事項を考慮する必要があります:
+
+-   Datetimes (日時)は、次のいずれかのパターンで、日付、時刻、およびタイムゾーン指定子で構成されます:
+    -   `<date>`
+    -   `<date>T<time>`
+    -   `<date>T<time><timezone>`
+    -   `<date><timezone>` という形式は使用できないことに注意してください。 ISO8601 によると:
+        *"タイム ゾーン指定子が必要な場合は、日付と時刻を組み合わせた後に続く"*
+-   `<date>` に関しては、次のパターンに従う必要があります: `YYYY-MM-DD`
+    - `YYYY`: year (4桁)
+    - `MM`: month (2桁)
+    - `DD`: day (2桁)
+-   `<time>` に関しては、[ISO8601 仕様](https://en.wikipedia.org/wiki/ISO_8601#Times) で説明されているパターンの
+    いずれかに従う必要があります:
+    -   `hh:mm:ss.sss` または `hhmmss.sss`.
+    -   `hh:mm:ss` または `hhmmss`。この場合、ミリ秒は `000` に設定されます
+    -   `hh:mm` または `hhmm`。この場合、秒は `00` に設定されます
+    -   `hh`。この場合、分と秒は `00` に設定されます
+    -   `<time>` を省略した場合、時、分、秒は `00` に設定されます
+-   `<timezones>` に関しては、[ISO8601 仕様](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators)
+    で説明されているパターンのいずれかに従う必要があります:
+    - `Z`
+    - `±hh:mm`
+    - `±hhmm`
+    - `±hh`
+-   ISO8601 では、*"UTC 関係情報が時間表現で指定されていない場合、時間は現地時間であると見なされる"*
+    と規定されています。ただし、クライアントとサーバが異なるゾーンにある場合、これはあいまいです。したがって、
+    このあいまいさを解決するために、タイムゾーン指定子が省略されている場合、Orion は常にタイムゾーン `Z` を想定します
+
+Orion は常に `YYYY-MM-DDThh:mm:ss.sssZ` の形式を使用して日時属性/メタデータを提供します。ただし、Orion は
+`YYYY-MM-DDThh:mm:ss.ssZ` 形式を使用して他のタイムスタンプ (レジストレーション/サブスクリプションの有効期限、
+最後の通知/失敗/通知の成功など) を提供することに注意してください (これについては、
+[関連する Issue](https://github.com/telefonicaid/fiware-orion/issues/3671) を参照)。
+
+さらに、Orion は datetime を提供する場合、常に UTC/Zulu タイムゾーンを使用することに注意してください
+(クライアント/レシーバが任意のタイムゾーンで実行されている可能性があるため、これが最適なデフォルト・オプションです)。
+これは将来変更される可能性があります ([関連する Issue](https://github.com/telefonicaid/fiware-orion/issues/2663)
+を参照)。属性とメタデータのタイプとして文字列 `ISO8601` もサポートされています。効果は `DateTime`
+を使用した場合と同じです。
 
 <a name="general-syntax-restrictions"></a>
 
@@ -498,7 +606,9 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 -   `id` は、エンティティ id を表すために使用されるフィールドと競合するためです
 -   `type` は、エンティティ型を表すために使用されるフィールドと競合するためです
 -   `geo:distance` は、中心点に近接するために `orderBy` で使用される文字列と競合するためです
--   組み込み属性名 ([組み込み属性](#builtin-attributes)の特定のセクションを参照)
+-   組み込みの属性名。同じ属性名を使用することは可能ですが、まったく推奨されません。このドキュメントの
+    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
+    セクションを確認してください
 -   `*` は、"すべてのカスタム/ユーザ属性" ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を
     参照) という特別な意味を持っています
 
@@ -508,7 +618,9 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 
 次の文字列をメタデータ名として使用しないでください:
 
--   組み込みメタデータ名 ("組み込みメタデータ" の特定のセクションを参照)
+-   組み込みのメタデータ名。同じメタデータ名を使用することは可能ですが、まったく推奨されません。このドキュメントの
+    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
+    セクションを確認してください
 -   `*` は、"すべてのカスタム/ユーザ・メタデータ"
     ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を参照) という特別な意味を持っています
 
@@ -569,6 +681,453 @@ NGSIv2 の `error` レポートは次のとおりです:
     -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
     -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
     -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
+
+<a name="update-operators-for-attribute-values"></a>
+
+## 属性値の更新演算子 (Update operators for attribute values)
+
+一部の属性値の更新には、特別なセマンティクスがあります。特に、このようなリクエストを行うことができます:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 3 },
+  "type": "Number"
+}
+```
+
+これは、*"属性Aの値を3増やす"* ことを意味します。
+
+この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスするアプリケーションで競合状態を
+回避するのに役立ちます。詳細については、[特定のドキュメント](user/update_operators.md)を参照してください。
+
+<a name="supported-operators"></a>
+
+### サポートされている演算子 (Supported operators)
+
+Orion 更新オペレーターは、MongoDB によって実装されたもののサブセットに基づいています
+([こちら](https://docs.mongodb.com/manual/reference/operator/update/)で説明)。Orion でサポートされている演算子の
+完全なセットは次のとおりです:
+
+| 演算子                   | 以前の属性値            | オペレーション                     | 最終値                          |
+|--------------------------|-------------------------|------------------------------------|---------------------------------|
+| [`$inc`](#inc)           | `"value":2`             | `value: { "$inc":2}`               | `"value":4`                     |
+| [`$mul`](#mul)           | `"value":3`             | `value: { "$mul":2}`               | `"value":6`                     |
+| [`$min`](#min)           | `"value":2`             | `value: { "$min":1}`               | `"value":1`                     |
+| [`$max`](#max)           | `"value":2`             | `value: { "$max":10}`              | `"value":10`                    |
+| [`$push`](#push)         | `"value":[1,2,3]`       | `value: { "$push":3}`              | `"value":[1,2,3,3]`             |
+| [`$addToSet`](#addtoset) | `"value":[1,2,3]`       | `value: { "$addToSet":4}`          | `"value":[1,2,3,4]`             |
+| [`$pull`](#pull)         | `"value":[1,2,3]`       | `value: { "$pull":2}`              | `"value":[1,3]`                 |
+| [`$pullAll`](#pullAll)   | `"value":[1,2,3]`       | `value: { "$pullAll":[2,3]}`       | `"value":[1]`                   |
+| [`$set`](#set)           | `"value":{"X":1,"Y":2}` | `value: { "$set":{"Y":20,"Z":30}}` | `"value":{"X":1,"Y":20,"Z":30}` |
+| [`$unset`](#unset)       | `"value":{"X":1,"Y":2}` | `value: { "$unset":{"X":1}}`       | `"value":{"Y":2}`               |
+
+それぞれの説明は次のとおりです。
+
+<a name="inc"></a>
+
+#### `$inc`
+
+与えられた値だけ増加します。
+
+たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは：
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": 2 },
+  "type": "Number"
+}
+```
+
+属性Aの値を12に変更します。
+
+この演算子は、数値 (正または負、整数または10進数) のみを受け入れます。
+
+<a name="mul"></a>
+
+#### `$mul`
+
+与えられた値を乗算します。
+
+たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは：
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$mul": 2 },
+  "type": "Number"
+}
+```
+
+属性Aの値を20に変更します。
+
+この演算子は、数値 (正または負、整数または10進数) のみを受け入れます。
+
+<a name="min"></a>
+
+#### `$min`
+
+現在の値が提供されている値よりも大きい場合、値を更新します。
+
+たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$min": 2 },
+  "type": "Number"
+}
+```
+
+属性Aの値を2に変更します。ただし、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$min": 20 },
+  "type": "Number"
+}
+```
+
+属性値は変更されません。
+
+数値とは別に、他の値タイプ (文字列など) がサポートされています。
+
+<a name="max"></a>
+
+#### `$max`
+
+現在の値が提供されている値よりも小さい場合、値を更新します。
+
+たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$max": 12 },
+  "type": "Number"
+}
+```
+
+属性Aの値を12に変更します。ただし、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$max": 4 },
+  "type": "Number"
+}
+```
+
+属性値は変更されません。
+
+数値とは別に、他の値タイプ (文字列など) がサポートされています。
+
+<a name="push"></a>
+
+#### `$push`
+
+値が配列である属性で使用するには、配列に項目を追加します。
+
+たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$push": 3 },
+  "type": "Array"
+}
+```
+
+属性Aの値を `[1, 2, 3, 3]` に変更します。
+
+<a name="addtoset"></a>
+
+#### `$addToSet`
+
+push に似ていますが、重複を避けます。
+
+たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$addToSet": 4 },
+  "type": "Array"
+}
+```
+
+属性Aの値を `[1, 2, 3, 4]` に変更します。ただし、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$addToSet": 3 },
+  "type": "Array"
+}
+```
+
+属性値は変更されません。
+
+<a name="pull"></a>
+
+#### `$pull`
+
+値が配列である属性で使用するには、パラメータとして渡されたアイテムのすべてのオカレンスを削除します。
+
+たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$pull": 2 },
+  "type": "Array"
+}
+```
+
+属性Aの値を `[1, 3]` に変更します。
+
+<a name="pullall"></a>
+
+#### `$pullAll`
+
+値が配列である属性で使用されます。パラメータも配列です。 パラメータとして使用される配列の
+メンバのいずれかのオカレンスがすべて削除されます。
+
+たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$pullAll": [2, 3] },
+  "type": "Array"
+}
+```
+
+属性Aの値を `[1]` に変更します。
+
+<a name="set"></a>
+
+#### `$set`
+
+他のサブ・キーを変更せずにオブジェクトのサブ・キーを追加/更新するためのオブジェクトである
+属性で使用されます。
+
+たとえば、エンティティ E の属性 A の既存の値が `{"X": 1, "Y": 2}` の場合、次のリクエストです:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30} },
+  "type": "Object"
+}
+```
+
+これは、属性Aの値を `{"X": 1, "Y": 20, "Z": 30}` に変更します。
+
+一貫性を保つために、`$set` は、次のようにオブジェクトではない値で使用できます:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": "foo" },
+  "type": "Object"
+}
+```
+
+これは通常の更新と同じ効果があります。たとえば、
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": "foo",
+  "type": "Object"
+}
+```
+
+定期的な更新が簡単なため、この使用法はお勧めしません。
+
+いくつかの追加の注意事項:
+
+-   `$set` は、以前の属性値が空のオブジェクト (つまり、`{} `) の場合に機能します
+-   `$set` は、属性が以前にエンティティに存在していなかった場合に機能します (ただし、
+    [ここで](#reate-or-replace-entities)説明されているように、エンティティ自体が存在する
+    必要があります)
+-   属性の前の値がオブジェクト (つまり、`"foo"` のようなコンテキスト文字列) でない場合、
+    `$set` は機能しません。この場合、`InternalServerError` が発生します
+
+<a name="unset"></a>
+
+#### `$unset`
+
+他のサブ・キーを変更せずにオブジェクトからサブ・キーを削除するためのオブジェクトである
+属性で使用されます。
+
+たとえば、エンティティ E の属性 A の既存の値が `{"X": 1, "Y": 2}` の場合、次のリクエストが
+あります:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+これは、属性 A の値を `{"Y":2}` に変更します。
+
+`$unset` で使用されるサブ・キーの実際の値は関係ありません。簡単にするために値1が推奨されますが、
+次のリクエストも機能し、上記の要求と同等になります:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$unset": {"X": null} },
+  "type": "Object"
+}
+```
+
+`$unset` の値がオブジェクトでない場合、無視されることに注意してください。既存のサブキーも
+無視されます。
+
+<a name="combining-set-and-unset"></a>
+
+#### `$set` と `$unset` の組み合わせ
+
+同じ属性の更新で `$set` と `$unset` の使用法を組み合わせることができます。
+
+たとえば、エンティティ E の属性 A の既存の値が `{"X": 1, "Y": 2}` の場合、次のリクエストがあります:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+属性 A の値を `{"Y":20}` に変更します。
+
+`$set` 値のサブ・キーは、同時に `$unset` 値またはその逆にすることはできません。
+たとえば、次のリクエストです：
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
+  "type": "Object"
+}
+```
+
+これは、エラーが発生します。
+
+<a name="how-orion-deals-with-operators"></a>
+
+### Orion が演算子を処理する方法
+
+Orion は操作自体を実行しませんが、MongoDB に渡します。MongoDB は、データベースに格納されている属性値で
+実際に実行されます。したがって、実行セマンティクスは、同等のオペランドについて
+[MongoDB ドキュメント](https://docs.mongodb.com/manual/reference/operator/update/)
+で説明されているものです。
+
+操作の結果、MongoDB レベルでエラーが発生した場合、エラーはそのままクライアント・レスポンスの
+500 Internal Error として処理されます。たとえば、`$inc` 演算子は MongoDB の数値のみをサポートします。
+したがって、このリクエストを送信すると:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": { "$inc": "foo" },
+  "type": "Number"
+}
+```
+
+結果はこのエラーになります:
+
+```
+500 Internal Server Error
+
+{"error":"InternalServerError","description":"Database Error &#40;collection: orion.entities - update&#40;&#41;: &lt;{ &quot;_id.id&quot; : &quot;E&quot;, &quot;_id.type&quot; : &quot;T&quot;, &quot;_id.servicePath&quot; : &quot;/&quot; },{ &quot;$set&quot; : { &quot;attrs.A.type&quot; : &quot;Number&quot;, &quot;attrs.A.mdNames&quot; : [  ], &quot;attrs.A.creDate&quot; : 1631801113.0986146927, &quot;attrs.A.modDate&quot; : 1631801407.5359125137, &quot;modDate&quot; : 1631801407.5359227657, &quot;lastCorrelator&quot; : &quot;cbe6923c-16f7-11ec-977e-000c29583ca5&quot; }, &quot;$unset&quot; : { &quot;attrs.A.md&quot; : 1, &quot;location&quot; : 1, &quot;expDate&quot; : 1 }, &quot;$inc&quot; : { &quot;attrs.A.value&quot; : &quot;foo&quot; } }&gt; - exception: Cannot increment with non-numeric argument: {attrs.A.value: &quot;foo&quot;}&#41;"}
+```
+
+これをデコードして:
+
+```
+"error":"InternalServerError","description":"Database Error (collection: orion.entities - update(): <{ "_id.id" : "E", "_id.type" : "T", "_id.servicePath" : "/" },{ "$set" : { "attrs.A.type" : "Number", "attrs.A.mdNames" : [  ], "attrs.A.creDate" : 1631801113.0986146927, "attrs.A.modDate" : 1631801407.5359125137, "modDate" : 1631801407.5359227657, "lastCorrelator" : "cbe6923c-16f7-11ec-977e-000c29583ca5" }, "$unset" : { "attrs.A.md" : 1, "location" : 1, "expDate" : 1 }, "$inc" : { "attrs.A.value" : "foo" } }> - exception: Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
+```
+
+最後を見ると、MongoDB によって報告されたエラーを見ることができます:
+
+```
+Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
+```
+
+さらに、Orion は、リクエストの属性の値が1つのキー (演算子) のみの JSON オブジェクトであると
+想定していることに注意してください。 あなたがこのような奇妙なことをした場合:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "value": {
+    "x": 1
+    "$inc": 1,
+    "$mul": 10
+  },
+  "type": "Number"
+}
+```
+
+（原則としてランダムに）この中の1つが実行されます:
+
+* Aの値が1増加します
+* Aはその値に10を掛けます
+* Aは、(文字通り) このJSONオブジェクトに更新された値です: `{ "x": 1, "$inc": 1, "$mul": 10 }
+
+したがって、これらの状況を回避するように注意してください。
+
+"1つの演算子のみを使用する" ルールの唯一の例外は、[上記のように](#combining-set-and-unset)、
+一緒に使用できる `$set` と `$unset` の場合です。
+
+<a name="current-limitations"></a>
+
+### 現在の制限
+
+<a name="create-or-replace-entities"></a>
+
+#### エンティティの作成または置換
+
+更新演算子は、エンティティの作成または置換操作では使用できません。たとえば、この方法で
+エンティティを作成する場合:
+
+```
+POST /v2/entities/E/attrs/A
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}
+```
+
+作成されたばかりのエンティティの属性Aは、(文字通り) 次の JSON オブジェクトを値として持ちます
+: `{ "$inc": 2 }`
+
+ただし、既存のエンティティに新しい属性を追加する場合は機能することに注意してください。
+たとえば、属性AとBを持つエンティティEがすでにあり、この方法でCを追加する場合:
+
+```
+POST /v2/entities/E
+{
+  "C": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}
+```
+
+Cは値 `2` で作成されます。
 
 <a name="geospatial-properties-of-entities"></a>
 
@@ -953,6 +1512,235 @@ color を一致させます。また、`q=title=='20'` は文字列 "20" にマ�
 `attrs` と `metadata` フィールドは `notification` のサブ・フィールドして、サブスクリプションでも使用でき、
 サブスクリプションに関連する通知にどの属性メタデータを含めるかを指定するのと同じ意味を持ちます。
 
+<a name="metadata-update-semantics"></a>
+
+## メタデータ更新のセマンティクス (Metadata update semantics)
+
+属性が更新されると、次のルールが適用されます:
+
+-  属性の更新リクエストに含まれるメタデータ *以前に存在しない*が属性に追加されます
+-  属性の更新リクエストに含まれるメタデータ *以前の既存* が属性で更新されます
+-  リクエストに含まれていない既存のメタデータは、属性で変更されません (つまり、以前の値が保持されます)
+
+たとえば、メタデータ `unit` と `avg` を持つ属性 `temperature` を考えてみましょう。これらの値は現時点で次のとおりです。
+
+-   `unit`: `"celsius"`
+-   `avg`: `25.4`
+
+次に、Context Broker は次のようなリクエストを受け取ります:
+
+```
+PUT /v2/entities/E/attrs/temperature
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+更新の処理後、属性 `temperature` のメタデータは次のようになります:
+
+- `unit`: `"celsius"` (存在し、リクエストに触れていない)
+- `avg`: `25.6` (存在するがリクエストに影響された)
+- `accuracy`: `98.7` (リクエストにより追加されたメタデータ)
+
+この既定の動作におけるメタデータの "粘着性" (stikyness) の背後にある理論的根拠は、
+[Orion リポジトリのこの Issue](https://github.com/telefonicaid/fiware-orion/issues/4033)で詳しく説明しています。
+
+現時点で、NGSIv2 では、導入された個々のメタデータ要素を削除することはできません。ただし、`metadata` を `{}` に設定して
+属性を更新するすべてのメタデータを削除できます。
+
+<a name="overridemetadata-option"></a>
+
+### `overrideMetadata` オプション
+
+`overrideMetadata` オプションを使用して、デフォルトの動作をオーバーライドできます。その場合、リクエストのメタデータは、
+属性に存在していた以前のメタデータを置き換えます。たとえば、以前と同じ初期状況ですが、リクエストに `overrideMetadata`
+オプションを追加します:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number",
+  "metadata": {
+    "avg": {
+      "value": 25.6,
+      "type": "Number"
+    },
+    "accuracy": {
+      "value": 98.7,
+      "type": "Number"
+    }
+  }
+}
+```
+
+更新を処理した後、属性 `temperature` のメタデータは次のようになります:
+
+-   `avg`: `25.6` (既存だが、リクエストで触れた)
+-   `accuracy`: `98.7` (リクエストによって追加されたメタデータ)
+
+`unit` メタデータが削除されていることに注意してください。
+
+`overrideMetadata` オプションは、リクエストの `metadata` フィールドを省略して
+(同等に、`"metadata":{}` を使用して) 特定の属性のメタデータをクリーンアップ
+するためにも使用できます。例えば:
+
+```
+PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
+{
+  "value": 26,
+  "type": "Number"
+}
+```
+
+`overrideMetadata` オプションは、属性値の更新操作 (例えば、`PUT /v2/entities/E/attrs/temperature/value`)
+では無視されることに注意してください。その場合、操作のセマンティクスは、値のみが更新されることを明示します
+(`type` および `metadata` 属性フィールドは変更されません)。
+
+<a name="oneshot-subscription"></a>
+
+## Oneshot Subscription
+
+Oneshot サブスクリプションは、一度の通知のためだけにエンティティをサブスクライブするオプションを提供します。コンシューマ
+がステータス `oneshot` のサブスクリプションを作成すると、[通常のサブスクリプション](walkthrough_apiv2.md#subscriptions)
+・リクエストと同じようにわずかな差異でサブスクリプションが作成されます。
+
+通常のケースでは、サブスクリプションが削除されるか、サブスクリプションの更新後にそのステータスが非アクティブになるまで、
+エンティティが更新されると、コンシューマは初期通知および継続的な通知を受け取ります。
+
+ワンショット・サブスクリプションの場合、サブスクリプションの作成後にエンティティが更新されたときに、コンシューマに
+通知されるのは1回だけです。通知がトリガーされると、サブスクリプションは `status`: `inactive` に移行します。この状態に
+なると、コンシューマは `oneshot` でステータスを更新して、同じ動作を繰り返すことができます。すなわち、1回限りの通知を
+再度得ることができます。
+
+![](../manuals/user/oneshot_subscription.png "oneshot_subscription.png")
+
+-   Room1 という ID で Room 型のエンティティがすでにデータベースに存在していると仮定します。
+
+コンテキスト・コンシューマは、以下のように status "oneshot" を持つそのエンティティのサブスクリプションを作成できます:
+
+```
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1028/accumulate"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "status" : "oneshot"
+}
+EOF
+```
+
+気圧の属性の値が更新されると、コンテキスト・コンシューマは温度属性の通知を受け取り、このサブスクリプションのステータスは
+自動的に非アクティブになり、コンシューマが次のようにして再び `oneshot` に更新するまで、それ以上の通知はトリガされません:
+
+```
+curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
+    -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "status": "oneshot"
+}
+EOF
+```
+ステータスが再び "oneshot" に更新されると、エンティティが更新されたときに、コンシューマは再度通知を受け取り、
+サブスクリプション・ステータスは自動的に `inactive` に変更されます。
+
+<a name="covered-subscriptions"></a>
+
+## Covered subscriptions
+
+`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれるエンティティ属性の
+サブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを通知します。
+たとえば、サブスクリプションが次のようになっている場合:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness` 属性は通知に含まれません。
+
+このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの属性
+(この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
+
+カスタム通知の場合、`covered` が `true` に設定されていると、`null` は、存在しない属性の `${...}` を置き換えるために
+使用されます (`covered` が `true` に設定されていない場合のデフォルトの動作は、存在しない属性を空の文字列に
+置き換えることです)。
+
+通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で "カバーされる" (covered)
+という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、受信したすべての通知で常に同じ着信属性の
+セットを必要とする通知エンドポイントに役立ちます。
+
+対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに注意してください。
+したがって、次の場合は無効です:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
+発生します:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
+
 <a name="notification-messages"></a>
 
 ## 通知メッセージ (Notification Messages)
@@ -1253,6 +2041,44 @@ Content-Type: application/json
 Content-Length: 65
 the value of the "temperature" attribute (of type Number) is 23.4
 ```
+
+<a name="subscriptions-based-in-alteration-type"></a>
+
+## 変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)
+
+デフォルトでは、サブスクリプションは、エンティティの作成操作または実際の更新操作中に、トリガー条件 (サブスクリプションの
+`subject` フィールドと `conditions` フィールドで表される、 たとえば、対象となるエンティティ、チェックする属性のリスト、
+フィルター式など) を満たした場合に、トリガー (通知が送信) されます。
+
+ただし、この既定の動作を変更して、たとえば、エンティティが作成されたときのみ、またはエンティティが削除されたときのみ通知を
+送信し、エンティティが更新されたときは送信しないようにすることができます。
+
+特に、`alterationTypes` フィールドは、条件のサブフィールドとして使用されます。このフィールドの値は、サブスクリプションが
+トリガーされる変更タイプのリストを要素で指定する配列です。現時点では、次の変更タイプがサポートされています:
+
+-   `entityUpdate`: サブスクリプションの対象となるエンティティが更新されるたびに通知が送信されます (エンティティが実際に
+    変更されたかどうかに関係なく)
+-   `entityChange`: サブスクリプションの対象となるエンティティが更新され、実際に変更されるたびに通知が送信されます
+    (または、実際の更新ではなく、更新リクエストで `forcedUpdate` オプションが使用されている場合)
+-   `entityCreate`: サブスクリプションの対象となるエンティティが作成されるたびに通知が送信されます
+-   `entityDelete`: サブスクリプションの対象となるエンティティが削除されるたびに通知が送信されます
+
+例えば:
+
+```
+  "conditions": {
+    "alterationTypes": [ "entityCreate", "entityDelete" ],
+    ...
+  }
+```
+
+エンティティの作成または削除が行われたときにサブスクリプションをトリガーしますが、更新が行われたときはトリガーしません。
+`alterationTypes` 配列の要素は、OR の意味で解釈されます。
+
+デフォルトの `alterationTypes` (つまり、明示的に指定されていないサブスクリプション用のもの) は
+`["entityCreate", "entityChange"]` です。
+
+特定の変更タイプは、[`alterationType` 組み込み属性](#builtin-attributes)を使用して通知で取得できます。
 
 <a name="api-routes"></a>
 

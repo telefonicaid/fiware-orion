@@ -1,103 +1,13 @@
 # <a name="top"></a>NGSIv2 実装ノート (NGSIv2 Implementation Notes)
 
-* [属性値の更新演算子](#update-operators-for-attribute-values)
-* [日時サポート](#datetime-support)
-* [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
 * [サブスクリプション・ペイロードの検証](#subscription-payload-validations)
 * [`actionType` メタデータ](#actiontype-metadata)
-* [Oneshot サブスクリプション](#oneshot-subscriptions)
-* [変更タイプ (alteration type) に基づくサブスクリプション](#subscriptions-based-in-alteration-type)
-* [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
 * [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
 * [レジストレーション](#registrations)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
 * [廃止予定の機能](#deprecated-features)
 
 このドキュメントでは、Orion Context Broker が [NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)で行った具体的な実装について考慮する必要があるいくつかの考慮事項について説明します。
-
-<a name="update-operators-for-attribute-values"></a>
-
-## 属性値の更新演算子
-
-一部の属性値の更新には、NGSIv2 仕様で説明されているもの以外に特別なセマンティクスが
-あります。特に、このようなリクエストを行うことができます:
-
-```
-POST /v2/entities/E/attrs/A
-{
-  "value": { "$inc": 3 },
-  "type": "Number"
-}
-```
-
-これは、*"属性Aの値を3増やす"* ことを意味します。
-
-この機能は、アプリケーションの複雑さを軽減し、同じコンテキストに同時にアクセスする
-アプリケーションの競合状態を回避するために役立ちます。
-詳細は[このドキュメント](update_operators.md)を参照してください。
-
-[トップ](#top)
-
-<a name="datetime-support"></a>
-## 日時のサポート
-
-NGSIv2 仕様の "Special Attribute Types" セクションから :
-
-> DateTime : 日付を ISO8601 形式で識別します。これらの属性は、より大きい、より小さい、より大きい、等しい、より小さい、等しいおよび範囲のクエリ演算子で使用できます。
-
-次の考慮事項は、属性の作成/更新時間または `q` と `mq` フィルタで使用される時に考慮しなければならない :
-
-* Datetimes は、date, time, timezone の指定子で構成され、次のいずれかのパターンで表されます :
-    * `<date>`
-    * `<date>T<time>`
-    * `<date>T<time><timezone>`
-    * フォーマット `<date><timezone>` は許可されていないことに注意してください。ISO8601 によると : *"タイムゾーン指定子が必要な場合、それは結合された日付と時刻に従います"*
-* `<date>` ついては、それがパターンに従わなければならない : `YYYY-MM-DD`
-    * `YYYY`: year (4桁)
-    * `MM`: month (2桁)
-    * `DD`: day (2桁)
-* これについて `<time>` は、[ISO8601 仕様](https://en.wikipedia.org/wiki/ISO_8601#Times)に記述されているパターンのいずれかに従わなければならない :
-    * `hh:mm:ss.sss` または `hhmmss.sss`
-    * `hh:mm:ss` または `hhmmss`。この場合、ミリ秒は `000` に設定されます
-    * ``hh:mm` または `hhmm`。この場合、秒は `00` に設定されます
-    * `hh`。この場合、分と秒は `00` に設定されます
-    * もし `<time>` 省略された場合、時、分、秒が `00` に設定されます
-* `<timezones>` については、[ISO8601 仕様](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators)に記述されているパターンのいずれかに従わなければならない :
-    * `Z`
-    * `±hh:mm`
-    * `±hhmm`
-    * `±hh`
-* ISO8601 は、*" 時間表現で UTC 関係情報が与えられていない場合、その時間は現地時間であると想定される "* と規定している。ただし、クライアントとサーバが異なるゾーンにある場合、これはあいまいです。したがって、この曖昧さを解決するために、時間帯指定子が省略されている場合、Orion は常にタイムゾーン `Z` を想定します
-
-Orion は常に、`YYYY-MM-DDThh:mm:ss.sssZ` という形式を使用して日時の属性/メタデータを提供します。ただし、Orion は
-`YYYY-MM-DDThh:mm:ss.ssZ` 形式を使用して他のタイムスタンプ (レジストレーション/サブスクリプションの有効期限、
-最後の通知/失敗/成功など) を提供することに注意してください
-(これについては、[関連する問題](https://github.com/telefonicaid/fiware-orion/issues/3671)を参照してください)。
-
-さらに、Orion は日付時刻を提供するときに常に UTC/Zulu タイムゾーンを使用することに注意してください (クライアント/
-レシーバーが任意のタイムゾーンで実行されている可能性があるため、これは最良のデフォルト・オプションです)
-これは将来変更される可能性があります ([関連する問題](https://github.com/telefonicaid/fiware-orion/issues/2663)を
-参照してください)。
-
-属性とメタデータの型としての文字列 "ISO8601" もサポートされています。この効果は、"DateTime" を使用した場合と同じです。
-
-[トップ](#top)
-
-<a name="user-attributes-or-metadata-matching-builtin-name"></a>
-## ユーザ属性または組み込み名前と一致するメタデータ
-
-(このセクションの内容は、`dateExpires` 属性を除くすべての組み込み関数に適用されます。`dateExpires` に関する特定の情報については、[一時的なエンティティ](transient_entities.md)のドキュメントを参照してください)。
-
-まず、**NGSIv2 組み込み属性やメタデータと同じ名前のものを使用しないことを強く推奨します**。実際、NGSIv2 仕様では、これを禁止しています。仕様の "属性名の制限" と "メタデータ名の制限" のセクションを参照してください。
-
-しかし、もし、あなたがそのような属性やメタデータを (おそらくレガシーの理由により) 持っていたとしても、以下の点を考慮に入れてください :
-
-* NGSIv2 組み込みの属性および/またはメタデータと同じ名前のものを作成/更新することができます。Orion は、そうするでしょう
-* ユーザ定義の属性および/またはメタデータは、GET リクエストまたはサブスクリプションで明示的に宣言する必要なく表示されます。 たとえば、エンティティ E1 に値 "2050-01-01" を持つ、`dateModified` 属性を作成した場合、`GET /v2/entities/E1` がそれを取得します。`?attrs=dateModified` を使う必要はありません。
-* (GET オペレーションまたは通知にレスポンスして) レンダリングされると、明示的に宣言されていても、ユーザ定義の属性/メタデータが組み込み関数より優先されます。たとえば、エンティティ E1 に値 "2050-01-01" を持つ `dateModified` 属性を作成し、`GET /v2/entities?attrs=dateModified` をリクエストすると、"2050-01-01" が得られます。
-* しかし、フィルタリング (すなわち `q` または `mq`) は組み込み関数の値に基づいています。 たとえば、エンティティ E1 に値 "2050-01-01" を持つ `dateModified` 属性を作成し、`GET /v2/entities?q=dateModified>2049-12-31` をリクエストした場合、エンティティは取得されません。"2050-01-01" は "2049-12-31" よりも大きいですが、エンティティを変更した日付 (2018年か2019年のいずれかの日付) は "2049-12-31" より大きくなりません。これは何らかの形で矛盾していることに注意してください (つまり、ユーザ定義はレンダリングでは優先されますがフィルタリングでは優先されません)、将来変更される可能性があります。
-
-[トップ](#top)
 
 <a name="subscription-payload-validations"></a>
 ## サブスクリプション・ペイロードの検証
@@ -144,94 +54,6 @@ NGSIv2 仕様のセクション "組み込みメタデータ" から `actionType
 > その値はリクエストオペレーションの型によって異なります : 更新のための `update`, 作成のための `append`, 削除のための `delete`。その型は常に Text です。
 
 現在の Orion の実装では、"update (更新)" と "append (追加)" がサポートされています。[この問題](https://github.com/telefonicaid/fiware-orion/issues/1494)が完了すると、"delete (削除)" のケースがサポートされます。
-
-[トップ](#top)
-
-## Oneshot サブスクリプション
-
-Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
-`oneshot`を使用することもできます。
-[Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
-
-[トップ](#top)
-
-<a name="subscriptions-based-in-alteration-type"></a>
-## 変更タイプ (alteration type) に基づくサブスクリプション
-
-NGSIv2 の仕様に従ってサブスクリプションの `conditions` フィールドで許可されるサブフィールドとは別に、
-Orionは `alterationTypes` フィールドをサポートして、サブスクリプションがトリガーされる変更
-(エンティティの作成、エンティティの変更など) を指定します。
-
-詳細については、[この特定のドキュメント](subscriptions_alttype.md)をご覧ください。
-
-[トップ](#top)
-
-<a name="covered-subscriptions"></a>
-## カバード・サブスクリプション (Covered subscriptions)
-
-`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれる
-エンティティ属性のサブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを
-通知します。たとえば、サブスクリプションが次のようになっている場合:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ]
-}
-```
-
-ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness`
-属性は通知に含まれません。
-
-このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ],
-  "covered": true
-}
-```
-
-この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの
-属性 (この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
-
-カスタム通知の場合、`covered` が `true` に設定されていると、`null` は、存在しない属性の `${...}` を置き
-換えるために使用されます (`covered` が `true` に設定されていない場合のデフォルトの動作は、存在しない
-属性を空の文字列に置き換えることです)。
-
-通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で
-"カバーされる" (covered) という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、
-受信したすべての通知で常に同じ着信属性のセットを必要とする通知エンドポイントに役立ちます。
-
-対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに
-注意してください。 したがって、次の場合は無効です:
-
-```
-"notification": {
-  ...
-  "attrs": [],
-  "covered": true
-}
-```
-
-そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
-発生します:
-
-```
-{
-    "description": "covered true cannot be used if notification attributes list is empty",
-    "error": "BadRequest"
-}
-```
 
 [トップ](#top)
 
