@@ -4213,3 +4213,24 @@ for the following aspects:
 * The `expired` value for `status` is not supported. The status is shows as `active` even in the
    registration is actually expired.
 * `legacyForwarding` field (within `provider`) to support forwarding in NGSIv1-based query/update format for legacy Context Providers 
+
+## Deprecated features
+
+Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
+have been implemented since the first release. Thus, there is changed functionality that doesn't appear in the current
+NGSIv2 stable specification document but that Orion still supports
+(as [deprecated functionality](../deprecated.md)) in order to keep backward compatibility.
+
+In particular:
+
+* The usage of `dateCreated` and `dateModified` in the `options` parameter (introduced
+in stable RC-2016.05 and removed in RC-2016.10) is still supported, e.g. `options=dateModified`. However,
+you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
+
+* `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
+`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
+`append`, `appendStrict`, `update`, `delete` and `replace`.
+
+* `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
+which attributes to include in the response to the query) and unary attribute filter in `q` within
+`expression` (to return only entities which have these attributes). Use them instead.
