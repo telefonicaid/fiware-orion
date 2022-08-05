@@ -3622,7 +3622,7 @@ A context registration is represented by a JSON object with the following fields
 | `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
 | [`provider`](#registrationprovider)              |          | object | Object that describes the context source registered.                                                                                                                                        |
 | [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
-| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`or `expired`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
+| `status`       | ✓        | string | Always `active` in the current implementation. |
 | `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
 | [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
@@ -4210,4 +4210,6 @@ for the following aspects:
 * The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
   but the registration is always active, even when the value is `inactive`. Please see
   [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
+* The `expired` value for `status` is not supported. The status is shows as `active` even in the
+   registration is actually expired.
 * `legacyForwarding` field (within `provider`) to support forwarding in NGSIv1-based query/update format for legacy Context Providers 
