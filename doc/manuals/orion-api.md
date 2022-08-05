@@ -3267,7 +3267,7 @@ A `http` object contains the following subfields:
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. It mus follow the `http` URL schema. |
+| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. It must follow the `http` URL schema format. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 #### `subscription.notification.mqtt`
@@ -4216,10 +4216,7 @@ for the following aspects:
 
 ## Deprecated features
 
-Although we try to minimize the changes in the stable version of the NGSIv2 specification, a few changes
-have been implemented since the first release. Thus, there is changed functionality that doesn't appear in the current
-NGSIv2 stable specification document but that Orion still supports
-(as [deprecated functionality](../deprecated.md)) in order to keep backward compatibility.
+During the NGSIv2 specification work, some features were developed but they don't remain in the final version of the specification. However, Orion implemented them at some version and are still supported in order to keep backward compatibility (as [deprecated functionality](../deprecated.md)). They are documented here, although **you are highly encouraged to not use any of them**.
 
 In particular:
 
