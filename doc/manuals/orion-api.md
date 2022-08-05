@@ -4152,7 +4152,7 @@ _**Response code**_
 # Differences regarding the original NGSIv2 spec
 
 This section contains the topics that, due to implementation decision, differs from the described in [the 
-original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). These differences comes after years of experience with NGSIv2, in two senses:
+original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). These differences come after years of experience with NGSIv2, in two senses:
 
 * Some functionally originally included in NGSIv2 has resulted not to be really useful or needed in real world scenarios. Thus, Orion doesn't implement it. For instance, update registrations operation
 * NGSIv2 has some flaws not detected at specification time. For instance, the way in which `status` subscription field was designed.
