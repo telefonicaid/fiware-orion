@@ -1,7 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Subscription payload validations](#subscription-payload-validations)
-* [Registrations](#registrations)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account

@@ -3184,7 +3184,7 @@ A subscription is represented by a JSON object with the following fields:
 | [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". More detail on oneshot subscriptions in the [corresponding section](#oneshot-subscription).|
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
@@ -3606,8 +3606,7 @@ at specific geographical areas. The way in which Orion implements such forwardin
 
 More information on forwarding to context information sources can be found in [this specific document](user/context_providers.md).
 
-Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
-specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
+Orion implements an additional field `legacyForwarding` (within [`provider`](#registrationdataprovided)). If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
 for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
 not have been migrated yet to NGSIv2, so this mode may prove useful.
 
@@ -3623,7 +3622,7 @@ A context registration is represented by a JSON object with the following fields
 | `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
 | [`provider`](#registrationprovider)              |          | object | Object that describes the context source registered.                                                                                                                                        |
 | [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
-| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`or `expired`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. Due to implementation reasons, `inactive` status is not supported. See more infomration in [Registration implementation differences](#registration-implementation-differences) section |
+| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`or `expired`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
 | `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
 | [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
@@ -3635,7 +3634,7 @@ The `provider` field contains the following subfields:
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `http`         |          | object | It is used to convey parameters for providers that deliver information through the HTTP protocol.(Only protocol supported nowadays). <br>It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpoint must *not* include the protocol specific part (for instance `/v2/entities`). |
 | `supportedForwardingMode`  |          | string | It is used to convey the forwarding mode supported by this context provider. By default `all`. Allowed values are: <ul><li><code>none</code>: This provider does not support request forwarding.</li><li><code>query</code>: This provider only supports request forwarding to query data.</li><li><code>update</code>: This provider only supports request forwarding to update data.</li><li><code>all</code>: This provider supports both query and update forwarding requests. (Default value).</li></ul> |
-|`legacyForwarding`| ✓      | boolean | If `true`, a NGSIv1-based query/update will be used for forwarding the requests of the registration. |
+|`legacyForwarding`| ✓      | boolean | If `true`, a NGSIv1-based query/update will be used for forwarding the requests of the registration. Default (if not included) is `false`. |
 
 #### `registration.dataProvided`
 
@@ -3643,9 +3642,8 @@ The `dataProvided` field contains the following subfields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities (only `.*` expression supported at this time(see this [section](#registration-implementation-differences))). Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> Type of the affected entities. If omitted, it means "any entity type".</li></ul> |
+| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: id or pattern of the affected entities (only the exact expression `.*` is supported). Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code>: Type of the affected entities. If omitted, it means "any entity type".</li></ul> |
 | `attrs`        |          | array | List of attributes to be provided (if not specified, all attributes). |
-| `expression`   |          | object | Due to implementation reasons, this filed is ignored. See [Registration implementation differences](#registration-implementation-differences) section |
 
 #### `registration.forwardingInformation`
 
@@ -4153,8 +4151,11 @@ _**Response code**_
 
 # Differences regarding the original NGSIv2 spec
 
-This section contains the topics that, due to implementation decision, the behaviour is differs from the described in the 
-original NGSIv2 specification.
+This section contains the topics that, due to implementation decision, differs from the described in [the 
+original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). These differences comes after years of experience with NGSIv2, in two senses:
+
+* Some functionally originally included in NGSIv2 has resulted not to be really useful or needed in real world scenarios. Thus, Orion doesn't implement it. For instance, update registrations operation
+* NGSIv2 has some flaws not detected at specification time. For instance, the way in which `status` subscription field was designed.
 
 ## `actionType` metadata
 
@@ -4164,7 +4165,7 @@ From original NGSIv2 specification section "Builtin metadata", regarding `action
 > `append` for creation and `delete` for deletion. Its type is always `Text`.
 
 Current Orion implementation supports `update` and `append`. The `delete` case will be
-supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
+supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/2591).
 
 ## Ambiguous subscription status `failed` not used
 
@@ -4209,3 +4210,4 @@ for the following aspects:
 * The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
   but the registration is always active, even when the value is `inactive`. Please see
   [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
+* `legacyForwarding` field (within `provider`) to support forwarding in NGSIv1-based query/update format for legacy Context Providers 
