@@ -3267,7 +3267,7 @@ A `http` object contains the following subfields:
 
 | Parameter | Optional | Type   | Description                                                                                   |
 |-----------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. It must follow the `http` URL schema format. |
+| `url`     |          | string | URL referencing the service to be invoked when a notification is generated. It must follow a valid URL format. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 #### `subscription.notification.mqtt`
