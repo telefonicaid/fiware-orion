@@ -1,10 +1,6 @@
 # <a name="top"></a>NGSIv2 Implementation Notes
 
 * [Subscription payload validations](#subscription-payload-validations)
-* [`actionType` metadata](#actiontype-metadata)
-* [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
-* [Registrations](#registrations)
-* [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
 
 This document describes some considerations to take into account
@@ -46,84 +42,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
-
-[Top](#top)
-
-## `actionType` metadata
-
-From NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
-
-> Its value depend on the request operation type: `update` for updates,
-> `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-Current Orion implementation supports "update" and "append". The "delete" case will be
-supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/1494).
-
-[Top](#top)
-
-## Ambiguous subscription status `failed` not used
-
-NGSIv2 specification describes `failed` value for `status` field in subscriptions:
-
-> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
-> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
-
-Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
-
-* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
-  upon entity updates) which last notification sent was failed
-* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
-  upon entity update) which was active in the past and which last notification sent in the time it was
-  active was failed
-
-In other words, looking to status `failed` is not possible to know if the subscription is currently
-active or inactive.
-
-Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
-if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
-`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
-the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
-
-[Top](#top)
-
-## Registrations
-
-Orion implements registration management as described in the NGSIv2 specification, except
-for the following aspects:
-
-* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
-  directly. I.e., updates must be done deleting and re-creating the registration. Please
-  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` is supported but only for the exact regular expression `.*`
-* `typePattern` is not implemented.
-* The `expression` field (within `dataProvided`) is not supported. The field is simply
-  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
-* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
-  but the registration is always active, even when the value is `inactive`. Please see
-  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
-
-According to NGSIv2 specification:
-
-> A NGSIv2 server implementation may implement query or update forwarding to context information sources.
-
-The way in which Orion implements such forwarding is as follows:
-
-* `POST /v2/op/query` for query forwarding
-* `POST /v2/op/update` for update forwarding
-
-More information on forwarding to context information sources can be found in [this specific document](context_providers.md).
-
-Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
-specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
-not have been migrated yet to NGSIv2, so this mode may prove useful.
-
-[Top](#top)
-
-## `keyValues` not supported in `POST /v2/op/notify`
-
-The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation. If you attempt
-to use it you would get a 400 Bad Request error.
 
 [Top](#top)
 

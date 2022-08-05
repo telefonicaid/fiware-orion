@@ -110,7 +110,6 @@
             - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
         - [Registration By ID](#registration-by-id)
             - [Retrieve Registration [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
-            - [Update Registration [PATCH /v2/registrations/{registrationId}]](#update-registration-patch-v2registrationsregistrationid)
             - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
     - [Batch Operations](#batch-operations)
         - [Update operation](#update-operation)
@@ -119,7 +118,11 @@
             - [Query [POST /v2/op/query]](#query-post-v2opquery)
         - [Notify operation](#notify-operation)
             - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
-
+- [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
+    - [`actionType` metadata](#actiontype-metadata)
+    - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
+    - [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
+    - [Registration implementation differences](#registration-implementation-differences)
 <!-- /TOC -->
 
 # Preface
@@ -3181,7 +3184,7 @@ A subscription is represented by a JSON object with the following fields:
 | [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for subscriptions experiencing problems with notifications, the status is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`. Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". |
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". More detail on oneshot subscriptions in the [corresponding section](#oneshot-subscription).|
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
@@ -3595,17 +3598,17 @@ _**Response code**_
 ## Registration Operations
 
 A Context Registration allows to bind external context information sources so that they can
-play the role of providers
-of certain subsets (entities, attributes) of the context information space, including those located
-at specific geographical areas.
+play the role of providers of certain subsets (entities, attributes) of the context information space, including those located
+at specific geographical areas. The way in which Orion implements such forwarding is as follows:
 
-A NGSIv2 server implementation may implement query and/or update forwarding to context information sources. In
-particular, some of the following forwarding mechanisms could be implemented (not exhaustive list):
+* [`POST /v2/op/query`](#query-post-v2opquery) for query forwarding
+* [`POST /v2/op/update`](#update-post-v2opupdate) for update forwarding
 
-* Legacy forwarding (based on NGSIv1 operations)
-* NGSI Context Source Forwarding Specification
+More information on forwarding to context information sources can be found in [this specific document](user/context_providers.md).
 
-Please check the corresponding specification in order to get the details.
+Orion implements an additional field `legacyForwarding` (within [`provider`](#registrationdataprovided)). If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
+for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
+not have been migrated yet to NGSIv2, so this mode may prove useful.
 
 ### Registration payload datamodel
 
@@ -3619,7 +3622,7 @@ A context registration is represented by a JSON object with the following fields
 | `description`           | ✓        | string | Description given to this registration.                                                                                                                                                     |
 | [`provider`](#registrationprovider)              |          | object | Object that describes the context source registered.                                                                                                                                        |
 | [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
-| `status`       | ✓        | string | Enumerated field which captures the current status of this registration with the possibles values: [`active`, `inactive`, `expired` or `failed`]. If this field is not provided at registration creation time, new registrations are created with the `active` status, which may be changed by clients afterwards. For expired registrations, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Also, for registrations experiencing problems with forwarding operations, the status is set to `failed`. As soon as the forwarding operations start working again, the status is changed back to `active`. |
+| `status`       | ✓        | string | Always `active` in the current implementation. |
 | `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
 | [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
 
@@ -3631,6 +3634,7 @@ The `provider` field contains the following subfields:
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
 | `http`         |          | object | It is used to convey parameters for providers that deliver information through the HTTP protocol.(Only protocol supported nowadays). <br>It must contain a subfield named `url` with the URL that serves as the endpoint that offers the providing interface. The endpoint must *not* include the protocol specific part (for instance `/v2/entities`). |
 | `supportedForwardingMode`  |          | string | It is used to convey the forwarding mode supported by this context provider. By default `all`. Allowed values are: <ul><li><code>none</code>: This provider does not support request forwarding.</li><li><code>query</code>: This provider only supports request forwarding to query data.</li><li><code>update</code>: This provider only supports request forwarding to update data.</li><li><code>all</code>: This provider supports both query and update forwarding requests. (Default value).</li></ul> |
+|`legacyForwarding`| ✓      | boolean | If `true`, a NGSIv1-based query/update will be used for forwarding the requests of the registration. Default (if not included) is `false`. |
 
 #### `registration.dataProvided`
 
@@ -3638,9 +3642,8 @@ The `dataProvided` field contains the following subfields:
 
 | Parameter      | Optional | Type   | Description                                                                                   |
 |----------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: d or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code> or <code>typePattern</code>: Type or pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> |
+| `entities`     |          | array | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code>: id or pattern of the affected entities (only the exact expression `.*` is supported). Both cannot be used at the same time, but one of them must be present.</li><li><code>type</code>: Type of the affected entities. If omitted, it means "any entity type".</li></ul> |
 | `attrs`        |          | array | List of attributes to be provided (if not specified, all attributes). |
-| `expression`   |          | object | By means of a filtering expression, allows to express what is the scope of the data provided. Currently only geographical scopes are supported through the following subterms: <ul><li><code>georel</code>: Any of the geographical relationships as specified by the [Geographical queries](#geographical-queries) section. </li><li><code>geometry</code>: Any of the supported geometries as specified by the [Geographical queries](#geographical-queries) section.</li> <li><code>coords</code>: String representation of coordinates as specified by the [Geographical queries](#geographical-queries)section.</li></ul> |
 
 #### `registration.forwardingInformation`
 
@@ -3853,45 +3856,6 @@ Example:
       }
 }      
 ```
-
-#### Update Registration [PATCH /v2/registrations/{registrationId}]
-
-Only the fields included in the request are updated in the registration.
-
-_**Request URL parameters**_
-
-This parameter is part of the URL request. It is mandatory. 
-
-| Parameter        | Type   | Description                          | Example                    |
-|------------------|--------|--------------------------------------|----------------------------|
-| `registrationId` | string | Id of the subscription to be updated | `62aa3d3ac734067e6f0d0871` |
-
-_**Request headers**_
-
-| Header               | Optional | Description                                                                                    | Example            |
-|----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
-| `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
-
-_**Request payload**_
-
-The payload is a JSON object containing the fields to be modified of the registration following the JSON registration 
-representation format (described in ["Registration payload datamodel](#registration-payload-datamodel) section).
-
-Example:
-
-```json
-{
-    "expires": "2017-10-04T00:00:00"
-}
-```
-
-_**Response code**_
-
-* Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
 
 #### Delete Registration [DELETE /v2/registrations/{registrationId}]
 
@@ -4143,18 +4107,6 @@ This operation is intended to consume a notification payload so that all the ent
 It is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
 
-_**Request query parameters**_
-
-| Parameter | Optional | Type   | Description         | Example     |
-|-----------|----------|--------|---------------------|-------------|
-| `options` | ✓        | string | Options dictionary. | `keyValues` |
-
-The values that `options` parameter can have for this specific request are:
-
-| Options     | Description                                                                                      |
-|-------------|--------------------------------------------------------------------------------------------------|
-| `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
-
 _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
@@ -4196,3 +4148,68 @@ _**Response code**_
 * Successful operation uses 200 OK
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
+
+# Differences regarding the original NGSIv2 spec
+
+This section contains the topics that, due to implementation decision, differs from the described in [the 
+original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). These differences come after years of experience with NGSIv2, in two senses:
+
+* Some functionally originally included in NGSIv2 has resulted not to be really useful or needed in real world scenarios. Thus, Orion doesn't implement it. For instance, update registrations operation
+* NGSIv2 has some flaws not detected at specification time. For instance, the way in which `failed` subscription status was designed.
+
+## `actionType` metadata
+
+From original NGSIv2 specification section "Builtin metadata", regarding `actionType` metadata:
+
+> Its value depend on the request operation type: `update` for updates,
+> `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+Current Orion implementation supports `update` and `append`. The `delete` case will be
+supported upon completion of [this issue](https://github.com/telefonicaid/fiware-orion/issues/2591).
+
+## Ambiguous subscription status `failed` not used
+
+The original NGSIv2 specification describes `failed` value for `status` field in subscriptions:
+
+> `status`: [...] Also, for subscriptions experiencing problems with notifications, the status
+> is set to `failed`. As soon as the notifications start working again, the status is changed back to `active`.
+
+Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
+
+* `failed` may refer to an active subscription (i.e. a subscription that will trigger notifications
+  upon entity updates) which last notification sent was failed
+* `failed` may refer to an inactive subscription (i.e. a subscription that will not trigger notifications
+  upon entity update) which was active in the past and which last notification sent in the time it was
+  active was failed
+
+In other words, looking to status `failed` is not possible to know if the subscription is currently
+active or inactive.
+
+Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
+`inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
+the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
+
+## `keyValues` not supported in `POST /v2/op/notify`
+
+The current Orion implementation doesn't support `keyValues` option in `POST /v2/op/notify` operation described in the 
+original NGSIv2 specification. If you attempt to use it you would get a 400 Bad Request error.
+
+## Registration implementation differences
+
+Orion implements registration management as described in the NGSIv2 specification, except
+for the following aspects:
+
+* `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
+  directly. I.e., updates must be done deleting and re-creating the registration. Please
+  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
+* `idPattern` is supported but only for the exact regular expression `.*`
+* `typePattern` is not implemented.
+* The `expression` field (within `dataProvided`) is not supported. The field is simply
+  ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
+* The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,
+  but the registration is always active, even when the value is `inactive`. Please see
+  [this issue](https://github.com/telefonicaid/fiware-orion/issues/3108) about it.
+* The `expired` value for `status` is not supported. The status is shows as `active` even in the
+   registration is actually expired.
+* `legacyForwarding` field (within `provider`) to support forwarding in NGSIv1-based query/update format for legacy Context Providers 
