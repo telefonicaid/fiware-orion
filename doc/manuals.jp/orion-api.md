@@ -124,7 +124,7 @@
        - [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
        - [`keyValues` は`POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
        - [レジストレーションの実装の違い](#registration-implementation-differences)
-- [非推奨の機能 (Deprecated features)](#Deprecated features)
+- [非推奨の機能 (Deprecated features)](#deprecated-features)
 <!-- /TOC -->
 
 <a name="preface"></a>
@@ -4303,7 +4303,7 @@ NGSIv2 仕様では、サブスクリプションの `status` フィールドの
 現在の Orion の実装は、`POST /v2/op/notify` オペレーションの `keyValues` オプションをサポートしていません。
 それを使用しようとすると、400 Bad Request エラーが発生します。
 
-<a name="ambiguous-subscription-status-failed-not-used"></a>
+<a name="registration-implementation-differences"></a>
 
 ## レジストレーションの実装の違い
 
