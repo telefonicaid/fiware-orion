@@ -22,4 +22,3 @@
   * [正規表現の使用](regex.md) (Using regular expressions)
   * [セキュリティの考慮事項](security.md) (Security considerations)
   * [Docker](docker.md)
-  * [NGSIv2 実装ノート](ngsiv2_implementation_notes.md) (NGSIv2 Implementation Notes)

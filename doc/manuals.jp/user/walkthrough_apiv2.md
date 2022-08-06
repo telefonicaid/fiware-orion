@@ -22,7 +22,7 @@
 
 このウォークスルーでは、読者が Orion Context Broker に慣れ親しんでプロセスを楽しむのに役立つと期待される実践的アプローチを採用しています。
 
-ウォークスルーは NGSIv2 仕様に基づいています。[ここ](http://telefonicaid.github.io/fiware-orion/api/v2/stable)で Apiary 形式で確認できます。また、[NGSIv2 実装ノート](ngsiv2_implementation_notes.md)を見てください。
+ウォークスルーは NGSIv2 仕様に基づいています。[ここ](http://telefonicaid.github.io/fiware-orion/api/v2/stable)で Apiary 形式で確認できます。また、[Orion API ドキュメント](../orion-api.md)を見てください。
 
 メイン・セクションは [コンテキスト管理](#context-management)です。コンテキスト管理 (車の温度などのエンティティに関する情報) のための Context Broker の基本的な機能について説明します。[コンテキスト・アベイラビリティ管理](#context-availability-management) (エンティティ自体についてではなく、その情報の提供者についての情報) は、このドキュメントの一部としても記述されています。
 
