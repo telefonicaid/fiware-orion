@@ -2376,9 +2376,7 @@ static void deleteAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
-  bool                    useDefaultType,
-  const std::string&      actionType,
-  const bool&             overrideMetadata
+  const std::string&      actionType
 )
 {
   for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
@@ -2571,7 +2569,7 @@ static bool deleteContextAttributeItem
 {
   if (deleteAttribute(attrs, toUnset, attrNamesRemove, targetAttr))
   {
-    deleteAttrInNotifyCer(notifyCerP, targetAttr,  apiVersion == V2, NGSI_MD_ACTIONTYPE_DELETE, overrideMetadata);
+    deleteAttrInNotifyCer(notifyCerP, targetAttr, NGSI_MD_ACTIONTYPE_DELETE);
     *entityModified = true;
 
     /* Check aspects related with location */
