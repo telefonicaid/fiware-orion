@@ -583,7 +583,7 @@ bool orionldPatchEntity2(void)
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
   KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-  if (dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP, false) == false)
+  if (dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP, false, NULL, NULL) == false)
   {
     LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
     return false;
