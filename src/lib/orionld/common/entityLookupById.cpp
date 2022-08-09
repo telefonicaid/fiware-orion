@@ -53,3 +53,30 @@ KjNode* entityLookupById(KjNode* entityArray, char* entityId)
 
   return NULL;
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityLookupBy_id_Id - lookup an entity in an array of DB entities, by its entity-id
+//
+KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId)
+{
+  for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    KjNode* _idNodeP = kjLookup(entityP, "_id");
+
+    if (_idNodeP != NULL)
+    {
+      KjNode* idNodeP = kjLookup(_idNodeP, "id");
+
+      if (idNodeP == NULL)
+        idNodeP = kjLookup(_idNodeP, "@id");
+
+      if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
+        return entityP;
+    }
+  }
+
+  return NULL;
+}

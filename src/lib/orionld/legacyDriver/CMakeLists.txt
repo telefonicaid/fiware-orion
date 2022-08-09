@@ -27,6 +27,7 @@ SET (SOURCES
     legacyDeleteSubscription.cpp
     legacyPostEntities.cpp
     legacyGetEntities.cpp
+    legacyPostBatchUpsert.cpp
 )
 
 # Include directories

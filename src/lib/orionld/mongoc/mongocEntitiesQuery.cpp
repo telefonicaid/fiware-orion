@@ -763,7 +763,7 @@ KjNode* mongocEntitiesQuery
   const char*      geojsonGeometry
 )
 {
-  if (attrList->items > 99)
+  if ((attrList != NULL) && (attrList->items > 99))
   {
     orionldError(OrionldBadRequestData, "Too many attributes", "maximum is 99", 400);
     return NULL;
@@ -854,7 +854,7 @@ KjNode* mongocEntitiesQuery
   }
 
   // GEO Query
-  if (geoInfoP->geometry != GeoNoGeometry)
+  if ((geoInfoP != NULL) && (geoInfoP->geometry != GeoNoGeometry))
   {
     if (geoFilter(&mongoFilter, geoInfoP) == false)
       return NULL;

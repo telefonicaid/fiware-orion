@@ -97,9 +97,10 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   for (unsigned int ix = 0; ix < sizeof(mustGo) / sizeof(mustGo[0]); ix++)
   {
     nodeP = kjLookup(entityP, mustGo[ix]);
-    if (nodeP != NULL)
-      kjChildRemove(entityP, nodeP);
+    if (nodeP == NULL)
+      continue;
 
+    kjChildRemove(entityP, nodeP);
     if (creation == true)  // Keep id and type, put them inside _id object
     {
       if ((ix == 1) || (ix == 2))
@@ -207,7 +208,8 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     kjChildAdd(_idP, spP);
 
     // Add "_id" to the beginning of the Entity
-    kjChildPrepend(entityP, _idP);
+    _idP->next = entityP->value.firstChildP;
+    entityP->value.firstChildP = _idP;
   }
 
   return true;

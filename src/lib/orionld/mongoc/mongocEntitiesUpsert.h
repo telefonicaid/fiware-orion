@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_
-#define SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESUPSERT_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESUPSERT_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,8 +23,9 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma and Ken Zangelin
+* Author: Ken Zangelin
 */
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -34,16 +35,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// entityLookupById -
+// mongocEntitiesUpsert -
 //
-extern KjNode* entityLookupById(KjNode* entityArray, char* entityId);
+extern bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// entityLookupBy_id_Id - lookup an entity in an array of DB entities, by its entity-id
-//
-extern KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId);
-
-#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESUPSERT_H_

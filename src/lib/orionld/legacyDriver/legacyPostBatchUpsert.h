@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_
-#define SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPSERT_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPSERT_H_
 
 /*
 *
@@ -23,27 +23,15 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma and Ken Zangelin
+* Author: Gabriel Quaresma
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// entityLookupById -
+// legacyPostBatchUpsert -
 //
-extern KjNode* entityLookupById(KjNode* entityArray, char* entityId);
+extern bool legacyPostBatchUpsert(void);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// entityLookupBy_id_Id - lookup an entity in an array of DB entities, by its entity-id
-//
-extern KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId);
-
-#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPSERT_H_
