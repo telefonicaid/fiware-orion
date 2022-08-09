@@ -27,19 +27,19 @@ New Batch Upsert
 export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0 IPv4 -experimental
+brokerStart CB 0 IPv4 -experimental -lmtmp
 
 --SHELL--
 
 #
-# 01. Upsert 3 entities (Create) with plentty of errors
+# 01. Upsert 3 entities (Create) with plenty of errors
 # 02. See the three entities in mongo
 # 03. QUERY for all three
 # 04. GET urn:ngsi-ld:T:E3
 #
 
-echo "01. Upsert 3 entities (Create) with plentty of errors"
-echo "====================================================="
+echo "01. Upsert 3 entities (Create) with plenty of errors"
+echo "===================================================="
 payload='[
   "123",
   12,
@@ -59,7 +59,7 @@ payload='[
   { "id": "urn:ngsi-ld:T:E2", "type": "T", "P1": { "value": 2, "unitCode": "CEL" } },
   { "id": "urn:ngsi-ld:T:E3", "type": "T", "P1": { "value": 3, "unitCode": "CEL", "P1_P1": 25, "P1_R1": {"object": "urn:ngsi-ld:T:E1"} } }
 ]'
-orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json # -H 'Performance: on' -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -86,8 +86,8 @@ echo
 
 
 --REGEXPECT--
-01. Upsert 3 entities (Create) with plentty of errors
-=====================================================
+01. Upsert 3 entities (Create) with plenty of errors
+====================================================
 HTTP/1.1 207 Multi-Status
 Content-Length: 2582
 Content-Type: application/json

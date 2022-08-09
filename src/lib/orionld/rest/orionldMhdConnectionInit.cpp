@@ -410,6 +410,8 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
 {
   if (strcmp(key, "Orionld-Legacy") == 0)
     orionldState.in.legacy = (char*) value;
+  else if (strcmp(key, "Performance") == 0)
+    orionldState.in.performance = true;
   else if (strcmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));

@@ -355,7 +355,7 @@ bool orionldPostBatchUpsert(void)
     orionldError(OrionldInternalError, "Database Error", "error querying the database for entities", 500);
     return false;
   }
-  kjTreeLog(dbEntityArray, "Entities from DB");
+  // kjTreeLog(dbEntityArray, "Entities from DB");
 
 
   //
@@ -384,7 +384,7 @@ bool orionldPostBatchUpsert(void)
   KjNode* entityP = orionldState.requestTree->value.firstChildP;
   KjNode* next;
 
-  kjTreeLog(dbEntityArray, "dbEntityArray");
+  // kjTreeLog(dbEntityArray, "dbEntityArray");
   while (entityP != NULL)
   {
     next = entityP->next;
@@ -409,7 +409,7 @@ bool orionldPostBatchUpsert(void)
       kjChildRemove(creationArray, entityP);
 
       // The entity needs a merge with what's in the DB before being used for replace
-      kjTreeLog(entityP, entityId);
+      // kjTreeLog(entityP, entityId);
       kjChildAdd(updateArray, entityP);
     }
     else
@@ -417,28 +417,14 @@ bool orionldPostBatchUpsert(void)
 
     LM(("%s Entity '%s'", (creation == true)? "Creating" : "Merging", entityId));
 
-    kjTreeLog(entityP, "Before dbModelFromApiEntity");
+    // kjTreeLog(entityP, "Before dbModelFromApiEntity");
     dbModelFromApiEntity(entityP, dbAttrsP, dbAttrNamesP, creation, NULL, NULL);
-    LM(("After dbModelFromApiEntity"));
-    LM(("entityP at %p", entityP));
-    for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-    {
-      LM(("Entity field '%s'", attrP->name));
-      if (attrP->type == KjObject)
-      {
-        for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
-        {
-          LM(("Attr '%s' field '%s'", attrP->name, subAttrP->name));
-        }
-      }
-    }
-    kjTreeLog(entityP, "After dbModelFromApiEntity");
-
+    // kjTreeLog(entityP, "After dbModelFromApiEntity");
     entityP = next;
   }
 
-  kjTreeLog(creationArray, "Create Array");
-  kjTreeLog(updateArray, "Update Array");
+  // kjTreeLog(creationArray, "Create Array");
+  // kjTreeLog(updateArray, "Update Array");
 
   int r = mongocEntitiesUpsert(creationArray, updateArray);
 

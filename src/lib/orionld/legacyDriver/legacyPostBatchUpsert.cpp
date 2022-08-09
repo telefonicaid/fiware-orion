@@ -226,6 +226,22 @@ bool legacyPostBatchUpsert(void)
   {
     next = entityP->next;
 
+    if (entityP->type != KjObject)
+    {
+      entityErrorPush(errorsArrayP, "No Entity::id", OrionldBadRequestData, "Invalid Entity", "must be a JSON Object", 400, false);
+      kjChildRemove(orionldState.requestTree, entityP);
+      entityP = next;
+      continue;
+    }
+
+    if (entityP->value.firstChildP == NULL)
+    {
+      entityErrorPush(errorsArrayP, "No Entity::id", OrionldBadRequestData, "Empty Entity", "must be a non-empty JSON Object", 400, false);
+      kjChildRemove(orionldState.requestTree, entityP);
+      entityP = next;
+      continue;
+    }
+
     KjNode*                idNodeP      = kjLookup(entityP, "id");        // To populate removeArray
     KjNode*                atidNodeP    = kjLookup(entityP, "@id");       // To populate removeArray
     KjNode*                contextNodeP = kjLookup(entityP, "@context");

@@ -237,6 +237,7 @@ typedef struct OrionldStateIn
   char*     authorization;
   char*     tenant;
   char*     legacy;          // Use legacy mongodb driver / mongoBackend
+  bool      performance;
 
   // Incoming payload
   char*     payload;

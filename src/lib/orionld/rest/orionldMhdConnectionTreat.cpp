@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/prometheus/promCounterIncrease.h"              // promCounterIncrease
 #include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
 #include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
@@ -856,6 +857,33 @@ static bool uriParamExpansion(void)
 
 // -----------------------------------------------------------------------------
 //
+// performanceHeader -
+//
+static void performanceHeader(void)
+{
+  struct timespec now;
+  struct timespec delta;
+
+  kTimeGet(&now);
+
+  delta.tv_sec  = now.tv_sec  - orionldState.timestamp.tv_sec;
+  delta.tv_nsec = now.tv_nsec - orionldState.timestamp.tv_nsec;
+
+  if (delta.tv_nsec < 0)
+  {
+    delta.tv_sec  -= 1;
+    delta.tv_nsec += 1000000000;
+  }
+
+  char dValue[64];
+  snprintf(dValue, sizeof(dValue) - 1, "%d.%09d", (int) delta.tv_sec, (int) delta.tv_nsec);
+  orionldHeaderAdd(&orionldState.out.headers, HttpPerformance, dValue, 0);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
@@ -1078,6 +1106,8 @@ MHD_Result orionldMhdConnectionTreat(void)
  serviceRoutine:
   serviceRoutineResult = orionldState.serviceP->serviceRoutine();
   PERFORMANCE(serviceRoutineEnd);
+  if (orionldState.in.performance == true)
+    performanceHeader();
 
   //
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
