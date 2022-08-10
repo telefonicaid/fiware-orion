@@ -34,8 +34,8 @@ brokerStart CB 0 IPv4 -experimental
 #
 # 01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
 # 02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
-# 03. Upsert/REPLACE urn:ngsi-ld:T:E1 - adding P1
-# 04. See the entity in mongo
+# 03. Upsert/REPLACE urn:ngsi-ld:T:E1
+# 04. See the three entities in mongo
 # 05. QUERY for all entites
 # 06. GET urn:ngsi-ld:T:E1
 #
@@ -65,6 +65,11 @@ payload='[
       "value": 1,
       "unitCode": "CEL"
     }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E2",
+    "type": "T",
+    "P1": 2
   }
 ]'
 orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
@@ -72,8 +77,8 @@ echo
 echo
 
 
-echo "03. Upsert/Update urn:ngsi-ld:T:E1 - adding P1"
-echo "=============================================="
+echo "03. Upsert/REPLACE urn:ngsi-ld:T:E1"
+echo "==================================="
 payload='[
   {
     "id": "urn:ngsi-ld:T:E1",
@@ -82,6 +87,11 @@ payload='[
       "value": 1,
       "unitCode": "CEL"
     }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E3",
+    "type": "T",
+    "P1": 3
   }
 ]'
 orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
@@ -89,8 +99,8 @@ echo
 echo
 
 
-echo "04. See the entity in mongo"
-echo "==========================="
+echo "04. See the three entities in mongo"
+echo "==================================="
 mongoCmd2 ftest "db.entities.find().pretty()"
 echo
 echo
@@ -123,13 +133,15 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 223
+Content-Length: 241
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "created": [],
+    "created": [
+        "urn:ngsi-ld:T:E2"
+    ],
     "errors": [
         {
             "entityId": "urn:ngsi-ld:T:E1",
@@ -145,16 +157,18 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-03. Upsert/Update urn:ngsi-ld:T:E1 - adding P1
-==============================================
+03. Upsert/REPLACE urn:ngsi-ld:T:E1
+===================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 57
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "created": [],
+    "created": [
+        "urn:ngsi-ld:T:E3"
+    ],
     "errors": [],
     "updated": [
         "urn:ngsi-ld:T:E1"
@@ -162,8 +176,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-04. See the entity in mongo
-===========================
+04. See the three entities in mongo
+===================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -196,13 +210,57 @@ MongoDB server version: REGEX(.*)
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : ""
 }
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 2,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E3",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
 bye
 
 
 05. QUERY for all entites
 =========================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 708
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -219,6 +277,30 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "createdAt": "202REGEX(.*)",
         "id": "urn:ngsi-ld:T:E1",
         "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "value": 2
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E2",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": 3
+        },
+        "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E3",
+        "modifiedAt": "REGEX(.*)",
         "type": "T"
     }
 ]
