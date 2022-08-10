@@ -60,7 +60,7 @@ KjNode* entityLookupById(KjNode* entityArray, char* entityId)
 //
 // entityLookupBy_id_Id - lookup an entity in an array of DB entities, by its entity-id
 //
-KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId)
+KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entityTypeNodeP)
 {
   for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
@@ -74,7 +74,16 @@ KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId)
         idNodeP = kjLookup(_idNodeP, "@id");
 
       if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
+      {
+        if (entityTypeNodeP != NULL)
+        {
+          *entityTypeNodeP = kjLookup(_idNodeP, "type");
+          if (*entityTypeNodeP == NULL)
+            *entityTypeNodeP = kjLookup(_idNodeP, "@type");
+        }
+
         return entityP;
+      }
     }
   }
 

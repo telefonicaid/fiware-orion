@@ -86,7 +86,7 @@ extern "C"
 bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP, bool creation, const char* entityId, const char* entityType)
 {
   KjNode*      nodeP;
-  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "creDate", "modDate", "servicePath" };
+  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "modDate", "servicePath" };
   KjNode*      idP      = NULL;
   KjNode*      typeP    = NULL;
 
@@ -126,6 +126,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   // Add to entityP:
   // - First "attrNames" (.added)
   // - Then "attrs"
+  // - Then the timestamps
   //
   KjNode* attrAddedV = kjArrayAdd(entityP, ".added");
   kjChildAdd(entityP, attrsP);
@@ -133,8 +134,23 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   // Not really necessary?   - RHS == null already tells the next layer ... ?
   KjNode* attrRemovedV = kjArrayAdd(entityP, ".removed");
 
+  KjNode* creDateP = kjLookup(attrsP, "creDate");
+  if (creDateP != NULL)
+  {
+    kjChildRemove(attrsP, creDateP);
+    kjChildAdd(entityP, creDateP);
+  }
+
   if (creation == true)
-    kjTimestampAdd(entityP, "creDate");
+  {
+    //
+    // Batch Upsert/REPLACE has already taken the creDate from the DB Entity
+    // AND, it has "creation" set to true, so ... if creDate is present, leave it be
+    //
+    if (creDateP == NULL)
+      kjTimestampAdd(entityP, "creDate");
+  }
+
   kjTimestampAdd(entityP, "modDate");
 
 

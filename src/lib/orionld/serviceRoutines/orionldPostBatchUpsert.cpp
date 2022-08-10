@@ -232,6 +232,9 @@ static void attributeMerge(KjNode* attrP, KjNode* dbAttrP)
 //
 static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
 {
+  kjTreeLog(entityP, "KZ: Incoming Entity");
+  kjTreeLog(dbEntityP, "KZ: DB Entity");
+
   //
   // Steal the createdAt (creDate) - OR create a new one if not present
   //
@@ -240,7 +243,10 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
   if (creDateP != NULL)
     kjChildRemove(dbEntityP, creDateP);
   else  // This should never happen
+  {
+    LM(("KZ: Weird, the DB-Entity didn't have a creDate ..."));
     creDateP = kjFloat(orionldState.kjsonP, "creDate", orionldState.requestTime);
+  }
 
   KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");  // "attrs" is not present in the DB if the entity has no attributes ... ?
 
@@ -264,7 +270,7 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
   }
 
   //
-  // Add Entity::creDate
+  // Add Entity::creDate (after the previous loop, to save some time)
   //
   kjChildAdd(entityP, creDateP);
 
@@ -273,6 +279,7 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
   //
   KjNode* modDateP = kjFloat(orionldState.kjsonP, "modDate", orionldState.requestTime);
   kjChildAdd(entityP, modDateP);
+  kjTreeLog(entityP, "KZ: Merged Entity");
 }
 
 
@@ -307,6 +314,34 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// entityTypeCheck -
+//
+static bool entityTypeCheck(KjNode* dbEntityTypeNodeP, KjNode* entityP)
+{
+  KjNode* newEntityTypeNodeP = kjLookup(entityP, "type");
+
+  if (newEntityTypeNodeP == NULL)
+    newEntityTypeNodeP = kjLookup(entityP, "@type");
+
+  if (newEntityTypeNodeP != NULL)
+  {
+    if (strcmp(newEntityTypeNodeP->value.s, dbEntityTypeNodeP->value.s) != 0)
+      LM_RE(false, ("Attempt to change Entity Type"));
+  }
+  else
+  {
+    // No Entity Type present in the incoming payload - no problem, I'll just add it
+    KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", dbEntityTypeNodeP->value.s);
+    kjChildAdd(entityP, entityTypeP);
+  }
+
+  return true;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpsert -
@@ -336,6 +371,17 @@ bool orionldPostBatchUpsert(void)
   PCHECK_ARRAY_EMPTY(orionldState.requestTree, 0, NULL, "payload body must be a non-empty JSON Array", 400);
 
   //
+  // Prerequisites for URI params:
+  // * both 'update' and 'replace' cannot be set in options (replace is default)
+  //
+  if ((orionldState.uriParamOptions.update == true) && (orionldState.uriParamOptions.replace == true))
+  {
+    orionldError(OrionldBadRequestData, "URI Param Error", "options: both /update/ and /replace/ present", 400);
+    return false;
+  }
+
+
+  //
   // By default, already existing entitiers are OVERWRITTEN.
   // If ?options=update is used, then already existing entities are to be updated, and in such case we need to
   // extract those to-be-updated entities from the database (the updating algorithm here is according to "Append Attributes).
@@ -344,17 +390,18 @@ bool orionldPostBatchUpsert(void)
   //
   // For the mongoc query, we need a StringArray for the entity IDs, and to set up the StringArray we need to know the number of
   // entities.
+  //
   // Very basic error checking is performed in this first loop to count the number of entities in the array.
   // entityCountAndFirstCheck() takes care of that.
   //
-  KjNode*      errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  int          noOfEntities   = entityCountAndFirstCheck(orionldState.requestTree, errorsArrayP);
+  KjNode*      outArrayErroredP = kjArray(orionldState.kjsonP, "errors");
+  int          noOfEntities     = entityCountAndFirstCheck(orionldState.requestTree, outArrayErroredP);
 
   LM(("Number of valid Entities after first check-round: %d", noOfEntities));
 
 
   //
-  // Now that we know the max number of entities (some may drop out after calling pCheckEntity),
+  // Now that we know the max number of entities (some may drop out after calling pCheckEntity - part of entitiesFinalCheck),
   // we can create the StringArray with the Entity IDs
   //
   StringArray  eIdArray;
@@ -373,7 +420,7 @@ bool orionldPostBatchUpsert(void)
   // We have the StringArray (eIdArray), so, now we can loop through the incoming array of entities and populate eIdArray
   // (extract the entity ids) later to be used by mongocEntitiesQuery().
   //
-  noOfEntities = entityStringArrayPopulate(orionldState.requestTree, &eIdArray, errorsArrayP);
+  noOfEntities = entityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP);
   LM(("Number of valid Entities after second check-round: %d", noOfEntities));
 
 
@@ -392,11 +439,11 @@ bool orionldPostBatchUpsert(void)
   //
   // Finally we have everything we need to 100% CHECK the incoming entities
   //
-  noOfEntities = entitiesFinalCheck(orionldState.requestTree, errorsArrayP, dbEntityArray, orionldState.uriParamOptions.update);
+  noOfEntities = entitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update);
   LM(("Number of valid Entities after second check-round: %d", noOfEntities));
 
-  KjNode* createdArrayP  = kjArray(orionldState.kjsonP, "created");
-  KjNode* updatedArrayP  = kjArray(orionldState.kjsonP, "updated");
+  KjNode* outArrayCreatedP  = kjArray(orionldState.kjsonP, "created");
+  KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");
 
 
   // Create alterations - must be done before we merge the entity with its "DB Entity"
@@ -420,23 +467,37 @@ bool orionldPostBatchUpsert(void)
   {
     next = entityP->next;
 
-    KjNode* idNodeP       = kjLookup(entityP, "id");
-    char*   entityId      = idNodeP->value.s;
-    KjNode* dbEntityP     = entityLookupBy_id_Id(dbEntityArray, entityId);
-    bool    creation      = true;
-    KjNode* dbAttrsP      = NULL;
-    KjNode* dbAttrNamesP  = NULL;
+    KjNode* idNodeP           = kjLookup(entityP, "id");
+    char*   entityId          = idNodeP->value.s;
+    KjNode* dbEntityTypeNodeP = NULL;
+    KjNode* dbEntityP         = entityLookupBy_id_Id(dbEntityArray, entityId, &dbEntityTypeNodeP);
+    bool    creation          = true;
+    KjNode* dbAttrsP          = NULL;
+    KjNode* dbAttrNamesP      = NULL;
 
     LM(("dbEntityP for entity '%s' at %p", entityId, dbEntityP));
     if (dbEntityP != NULL)
     {
-      entitySuccessPush(updatedArrayP, entityId);
+      //
+      // The entity already exists (and it has an Entity Type)
+      // The entity type cannot be modified, so ... need to check that
+      //
+      if (entityTypeCheck(dbEntityTypeNodeP, entityP) == false)
+      {
+        entityErrorPush(outArrayErroredP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400, false);
+        kjChildRemove(orionldState.requestTree, entityP);
+        entityP = next;
+        noOfEntities -= 1;
+        continue;
+      }
+
+      entitySuccessPush(outArrayUpdatedP, entityId);
 
       dbAttrsP     = kjLookup(dbEntityP, "attrs");
       dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
 
       entityMerge(entityP, dbEntityP);  // Resulting Entity is entityP - not sure this should be done before dbModelFromApiEntity
-      creation = false;
+      // creation = false; - it's just the stupid creDate that will be there TWICE
       kjChildRemove(creationArray, entityP);
 
       // The entity needs a merge with what's in the DB before being used for replace
@@ -444,37 +505,43 @@ bool orionldPostBatchUpsert(void)
       kjChildAdd(updateArray, entityP);
     }
     else
-      entitySuccessPush(createdArrayP, entityId);
+      entitySuccessPush(outArrayCreatedP, entityId);
 
     LM(("%s Entity '%s'", (creation == true)? "Creating" : "Merging", entityId));
 
-    kjTreeLog(entityP, "Before dbModelFromApiEntity");
+    kjTreeLog(entityP, "KZ: entityP BEFORE dbModelFromApiEntity (API-Entity)");
     KjNode* apiEntityP = kjClone(orionldState.kjsonP, entityP);
     dbModelFromApiEntity(entityP, dbAttrsP, dbAttrNamesP, creation, NULL, NULL);
 
-    kjTreeLog(entityP, "Before alteration");
+    kjTreeLog(entityP, "KZ: entityP AFTER dbModelFromApiEntity (now a DB-Entity)");
     alteration(entityId, NULL, apiEntityP);
     entityP = next;
   }
 
-  // kjTreeLog(creationArray, "Create Array");
-  // kjTreeLog(updateArray, "Update Array");
+  kjTreeLog(creationArray, "KZ: Create Array");
+  kjTreeLog(updateArray, "KZ: Update Array");
 
-  int r = mongocEntitiesUpsert(creationArray, updateArray);
-
-  if (r == false)
+  //
+  // Any correct Entity to be created/updated??
+  //
+  if ((creationArray->value.firstChildP != NULL) || (updateArray->value.firstChildP != NULL))
   {
-    orionldError(OrionldInternalError, "Database Error", "mongocEntitiesUpsert failed", 500);
-    return false;
+    int r = mongocEntitiesUpsert(creationArray, updateArray);
+
+    if (r == false)
+    {
+      orionldError(OrionldInternalError, "Database Error", "mongocEntitiesUpsert failed", 500);
+      return false;
+    }
   }
 
   //
   // Returning the three arrays
   //
   KjNode* response = kjObject(orionldState.kjsonP, NULL);
-  kjChildAdd(response, createdArrayP);
-  kjChildAdd(response, updatedArrayP);
-  kjChildAdd(response, errorsArrayP);
+  kjChildAdd(response, outArrayCreatedP);
+  kjChildAdd(response, outArrayUpdatedP);
+  kjChildAdd(response, outArrayErroredP);
 
   orionldState.httpStatusCode  = 207;
   orionldState.responseTree    = response;

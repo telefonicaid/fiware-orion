@@ -1,0 +1,252 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New Batch Upsert - update one entity by adding an attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
+# 02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
+# 03. Upsert/REPLACE urn:ngsi-ld:T:E1 - adding P1
+# 04. See the entity in mongo
+# 05. QUERY for all entites
+# 06. GET urn:ngsi-ld:T:E1
+#
+
+echo "01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P0": {
+    "value": 0,
+    "unitCode": "CEL"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error"
+echo "===================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T2",
+    "P1": {
+      "value": 1,
+      "unitCode": "CEL"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
+echo
+echo
+
+
+echo "03. Upsert/Update urn:ngsi-ld:T:E1 - adding P1"
+echo "=============================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T",
+    "P1": {
+      "value": 1,
+      "unitCode": "CEL"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
+echo
+echo
+
+
+echo "04. See the entity in mongo"
+echo "==========================="
+mongoCmd2 ftest "db.entities.find().pretty()"
+echo
+echo
+
+
+echo "05. QUERY for all entites"
+echo "========================="
+orionCurl --url '/ngsi-ld/v1/entities?local=true&options=sysAttrs'
+echo
+echo
+
+
+echo "06. GET urn:ngsi-ld:T:E1"
+echo "========================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:E1?options=sysAttrs'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+
+
+
+02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
+====================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 223
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "created": [],
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:T:E1",
+            "error": {
+                "detail": "the Entity Type cannot be altered",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "updated": []
+}
+
+
+03. Upsert/Update urn:ngsi-ld:T:E1 - adding P1
+==============================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 57
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "created": [],
+    "errors": [],
+    "updated": [
+        "urn:ngsi-ld:T:E1"
+    ]
+}
+
+
+04. See the entity in mongo
+===========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [
+				"unitCode"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "CEL"
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. QUERY for all entites
+=========================
+HTTP/1.1 200 OK
+Content-Length: 248
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E1",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    }
+]
+
+
+06. GET urn:ngsi-ld:T:E1
+========================
+HTTP/1.1 200 OK
+Content-Length: 246
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 1
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:ngsi-ld:T:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
