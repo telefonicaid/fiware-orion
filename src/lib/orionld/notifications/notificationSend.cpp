@@ -196,21 +196,21 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
   //
   // LanguageProperty and 'lang'
   //
-  LM(("KZ: attributeToNormalized: lang == '%s'", lang));
+  LM(("attributeToNormalized: lang == '%s'", lang));
   if (attrTypeP != NULL)
   {
-    LM(("KZ: attrTypeP at %p (%s)", attrTypeP, attrTypeP->value.s));
+    LM(("attrTypeP at %p (%s)", attrTypeP, attrTypeP->value.s));
     if ((lang[0] != 0) && (strcmp(attrTypeP->value.s, "LanguageProperty")  == 0))
     {
       KjNode* valueP = kjLookup(attrP, "languageMap");
-      LM(("KZ: languageMap at %p", valueP));
+      LM(("languageMap at %p", valueP));
       if (valueP != NULL)
       {
         char*   pickedLanguage;  // Name of the picked language
         KjNode* langNodeP = langItemPick(valueP, attrP->name, lang, &pickedLanguage);
 
-        LM(("KZ: langNodeP at %p", langNodeP));
-        LM(("KZ: pickedLanguage: '%s'", pickedLanguage));
+        LM(("langNodeP at %p", langNodeP));
+        LM(("pickedLanguage: '%s'", pickedLanguage));
         valueP->value       = langNodeP->value;
         valueP->type        = langNodeP->type;
 
@@ -222,12 +222,12 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
 
         KjNode* langP = kjString(orionldState.kjsonP, "lang", pickedLanguage);
         kjChildAdd(attrP, langP);
-        LM(("KZ: Added lang '%s' to attr '%s'", pickedLanguage, attrP->name));
+        LM(("Added lang '%s' to attr '%s'", pickedLanguage, attrP->name));
       }
     }
     else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
     {
-      LM(("KZ: it's a relationship ... change name from 'value' to 'object'?    OR, is that done already?"));
+      LM(("it's a relationship ... change name from 'value' to 'object'?    OR, is that done already?"));
     }
   }
 }
@@ -276,7 +276,7 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
       LM(("attr '%s'", attrP->name));
       LM(("saP is a JSON %s, at %p", kjValueType(saP->type), saP));
       LM(("saP->name at %p", saP->name));
-      LM(("KZ: Treating '%s' field of attr '%s", saP->name, attrP->name));
+      LM(("Treating '%s' field of attr '%s", saP->name, attrP->name));
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;
@@ -292,7 +292,7 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
       else if (subP->renderFormat == RF_CONCISE)
         attributeToConcise(saP, &asSimplified, subP->lang.c_str());  // asSimplified is not used down here
       else
-        LM(("KZ: subAttributeToNormalized"));
+        LM(("subAttributeToNormalized"));
     }
   }
 }
@@ -576,8 +576,8 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   // Request Header
   //
-  char              requestHeader[512];
-  size_t            requestHeaderLen;
+  char    requestHeader[512];
+  size_t  requestHeaderLen;
 
   // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
   if (mAltP->subP->renderFormat < RF_CROSS_APIS_NORMALIZED)

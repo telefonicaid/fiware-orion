@@ -27,7 +27,7 @@ New Batch Upsert
 export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0 IPv4 -experimental -lmtmp
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 

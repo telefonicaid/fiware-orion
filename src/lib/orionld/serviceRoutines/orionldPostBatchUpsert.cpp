@@ -29,7 +29,8 @@ extern "C"
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjBuilder.h"                                   // kjArray
+#include "kjson/kjBuilder.h"                                   // kjArray, ...
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -276,6 +277,36 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// alteration -
+//
+static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
+{
+  OrionldAlteration* alterationP = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+
+  if (entityType == NULL)
+  {
+    KjNode* typeP = kjLookup(apiEntityP, "type");
+
+    if (typeP != NULL)
+      entityType = typeP->value.s;
+  }
+
+  alterationP->entityId          = entityId;
+  alterationP->entityType        = entityType;
+  alterationP->patchTree         = NULL;
+  alterationP->dbEntityP         = NULL;
+  alterationP->patchedEntity     = apiEntityP;  // entity id, createdAt, modifiedAt ...
+  alterationP->alteredAttributes = 0;
+  alterationP->alteredAttributeV = NULL;
+  alterationP->next              = orionldState.alterations;
+
+  orionldState.alterations = alterationP;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpsert -
@@ -396,7 +427,7 @@ bool orionldPostBatchUpsert(void)
     KjNode* dbAttrsP      = NULL;
     KjNode* dbAttrNamesP  = NULL;
 
-    LM(("KZ: dbEntityP for entity '%s' at %p", entityId, dbEntityP));
+    LM(("dbEntityP for entity '%s' at %p", entityId, dbEntityP));
     if (dbEntityP != NULL)
     {
       entitySuccessPush(updatedArrayP, entityId);
@@ -404,7 +435,7 @@ bool orionldPostBatchUpsert(void)
       dbAttrsP     = kjLookup(dbEntityP, "attrs");
       dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
 
-      entityMerge(entityP, dbEntityP);  // Resulting Entity in entityP - not sure this should be done before dbModelFromApiEntity
+      entityMerge(entityP, dbEntityP);  // Resulting Entity is entityP - not sure this should be done before dbModelFromApiEntity
       creation = false;
       kjChildRemove(creationArray, entityP);
 
@@ -417,9 +448,12 @@ bool orionldPostBatchUpsert(void)
 
     LM(("%s Entity '%s'", (creation == true)? "Creating" : "Merging", entityId));
 
-    // kjTreeLog(entityP, "Before dbModelFromApiEntity");
+    kjTreeLog(entityP, "Before dbModelFromApiEntity");
+    KjNode* apiEntityP = kjClone(orionldState.kjsonP, entityP);
     dbModelFromApiEntity(entityP, dbAttrsP, dbAttrNamesP, creation, NULL, NULL);
-    // kjTreeLog(entityP, "After dbModelFromApiEntity");
+
+    kjTreeLog(entityP, "Before alteration");
+    alteration(entityId, NULL, apiEntityP);
     entityP = next;
   }
 

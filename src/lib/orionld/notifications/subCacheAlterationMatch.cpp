@@ -132,14 +132,21 @@ static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* 
   // </DEBUG>
 #endif
 
+  // matchP is really the match-list. itemP is the one we're looking for
   while (matchP != NULL)
   {
     if (itemP->subP == matchP->subP)  // Same subscription - might be a match
     {
       if ((matchP->altAttrP == NULL) && (itemP->altAttrP == NULL))
       {
-        LM(("Already there *********** 1"));
-        return true;
+        LM(("KZ: Already there (itemP entity id %s vs matchList entity %s)", itemP->altP->entityId, matchP->altP->entityId));
+        //
+        // If the altered entity is the same, this is a duplicate.
+        // If the altered entity is different, then itemP's entity needs to be added to the datas array of matchP ...
+        //
+        if (strcmp(itemP->altP->entityId, matchP->altP->entityId) != 0)
+          LM(("KZ: Different entity (%s vs %s) - need to add it to the notification for sub %s", itemP->altP->entityId, matchP->altP->entityId, matchP->subP->subscriptionId));
+        // return true;
       }
       else if ((matchP->altAttrP != NULL) && (itemP->altAttrP != NULL))
       {
@@ -182,6 +189,7 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
       itemP->next = matchP->next;
       matchP->next = itemP;
 
+      LM(("KZ: Inserting Alteration of entity '%s' for subscription '%s' (consecutive alteration)", itemP->altP->entityId, itemP->subP->subscriptionId));
       return matchList;
     }
 
@@ -190,6 +198,7 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 
 
   // First alteration-match of a subscription - prepending it to the matchList
+  LM(("KZ: Inserting Alteration of entity '%s' for subscription '%s' (First alteration for this subscription)", itemP->altP->entityId, itemP->subP->subscriptionId));
   itemP->next = matchList;
   return itemP;
 }
@@ -209,6 +218,7 @@ static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchLis
 
   if (matchList == NULL)
   {
+    LM(("KZ: Inserting Alteration of entity '%s' for subscription '%s' (First alteration for this subscription)", amP->altP->entityId, amP->subP->subscriptionId));
     matchList  = amP;
     amP->next  = NULL;
     *matchesP += 1;
@@ -221,8 +231,6 @@ static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchLis
       matchList  = matchListInsert(matchList, amP);
       *matchesP += 1;
     }
-    else
-      LM(("Not adding match as it is already covered"));
   }
 
   return matchList;

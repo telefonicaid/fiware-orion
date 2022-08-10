@@ -235,6 +235,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   kTimeGet(&notificationTime);
   notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
 
+  //
+  // **********************************************************************
+  //   HERE is where I send each and every Notification seperately.
+  //   Instead, I should group those alterations that are for the same subscription.
+  //   Merge the entities into the data array and send one single nmoptification per subscription.
+  // **********************************************************************
+  //
   for (OrionldAlterationMatch* mAltP = matchList; mAltP != NULL; mAltP = mAltP->next)
   {
     CURL* curlHandleP;
