@@ -554,6 +554,18 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   if (mAltP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, mAltP);
 
+  // <DEBUG>
+  for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
+  {
+    LM(("KZ: AlterationMatch %p", mP));
+    LM(("KZ:   Subscription    %s", mP->subP->subscriptionId));
+    LM(("KZ:   Entity:         %s", mP->altP->entityId));
+    LM(("KZ:   patchTree:      %p", mP->altP->patchTree));
+    LM(("KZ:   patchedEntity:  %p", mP->altP->patchedEntity));
+    LM(("KZ:"));
+  }
+  // </DEBUG>
+
   //
   // Payload Body
   //

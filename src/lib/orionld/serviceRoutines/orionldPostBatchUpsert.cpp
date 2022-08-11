@@ -232,8 +232,8 @@ static void attributeMerge(KjNode* attrP, KjNode* dbAttrP)
 //
 static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
 {
-  kjTreeLog(entityP, "KZ: Incoming Entity");
-  kjTreeLog(dbEntityP, "KZ: DB Entity");
+  kjTreeLog(entityP, "Incoming Entity");
+  kjTreeLog(dbEntityP, "DB Entity");
 
   //
   // Steal the createdAt (creDate) - OR create a new one if not present
@@ -244,7 +244,7 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
     kjChildRemove(dbEntityP, creDateP);
   else  // This should never happen
   {
-    LM(("KZ: Weird, the DB-Entity didn't have a creDate ..."));
+    LM(("Weird, the DB-Entity didn't have a creDate ..."));
     creDateP = kjFloat(orionldState.kjsonP, "creDate", orionldState.requestTime);
   }
 
@@ -279,7 +279,7 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
   //
   KjNode* modDateP = kjFloat(orionldState.kjsonP, "modDate", orionldState.requestTime);
   kjChildAdd(entityP, modDateP);
-  kjTreeLog(entityP, "KZ: Merged Entity");
+  kjTreeLog(entityP, "Merged Entity");
 }
 
 
@@ -505,7 +505,7 @@ bool orionldPostBatchUpsert(void)
 
     LM(("%s Entity '%s'", (creation == true)? "Creating" : "Merging", entityId));
 
-    kjTreeLog(entityP, "KZ: entityP BEFORE dbModelFromApiEntity (API-Entity)");
+    kjTreeLog(entityP, "entityP BEFORE dbModelFromApiEntity (API-Entity)");
     KjNode* apiEntityP = kjClone(orionldState.kjsonP, entityP);
 
     // In case creDate/modDate have been added to the entity, they can now be removed from the cloned Entity
@@ -521,13 +521,13 @@ bool orionldPostBatchUpsert(void)
     // Transform the API entity (entityP) into the database model
     dbModelFromApiEntity(entityP, dbAttrsP, dbAttrNamesP, creation, NULL, NULL);
 
-    kjTreeLog(entityP, "KZ: entityP AFTER dbModelFromApiEntity (now a DB-Entity)");
+    kjTreeLog(entityP, "entityP AFTER dbModelFromApiEntity (now a DB-Entity)");
     alteration(entityId, NULL, apiEntityP);
     entityP = next;
   }
 
-  kjTreeLog(creationArray, "KZ: Create Array");
-  kjTreeLog(updateArray, "KZ: Update Array");
+  kjTreeLog(creationArray, "Create Array");
+  kjTreeLog(updateArray, "Update Array");
 
   //
   // Any correct Entity to be created/updated??

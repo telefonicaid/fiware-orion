@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-New Batch Upsert - update one entity by adding an attribute
+New Batch Upsert - Update-REPLACE with notifications
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -33,17 +33,18 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 --SHELL--
 
 #
-# 00. Create a subscription for everything (i.e. all entities with type T)
-# 01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
-# 02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
-# 03. Upsert/REPLACE urn:ngsi-ld:T:E1
-# 04. See the three entities in mongo
-# 05. QUERY for all entites
-# 06. GET urn:ngsi-ld:T:E1
-# 07. Dump Accumulator - see four notifications
+# 01. Create a subscription for everything (i.e. all entities with type T)
+# 02. Create a subscription for nothing (i.e. all entities with type R)
+# 03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1 + notification for E1
+# 04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error + notification for E2
+# 05. Upsert/REPLACE urn:ngsi-ld:T:E1 + notification for E1 and E3
+# 06. See the three entities in mongo
+# 07. QUERY for all entites
+# 08. GET urn:ngsi-ld:T:E1
+# 09. Dump Accumulator - see four notifications
 #
 
-echo "00. Create a subscription for everything (i.e. all entities with type T)"
+echo "01. Create a subscription for everything (i.e. all entities with type T)"
 echo "========================================================================"
 payload='{
   "type": "Subscription",
@@ -64,7 +65,28 @@ echo
 echo
 
 
-echo "01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1"
+echo "02. Create a subscription for nothing (i.e. all entities with type R)"
+echo "====================================================================="
+payload='{
+  "type": "Subscription",
+  "id": "urn:ngsi-ld:subscriptions:S2",
+  "entities": [
+    {
+      "type": "R"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1"
 echo "============================================================================================="
 payload='{
   "id": "urn:ngsi-ld:T:E1",
@@ -79,7 +101,7 @@ echo
 echo
 
 
-echo "02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error"
+echo "04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error"
 echo "===================================================================================="
 payload='[
   {
@@ -101,7 +123,7 @@ echo
 echo
 
 
-echo "03. Upsert/REPLACE urn:ngsi-ld:T:E1"
+echo "05. Upsert/REPLACE urn:ngsi-ld:T:E1"
 echo "==================================="
 payload='[
   {
@@ -123,28 +145,28 @@ echo
 echo
 
 
-echo "04. See the three entities in mongo"
+echo "06. See the three entities in mongo"
 echo "==================================="
 mongoCmd2 ftest "db.entities.find().pretty()"
 echo
 echo
 
 
-echo "05. QUERY for all entites"
+echo "07. QUERY for all entites"
 echo "========================="
 orionCurl --url '/ngsi-ld/v1/entities?local=true&options=sysAttrs'
 echo
 echo
 
 
-echo "06. GET urn:ngsi-ld:T:E1"
+echo "08. GET urn:ngsi-ld:T:E1"
 echo "========================"
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:E1?options=sysAttrs'
 echo
 echo
 
 
-echo "07. Dump Accumulator - see four notifications"
+echo "09. Dump Accumulator - see four notifications"
 echo "============================================="
 accumulatorDump
 accumulatorReset
@@ -153,7 +175,7 @@ echo
 
 
 --REGEXPECT--
-00. Create a subscription for everything (i.e. all entities with type T)
+01. Create a subscription for everything (i.e. all entities with type T)
 ========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -162,7 +184,16 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 
 
 
-01. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
+02. Create a subscription for nothing (i.e. all entities with type R)
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2
+
+
+
+03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
 =============================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -171,7 +202,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 
 
 
-02. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
+04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
 ====================================================================================
 HTTP/1.1 207 Multi-Status
 Content-Length: 241
@@ -198,7 +229,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-03. Upsert/REPLACE urn:ngsi-ld:T:E1
+05. Upsert/REPLACE urn:ngsi-ld:T:E1
 ===================================
 HTTP/1.1 207 Multi-Status
 Content-Length: 75
@@ -217,7 +248,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-04. See the three entities in mongo
+06. See the three entities in mongo
 ===================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
@@ -298,7 +329,7 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-05. QUERY for all entites
+07. QUERY for all entites
 =========================
 HTTP/1.1 200 OK
 Content-Length: 708
@@ -347,7 +378,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 ]
 
 
-06. GET urn:ngsi-ld:T:E1
+08. GET urn:ngsi-ld:T:E1
 ========================
 HTTP/1.1 200 OK
 Content-Length: 246
@@ -370,7 +401,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-07. Dump Accumulator - see four notifications
+09. Dump Accumulator - see four notifications
 =============================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 278

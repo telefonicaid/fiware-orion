@@ -144,7 +144,7 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (modifiedAtP != NULL)
       kjChildRemove(attrP, modifiedAtP);
 
-    kjTreeLog(attrP, "KZ: attr");
+    kjTreeLog(attrP, "attrP");
     for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
     {
       if (mdP->type != KjObject)
