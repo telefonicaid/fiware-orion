@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -170,9 +171,16 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
     LM(("ALT: Alteration %d:", alterations));
-    LM(("ALT:   Entity Id:    %s", aP->entityId));
-    LM(("ALT:   Entity Type:  %s", aP->entityType));
-    LM(("ALT:   Attributes:   %d", aP->alteredAttributes));
+    LM(("ALT:   Entity Id:     %s", aP->entityId));
+    LM(("ALT:   Entity Type:   %s", aP->entityType));
+    LM(("ALT:   Attributes:    %d", aP->alteredAttributes));
+
+    if (aP->patchedEntity != NULL)
+    {
+      char patchedEntity[1024];
+      kjFastRender(aP->patchedEntity, patchedEntity);
+      LM(("ALT:   patchedEntity: %s", patchedEntity));
+    }
 
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
@@ -202,13 +210,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
 #ifdef DEBUG
   int ix = 1;
-  LM(("%d Matching subscriptions:", matches));
+  LM(("KZ: %d items in matchList:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     if (matchP->altAttrP != NULL)
-      LM(("o %d/%d Subscription '%s' (url: %s), due to '%s'", ix, matches, matchP->subP->subscriptionId, matchP->subP->url, orionldAlterationName(matchP->altAttrP->alterationType)));
+      LM(("KZ: o %d/%d Subscription '%s' (url: %s), due to '%s'", ix, matches, matchP->subP->subscriptionId, matchP->subP->url, orionldAlterationName(matchP->altAttrP->alterationType)));
     else
-      LM(("o %d/%d Subscription '%s' (url: %s)", ix, matches, matchP->subP->subscriptionId, matchP->subP->url));
+      LM(("KZ: o %d/%d Subscription '%s' (url: %s)", ix, matches, matchP->subP->subscriptionId, matchP->subP->url));
     ++ix;
   }
 #endif
@@ -242,15 +250,36 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //   Merge the entities into the data array and send one single nmoptification per subscription.
   // **********************************************************************
   //
-  for (OrionldAlterationMatch* mAltP = matchList; mAltP != NULL; mAltP = mAltP->next)
+  while (matchList != NULL)
   {
+    //
+    // 1. Extract first match from matchList, call it matchHead
+    // 2. Extract all subsequent matches from matchList - add them to matchHead
+    // 3. Call notificationSend, whicvh will combine all of them into one single notification
+    //
+    // The matches come in subscription order, so, we just need to break after the first non-same subscription
+    //
+    OrionldAlterationMatch* matchHead = matchList;
+    matchList = matchList->next;
+    matchHead->next = NULL;  // The matchHead-list is now NULL-terminated and separated from matchList
+    LM(("KZ: inserting match in matchHead-list: %p", matchHead));
+    while ((matchList != NULL) && (matchList->subP == matchHead->subP))
+    {
+      LM(("KZ: inserting match in matchHead-list: %p", matchList));
+      OrionldAlterationMatch* current = matchList;
+      matchList     = matchList->next;
+      current->next = matchHead;
+      matchHead     = current;
+    }
+    LM(("KZ: matchHead-list done"));
+
     CURL* curlHandleP;
-    int fd = notificationSend(mAltP, notificationTimeAsFloat, &curlHandleP);  // curl handle as output param?
+    int   fd = notificationSend(matchHead, notificationTimeAsFloat, &curlHandleP);  // curl handle as output param?
     if (fd != -1)
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
-      npP->subP        = mAltP->subP;
+      npP->subP        = matchHead->subP;
       npP->fd          = fd;
       npP->curlHandleP = curlHandleP;
 

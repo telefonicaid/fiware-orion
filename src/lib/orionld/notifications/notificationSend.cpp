@@ -234,6 +234,10 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attributeFix - compaction and format (concise, simplified, normalized)
+//
 static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 {
   bool simplified = (subP->renderFormat == RF_KEYVALUES);
@@ -301,7 +305,7 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 
 // -----------------------------------------------------------------------------
 //
-// entityFix -
+// entityFix - compaction and format (concise, simplified, normalized)
 //
 KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
 {
@@ -413,73 +417,6 @@ KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
 
 // -----------------------------------------------------------------------------
 //
-// notificationTreeForNgsiV2 -
-//
-KjNode* notificationTreeForNgsiV2(CachedSubscription* subP, KjNode* entityP)
-{
-  KjNode* notificationP        = kjObject(orionldState.kjsonP, NULL);
-  KjNode* subscriptionIdNodeP  = kjString(orionldState.kjsonP, "subscriptionId", subP->subscriptionId);
-  KjNode* dataNodeP            = kjArray(orionldState.kjsonP,  "data");
-  bool    keyValues            = false;
-  bool    compact              = false;
-
-  if ((subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
-    keyValues = true;
-
-  if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
-    compact = true;
-
-  KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(entityP, keyValues, compact);
-
-  kjChildAdd(dataNodeP, ngsiv2EntityP);
-  kjChildAdd(notificationP, dataNodeP);
-  kjChildAdd(notificationP, subscriptionIdNodeP);
-
-  return notificationP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// notificationTree -
-//
-KjNode* notificationTree(CachedSubscription* subP, KjNode* entityP)
-{
-  KjNode* notificationP = kjObject(orionldState.kjsonP, NULL);
-  char    notificationId[80];
-
-  strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId) - 1);  // notificationId, could be a thread variable ...
-  uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
-
-  KjNode* idNodeP              = kjString(orionldState.kjsonP, "id", notificationId);
-  KjNode* typeNodeP            = kjString(orionldState.kjsonP, "type", "Notification");
-  KjNode* subscriptionIdNodeP  = kjString(orionldState.kjsonP, "subscriptionId", subP->subscriptionId);
-  KjNode* notifiedAtNodeP      = kjString(orionldState.kjsonP, "notifiedAt", orionldState.requestTimeString);
-  KjNode* dataNodeP            = kjArray(orionldState.kjsonP,  "data");
-
-  kjChildAdd(notificationP, idNodeP);
-  kjChildAdd(notificationP, typeNodeP);
-  kjChildAdd(notificationP, subscriptionIdNodeP);
-  kjChildAdd(notificationP, notifiedAtNodeP);
-  kjChildAdd(notificationP, dataNodeP);
-
-  entityP = entityFix(entityP, subP);
-  kjChildAdd(dataNodeP, entityP);
-
-  if (subP->httpInfo.mimeType == JSONLD)  // Add @context to the entity
-  {
-    KjNode* contextNodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);  // FIXME: use context from subscription!
-    kjChildAdd(notificationP, contextNodeP);
-  }
-
-  return notificationP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // attributeFilter -
 //
 static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP)
@@ -529,6 +466,94 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 
 // -----------------------------------------------------------------------------
 //
+// notificationTreeForNgsiV2 -
+//
+KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
+{
+  CachedSubscription* subP                 = matchP->subP;
+  KjNode*             notificationP        = kjObject(orionldState.kjsonP, NULL);
+  KjNode*             subscriptionIdNodeP  = kjString(orionldState.kjsonP, "subscriptionId", subP->subscriptionId);
+  KjNode*             dataNodeP            = kjArray(orionldState.kjsonP,  "data");
+  bool                keyValues            = false;
+  bool                compact              = false;
+
+  //
+  // Filter out unwanted attributes, if so requested (by the Subscription)
+  //
+  KjNode* apiEntityP = matchP->altP->patchedEntity;  // This is not correct - can be more than one entity
+
+  if (matchP->subP->attributes.size() > 0)
+    apiEntityP = attributeFilter(apiEntityP, matchP);
+
+  if ((subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
+    keyValues = true;
+
+  if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
+    compact = true;
+
+  KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(apiEntityP, keyValues, compact);
+
+  kjChildAdd(dataNodeP, ngsiv2EntityP);  // Adding only the first one ...
+  kjChildAdd(notificationP, dataNodeP);
+  kjChildAdd(notificationP, subscriptionIdNodeP);
+
+  return notificationP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationTree -
+//
+KjNode* notificationTree(OrionldAlterationMatch* matchList)
+{
+  CachedSubscription* subP          = matchList->subP;
+  KjNode*             notificationP = kjObject(orionldState.kjsonP, NULL);
+  char                notificationId[80];
+
+  strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId) - 1);  // notificationId, could be a thread variable ...
+  uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
+
+  KjNode* idNodeP              = kjString(orionldState.kjsonP, "id", notificationId);
+  KjNode* typeNodeP            = kjString(orionldState.kjsonP, "type", "Notification");
+  KjNode* subscriptionIdNodeP  = kjString(orionldState.kjsonP, "subscriptionId", subP->subscriptionId);
+  KjNode* notifiedAtNodeP      = kjString(orionldState.kjsonP, "notifiedAt", orionldState.requestTimeString);
+  KjNode* dataNodeP            = kjArray(orionldState.kjsonP,  "data");
+
+  kjChildAdd(notificationP, idNodeP);
+  kjChildAdd(notificationP, typeNodeP);
+  kjChildAdd(notificationP, subscriptionIdNodeP);
+  kjChildAdd(notificationP, notifiedAtNodeP);
+  kjChildAdd(notificationP, dataNodeP);
+
+  for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
+  {
+    KjNode* apiEntityP = matchP->altP->patchedEntity;
+
+    //
+    // Filter out unwanted attributes, if so requested (by the Subscription)
+    //
+    if (matchP->subP->attributes.size() > 0)
+      apiEntityP = attributeFilter(apiEntityP, matchP);
+
+    apiEntityP = entityFix(apiEntityP, subP);
+    kjChildAdd(dataNodeP, apiEntityP);
+  }
+
+  if (subP->httpInfo.mimeType == JSONLD)  // Add @context to the entity
+  {
+    KjNode* contextNodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);  // FIXME: use context from subscription!
+    kjChildAdd(notificationP, contextNodeP);
+  }
+
+  return notificationP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // notificationSend -
 //
 // writev is used for the notifications.
@@ -546,13 +571,6 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** curlHandlePP)
 {
   bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
-  KjNode* apiEntityP = mAltP->altP->patchedEntity;
-
-  //
-  // Filter out unwanted attributes, if so requested (by the Subscription)
-  //
-  if (mAltP->subP->attributes.size() > 0)
-    apiEntityP = attributeFilter(apiEntityP, mAltP);
 
   // <DEBUG>
   for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
@@ -569,7 +587,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   // Payload Body
   //
-  KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP->subP, apiEntityP) : notificationTreeForNgsiV2(mAltP->subP, apiEntityP);
+  KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP) : notificationTreeForNgsiV2(mAltP);
 
   if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
     notificationDataToGeoJson(notificationP);

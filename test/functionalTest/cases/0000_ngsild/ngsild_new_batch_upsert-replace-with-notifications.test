@@ -455,32 +455,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
-Content-Length: 261
-User-Agent: orionld/post-v1.1.0
-Accept: application/json
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Ngsild-Attribute-Format: Normalized
-
-{
-    "data": [
-        {
-            "P1": {
-                "type": "Property",
-                "value": 3
-            },
-            "id": "urn:ngsi-ld:T:E3",
-            "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
-    "notifiedAt": "202REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
-    "type": "Notification"
-}
-=======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
-Content-Length: 278
+Content-Length: 350
 User-Agent: orionld/post-v1.1.0
 Accept: application/json
 Content-Type: application/json
@@ -496,6 +471,14 @@ Ngsild-Attribute-Format: Normalized
                 "value": 3
             },
             "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E3",
             "type": "T"
         }
     ],

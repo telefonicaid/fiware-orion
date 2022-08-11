@@ -110,9 +110,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 03. Dump Accumulator - see the 3 entities
 =========================================
-#SORT_START
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
-Content-Length: 377
+Content-Length: 555
 User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -121,6 +120,24 @@ Ngsild-Attribute-Format: Normalized
 
 {
     "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 2
+            },
+            "id": "urn:ngsi-ld:T:E2",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        },
         {
             "P1": {
                 "P1_P1": {
@@ -145,59 +162,6 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
-POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
-Content-Length: 278
-User-Agent: orionld/REGEX(.*)
-Accept: application/json
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Ngsild-Attribute-Format: Normalized
-
-{
-    "data": [
-        {
-            "P1": {
-                "type": "Property",
-                "unitCode": "CEL",
-                "value": 1
-            },
-            "id": "urn:ngsi-ld:T:E1",
-            "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
-    "notifiedAt": "202REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
-    "type": "Notification"
-}
-=======================================
-POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
-Content-Length: 278
-User-Agent: orionld/REGEX(.*)
-Accept: application/json
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Ngsild-Attribute-Format: Normalized
-
-{
-    "data": [
-        {
-            "P1": {
-                "type": "Property",
-                "unitCode": "CEL",
-                "value": 2
-            },
-            "id": "urn:ngsi-ld:T:E2",
-            "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
-    "notifiedAt": "202REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
-    "type": "Notification"
-}
-=======================================
-#SORT_END
 
 
 --TEARDOWN--
