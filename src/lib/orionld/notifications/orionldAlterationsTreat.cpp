@@ -174,14 +174,14 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     LM(("ALT:   Entity Id:     %s", aP->entityId));
     LM(("ALT:   Entity Type:   %s", aP->entityType));
     LM(("ALT:   Attributes:    %d", aP->alteredAttributes));
-
+#if 0
     if (aP->patchedEntity != NULL)
     {
-      char patchedEntity[1024];
+      char patchedEntity[1024];  // ngsild_new_entity_query-with-concise.test: 1024 is not enough ...
       kjFastRender(aP->patchedEntity, patchedEntity);
       LM(("ALT:   patchedEntity: %s", patchedEntity));
     }
-
+#endif
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
       LM(("ALT:   Attribute        %s", aP->alteredAttributeV[ix].attrName));
