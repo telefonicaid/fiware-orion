@@ -28,20 +28,22 @@ export BROKER=orionld
 dbInit CB
 dbDrop orionld
 brokerStart CB 0 IPv4 -experimental
-accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER2_PORT
 
 --SHELL--
 
 #
 # 01. Create a subscription for everything (i.e. all entities with type T)
-# 02. Create a subscription for nothing (i.e. all entities with type R)
+# 02. Create another subscription for everything (to accumulator2)
 # 03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1 + notification for E1
 # 04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error + notification for E2
 # 05. Upsert/REPLACE urn:ngsi-ld:T:E1 + notification for E1 and E3
 # 06. See the three entities in mongo
 # 07. QUERY for all entites
 # 08. GET urn:ngsi-ld:T:E1
-# 09. Dump Accumulator - see four notifications
+# 09. Dump Accumulator - see four notifications (one double)
+# 10. Dump Accumulator2 - see four notifications (one double)
 #
 
 echo "01. Create a subscription for everything (i.e. all entities with type T)"
@@ -65,19 +67,19 @@ echo
 echo
 
 
-echo "02. Create a subscription for nothing (i.e. all entities with type R)"
-echo "====================================================================="
+echo "02. Create another subscription for everything (to accumulator2)"
+echo "================================================================"
 payload='{
   "type": "Subscription",
   "id": "urn:ngsi-ld:subscriptions:S2",
   "entities": [
     {
-      "type": "R"
+      "type": "T"
     }
   ],
   "notification": {
     "endpoint": {
-      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+      "uri": "http://127.0.0.1:'${LISTENER2_PORT}'/notify"
     }
   }
 }'
@@ -166,10 +168,17 @@ echo
 echo
 
 
-echo "09. Dump Accumulator - see four notifications"
-echo "============================================="
+echo "09. Dump Accumulator - see four notifications (one double)"
+echo "=========================================================="
 accumulatorDump
 accumulatorReset
+echo
+echo
+
+
+echo "10. Dump Accumulator2 - see four notifications (one double)"
+echo "==========================================================="
+accumulator2Dump
 echo
 echo
 
@@ -184,8 +193,8 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 
 
 
-02. Create a subscription for nothing (i.e. all entities with type R)
-=====================================================================
+02. Create another subscription for everything (to accumulator2)
+================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -401,8 +410,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-09. Dump Accumulator - see four notifications
-=============================================
+09. Dump Accumulator - see four notifications (one double)
+==========================================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 278
 User-Agent: orionld/post-v1.1.0
@@ -490,6 +499,97 @@ Ngsild-Attribute-Format: Normalized
 =======================================
 
 
+10. Dump Accumulator2 - see four notifications (one double)
+===========================================================
+POST http://127.0.0.1:9977/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 278
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9977/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 261
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 2
+            },
+            "id": "urn:ngsi-ld:T:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9977/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 350
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+accumulatorStop
+accumulatorStop $LISTENER2_PORT
