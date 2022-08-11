@@ -309,6 +309,7 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
   alterationP->alteredAttributeV = NULL;
   alterationP->next              = orionldState.alterations;
 
+  kjTreeLog(alterationP->patchedEntity, "NOTIF: patchedEntity");
   orionldState.alterations = alterationP;
 }
 
@@ -446,10 +447,6 @@ bool orionldPostBatchUpsert(void)
   KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");
 
 
-  // Create alterations - must be done before we merge the entity with its "DB Entity"
-  // GET alteration matching subscriptions
-
-
   // One Array for entities that did not priorly exist  (creation)
   // Another array for already existing entities        (replacement)
   //
@@ -496,8 +493,7 @@ bool orionldPostBatchUpsert(void)
       dbAttrsP     = kjLookup(dbEntityP, "attrs");
       dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
 
-      entityMerge(entityP, dbEntityP);  // Resulting Entity is entityP - not sure this should be done before dbModelFromApiEntity
-      // creation = false; - it's just the stupid creDate that will be there TWICE
+      entityMerge(entityP, dbEntityP);  // Resulting Entity is entityP
       kjChildRemove(creationArray, entityP);
 
       // The entity needs a merge with what's in the DB before being used for replace
@@ -511,6 +507,18 @@ bool orionldPostBatchUpsert(void)
 
     kjTreeLog(entityP, "KZ: entityP BEFORE dbModelFromApiEntity (API-Entity)");
     KjNode* apiEntityP = kjClone(orionldState.kjsonP, entityP);
+
+    // In case creDate/modDate have been added to the entity, they can now be removed from the cloned Entity
+    KjNode* creDateP = kjLookup(apiEntityP, "creDate");
+    KjNode* modDateP = kjLookup(apiEntityP, "modDate");
+
+    if (creDateP != NULL)
+      kjChildRemove(apiEntityP, creDateP);
+
+    if (modDateP != NULL)
+      kjChildRemove(apiEntityP, modDateP);
+
+    // Transform the API entity (entityP) into the database model
     dbModelFromApiEntity(entityP, dbAttrsP, dbAttrNamesP, creation, NULL, NULL);
 
     kjTreeLog(entityP, "KZ: entityP AFTER dbModelFromApiEntity (now a DB-Entity)");
