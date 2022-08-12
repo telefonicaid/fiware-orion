@@ -83,12 +83,14 @@ extern "C"
 //   * modDate
 //   * lastCorrelator
 //
-bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP, bool creation, const char* entityId, const char* entityType)
+bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbEntityP, bool creation, const char* entityId, const char* entityType)
 {
   KjNode*      nodeP;
-  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "modDate", "servicePath" };
-  KjNode*      idP      = NULL;
-  KjNode*      typeP    = NULL;
+  const char*  mustGo[]     = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "modDate", "creDate", "servicePath" };
+  KjNode*      idP          = NULL;
+  KjNode*      typeP        = NULL;
+  KjNode*      dbAttrsP     = NULL;
+  KjNode*      dbAttrNamesP = NULL;
 
   //
   // Remove any non-attribute nodes from the incoming tree (entityP)
@@ -123,6 +125,25 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   entityP->lastChild         = NULL;
 
   //
+  // If the entity already existed, the creDate needs to be copied from the previous entity
+  //
+  bool creDateAdded = false;
+  if (dbEntityP != NULL)
+  {
+    dbAttrsP     = kjLookup(dbEntityP, "attrs");      // Not present if the entity has no attributes
+    dbAttrNamesP = kjLookup(dbEntityP, "attrNames");  // Must be there
+    LM(("dbAttrNamesP at %p", dbAttrNamesP));
+    KjNode* creDateNodeP = kjLookup(dbEntityP, "creDate");
+    if (creDateNodeP != NULL)
+    {
+      kjChildRemove(dbEntityP, creDateNodeP);
+      kjChildAdd(entityP, creDateNodeP);
+      creDateAdded = true;
+    }
+  }
+
+
+  //
   // Add to entityP:
   // - First "attrNames" (.added)
   // - Then "attrs"
@@ -134,22 +155,8 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   // Not really necessary?   - RHS == null already tells the next layer ... ?
   KjNode* attrRemovedV = kjArrayAdd(entityP, ".removed");
 
-  KjNode* creDateP = kjLookup(attrsP, "creDate");
-  if (creDateP != NULL)
-  {
-    kjChildRemove(attrsP, creDateP);
-    kjChildAdd(entityP, creDateP);
-  }
-
-  if (creation == true)
-  {
-    //
-    // Batch Upsert/REPLACE has already taken the creDate from the DB Entity
-    // AND, it has "creation" set to true, so ... if creDate is present, leave it be
-    //
-    if (creDateP == NULL)
-      kjTimestampAdd(entityP, "creDate");
-  }
+  if (creDateAdded == false)
+    kjTimestampAdd(entityP, "creDate");
 
   kjTimestampAdd(entityP, "modDate");
 

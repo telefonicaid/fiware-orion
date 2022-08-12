@@ -48,7 +48,7 @@ extern "C"
 //
 bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 {
-  LM(("Upserting Entities"));
+  LM(("KZ: Upserting Entities"));
   mongocConnectionGet();  // mongocConnectionGet(MONGO_ENTITIES) - do the mongoc_client_get_collection also
 
   if (orionldState.mongoc.entitiesP == NULL)
@@ -58,10 +58,10 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 
   bulkP = mongoc_collection_create_bulk_operation_with_opts(orionldState.mongoc.entitiesP, NULL);
 
-  LM(("First the ones to be created:"));
+  LM(("KZ: First the ones to be created:"));
   for (KjNode* entityP = createArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    LM(("  o %p", entityP));
+    LM(("KZ:  o %p", entityP));
     bson_t doc;
 
     bson_init(&doc);
@@ -70,7 +70,7 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
     bson_destroy(&doc);
   }
 
-  LM(("Then the ones to be updated (replaced):"));
+  LM(("KZ: Then the ones to be updated (replaced):"));
   for (KjNode* entityP = updateArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     bson_t doc;
@@ -80,12 +80,12 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
     bson_init(&match);
 
 
-    kjTreeLog(entityP, "Entity to be updated");
+    kjTreeLog(entityP, "KZ: Entity to be updated");
     KjNode* _idP = kjLookup(entityP, "_id");
 
     if (_idP == NULL)
     {
-      LM_E(("Can't update an entity without entity id"));
+      LM_E(("KZ: Can't update an entity without entity id"));
       continue;
     }
 
@@ -93,13 +93,13 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 
     if (idP == NULL)
     {
-      LM_E(("Can't update an entity without an entity id"));
+      LM_E(("KZ: Can't update an entity without an entity id"));
       continue;
     }
 
     bson_append_utf8(&match, "_id.id", 6, idP->value.s, -1);
 
-    LM(("  o %s", idP->value.s));
+    LM(("KZ:  o %s", idP->value.s));
     mongocKjTreeToBson(entityP, &doc);  // The entity needs to be DB-Prepared !
     mongoc_bulk_operation_replace_one(bulkP, &match, &doc, false);
     bson_destroy(&doc);

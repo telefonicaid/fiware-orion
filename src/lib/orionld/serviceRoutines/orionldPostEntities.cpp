@@ -110,7 +110,7 @@ bool orionldPostEntities(void)
   if (troe)
     cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // apiEntityP contains entity ID and TYPE
 
-  if (dbModelFromApiEntity(orionldState.requestTree, NULL, NULL, true, orionldState.payloadIdNode->value.s, orionldState.payloadTypeNode->value.s) == false)
+  if (dbModelFromApiEntity(orionldState.requestTree, NULL, true, orionldState.payloadIdNode->value.s, orionldState.payloadTypeNode->value.s) == false)
   {
     //
     // Not calling orionldError as a better error message is overwritten if I do.

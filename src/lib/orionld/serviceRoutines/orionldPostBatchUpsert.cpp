@@ -164,7 +164,7 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
   {
     next = eP->next;
 
-    KjNode*         idNodeP      = kjLookup(eP, "id");
+    KjNode*         idNodeP      = kjLookup(eP, "id");  // entityStringArrayPopulate makes sure that "id" exists
     char*           entityId     = idNodeP->value.s;
     KjNode*         contextNodeP = kjLookup(eP, "@context");
     OrionldContext* contextP     = NULL;
@@ -203,12 +203,12 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
 
 // -----------------------------------------------------------------------------
 //
-// attributeMerge -
+// attributeCreDateFromDbAttr -
 //
 // There's really no merge to be done - the new attribute overwrites the old one.
 // Just, the old creDate needs to be preserved.
 //
-static void attributeMerge(KjNode* attrP, KjNode* dbAttrP)
+static void attributeCreDateFromDbAttr(KjNode* attrP, KjNode* dbAttrP)
 {
   KjNode* dbCreDateP = kjLookup(dbAttrP, "creDate");
 
@@ -224,17 +224,32 @@ static void attributeMerge(KjNode* attrP, KjNode* dbAttrP)
 
 // ----------------------------------------------------------------------------
 //
-// entityMerge -
+// entityMergeForUpdate -
 //
 // NOTE:
 //   Built-in TIMESTAMPS (creDate/createdAt/modDate/modifiedAt) are taken care of by dbModelFromApi[Entity/Attribute/SubAttribute]()
 //   EXCEPT for the entity creDate in case of update of an entity
 //
-static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
+static void entityMergeForUpdate(KjNode* entityP, KjNode* dbEntityP)
 {
-  kjTreeLog(entityP, "Incoming Entity");
-  kjTreeLog(dbEntityP, "DB Entity");
+}
 
+
+
+// ----------------------------------------------------------------------------
+//
+// entityMergeForReplace -
+//
+// NOTE:
+//   Built-in TIMESTAMPS (creDate/createdAt/modDate/modifiedAt) are taken care of by dbModelFromApi[Entity/Attribute/SubAttribute]()
+//   EXCEPT for the entity creDate in case of update of an entity
+//
+static void entityMergeForReplace(KjNode* entityP, KjNode* dbEntityP)
+{
+  kjTreeLog(entityP, "ALT: Incoming Entity");
+  kjTreeLog(dbEntityP, "ALT: DB Entity");
+
+#if 0
   //
   // Steal the createdAt (creDate) - OR create a new one if not present
   //
@@ -247,7 +262,7 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
     LM(("Weird, the DB-Entity didn't have a creDate ..."));
     creDateP = kjFloat(orionldState.kjsonP, "creDate", orionldState.requestTime);
   }
-
+#endif
   KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");  // "attrs" is not present in the DB if the entity has no attributes ... ?
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -265,21 +280,23 @@ static void entityMerge(KjNode* entityP, KjNode* dbEntityP)
     if (dbAttrP != NULL)
     {
       kjChildRemove(dbEntityP, dbAttrP);  // The attr is removed from the db-entity so we can later add all the rest of attrs
-      attributeMerge(attrP, dbAttrP);
+      attributeCreDateFromDbAttr(attrP, dbAttrP);
     }
   }
 
   //
   // Add Entity::creDate (after the previous loop, to save some time)
   //
-  kjChildAdd(entityP, creDateP);
+  // kjChildAdd(entityP, creDateP);
 
+#if 0
   //
   // Add Entity::modDate
   //
   KjNode* modDateP = kjFloat(orionldState.kjsonP, "modDate", orionldState.requestTime);
   kjChildAdd(entityP, modDateP);
   kjTreeLog(entityP, "Merged Entity");
+#endif
 }
 
 
@@ -304,7 +321,7 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
   alterationP->entityType        = entityType;
   alterationP->patchTree         = NULL;
   alterationP->dbEntityP         = NULL;
-  alterationP->patchedEntity     = apiEntityP;  // entity id, createdAt, modifiedAt ...
+  alterationP->patchedEntity     = apiEntityP;
   alterationP->alteredAttributes = 0;
   alterationP->alteredAttributeV = NULL;
   alterationP->next              = orionldState.alterations;
@@ -434,7 +451,7 @@ bool orionldPostBatchUpsert(void)
     orionldError(OrionldInternalError, "Database Error", "error querying the database for entities", 500);
     return false;
   }
-  // kjTreeLog(dbEntityArray, "Entities from DB");
+  kjTreeLog(dbEntityArray, "AN: Entities from DB");
 
 
   //
@@ -460,6 +477,7 @@ bool orionldPostBatchUpsert(void)
   KjNode* next;
 
   // kjTreeLog(dbEntityArray, "dbEntityArray");
+  kjTreeLog(dbEntityArray, "AN: Entities from DB");
   while (entityP != NULL)
   {
     next = entityP->next;
@@ -469,12 +487,11 @@ bool orionldPostBatchUpsert(void)
     KjNode* dbEntityTypeNodeP = NULL;
     KjNode* dbEntityP         = entityLookupBy_id_Id(dbEntityArray, entityId, &dbEntityTypeNodeP);
     bool    creation          = true;
-    KjNode* dbAttrsP          = NULL;
-    KjNode* dbAttrNamesP      = NULL;
 
-    LM(("dbEntityP for entity '%s' at %p", entityId, dbEntityP));
+    LM(("AN: dbEntityP for entity '%s' at %p", entityId, dbEntityP));
     if (dbEntityP != NULL)
     {
+      kjTreeLog(dbEntityP, "AN: dbEntityP");
       //
       // The entity already exists (and it has an Entity Type)
       // The entity type cannot be modified, so ... need to check that
@@ -489,39 +506,27 @@ bool orionldPostBatchUpsert(void)
       }
 
       entitySuccessPush(outArrayUpdatedP, entityId);
-
-      dbAttrsP     = kjLookup(dbEntityP, "attrs");
-      dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-
-      entityMerge(entityP, dbEntityP);  // Resulting Entity is entityP
       kjChildRemove(creationArray, entityP);
 
-      // The entity needs a merge with what's in the DB before being used for replace
-      // kjTreeLog(entityP, entityId);
+      if (orionldState.uriParamOptions.update == false)
+        entityMergeForReplace(entityP, dbEntityP);  // Resulting Entity is entityP
+      else
+        entityMergeForUpdate(entityP, dbEntityP);
+
+      kjTreeLog(entityP, "ALT: Merged Entity - later cloned for apiEntityP and ALTERATIONS");
+
       kjChildAdd(updateArray, entityP);
     }
     else
       entitySuccessPush(outArrayCreatedP, entityId);
 
-    LM(("%s Entity '%s'", (creation == true)? "Creating" : "Merging", entityId));
-
-    kjTreeLog(entityP, "entityP BEFORE dbModelFromApiEntity (API-Entity)");
     KjNode* apiEntityP = kjClone(orionldState.kjsonP, entityP);
 
-    // In case creDate/modDate have been added to the entity, they can now be removed from the cloned Entity
-    KjNode* creDateP = kjLookup(apiEntityP, "creDate");
-    KjNode* modDateP = kjLookup(apiEntityP, "modDate");
-
-    if (creDateP != NULL)
-      kjChildRemove(apiEntityP, creDateP);
-
-    if (modDateP != NULL)
-      kjChildRemove(apiEntityP, modDateP);
-
     // Transform the API entity (entityP) into the database model
-    dbModelFromApiEntity(entityP, dbAttrsP, dbAttrNamesP, creation, NULL, NULL);
+    kjTreeLog(dbEntityP, "AN: dbEntityP before dbModelFromApiEntity");
+    dbModelFromApiEntity(entityP, dbEntityP, creation, NULL, NULL);
 
-    kjTreeLog(entityP, "entityP AFTER dbModelFromApiEntity (now a DB-Entity)");
+    kjTreeLog(apiEntityP, "ALT: API-Entity for Alteration ");
     alteration(entityId, NULL, apiEntityP);
     entityP = next;
   }

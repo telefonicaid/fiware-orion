@@ -63,8 +63,7 @@ extern "C"
 extern bool dbModelFromApiEntity
 (
   KjNode*     entityP,
-  KjNode*     dbAttrsP,
-  KjNode*     dbAttrNamesP,
+  KjNode*     dbEntityP,
   bool        creation,
   const char* entityId,
   const char* entityType

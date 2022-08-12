@@ -582,8 +582,7 @@ bool orionldPatchEntity2(void)
   //        I extract the part that is to be forwarded from the tree before I destroy
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
-  KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-  if (dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP, false, NULL, NULL) == false)
+  if (dbModelFromApiEntity(orionldState.requestTree, dbEntityP, false, NULL, NULL) == false)
   {
     LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
     return false;

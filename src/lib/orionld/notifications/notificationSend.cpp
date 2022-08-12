@@ -275,12 +275,14 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
     //
     // Here we're "in subAttributeFix"
     //
+
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
       LM(("attr '%s'", attrP->name));
       LM(("saP is a JSON %s, at %p", kjValueType(saP->type), saP));
       LM(("saP->name at %p", saP->name));
       LM(("Treating '%s' field of attr '%s", saP->name, attrP->name));
+
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;
@@ -310,6 +312,14 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
 {
   KjNode* entityP = kjClone(orionldState.kjsonP, originalEntityP);
+
+  //
+  // BUG workaround - a creDate might have been copied in here without belonging
+  //                  Seems like it comes from entityMergeForReplace (orionldPostBatchUpsert.cpp)
+  //
+  KjNode* modDateP = kjLookup(entityP, "modDate");
+  if (modDateP != NULL)
+    kjChildRemove(entityP, modDateP);
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {

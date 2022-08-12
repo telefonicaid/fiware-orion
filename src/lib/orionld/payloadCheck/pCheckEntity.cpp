@@ -187,6 +187,12 @@ bool pCheckEntity
       continue;
     }
 
+    //
+    // FIXME:
+    //   Need to set attrP->name = (char*) "type" in case it's "@type"
+    //   The duplication error in typeCheck in not correct
+    //   Make this two ifs, not one
+    //
     if ((strcmp(attrP->name, "type")  == 0) || (strcmp(attrP->name, "@type") == 0))
     {
       if (typeCheck(attrP, typeP) == false)
