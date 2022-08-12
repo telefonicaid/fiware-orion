@@ -246,30 +246,13 @@ static void entityMergeForUpdate(KjNode* entityP, KjNode* dbEntityP)
 //
 static void entityMergeForReplace(KjNode* entityP, KjNode* dbEntityP)
 {
-  kjTreeLog(entityP, "ALT: Incoming Entity");
-  kjTreeLog(dbEntityP, "ALT: DB Entity");
-
-#if 0
-  //
-  // Steal the createdAt (creDate) - OR create a new one if not present
-  //
-  KjNode* creDateP = kjLookup(dbEntityP, "creDate");
-
-  if (creDateP != NULL)
-    kjChildRemove(dbEntityP, creDateP);
-  else  // This should never happen
-  {
-    LM(("Weird, the DB-Entity didn't have a creDate ..."));
-    creDateP = kjFloat(orionldState.kjsonP, "creDate", orionldState.requestTime);
-  }
-#endif
   KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");  // "attrs" is not present in the DB if the entity has no attributes ... ?
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (strcmp(attrP->name, "id")    == 0)  continue;
     if (strcmp(attrP->name, "type")  == 0)  continue;
-    if (strcmp(attrP->name, "@type") == 0)  continue;
+    if (strcmp(attrP->name, "@type") == 0)  continue;  // FIXME: @type -> type should be fixed already (by pCheckEntity)
     if (strcmp(attrP->name, "scope") == 0)  continue;
     // FIXME: More special entity fields ...
 
@@ -283,20 +266,6 @@ static void entityMergeForReplace(KjNode* entityP, KjNode* dbEntityP)
       attributeCreDateFromDbAttr(attrP, dbAttrP);
     }
   }
-
-  //
-  // Add Entity::creDate (after the previous loop, to save some time)
-  //
-  // kjChildAdd(entityP, creDateP);
-
-#if 0
-  //
-  // Add Entity::modDate
-  //
-  KjNode* modDateP = kjFloat(orionldState.kjsonP, "modDate", orionldState.requestTime);
-  kjChildAdd(entityP, modDateP);
-  kjTreeLog(entityP, "Merged Entity");
-#endif
 }
 
 

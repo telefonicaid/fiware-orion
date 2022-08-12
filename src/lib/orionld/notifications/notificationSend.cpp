@@ -313,20 +313,11 @@ KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
 {
   KjNode* entityP = kjClone(orionldState.kjsonP, originalEntityP);
 
-  //
-  // BUG workaround - a creDate might have been copied in here without belonging
-  //                  Seems like it comes from entityMergeForReplace (orionldPostBatchUpsert.cpp)
-  //
-  KjNode* modDateP = kjLookup(entityP, "modDate");
-  if (modDateP != NULL)
-    kjChildRemove(entityP, modDateP);
-
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (strcmp(attrP->name, "id") == 0)
       continue;
 
-    // compaction of the value of 'type' for the Entity
     if (strcmp(attrP->name, "type") == 0)
     {
       attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);
