@@ -79,7 +79,8 @@ static bool idCheck(KjNode* attrP, KjNode* idP)
 {
   if (idP != NULL)
   {
-    orionldError(OrionldBadRequestData, "Both /id/ and /@id/ field in an entity", idP->value.s, 400);
+    // We know that there must have been an "id" and an "@id", as duplicated fields are detected already by kjLookupByNameExceptOne
+    orionldError(OrionldBadRequestData, "Duplicated field in an entity (id+@id)", idP->value.s, 400);
     return false;
   }
 
@@ -95,11 +96,15 @@ static bool idCheck(KjNode* attrP, KjNode* idP)
 //
 // typeCheck -
 //
-static bool typeCheck(KjNode* attrP, KjNode* typeP)
+static bool typeCheck(KjNode* attrP, KjNode* typeP, KjNode* idP)
 {
   if (typeP != NULL)
   {
-    orionldError(OrionldBadRequestData, "Both /type/ and /@type/ field in an entity", typeP->value.s, 400);
+    // We know that there must have been a "type" and an "@type", as duplicated fields are detected already by kjLookupByNameExceptOne
+    if (idP != NULL)
+      orionldError(OrionldBadRequestData, "Duplicated field in an entity (type+@type)", idP->value.s, 400);
+    else
+      orionldError(OrionldBadRequestData, "Duplicated field in an entity", "type+@type", 400);
     return false;
   }
 
@@ -195,7 +200,7 @@ bool pCheckEntity
     //
     if ((strcmp(attrP->name, "type")  == 0) || (strcmp(attrP->name, "@type") == 0))
     {
-      if (typeCheck(attrP, typeP) == false)
+      if (typeCheck(attrP, typeP, idP) == false)
         return false;
       typeP = attrP;
 

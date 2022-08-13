@@ -451,7 +451,7 @@ Date: REGEX(.*)
 
 {
     "detail": "urn:E1",
-    "title": "Both /id/ and /@id/ field in an entity",
+    "title": "Duplicated field in an entity (id+@id)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -459,13 +459,13 @@ Date: REGEX(.*)
 14. Attempt to PUT E1 with both type and @type - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 172
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/T",
-    "title": "Both /type/ and /@type/ field in an entity",
+    "detail": "urn:E1",
+    "title": "Duplicated field in an entity (type+@type)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

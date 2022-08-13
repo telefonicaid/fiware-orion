@@ -89,7 +89,7 @@ echo
 01. Upsert 3 entities (Create) with plenty of errors
 ====================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 2582
+Content-Length: 2553
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -178,7 +178,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "error": {
                 "detail": "urn:ngsi-ld:T:Eh1",
                 "status": 400,
-                "title": "Both /id/ and /@id/ field in an entity",
+                "title": "Duplicated field in an entity (id+@id)",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
@@ -187,7 +187,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "error": {
                 "detail": "urn:ngsi-ld:T:Eh1",
                 "status": 400,
-                "title": "Both /id/ and /@id/ field in an entity",
+                "title": "Duplicated field in an entity (id+@id)",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
@@ -203,9 +203,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         {
             "entityId": "urn:ngsi-ld:T:Eh1",
             "error": {
-                "detail": "https://uri.etsi.org/ngsi-ld/default-context/T",
+                "detail": "urn:ngsi-ld:T:Eh1",
                 "status": 400,
-                "title": "Both /type/ and /@type/ field in an entity",
+                "title": "Duplicated field in an entity (type+@type)",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         },
