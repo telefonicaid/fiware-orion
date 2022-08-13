@@ -331,6 +331,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 04b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
@@ -404,6 +405,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 05. Create Entity with a LanguageProperty with a languageMap: { "se": "no", "en": "yes" }: see "en" (second default)
@@ -417,6 +419,7 @@ Location: /ngsi-ld/v1/entities/urn:E2
 
 05b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
@@ -490,6 +493,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 06. Create Entity with a LanguageProperty with a languageMap: { "se": "yes", "sk": "no" }: see "se" (first item if no default found)
@@ -503,6 +507,7 @@ Location: /ngsi-ld/v1/entities/urn:E3
 
 06b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
@@ -576,6 +581,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 07. Create Entity with a LanguageProperty with a languageMap: { "@none": "no", "en": "no", "es": "yes" }: see "es" (what was asked for)
@@ -589,6 +595,7 @@ Location: /ngsi-ld/v1/entities/urn:E4
 
 07b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
@@ -662,6 +669,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 08. Create Entity with a LanguageProperty with a languageMap: { "@none": ["yes"], "en": ["no"], "se": ["no"] }: see "@none" (default)
@@ -675,6 +683,7 @@ Location: /ngsi-ld/v1/entities/urn:E5
 
 08b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 219
 User-Agent: orionld/REGEX(.*)
@@ -757,6 +766,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 09. Create Entity with a LanguageProperty with a languageMap: { "se": ["no"], "en": ["yes"] }: see "en" (second default)
@@ -770,6 +780,7 @@ Location: /ngsi-ld/v1/entities/urn:E6
 
 09b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 224
 User-Agent: orionld/REGEX(.*)
@@ -852,6 +863,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 10. Create Entity with a LanguageProperty with a languageMap: { "se": ["yes"], "sk": ["no"] }: see "se" (first item if no default found)
@@ -865,6 +877,7 @@ Location: /ngsi-ld/v1/entities/urn:E7
 
 10b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 211
 User-Agent: orionld/REGEX(.*)
@@ -944,6 +957,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 11. Create Entity with a LanguageProperty with a languageMap: { "@none": ["no"], "en": ["no"], "es": ["yes"] }: see "es" (what was asked for)
@@ -957,6 +971,7 @@ Location: /ngsi-ld/v1/entities/urn:E8
 
 11b. Dump/Reset Accumulator
 ===========================
+#SORT_START
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
 Content-Length: 211
 User-Agent: orionld/REGEX(.*)
@@ -1036,6 +1051,7 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--
