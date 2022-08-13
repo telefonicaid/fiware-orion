@@ -188,7 +188,9 @@ bool pCheckEntity
     {
       if (idCheck(attrP, idP) == false)  // POST /entities/*/attrs   CANNOT add/modify "id"
         return false;
-      idP = attrP;
+
+      idP       = attrP;
+      idP->name = (char*) "id";
       continue;
     }
 
@@ -202,7 +204,9 @@ bool pCheckEntity
     {
       if (typeCheck(attrP, typeP, idP) == false)
         return false;
-      typeP = attrP;
+
+      typeP       = attrP;
+      typeP->name = (char*) "type";
 
       // Must expand the entity type
       typeP->value.s = orionldContextItemExpand(orionldState.contextP, typeP->value.s, true, NULL);

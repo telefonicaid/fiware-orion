@@ -63,6 +63,7 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
@@ -83,15 +84,29 @@ static bool entityTypeChange(KjNode* entityP, KjNode* dbEntityP, char** newTypeP
   KjNode*  oldTypeNodeP  = kjLookup(dbEntityP, "type");
   char*    oldType       = (oldTypeNodeP != NULL)? oldTypeNodeP->value.s : NULL;
 
+  LM(("TYPES: newTypeNodeP at %p", newTypeNodeP));
+  LM(("TYPES: oldTypeNodeP at %p", oldTypeNodeP));
+
+  if (newTypeNodeP != NULL)
+    LM(("TYPES: newType: '%s'", newTypeNodeP->value.s));
+  if (oldTypeNodeP != NULL)
+    LM(("TYPES: oldType: '%s'", oldTypeNodeP->value.s));
+
   if ((newType != NULL) && (oldType != NULL))
   {
     if (strcmp(newType, oldType) != 0)  // They differ
     {
       *newTypeP = newType;
+      LM(("TYPES: Bad - old and new type differ"));
       return true;
     }
+    else
+      LM(("TYPES: '%s' and '%s' are identical", newType, oldType));
   }
+  else
+    LM(("TYPES: Both new and old are NULL"));
 
+  LM(("TYPES: All Good - no diff ..."));
   return false;
 }
 
@@ -140,6 +155,7 @@ bool orionldPostBatchUpdate(void)
   //     Check also that the entity type is the same, if given in the request
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, true);  // true: include attrNames array
+  kjTreeLog(idTypeAndCreDateFromDb, "TYPES: From dbEntityListLookupWithIdTypeCreDate");
   KjNode* entityP;
 
   if (idTypeAndCreDateFromDb == NULL)
@@ -168,11 +184,10 @@ bool orionldPostBatchUpdate(void)
   for (KjNode* entityP = incomingTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode*  idNodeP       = kjLookup(entityP, "id");
-    KjNode*  atidNodeP     = kjLookup(entityP, "@id");
     char*    entityId;
 
     if (idNodeP == NULL)
-      idNodeP = atidNodeP;
+      idNodeP = kjLookup(entityP, "@id");
 
     if (idNodeP == NULL)
     {
@@ -196,8 +211,8 @@ bool orionldPostBatchUpdate(void)
       kjChildRemove(incomingTree, entityP);
       continue;
     }
-
-    // If @context inpayload body, it needs to be respected
+    kjTreeLog(dbEntityP, "TYPES: DB Entity");
+    // If @context in payload body, it needs to be respected
     KjNode* contextNodeP  = kjLookup(entityP, "@context");
     if (contextNodeP != NULL)
       orionldState.contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
