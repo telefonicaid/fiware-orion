@@ -37,6 +37,7 @@ brokerStart CB 0-255 --prettyPrint
 # 04. Creation of registration using @id and @type
 # 05. Update of registration using @id and @type
 # 06. Creation of entities with entityOperations using @id and @type
+# 06b. See urn:ngsi-ld:entity:E1 in DB and make sure the entity type is expanded
 # 07. Update of entities with entityOperations using @id and @type
 # 08. Upsert of entities - options=update - with entityOperations using @id and @type
 # 09. Upsert of entities - options=replace - with entityOperations using @id and @type
@@ -224,7 +225,7 @@ payload='[
       "Vehicle": "http://example.org/Vehicle"
     },
     "@id": "urn:ngsi-ld:entity:E1",
-    "@type": "Vehicle",
+    "type": "Vehicle",
     "P1": {
       "type": "Property",
       "value": "STEP 01"
@@ -243,6 +244,13 @@ payload='[
   }
 ]'
 orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "06b. See urn:ngsi-ld:entity:E1 in DB and make sure the entity type is expanded"
+echo "=============================================================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
 echo
 echo
 
@@ -418,6 +426,36 @@ Date: REGEX(.*)
   "urn:ngsi-ld:entity:E2"
 ]
 
+
+
+06b. See urn:ngsi-ld:entity:E1 in DB and make sure the entity type is expanded
+==============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "http://example.org/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "STEP 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
 
 
 07. Update of entities with entityOperations using @id and @type

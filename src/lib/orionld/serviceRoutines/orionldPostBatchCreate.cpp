@@ -194,7 +194,7 @@ bool orionldPostBatchCreate(void)
   {
     for (KjNode* dbEntityP = idTypeAndCreDateFromDb->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
     {
-      char*    idInDb        = NULL;
+      char*    idInDb = NULL;
       KjNode*  entityP;
 
       // Get entity id, type and creDate from the DB
@@ -226,6 +226,13 @@ bool orionldPostBatchCreate(void)
     // Get the 'id' field
     //
     KjNode* idP = kjLookup(entityP, "id");
+    if (idP == NULL)
+    {
+      idP = kjLookup(entityP, "@id");
+      if (idP != NULL)
+        idP->name = (char*) "id";
+    }
+
     if (idP == NULL)
     {
       LM_E(("Internal Error (no 'id' for entity in batch create entity array - how did this get all the way here?)"));
@@ -271,7 +278,7 @@ bool orionldPostBatchCreate(void)
     if (contextP != NULL)
       orionldState.contextP = contextP;
 
-    // Entity ok, from a "repetition point of view", now, let's make sure it's correct!
+    // Entity ok, from a "repetition point of view", now, let's MAKE SURE it's correct!
     if (pCheckEntity(entityP, true, NULL) == false)
     {
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, true);
