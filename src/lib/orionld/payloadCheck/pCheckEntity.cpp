@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -181,37 +182,37 @@ bool pCheckEntity
       return false;
     }
 
-    if (strcmp(attrP->name, "@context") == 0)      continue;
-    if (strcmp(attrP->name, "scope")    == 0)      continue;
-
+    //
+    // id
+    //
     if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "@id") == 0))
     {
       if (idCheck(attrP, idP) == false)  // POST /entities/*/attrs   CANNOT add/modify "id"
         return false;
 
-      idP       = attrP;
-      idP->name = (char*) "id";
+      idP = attrP;
       continue;
     }
 
     //
-    // FIXME:
-    //   Need to set attrP->name = (char*) "type" in case it's "@type"
-    //   The duplication error in typeCheck in not correct
-    //   Make this two ifs, not one
+    // type
     //
     if ((strcmp(attrP->name, "type")  == 0) || (strcmp(attrP->name, "@type") == 0))
     {
       if (typeCheck(attrP, typeP, idP) == false)
         return false;
 
-      typeP       = attrP;
-      typeP->name = (char*) "type";
-
-      // Must expand the entity type
+      typeP          = attrP;
       typeP->value.s = orionldContextItemExpand(orionldState.contextP, typeP->value.s, true, NULL);
       continue;
     }
+
+    //
+    // Special attributes
+    //
+    if (strcmp(attrP->name, "@context") == 0)      continue;
+    if (strcmp(attrP->name, "scope")    == 0)      continue;
+
 
     OrionldAttributeType  aTypeFromDb  = NoAttributeType;
     OrionldContextItem*   contextItemP = NULL;
@@ -235,6 +236,12 @@ bool pCheckEntity
     if (pCheckAttribute(attrP, true, aTypeFromDb, true, contextItemP) == false)
       return false;
   }
+
+  //
+  // Remove the possible '@' for Entity "id" and "type"
+  //
+  if (idP   != NULL) idP->name   = (char*) "id";
+  if (typeP != NULL) typeP->name = (char*) "type";
 
   // If batch or POST /entities - idP cannot be NULL
   // - All other operations, it must be NULL (can't be present)
