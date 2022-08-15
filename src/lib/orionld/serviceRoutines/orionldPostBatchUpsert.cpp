@@ -561,6 +561,25 @@ bool orionldPostBatchUpsert(void)
         alreadyInDbModelFormat = true;
         KjNode* clonedDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
         apiEntityP = dbModelToApiEntity(clonedDbEntityP, false, entityId);  // For notifications we need the entire entity
+
+        //
+        // FIXME:  Need the whole thing from patchEntity2.
+        //
+        // Only part of the apiEntity has actually been updated.
+        // The mistake is clear if you look at the function attributeMatch (subCacheAlterationMatch.cpp):
+        //
+        //   if (altP->alteredAttributes == 0)  // E.g. complete replace of an entity
+        //
+        // So, what's missing here is the entire fine granular thing from patchEntity2 (needs to be amended):
+        //
+        //    OrionldAlteration* alterationP = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP);
+        //    alterationP->dbEntityP         = kjClone(orionldState.kjsonP, dbEntityP);
+        //    alterationP->next              = orionldState.alterations;
+        //    orionldState.alterations       = alterationP;
+        //    alterationDone = true;
+        //
+        // The function 'orionldAlterations' need its own module in orionld/notifications (it's in orionldPatchEntity2.cpp)
+        //
       }
 
       // Adding entityP to the updateArray for mongocEntitiesUpsert, even though it will be transformed later by dbModelFromApiEntity
@@ -579,12 +598,9 @@ bool orionldPostBatchUpsert(void)
 
     // Transform the API entity (entityP) into the database model
     if (alreadyInDbModelFormat == false)
-    {
-      kjTreeLog(dbEntityP, "AN: dbEntityP before dbModelFromApiEntity");
       dbModelFromApiEntity(entityP, dbEntityP, creation, NULL, NULL);
-    }
 
-    kjTreeLog(apiEntityP, "ALT: API-Entity for Alteration/Notification");
+    // if (alterationDone == false)
     alteration(entityId, NULL, apiEntityP);
     entityP = next;
   }
