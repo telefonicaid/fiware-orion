@@ -250,6 +250,20 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
   eqForDot(attrP->name);
   attrP->name = orionldContextItemAliasLookup(subP->contextP, attrP->name, NULL, NULL);
 
+  //
+  // ".added" and ".removed" are help arrays for Merge+Patch behaviour
+  // They shouldn't be here at this point but if they are, they're to be ignored
+  // So, we just remove them, for now.
+  //
+  // All this needs to be carefully studied and probably modified.
+  //
+  KjNode* addedP    = kjLookup(attrP, ".added");
+  KjNode* removedP  = kjLookup(attrP, ".removed");
+
+  if (addedP   != NULL) kjChildRemove(attrP, addedP);
+  if (removedP != NULL) kjChildRemove(attrP, removedP);
+
+
   bool asSimplified = false;
   kjTreeLog(attrP, "Attribute BEFORE");
   if (simplified)
@@ -311,7 +325,20 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 //
 KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
 {
-  KjNode* entityP = kjClone(orionldState.kjsonP, originalEntityP);
+  KjNode* entityP   = kjClone(orionldState.kjsonP, originalEntityP);
+
+  //
+  // ".added" and ".removed" are help arrays for Merge+Patch behaviour
+  // They shouldn't be here at this point but if they are, they're to be ignored
+  // So, we just remove them, for now.
+  //
+  // All this needs to be carefully studied and probably modified.
+  //
+  KjNode* addedP    = kjLookup(entityP, ".added");
+  KjNode* removedP  = kjLookup(entityP, ".removed");
+
+  if (addedP   != NULL) kjChildRemove(entityP, addedP);
+  if (removedP != NULL) kjChildRemove(entityP, removedP);
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {

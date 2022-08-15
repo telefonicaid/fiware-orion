@@ -44,6 +44,12 @@ static void kjTreeToBson(KjNode* nodeP, bson_t* parentP, bool inArray, int array
   int   slen;
   char* name;
 
+  //
+  // Fields whose names start with dot are "help fields" and are not to be taken into account
+  //
+  if ((nodeP->name != NULL) && (nodeP->name[0] == '.'))
+    return;
+
   if (inArray == true)
   {
     slen = snprintf(nameBuf, sizeof(nameBuf), "%d", arrayIndex);

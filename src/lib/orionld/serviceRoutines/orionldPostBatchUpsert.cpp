@@ -47,6 +47,8 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/dbModel/dbModelFromApiEntity.h"              // dbModelFromApiEntity
+#include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity
+#include "orionld/dbModel/dbModelFromApiAttribute.h"           // dbModelFromApiAttribute
 #include "orionld/mongoc/mongocEntitiesQuery.h"                // mongocEntitiesQuery
 #include "orionld/mongoc/mongocEntitiesUpsert.h"               // mongocEntitiesUpsert
 #include "orionld/legacyDriver/legacyPostBatchUpsert.h"        // legacyPostBatchUpsert
@@ -259,6 +261,9 @@ static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
     kjChildAdd(dbEntityP, dbAttrsP);
   }
 
+  KjNode* attrAddedV   = kjArray(orionldState.kjsonP, ".added");
+  KjNode* attrRemovedV = kjArray(orionldState.kjsonP, ".removed");
+
   kjTreeLog(apiEntityP, "UP: API Entity");
   LM(("UP: ---------- Looping over API-Entity attributes"));
   for (KjNode* apiAttrP = apiEntityP->value.firstChildP; apiAttrP != NULL; apiAttrP = apiAttrP->next)
@@ -273,32 +278,29 @@ static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
     dotForEq(eqAttrName);
     KjNode* dbAttrP = kjLookup(dbAttrsP, eqAttrName);
 
-    if (dbAttrP == NULL)  // The attribute is NEW and should be added to attrs and attrNames
+    if (dbAttrP == NULL)  // The attribute is NEW and must be added to attrs and attrNames
     {
+      LM(("UP: The attribute '%s' is NEW and must be added to attrs and attrNames", dotAttrName));
       KjNode* attrNameNode = kjString(orionldState.kjsonP, NULL, dotAttrName);
       kjChildAdd(dbAttrNamesP, attrNameNode);
-#if 0
-      dbModelFromApiAttribute(apiAttrP, dbAttrsP, NULL, NULL, NULL);  // attrAddedV, attrRemovedV, ignoreP   ALL NULL ...
+
+      dbModelFromApiAttribute(apiAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);  // ignoreP == NULL ...
       kjChildAdd(dbAttrsP, apiAttrP);  // apiAttrP is now in DB-Model format
-#else
-      dbAttrP = kjObject(orionldState.kjsonP, eqAttrName);
-      kjChildAdd(dbAttrsP, dbAttrP);
-#endif      
     }
     else
     {
-      LM(("Attribute '%s' is replaced by the API Attribute", apiAttrP->name));
+      LM(("UP: Attribute '%s' is replaced by the API Attribute", dotAttrName));
       kjChildRemove(dbAttrsP, dbAttrP);
-#if 0      
-      dbModelFromApiAttribute(apiAttrP, dbAttrsP, NULL, NULL, NULL);  // attrAddedV, attrRemovedV, ignoreP   ALL NULL ...
+
+      LM(("UP: Calling dbModelFromApiAttribute"));
+      dbModelFromApiAttribute(apiAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);  // ignoreP == NULL ...
       kjChildAdd(dbAttrsP, apiAttrP);  // apiAttrP is now in DB-Model format
-#else
-      dbAttrP = kjObject(orionldState.kjsonP, apiAttrP->name);
-      kjChildAdd(dbAttrsP, dbAttrP);
-#endif       
     }
   }
   LM(("UP: ---------- Looped over API-Entity attributes"));
+
+  kjChildAdd(apiEntityP, attrAddedV);
+  kjChildAdd(apiEntityP, attrRemovedV);
 }
 
 
@@ -355,7 +357,7 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
 
   alterationP->entityId          = entityId;
   alterationP->entityType        = entityType;
-  alterationP->patchTree         = NULL;
+  alterationP->patchTree         = NULL;        // For new, more fine-granulated notifications
   alterationP->dbEntityP         = NULL;
   alterationP->patchedEntity     = apiEntityP;
   alterationP->alteredAttributes = 0;
@@ -550,16 +552,16 @@ bool orionldPostBatchUpsert(void)
         entityMergeForReplace(entityP, dbEntityP);  // Resulting Entity is entityP
       else
       {
-        apiEntityP = entityP;
         // entityMergeForUpdate:
         // - DOES NOT modify entityP
         // - leaves the merged entity already in DB Model format - in dbEntityP
         entityMergeForUpdate(entityP, dbEntityP);
         entityP = dbEntityP;
+        kjTreeLog(dbEntityP, "UP: Merged entity - for alterations/notifications");
         alreadyInDbModelFormat = true;
+        KjNode* clonedDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
+        apiEntityP = dbModelToApiEntity(clonedDbEntityP, false, entityId);  // For notifications we need the entire entity
       }
-
-      kjTreeLog(entityP, "ALT: Merged Entity - later cloned for apiEntityP and ALTERATIONS");
 
       // Adding entityP to the updateArray for mongocEntitiesUpsert, even though it will be transformed later by dbModelFromApiEntity
       kjChildAdd(updateArray, entityP);
@@ -582,7 +584,7 @@ bool orionldPostBatchUpsert(void)
       dbModelFromApiEntity(entityP, dbEntityP, creation, NULL, NULL);
     }
 
-    kjTreeLog(apiEntityP, "ALT: API-Entity for Alteration ");
+    kjTreeLog(apiEntityP, "ALT: API-Entity for Alteration/Notification");
     alteration(entityId, NULL, apiEntityP);
     entityP = next;
   }
