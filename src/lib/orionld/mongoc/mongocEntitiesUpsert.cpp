@@ -99,6 +99,9 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 
     bson_append_utf8(&match, "_id.id", 6, idP->value.s, -1);
 
+    // Now that the entity id is known, the entire _id must be removed - can't update with _id present
+    kjChildRemove(entityP, _idP);
+
     LM(("KZ:  o %s", idP->value.s));
     mongocKjTreeToBson(entityP, &doc);  // The entity needs to be DB-Prepared !
     mongoc_bulk_operation_replace_one(bulkP, &match, &doc, false);
