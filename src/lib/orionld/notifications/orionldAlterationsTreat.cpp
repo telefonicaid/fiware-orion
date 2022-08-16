@@ -214,9 +214,9 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     if (matchP->altAttrP != NULL)
-      LM(("KZ: o %d/%d Subscription '%s' (url: %s), due to '%s'", ix, matches, matchP->subP->subscriptionId, matchP->subP->url, orionldAlterationName(matchP->altAttrP->alterationType)));
+      LM(("KZ: o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
     else
-      LM(("KZ: o %d/%d Subscription '%s' (url: %s)", ix, matches, matchP->subP->subscriptionId, matchP->subP->url));
+      LM(("KZ: o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
     ++ix;
   }
 #endif
@@ -227,6 +227,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   if (altList->dbEntityP != NULL)
   {
+    LM(("Applying PATCH"));
     altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
 
     for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
@@ -237,19 +238,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
   //
   // Timestamp for sending of notification - for stats in subscriptions
+  // OR: Should I use the request time instead?
   //
   struct timespec  notificationTime;
   double           notificationTimeAsFloat;
   kTimeGet(&notificationTime);
   notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
 
-  //
-  // **********************************************************************
-  //   HERE is where I send each and every Notification seperately.
-  //   Instead, I should group those alterations that are for the same subscription.
-  //   Merge the entities into the data array and send one single nmoptification per subscription.
-  // **********************************************************************
-  //
   while (matchList != NULL)
   {
     //
@@ -262,16 +257,16 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     OrionldAlterationMatch* matchHead = matchList;
     matchList = matchList->next;
     matchHead->next = NULL;  // The matchHead-list is now NULL-terminated and separated from matchList
-    LM(("KZ: inserting match in matchHead-list: %p", matchHead));
+    LM(("Q: inserting match in matchHead-list: sub: %s, entity: %s", matchHead->subP->subscriptionId, matchHead->altP->entityId));
     while ((matchList != NULL) && (matchList->subP == matchHead->subP))
     {
-      LM(("KZ: inserting match in matchHead-list: %p", matchList));
       OrionldAlterationMatch* current = matchList;
+      LM(("Q: inserting match in matchHead-list: sub: %s, entity: %s", current->subP->subscriptionId, current->altP->entityId));
       matchList     = matchList->next;
       current->next = matchHead;
       matchHead     = current;
     }
-    LM(("KZ: matchHead-list done"));
+    LM(("Q: matchHead-list done - calling notificationSend"));
 
     CURL* curlHandleP;
     int   fd = notificationSend(matchHead, notificationTimeAsFloat, &curlHandleP);  // curl handle as output param?

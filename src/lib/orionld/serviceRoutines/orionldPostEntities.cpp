@@ -140,7 +140,7 @@ bool orionldPostEntities(void)
   orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
   orionldState.alterations->entityId          = entityId;
   orionldState.alterations->entityType        = entityType;
-  orionldState.alterations->patchTree         = NULL;
+  orionldState.alterations->patchTree         = apiEntityP;
   orionldState.alterations->dbEntityP         = NULL;
   orionldState.alterations->patchedEntity     = apiEntityP;  // entity id, createdAt, modifiedAt ...
   orionldState.alterations->alteredAttributes = 0;

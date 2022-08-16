@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
 #include "orionld/payloadCheck/pCheckUri.h"                    // pCheckUri
 #include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
@@ -52,6 +53,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntitiesQuery.h"                // mongocEntitiesQuery
 #include "orionld/mongoc/mongocEntitiesUpsert.h"               // mongocEntitiesUpsert
 #include "orionld/legacyDriver/legacyPostBatchUpsert.h"        // legacyPostBatchUpsert
+#include "orionld/notifications/orionldAlterations.h"          // orionldAlterations
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own interface
 
 
@@ -298,9 +300,6 @@ static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
     }
   }
   LM(("UP: ---------- Looped over API-Entity attributes"));
-
-  kjChildAdd(apiEntityP, attrAddedV);
-  kjChildAdd(apiEntityP, attrRemovedV);
 }
 
 
@@ -343,7 +342,7 @@ static void entityMergeForReplace(KjNode* apiEntityP, KjNode* dbEntityP)
 //
 // alteration -
 //
-static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
+static void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* incomingP)
 {
   OrionldAlteration* alterationP = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
 
@@ -357,14 +356,14 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP)
 
   alterationP->entityId          = entityId;
   alterationP->entityType        = entityType;
-  alterationP->patchTree         = NULL;        // For new, more fine-granulated notifications
+  alterationP->patchTree         = incomingP;
   alterationP->dbEntityP         = NULL;
   alterationP->patchedEntity     = apiEntityP;
   alterationP->alteredAttributes = 0;
   alterationP->alteredAttributeV = NULL;
-  alterationP->next              = orionldState.alterations;
 
-  kjTreeLog(alterationP->patchedEntity, "NOTIF: patchedEntity");
+  // Link it into the list
+  alterationP->next        = orionldState.alterations;
   orionldState.alterations = alterationP;
 }
 
@@ -453,7 +452,7 @@ bool orionldPostBatchUpsert(void)
   KjNode*      outArrayErroredP = kjArray(orionldState.kjsonP, "errors");
   int          noOfEntities     = entityCountAndFirstCheck(orionldState.requestTree, outArrayErroredP);
 
-  LM(("Number of valid Entities after first check-round: %d", noOfEntities));
+  LM(("Number of valid Entities after 1st check-round: %d", noOfEntities));
 
 
   //
@@ -477,7 +476,7 @@ bool orionldPostBatchUpsert(void)
   // (extract the entity ids) later to be used by mongocEntitiesQuery().
   //
   noOfEntities = entityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP);
-  LM(("Number of valid Entities after second check-round: %d", noOfEntities));
+  LM(("Number of valid Entities after 2nd check-round: %d", noOfEntities));
 
 
   //
@@ -496,7 +495,7 @@ bool orionldPostBatchUpsert(void)
   // Finally we have everything we need to 100% CHECK the incoming entities
   //
   noOfEntities = entitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update);
-  LM(("Number of valid Entities after second check-round: %d", noOfEntities));
+  LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
   KjNode* outArrayCreatedP  = kjArray(orionldState.kjsonP, "created");
   KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");
@@ -511,15 +510,18 @@ bool orionldPostBatchUpsert(void)
   //
   // Merge new entity data into "old" DB entity data
   //
+  // incoming:   untouched entity, as it came in
+  // apiEntityP: merged with DB, but in NGSI-LD API format
+  // dbEntityP:  merged with DB, in DB Model format
+  //
   KjNode* entityP = orionldState.requestTree->value.firstChildP;
   KjNode* next;
 
-  // kjTreeLog(dbEntityArray, "dbEntityArray");
-  kjTreeLog(dbEntityArray, "AN: Entities from DB");
   while (entityP != NULL)
   {
     next = entityP->next;
 
+    KjNode* incomingP              = kjClone(orionldState.kjsonP, entityP);
     KjNode* idNodeP                = kjLookup(entityP, "id");
     char*   entityId               = idNodeP->value.s;
     KjNode* dbEntityTypeNodeP      = NULL;
@@ -527,8 +529,8 @@ bool orionldPostBatchUpsert(void)
     bool    creation               = true;
     KjNode* apiEntityP             = NULL;
     bool    alreadyInDbModelFormat = false;
+    bool    alterationDone         = false;
 
-    LM(("AN: dbEntityP for entity '%s' at %p", entityId, dbEntityP));
     if (dbEntityP != NULL)
     {
       kjTreeLog(dbEntityP, "AN: dbEntityP");
@@ -552,34 +554,36 @@ bool orionldPostBatchUpsert(void)
         entityMergeForReplace(entityP, dbEntityP);  // Resulting Entity is entityP
       else
       {
+        //
         // entityMergeForUpdate:
-        // - DOES NOT modify entityP
-        // - leaves the merged entity already in DB Model format - in dbEntityP
+        //   * DOES NOT modify entityP
+        //   * leaves the merged entity already in DB Model format - in dbEntityP
+        //
         entityMergeForUpdate(entityP, dbEntityP);
-        entityP = dbEntityP;
+
         kjTreeLog(dbEntityP, "UP: Merged entity - for alterations/notifications");
         alreadyInDbModelFormat = true;
         KjNode* clonedDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
-        apiEntityP = dbModelToApiEntity(clonedDbEntityP, false, entityId);  // For notifications we need the entire entity
+        apiEntityP = dbModelToApiEntity(clonedDbEntityP, false, entityId);  // For notifications we need the entire resulting entity
 
         //
-        // FIXME:  Need the whole thing from patchEntity2.
+        // Alteration for Update
         //
-        // Only part of the apiEntity has actually been updated.
-        // The mistake is clear if you look at the function attributeMatch (subCacheAlterationMatch.cpp):
-        //
-        //   if (altP->alteredAttributes == 0)  // E.g. complete replace of an entity
-        //
-        // So, what's missing here is the entire fine granular thing from patchEntity2 (needs to be amended):
-        //
-        //    OrionldAlteration* alterationP = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP);
-        //    alterationP->dbEntityP         = kjClone(orionldState.kjsonP, dbEntityP);
-        //    alterationP->next              = orionldState.alterations;
-        //    orionldState.alterations       = alterationP;
-        //    alterationDone = true;
-        //
-        // The function 'orionldAlterations' need its own module in orionld/notifications (it's in orionldPatchEntity2.cpp)
-        //
+        char*               entityType  = dbEntityTypeNodeP->value.s;
+        KjNode*             dbAttrsP    = kjLookup(dbEntityP, "attrs");
+        OrionldAlteration*  alterationP = orionldAlterations(entityId, entityType, entityP, dbAttrsP, false);
+
+        alterationP->dbEntityP         = kjClone(orionldState.kjsonP, dbEntityP);
+        alterationP->patchedEntity     = apiEntityP;
+        alterationP->patchTree         = incomingP;
+
+        // Add the new alteration to the alteration-list (orionldState.alterations)
+        alterationP->next              = orionldState.alterations;
+        orionldState.alterations       = alterationP;
+
+        alterationDone = true;
+
+        entityP = dbEntityP;
       }
 
       // Adding entityP to the updateArray for mongocEntitiesUpsert, even though it will be transformed later by dbModelFromApiEntity
@@ -590,7 +594,7 @@ bool orionldPostBatchUpsert(void)
 
     //
     // * entityP is transformed info DB-Model for mongocEntitiesUpsert
-    // * apiEntityP must stay API-Entity and is used for alterations (so, entityP is cloned before dbModelFromApiEntity)
+    // * apiEntityP must stay API-Entity and is used for alterations (so, entityP is cloned before dbModelFromApiEntity for apiEntityP to not get destroyed)
     // * TRoE ... can probably use apiEntityP (wait, entityMergeForUpdate will destroy that ...)
     //
     if (apiEntityP == NULL)
@@ -600,8 +604,8 @@ bool orionldPostBatchUpsert(void)
     if (alreadyInDbModelFormat == false)
       dbModelFromApiEntity(entityP, dbEntityP, creation, NULL, NULL);
 
-    // if (alterationDone == false)
-    alteration(entityId, NULL, apiEntityP);
+    if (alterationDone == false)
+      alteration(entityId, NULL, apiEntityP, incomingP);
     entityP = next;
   }
 

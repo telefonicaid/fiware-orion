@@ -31,6 +31,7 @@ brokerStart CB 0 IPv4 -experimental
 accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
 accumulatorStart --pretty-print 127.0.0.1 $LISTENER2_PORT
 accumulatorStart --pretty-print 127.0.0.1 $LISTENER3_PORT
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER4_PORT
 
 --SHELL--
 
@@ -48,7 +49,7 @@ accumulatorStart --pretty-print 127.0.0.1 $LISTENER3_PORT
 # 11. Dump Accumulator - see four notifications (one double)
 # 12. Dump Accumulator2 - see four notifications (one double)
 # 13. Dump Accumulator3 - see one notification (step 05)
-# 14. Dump Accumulator4 - see one notifications (step 07)
+# 14. Dump Accumulator4 - see one notification (step 07)
 #
 
 echo "01. Create subscription S1 for everything (i.e. all entities with type T)"
@@ -239,8 +240,8 @@ echo
 echo
 
 
-echo "14. Dump Accumulator4 - see one notifications (step 07)"
-echo "======================================================="
+echo "14. Dump Accumulator4 - see one notification (step 07)"
+echo "======================================================"
 accumulator4Dump
 echo
 echo
@@ -710,10 +711,75 @@ Ngsild-Attribute-Format: Normalized
 
 13. Dump Accumulator3 - see one notification (step 05)
 ======================================================
+POST http://127.0.0.1:9957/notify?subscriptionId=urn:ngsi-ld:subscriptions:S3
+Content-Length: 278
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S3",
+    "type": "Notification"
+}
+=======================================
 
 
-14. Dump Accumulator4 - see one notifications (step 07)
-=======================================================
+14. Dump Accumulator4 - see one notification (step 07)
+======================================================
+POST http://127.0.0.1:9937/notify?subscriptionId=urn:ngsi-ld:subscriptions:S4
+Content-Length: 402
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 1
+            },
+            "P1": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S4",
+    "type": "Notification"
+}
+=======================================
 
 
 --TEARDOWN--

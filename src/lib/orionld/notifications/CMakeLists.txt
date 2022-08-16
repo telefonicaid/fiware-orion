@@ -21,6 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    orionldAlterations.cpp
     orionldAlterationsTreat.cpp
     subCacheAlterationMatch.cpp
     notificationSend.cpp

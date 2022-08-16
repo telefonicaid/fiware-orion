@@ -58,8 +58,8 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
   //
   // Remove unwanted parts of the attribute from DB
   //
-  const char* unwanted[]   = { "mdNames", "creDate",   "modDate" };
-  const char* ngsildName[] = { NULL,      "createdAt", "modifiedAt" };
+  const char* unwanted[]   = { "mdNames", ".added", ".removed", "creDate",   "modDate"    };
+  const char* ngsildName[] = { NULL,      NULL,     NULL,       "createdAt", "modifiedAt" };
 
   for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {
@@ -67,7 +67,7 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
 
     if (nodeP != NULL)
     {
-      if ((sysAttrs == true) && (ix > 0))
+      if ((sysAttrs == true) && (ix > 2))
       {
         char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
         numberToDate(dbAttrP->value.f, dateTimeBuf, 32);

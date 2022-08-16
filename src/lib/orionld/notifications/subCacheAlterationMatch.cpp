@@ -184,12 +184,12 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
     if (matchP->subP == itemP->subP)
     {
       //
-      // insert it in the list
+      // insert it in the list, right after matchP
       //
       itemP->next = matchP->next;
       matchP->next = itemP;
 
-      LM(("Inserting Alteration of entity '%s' for subscription '%s' (consecutive alteration)", itemP->altP->entityId, itemP->subP->subscriptionId));
+      LM(("Q: Inserting Alteration of entity '%s' for subscription '%s' (consecutive alteration)", itemP->altP->entityId, itemP->subP->subscriptionId));
       return matchList;
     }
 
@@ -198,9 +198,9 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 
 
   // First alteration-match of a subscription - prepending it to the matchList
-  LM(("Inserting Alteration of entity '%s' for subscription '%s' (First alteration for this subscription)", itemP->altP->entityId, itemP->subP->subscriptionId));
+  LM(("Q: Inserting Alteration of entity '%s' for subscription '%s' (First alteration for this subscription)", itemP->altP->entityId, itemP->subP->subscriptionId));
   itemP->next = matchList;
-  return itemP;
+  return itemP;  // As new matchList
 }
 
 
@@ -209,7 +209,14 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 //
 // matchToMatchList -
 //
-static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchList, CachedSubscription* subP, OrionldAlteration* altP, OrionldAttributeAlteration* aaP, int* matchesP)
+static OrionldAlterationMatch* matchToMatchList
+(
+  OrionldAlterationMatch*      matchList,
+  CachedSubscription*          subP,
+  OrionldAlteration*           altP,
+  OrionldAttributeAlteration*  aaP,
+  int*                         matchesP
+)
 {
   OrionldAlterationMatch* amP = (OrionldAlterationMatch*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlterationMatch));
   amP->altP     = altP;
@@ -228,9 +235,12 @@ static OrionldAlterationMatch* matchToMatchList(OrionldAlterationMatch* matchLis
     // Already there? - look up the existing subs in matchList to make sure we don't get any duplicates
     if (matchLookup(matchList, amP) == false)
     {
+      LM(("Q: Inserting match for subscription '%s'", subP->subscriptionId));
       matchList  = matchListInsert(matchList, amP);
       *matchesP += 1;
     }
+    else
+      LM(("Q: NOT Inserting match for subscription '%s' (already there)", subP->subscriptionId));
   }
 
   return matchList;
@@ -246,37 +256,87 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 {
   int matches = 0;
 
+  //
+  // FIXME:
+  //   No update should ever have ZERO alteredAttributes - I implemented that for convenience, but, can't stay.
+  //   For now, this code inside "if (altP->alteredAttributes == 0)" stays but is all a bit "chapuza".
+  //
+  //   MIGHT BE I let "Creation" have zero alteredAttributes, as all attributes are created, none are removed nor updated ...
+  //
   if (altP->alteredAttributes == 0)  // E.g. complete replace of an entity - treating it as EntityModified (for now)
   {
+    LM(("Q: Subscription '%s': altP->alteredAttributes == 0", subP->subscriptionId));
+
     //
-    // FIXME: what if an Entity is created with a single attribute P1, and there is a subscription with a "watchedAttributes": [ "P2" ]
-    //        should a notification be sent or not?
-    //        I just brouight this doubt to ETSI ISG CIM (2022-05-27)
+    // watchedAttributes
     //
+    int  watchAttrs = subP->notifyConditionV.size();
+    bool match      = (watchAttrs == 0);  // If no watchedAttributes, then it's a match
+
+    LM(("Q: Subscription '%s' has %d watchedAttributes", subP->subscriptionId, watchAttrs));
+
+    if ((watchAttrs > 0) && (altP->patchTree != NULL))
+    {
+      LM(("Q: Alteration %p has a patchTree at %p", altP, altP->patchTree));
+      for (KjNode* attrP = altP->patchTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+        if (strcmp(attrP->name, "id")   == 0) continue;
+        if (strcmp(attrP->name, "type") == 0) continue;
+
+        for (int ix = 0; ix < watchAttrs; ix++)
+        {
+          LM(("Q: Comparing attr '%s' with watchedAttribute '%s'", attrP->name, subP->notifyConditionV[ix].c_str()));
+          if (strcmp(attrP->name, subP->notifyConditionV[ix].c_str()) == 0)
+          {
+            match = true;
+            break;
+          }
+        }
+
+        if (match == true)
+          break;
+      }
+    }
+    LM(("Q: match: %s", (match == true)? "yes" : "no"));
+
+    // FIXME: Would need also to check those attributes that were deleted (either directly or via a REPLACE)
 
     // Is the Alteration type ON for this subscription?
-    if (subP->triggers[EntityModified] == true)
-      matchList = matchToMatchList(matchList, subP, altP, NULL, &matches);
+    if (match == true)
+    {
+      if (subP->triggers[EntityModified] == true)
+      {
+        LM(("Q: Adding match for subscription '%s'", subP->subscriptionId));
+        matchList = matchToMatchList(matchList, subP, altP, NULL, &matches);
+      }
+      else
+        LM(("Q: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
+    }
     else
-      LM(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
+      LM(("Q: Sub '%s' - no match due to Watched Attributes", subP->subscriptionId));
   }
 
+  LM(("Q: alteredAttributes: %d", altP->alteredAttributes));
   for (int aaIx = 0; aaIx < altP->alteredAttributes; aaIx++)
   {
     OrionldAttributeAlteration*  aaP        = &altP->alteredAttributeV[aaIx];
     int                          watchAttrs = subP->notifyConditionV.size();
     int                          nIx        = 0;
 
+    LM(("Subscription '%s' has %d watchedAttributes", subP->subscriptionId, watchAttrs));
     while (nIx < watchAttrs)
     {
-      // LM(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
+      LM(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
       if (strcmp(aaP->attrName, subP->notifyConditionV[nIx].c_str()) == 0)
         break;
       ++nIx;
     }
 
     if ((watchAttrs > 0) && (nIx == watchAttrs))  // No match found
+    {
+      LM(("Sub '%s' - no match due to watchedAttributes", subP->subscriptionId));
       continue;
+    }
 
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[aaP->alterationType] == false)
@@ -290,7 +350,8 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
   if (matches == 0)
     LM(("Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
-
+  else
+    LM(("Subscription '%s' is a MATCH", subP->subscriptionId));
   *matchesP += matches;
 
   return matchList;
@@ -786,6 +847,8 @@ bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
 //
 bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
+  LM(("Q: isTimestamp: %s", (isTimestamp == true)? "yes" : "no"));
+
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
   //
@@ -814,28 +877,33 @@ bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
     }
   }
 
+  LM(("Q: lhsNode->type: %s", kjValueType(lhsNode->type)));
+  LM(("Q: rhs->type:     %s", qNodeType(rhs->type)));
+
+  bool r = false;
   if (lhsNode->type == KjInt)
   {
-    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.i < rhs->value.i);
-    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.i < rhs->value.f);
+    if      (rhs->type == QNodeIntegerValue) r = (lhsNode->value.i < rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   r = (lhsNode->value.i < rhs->value.f);
   }
   else if (lhsNode->type == KjFloat)
   {
-    if      (rhs->type == QNodeIntegerValue) return (lhsNode->value.f < rhs->value.i);
-    else if (rhs->type == QNodeFloatValue)   return (lhsNode->value.f < rhs->value.f);
+    if      (rhs->type == QNodeIntegerValue) r = (lhsNode->value.f < rhs->value.i);
+    else if (rhs->type == QNodeFloatValue)   r = (lhsNode->value.f < rhs->value.f);
   }
   else if (lhsNode->type == KjString)
   {
     if (rhs->type == QNodeStringValue)
-      return (strcmp(lhsNode->value.s, rhs->value.s) < 0);  // "< 0" means first arg < second arg to strcmp
+      r = (strcmp(lhsNode->value.s, rhs->value.s) < 0);  // "< 0" means first arg < second arg to strcmp
   }
   else if (lhsNode->type == KjBoolean)  // true > false ... ?
   {
-    if (rhs->type == QNodeTrueValue)       return false;
-    if (rhs->type == QNodeFalseValue)      return (lhsNode->value.b == true);
+    if (rhs->type == QNodeTrueValue)       r = false;
+    if (rhs->type == QNodeFalseValue)      r = (lhsNode->value.b == true);
   }
 
-  return false;
+  LM(("Q: Returning %s", (r == true)? "true" : "false"));
+  return r;
 }
 
 
@@ -897,13 +965,19 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     // If it does not, then the result is always "false" (except for the case "q=!P1", of course :))
     //
     bool     isTimestamp = false;
-    KjNode*  lhsNode     = kjNavigate2(altP->patchedEntity, lhs->value.v, &isTimestamp);
+    KjNode*  lhsNode     = kjNavigate2(altP->patchTree, lhs->value.v, &isTimestamp);
+
+    kjTreeLog(altP->patchTree, "Q2: patchTree");
 
     //
     // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
     //
     if (lhsNode == NULL)
+    {
+      LM(("Q2: Attribute '%s' does not exist", lhs->value.v));
       return (qP->type == QNodeNotExists)? true : false;
+    }
+    LM(("Q2: Attribute '%s' exists", lhs->value.v));
 
     if      (qP->type == QNodeNotExists)  return false;
     else if (qP->type == QNodeExists)     return true;
@@ -921,7 +995,7 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     }
     else if (qP->type == QNodeGT)         return  qGtCompare(altP, lhsNode, rhs, isTimestamp);
     else if (qP->type == QNodeLT)         return  qLtCompare(altP, lhsNode, rhs, isTimestamp);
-    else if (qP->type == QNodeGE)         return !qLtCompare(altP, lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeGE)  { bool r; LM(("Q: GE")); r = !qLtCompare(altP, lhsNode, rhs, isTimestamp); LM(("Q: Returning %s", (r == true)? "true" : "false" )); return r; }
     else if (qP->type == QNodeLE)         return !qGtCompare(altP, lhsNode, rhs, isTimestamp);
     else if (qP->type == QNodeMatch)      return qMatchCompare(altP, lhsNode, rhs);
     else if (qP->type == QNodeNoMatch)    return !qMatchCompare(altP, lhsNode, rhs);
@@ -947,10 +1021,14 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   // Loop over each alteration, and check ALL SUBSCRIPTIONS in the cache for that alteration
   // For each matching subscription, add the alterations into 'matchList'
   //
+  int ix = 0;
   for (OrionldAlteration* altP = alterationList; altP != NULL; altP = altP->next)
   {
+    LM(("Q: Checking alteration %d (%p) on Entity '%s'", ix, altP, altP->entityId));
+    ++ix;
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
     {
+      LM(("Q: Checking match for subscription '%s' on alteration %p", subP->subscriptionId, altP));
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
       {
         LM(("Sub '%s' - no match due to tenant", subP->subscriptionId));
@@ -1002,11 +1080,14 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       if (subP->qP != NULL)
       {
+        LM(("Q: Calling qMatch for subscription '%s'", subP->subscriptionId));
         if (qMatch(subP->qP, altP) == false)
         {
-          LM(("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
+          LM(("Q: Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
           continue;
         }
+        else
+          LM(("Q: Sub '%s' - MATCH with ldq == '%s'", subP->subscriptionId, subP->qText));
       }
 
       //
@@ -1018,6 +1099,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       // 'geoQ' MUST come last as it requires a database query
       // (OR: somehow use GEOS library and fix it that way ...)
       //
+      LM(("Q: Calling attributeMatch(alteration %p, subscription '%s')", altP, subP->subscriptionId));
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
   }

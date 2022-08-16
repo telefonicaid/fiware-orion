@@ -263,24 +263,12 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
   if (addedP   != NULL) kjChildRemove(attrP, addedP);
   if (removedP != NULL) kjChildRemove(attrP, removedP);
 
-
   bool asSimplified = false;
-  kjTreeLog(attrP, "Attribute BEFORE");
-  if (simplified)
-  {
-    LM(("Calling attributeToSimplified"));
-    attributeToSimplified(attrP, subP->lang.c_str());
-  }
-  else if (concise)
-  {
-    LM(("Calling attributeToConcise"));
-    attributeToConcise(attrP, &asSimplified, subP->lang.c_str());
-  }
-  else  // normalized
-  {
-    LM(("Calling attributeToNormalized"));
-    attributeToNormalized(attrP, subP->lang.c_str());
-  }
+
+  if      (simplified)  attributeToSimplified(attrP, subP->lang.c_str());
+  else if (concise)     attributeToConcise(attrP, &asSimplified, subP->lang.c_str());
+  else                  attributeToNormalized(attrP, subP->lang.c_str());
+
   kjTreeLog(attrP, "Attribute AFTER");
 
   if ((asSimplified == false) && (simplified == false))
@@ -603,12 +591,12 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   // <DEBUG>
   for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
   {
-    LM(("KZ: AlterationMatch %p", mP));
-    LM(("KZ:   Subscription    %s", mP->subP->subscriptionId));
-    LM(("KZ:   Entity:         %s", mP->altP->entityId));
-    LM(("KZ:   patchTree:      %p", mP->altP->patchTree));
-    LM(("KZ:   patchedEntity:  %p", mP->altP->patchedEntity));
-    LM(("KZ:"));
+    LM(("Q: AlterationMatch %p", mP));
+    LM(("Q:   Subscription    %s", mP->subP->subscriptionId));
+    LM(("Q:   Entity:         %s", mP->altP->entityId));
+    LM(("Q:   patchTree:      %p", mP->altP->patchTree));
+    LM(("Q:   patchedEntity:  %p", mP->altP->patchedEntity));
+    LM(("Q:"));
   }
   // </DEBUG>
 
@@ -814,10 +802,11 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   // The message is ready - just need to be sent
   //
+  LM(("Q: delegating sending of the notification to httpNotify/httpsNotify/mqttNotify"));
   if      (mAltP->subP->protocol == HTTP)    return httpNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
   else if (mAltP->subP->protocol == HTTPS)   return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp, curlHandlePP);
   else if (mAltP->subP->protocol == MQTT)    return mqttNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
 
-  LM_W(("Unsupported protocol for notifications: '%s'", mAltP->subP->protocol));
+  LM_W(("Q: Unsupported protocol for notifications: '%s'", mAltP->subP->protocol));
   return -1;
 }
