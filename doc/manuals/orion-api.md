@@ -2521,7 +2521,7 @@ The values that `options` parameter can have for this specific request are:
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `append`    | Force an append operation.                                                                                                                         |
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
-| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityUpdate` [alteration type](#subscriptions-based-in-alteration-type) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
@@ -2581,7 +2581,7 @@ The values that `options` parameter can have for this specific request are:
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
-| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityUpdate` [alteration type](#subscriptions-based-in-alteration-type) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
@@ -2643,7 +2643,7 @@ The values that `options` parameter can have for this specific request are:
 | Options     | Description                                                                                                                                        |
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
-| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityUpdate` [alteration type](#subscriptions-based-in-alteration-type) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
@@ -2801,7 +2801,7 @@ The values that `options` parameter can have for this specific request are:
 | Options            | Description                                                                                                                                          |
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
-| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityUpdate` [alteration type](#subscriptions-based-in-alteration-type) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
@@ -2963,7 +2963,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options        | Description                                                                                                                                          |
 |----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityUpdate` [alteration type](#subscriptions-based-in-alteration-type) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
@@ -3902,7 +3902,7 @@ The values that `options` parameter can have for this specific request are:
 |-------------|--------------------------------------------------------------------------------------------------|
 | `keyValues` | When used, the request payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `overrideMetadata` | Replace the existing metadata with the one provided in the request. See [Metadata update semantics](#metadata-update-semantics) section for details. |
-| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityChange` [alteration type](user/subscriptions_alttype.md) for the same effect. |
+| `forcedUpdate` | Update operation have to trigger any matching subscription, no matter if there is an actual attribute update or no instead of the default behavior, which is to updated only if attribute is effectively updated. Check also the `entityUpdate` [alteration type](#subscriptions-based-in-alteration-type) for the same effect. |
 | `flowControl`  | Enable flow control mechanism, to avoid saturation under high-load scenarios. It is explained in [this section in the documentation](admin/perf_tuning.md#updates-flow-control-mechanism). |
 
 _**Request headers**_
