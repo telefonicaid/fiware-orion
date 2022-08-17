@@ -82,7 +82,7 @@
             - [Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
             - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
-            - [Retrieve entity information for a given type [GET /v2/types]](#retrieve-entity-information-for-a-given-type-get-v2types)
+            - [Retrieve entity information for a given type [GET /v2/types/{type}]](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
             - [`subscription.subject`](#subscriptionsubject)
@@ -3012,20 +3012,7 @@ _**Response code**_
 
 #### List Entity Types [GET /v2/type]
 
-If the `values` option is not in use, this operation returns a JSON array with the entity types.
-Each element is a JSON object with information about the type:
-
-* `type` : the entity type name.
-* `attrs` : the set of attribute names along with all the entities of such type, represented in
-  a JSON object whose keys are the attribute names and whose values contain information of such
-  attributes (in particular a list of the types used by attributes with that name along with all the
-  entities).
-* `count` : the number of entities belonging to that type.
-
-If the `values` option is used, the operation returns a JSON array with a list of entity type
-names as strings.
-
-Results are ordered by entity `type` in alphabetical order.
+Retrieves a list of entity types, as described in the response payload section below.
 
 _**Request query parameters**_
 
@@ -3041,7 +3028,7 @@ The values that `options` parameter can have for this specific request are:
 |----------|------------------------------------------------------------------------------------------|
 | `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
-| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
+| `noAttrDetail` | When used, the request does not provide attribute type details, i.e. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
 
 _**Request headers**_
 
@@ -3062,10 +3049,19 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-This request return a JSON array with an object for each different entity type found, that contains elements:
-- `type`. The name of the entity type. The type itself.
-- `attrs`. An object that contains all the attributes and the types of each attribute that belongs to that specific type.
-- `count`. The amount of entities that have that specific entity type.
+If the `values` option is not in use, this operation returns a JSON array with the entity types.
+Each element is a JSON object with information about the type:
+
+* `type` : the entity type name.
+* `attrs`. An object that contains a key for each type of attributes present on the entities that 
+  belongs to that specific type. The value of this key is an object which contains an array, `types`,
+  with all the different types found for that attribute in all the entities of the type specified.    
+* `count` : the number of entities belonging to that type.
+
+If the `values` option is used, the operation returns a JSON array with a list of entity type
+names as strings.
+
+Results are ordered by entity `type` in alphabetical order.
 
 Example:
 
@@ -3104,15 +3100,9 @@ Example:
 ]
 ```
 
-#### Retrieve entity information for a given type [GET /v2/types]
+#### Retrieve entity information for a given type [GET /v2/types/{type}]
 
-This operation returns a JSON object with information about the type:
-
-* `attrs` : the set of attribute names along with all the entities of such type, represented in
-  a JSON object whose keys are the attribute names and whose values contain information of such
-  attributes (in particular a list of the types used by attributes with that name along with all the
-  entities).
-* `count` : the number of entities belonging to that type.
+This operation returns a JSON object with information about the type, as described in the response payload section below.
 
 _**Request query parameters**_
 
@@ -3124,7 +3114,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                              |
 |----------|------------------------------------------------------------------------------------------|
-| `noAttrDetail` | When used, the request does not provide attribute type details. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
+| `noAttrDetail` | When used, the request does not provide attribute type details, i.e. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
 
 _**Request headers**_
 
@@ -3146,8 +3136,9 @@ Successful operations return `Content-Type` header with `application/json` value
 _**Response payload**_
 
 This request return a JSON with 2 fields for the entity type retrieved
-- `attrs`. An object that contains a object for each type of attributes present on the entities that belongs to that specific type. 
-   This object contains an array, `types`, with al the different types found for that attribute in all the entities of the type specified.
+- `attrs`. An object that contains a key for each type of attributes present on the entities that 
+  belongs to that specific type. The value of this key is an object which contains an array, `types`,
+  with all the different types found for that attribute in all the entities of the type specified.
 - `count`. The amount of entities that have that specific entity type.
 
 Example:
