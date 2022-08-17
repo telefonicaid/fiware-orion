@@ -174,11 +174,44 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
     KjNode*         contextNodeP = kjLookup(eP, "@context");
     OrionldContext* contextP     = NULL;
 
-    if (contextNodeP != NULL)
-      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
+    //
+    // If Content-Type is application/ld+json, then every entity must have an @context
+    // If instead the Content-Type is application/json then an @context cannot be present
+    //
+    if (orionldState.in.contentType == JSONLD)
+    {
+      if (contextNodeP == NULL)
+      {
+        LM_E(("Content-Type is 'application/ld+json', but no @context found for entity '%s'", entityId));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400, false);
+        kjChildRemove(orionldState.requestTree, eP);
+        eP = next;
+        continue;
+      }
 
-    if (contextP != NULL)
+      contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);
+      if (contextP == NULL)
+      {
+        LM_E(("orionldContextFromTree reports error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status, false);
+        kjChildRemove(orionldState.requestTree, eP);
+        eP = next;
+        continue;
+      }
+
       orionldState.contextP = contextP;
+    }
+    else
+    {
+      if (contextNodeP != NULL)
+      {
+        LM_E(("Content-Type is 'application/json', and an @context is present in the payload data array item of entity '%s'", entityId));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400, false);
+        kjChildRemove(orionldState.requestTree, eP);
+        eP = next;
+        continue;
+      }
+    }
 
     KjNode* dbAttrsP = NULL;
     if (update == true)
