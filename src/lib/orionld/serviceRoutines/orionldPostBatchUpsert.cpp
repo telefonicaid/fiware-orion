@@ -655,12 +655,23 @@ bool orionldPostBatchUpsert(void)
     bool    alreadyInDbModelFormat = false;
     bool    alterationDone         = false;
 
-    LM(("X2: Entity '%s' in DB: %p", entityId, dbEntityP));
+    //
+    // The @context has been applied already - if still in the payload body, it needs to go
+    //
+    KjNode* contextNodeP = kjLookup(entityP, "@context");
+    if (contextNodeP != NULL)
+    {
+      LM(("X2: Found an @context - removing it"));
+      kjChildRemove(entityP, contextNodeP);
+    }
+
+    //
+    // If the entity to be upserted is found in the DB, then it's not a Creation but un Update
+    //
     if (dbEntityP != NULL)
     {
       //
-      // The entity already exists (and it has an Entity Type)
-      // The entity type cannot be modified, so ... need to check that
+      // The entity type cannot be modified
       //
       if (entityTypeCheck(dbEntityTypeNodeP, entityP) == false)
       {
