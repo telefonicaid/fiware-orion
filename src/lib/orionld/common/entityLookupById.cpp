@@ -24,13 +24,13 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
-#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldResponseErrorType.h"            // OrionldResponseErrorType
 
 
 

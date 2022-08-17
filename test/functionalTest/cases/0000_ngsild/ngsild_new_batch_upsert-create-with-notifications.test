@@ -91,21 +91,16 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 
 02. Upsert 3 entities (Create) of type T
 ========================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 95
+HTTP/1.1 201 Created
+Content-Length: 58
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
-{
-    "created": [
-        "urn:ngsi-ld:T:E1",
-        "urn:ngsi-ld:T:E2",
-        "urn:ngsi-ld:T:E3"
-    ],
-    "errors": [],
-    "updated": []
-}
+[
+    "urn:ngsi-ld:T:E1",
+    "urn:ngsi-ld:T:E2",
+    "urn:ngsi-ld:T:E3"
+]
 
 
 03. Dump Accumulator - see the 3 entities

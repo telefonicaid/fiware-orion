@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
@@ -52,6 +53,9 @@ extern "C"
 //
 static KjNode* entityIdLookup(KjNode* tree, const char* entityId)
 {
+  kjTreeLog(tree, "XX: tree");
+
+  LM(("orionldState.batchEntities->value.firstChildP == %p", tree->value.firstChildP));
   for (KjNode* itemP = tree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     KjNode* idP = kjLookup(itemP, "id");
@@ -97,13 +101,20 @@ bool troePostBatchUpsert(void)
     if (troeIgnored(entityP) == true)
       continue;
 
+    kjTreeLog(entityP, "XX: entityP");
     KjNode* entityIdP    = kjLookup(entityP, "id");
     bool    entityUpdate = false;  // Updated of entities aren't recorded in the "entities" table
 
+    LM(("XX: entityIdP at %p", entityIdP));
     if (entityIdP != NULL)  // Can't be NULL, really ...
     {
+      LM(("XX: orionldState.batchEntities at %p", orionldState.batchEntities));
       if (orionldState.batchEntities != NULL)
       {
+        LM(("XX: Still here"));
+        kjTreeLog(orionldState.batchEntities, "orionldState.batchEntities");
+        LM(("XX: Still here"));
+        LM(("XX: Entity ID: '%s'", entityIdP->value.s));
         // If the entity already existed, the entity op mode must be "REPLACE"
         if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
           troeEntityMode = (char*) "Create";
@@ -123,6 +134,7 @@ bool troePostBatchUpsert(void)
       pgAttributesBuild(&attributes, entityP, NULL, "Replace", &subAttributes);
     else
       pgEntityBuild(&entities, troeEntityMode, entityP, NULL, NULL, &attributes, &subAttributes);
+    LM(("XX: Here"));
   }
 
 
@@ -133,6 +145,7 @@ bool troePostBatchUpsert(void)
   if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
   if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
+  LM(("XX: sqlIx == %d", sqlIx));
   if (sqlIx > 0)
     pgCommands(sqlV, sqlIx);
 

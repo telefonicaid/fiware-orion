@@ -214,15 +214,11 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 241
+Content-Length: 228
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "created": [
-        "urn:ngsi-ld:T:E2"
-    ],
     "errors": [
         {
             "entityId": "urn:ngsi-ld:T:E1",
@@ -234,27 +230,22 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             }
         }
     ],
-    "updated": []
+    "success": [
+        "urn:ngsi-ld:T:E2"
+    ]
 }
 
 
 05. Upsert/REPLACE urn:ngsi-ld:T:E1
 ===================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 75
+HTTP/1.1 201 Created
+Content-Length: 20
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
-{
-    "created": [
-        "urn:ngsi-ld:T:E3"
-    ],
-    "errors": [],
-    "updated": [
-        "urn:ngsi-ld:T:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:T:E3"
+]
 
 
 06. See the three entities in mongo

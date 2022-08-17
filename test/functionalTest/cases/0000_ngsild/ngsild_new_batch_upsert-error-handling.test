@@ -89,17 +89,11 @@ echo
 01. Upsert 3 entities (Create) with plenty of errors
 ====================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 2553
+Content-Length: 2540
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "created": [
-        "urn:ngsi-ld:T:E1",
-        "urn:ngsi-ld:T:E2",
-        "urn:ngsi-ld:T:E3"
-    ],
     "errors": [
         {
             "entityId": "No Entity::id",
@@ -228,7 +222,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             }
         }
     ],
-    "updated": []
+    "success": [
+        "urn:ngsi-ld:T:E1",
+        "urn:ngsi-ld:T:E2",
+        "urn:ngsi-ld:T:E3"
+    ]
 }
 
 
