@@ -3012,7 +3012,7 @@ _**Response code**_
 
 #### List Entity Types [GET /v2/type]
 
-Retrives a list of entity types, as described in the response payload section below.
+Retrieves a list of entity types, as described in the response payload section below.
 
 _**Request query parameters**_
 
