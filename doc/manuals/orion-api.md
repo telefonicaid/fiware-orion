@@ -745,7 +745,7 @@ Increase by a given value.
 For instance, if the preexisting value of attribute A in entity E is 10 the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$inc": 2 },
   "type": "Number"
@@ -763,7 +763,7 @@ Multiply by a given value
 For instance, if the preexisting value of attribute A in entity E is 10 the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$mul": 2 },
   "type": "Number"
@@ -781,7 +781,7 @@ Updates value if current value is greater than the one provides.
 For instance, if the preexisting value of attribute A in entity E is 10 the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$min": 2 },
   "type": "Number"
@@ -791,7 +791,7 @@ POST /v2/entities/E/attrs/A
 would change the value of attribute A to 2. However, the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$min": 20 },
   "type": "Number"
@@ -809,7 +809,7 @@ Updates value if current value is lesser than the one provides.
 For instance, if the preexisting value of attribute A in entity E is 10 the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$max": 12 },
   "type": "Number"
@@ -819,7 +819,7 @@ POST /v2/entities/E/attrs/A
 would change the value of attribute A to 12. However, the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$max": 4 },
   "type": "Number"
@@ -837,7 +837,7 @@ To be used with attributes which value is an array, add an item to the array.
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$push": 3 },
   "type": "Array"
@@ -853,7 +853,7 @@ Similar to push but avoids duplications.
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 4 },
   "type": "Array"
@@ -863,7 +863,7 @@ POST /v2/entities/E/attrs/A
 would change the value of attribute A to `[1, 2, 3, 4]`. However, the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 3 },
   "type": "Array"
@@ -880,7 +880,7 @@ passed as parameter.
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$pull": 2 },
   "type": "Array"
@@ -897,7 +897,7 @@ the occurrences of any of the members of the array used as parameter are removed
 For instance, if the preexisting value of attribute A in entity E is `[1, 2, 3]` the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$pullAll": [2, 3] },
   "type": "Array"
@@ -915,7 +915,7 @@ For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "
 following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": {"Y": 20, "Z": 30} },
   "type": "Object"
@@ -927,7 +927,7 @@ would change the value of attribute A to `{"X": 1, "Y": 20, "Z": 30}`.
 For consistence, `$set` can be used with values that are not an object, such as:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": "foo" },
   "type": "Object"
@@ -937,7 +937,7 @@ POST /v2/entities/E/attrs/A
 which has the same effect than a regular update, i.e.:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": "foo",
   "type": "Object"
@@ -963,7 +963,7 @@ For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "
 following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$unset": {"X": 1} },
   "type": "Object"
@@ -976,7 +976,7 @@ The actual value of the sub-key used with `$unset` is not relevant. A value of 1
 for simplicity but the following request would also work and would be equivalent to the one above:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$unset": {"X": null} },
   "type": "Object"
@@ -994,7 +994,7 @@ For instance, if the preexisting value of attribute A in entity E is `{"X": 1, "
 following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
   "type": "Object"
@@ -1007,7 +1007,7 @@ The sub-keys in the `$set` value cannot be at the same time in the `$unset` valu
 the other way around. For instance the following request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
   "type": "Object"
@@ -1028,7 +1028,7 @@ If the operation results in error at MongoDB level, the error is progressed as i
 MongoDB. So if we send this request:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$inc": "foo" },
   "type": "Number"
@@ -1059,7 +1059,7 @@ In addition, note that Orion assumes that the value for the attribute in the req
 is a JSON object which just one key (the operator). If you do a weird thing something like this:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": {
     "x": 1
@@ -1089,7 +1089,7 @@ Update operators cannot be used in entity creation or replace operations. For in
 you create an entity this way:
 
 ```
-POST /v2/entities/E/attrs/A
+POST /v2/entities
 {
   "id": "E",
   "type": "T",
@@ -1106,7 +1106,7 @@ However, note that the case of adding new attributes to existing entities will w
 we already have an entity E with attributes A and B and we append C this way:
 
 ```
-POST /v2/entities/E
+POST /v2/entities/E/attrs
 {
   "C": {
     "value": { "$inc": 2 },
