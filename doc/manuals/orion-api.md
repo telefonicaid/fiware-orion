@@ -70,8 +70,6 @@
       - [Deletion of expired entities](#deletion-of-expired-entities)
       - [Backward compatibility considerations](#backward-compatibility-considerations)
 - [API Routes](#api-routes)
-    - [Group API Entry Point](#group-api-entry-point)
-        - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
             - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
@@ -133,6 +131,9 @@
     - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
     - [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
     - [Registration implementation differences](#registration-implementation-differences)
+    - [`GET /v2` operation](#get-v2-operation)
+    - [Deprecated features](#deprecated-features)
+
 <!-- /TOC -->
 
 # Preface
@@ -2278,38 +2279,6 @@ be automatically deleted in an unwanted way**.
 
 # API Routes
 
-## Group API Entry Point
-
-### Retrieve API Resources [GET /v2]
-
-This resource does not have any attributes. Instead it offers the initial
-API affordances in the form of the links in the JSON body.
-
-It is recommended to follow the “url” link values,
-[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
-applicable to retrieve resources. Instead of constructing your own URLs,
-to keep your client decoupled from implementation details.
-
-_**Response code**_
-
-* Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
-
-_**Response headers**_
-
-Successful operations return `Content-Type` header with `application/json` value.
-
-_**Response payload**_
-
-This request returns a JSON object with the following elements:
-+ entities_url: /v2/entities (required, string) - URL which points to the entities resource
-+ types_url: /v2/types (required, string) - URL which points to the types resource
-+ subscriptions_url: /v2/subscriptions (required, string) - URL which points to the
-  subscriptions resource
-+ registrations_url: /v2/registrations (required, string) - URL which points to the
-  registrations resource
-
 ## Entities Operations
 
 ### Entities List
@@ -4356,6 +4325,12 @@ for the following aspects:
 * The `expired` value for `status` is not supported. The status is shows as `active` even in the
    registration is actually expired.
 * `legacyForwarding` field (within `provider`) to support forwarding in NGSIv1-based query/update format for legacy Context Providers 
+
+## `GET /v2` operation
+
+NGSIv2 specification includes a `GET /v2` which provides endpoint URLs. However, given that the
+URL endpoints are part of the API specification itself, it is a pretty useless operation, so Orion
+doesn't support it.
 
 ## Deprecated features
 
