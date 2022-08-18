@@ -21,7 +21,6 @@ pages:
       - 'CORS': 'user/cors.md'
       - 'Geolocation': 'user/geolocation.md'
       - 'MQTT notifications': 'user/mqtt_notifications.md'
-      - 'Transient Entities': 'user/transient_entities.md'
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'
       - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
