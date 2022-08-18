@@ -3538,7 +3538,7 @@ Example:
       "lastFailure": "2015-10-06T16:00:00.00Z"
     },
     "expires": "2025-04-05T14:00:00.00Z",
-    "status": "failed",
+    "status": "active",
     "throttling": 5
   }
 ]
@@ -3990,7 +3990,7 @@ Example:
         "supportedForwardingMode": "all"
       },
       "expires": "2017-10-31T12:00:00",
-      "status": "failed",
+      "status": "active",
       "forwardingInformation": {
         "timesSent": 12,
         "lastForwarding": "2017-10-06T16:00:00.00Z",
