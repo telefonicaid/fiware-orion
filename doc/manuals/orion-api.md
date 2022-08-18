@@ -338,13 +338,13 @@ Some operations use partial representation of entities:
 
 * In responses, `metadata` is set to `{}` if the attribute doesn't have any metadata. 
 
-The metadata update semantics used by Orion Context Broker (and the related `overrideMetadata` 
+The metadata update semantics used by Orion (and the related `overrideMetadata`
 option are detailed in [this section of the documentation](#metadata-update-semantics).
 
 ## Special Attribute Types
 
-Generally speaking, user-defined attribute types are informative; they are processed by the NGSIv2
-server in an opaque way. Nonetheless, the types described below are used to convey a special
+Generally speaking, user-defined attribute types are informative; they are processed by Orion
+in an opaque way. Nonetheless, the types described below are used to convey a special
 meaning:
 
 * `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the query
@@ -372,8 +372,8 @@ meaning:
 
 ## Builtin Attributes
 
-There are entity properties that are not directly modifiable by NGSIv2 clients, but that can be
-rendered by NGSIv2 servers to provide extra information. From a representation point of view, they
+There are entity properties that are not directly modifiable by clients, but that can be
+rendered by Orion to provide extra information. From a representation point of view, they
 are just like regular attributes, with name, value and type.
 
 Builtin attributes are not rendered by default. In order to render a specific attribute, add its
@@ -403,8 +403,8 @@ However, they cannot be used in resource URLs.
 
 ## Special Metadata Types
 
-Generally speaking, user-defined metadata types are informative; they are processed by the NGSIv2
-server in an opaque way. Nonetheless, the types described below are used to convey a special
+Generally speaking, user-defined metadata types are informative; they are processed by Orion
+in an opaque way. Nonetheless, the types described below are used to convey a special
 meaning:
 
 * `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
@@ -425,8 +425,8 @@ for `ignoreType` in `DateTime` may come in the future.
 
 ## Builtin Metadata
 
-Some attribute properties are not directly modifiable by NGSIv2 clients, but they can be
-rendered by NGSIv2 servers to provide extra information. From a representational point of view, they
+Some attribute properties are not directly modifiable by clients, but they can be
+rendered by Orion to provide extra information. From a representational point of view, they
 are just like regular metadata, with name, value, and type.
 
 Builtin metadata are not rendered by default. In order to render a specific metadata, add its
@@ -458,13 +458,13 @@ Like regular metadata, they can be used in `mq` filters. However, they cannot be
 [Transient entities section](#transient-entities) for specific information about `dateExpires`).
 
 First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an 
-NGSIv2 builtin**. In fact, the NGSIv2 specification forbids that (check "Attribute names restrictions" and
-"Metadata names restrictions" sections in the specification).
+builtin**. In fact, this specification forbids that (check [Attribute names restrictions](#attribute-names-restrictions) and
+[Metadata names restrictions](#metadata-names-restrictions) sections).
 
 However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
 account the following considerations:
 
-* You can create/update attributes and/or metadata which name is the same of a NGSIv2 builtin.
+* You can create/update attributes and/or metadata which name is the same of a builtin.
   Orion will let you do so.
 * User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
   or subscription. For instance, if you created a `dateModified` attribute with value
@@ -599,7 +599,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 
 ## Identifiers syntax restrictions
 
-Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax.
+Fields used as identifiers in this API follow special rules regarding allowed syntax.
 These rules apply to:
 
 * Entity id
@@ -616,7 +616,7 @@ The rules are:
 * Maximum field length is 256 characters.
 * Minimum field length is 1 character.
 
-In addition, the [General syntax restrictions](#general-syntax-restrictions) also apply to NGSIv2 identifiers.
+In addition, the [General syntax restrictions](#general-syntax-restrictions) also apply to these identifiers.
 
 In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
@@ -685,14 +685,14 @@ If present, the error payload is a JSON object including the following fields:
 + `error` (required, string): a textual description of the error.
 + `description` (optional, string): additional information about the error.
 
-All NGSIv2 server implementations must use the following HTTP status codes and `error` texts
+Orion uses the HTTP status codes and `error` texts
 described in this section. However, the particular text used for `description` field is
-an implementation specific aspect.
+thought for humans and its exact wording may vary between Orion versions.
 
-NGSIv2 `error` reporting is as follows:
+The `error` reporting is as follows:
 
 + If the incoming JSON payload cannot be parsed then `ParseError` (`400`) is returned.
-+ Errors which are only caused by request itself (i.e. they do not depend on the NGSIv2 server status),
++ Errors which are only caused by request itself (i.e. they do not depend on the Orion status),
   either in the URL parameters or in the payload, results in `BadRequest`(`400`).
   + Exception: incoming JSON payload errors, which have another `error` message (see previous bullet).
 + Attempt to exceed spatial index limit results in `NoResourceAvailable` (`413`). See [Geospatial properties of entities](#geospatial-properties-of-entities)
@@ -1133,7 +1133,7 @@ The geospatial properties of a context entity can be represented by means of reg
 context attributes.
 The provision of geospatial properties enables the resolution of geographical queries.
 
-Two different syntaxes must be supported by compliant implementations: 
+Two different syntaxes are supported by Orion:
 
 * *Simple Location Format*. It is meant as a very lightweight format for developers and users to
   quickly and easily add to their existing entities.
@@ -1261,7 +1261,7 @@ must conform to the following syntax:
     that compose the polygon remain on the outer edge of the defined area.
     For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
     polygon definition. 
-    Implementations should raise an error when none of the former conditions are met by input data. 
+    Orion should raise an error when none of the former conditions are met by input data.
   * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of
     a map or a rough area of interest. A box is represented by a two-length string array of
     latitude-longitude pairs.
@@ -1491,7 +1491,7 @@ Matching entities are those located within the referred polygon.
 
 ### Query Resolution
 
-If an implementation is not able to resolve a geographical query, the HTTP Status code of the
+If Orion is not able to resolve a geographical query, the HTTP Status code of the
 response must be ```422```, *Unprocessable Entity*. The error name, present in the error payload,
 must be ``NotSupportedQuery``. 
 
@@ -1564,7 +1564,7 @@ are at the present moment:
 * `unit`: `"celsius"`
 * `avg`: `25.4`
 
-and Context Broker receives a request like this:
+and Orion receives a request like this:
 
 ```
 PUT /v2/entities/E/attrs/temperature
@@ -1593,7 +1593,7 @@ After processing the update, the metadata at the attribute `temperature` would b
 The rationale behind the "stikyness" of metadata in this default behaviour is described in
 more detail in [this issue at Orion repository](https://github.com/telefonicaid/fiware-orion/issues/4033)
 
-At the moment, NGSIv2 doesn't allow to delete individual metadata elements once introduced.
+At the moment, Orion doesn't allow to delete individual metadata elements once introduced.
 However, you can delete all metadata updating the attribute with `metadata` set to `{}`.
 
 ### `overrideMetadata` option
@@ -1849,7 +1849,7 @@ If `attrsFormat` is `values` then values partial entity representation mode is u
 ```
 
 If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users 
-can benefit from the enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
+can benefit from the enhancements of Orion subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
 
 Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
 
@@ -1904,7 +1904,7 @@ value itself hasn't changed.
 
 ## Custom Notifications
 
-NGSIv2 clients can customize notification messages using a simple template mechanism when
+Clients can customize notification messages using a simple template mechanism when
 `notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
 depends on the protocol type.
 
@@ -1916,7 +1916,7 @@ In case of `httpCustom`:
   doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
 * `qs` (both parameter name and value can be templatized)
 * `payload`
-* `method`, lets the NGSIv2 clients select the HTTP method to be used for delivering
+* `method`, lets the clients select the HTTP method to be used for delivering
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
 
@@ -2016,7 +2016,7 @@ Some notes to take into account when using `json` instead of `payload`:
 
 Some considerations to take into account when using custom notifications:
 
-* It is the NGSIv2 client's responsibility to ensure that after substitution, the notification is a
+* It is the client's responsibility to ensure that after substitution, the notification is a
   correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
   correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
   template is malformed, then no notification is sent.
@@ -2056,7 +2056,7 @@ For instance:
 
 ### Custom payload and headers special treatment
 
-[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in NGSIv2 API operations, such as
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in the API operations, such as
 `POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
 in `httpCustom.headers`.
 
@@ -2086,7 +2086,7 @@ Note that the above payload value is the URL encoded version of this string:
 `the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
 `"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
 
-Now, let's consider that NGSIv2 implementation triggers a notification associated to this subscription.
+Now, let's consider that Orion triggers a notification associated to this subscription.
 Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
 `temperature` with value 23.4. The resulting notification after applying the template would be:
 
@@ -2158,7 +2158,7 @@ in the case you are already using attributes with the exact name `dateExpires`**
 The expiration timestamp of an entity is defined by means of the `dateExpires` [builtin attribute](#builtin-attributes). This is an
 attribute of `DateTime` type, which value is the datetime when the entity will expire.
 
-As any other NGSIv2 builtin attribute, `dateExpires` is not shown by default, you need to use `attrs` URI parameter (in GET
+As any other builtin attribute, `dateExpires` is not shown by default, you need to use `attrs` URI parameter (in GET
 based queries) or `"attrs"` field (in `POST /v2/op/query`) in order to get it. Please have a look to
 [Filtering out attributes and metadata section](#filtering-out-attributes-and-metadata).
 
@@ -2289,7 +2289,6 @@ It is recommended to follow the “url” link values,
 [Link](https://tools.ietf.org/html/rfc5988) or Location headers where
 applicable to retrieve resources. Instead of constructing your own URLs,
 to keep your client decoupled from implementation details.
-
 
 _**Response code**_
 
@@ -3768,7 +3767,7 @@ A context registration is represented by a JSON object with the following fields
 | [`dataProvided`](#registrationdataprovided)          |          | object | Object that describes the data provided by this source.                                                                                                                                     |
 | `status`       | ✓        | string | Always `active` in the current implementation. |
 | `expires`               | ✓        | ISO8601 | Registration expiration date in ISO8601 format. Permanent registrations must omit this field.                                                                                               |
-| [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. Automatically provided by the implementation, in the case such implementation supports forwarding capabilities. |
+| [`forwardingInformation`](#registrationforwardinginformation) |          | object | Information related to the forwarding operations made against the provider. |
 
 #### `registration.provider`
 
@@ -4248,7 +4247,7 @@ Example:
 #### Notify [POST /v2/op/notify]
 
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
-It is useful when one NGSIv2 endpoint is subscribed to another NGSIv2 endpoint (federation scenarios). 
+It is useful when one Orion endpoint is subscribed to another Orion endpoint (federation scenarios).
 The behavior must be exactly the same as `POST /v2/op/update` with `actionType` equal to `append`. 
 
 _**Request headers**_
@@ -4261,7 +4260,7 @@ _**Request headers**_
 
 _**Request payload**_
 
-The request payload must be an NGSIv2 notification payload, as described in section [Notification Messages](#notification-messages).
+The request payload must be an Orion notification payload, as described in section [Notification Messages](#notification-messages).
 
 Example:
 
@@ -4329,7 +4328,7 @@ Status `failed` was removed in Orion 3.4.0 due to it is ambiguous:
 In other words, looking to status `failed` is not possible to know if the subscription is currently
 active or inactive.
 
-Thus, `failed` is not used by Orion Context Broker and the status of the subscription always clearly specifies
+Thus, `failed` is not used by Orion and the status of the subscription always clearly specifies
 if the subscription is `active` (including the variant [`oneshot`](#oneshot-subscriptions)) or
 `inactive` (including the variant `expired`). You can check the value of `failsCounter` in order to know if
 the subscription failed in its last notification or not (i.e. checking that `failsCounter` is greater than 0).
