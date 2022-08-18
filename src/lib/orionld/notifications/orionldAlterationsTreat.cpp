@@ -171,6 +171,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
     LM(("ALT: Alteration %d:", alterations));
+    LM(("ALT:   Entity In:     %p", aP->patchedEntity));
     LM(("ALT:   Entity Id:     %s", aP->entityId));
     LM(("ALT:   Entity Type:   %s", aP->entityType));
     LM(("ALT:   Attributes:    %d", aP->alteredAttributes));

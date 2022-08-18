@@ -155,6 +155,34 @@ static int entityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP
 
 
 
+// -----------------------------------------------------------------------------
+//
+// entityTypeCheck -
+//
+bool entityTypeCheck(KjNode* dbEntityTypeNodeP, KjNode* entityP)
+{
+  KjNode* newEntityTypeNodeP = kjLookup(entityP, "type");
+
+  if (newEntityTypeNodeP == NULL)
+    newEntityTypeNodeP = kjLookup(entityP, "@type");
+
+  if (newEntityTypeNodeP != NULL)
+  {
+    if (strcmp(newEntityTypeNodeP->value.s, dbEntityTypeNodeP->value.s) != 0)
+      LM_RE(false, ("Attempt to change Entity Type"));
+  }
+  else
+  {
+    // No Entity Type present in the incoming payload - no problem, I'll just add it
+    KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", dbEntityTypeNodeP->value.s);
+    kjChildAdd(entityP, entityTypeP);
+  }
+
+  return true;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // entitiesFinalCheck -
@@ -213,10 +241,13 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
       }
     }
 
-    KjNode* dbAttrsP = NULL;
+    kjTreeLog(dbEntityArray, "dbEntityArray");
+    KjNode* dbAttrsP           = NULL;
+    KjNode* dbEntityTypeNodeP  = NULL;
+    KjNode* dbEntityP          = entityLookupBy_id_Id(dbEntityArray, entityId, &dbEntityTypeNodeP);
+
     if (update == true)
     {
-      KjNode* dbEntityP = entityLookupById(dbEntityArray, entityId);
       if (dbEntityP != NULL)
         dbAttrsP = kjLookup(dbEntityP, "attrs");
     }
@@ -229,8 +260,27 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
       continue;
     }
 
+    //
+    // If the entity to be upserted is found in the DB, we must make sure the entity type isn't changing
+    // This check is done after pCheckEntity as pCheckEntity expands the entity type
+    //
+    if (dbEntityP != NULL)
+    {
+      if (entityTypeCheck(dbEntityTypeNodeP, eP) == false)
+      {
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400, false);
+        kjChildRemove(orionldState.requestTree, eP);
+        eP = next;
+        continue;
+      }
+    }
+
+    // The @context has been applied (by pCheckEntity) - if in the payload body, it needs to go
+    if (contextNodeP != NULL)
+      kjChildRemove(eP, contextNodeP);
+
     ++noOfEntities;
-    LM(("Got Entity '%s'", entityId));
+
     eP = next;
   }
 
@@ -402,34 +452,6 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjN
   // Link it into the list
   alterationP->next        = orionldState.alterations;
   orionldState.alterations = alterationP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityTypeCheck -
-//
-static bool entityTypeCheck(KjNode* dbEntityTypeNodeP, KjNode* entityP)
-{
-  KjNode* newEntityTypeNodeP = kjLookup(entityP, "type");
-
-  if (newEntityTypeNodeP == NULL)
-    newEntityTypeNodeP = kjLookup(entityP, "@type");
-
-  if (newEntityTypeNodeP != NULL)
-  {
-    if (strcmp(newEntityTypeNodeP->value.s, dbEntityTypeNodeP->value.s) != 0)
-      LM_RE(false, ("Attempt to change Entity Type"));
-  }
-  else
-  {
-    // No Entity Type present in the incoming payload - no problem, I'll just add it
-    KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", dbEntityTypeNodeP->value.s);
-    kjChildAdd(entityP, entityTypeP);
-  }
-
-  return true;
 }
 
 
@@ -646,9 +668,9 @@ bool orionldPostBatchUpsert(void)
     //
     //   The orionldState.requestTree that is now checked, expanded and in Normalized format must be cloned for TRoE
     //   Remember that the TRoE functions (troePostBatchUpsert) use orionldState.requestTree,
-    //   so, the tree needs to be cloned before destroyed and later orionldState.requestTree set to point to it just before leaving this function
+    //   so, the tree needs to be cloned before it is destroyed by XXX.
     //
-    //   orionldState.requestTree looks intact, perhaps no clone is needed
+    //   orionldState.requestTree is set to point to it just before leaving this function - for TRoE
     //
     incomingTreeForTroe        = kjClone(orionldState.kjsonP, orionldState.requestTree);
     orionldState.batchEntities = entityListWithIdAndType(dbEntityArray);  // For TRoE
@@ -689,32 +711,10 @@ bool orionldPostBatchUpsert(void)
     bool    alterationDone         = false;
 
     //
-    // The @context has been applied already - if still in the payload body, it needs to go
-    //
-    KjNode* contextNodeP = kjLookup(entityP, "@context");
-    if (contextNodeP != NULL)
-    {
-      LM(("X2: Found an @context - removing it"));
-      kjChildRemove(entityP, contextNodeP);
-    }
-
-    //
     // If the entity to be upserted is found in the DB, then it's not a Creation but un Update
     //
     if (dbEntityP != NULL)
     {
-      //
-      // The entity type cannot be modified
-      //
-      if (entityTypeCheck(dbEntityTypeNodeP, entityP) == false)
-      {
-        entityErrorPush(outArrayErroredP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400, false);
-        kjChildRemove(orionldState.requestTree, entityP);
-        entityP = next;
-        noOfEntities -= 1;
-        continue;
-      }
-
       entitySuccessPush(outArrayUpdatedP, entityId);
       kjChildRemove(creationArray, entityP);
       LM(("X2: Removed entity '%s' from creationArray", entityId));
