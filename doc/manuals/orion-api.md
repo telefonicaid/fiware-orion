@@ -2334,7 +2334,7 @@ notifications.
 
 ### Entity service paths
 
-Orion Context Broker supports hierarchical scopes, so entities can be
+Orion supports hierarchical scopes, so entities can be
 assigned to a scope [at creation time](user/walkthrough_apiv2.md#entity-creation).
 Then, [query](user/walkthrough_apiv2.md#query-entity) and [subscription](user/walkthrough_apiv2.md#subscriptions)
 can be also scoped to locate entities in the corresponding scopes.
@@ -2418,7 +2418,7 @@ Some additional remarks:
 
 -   Current version doesn’t allow to change the scope to which an entity
     belongs through the API (a workaround is to modify the
-    `id.servicePath` field in the entities collection directly).
+    `_id.servicePath` field in the [entities collection](admin/database_model.md#entities-collection) directly).
 
 ### Service paths in subscriptions and registrations
 
