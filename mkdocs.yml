@@ -25,8 +25,6 @@ pages:
       - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
       - 'Filtering': 'user/filtering.md'
-      - 'Multi tenancy': 'user/multitenancy.md'
-      - 'Entity service paths': 'user/service_path.md'
       - 'Update action types': 'user/update_action_types.md'
       - 'Context Broker federation': 'user/federation.md'
       - 'Using regular expressions': 'user/regex.md'
