@@ -70,9 +70,9 @@
       - [Deletion of expired entities](#deletion-of-expired-entities)
       - [Backward compatibility considerations](#backward-compatibility-considerations)
     - [Multi tenancy](#multi-tenancy)
-    - [Service paths](#service-paths)
-        - [Entity service paths](#entity-service-paths)
-        - [Service paths in subscriptions and registrations](#service-paths-in-subscriptions-and-registrations)
+    - [Service path](#service-path)
+        - [Entity service path](#entity-service-path)
+        - [Service path in subscriptions and registrations](#service-path-in-subscriptions-and-registrations)
 - [API Routes](#api-routes)
     - [Group API Entry Point](#group-api-entry-point)
         - [Retrieve API Resources [GET /v2]](#retrieve-api-resources-get-v2)
@@ -2330,9 +2330,9 @@ and, in that sense, it is not coherent the tenant you used in
 update requests compared with the one that Orion sends in
 notifications.
 
-## Service paths
+## Service path
 
-### Entity service paths
+### Entity service path
 
 Orion supports hierarchical scopes, so entities can be
 assigned to a scope [at creation time](user/walkthrough_apiv2.md#entity-creation).
@@ -2420,9 +2420,9 @@ Some additional remarks:
     belongs through the API (a workaround is to modify the
     `_id.servicePath` field in the [entities collection](admin/database_model.md#entities-collection) directly).
 
-### Service paths in subscriptions and registrations
+### Service path in subscriptions and registrations
 
-While entities belong to services *and* servicepaths, subscriptions and registrations
+While entities belong to services *and* service paths, subscriptions and registrations
 belong *only* to the service. The servicepath in subscriptions and registrations
 doesn't denote sense of belonging, but is the expression of the query associated
 to the subscription or registration.
@@ -2524,7 +2524,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example   |
 |----------------------|----------|------------------------------------------------------------------------------------------------|-----------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`    |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`|
 
 _**Response code**_
@@ -2606,7 +2606,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -2688,7 +2688,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -2768,7 +2768,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -2854,7 +2854,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -2914,7 +2914,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -2976,7 +2976,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -3027,7 +3027,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3070,7 +3070,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3134,7 +3134,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -3185,7 +3185,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3226,7 +3226,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3296,7 +3296,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type.                                                                                     | `text/plain`       |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -3359,7 +3359,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3445,7 +3445,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3645,7 +3645,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3716,7 +3716,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -3784,7 +3784,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3854,7 +3854,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -3892,7 +3892,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -3986,7 +3986,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -4050,7 +4050,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -4111,7 +4111,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example   |
 |----------------------|----------|------------------------------------------------------------------------------------------------|-----------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`    |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`    |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`|
 
 _**Response code**_
@@ -4179,7 +4179,7 @@ _**Request headers**_
 
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Response code**_
@@ -4216,7 +4216,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -4307,7 +4307,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
@@ -4418,7 +4418,7 @@ _**Request headers**_
 | Header               | Optional | Description                                                                                    | Example            |
 |----------------------|----------|------------------------------------------------------------------------------------------------|--------------------|
 | `Content-Type`       |          | MIME type. Required to be `application/json`.                                                  | `application/json` |
-| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multitency](#multitenancy) for more information.            | `acme`             |
+| `Fiware-Service`     | ✓        | Tenant or service. See subsection [Multi tenancy](#multi-tenancy) for more information.            | `acme`             |
 | `Fiware-ServicePath` | ✓        | Service path or subservice. See subsection [Service Path](#service-path) for more information. | `/project`         |
 
 _**Request payload**_
