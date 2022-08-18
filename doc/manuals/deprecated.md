@@ -15,7 +15,7 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
-* `GET /v2` operation in Orion 3.8.0. This operation is is pretty useless and not actually used.
+* `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
   (removed in Orion 3.2.0). The results covered by initial notification can be very large and we cannot apply pagination here
   (as it is done in the synchronous retrieval of entities using `GET /v2/entities`). In fact, only
