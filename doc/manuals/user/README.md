@@ -14,8 +14,6 @@
   * [Update operators for attribute values](update_operators.md)
   * [Context Providers registration and request forwarding](context_providers.md)
   * [Filtering results](filtering.md)
-  * [Multy tenancy](multitenancy.md)
-  * [Entity service paths](service_path.md)
   * [Update action types](update_action_types.md)
   * [Context broker federation](federation.md)
   * [Using regular expressions](regex.md)
