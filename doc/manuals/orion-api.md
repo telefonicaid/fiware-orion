@@ -2282,7 +2282,7 @@ be automatically deleted in an unwanted way**.
 
 ## Multi tenancy
 
-Orion Context Broker implements a simple multitenant/multiservice
+Orion implements a simple multitenant/multiservice
 model based and logical database separation, to ease service/tenant
 based authorization policies provided by other FIWARE components or
 third party software, e.g. the ones in the FIWARE security framework
