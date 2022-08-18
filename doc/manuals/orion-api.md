@@ -56,6 +56,7 @@
     - [Oneshot Subscription](#oneshot-subscription)
     - [Covered subscriptions](#covered-subscriptions)
     - [Notification Messages](#notification-messages)
+    - [Notification triggering](#notification-triggering)
     - [Custom Notifications](#custom-notifications)
       - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -1875,6 +1876,23 @@ Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` i
 HTTP header with the value of the format of the associated subscription, so that notification receivers 
 are aware of the format without needing to process the notification payload.
 
+## Notification triggering
+
+Based on the [`condition` subscription field](#subscriptionsubjectcondition), upon
+entity update, the notification triggering rules are as follow:
+
+* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
+  the `attrs` list changes and at the same time `expression` matches.
+* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
+  attributes in the `attrs` list changes.
+* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
+  attributes of the entity changes and at the same time `expression` matches.
+* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
+  attributes of the entity changes.
+
+Note that changing the metadata of a given attribute is considered a change even though the attribute
+value itself hasn't changed.
+
 ## Custom Notifications
 
 NGSIv2 clients can customize notification messages using a simple template mechanism when
@@ -3202,18 +3220,8 @@ A `condition` contains the following subfields:
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and subelements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 
-Based on the `condition` field, the notification triggering rules are as follow:
-
-* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes and at the same time `expression` matches.
-* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
-  attributes in the `attrs` list changes.
-* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
-  attributes of the entity changes and at the same time `expression` matches.
-* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
-  attributes of the entity changes.
-
-Note that changing the metadata of a given attribute is considered a change even though the attribute value itself hasn't changed.
+Notification triggering (i.e. when a notification is triggered based on entity updates)
+is described in [this specific section](#notification-triggering).
 
 #### `subscription.notification`
 
