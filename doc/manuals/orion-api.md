@@ -2282,20 +2282,20 @@ be automatically deleted in an unwanted way**.
 
 ## Multi tenancy
 
-The Orion Context Broker implements a simple multitenant/multiservice
+Orion Context Broker implements a simple multitenant/multiservice
 model based and logical database separation, to ease service/tenant
 based authorization policies provided by other FIWARE components or
 third party software, e.g. the ones in the FIWARE security framework
 (PEP proxy, IDM and Access Control). This functionality is activated
-when the `-multiservice` command line option is used. When
+when the `-multiservice` [command line option](admin/cli.md) is used. When
 `-multiservice` is used, Orion uses the `Fiware-Service` HTTP header in
 the request to identify the service/tenant. If the header is not present
 in the HTTP request, the default service/tenant is used.
 
 Multitenant/multiservice ensures that the
 entities/attributes/subscriptions of one service/tenant are *"invisible"*
-to other services/tentants. For example, queryContext on tenantA space
-will never return entities/attributes from tenantB space. This isolation
+to other services/tentants. For example, `GET /v2/entities` on tenantA space
+will never return entities from tenantB space. This isolation
 is based on database separation, which [details are described in the
 Installation and Administration
 manual](admin/database_admin.md#multiservicemultitenant-database-separation).
@@ -2324,11 +2324,11 @@ alphanumeric characters (and the `\` symbol). Maximum length is 50
 characters,
 which should be enough for most use cases. Orion Context Broker
 interprets the tenant name in lowercase, thus, although you can use
-tenants such as in updateContext `MyService` it is not advisable, as the
+tenants such as in update `MyService` it is not advisable, as the
 notifications related with that tenant will be sent with `myservice`
 and, in that sense, it is not coherent the tenant you used in
-updateContext compared with the one that Orion sends in
-notifyContextRequest.
+update requests compared with the one that Orion sends in
+notifications.
 
 ## Service paths
 
