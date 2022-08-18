@@ -15,6 +15,7 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
   (removed in Orion 3.2.0). The results covered by initial notification can be very large and we cannot apply pagination here
   (as it is done in the synchronous retrieval of entities using `GET /v2/entities`). In fact, only
@@ -94,6 +95,7 @@ The following table provides information about the last Orion version supporting
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
+| `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
 | Initial notification upon subscription creation or update                  | 3.1.0                                     | June 9th, 2021                  |
 | NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.5.2                                     | December 17th, 2020              |
 | Rush (along with CLI: `-rush`)                                             | 2.2.0                                     | February 21st, 2019             |
