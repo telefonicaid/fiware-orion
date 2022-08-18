@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                            // strcmp
 #include <unistd.h>                                            // NULL
 
 extern "C"
@@ -159,7 +160,7 @@ static int entityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP
 //
 // entityTypeCheck -
 //
-bool entityTypeCheck(KjNode* dbEntityTypeNodeP, KjNode* entityP)
+bool entityTypeCheck(const char* oldEntityType, KjNode* entityP)
 {
   KjNode* newEntityTypeNodeP = kjLookup(entityP, "type");
 
@@ -168,13 +169,13 @@ bool entityTypeCheck(KjNode* dbEntityTypeNodeP, KjNode* entityP)
 
   if (newEntityTypeNodeP != NULL)
   {
-    if (strcmp(newEntityTypeNodeP->value.s, dbEntityTypeNodeP->value.s) != 0)
+    if (strcmp(newEntityTypeNodeP->value.s, oldEntityType) != 0)
       LM_RE(false, ("Attempt to change Entity Type"));
   }
   else
   {
     // No Entity Type present in the incoming payload - no problem, I'll just add it
-    KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", dbEntityTypeNodeP->value.s);
+    KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", oldEntityType);
     kjChildAdd(entityP, entityTypeP);
   }
 
@@ -185,13 +186,62 @@ bool entityTypeCheck(KjNode* dbEntityTypeNodeP, KjNode* entityP)
 
 // ----------------------------------------------------------------------------
 //
+// creationByPreviousInstance -
+//
+static bool creationByPreviousInstance(KjNode* creationArrayP, KjNode* entityP, const char* entityId, char** oldTypeP)
+{
+  for (KjNode* eP = creationArrayP->value.firstChildP; eP != NULL; eP = eP->next)
+  {
+    KjNode* idNodeP = kjLookup(eP, "id");
+
+    if (idNodeP == NULL)  // Can't happen
+      continue;
+
+    if (strcmp(entityId, idNodeP->value.s) == 0)
+    {
+      KjNode* typeNodeP = kjLookup(eP, "type");
+
+      *oldTypeP = typeNodeP->value.s;
+      return true;
+    }
+  }
+
+  //
+  // The entity is not part of the "Creation Array" - so, we add it
+  // Any new er instances of this entity must have the exact same entity type
+  //
+  KjNode* newTypeNodeP = kjLookup(entityP, "type");  // What if newTypeNodeP is NULL - that would be an error!
+
+  if (newTypeNodeP == NULL)
+    *oldTypeP = NULL;
+  else
+  {
+    *oldTypeP = newTypeNodeP->value.s;
+
+    KjNode* eP    = kjObject(orionldState.kjsonP, NULL);
+    KjNode* idP   = kjString(orionldState.kjsonP, "id", entityId);
+    KjNode* typeP = kjString(orionldState.kjsonP, "type", newTypeNodeP->value.s);
+
+    kjChildAdd(eP, idP);
+    kjChildAdd(eP, typeP);
+    kjChildAdd(creationArrayP, eP);
+  }
+
+  return false;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
 // entitiesFinalCheck -
 //
 static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update)
 {
-  int     noOfEntities = 0;
-  KjNode* eP           = requestTree->value.firstChildP;
-  KjNode* next;
+  int      noOfEntities   = 0;
+  KjNode*  eP             = requestTree->value.firstChildP;
+  KjNode*  next;
+  KjNode*  creationArrayP = kjArray(orionldState.kjsonP, NULL);  // Array of entity id+type of entities that are to be created
 
   while (eP != NULL)
   {
@@ -241,7 +291,6 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
       }
     }
 
-    kjTreeLog(dbEntityArray, "dbEntityArray");
     KjNode* dbAttrsP           = NULL;
     KjNode* dbEntityTypeNodeP  = NULL;
     KjNode* dbEntityP          = entityLookupBy_id_Id(dbEntityArray, entityId, &dbEntityTypeNodeP);
@@ -266,9 +315,37 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
     //
     if (dbEntityP != NULL)
     {
-      if (entityTypeCheck(dbEntityTypeNodeP, eP) == false)
+      if (entityTypeCheck(dbEntityTypeNodeP->value.s, eP) == false)
       {
         entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400, false);
+        kjChildRemove(orionldState.requestTree, eP);
+        eP = next;
+        continue;
+      }
+    }
+    else
+    {
+      //
+      // The entity 'entityId' does not exist in the DB - seems like it's being CREATED
+      // BUT - might not be the first instance of the entity in the incoming Array
+      // Must check that as well.
+      // AND, if not the first instance, then the entity type must be checked for altering (perhaps even entityTypeCheck can be used?)
+      //
+
+      char* oldType = NULL;
+      if (creationByPreviousInstance(creationArrayP, eP, entityId, &oldType) == true)
+      {
+        if (entityTypeCheck(oldType, eP) == false)
+        {
+          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400, false);
+          kjChildRemove(orionldState.requestTree, eP);
+          eP = next;
+          continue;
+        }
+      }
+      else if (oldType == NULL)
+      {
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid Entity", "no type in incoming payload for CREATION of Entity", 400, false);
         kjChildRemove(orionldState.requestTree, eP);
         eP = next;
         continue;
@@ -355,10 +432,15 @@ static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
 
   kjTreeLog(apiEntityP, "UP: API Entity");
   LM(("UP: ---------- Looping over API-Entity attributes"));
-  for (KjNode* apiAttrP = apiEntityP->value.firstChildP; apiAttrP != NULL; apiAttrP = apiAttrP->next)
+
+  KjNode* apiAttrP = apiEntityP->value.firstChildP;
+  KjNode* next;
+  while (apiAttrP != NULL)
   {
-    if (strcmp(apiAttrP->name, "id")   == 0)  { LM(("UP: skipping 'id'"));   continue; }
-    if (strcmp(apiAttrP->name, "type") == 0)  { LM(("UP: skipping 'type'")); continue; }
+    next = apiAttrP->next;
+
+    if (strcmp(apiAttrP->name, "id")   == 0)  { LM(("UP: skipping 'id'"));   apiAttrP = next; continue; }
+    if (strcmp(apiAttrP->name, "type") == 0)  { LM(("UP: skipping 'type'")); apiAttrP = next; continue; }
 
     char    eqAttrName[512];
     char*   dotAttrName = apiAttrP->name;
@@ -366,6 +448,8 @@ static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
     strncpy(eqAttrName, apiAttrP->name, sizeof(eqAttrName) - 1);
     dotForEq(eqAttrName);
     KjNode* dbAttrP = kjLookup(dbAttrsP, eqAttrName);
+
+    kjChildRemove(apiEntityP, apiAttrP);
 
     if (dbAttrP == NULL)  // The attribute is NEW and must be added to attrs and attrNames
     {
@@ -385,7 +469,10 @@ static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
       dbModelFromApiAttribute(apiAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);  // ignoreP == NULL ...
       kjChildAdd(dbAttrsP, apiAttrP);  // apiAttrP is now in DB-Model format
     }
+
+    apiAttrP = next;
   }
+
   LM(("UP: ---------- Looped over API-Entity attributes"));
 }
 
@@ -452,6 +539,8 @@ static void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjN
   // Link it into the list
   alterationP->next        = orionldState.alterations;
   orionldState.alterations = alterationP;
+
+  LM(("MI: Added alteration for entity '%s'", entityId));
 }
 
 
@@ -563,6 +652,43 @@ KjNode* kjConcatenate(KjNode* destP, KjNode* srcP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// multipleInstances -
+//
+// IMPORTANT NOTE
+//   The entity type cannot be modified (well, not until multi-typing is implemented).
+//   The "entity-type-change check" is already implemented - for entities that existed in the DB prior to the batch upsert request.
+//   BUT, what if the entity does not exist, but we have more than one instance of an entity ?
+//
+//   Well, in such case, the first instance creates the entity (AND DEFINES THE ENTITY TYPE).
+//   Instances after this first ("creating") instance MUST have the same entity type. If not, they're erroneous.
+//   - Erroneous instances must be removed also for TRoE
+//
+static bool multipleInstances(const char* entityId, KjNode* updatedArrayP, KjNode* createdArrayP, bool* entityIsNewP)
+{
+  *entityIsNewP = false;
+
+  for (KjNode* itemP = updatedArrayP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    if (strcmp(entityId, itemP->value.s) == 0)
+      return true;
+  }
+
+  for (KjNode* itemP = createdArrayP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    if (strcmp(entityId, itemP->value.s) == 0)
+    {
+      *entityIsNewP = true;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpsert -
@@ -662,7 +788,7 @@ bool orionldPostBatchUpsert(void)
   noOfEntities = entitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update);
   LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
-  KjNode* incomingTreeForTroe = NULL;
+  KjNode* troeEntityArray = NULL;
   if (troe)
   {
     //
@@ -672,7 +798,7 @@ bool orionldPostBatchUpsert(void)
     //
     //   orionldState.requestTree is set to point to it just before leaving this function - for TRoE
     //
-    incomingTreeForTroe        = kjClone(orionldState.kjsonP, orionldState.requestTree);
+    troeEntityArray        = kjClone(orionldState.kjsonP, orionldState.requestTree);
     orionldState.batchEntities = entityListWithIdAndType(dbEntityArray);  // For TRoE
   }
 
@@ -680,6 +806,7 @@ bool orionldPostBatchUpsert(void)
   KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");
 
 
+  //
   // One Array for entities that did not priorly exist  (creation)
   // Another array for already existing entities        (replacement)
   //
@@ -688,10 +815,16 @@ bool orionldPostBatchUpsert(void)
 
   //
   // Merge new entity data into "old" DB entity data
+
+
   //
-  // incoming:   untouched entity, as it came in
-  // apiEntityP: merged with DB, but in NGSI-LD API format
-  // dbEntityP:  merged with DB, in DB Model format
+  // Looping over all the accepted entities
+  //
+  // Different entity pointers (KjNode*):
+  // - incomingP:  untouched entity, just as it came in      - for Alteration
+  // - apiEntityP: merged with DB, but in NGSI-LD API format - for Notification
+  // - dbEntityP:  merged with DB, in DB Model format        - for mongoc
+  //
   //
   KjNode* entityP = orionldState.requestTree->value.firstChildP;
   KjNode* next;
@@ -709,6 +842,46 @@ bool orionldPostBatchUpsert(void)
     KjNode* apiEntityP             = NULL;
     bool    alreadyInDbModelFormat = false;
     bool    alterationDone         = false;
+    bool    entityIsNew            = false;
+
+    if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP, &entityIsNew))
+    {
+      //
+      // In case of multiple instances of one and the same entity:
+      //
+      // - options=replace (default):
+      //   the newer (later in the array) entity completely replaces the old one.
+      //   - Entity Type can't change
+      //   - creDate stays
+      //
+      // - options=update
+      //   the newer (later in the array) entity patches the previous by replacing attributes
+      //   Need to keep patched the dbEntity but also the resulting API Entity (for Notifications)
+      //
+      KjNode* baseEntityP;
+
+      if (entityIsNew == true)
+      {
+        kjTreeLog(outArrayCreatedP, "MI: outArrayCreatedP");
+        baseEntityP = entityLookupById(outArrayCreatedP, entityId);
+        LM(("MI: The entity '%s' has multiple instances, (creating, then updating entity at %p)", entityId, baseEntityP));
+      }
+      else
+      {
+        kjTreeLog(outArrayUpdatedP, "MI: outArrayUpdatedP");
+        baseEntityP = entityLookupById(outArrayUpdatedP, entityId);
+        LM(("MI: The entity '%s' has multiple instances (updating already existing entity at %p)", entityId, baseEntityP));
+      }
+
+      LM_W(("--------------------------------------------------------------------------------"));
+      LM_W(("Multiple Instances of an Entity in New BATCH Upsert is not yet implemented"));
+      LM_W(("For now, the first instance is used and the rest of the instances arte ignored"));
+      LM_W(("--------------------------------------------------------------------------------"));
+      entityP = next;
+      continue;
+    }
+    else
+      LM(("MI: The entity '%s' is to be %s", entityId, (dbEntityP == NULL)? "CREATED" : "UPDATED"));
 
     //
     // If the entity to be upserted is found in the DB, then it's not a Creation but un Update
@@ -856,8 +1029,8 @@ bool orionldPostBatchUpsert(void)
     orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
 
-  if (incomingTreeForTroe != NULL)
-    orionldState.requestTree = incomingTreeForTroe;
+  if (troeEntityArray != NULL)
+    orionldState.requestTree = troeEntityArray;
 
   return true;
 }

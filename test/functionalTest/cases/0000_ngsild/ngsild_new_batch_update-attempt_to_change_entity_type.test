@@ -1,0 +1,162 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attempt to change entity type during a Batch Update
+
+--SHELL-INIT--
+#Copied from ngsild_batch_update-attempt_to_change_entity_type.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Batch Creation via UPSERT of two entities, urn:E1 and urn:E2
+# 02. Attempt to change entity type of entity urn:E1 in a batch update operation
+# 03. Attempt to change entity type of entity urn:E1 in a batch upsert operation
+#
+
+echo "01. Batch Creation via UPSERT of two entities, urn:E1 and urn:E2"
+echo "================================================================"
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "GtfsStation",
+    "name": {
+      "type": "Property",
+      "value": "Rangsdorf, Bahnhof",
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    }
+  },
+  {
+    "id": "urn:E2",
+    "type": "GtfsStation",
+    "name": {
+      "type": "Property",
+      "value": "Leipzig, Hauptbahnhof",
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to change entity type of entity urn:E1 in a batch update operation"
+echo "=============================================================================="
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "T2",
+    "name": {
+      "type": "Property",
+      "value": "Hamburg, Bahnhof"
+    }
+  }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/update' --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to change entity type of entity urn:E1 in a batch upsert operation"
+echo "=============================================================================="
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "T2",
+    "name": {
+      "type": "Property",
+      "value": "Hamburg, Bahnhof"
+    }
+  }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Creation via UPSERT of two entities, urn:E1 and urn:E2
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 19
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:E1",
+    "urn:E2"
+]
+
+
+02. Attempt to change entity type of entity urn:E1 in a batch update operation
+==============================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 224
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "detail": "https://uri.etsi.org/ngsi-ld/default-context/T2",
+                "status": 400,
+                "title": "non-matching entity type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+03. Attempt to change entity type of entity urn:E1 in a batch upsert operation
+==============================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "detail": "the Entity Type cannot be altered",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
