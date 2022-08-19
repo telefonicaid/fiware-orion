@@ -113,7 +113,7 @@ broker にリクエストを発行するには、`curl` コマンド・ライン
 -   POST の場合 :
 
 ```
-curl localhost:1026/<operation_url> -s -S [headers]' -d @- <<EOF
+curl localhost:1026/<operation_url> -s -S [headers] -d @- <<EOF
 [payload]
 EOF
 ```
