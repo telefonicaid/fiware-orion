@@ -156,16 +156,19 @@ MongoDB server version: REGEX(.*)
 		"type" : "https://uri.fiware.org/ns/data-models#WeatherObserved",
 		"servicePath" : "/"
 	},
-	"creDate" : REGEX(.*),
-	"attrNames" : [ ],
+	"attrNames" : [
+		"https://uri.fiware.org/ns/data-models#dataProvider"
+	],
 	"attrs" : {
 		"https://uri=fiware=org/ns/data-models#dataProvider" : {
 			"type" : "Property",
+			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "sensor.community",
-			"creDate" : REGEX(.*)
+			"mdNames" : [ ]
 		}
 	},
+	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : ""
 }

@@ -73,6 +73,10 @@ static KjNode* entityIdLookup(KjNode* tree, const char* entityId)
 //
 // troePostBatchUpsert -
 //
+// IN
+//   orionldState.requestTree:   Untouched after pCheckEntity
+//   orionldState.batchEntities: Array of entities that are REPLACED and not CREATED [ { "id": "urn:E1", ... }, ... {} ]
+//
 bool troePostBatchUpsert(void)
 {
   PgAppendBuffer  entities;

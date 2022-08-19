@@ -226,6 +226,10 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   // Applying the PATCH, if any
   //
+  // FIXME:
+  //   The original db entity is needed only to apply the patch.
+  //   Would be better to apply the patch before so would not need "altList->dbEntityP"
+  //
   if (altList->dbEntityP != NULL)
   {
     LM(("Applying PATCH"));

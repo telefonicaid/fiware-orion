@@ -160,7 +160,7 @@ static int entityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP
 //
 // entityTypeCheck -
 //
-bool entityTypeCheck(const char* oldEntityType, KjNode* entityP)
+static bool entityTypeCheck(const char* oldEntityType, KjNode* entityP)
 {
   KjNode* newEntityTypeNodeP = kjLookup(entityP, "type");
 
@@ -368,163 +368,9 @@ static int entitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode*
 
 // -----------------------------------------------------------------------------
 //
-// apiAttributeCreateadAtFromDb -
-//
-// There's really no merge to be done - the new attribute overwrites the old one.
-// Just, the old creDate needs to be preserved.
-//
-static void apiAttributeCreateadAtFromDb(KjNode* attrP, KjNode* dbAttrP)
-{
-  KjNode* dbCreDateP = kjLookup(dbAttrP, "creDate");
-
-  if (dbCreDateP != NULL)
-    kjChildRemove(dbAttrP, dbCreDateP);
-  else
-    dbCreDateP = kjFloat(orionldState.kjsonP, "creDate", orionldState.requestTime);
-
-  LM(("CA: Adding creDate to attribute '%s'", attrP->name));
-  kjChildAdd(attrP, dbCreDateP);
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityMergeForUpdate -
-//
-// - DOES NOT modify entityP
-// - leaves the merged entity already in DB Model format - in dbEntityP
-//
-// The merge for update keeps the attributes that are already in the DB and replaces those that
-// are also in the API entity. New attributes are added.
-// The result is in dbEntityP
-//
-// So:
-// Loop over apiEntityP
-//   - find attribute in DB entity
-//   - if not found - add to DB entity ("attrs") + timestamps
-//   - if found     - extract the creDate and "give to" the API Entity attribute,
-//                    then transform to DB Model and add to "attrs" of DB-Entity
-//   - Remember to update "attrNames"
-//
-static void entityMergeForUpdate(KjNode* apiEntityP, KjNode* dbEntityP)
-{
-  LM(("UP: In entityMergeForUpdate"));
-  kjTreeLog(dbEntityP, "UP: DB Entity");
-  kjTreeLog(apiEntityP, "UP: API Entity");
-
-  //
-  // "attr" member of the DB Entity - might not be present (stupid DB Model !!!)
-  //
-  KjNode* dbAttrsP     = kjLookup(dbEntityP, "attrs");
-  KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-
-  if (dbAttrsP == NULL)  // No attributes in the entity in the database
-  {
-    dbAttrsP = kjObject(orionldState.kjsonP, "attrs");
-    kjChildAdd(dbEntityP, dbAttrsP);
-  }
-
-  KjNode* attrAddedV   = kjArray(orionldState.kjsonP, ".added");
-  KjNode* attrRemovedV = kjArray(orionldState.kjsonP, ".removed");
-
-  kjTreeLog(apiEntityP, "UP: API Entity");
-  LM(("UP: ---------- Looping over API-Entity attributes"));
-
-  KjNode* apiAttrP = apiEntityP->value.firstChildP;
-  KjNode* next;
-  while (apiAttrP != NULL)
-  {
-    next = apiAttrP->next;
-
-    if (strcmp(apiAttrP->name, "id")   == 0)  { LM(("UP: skipping 'id'"));   apiAttrP = next; continue; }
-    if (strcmp(apiAttrP->name, "type") == 0)  { LM(("UP: skipping 'type'")); apiAttrP = next; continue; }
-
-    char    eqAttrName[512];
-    char*   dotAttrName = apiAttrP->name;
-
-    strncpy(eqAttrName, apiAttrP->name, sizeof(eqAttrName) - 1);
-    dotForEq(eqAttrName);
-    KjNode* dbAttrP = kjLookup(dbAttrsP, eqAttrName);
-
-    kjChildRemove(apiEntityP, apiAttrP);
-
-    if (dbAttrP == NULL)  // The attribute is NEW and must be added to attrs and attrNames
-    {
-      LM(("UP: The attribute '%s' is NEW and must be added to attrs and attrNames", dotAttrName));
-      KjNode* attrNameNode = kjString(orionldState.kjsonP, NULL, dotAttrName);
-      kjChildAdd(dbAttrNamesP, attrNameNode);
-
-      dbModelFromApiAttribute(apiAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);  // ignoreP == NULL ...
-      kjChildAdd(dbAttrsP, apiAttrP);  // apiAttrP is now in DB-Model format
-    }
-    else
-    {
-      LM(("UP: Attribute '%s' is replaced by the API Attribute", dotAttrName));
-      kjChildRemove(dbAttrsP, dbAttrP);
-
-      LM(("UP: Calling dbModelFromApiAttribute"));
-      dbModelFromApiAttribute(apiAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);  // ignoreP == NULL ...
-      kjChildAdd(dbAttrsP, apiAttrP);  // apiAttrP is now in DB-Model format
-    }
-
-    apiAttrP = next;
-  }
-
-  LM(("UP: ---------- Looped over API-Entity attributes"));
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityMergeForReplace -
-//
-// NOTE:
-//   Built-in TIMESTAMPS (creDate/createdAt/modDate/modifiedAt) are taken care of by dbModelFromApi[Entity/Attribute/SubAttribute]()
-//   EXCEPT for the entity creDate in case of update of an entity
-//
-static void entityMergeForReplace(KjNode* apiEntityP, KjNode* dbEntityP)
-{
-  kjTreeLog(apiEntityP, "CA: apiEntityP");
-  kjTreeLog(dbEntityP,  "CA: dbEntityP");
-
-  KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");  // "attrs" is not present in the DB if the entity has no attributes ... ?
-
-  for (KjNode* apiAttrP = apiEntityP->value.firstChildP; apiAttrP != NULL; apiAttrP = apiAttrP->next)
-  {
-    LM(("CA: Entity Part: '%s'", apiAttrP->name));
-    if (strcmp(apiAttrP->name, "id")    == 0)  continue;
-    if (strcmp(apiAttrP->name, "type")  == 0)  continue;
-    if (strcmp(apiAttrP->name, "@type") == 0)  continue;  // FIXME: @type -> type should be fixed already (by pCheckEntity)
-    if (strcmp(apiAttrP->name, "scope") == 0)  continue;
-    // FIXME: More special entity fields?
-
-    //
-    // It's not a special Entity field - must be an attribute
-    // And, in such case, we need to grab the creDate from the database, in case the attribute already existed
-    //
-    char attrEqName[256];
-    strncpy(attrEqName, apiAttrP->name, sizeof(attrEqName) - 1);
-    dotForEq(attrEqName);
-    KjNode* dbAttrP = kjLookup(dbAttrsP, attrEqName);
-    if (dbAttrP != NULL)
-    {
-      kjChildRemove(dbEntityP, dbAttrP);  // The attr is removed from the db-entity so we can later add all the rest of attrs
-      apiAttributeCreateadAtFromDb(apiAttrP, dbAttrP);
-    }
-  }
-
-  kjTreeLog(apiEntityP, "CA: apiEntityP merged for DB");
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // alteration -
 //
-static void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* incomingP)
+void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* incomingP)
 {
   OrionldAlteration* alterationP = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
 
@@ -617,32 +463,11 @@ static KjNode* entityListWithIdAndType(KjNode* dbEntityArray)
 
 
 
-// -----------------------------------------------------------------------------
-//
-// kjMemberCount
-//
-static int kjMemberCount(KjNode* arrayP)
-{
-  if ((arrayP->type != KjArray) && (arrayP->type != KjObject))
-    return -1;
-
-  int members = 0;
-
-  for (KjNode* memberP = arrayP->value.firstChildP; memberP != NULL; memberP = memberP->next)
-  {
-    ++members;
-  }
-
-  return members;
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // kjConcatenate - move all children from srcP to the end of destP)
 //
-KjNode* kjConcatenate(KjNode* destP, KjNode* srcP)
+static KjNode* kjConcatenate(KjNode* destP, KjNode* srcP)
 {
   if (destP->value.firstChildP == NULL)
     destP->value.firstChildP = srcP->value.firstChildP;
@@ -697,18 +522,159 @@ static bool multipleInstances(const char* entityId, KjNode* updatedArrayP, KjNod
 
 
 
+// -----------------------------------------------------------------------------
+//
+// batchCreateEntity -
+//
+// * An entity in DB-Model format is returned
+// * 'inEntityP' is left untouched
+//
+static KjNode* batchCreateEntity(KjNode* inEntityP, char* entityId, char* entityType)
+{
+  KjNode* dbFinalEntityP = kjClone(orionldState.kjsonP, inEntityP);  // Starts out as API-Entity but dbModelFromApiEntity makes it a DB-Entity
+
+  if (dbModelFromApiEntity(dbFinalEntityP, NULL, true, entityId, entityType) == false)
+    return NULL;
+
+  return dbFinalEntityP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// batchReplaceEntity -
+//
+// About the current state in mongo -
+//   The only difference between BATCH Create and BATCH Replace is that
+//   the Entity creDate needs to stay intact in the latter
+//
+// About Notifications
+//   We're REPLACING an entire entity, so, some attributes that existed may disappear
+//   This should be notified.
+//   Having the "Original DB Entity", it's easy to figure out which attributes are removed in the REPLACE operation
+//
+static KjNode* batchReplaceEntity(KjNode* inEntityP, char* entityId, char* entityType, double entityCreDate)
+{
+  KjNode* dbFinalEntityP = kjClone(orionldState.kjsonP, inEntityP);  // Starts out as API-Entity but dbModelFromApiEntity makes it a DB-Entity
+
+  if (dbModelFromApiEntity(dbFinalEntityP, NULL, true, entityId, entityType) == false)
+    return NULL;
+
+  //
+  // Fix the entity's creDate (from the version of the entity that was fouind in the database)
+  //
+  KjNode* creDateNodeP = kjLookup(dbFinalEntityP, "creDate");
+  if (creDateNodeP != NULL)
+    creDateNodeP->value.f = entityCreDate;
+  else
+  {
+    creDateNodeP = kjFloat(orionldState.kjsonP, "creDate", entityCreDate);
+    kjChildAdd(dbFinalEntityP, creDateNodeP);
+  }
+
+  return dbFinalEntityP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// batchUpdateEntity -
+//
+// Take the Original DB Entity and add/remove from it (not sure if we need to clone it - it might noe be used after this)
+// Loop over inEntityP, all the attributes
+//   * Transform API Attribute into DB-Attribute (dbModelToDbAttribute)
+//   * if attr in "Original DB Entity"
+//       remove it from "Original DB Entity"
+//     else
+//       add attr name to "attrNames"
+//   * Add DB-Attribute to "Original DB Entity"
+//   * Return "Original DB Entity"
+//   * The creDate is already OK
+//   * The modDate needs to be updated
+//
+static KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* entityId, char* entityType)
+{
+  KjNode* dbFinalEntityP = kjClone(orionldState.kjsonP, originalDbEntityP);
+
+  //
+  // "attr" member of the DB Entity - might not be present (stupid DB Model !!!)
+  //
+  KjNode* dbAttrsP     = kjLookup(dbFinalEntityP, "attrs");
+  KjNode* dbAttrNamesP = kjLookup(dbFinalEntityP, "attrNames");
+
+  // No "attrs" in the entity in the database? - normal, if the entity has no attributes
+  if (dbAttrsP == NULL)
+  {
+    dbAttrsP = kjObject(orionldState.kjsonP, "attrs");
+    kjChildAdd(dbFinalEntityP, dbAttrsP);
+  }
+
+  // No "attrNames" in the entity in the database? - that should not happen
+  if (dbAttrNamesP == NULL)
+  {
+    dbAttrNamesP = kjArray(orionldState.kjsonP, "attrNames");
+    kjChildAdd(dbFinalEntityP, dbAttrsP);
+  }
+
+  for (KjNode* apiAttrP = inEntityP->value.firstChildP; apiAttrP != NULL; apiAttrP = apiAttrP->next)
+  {
+    if (strcmp(apiAttrP->name, "id")   == 0) continue;
+    if (strcmp(apiAttrP->name, "type") == 0) continue;
+
+    char eqAttrName[512];
+    strncpy(eqAttrName, apiAttrP->name, sizeof(eqAttrName) - 1);
+    dotForEq(eqAttrName);
+    KjNode* dbAttrP = kjLookup(dbAttrsP, eqAttrName);
+
+    if (dbAttrP != NULL)  // The attribute already existed - we remove it before the new version of the attribute is added
+      kjChildRemove(dbAttrsP, dbAttrP);
+    else
+    {
+      // The attribute is to be ADDED, so it must be added to "attrNames" (with dots, not eq)
+      KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, apiAttrP->name);
+      kjChildAdd(dbAttrNamesP, attrNameNodeP);
+    }
+
+    //
+    // Transforming the attribute into DB Model and adding it to "attrs"
+    // ".added" and ".removed" ...   need to look into this !!!
+    //
+    KjNode* attrAddedV   = kjArray(orionldState.kjsonP, ".added");
+    KjNode* attrRemovedV = kjArray(orionldState.kjsonP, ".removed");
+
+    dbAttrP = kjClone(orionldState.kjsonP, apiAttrP);  // Copy the API attribute and then transform it into DB Model
+
+    dbModelFromApiAttribute(dbAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);
+    kjChildAdd(dbAttrsP, dbAttrP);
+  }
+
+  //
+  // Update the entity's modDate (or create it if it for some obscure reason is missing!)
+  //
+  KjNode* modDateNodeP = kjLookup(dbFinalEntityP, "modDate");
+  if (modDateNodeP != NULL)
+    modDateNodeP->value.f = orionldState.requestTime;
+  else
+  {
+    modDateNodeP = kjFloat(orionldState.kjsonP, "modDate", orionldState.requestTime);
+    kjChildAdd(dbFinalEntityP, modDateNodeP);
+  }
+
+  return dbFinalEntityP;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpsert -
 //
 // Still to implement
-// - datasetId
-// - Notifications - before merging entities (4)
+// - datasetId  (don't want to ...)
 // - More than one instance of a specific entity in the array
-// - Merge updating entities (1)
-// - Write to mongo (2)
-// - Forwarding
-// - TRoE
+// - Forwarding (need new registrations for that)
 //
 bool orionldPostBatchUpsert(void)
 {
@@ -788,7 +754,6 @@ bool orionldPostBatchUpsert(void)
     orionldError(OrionldInternalError, "Database Error", "error querying the database for entities", 500);
     return false;
   }
-  kjTreeLog(dbEntityArray, "AN: Entities from DB");
 
   //
   // Finally we have everything we need to 100% CHECK the incoming entities
@@ -796,206 +761,95 @@ bool orionldPostBatchUpsert(void)
   noOfEntities = entitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update);
   LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
-  KjNode* troeEntityArray = NULL;
   if (troe)
-  {
-    //
-    //   The orionldState.requestTree that is now checked, expanded and in Normalized format must be cloned for TRoE
-    //   Remember that the TRoE functions (troePostBatchUpsert) use orionldState.requestTree,
-    //   so, the tree needs to be cloned before it is destroyed by XXX.
-    //
-    //   orionldState.requestTree is set to point to it just before leaving this function - for TRoE
-    //
-    troeEntityArray        = kjClone(orionldState.kjsonP, orionldState.requestTree);
-    orionldState.batchEntities = entityListWithIdAndType(dbEntityArray);  // For TRoE
-  }
+    orionldState.batchEntities = entityListWithIdAndType(dbEntityArray);  // For TRoE - but, a new method should be found
 
   KjNode* outArrayCreatedP  = kjArray(orionldState.kjsonP, "created");
   KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");
 
-
-  //
-  // One Array for entities that did not priorly exist  (creation)
-  // Another array for already existing entities        (replacement)
-  //
-  KjNode* dbCreateArray = orionldState.requestTree;
-  KjNode* dbUpdateArray = kjArray(orionldState.kjsonP, NULL);
-
-  //
-  // Merge new entity data into "old" DB entity data
-
-
   //
   // Looping over all the accepted entities
   //
-  // Different entity pointers (KjNode*):
-  // - incomingP:  untouched entity, just as after pCheckEntity - for Alteration
-  // - apiEntityP: merged with DB, but in NGSI-LD API format    - for Notification
-  // - dbEntityP:  merged with DB, in DB Model format           - for mongoc
-  //
-  // -----------------------------------------------------------------------------
-  //
-  // Too messy - I need to rewrite this loop
-  //
   // 1. orionldState.requestTree must remain untouched (as it came out of pCheckEntity)
-  // 2. incomingEntityP      - current entity in orionldState.requestTree
+  //
+  // 2. inEntityP            - current entity in orionldState.requestTree
   // 3. originalDbEntityP    - as the entity was in the DB before this request
   // 4. originalApiEntityP   - as the entity was in API format before this request  (not sure it's necessary)
   // 5. finalApiEntityP      - merged entity, in API format
   // 6. finalDbEntityP       - as is goes to mongoc
-  // 7. dbCreateArray        - array of finalDbEntityP that are to be created
-  // 8. dbUpdateArray        - array of finalDbEntityP that are to be updated
+  // 7. dbCreateArray        - array of finalDbEntityP that are to be created - for mongoc
+  // 8. dbUpdateArray        - array of finalDbEntityP that are to be updated - for mongoc
   //
   // TRoE needs         incomingEntityP
   // Alteration needs   incomingEntityP (to check for matching subscriptions)
   // Alteration needs   finalApiEntityP (for the notification - filter attrs etc)
   // mongoc needs       finalDbEntityP
   //
-#if 0
-#else
-  KjNode* entityP = orionldState.requestTree->value.firstChildP;
-  KjNode* next;
+  KjNode* dbCreateArray = kjArray(orionldState.kjsonP, NULL);
+  KjNode* dbUpdateArray = kjArray(orionldState.kjsonP, NULL);
 
-  while (entityP != NULL)
+  for (KjNode* inEntityP = orionldState.requestTree->value.firstChildP; inEntityP != NULL; inEntityP = inEntityP->next)
   {
-    next = entityP->next;
-
-    KjNode* incomingP              = kjClone(orionldState.kjsonP, entityP);
-    KjNode* idNodeP                = kjLookup(entityP, "id");  // pCheckEntity assures "id" is present (and not called "@id")
-    char*   entityId               = idNodeP->value.s;
-    KjNode* dbEntityTypeNodeP      = NULL;
-    KjNode* dbEntityP              = entityLookupBy_id_Id(dbEntityArray, entityId, &dbEntityTypeNodeP);
-    bool    creation               = true;
-    KjNode* apiEntityP             = NULL;
-    bool    alreadyInDbModelFormat = false;
-    bool    alterationDone         = false;
-    bool    entityIsNew            = false;
+    KjNode*  idNodeP            = kjLookup(inEntityP, "id");    // pCheckEntity assures "id" is present (as a String and not named "@id")
+    KjNode*  typeNodeP          = kjLookup(inEntityP, "type");  // pCheckEntity assures "type" if present is a String and not named "@type"
+    char*    entityId           = idNodeP->value.s;
+    char*    entityType         = (typeNodeP != NULL)? typeNodeP->value.s : NULL;
+    KjNode*  originalDbEntityP  = entityLookupBy_id_Id(dbEntityArray, entityId, NULL);
+    KjNode*  finalDbEntityP;
+    bool     entityIsNew;
 
     if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP, &entityIsNew))
     {
-      //
-      // In case of multiple instances of one and the same entity:
-      //
-      // - options=replace (default):
-      //   the newer (later in the array) entity completely replaces the old one.
-      //   - Entity Type can't change
-      //   - creDate stays
-      //
-      // - options=update
-      //   the newer (later in the array) entity patches the previous by replacing attributes
-      //   Need to keep patched the dbEntity but also the resulting API Entity (for Notifications)
-      //
-      KjNode* baseEntityP;
-
-      if (entityIsNew == true)
-      {
-        kjTreeLog(outArrayCreatedP, "MI: outArrayCreatedP");
-        baseEntityP = entityLookupById(outArrayCreatedP, entityId);
-        LM(("MI: The entity '%s' has multiple instances, (creating, then updating entity at %p)", entityId, baseEntityP));
-      }
-      else
-      {
-        kjTreeLog(outArrayUpdatedP, "MI: outArrayUpdatedP");
-        baseEntityP = entityLookupById(outArrayUpdatedP, entityId);
-        LM(("MI: The entity '%s' has multiple instances (updating already existing entity at %p)", entityId, baseEntityP));
-      }
-
       LM_W(("--------------------------------------------------------------------------------"));
       LM_W(("Multiple Instances of an Entity in New BATCH Upsert is not yet implemented"));
-      LM_W(("For now, the first instance is used and the rest of the instances arte ignored"));
+      LM_W(("For now, the first instance is used and the rest of the instances are ignored"));
       LM_W(("--------------------------------------------------------------------------------"));
-      entityP = next;
+
       continue;
     }
-    else
-      LM(("MI: The entity '%s' is to be %s", entityId, (dbEntityP == NULL)? "CREATED" : "UPDATED"));
 
-    //
-    // If the entity to be upserted is found in the DB, then it's not a Creation but un Update
-    //
-    if (dbEntityP != NULL)
+    if (originalDbEntityP == NULL)  // The entity did not exist before - CREATION
     {
-      entitySuccessPush(outArrayUpdatedP, entityId);
-      kjChildRemove(dbCreateArray, entityP);
-      LM(("X2: Removed entity '%s' from dbCreateArray", entityId));
+      finalDbEntityP = batchCreateEntity(inEntityP, entityId, entityType);
 
+      if (finalDbEntityP != NULL)
+      {
+        kjChildAdd(dbCreateArray, finalDbEntityP);
+        entitySuccessPush(outArrayCreatedP, entityId);
+      }
+    }
+    else
+    {
       if (orionldState.uriParamOptions.update == false)
       {
-        kjTreeLog(entityP, "Entity before entityMergeForReplace");
-        entityMergeForReplace(entityP, dbEntityP);  // Resulting Entity is entityP and it's an API-Entity, not DB
-        kjTreeLog(entityP, "Entity after entityMergeForReplace");
+        KjNode* entityCreDateNodeP = kjLookup(originalDbEntityP, "creDate");  // I'd really prefer dbModelFromApiEntity to fix "creDate"
+        double  entityCreDate      = (entityCreDateNodeP != NULL)? entityCreDateNodeP->value.f : orionldState.requestTime;
+
+        finalDbEntityP = batchReplaceEntity(inEntityP, entityId, entityType, entityCreDate);
       }
       else
+        finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, entityId, entityType);
+
+      if (finalDbEntityP != NULL)
       {
-        //
-        // entityMergeForUpdate:
-        //   * DOES NOT modify entityP
-        //   * leaves the merged entity already in DB Model format - in dbEntityP
-        //
-        entityMergeForUpdate(entityP, dbEntityP);
-
-        alreadyInDbModelFormat = true;
-        KjNode* clonedDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
-        LM(("CA: Calling dbModelToApiEntity"));
-        apiEntityP = dbModelToApiEntity(clonedDbEntityP, false, entityId);  // For notifications we need the entire resulting entity
-
-        //
-        // Alteration for Update
-        //
-        char*               entityType  = dbEntityTypeNodeP->value.s;
-        KjNode*             dbAttrsP    = kjLookup(dbEntityP, "attrs");
-        OrionldAlteration*  alterationP = orionldAlterations(entityId, entityType, entityP, dbAttrsP, false);
-
-        alterationP->dbEntityP         = kjClone(orionldState.kjsonP, dbEntityP);
-        alterationP->patchedEntity     = apiEntityP;
-        alterationP->patchTree         = incomingP;
-
-        // Add the new alteration to the alteration-list (orionldState.alterations)
-        alterationP->next              = orionldState.alterations;
-        orionldState.alterations       = alterationP;
-
-        alterationDone = true;
-
-        entityP = dbEntityP;  // entityP is in DB-Model format AND alreadyInDbModelFormat is set
+        kjChildAdd(dbUpdateArray, finalDbEntityP);
+        entitySuccessPush(outArrayUpdatedP, entityId);
       }
-
-      // Adding entityP to the dbUpdateArray for mongocEntitiesUpsert, even though it will be transformed later by dbModelFromApiEntity
-      LM(("X2: Inserting '%s' in the dbUpdateArray", entityId));
-      LM(("X2: No Of Members in dbEntityArray: %d", kjMemberCount(dbEntityArray)));
-
-      kjChildRemove(dbEntityArray, dbEntityP);
-      kjChildAdd(dbUpdateArray, entityP);  // Here dbEntityArray is modified
-
-      LM(("X2: No Of Members in dbEntityArray: %d", kjMemberCount(dbEntityArray)));
-      LM(("X2: Inserted '%s' in the dbUpdateArray", entityId));
-    }
-    else
-      entitySuccessPush(outArrayCreatedP, entityId);
-
-    //
-    // * entityP is transformed info DB-Model for mongocEntitiesUpsert
-    // * apiEntityP must stay API-Entity and is used for alterations (so, entityP is cloned before dbModelFromApiEntity for apiEntityP to not get destroyed)
-    // * TRoE ... can probably use apiEntityP (wait, entityMergeForUpdate will destroy that ...)
-    //
-    if (apiEntityP == NULL)
-      apiEntityP = kjClone(orionldState.kjsonP, entityP);
-
-    // Transform the API entity (entityP) into the database model
-    if (alreadyInDbModelFormat == false)
-    {
-      LM(("CA: Calling dbModelFromApiEntity"));
-      dbModelFromApiEntity(entityP, dbEntityP, creation, NULL, NULL);
     }
 
-    if (alterationDone == false)
-      alteration(entityId, NULL, apiEntityP, incomingP);
+    if (finalDbEntityP == NULL)
+      continue;
 
-    entityP = next;
+    //
+    // Alterations need the complete API entity (I might change that for the complete DB Entity ...)
+    // dbModelToApiEntity is DESTRUCTIVE, so I need to clone the 'finalDbEntityP' first
+    //
+    KjNode* dbEntityCopy    = kjClone(orionldState.kjsonP, finalDbEntityP);
+    KjNode* finalApiEntityP = dbModelToApiEntity(dbEntityCopy, false, entityId);
+
+    kjTreeLog(finalApiEntityP, "MI: After dbModelToApiEntity");
+    alteration(entityId, entityType, finalApiEntityP, inEntityP);
   }
-#endif
-
-  kjTreeLog(dbCreateArray, "Create Array");
-  kjTreeLog(dbUpdateArray, "Update Array");
 
   //
   // Any correct Entity to be created/updated??
@@ -1058,12 +912,8 @@ bool orionldPostBatchUpsert(void)
   orionldState.out.contentType = JSON;
   orionldState.noLinkHeader    = true;
 
-  if (orionldState.tenantP != &tenant0)
+  if (orionldState.tenantP != &tenant0)  // Perhaps not if 204 ...
     orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
-
-
-  if (troeEntityArray != NULL)
-    orionldState.requestTree = troeEntityArray;
 
   return true;
 }

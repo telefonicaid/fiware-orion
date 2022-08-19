@@ -1,0 +1,233 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Creating one single entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 0 IPv4 -troe -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription for all entities of type Vehicle
+# 02. BATCH Upsert/Create entity E1 with 2 attributes with 2 sub-attributes each
+# 03. Dump the accumulator to see one notification
+# 04. See the entity in TRoE
+# 05. See the attributes in TRoE
+# 06. See the sub-attributes in TRoE
+#
+
+echo "01. Create a subscription for all entities of type Vehicle"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "Vehicle"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. BATCH Upsert/Create entity E1 with 2 attributes with 2 sub-attributes each"
+echo "=============================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01",
+      "P1_P1": {
+        "type": "Property",
+        "value": "STEP 01"
+      },
+      "P1_R1": {
+        "type": "Relationship",
+        "object": "urn:E1:R1"
+      },
+      "unitCode": "cm",
+      "observedAt": "2022-08-18T12:28:00.123Z"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E1:R1",
+      "P1_P1": {
+        "type": "Property",
+        "value": "STEP 01"
+      },
+      "P1_R1": {
+        "type": "Relationship",
+        "object": "urn:E1:R1"
+      },
+      "observedAt": "2022-08-18T12:28:00.123Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump the accumulator to see one notification"
+echo "================================================"
+accumulatorDump
+echo
+echo
+
+
+echo "04. See the entity in TRoE"
+echo "=========================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "05. See the attributes in TRoE"
+echo "=============================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo
+
+
+echo "06. See the sub-attributes in TRoE"
+echo "=================================="
+postgresCmd -sql "SELECT id,valueType,entityId,unitcode,text,number,boolean,ts FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription for all entities of type Vehicle
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. BATCH Upsert/Create entity E1 with 2 attributes with 2 sub-attributes each
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 25
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:entity:E1"
+]
+
+
+03. Dump the accumulator to see one notification
+================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 624
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "P1_P1": {
+                    "type": "Property",
+                    "value": "STEP 01"
+                },
+                "P1_R1": {
+                    "object": "urn:E1:R1",
+                    "type": "Relationship"
+                },
+                "observedAt": "2022-08-18T12:28:00.123Z",
+                "type": "Property",
+                "unitCode": "cm",
+                "value": "STEP 01"
+            },
+            "R1": {
+                "P1_P1": {
+                    "type": "Property",
+                    "value": "STEP 01"
+                },
+                "P1_R1": {
+                    "object": "urn:E1:R1",
+                    "type": "Relationship"
+                },
+                "object": "urn:E1:R1",
+                "observedAt": "2022-08-18T12:28:00.123Z",
+                "type": "Relationship"
+            },
+            "id": "urn:ngsi-ld:entity:E1",
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+04. See the entity in TRoE
+==========================
+opmode,id,type,ts
+Create,urn:ngsi-ld:entity:E1,https://uri.etsi.org/ngsi-ld/default-context/Vehicle,202REGEX(.*)
+
+
+05. See the attributes in TRoE
+==============================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entity:E1,t,cm,None,STEP 01,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entity:E1,t,,None,urn:E1:R1,,,202REGEX(.*)
+
+
+06. See the sub-attributes in TRoE
+==================================
+id,valuetype,entityid,unitcode,text,number,boolean,ts
+https://uri.etsi.org/ngsi-ld/default-context/P1_P1,String,urn:ngsi-ld:entity:E1,,STEP 01,,,202REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/P1_R1,Relationship,urn:ngsi-ld:entity:E1,,urn:E1:R1,,,202REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/P1_P1,String,urn:ngsi-ld:entity:E1,,STEP 01,,,202REGEX(.*)
+https://uri.etsi.org/ngsi-ld/default-context/P1_R1,Relationship,urn:ngsi-ld:entity:E1,,urn:E1:R1,,,202REGEX(.*)
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
+pgDrop $CB_DB_NAME

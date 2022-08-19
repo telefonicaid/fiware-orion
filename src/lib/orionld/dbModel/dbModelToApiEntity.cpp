@@ -49,11 +49,13 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiEntity -
+// dbModelToApiEntity - transform a DB-Model Entity to an API Entity
+//
+// The incoming DB-Model Entity is DESTROYED by this function
 //
 // USED BY
-//   orionldAlterationsTreat
-//
+//   orionldAlterationsTreat() ?
+//   orionldPostBatchUpsert()
 //
 KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityId)
 {

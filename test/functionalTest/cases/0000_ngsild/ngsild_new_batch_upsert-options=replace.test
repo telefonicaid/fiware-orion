@@ -338,7 +338,6 @@ MongoDB server version: REGEX(.*)
 		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
 		"servicePath" : "/"
 	},
-	"creDate" : REGEX(.*),
 	"attrNames" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -351,6 +350,7 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [ ]
 		}
 	},
+	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : ""
 }
