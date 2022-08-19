@@ -31,25 +31,23 @@
 
 /* ****************************************************************************
 *
-* renderAndRelease - 
+* renderAndRelease -
+*
 */
 TEST(ScopeVector, renderAndRelease)
 {
   Scope*         s = new Scope("Type", "Value");
   ScopeVector    sV;
-  const char*    outfile = "ngsi.scopeVector.render.middle.xml";
   std::string    out;
 
   utInit();
 
-  out = sV.render(XML, "", false);
+  out = sV.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   sV.push_back(s);
 
-  out = sV.render(XML, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  out = sV.toJsonV1(false);
 
   EXPECT_EQ(sV.size(), 1);
   sV.release();
@@ -62,7 +60,7 @@ TEST(ScopeVector, renderAndRelease)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(ScopeVector, check)
 {
@@ -72,15 +70,15 @@ TEST(ScopeVector, check)
   std::string    expected1 = "OK";
   std::string    expected2 = "Empty type in restriction scope";
   std::string    rendered;
-  
+
   utInit();
 
   sV.push_back(s1);
-  rendered = sV.check(RegisterContext, XML, "", "", 0);
+  rendered = sV.check();
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   sV.push_back(s2);
-  rendered = sV.check(RegisterContext, XML, "", "", 0);
+  rendered = sV.check();
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());  
 
   utExit();
@@ -90,26 +88,7 @@ TEST(ScopeVector, check)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(ScopeVector, present)
-{
-  ScopeVector   sV;
-  Scope         scope("Type", "Value");
-
-  utInit();
-
-  sV.push_back(&scope);
-  sV.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* getAndSize - 
+* getAndSize -
 */
 TEST(ScopeVector, getAndSize)
 {
@@ -127,13 +106,13 @@ TEST(ScopeVector, getAndSize)
 
   EXPECT_EQ(3, sV.size());
 
-  scopeP = sV.get(0);
+  scopeP = sV[0];
   EXPECT_STREQ("Value0", scopeP->value.c_str());
 
-  scopeP = sV.get(1);
+  scopeP = sV[1];
   EXPECT_STREQ("Value1", scopeP->value.c_str());
 
-  scopeP = sV.get(2);
+  scopeP = sV[2];
   EXPECT_STREQ("Value2", scopeP->value.c_str());
 
   utExit();

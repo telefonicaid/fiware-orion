@@ -1,18 +1,1 @@
-{
-  "contextResponses" : [
-    {
-      "attributes" : [
-        {
-          "name" : "caName",
-          "type" : "caType",
-          "value" : "caValue"
-        }
-      ],
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK",
-        "details" : "details"
-      }
-    }
-  ]
-}
+{"contextResponses":[{"attributes":[{"name":"caName","type":"caType","value":"caValue"}],"statusCode":{"code":"200","reasonPhrase":"OK","details":"details"}}]}

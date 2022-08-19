@@ -28,16 +28,21 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/errorMessages.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
+#include "rest/HttpHeaders.h"
+#include "rest/rest.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/badVerbGetPostOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbGetPostOnly - 
+* badVerbGetPostOnly -
 */
 std::string badVerbGetPostOnly
 (
@@ -47,11 +52,20 @@ std::string badVerbGetPostOnly
   ParseData*                 parseDataP
 )
 {
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("POST, GET");
+  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method+ "'";
+  OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
+
+  ciP->httpHeader.push_back(HTTP_ALLOW);
+  std::string headerValue = "POST, GET";
+  //OPTIONS verb is only available for V2 API
+  if ((corsEnabled == true) && (ciP->apiVersion == V2))
+  {
+    headerValue = headerValue + ", OPTIONS";
+  }
+  ciP->httpHeaderValue.push_back(headerValue);
   ciP->httpStatusCode = SccBadVerb;
 
-  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
+  alarmMgr.badInput(clientIp, details);
 
-  return "";
+  return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
 }

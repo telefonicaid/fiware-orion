@@ -88,21 +88,5 @@ void jsonUncrRelease(ParseData* parseDataP)
 */
 std::string jsonUncrCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
-  return parseData->uncr.res.check(UnsubscribeContext, ciP->outFormat, "", parseData->errorString, 0);
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonUncrPresent - 
-*/
-void jsonUncrPresent(ParseData* parseDataP)
-{
-  if (!lmTraceIsSet(LmtDump))
-    return;
-
-  LM_F(("\n\n"));
-
-  parseDataP->uncr.res.subscriptionId.present("");
+  return parseData->uncr.res.check();
 }

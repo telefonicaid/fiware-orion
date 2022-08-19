@@ -1,7 +1,1 @@
-{
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "Empty attribute name"
-  }
-}
+{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"Empty attribute name"}}

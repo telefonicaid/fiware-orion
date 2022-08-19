@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "ngsi/StatusCode.h"
@@ -51,30 +50,33 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 
 /* ****************************************************************************
 *
-* AppendContextElementResponse::render - 
+* AppendContextElementResponse::toJsonV1 -
 */
-std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
+std::string AppendContextElementResponse::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType
+)
 {
-  std::string tag = "appendContextElementResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.toJsonV1(false);
   }
   else
   {
-    if (entity.id != "")
+    if (!entity.id.empty())
     {
-      out += entity.render(ciP->outFormat, indent + "  ", true);
+      out += entity.toJsonV1(true);
     }
 
-    out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag();
 
   return out;
 }
@@ -87,20 +89,19 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
 */
 std::string AppendContextElementResponse::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  const std::string&  predetectedError
 )
 {
   std::string res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -109,7 +110,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(ciP, requestType, indent);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -142,9 +143,9 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   {
     ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
-    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    contextAttributeResponseVector.fill(cerP->entity.attributeVector, cerP->statusCode);
     
-    entity.fill(&cerP->contextElement.entityId);
+    entity.fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
   }
   else
   {
@@ -186,11 +187,11 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   }
 
   // Now, if the external error code is 404 and 'details' is empty - add the name of the incoming entity::id as details
-  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details == ""))
+  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details.empty()))
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
-      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+      errorCode.details = ucrsP->contextElementResponseVector[0]->entity.id;
     }
   }
 }

@@ -1,0 +1,311 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log level via REST
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Set log level to NONE
+# 02. GET log level, see NONE
+# 03. Set log level to FATAL
+# 04. GET log level, see FATAL
+# 05. Set log level to ERROR
+# 06. GET log level, see ERROR
+# 07. Set log level to WARN
+# 08. GET log level, see WARN
+# 09. Set log level to INFO
+# 10. GET log level, see INFO
+# 11. Set log level to DEBUG
+# 12. GET log level, see DEBUG
+# 13. Set log level to XYZ - see error
+# 14. GET log level, see DEBUG
+#
+
+echo "01. Set log level to NONE"
+echo "========================="
+orionCurl --url /admin/log?level=NONE -X PUT
+echo
+echo
+
+
+echo "02. GET log level, see NONE"
+echo "==========================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "03. Set log level to FATAL"
+echo "=========================="
+orionCurl --url /admin/log?level=FATAL -X PUT
+echo
+echo
+
+
+echo "04. GET log level, see FATAL"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "05. Set log level to ERROR"
+echo "=========================="
+orionCurl --url /admin/log?level=ERROR -X PUT
+echo
+echo
+
+
+echo "06. GET log level, see ERROR"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "07. Set log level to WARN"
+echo "========================="
+orionCurl --url /admin/log?level=WARN -X PUT
+echo
+echo
+
+
+echo "08. GET log level, see WARN"
+echo "==========================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "09. Set log level to INFO"
+echo "========================="
+orionCurl --url /admin/log?level=INFO -X PUT
+echo
+echo
+
+
+echo "10. GET log level, see INFO"
+echo "==========================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "11. Set log level to DEBUG"
+echo "=========================="
+orionCurl --url /admin/log?level=DEBUG -X PUT
+echo
+echo
+
+
+echo "12. GET log level, see DEBUG"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "13. Set log level to XYZ - see error"
+echo "===================================="
+orionCurl --url /admin/log?level=XYZ -X PUT
+echo
+echo
+
+
+echo "14. GET log level, see DEBUG"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+
+
+--REGEXPECT--
+01. Set log level to NONE
+=========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET log level, see NONE
+===========================
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "NONE"
+}
+
+
+03. Set log level to FATAL
+==========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET log level, see FATAL
+============================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "FATAL"
+}
+
+
+05. Set log level to ERROR
+==========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET log level, see ERROR
+============================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "ERROR"
+}
+
+
+07. Set log level to WARN
+=========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET log level, see WARN
+===========================
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "WARN"
+}
+
+
+09. Set log level to INFO
+=========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. GET log level, see INFO
+===========================
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "INFO"
+}
+
+
+11. Set log level to DEBUG
+==========================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. GET log level, see DEBUG
+============================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "DEBUG"
+}
+
+
+13. Set log level to XYZ - see error
+====================================
+HTTP/1.1 400 Bad Request
+Content-Length: 29
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid log level"
+}
+
+
+14. GET log level, see DEBUG
+============================
+HTTP/1.1 200 OK
+Content-Length: 17
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "level": "DEBUG"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/StatusCode.h"
@@ -89,28 +93,28 @@ std::string deleteAllEntitiesWithTypeAndId
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
-    answer = response.render(ciP->outFormat, "", false, false);
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     return answer;
   }
-  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    answer = response.render(ciP->outFormat, "", false, false);
+    TIMED_RENDER(answer = response.toJsonV1(false, false));
 
     return answer;
   }
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "", "", "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "", "", ActionTypeDelete);
 
 
   // 04. Call Standard Operation
@@ -122,7 +126,8 @@ std::string deleteAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
+
   parseDataP->upcr.res.release();
   response.release();
 

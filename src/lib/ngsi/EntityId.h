@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/Request.h"
-#include "common/Format.h"
 
 
 
@@ -40,40 +39,37 @@
 class EntityId
 {
  public:
-  std::string  id;           // Mandatory
-  std::string  type;         // Optional
-  std::string  isPattern;    // Optional
+  std::string  id;            // Mandatory
+  std::string  type;          // Optional
+  std::string  isPattern;     // Optional
+  bool         isTypePattern; // Used by NGSIv2 API
 
-  std::string  servicePath;  // Not part of payload, just an internal field
-  std::string  tag;          // Help variable for the 'render' method
+  std::string  servicePath;   // Not part of payload, just an internal field
+
+  double       creDate;       // used by dateCreated functionality in NGSIv2
+  double       modDate;       // used by dateModified functionality in NGSIv2
 
   EntityId();
   EntityId(EntityId* eP);
   EntityId(const std::string&  _id,
            const std::string&  _type,
-           const std::string&  _isPattern = "",
-           const std::string&  _tag = "entityId");
+           const std::string&  _isPattern     = "",
+           bool                _isTypePattern = false);
 
-  void         tagSet(const std::string& tagName);
-  void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern);
-  void         fill(const struct EntityId* eidP);
-  void         present(const std::string& indent, int ix);
+  void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern = false);
+  void         fill(const struct EntityId* eidP, bool useDefaultType = false);
+
   void         release(void);
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
   bool         equal(EntityId* eP);
   bool         isPatternIsTrue(void);
 
-  std::string  render(Format              format,
-                      const std::string&  indent,
-                      bool                comma      = false,
-                      bool                isInVector = false,
-                      const std::string&  assocTag   = "");
+  std::string  toJson(void);
+  std::string  toJsonV1(bool comma, bool isInVector = false);
 
-  std::string  check(RequestType          requestType,
-                     Format               format,
-                     const std::string&   indent,
-                     const std::string&   predetectedError,
-                     int                  counter);
+  std::string  check(RequestType  requestType);
+
+  std::string  toJson(void) const;
 };
 
 #endif  // SRC_LIB_NGSI_ENTITYID_H_

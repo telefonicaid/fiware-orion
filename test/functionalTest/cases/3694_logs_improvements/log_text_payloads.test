@@ -1,0 +1,140 @@
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Test for request logs with text payloads
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E/T/A=foo
+# 02. Get E/T/A as text
+# 03. Update E/T/A=bar as text
+# 04. Get E/T/A as normal
+# 05. Get logs and see all traces
+#
+
+echo "01. Create entity E/T/A=foo"
+echo "==========================="
+payload='
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "type": "Text",
+    "value": "foo"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Get E/T/A as text"
+echo "====================="
+orionCurl --url "/v2/entities/E/attrs/A/value" --out text
+echo
+echo
+
+
+echo "03. Update E/T/A=bar as text"
+echo "============================"
+payload='"bar"'
+orionCurl --url "/v2/entities/E/attrs/A/value" --payload "$payload" --in text -X PUT
+echo
+echo
+
+
+echo "04. Get E/T/A as normal"
+echo "======================="
+orionCurl --url "/v2/entities/E/attrs/A"
+echo
+echo
+
+
+echo "05. Get logs and see all traces"
+echo "==============================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Request' | awk -F '|' '{print $10}'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E/T/A=foo
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get E/T/A as text
+=====================
+HTTP/1.1 200 OK
+Content-Length: 5
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+"foo"
+
+
+03. Update E/T/A=bar as text
+============================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Get E/T/A as normal
+=======================
+HTTP/1.1 200 OK
+Content-Length: 43
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": "Text",
+    "value": "bar"
+}
+
+
+05. Get logs and see all traces
+===============================
+ msg=Request received: POST /v2/entities, request payload (67 bytes): { "id": "E", "type": "T", "A": { "type": "Text", "value": "foo" } }, response code: 201
+ msg=Request received: GET /v2/entities/E/attrs/A/value, response code: 200
+ msg=Request received: PUT /v2/entities/E/attrs/A/value, request payload (4 bytes): "bar, response code: 204
+ msg=Request received: GET /v2/entities/E/attrs/A, response code: 200
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

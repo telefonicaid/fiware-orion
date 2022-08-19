@@ -43,7 +43,6 @@
 * Payload Out: UpdateContextSubscriptionResponse
 *
 * URI parameters
-*   - notifyFormat=XXX     (handled by std-op postUpdateContextSubscription)
 *   x entity::type=TYPE    (NOT TREATED)
 *   x !exist=entity::type  (NOT TREATED)
 *   x exist=entity::type   (NOT TREATED)
@@ -62,14 +61,9 @@ std::string putSubscriptionConvOp
   if (subscriptionId != ucsrP->subscriptionId.get())
   {
     std::string out;
+    std::string details = std::string("unmatching subscriptionId URI/payload: /") + subscriptionId + "/ vs /" + ucsrP->subscriptionId.get() + "/";
 
-    out = restErrorReplyGet(ciP,
-                            ciP->outFormat,
-                            "",
-                            "updateContextSubscription",
-                            SccBadRequest,
-                            std::string("unmatching subscriptionId URI/payload: /") +
-                            subscriptionId + "/ vs /" + ucsrP->subscriptionId.get() + "/");
+    restErrorReplyGet(ciP, SccBadRequest, details, &out);
 
     return out;
   }

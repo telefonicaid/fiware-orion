@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -34,16 +33,15 @@
 
 /* ****************************************************************************
 *
-* UnsubscribeContextRequest::render - 
+* UnsubscribeContextRequest::toJsonV1 -
 */
-std::string UnsubscribeContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string UnsubscribeContextRequest::toJsonV1(void)
 {
   std::string out = "";
-  std::string tag = "unsubscribeContextRequest";
 
-  out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(UnsubscribeContext, format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag();
+  out += subscriptionId.toJsonV1(UnsubscribeContext, false);
+  out += endTag();
 
   return out;
 }
@@ -54,29 +52,18 @@ std::string UnsubscribeContextRequest::render(RequestType requestType, Format fo
 *
 * UnsubscribeContextRequest::check - 
 */
-std::string UnsubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UnsubscribeContextRequest::check()
 {
   UnsubscribeContextResponse  response;
   std::string                 res;
 
-  if ((res = subscriptionId.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK")
+  if ((res = subscriptionId.check()) != "OK")
   {
      response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     return response.render(UnsubscribeContext, format, indent);
+     return response.toJsonV1();
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextRequest::present - 
-*/
-void UnsubscribeContextRequest::present(const std::string& indent)
-{
-   subscriptionId.present(indent);
 }
 
 

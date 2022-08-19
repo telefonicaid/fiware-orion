@@ -1,0 +1,228 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT/POST/PATCH /v2/entities/eid tests
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities E1 complete
+# 02. GET /v2/entities/E1
+#
+
+echo "01. POST /v2/entities E1 complete"
+echo "================================="
+payload='{
+  "id": "E1",
+  "string_object": {
+    "value": "a1",
+    "type":  "TA1"
+  },
+  "int_object": {
+    "value": 21,
+    "type":  "TA1"
+  },
+  "float_object": {
+    "value": 22.1,
+    "type":  "TA1"
+  },
+  "true_object": {
+    "value": true,
+    "type":  "TA1"
+  },
+  "false_object": {
+    "value": false,
+    "type":  "TA1"
+  },
+  "object_object": {
+    "value": { "a": 1, "b": 2 },
+    "type":  "TA1"
+  },
+  "vector_object": {
+    "value": [ "a", "b" ],
+    "type":  "TA1"
+  },
+  "with_metadata01": {
+    "value": 0,
+    "type": "MT1",
+    "metadata": {
+      "md_int":    { "value": 1 },
+      "md_float:": { "value": 2.01 },
+      "md_string": { "value": "STRING" },
+      "md_true":   { "value": true },
+      "md_false":  { "value": false },
+      "md_object_int": {
+        "value": 1,
+        "type": "MDINT"
+      },
+      "md_object_float": {
+        "value": 2.01,
+        "type": "MDFLOAT"
+      },
+      "md_object_string": {
+        "value": "3",
+        "type": "MDSTRING"
+      },
+      "md_object_true": {
+        "value": true,
+        "type": "MDBOOL"
+      },
+      "md_object_false": {
+        "value": false,
+        "type": "MDBOOL"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET /v2/entities/E1"
+echo "======================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+
+--REGEXPECT--
+01. POST /v2/entities E1 complete
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/E1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 947
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "false_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": false
+    },
+    "float_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": 22.1
+    },
+    "id": "E1",
+    "int_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": 21
+    },
+    "object_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": {
+            "a": 1,
+            "b": 2
+        }
+    },
+    "string_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": "a1"
+    },
+    "true_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": true
+    },
+    "type": "Thing",
+    "vector_object": {
+        "metadata": {},
+        "type": "TA1",
+        "value": [
+            "a",
+            "b"
+        ]
+    },
+    "with_metadata01": {
+        "metadata": {
+            "md_false": {
+                "type": "Boolean",
+                "value": false
+            },
+            "md_float:": {
+                "type": "Number",
+                "value": 2.01
+            },
+            "md_int": {
+                "type": "Number",
+                "value": 1
+            },
+            "md_object_false": {
+                "type": "MDBOOL",
+                "value": false
+            },
+            "md_object_float": {
+                "type": "MDFLOAT",
+                "value": 2.01
+            },
+            "md_object_int": {
+                "type": "MDINT",
+                "value": 1
+            },
+            "md_object_string": {
+                "type": "MDSTRING",
+                "value": "3"
+            },
+            "md_object_true": {
+                "type": "MDBOOL",
+                "value": true
+            },
+            "md_string": {
+                "type": "Text",
+                "value": "STRING"
+            },
+            "md_true": {
+                "type": "Boolean",
+                "value": true
+            }
+        },
+        "type": "MT1",
+        "value": 0
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

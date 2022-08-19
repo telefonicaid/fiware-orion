@@ -1,9 +1,1 @@
-{
-  "subscribeError" : {
-    "errorCode" : {
-      "code" : "400",
-      "reasonPhrase" : "Bad Request",
-      "details" : "invalid payload: bad value for polygon/inverted: /2/"
-    }
-  }
-}
+{"subscribeError":{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"invalid payload: bad value for polygon/inverted: /2/"}}}

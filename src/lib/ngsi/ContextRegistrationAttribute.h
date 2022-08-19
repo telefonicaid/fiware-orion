@@ -28,8 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "common/globals.h"
+
 #include "ngsi/MetadataVector.h"
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
 
@@ -42,20 +43,12 @@ typedef struct ContextRegistrationAttribute
 {
   std::string     name;            // Mandatory
   std::string     type;            // Optional
-  std::string     isDomain;        // Mandatory
-  MetadataVector  metadataVector;  // Optional
 
   ContextRegistrationAttribute();
-  ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
-  std::string     render(Format format, const std::string& indent, bool comma = false);
-  void            present(int ix, const std::string& indent);
-  void            release(void);
+  ContextRegistrationAttribute(const std::string& _name, const std::string& _type);
+  std::string     toJsonV1(bool comma);
 
-  std::string     check(RequestType         requestType,
-                        Format              format,
-                        const std::string&  indent,
-                        const std::string&  predetectedError,
-                        int                 counter);
+  std::string     check(ApiVersion apiVersion);
 } ContextRegistrationAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTE_H_

@@ -1,0 +1,158 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute with double underscore
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity with double undercore
+# 02. Retreive entity
+#
+
+echo '01. Create an entity with double undercore'
+echo '=========================================='
+payload='{
+    "id": "KMZ1211",
+    "type": "Bus",
+    "__owner": {
+        "value": 1,
+        "type": "Integer",
+        "metadata": {
+            "client_id": {
+                "type": "Integer",
+                "value": "1cb7246a5fcd11e69cd1ecf4bbf955f4"
+            }
+        }
+    },
+    "__UID": {
+        "value": 17,
+        "type": "Integer",
+        "metadata": {
+            "class_uid": {
+                "type": "Integer",
+                "value": 1
+            }
+        }
+    },
+    "__label": {
+        "value": "test",
+        "type": "String"
+    },
+    "pre__label": {
+        "value": "test",
+        "type": "String"
+    },
+    "label__post": {
+        "value": "test",
+        "type": "String"
+    },
+    "label__": {
+        "value": "test",
+        "type": "String"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Retreive entity"
+echo "==================="
+orionCurl --url /v2/entities/KMZ1211
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with double undercore
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/KMZ1211?type=Bus
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Retreive entity
+===================
+HTTP/1.1 200 OK
+Content-Length: 482
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "__UID": {
+        "metadata": {
+            "class_uid": {
+                "type": "Integer",
+                "value": 1
+            }
+        },
+        "type": "Integer",
+        "value": 17
+    },
+    "__label": {
+        "metadata": {},
+        "type": "String",
+        "value": "test"
+    },
+    "__owner": {
+        "metadata": {
+            "client_id": {
+                "type": "Integer",
+                "value": "1cb7246a5fcd11e69cd1ecf4bbf955f4"
+            }
+        },
+        "type": "Integer",
+        "value": 1
+    },
+    "id": "KMZ1211",
+    "label__": {
+        "metadata": {},
+        "type": "String",
+        "value": "test"
+    },
+    "label__post": {
+        "metadata": {},
+        "type": "String",
+        "value": "test"
+    },
+    "pre__label": {
+        "metadata": {},
+        "type": "String",
+        "value": "test"
+    },
+    "type": "Bus"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,0 +1,272 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Strings in q URI Param
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E1 with a String attribute S == '123'
+# 02. Create E2 with a Number attribute S == 123
+# 03a. Query with q=S:'123', see E1
+# 03b. Query with q=S=='123', see E1
+# 04a. Query with q=S:123, see E2
+# 04b. Query with q=S==123, see E2
+# 05a. Query with int-list: q=S:121,122,123 - see E2
+# 05b. Query with int-list: q=S:121,122,124 - see no hit
+# 06a. Query with string-list: q=S:'121','122','123' - see E1
+# 06b. Query with string-list: q=S:'121','122','124' - see no hit
+#
+
+echo "01. Create E1 with a String attribute S == '123'"
+echo "================================================"
+payload='{
+  "id": "E1",
+  "S": "123"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 with a Number attribute S == 123"
+echo "=============================================="
+payload='{
+  "id": "E2",
+  "S": 123
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03a. Query with q=S:'123', see E1"
+echo "================================="
+orionCurl --url "/v2/entities?q=S:'123'&options=keyValues"
+echo
+echo
+
+
+echo "03b. Query with q=S=='123', see E1"
+echo "=================================="
+orionCurl --url "/v2/entities?q=S=='123'&options=keyValues"
+echo
+echo
+
+
+echo "04a. Query with q=S:123, see E2"
+echo "==============================="
+orionCurl --url "/v2/entities?q=S:123&options=keyValues"
+echo
+echo
+
+
+echo "04b. Query with q=S==123, see E2"
+echo "================================"
+orionCurl --url "/v2/entities?q=S==123&options=keyValues"
+echo
+echo
+
+
+echo "05a. Query with int-list: q=S:121,122,123 - see E2"
+echo "=================================================="
+orionCurl --url "/v2/entities?q=S:121,123,125&options=keyValues"
+echo
+echo
+
+
+echo "05b. Query with int-list: q=S:121,122,124 - see no hit"
+echo "======================================================"
+orionCurl --url "/v2/entities?q=S:121,122,124&options=keyValues"
+echo
+echo
+
+
+echo "06a. Query with string-list: q=S:'121','122','123' - see E1"
+echo "==========================================================="
+orionCurl --url "/v2/entities?q=S:'121','123','123'&options=keyValues"
+echo
+echo
+
+
+echo "06b. Query with string-list: q=S:'121','122','124' - see no hit"
+echo "==============================================================="
+orionCurl --url "/v2/entities?q=S:'121','122','124'&options=keyValues"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with a String attribute S == '123'
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E2 with a Number attribute S == 123
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03a. Query with q=S:'123', see E1
+=================================
+HTTP/1.1 200 OK
+Content-Length: 38
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": "123",
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+03b. Query with q=S=='123', see E1
+==================================
+HTTP/1.1 200 OK
+Content-Length: 38
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": "123",
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+04a. Query with q=S:123, see E2
+===============================
+HTTP/1.1 200 OK
+Content-Length: 36
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": 123,
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+04b. Query with q=S==123, see E2
+================================
+HTTP/1.1 200 OK
+Content-Length: 36
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": 123,
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+05a. Query with int-list: q=S:121,122,123 - see E2
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 36
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": 123,
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+05b. Query with int-list: q=S:121,122,124 - see no hit
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+06a. Query with string-list: q=S:'121','122','123' - see E1
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 38
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "S": "123",
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+06b. Query with string-list: q=S:'121','122','124' - see no hit
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

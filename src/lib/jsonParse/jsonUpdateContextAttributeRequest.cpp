@@ -35,6 +35,7 @@
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -57,14 +58,7 @@ static std::string attributeType(const std::string& path, const std::string& val
 */
 static std::string attributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  //
-  // NOTE: UpdateContextAttributeRequest *is* an attribute, so no attributeP is
-  //       called for in UpdateContextAttributeData. However, in order to
-  //       save the 'typeFromXmlAttribute', a ContextAttribute has been added to 
-  //       UpdateContextAttributeData.
-  //
-  reqData->lastContextAttribute = &reqData->upcar.attribute;
-
+  reqData->upcar.res.valueType    = orion::ValueTypeString;
   reqData->upcar.res.contextValue = value;
 
   return "OK";
@@ -93,7 +87,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
-  reqData->upcar.metadataP->name = value;
+  reqData->upcar.metadataP->name = safeValue(value);
   return "OK";
 }
 
@@ -107,6 +101,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqData->upcar.metadataP->type = value;
+  reqData->upcar.metadataP->typeGiven = true;
   return "OK";
 }
 
@@ -119,7 +114,8 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
-  reqData->upcar.metadataP->value = value;
+  reqData->upcar.metadataP->stringValue = value;
+  reqData->upcar.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -171,23 +167,5 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(UpdateContextAttribute, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->upcar.res.check(ciP->apiVersion, reqData->errorString);
 }
-
-
-
-/* ****************************************************************************
-*
-* jsonUpcarPresent -
-*/
-void jsonUpcarPresent(ParseData* reqData)
-{
-  if (!lmTraceIsSet(LmtDump))
-  {
-    return;
-  }
-
-  LM_F(("\n\n"));
-  reqData->upcar.res.present("");
-}
-

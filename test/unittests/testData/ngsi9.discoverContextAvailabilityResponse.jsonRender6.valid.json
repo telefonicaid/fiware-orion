@@ -1,16 +1,1 @@
-{
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "attributes" : [
-          {
-            "name" : "Attr1",
-            "type" : "AType",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://tid.test.com/unitTest6"
-      }
-    }
-  ]
-}
+{"contextRegistrationResponses":[{"contextRegistration":{"attributes":[{"name":"Attr1","type":"AType"}],"providingApplication":"http://tid.test.com/unitTest6"}}]}

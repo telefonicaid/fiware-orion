@@ -25,7 +25,13 @@
 
 #include <string>
 #include <sstream>
+
+#include "logMsg/logMsg.h"
+#include "apiTypesV2/HttpInfo.h"
+#include "common/RenderFormat.h"
 #include "mongoBackend/TriggeredSubscription.h"
+
+
 
 /* ****************************************************************************
 *
@@ -33,19 +39,45 @@
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  long long          _throttling,
-  long long          _lastNotification,
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL
+  long long                _throttling,
+  long long                _maxFailsLimit,
+  long long                _failsCounter,
+  long long                _lastNotification,
+  RenderFormat             _renderFormat,
+  const ngsiv2::HttpInfo&  _httpInfo,
+  const ngsiv2::MqttInfo&  _mqttInfo,
+  const StringList&        _attrL,
+  const std::string&       _cacheSubId,
+  const char*              _tenant,
+  bool                     _covered
 )
+:
+  throttling(_throttling),
+  maxFailsLimit(_maxFailsLimit),
+  failsCounter(_failsCounter),
+  lastNotification(_lastNotification),
+  renderFormat(_renderFormat),
+  httpInfo(_httpInfo),
+  mqttInfo(_mqttInfo),
+  attrL(_attrL),
+  cacheSubId(_cacheSubId),
+  tenant((_tenant == NULL)? "" : _tenant),
+  stringFilterP(NULL),
+  mdStringFilterP(NULL),
+  blacklist(false),
+  covered(_covered)
 {
-  throttling        = _throttling;
-  lastNotification  = _lastNotification;
-  format            = _format;
-  reference         = _reference;
-  attrL             = _attrL;
+  // Dynamic memory must be cloned
+  if (_httpInfo.json != NULL)
+  {
+    httpInfo.json = _httpInfo.json->clone();
+  }
+  if (_mqttInfo.json != NULL)
+  {
+    mqttInfo.json = _mqttInfo.json->clone();
+  }
 }
+
 
 
 /* ****************************************************************************
@@ -56,16 +88,74 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL
+  RenderFormat             _renderFormat,
+  const ngsiv2::HttpInfo&  _httpInfo,
+  const ngsiv2::MqttInfo&  _mqttInfo,
+  const StringList&        _attrL
+)
+:
+  throttling(-1),
+  maxFailsLimit(-1),
+  failsCounter(-1),
+  lastNotification(-1),
+  renderFormat(_renderFormat),
+  httpInfo(_httpInfo),
+  mqttInfo(_mqttInfo),
+  attrL(_attrL),
+  cacheSubId(""),
+  tenant(""),
+  stringFilterP(NULL),
+  mdStringFilterP(NULL),
+  blacklist(false),
+  covered(false)
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::~TriggeredSubscription - 
+*/
+TriggeredSubscription::~TriggeredSubscription()
+{
+  if (stringFilterP != NULL)
+  {
+    delete stringFilterP;
+    stringFilterP = NULL;
+  }
+
+  if (mdStringFilterP != NULL)
+  {
+    delete mdStringFilterP;
+    mdStringFilterP = NULL;
+  }
+
+  // Only one of the release operations will actually do something
+  httpInfo.release();
+  mqttInfo.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::fillExpression -
+*
+* TriggeredSubscription class is shared for NGSI9 and NGSI10 subscriptions, so it is better
+* to keep expressions (an artifact for NGSI10) out of the constructor, in its independent fill
+* method
+*/
+void TriggeredSubscription::fillExpression
+(
+  const std::string&  georel,
+  const std::string&  geometry,
+  const std::string&  coords
 )
 {
-  throttling        = -1;
-  lastNotification  = -1;
-  format            = _format;
-  reference         = _reference;
-  attrL             = _attrL;
+  expression.georel   = georel;
+  expression.geometry = geometry;
+  expression.coords   = coords;
 }
 
 
@@ -77,8 +167,34 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 {
   std::stringstream ss;
 
-  ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;
+  ss << throttling << delimiter << lastNotification << delimiter << renderFormatToString(renderFormat) << delimiter << httpInfo.url;
+  ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
 
   return ss.str();
 }
 
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::stringFilterSet - 
+*/
+bool TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP)
+{
+  stringFilterP = _stringFilterP->clone(errorStringP);
+
+  return (stringFilterP == NULL)? false : true;
+}
+
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::mdStringFilterSet - 
+*/
+bool TriggeredSubscription::mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP)
+{
+  mdStringFilterP = _stringFilterP->clone(errorStringP);
+
+  return (mdStringFilterP == NULL)? false : true;
+}

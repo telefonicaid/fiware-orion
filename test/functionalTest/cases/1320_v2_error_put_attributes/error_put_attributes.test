@@ -1,0 +1,124 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error Put Attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities to create E1/T1/A1=0
+# 02. POST /v2/entities to create E1/T2/A1=0
+# 03. PUT /v2/entities/E1 (too many results)
+# 04. PUT /v2/entities/fgg (entity not found)
+#
+
+
+echo "01. POST /v2/entities to create E1/T1/A1=0"
+echo "=========================================="
+payload='{ "id": "E1", "type": "T1", "A1": 0 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/entities to create E1/T2/A1=0"
+echo "=========================================="
+payload='{ "id": "E1", "type": "T2", "A1": 0 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1 (too many results)"
+echo "=========================================="
+payload='{ "A1": 1 }'
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "04. PUT /v2/entities/fgg (entity not found)"
+echo "==========================================="
+payload='{ "A1": 1 }'
+orionCurl --url '/v2/entities/fgg/attrs?options=keyValues' --payload "$payload" -X PUT
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities to create E1/T1/A1=0
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/entities to create E1/T2/A1=0
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. PUT /v2/entities/E1 (too many results)
+==========================================
+HTTP/1.1 409 Conflict
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "More than one matching entity. Please refine your query",
+    "error": "TooManyResults"
+}
+
+
+04. PUT /v2/entities/fgg (entity not found)
+===========================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

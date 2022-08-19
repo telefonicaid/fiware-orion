@@ -26,20 +26,28 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
-#include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::render -
+* NotifyContextRequest::toJsonV1 -
 */
-std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string NotifyContextRequest::toJsonV1
+(
+  bool                             asJsonObject,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
+)
 {
   std::string  out                                  = "";
-  std::string  tag                                  = "notifyContextRequest";
   bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
 
   //
@@ -48,11 +56,11 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
-  out += subscriptionId.render(NotifyContext, ciP->outFormat, indent + "  ", true);
-  out += originator.render(ciP->outFormat, indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(ciP, NotifyContext, indent  + "  ", false);
-  out += endTag(indent, tag, ciP->outFormat);
+  out += startTag();
+  out += subscriptionId.toJsonV1(NotifyContext, true);
+  out += originator.toJsonV1(contextElementResponseVectorRendered);
+  out += contextElementResponseVector.toJsonV1(asJsonObject, NotifyContext, attrsFilter, blacklist, metadataFilter, false);
+  out += endTag();
 
   return out;
 }
@@ -61,20 +69,50 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
 
 /* ****************************************************************************
 *
+* NotifyContextRequest::toJson -
+*/
+std::string NotifyContextRequest::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter    
+)
+{
+  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
+  {
+    OrionError oe(SccBadRequest, "Invalid notification format");
+    alarmMgr.badInput(clientIp, "Invalid notification format");
+
+    return oe.toJson();
+  }  
+
+  JsonObjectHelper jh;
+
+  jh.addString("subscriptionId", subscriptionId.get());
+  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;
-   
-  if (predetectedError != "")
+
+  if (!predetectedError.empty())
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))               != "OK") ||
-           ((res = originator.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))                   != "OK") ||
-           ((res = contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check())                    != "OK") ||
+           ((res = originator.check())                        != "OK") ||
+           ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
@@ -83,20 +121,7 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
     return "OK";
   }
 
-  return response.render(NotifyContext, ciP->outFormat, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextRequest::present -
-*/
-void NotifyContextRequest::present(const std::string& indent)
-{
-  subscriptionId.present(indent);
-  originator.present(indent);
-  contextElementResponseVector.present(indent);
+  return response.toJsonV1();
 }
 
 
@@ -108,4 +133,22 @@ void NotifyContextRequest::present(const std::string& indent)
 void NotifyContextRequest::release(void)
 {
   contextElementResponseVector.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyContextRequest::clone -
+*/
+NotifyContextRequest* NotifyContextRequest::clone(void)
+{
+  NotifyContextRequest* ncrP = new NotifyContextRequest();
+
+  ncrP->subscriptionId = subscriptionId;
+  ncrP->originator     = originator;
+
+  ncrP->contextElementResponseVector.fill(contextElementResponseVector);
+
+  return ncrP;
 }

@@ -1,0 +1,170 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+CORS Registration
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -corsOrigin arrakis
+
+--SHELL--
+echo "01. Register entity E1/A1, using APIv2"
+echo "======================================"
+payload='{
+   "description": "located in CP1",
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+REG_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+echo "02. OPTIONS Registrations (Access-Control-Allow-Origin header not included)"
+echo "==========================================================================="
+orionCurl --url /v2/registrations -X OPTIONS
+echo
+echo
+
+echo "03. OPTIONS Registrations with arrakis origin (Access-Control-Allow-Origin header included)"
+echo "==========================================================================================="
+orionCurl --url /v2/registrations -X OPTIONS --origin arrakis
+echo
+echo
+
+echo "04. OPTIONS Registrations with caladan origin (Access-Control-Allow-Origin header not included)"
+echo "==============================================================================================="
+orionCurl --url /v2/registrations -X OPTIONS --origin caladan
+echo
+echo
+
+echo "05. OPTIONS specific Registration (Access-Control-Allow-Origin header not included)"
+echo "==================================================================================="
+orionCurl --url /v2/registrations/${REG_ID} -X OPTIONS
+echo
+echo
+
+echo "06. OPTIONS specific Registration with arrakis origin (Access-Control-Allow-Origin header included)"
+echo "==================================================================================================="
+orionCurl --url /v2/registrations/${REG_ID} -X OPTIONS --origin arrakis
+echo
+echo
+
+echo "07. OPTIONS specific Registration with caladan origin (Access-Control-Allow-Origin header not included)"
+echo "======================================================================================================="
+orionCurl --url /v2/registrations/${REG_ID} -X OPTIONS --origin caladan
+echo
+echo
+
+--REGEXPECT--
+01. Register entity E1/A1, using APIv2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. OPTIONS Registrations (Access-Control-Allow-Origin header not included)
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. OPTIONS Registrations with arrakis origin (Access-Control-Allow-Origin header included)
+===========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: arrakis
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. OPTIONS Registrations with caladan origin (Access-Control-Allow-Origin header not included)
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. OPTIONS specific Registration (Access-Control-Allow-Origin header not included)
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. OPTIONS specific Registration with arrakis origin (Access-Control-Allow-Origin header included)
+===================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Access-Control-Max-Age: REGEX([0-9]+)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Origin: arrakis
+Access-Control-Allow-Methods: GET, DELETE, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. OPTIONS specific Registration with caladan origin (Access-Control-Allow-Origin header not included)
+=======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

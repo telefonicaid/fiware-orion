@@ -1,0 +1,392 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with q string filter using all ops but without right-hand-value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Empty q
+# 02. Operation NOT EXIST
+# 03. Operation ==
+# 04. Operation !=
+# 05. Operation >
+# 06. Operation <
+# 07. Operation >=
+# 08. Operation <=
+# 09. Q-part empty I
+# 10. Q-part empty II
+# 11. Operation == without left-hand-side
+# 12. Operation != without left-hand-side
+# 13. Operation > without left-hand-side
+# 14. Operation < without left-hand-side
+# 15. Operation >= without left-hand-side
+# 16. Operation <= without left-hand-side
+#
+
+
+echo "01. Empty q"
+echo "==========="
+orionCurl --url '/v2/entities?q='
+echo
+echo
+
+
+echo "02. Operation NOT EXIST"
+echo "======================="
+orionCurl --url '/v2/entities?q=!'
+echo
+echo
+
+
+echo "03. Operation =="
+echo "================"
+orionCurl --url '/v2/entities?q=A1=='
+echo
+echo
+
+
+echo "04. Operation !="
+echo "================"
+orionCurl --url '/v2/entities?q=A1!='
+echo
+echo
+
+
+echo "05. Operation >"
+echo "==============="
+orionCurl --url '/v2/entities?q=A1>'
+echo
+echo
+
+
+echo "06. Operation <"
+echo "==============="
+orionCurl --url '/v2/entities?q=A1<'
+echo
+echo
+
+
+echo "07. Operation >="
+echo "================"
+orionCurl --url '/v2/entities?q=A1>='
+echo
+echo
+
+
+echo "08. Operation <="
+echo "================"
+orionCurl --url '/v2/entities?q=A1<='
+echo
+echo
+
+
+echo "09. Q-part empty I"
+echo "=================="
+orionCurl --url '/v2/entities?q=;'
+echo
+echo
+
+
+echo "10. Q-part empty II"
+echo "==================="
+orionCurl --url '/v2/entities?q=type;;'
+echo
+echo
+
+
+echo "11. Operation == without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q===12'
+echo
+echo
+
+
+echo "12. Operation != without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q===12'
+echo
+echo
+
+
+echo "13. Operation > without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=>12'
+echo
+echo
+
+
+echo "14. Operation < without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=<12'
+echo
+echo
+
+
+echo "15. Operation >= without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=>=12'
+echo
+echo
+
+
+echo "16. Operation <= without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=<=12'
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Empty q
+===========
+HTTP/1.1 400 Bad Request
+Content-Length: 78
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Empty right-hand-side for URI param /q/",
+    "error": "BadRequest"
+}
+
+
+02. Operation NOT EXIST
+=======================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+03. Operation ==
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+04. Operation !=
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+05. Operation >
+===============
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+06. Operation <
+===============
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+07. Operation >=
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+08. Operation <=
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+09. Q-part empty I
+==================
+HTTP/1.1 400 Bad Request
+Content-Length: 46
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty q",
+    "error": "BadRequest"
+}
+
+
+10. Q-part empty II
+===================
+HTTP/1.1 400 Bad Request
+Content-Length: 51
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty q-item",
+    "error": "BadRequest"
+}
+
+
+11. Operation == without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+12. Operation != without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+13. Operation > without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+14. Operation < without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+15. Operation >= without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+16. Operation <= without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

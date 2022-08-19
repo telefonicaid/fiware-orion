@@ -1,0 +1,253 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT/POST/PATCH /v2/entities/eid with error
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities/E1 with id in payload
+# 02. POST /v2/entities/E1 with type in payload
+# 03. PUT  /v2/entities/E1 with id in payload
+# 04. PUT  /v2/entities/E1 with type in payload
+# 05. PATCH  /v2/entities/E1 with id in payload
+# 06. PATCH  /v2/entities/E1 with type in payload
+# 07. POST /v2/entities/E1 with 'bad_tag' for attribute
+# 08. POST /v2/entities without id in payload
+#
+
+echo "01. POST /v2/entities/E1/attrs with id in payload"
+echo "================================================="
+payload='{
+  "id": "E1",
+  "a1": "a1"
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/entities/E1/attrs with type in payload"
+echo "==================================================="
+payload='{
+  "type":"T1",
+  "a1": "a1"
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1/attrs with id in payload"
+echo "================================================"
+payload='{
+  "id": "E1",
+  "a1": "a1"
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "04. PUT /v2/entities/E1/attrs with type in payload"
+echo "=================================================="
+payload='{
+  "type":"T1",
+  "a1": "a1"
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "05. PATCH /v2/entities/E1/attrs with id in payload"
+echo "=================================================="
+payload='{
+  "id": "E1",
+  "a1": "a1"
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. PATCH /v2/entities/E1/attrs with type in payload"
+echo "===================================================="
+payload='{
+  "type":"T1",
+  "a1": "a1"
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. POST /v2/entities/E1/attrs with 'bad_tag' for attribute"
+echo "==========================================================="
+payload='{
+  "a1": {
+    "value": 12,
+    "type": "int",
+    "bad_tag": 14
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+
+echo "08. POST /v2/entities without id in payload"
+echo "==========================================="
+payload='{
+  "type": "T1",
+  "a1": {
+    "value": 12,
+    "type": "int"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities/E1/attrs with id in payload
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id specified in payload",
+    "error": "BadRequest"
+}
+
+
+02. POST /v2/entities/E1/attrs with type in payload
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type specified in payload",
+    "error": "BadRequest"
+}
+
+
+03. PUT /v2/entities/E1/attrs with id in payload
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id specified in payload",
+    "error": "BadRequest"
+}
+
+
+04. PUT /v2/entities/E1/attrs with type in payload
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type specified in payload",
+    "error": "BadRequest"
+}
+
+
+05. PATCH /v2/entities/E1/attrs with id in payload
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id specified in payload",
+    "error": "BadRequest"
+}
+
+
+06. PATCH /v2/entities/E1/attrs with type in payload
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity type specified in payload",
+    "error": "BadRequest"
+}
+
+
+07. POST /v2/entities/E1/attrs with 'bad_tag' for attribute
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "unrecognized property for context attribute",
+    "error": "BadRequest"
+}
+
+
+08. POST /v2/entities without id in payload
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 83
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "entity id length: 0, min length supported: 1",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

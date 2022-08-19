@@ -42,26 +42,15 @@ typedef struct ContextRegistrationVector
 
   void                  push_back(ContextRegistration* item);
   unsigned int          size(void);
-  ContextRegistration*  get(int ix);
-  std::string           render(Format format, const std::string& indent, bool comma);
-  void                  present(const std::string& indent);
+  std::string           toJsonV1(bool comma);
   void                  release(void);
 
-  std::string           check(RequestType         requestType,
-                              Format              format,
-                              const std::string&  indent,
+  std::string           check(ApiVersion          apiVersion,
+                              RequestType         requestType,
                               const std::string&  predetectedError,
                               int                 counter);
 
-  ContextRegistration*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
+  ContextRegistration*  operator[](unsigned int ix) const;
 
 } ContextRegistrationVector;
 

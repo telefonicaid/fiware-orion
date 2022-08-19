@@ -28,10 +28,8 @@
 #include <string>
 
 #include "ngsi/Request.h"
-#include "common/Format.h"
 #include "orionTypes/areas.h"
-
-using namespace orion;
+#include "rest/StringFilter.h"
 
 
 
@@ -39,16 +37,16 @@ using namespace orion;
 *
 * Defined scopes so far
 */
-#define SCOPE_TYPE_ASSOC           "IncludeAssociations"
-#define SCOPE_VALUE_ASSOC_SOURCE   "SOURCES"
-#define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
-#define SCOPE_VALUE_ASSOC_ALL      "ALL"
-
 #define SCOPE_OPERATOR_NOT           "Not"
 
 #define SCOPE_FILTER                 "FIWARE" "::" "Filter"
 #define SCOPE_FILTER_EXISTENCE       SCOPE_FILTER "::" "Existence"
 #define SCOPE_FILTER_NOT_EXISTENCE   SCOPE_FILTER "::" SCOPE_OPERATOR_NOT "::" "Existence"
+
+#define SCOPE_TYPE_SIMPLE_QUERY      "FIWARE::StringQuery"
+#define SCOPE_TYPE_SIMPLE_QUERY_MD   "FIWARE::StringQuery::Metadata"
+
+#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION
 
 #define SCOPE_VALUE_ENTITY_TYPE      "entity::type"
 
@@ -68,19 +66,27 @@ typedef struct Scope
   orion::AreaType     areaType;
   orion::Circle       circle;
   orion::Polygon      polygon;
+  orion::Point        point;
+  orion::Line         line;
+  orion::Box          box;
+  orion::Georel       georel;
+  StringFilter*       stringFilterP;
+  StringFilter*       mdStringFilterP;
 
   Scope();
-  Scope(const std::string& _type, const std::string& _value);
+  Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
 
-  std::string render(Format format, const std::string& indent, bool notLastInVector);
-  void        present(const std::string& indent, int ix);
-  void        release(void);
+  int          fill(ApiVersion          apiVersion,
+                    const std::string&  geometry,
+                    const std::string&  coords,
+                    const std::string&  georelString,
+                    std::string*        errorString);
 
-  std::string check(RequestType         requestType,
-                    Format              format,
-                    const std::string&  indent,
-                    const std::string&  predetectedError,
-                    int                 counter);
+  std::string  toJsonV1(bool notLastInVector);
+  void         release(void);
+
+  std::string  check(void);
+  void         areaTypeSet(const std::string& areaTypeString);
 } Scope;
 
 #endif  // SRC_LIB_NGSI_SCOPE_H_

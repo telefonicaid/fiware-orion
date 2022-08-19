@@ -431,7 +431,6 @@ int paParse
 )
 {
   char*  progNameCopy;
-  int    ix;
   int    s;
   FILE*  fP;
 
@@ -447,11 +446,28 @@ int paParse
   /*                                                      */
   if (argC > 1)
   {
+    int ix;
+
     strncpy(paCommandLine, argV[1], sizeof(paCommandLine));
     for (ix = 2; ix < argC; ix++)
     {
-      strncat(paCommandLine, " ",      sizeof(paCommandLine) - 1);
-      strncat(paCommandLine, argV[ix], sizeof(paCommandLine) - 1);
+      if (sizeof(paCommandLine) - strlen(paCommandLine) > 1)
+      {
+        strncat(paCommandLine, " ", sizeof(paCommandLine) - strlen(paCommandLine) - 1);
+      }
+      else
+      {
+        break;
+      }
+
+      if (sizeof(paCommandLine) - strlen(paCommandLine) > 1)
+      {
+        strncat(paCommandLine, argV[ix], sizeof(paCommandLine) - strlen(paCommandLine) - 1);
+      }
+      else
+      {
+        break;
+      }
     }
   }
 
@@ -469,13 +485,36 @@ int paParse
   if (paProgName == NULL) /* hasn't been set with paConfig */
   {
     progNameCopy = strdup(argV[0]);
+
     progName     = strdup(paProgNameSet(argV[0], level, pid, extra));
+    if (progName == NULL)
+    {
+      // strdup could return NULL if we run of of memory. Very unlikely, but
+      // theoretically possible (and static code analysis tools complaint about it ;)
+      printf("FATAL ERROR: strdup returns NULL");
+      exit(1);
+    }
+
     paProgName   = strdup(progName);
+    if (paProgName == NULL)
+    {
+      // strdup could return NULL if we run of of memory. Very unlikely, but
+      // theoretically possible (and static code analysis tools complaint about it ;)
+      printf("FATAL ERROR: strdup returns NULL");
+      exit(1);
+    }
   }
   else
   {
     progNameCopy = strdup(paProgName);
     progName     = strdup(paProgName);
+    if ((progNameCopy == NULL) || (progName == NULL))
+    {
+      // strdup could return NULL if we run of of memory. Very unlikely, but
+      // theoretically possible (and static code analysis tools complaint about it ;)
+      printf("FATAL ERROR: strdup returns NULL");
+      exit(1);
+    }
   }
 
 
@@ -536,7 +575,7 @@ int paParse
     RETURN_ERROR("paLimitCheck");
   }
 
-  if ((s != -2) && ((s = paConfigActions(false)) == -1))
+  if ((s != -2) && (paConfigActions(false) == -1))
   {
     RETURN_ERROR("paConfigActions");
   }
@@ -610,11 +649,24 @@ int paParse
     }
   }
 
-  free(paiList);
-  free(paRcFileName);
-  free(paUsageProgName);
-
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* paCleanup - free allocated variables
+*/
+void paCleanup(void)
+{
+  free(paUsageProgName);
+  free(paRcFileName);
+  free(paiList);
+
+  paUsageProgName = NULL;
+  paRcFileName    = NULL;
+  paiList         = NULL;
 }
 
 

@@ -24,6 +24,8 @@
 */
 #include "gtest/gtest.h"
 
+#include "unittest.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,22 +35,26 @@
 #include "common/globals.h"
 
 #include "rest/RestService.h"
-#include "serviceRoutines/postRegisterContext.h"
+#include "rest/rest.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
-
-#include "unittest.h"
+#include "serviceRoutines/badVerbGetOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* restServiceV - 
+* getV - 
 */
-RestService restServiceV[] =
+RestService getV[] =
 {
-  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                       }, "", postRegisterContext                       },
-  { "GET",    ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", getContextEntitiesByEntityId              },
-  { "",       InvalidRequest,                        0, {                                                   }, "", NULL                                      }
+  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, getContextEntitiesByEntityId     },
+  { InvalidRequest,                        0, {                                                   }, NULL                             }
+};
+
+RestService badVerbV[] =
+{
+  { ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, badVerbGetOnly                   },
+  { InvalidRequest,                        0, {                                                   }, NULL                             }
 };
 
 
@@ -65,7 +71,9 @@ TEST(Convenience, emptyPath)
 
   utInit();
 
-  response = restService(&ci, restServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
+  response = orion::requestServe(&ci);
   EXPECT_STREQ(expected.c_str(), response.c_str());
 
   utExit();
@@ -75,7 +83,7 @@ TEST(Convenience, emptyPath)
 
 /* ****************************************************************************
 *
-* shortPath - 
+* shortPath -
 */
 TEST(Convenience, shortPath)
 {
@@ -84,27 +92,36 @@ TEST(Convenience, shortPath)
   ConnectionInfo  ci3("ngsi8", "GET", "1.1");
   ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
   std::string     out;
-  const char*     outfile1 = "ngsi.convenience.shortPath.postponed.xml";
-  const char*     outfile2 = "ngsi.convenience.shortPath2.postponed.xml";
-  const char*     outfile3 = "ngsi.convenience.shortPath3.postponed.xml";
-  const char*     outfile4 = "ngsi.convenience.shortPath4.postponed.xml";
+  const char*     outfile      = "ngsi.unrecognizedRequest.json";
+  RestService     restService1 = { InvalidRequest, 1, { "ngsi10"         }, NULL };
+  RestService     restService2 = { InvalidRequest, 1, { "ngsi9"          }, NULL };
+  RestService     restService3 = { InvalidRequest, 1, { "ngsi8"          }, NULL };
+  RestService     restService4 = { InvalidRequest, 2, { "ngsi10", "json" }, NULL };
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = restService(&ci1, restServiceV);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
+  ci1.apiVersion   = V1;
+  ci1.restServiceP = &restService1;
+  out = orion::requestServe(&ci1);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = restService(&ci2, restServiceV);
+  ci2.apiVersion   = V1;
+  ci2.restServiceP = &restService2;
+  out = orion::requestServe(&ci2);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  out = restService(&ci3, restServiceV);
+  ci3.apiVersion   = V1;
+  ci3.restServiceP = &restService3;
+  out = orion::requestServe(&ci3);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  out = restService(&ci4, restServiceV);
+  ci4.apiVersion   = V1;
+  ci4.restServiceP = &restService4;
+  out = orion::requestServe(&ci4);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -114,19 +131,24 @@ TEST(Convenience, shortPath)
 
 /* ****************************************************************************
 *
-* badPathNgsi9 - 
+* badPathNgsi9 -
 */
 TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
-  const char*               outfile = "ngsi.convenience.badPathNgsi9.postponed.xml";
+  const char*               outfile = "ngsi.unrecognizedRequest.json";
+  RestService               restService = { InvalidRequest, 2, { "ngsi9", "badpathcomponent" }, NULL };
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  out = restService(&ci, restServiceV);
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -136,18 +158,23 @@ TEST(Convenience, badPathNgsi9)
 
 /* ****************************************************************************
 *
-* badPathNgsi10 - 
+* badPathNgsi10 -
 */
 TEST(Convenience, badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;
-  const char*               outfile = "ngsi10.convenience.badPathNgsi10.postponed.xml";
+  const char*               outfile     = "ngsi.unrecognizedRequest.json";
+  RestService               restService = { InvalidRequest, 2, { "ngsi10", "badpathcomponent" }, NULL };
 
   utInit();
 
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = restService(&ci, restServiceV);
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

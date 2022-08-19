@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -27,15 +27,15 @@ import sys
 
 
 def validation_error(input_line, ref_line):
-    print "VALIDATION ERROR: input line:"
-    print "   " + input_line
-    print "does not match ref line:"
-    print "   " + ref_line
+    print ("VALIDATION ERROR: input line:")
+    print ("   " + input_line)
+    print ("does not match ref line:")
+    print ("   " + ref_line)
     exit(1)
 
 
 def line_count(file_name):
-    input = open(file_name, 'r')
+    input = open(file_name, 'r', encoding='utf-8')
     lines = 0
 
     for input_line in input.readlines():
@@ -45,11 +45,16 @@ def line_count(file_name):
     return lines
 
 
+def escape(s):
+    # Maybe some other "regex sensible" chars need to be escaped... this function will be
+    # adjusted in that case
+    return s.replace('[', '\[').replace(']', '\]').replace('{','\{').replace('}', '\}').replace('?', '\?')
+
 
 def diff_files(input_file, ref_file):
 
-    input = open(input_file, 'r')
-    ref = open(ref_file, 'r')
+    input = open(input_file, 'r', encoding='utf-8')
+    ref = open(ref_file, 'r', encoding='utf-8')
 
     input_lines = input.readlines()
 
@@ -58,7 +63,7 @@ def diff_files(input_file, ref_file):
         try:
             input_line = input_lines.pop(0)
         except IndexError:
-            print "VALIDATION ERROR: input file has less lines than reference"
+            print ("VALIDATION ERROR: input file has less lines than reference")
             exit(1)
 
         # Removing trailing whitespace(to avoid "noisy" input/reference files)
@@ -70,7 +75,9 @@ def diff_files(input_file, ref_file):
         if m is not  None:
             # We build the regex, concatenating preamble,
             # regex expression itself and the last part
-            regex = m.group(1) + m.group(2) + m.group(3)
+            # The ending '$' is to avoid "false matching"
+            # when some text exist after the REGEX(...)
+            regex = escape(m.group(1)) + m.group(2) + escape(m.group(3)) + '$'
 
             if not re.match(regex, input_line):
                 validation_error(input_line, ref_line)
@@ -78,7 +85,7 @@ def diff_files(input_file, ref_file):
             if not ref_line == input_line:
                 validation_error(input_line, ref_line)
 
-    print "Validation ok"
+    print ("Validation ok")
     exit(0)
 
 
@@ -106,15 +113,15 @@ def main():
     rlines = line_count(options.ref_file)
 
     if ilines == 0:
-        print "VALIDATION ERROR: input file is EMPTY"
+        print ("VALIDATION ERROR: input file is EMPTY")
         exit(1)
 
     if rlines == 0:
-        print "VALIDATION ERROR: reference file is EMPTY"
+        print ("VALIDATION ERROR: reference file is EMPTY")
         exit(1)
 
     if not ilines == rlines:
-        print "VALIDATION ERROR: input file and reference file have different line count"
+        print ("VALIDATION ERROR: input file and reference file have different line count")
         exit(1)
 
     diff_files(options.input_file, options.ref_file)

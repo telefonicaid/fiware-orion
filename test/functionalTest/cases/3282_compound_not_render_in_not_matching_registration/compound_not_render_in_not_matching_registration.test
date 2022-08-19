@@ -1,0 +1,359 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Compound values are lost when rendering due to not-matching registration
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+#
+# 01. Create entity
+# 02. Create not matching registration
+# 03. Get all entities
+# 04. Get all entities with keyValues
+# 05. Get entity
+# 06. Get entity with keyValues
+#
+
+echo "01. Create entity"
+echo "================="
+payload='{
+  "id": "E10",
+  "type": "T",
+  "A": {
+    "value": 26.5,
+    "type": "Float",
+    "metadata": {
+      "MD1": {
+        "value": 0.8,
+        "type": "Float"
+      },
+      "MD2": {
+        "value": {
+          "z": 1,
+          "w": 2
+        },
+        "type": "Float"
+      },
+      "MD3": {
+        "value": [ "B", 5, false ],
+        "type": "Float"
+      }
+    }
+  },
+  "B": {
+    "value": {
+      "x": 1,
+      "y": 2
+    },
+    "type": "Text",
+    "metadata": {
+      "accuracy": {
+        "value": 0.8,
+        "type": "Float"
+      }
+    }
+  },
+  "C": {
+    "value": [ "A", 2, true ],
+    "type": "Boolean",
+    "metadata": {
+      "accuracy": {
+        "value": 0.8,
+        "type": "Float"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create not matching registration"
+echo "===================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ],
+    "attrs": [
+      "C1",
+      "C2"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost':$CP1_PORT'/v1"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Get all entities"
+echo "===================="
+orionCurl --url '/v2/entities'
+echo
+echo
+
+
+echo "04. Get all entities with keyValues"
+echo "==================================="
+orionCurl --url '/v2/entities?options=keyValues'
+echo
+echo
+
+
+echo "05. Get entity"
+echo "=============="
+orionCurl --url '/v2/entities/E10'
+echo
+echo
+
+
+echo "06. Get entity with keyValues"
+echo "============================="
+orionCurl --url '/v2/entities/E10?options=keyValues'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity
+=================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E10?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create not matching registration
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Get all entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 389
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {
+                "MD1": {
+                    "type": "Float",
+                    "value": 0.8
+                },
+                "MD2": {
+                    "type": "Float",
+                    "value": {
+                        "w": 2,
+                        "z": 1
+                    }
+                },
+                "MD3": {
+                    "type": "Float",
+                    "value": [
+                        "B",
+                        5,
+                        false
+                    ]
+                }
+            },
+            "type": "Float",
+            "value": 26.5
+        },
+        "B": {
+            "metadata": {
+                "accuracy": {
+                    "type": "Float",
+                    "value": 0.8
+                }
+            },
+            "type": "Text",
+            "value": {
+                "x": 1,
+                "y": 2
+            }
+        },
+        "C": {
+            "metadata": {
+                "accuracy": {
+                    "type": "Float",
+                    "value": 0.8
+                }
+            },
+            "type": "Boolean",
+            "value": [
+                "A",
+                2,
+                true
+            ]
+        },
+        "id": "E10",
+        "type": "T"
+    }
+]
+
+
+04. Get all entities with keyValues
+===================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": 26.5,
+        "B": {
+            "x": 1,
+            "y": 2
+        },
+        "C": [
+            "A",
+            2,
+            true
+        ],
+        "id": "E10",
+        "type": "T"
+    }
+]
+
+
+05. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 387
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {
+            "MD1": {
+                "type": "Float",
+                "value": 0.8
+            },
+            "MD2": {
+                "type": "Float",
+                "value": {
+                    "w": 2,
+                    "z": 1
+                }
+            },
+            "MD3": {
+                "type": "Float",
+                "value": [
+                    "B",
+                    5,
+                    false
+                ]
+            }
+        },
+        "type": "Float",
+        "value": 26.5
+    },
+    "B": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": 0.8
+            }
+        },
+        "type": "Text",
+        "value": {
+            "x": 1,
+            "y": 2
+        }
+    },
+    "C": {
+        "metadata": {
+            "accuracy": {
+                "type": "Float",
+                "value": 0.8
+            }
+        },
+        "type": "Boolean",
+        "value": [
+            "A",
+            2,
+            true
+        ]
+    },
+    "id": "E10",
+    "type": "T"
+}
+
+
+06. Get entity with keyValues
+=============================
+HTTP/1.1 200 OK
+Content-Length: 67
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": 26.5,
+    "B": {
+        "x": 1,
+        "y": 2
+    },
+    "C": [
+        "A",
+        2,
+        true
+    ],
+    "id": "E10",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

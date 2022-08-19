@@ -31,63 +31,35 @@
 
 /* ****************************************************************************
 *
-* startTag - 
+* startTag -
 */
 TEST(commonTag, startTag)
 {
    std::string      tag    = "TAG";
-   std::string      indent = "  ";
-   std::string      xml    = "  <TAG>\n";
-   std::string      json   = "  {\n";
-   std::string      json2  = "  \"TAG\" : {\n";
    std::string      out;
 
-   out = startTag(indent, tag, XML);
-   EXPECT_EQ(xml, out);
+   out = startTag(tag, false);
+   EXPECT_EQ("\"TAG\":{", out);
 
-   out = startTag(indent, tag, JSON, false);
-   EXPECT_EQ(json, out);
+   out = startTag(tag, true);
+   EXPECT_EQ("\"TAG\":[", out);
 
-   out = startTag(indent, tag, JSON, true);
-   EXPECT_EQ(json2, out);
-
-   out = startTag(indent, tag, HTML, true);
-   EXPECT_EQ("Format not supported", out);
-
-   out = startTag(indent, tag, tag, JSON, false, true);
-   EXPECT_EQ("  \"TAG\" : {\n", out);
-
-   out = startTag(indent, tag, tag, JSON, true, true);
-   EXPECT_EQ("  \"TAG\" : [\n", out);
-
-   out = startTag(indent, tag, tag, JSON, false, false);
-   EXPECT_EQ("  {\n", out);
-
-   out = startTag(indent, tag, tag, JSON, true, false);
-   EXPECT_EQ("  [\n", out);
-
-   out = startTag(indent, tag, tag, HTML, true, false);
-   EXPECT_EQ("Format not supported", out);
+   out = startTag();
+   EXPECT_EQ("{", out);
 }
 
 
 
 /* ****************************************************************************
 *
-* endTag - 
+* endTag -
 */
 TEST(commonTag, endTag)
 {
-   std::string      tag    = "TAG";
-   std::string      indent = "  ";
-   std::string      xml    = "  </TAG>\n";
-   std::string      json   = "  }\n";
+   std::string      json   = "}";
    std::string      out;
 
-   out = endTag(indent, tag, XML);
-   EXPECT_EQ(xml, out);
-
-   out = endTag(indent, tag, JSON);
+   out = endTag();
    EXPECT_EQ(json, out);
 }
 
@@ -95,40 +67,34 @@ TEST(commonTag, endTag)
 
 /* ****************************************************************************
 *
-* valueTag - 
+* valueTag -
 */
 TEST(commonTag, valueTag)
 {
    std::string      tag                     = "TAG";
-   std::string      indent                  = "  ";
    std::string      value                   = "tag";
-   std::string      xml                     = "  <TAG>tag</TAG>\n";
-   std::string      jsonComma               = "  \"TAG\" : \"tag\",\n";
-   std::string      jsonNoComma             = "  \"TAG\" : \"tag\"\n";
-   std::string      jsonCommaAndAssociation = "  \"TAG\" : tag,\n";
-   std::string      integerJsonNoComma      = "  \"TAG\" : \"8\"\n";
-   std::string      stringJsonComma         = "  \"TAG\" : \"8\",\n";
-   std::string      stringJsonNoComma       = "  \"TAG\" : \"8\"\n";
+   std::string      jsonComma               = "\"TAG\":\"tag\",";
+   std::string      jsonNoComma             = "\"TAG\":\"tag\"";
+   std::string      integerJsonNoComma      = "\"TAG\":\"8\"";
+   std::string      stringJsonComma         = "\"TAG\":\"8\",";
+   std::string      stringJsonNoComma       = "\"TAG\":\"8\"";
    std::string      out;
 
-   out = valueTag(indent, tag, value, XML);
-   EXPECT_EQ(xml, out);
+   out = valueTag(tag, value);
+   EXPECT_EQ(jsonNoComma, out);
 
-   out = valueTag(indent, tag, value, JSON, true);
+   out = valueTag(tag, value, true);
    EXPECT_EQ(jsonComma, out);   
 
-   out = valueTag(indent, tag, value, JSON);
+   out = valueTag(tag, value);
    EXPECT_EQ(jsonNoComma, out);   
 
-   out = valueTag(indent, tag, value, JSON, true, true);
-   EXPECT_EQ(jsonCommaAndAssociation, out);
-
-   out = valueTag(indent, tag, 8, JSON, false);
+   out = valueTag(tag, 8, false);
    EXPECT_EQ(integerJsonNoComma, out);
 
-   out = valueTag(indent, tag, tag, "8", JSON, true);
+   out = valueTag(tag, "8", true, false);
    EXPECT_EQ(stringJsonComma, out);
 
-   out = valueTag(indent, tag, tag, "8", JSON, false);
+   out = valueTag(tag, "8", false, false);
    EXPECT_EQ(stringJsonNoComma, out);
 }

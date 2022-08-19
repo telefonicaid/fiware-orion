@@ -28,10 +28,10 @@
 #include <stdint.h>   // int64_t et al
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
-#define DEFAULT_DURATION "PT24H"
+#define DEFAULT_DURATION            "PT24H"
+#define DEFAULT_DURATION_IN_SECONDS  86400
 
 
 /* ****************************************************************************
@@ -53,16 +53,11 @@ class Duration
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(Format format, const std::string& indent, bool comma = true);
+  std::string   toJsonV1(bool comma);
   int64_t       parse(void);
-  void          present(const std::string& indent);
   void          release(void);
 
-  std::string   check(RequestType         requestType,
-                      Format              format,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string   check(void);
 };
 
 #endif  // SRC_LIB_NGSI_DURATION_H_

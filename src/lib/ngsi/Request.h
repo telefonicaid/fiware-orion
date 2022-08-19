@@ -37,15 +37,9 @@ struct ConnectionInfo;
 */
 typedef enum RequestType
 {
+  NoRequest,
   RegisterContext = 1,
   DiscoverContextAvailability,
-  SubscribeContextAvailability,
-  RtSubscribeContextAvailabilityResponse,
-  UpdateContextAvailabilitySubscription,
-  RtUpdateContextAvailabilitySubscriptionResponse,
-  UnsubscribeContextAvailability,
-  RtUnsubscribeContextAvailabilityResponse,
-  NotifyContextAvailability,
 
   QueryContext = 11,
   RtQueryContextResponse,
@@ -56,6 +50,7 @@ typedef enum RequestType
   NotifyContext,
   UpdateContext,
   RtUpdateContextResponse,
+  NotifyContextSent,
 
   ContextEntitiesByEntityId = 21,
   ContextEntityAttributes,
@@ -63,7 +58,6 @@ typedef enum RequestType
   ContextEntityTypes,
   ContextEntityTypeAttributeContainer,
   ContextEntityTypeAttribute,
-  Ngsi9SubscriptionsConvOp,
 
   IndividualContextEntity                = 31,
   IndividualContextEntityAttributes,
@@ -80,19 +74,23 @@ typedef enum RequestType
   AppendContextElement,
   UpdateContextAttribute,
 
-  LogRequest = 51,
+  LogTraceRequest = 51,
+  LogLevelRequest,
+  SemStateRequest,
+  MetricsRequest,
   VersionRequest,
   ExitRequest,
+
   LeakRequest,
   StatisticsRequest,
-
   RegisterResponse,
   RtSubscribeResponse,
   RtSubscribeError,
+
   RtContextElementResponse,
   RtContextAttributeResponse,
 
-  EntityTypes = 61,
+  EntityTypes = 65,
   AttributesForEntityType,
   RtEntityTypesResponse,
   RtAttributesForEntityTypeResponse,
@@ -102,10 +100,26 @@ typedef enum RequestType
   EntityByIdAttributeByNameIdAndType,
 
   // /v2 API
-  EntitiesRequest = 70,
+  EntitiesRequest = 75,
   EntitiesResponse,
   EntryPointsRequest,
   EntryPointsResponse,
+  EntityRequest,
+  EntityResponse,
+  EntityAttributeRequest,
+  EntityAttributeResponse,
+  EntityAttributeValueRequest,
+  EntityAttributeValueResponse,
+  EntityTypeRequest,
+  EntityAllTypesRequest,
+  SubscriptionsRequest,
+  IndividualSubscriptionRequest,
+  BatchQueryRequest,
+  BatchUpdateRequest,
+
+  // v2 registration
+  RegistrationRequest,
+  RegistrationsRequest,
 
   InvalidRequest = 100
 } RequestType;
@@ -125,6 +139,14 @@ struct ParseData;
 * requestType - 
 */
 extern const char* requestType(RequestType rt);
+
+
+
+/* ****************************************************************************
+*
+* requestTypeForCounter -
+*/
+extern const char* requestTypeForCounter(RequestType rt);
 
 
 

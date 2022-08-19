@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_RESPONSE_H
-#define UPDATE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_
 
 /*
 *
@@ -29,9 +29,10 @@
 #include <vector>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "common/Format.h"
 #include "ngsi/StatusCode.h"
-#include "rest/ConnectionInfo.h"
+#include "ngsi10/UpdateContextRequest.h"
+
+#include "rest/OrionError.h"
 
 
 
@@ -44,18 +45,20 @@ typedef struct UpdateContextResponse
   ContextElementResponseVector  contextElementResponseVector;  // Optional
   StatusCode                    errorCode;                     // Optional
 
+  OrionError                    oe;                            // Used by NGSIv2
+
   UpdateContextResponse();
   UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);  
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(const std::string& indent);
+  std::string   toJsonV1(bool asJsonObject);
+  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
-  void          notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP);
-  void          foundPush(EntityId* eP, ContextAttribute* aP);
+  void          fill(UpdateContextRequest* upcrP, HttpStatusCode sc);   // Needed by NGSIv2 forwarding logic
+  void          notFoundPush(Entity* eP, ContextAttribute* aP, StatusCode* scP);
+  void          foundPush(Entity* eP, ContextAttribute* aP);
   void          merge(UpdateContextResponse* upcrsP);
 } UpdateContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTRESPONSE_H_

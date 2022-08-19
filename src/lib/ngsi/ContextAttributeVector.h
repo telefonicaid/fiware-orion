@@ -28,8 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/RenderFormat.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -44,37 +44,28 @@ typedef struct ContextAttributeVector
 
   ContextAttributeVector();
 
-  void               present(const std::string& indent);
-  void               push_back(ContextAttribute* item);
-  void               push_back(ContextAttributeVector* aVec);
-  unsigned int       size(void);
-  ContextAttribute*  get(unsigned int ix);
-  void               release(void);
-  void               fill(struct ContextAttributeVector* cavP);
+  void                     push_back(ContextAttribute* item);
+  void                     push_back(const ContextAttributeVector& caV, bool cloneCompound = false);
+  unsigned int             size(void) const;
+  void                     release(void);
+  void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false, bool cloneCompounds = false);
+  int                      get(const std::string& attributeName) const;
 
-  ContextAttribute*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  ContextAttribute*  operator[](unsigned int ix) const;
 
-    return NULL;
-  }
 
-  std::string        check(RequestType          requestType,
-                           Format               format,
-                           const std::string&   indent,
-                           const std::string&   predetectedError,
-                           int                  counter);
+  std::string        check(ApiVersion apiVersion, RequestType requestType);
 
-  std::string        render(ConnectionInfo*     ciP,
-                            RequestType         requestType,
-                            const std::string&  indent,
-                            bool                comma     = false,
-                            bool                omitValue = false,
-                            bool                attrsAsName = false);
-  std::string        toJson(bool isLastElement);
+  std::string        toJsonV1(bool                                   asJsonObject,
+                              RequestType                            requestType,
+                              const std::vector<ContextAttribute*>&  orderedAttrs,
+                              const std::vector<std::string>&        metadataFilter,
+                              bool                                   comma       = false,
+                              bool                                   omitValue   = false,
+                              bool                                   attrsAsName = false);
+
+  std::string        toJsonTypes(void);
+
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

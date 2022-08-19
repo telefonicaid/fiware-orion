@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -82,9 +86,7 @@ std::string postAllEntitiesWithTypeAndId
   std::string                   answer;
   AppendContextElementResponse  response;
 
-  // FIXME P1: AttributeDomainName skipped
-  // FIXME P1: domainMetadataVector skipped
-
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   // 01. Get values from URL (entityId::type, esist, !exist)
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
@@ -97,36 +99,41 @@ std::string postAllEntitiesWithTypeAndId
   }
 
 
-  // 02. Check that the entity is NOT filled in in the payload
-  if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
+  // 02. Check that the entity is NOT filled in the payload
+  if ((!reqP->entity.id.empty()) || (!reqP->entity.type.empty()) || (!reqP->entity.isPattern.empty()))
   {
-    LM_W(("Bad Input (unknown field)"));
+    std::string  out;
+
+    alarmMgr.badInput(clientIp, "some of entity id, type or isPattern is not empty");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
+
+    return out;
   }
 
 
   // 03. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIMED_RENDER(answer = response.toJsonV1(asJsonObject, AllEntitiesWithTypeAndId));
 
     parseDataP->acer.res.release();
     return answer;
   }
-  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIMED_RENDER(answer = response.toJsonV1(asJsonObject, AllEntitiesWithTypeAndId));
 
     parseDataP->acer.res.release();
     return answer;
@@ -141,7 +148,7 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 05. Call Standard Operation
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 06. Fill in response from UpdateContextReSponse
@@ -149,7 +156,8 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
-  answer = response.render(ciP, IndividualContextEntity, "");
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
+
   parseDataP->upcr.res.release();
   response.release();
 

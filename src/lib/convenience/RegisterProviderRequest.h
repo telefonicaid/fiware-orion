@@ -32,7 +32,6 @@
 #include "ngsi/Duration.h"
 #include "ngsi/ProvidingApplication.h"
 #include "ngsi/RegistrationId.h"
-#include "common/Format.h"
 
 
 
@@ -42,17 +41,15 @@
 */
 typedef struct RegisterProviderRequest
 {
-  MetadataVector             metadataVector;             // Optional
   Duration                   duration;                   // Optional
   ProvidingApplication       providingApplication;       // Mandatory
   RegistrationId             registrationId;             // Optional
 
   RegisterProviderRequest();
 
-  std::string  render(Format format, std::string indent);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
-  void         present(std::string indent);
-  void         release();
+  std::string  toJsonV1(void);
+  std::string  check(ApiVersion apiVersion, RequestType requestType, const std::string& preError);
+
 } RegisterProviderRequest;
 
 #endif  // SRC_LIB_CONVENIENCE_REGISTERPROVIDERREQUEST_H_

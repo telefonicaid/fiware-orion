@@ -40,18 +40,20 @@ typedef struct NotifyConditionVector
 {
   std::vector<NotifyCondition*>  vec;
 
-  std::string       render(Format format, const std::string& indent, bool comma);
-  void              present(const std::string& indent);
+  NotifyConditionVector();
+
+  std::string       toJsonV1(bool comma);
   void              push_back(NotifyCondition* item);
-  unsigned int      size(void);
-  NotifyCondition*  get(int ix);
+  unsigned int      size(void) const;
   void              release(void);
+  void              fill(const NotifyConditionVector& nv);
 
   std::string       check(RequestType         requestType,
-                          Format              format,
-                          const std::string&  indent,
                           const std::string&  predetectedError,
                           int                 counter);
+
+  NotifyCondition* operator[] (unsigned int ix) const;
+
 } NotifyConditionVector;
 
 #endif  // SRC_LIB_NGSI_NOTIFYCONDITIONVECTOR_H_

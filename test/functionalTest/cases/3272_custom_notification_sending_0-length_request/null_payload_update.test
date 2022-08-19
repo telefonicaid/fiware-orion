@@ -1,0 +1,256 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET custom subscriptions with null payload
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart
+
+--SHELL--
+#
+# 01. Create sub with payload: "abc"
+# 02. Create entity E/T
+# 03. Dump & reset accumulator: see custom notification with payload "abc"
+# 04. Update sub without payload field
+# 05. Update entity E/T
+# 06. Dump & reset accumulator: see custom notification with normalized payload
+# 07. Update sub without payload: null
+# 08. Update entity E/T
+# 09. Dump & reset accumulator: see custom notification without payload
+#
+
+echo '01. Create sub with payload: "abc"'
+echo "=================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${LISTENER_PORT}'/notify",
+      "payload": "abc"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create entity E/T"
+echo "====================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": 2
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo '03. Dump & reset accumulator: see custom notification with payload "abc"'
+echo "========================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Update sub without payload field"
+echo "===================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Update entity E/T"
+echo "====================="
+payload='{
+  "A": 3
+}'
+orionCurl --url /v2/entities/E/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo '06. Dump & reset accumulator: see custom notification with normalized payload'
+echo "============================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Update sub without payload: null"
+echo "===================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'${LISTENER_PORT}'/notify",
+      "payload": null
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. Update entity E/T"
+echo "====================="
+payload='{
+  "A": 4
+}'
+orionCurl --url /v2/entities/E/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo '09. Dump & reset accumulator: see custom notification without payload'
+echo "====================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub with payload: "abc"
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E/T
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Dump & reset accumulator: see custom notification with payload "abc"
+========================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 3
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+abc=======================================
+
+
+04. Update sub without payload field
+====================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update entity E/T
+=====================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Dump & reset accumulator: see custom notification with normalized payload
+=============================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 122
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E","type":"T","A":{"type":"Number","value":3,"metadata":{}}}]}=======================================
+
+
+07. Update sub without payload: null
+====================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Update entity E/T
+=====================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Dump & reset accumulator: see custom notification without payload
+=====================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 0
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

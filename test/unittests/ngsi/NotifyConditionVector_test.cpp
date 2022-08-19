@@ -33,34 +33,30 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(NotifyConditionVector, render)
 {
   NotifyCondition*       ncP = new NotifyCondition();
   NotifyConditionVector  ncV;
   std::string            out;
-  const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.xml";
-  const char*            outfile2 = "ngsi.notifyConditionVector.render.middle.json";
-  
+  const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.json";
+
   utInit();
 
-  out = ncV.render(XML, "", false);
+  out = ncV.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  out = ncV.render(XML, "", false);
+  out = ncV.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  out = ncV.render(JSON, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncV.release();
 
-  out = ncV.render(XML, "", false);
+  out = ncV.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();
@@ -70,29 +66,29 @@ TEST(NotifyConditionVector, render)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 TEST(NotifyConditionVector, check)
 {
   NotifyCondition        nc;
   NotifyConditionVector  ncV;
   std::string            checked;
-  std::string            expected2 = "invalid notify condition type: 'Type'";
+  std::string            expected2 = "invalid notify condition type: /Type/";
   std::string            expected3 = "empty type for NotifyCondition";
-  
+
   utInit();
 
-  checked = ncV.check(RegisterContext, XML, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   nc.type = "Type";
   ncV.push_back(&nc);
 
-  checked = ncV.check(RegisterContext, XML, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   nc.type = "";
-  checked = ncV.check(RegisterContext, XML, "", "", 0);
+  checked = ncV.check(RegisterContext, "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   utExit();
@@ -102,28 +98,7 @@ TEST(NotifyConditionVector, check)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(NotifyConditionVector, present)
-{
-  NotifyCondition        nc;
-  NotifyConditionVector  ncV;
-  
-  utInit();
-
-  nc.type = "Type";
-  ncV.push_back(&nc);
-
-  ncV.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* get - 
+* get -
 */
 TEST(NotifyConditionVector, get)
 {
@@ -143,13 +118,13 @@ TEST(NotifyConditionVector, get)
   ncV.push_back(&nc1);
   ncV.push_back(&nc2);
 
-  ncP = ncV.get(0);
+  ncP = ncV[0];
   EXPECT_STREQ("Type0", ncP->type.c_str());
 
-  ncP = ncV.get(1);
+  ncP = ncV[1];
   EXPECT_STREQ("Type1", ncP->type.c_str());
 
-  ncP = ncV.get(2);
+  ncP = ncV[2];
   EXPECT_STREQ("Type2", ncP->type.c_str());
 
   EXPECT_EQ(3, ncV.size());

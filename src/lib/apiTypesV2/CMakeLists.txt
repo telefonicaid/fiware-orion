@@ -24,14 +24,28 @@ SET (SOURCES
     Entity.cpp
     EntityVector.cpp
     Entities.cpp
-    ErrorCode.cpp
+    Attribute.cpp
+    Subscription.cpp
+    Registration.cpp
+    EntID.cpp
+    BatchQuery.cpp
+    BatchUpdate.cpp
+    HttpInfo.cpp
+    MqttInfo.cpp
 )
 
 SET (HEADERS
     Entity.h
     EntityVector.h
-    Entities.h
-    ErrorCode.h
+    Entities.h    
+    Attribute.h
+    Subscription.h
+    Registration.h
+    EntID.h
+    BatchQuery.h
+    BatchUpdate.h
+    HttpInfo.h
+    MqttInfo.cpp
 )
 
 

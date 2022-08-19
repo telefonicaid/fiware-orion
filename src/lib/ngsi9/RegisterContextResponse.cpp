@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
@@ -44,7 +43,7 @@ RegisterContextResponse::RegisterContextResponse()
 {
   registrationId.set("");
   duration.set("");
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -65,7 +64,7 @@ RegisterContextResponse::RegisterContextResponse(RegisterContextRequest* rcrP)
 {
   registrationId.set(rcrP->registrationId.get());
   duration.set(rcrP->duration.get());
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -78,7 +77,7 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 {
   registrationId.set(_registrationId);
   duration.set(_duration);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -91,30 +90,35 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 {
   registrationId.set(_registrationId);
   errorCode     = _errorCode;
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
 
 /* ****************************************************************************
 *
-* RegisterContextResponse::render - 
+* RegisterContextResponse::toJsonV1 -
 */
-std::string RegisterContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string RegisterContextResponse::toJsonV1(void)
 {
   std::string  out = "";
-  std::string  tag = "registerContextResponse";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
-  out += startTag(indent, tag, format, false);
+  out += startTag();
 
-  out += duration.render(format, indent + "  ", true);
-  out += registrationId.render(RegisterResponse, format, indent + "  ", errorCodeRendered);
+  if (!errorCodeRendered)
+  {
+    out += duration.toJsonV1(true);
+  }
+
+  out += registrationId.toJsonV1(RegisterResponse, errorCodeRendered);
 
   if (errorCodeRendered)
-    out += errorCode.render(format, indent + "  ");
+  {
+    out += errorCode.toJsonV1(false);
+  }
 
-  out += endTag(indent, tag, format);
+  out += endTag();
 
   return out;
 }
@@ -125,37 +129,24 @@ std::string RegisterContextResponse::render(RequestType requestType, Format form
 *
 * RegisterContextResponse::check - 
 */
-std::string RegisterContextResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextResponse::check(const std::string& predetectedError)
 {
   RegisterContextResponse  response;
   std::string              res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = duration.check(RegisterResponse, format, indent, predetectedError, counter))       != "OK") ||
-           ((res = registrationId.check(RegisterResponse, format, indent, predetectedError, counter)) != "OK"))
+  else if (((res = duration.check())       != "OK") ||
+           ((res = registrationId.check()) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(RegisterContext, format, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void RegisterContextResponse::present(const std::string& indent)
-{
-   registrationId.present(indent);
-   duration.present(indent);
-   errorCode.present(indent);
+  return response.toJsonV1();
 }
 
 

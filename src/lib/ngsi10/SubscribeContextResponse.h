@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_CONTEXT_RESPONSE_H
-#define SUBSCRIBE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_
 
 /*
 *
@@ -30,7 +30,6 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/SubscribeResponse.h"
 #include "ngsi/SubscribeError.h"
-#include "common/Format.h"
 
 
 
@@ -47,7 +46,8 @@ typedef struct SubscribeContextResponse
   SubscribeContextResponse(StatusCode& errorCode);
   ~SubscribeContextResponse();
 
-  std::string render(RequestType requestType, Format format, const std::string& indent);
+  std::string toJsonV1(void);
+  std::string toJson(void);
 } SubscribeContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_SUBSCRIBECONTEXTRESPONSE_H_

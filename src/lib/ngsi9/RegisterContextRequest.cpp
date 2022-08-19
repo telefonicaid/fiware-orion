@@ -29,7 +29,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/Format.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ContextRegistrationVector.h"
@@ -40,25 +40,24 @@
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::render - 
+* RegisterContextRequest::toJsonV1 -
 */
-std::string RegisterContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string RegisterContextRequest::toJsonV1(void)
 {
   std::string  out                                 = "";
-  std::string  xmlTag                              = "registerContextRequest";
-  bool         durationRendered                    = duration.get() != "";
-  bool         registrationIdRendered              = registrationId.get() != "";
+  bool         durationRendered                    = !duration.get().empty();
+  bool         registrationIdRendered              = !registrationId.get().empty();
   bool         commaAfterRegistrationId            = false; // Last element
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  out += startTag(indent, xmlTag, "", format, false, false);
+  out += startTag();
 
-  out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(format,                        indent + "  ", commaAfterDuration);
-  out += registrationId.render(RegisterContext, format, indent + "  ", commaAfterRegistrationId);
+  out += contextRegistrationVector.toJsonV1(      commaAfterContextRegistrationVector);
+  out += duration.toJsonV1(                       commaAfterDuration);
+  out += registrationId.toJsonV1(RegisterContext, commaAfterRegistrationId);
 
-  out += endTag(indent, xmlTag, format, false);
+  out += endTag(false);
 
   return out;
 }
@@ -67,41 +66,43 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::check - 
+* RegisterContextRequest::check -
 */
-std::string RegisterContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
-    LM_W(("Bad Input (%s)", predetectedError.c_str()));
+    alarmMgr.badInput(clientIp, predetectedError);
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (contextRegistrationVector.size() == 0)
   {
-    LM_W(("Bad Input (empty contextRegistration list)"));
+    alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
-  }
-  else if (((res = contextRegistrationVector.check(RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
-           ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
-           ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
+  } 
+  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, predetectedError, counter)) != "OK") ||
+           ((res = duration.check())                                                                        != "OK") ||
+           ((res = registrationId.check())                                                                  != "OK"))
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return response.render(RegisterContext, format, indent);
+  return response.toJsonV1();
 }
 
 
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::release - 
+* RegisterContextRequest::release -
 */
 void RegisterContextRequest::release(void)
 {
@@ -114,7 +115,7 @@ void RegisterContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* RegisterContextRequest::fill - 
+* RegisterContextRequest::fill -
 */
 void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {
@@ -124,15 +125,14 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
   duration       = rpr.duration;
   registrationId = rpr.registrationId;
 
-  crP->registrationMetadataVector.fill((MetadataVector*) &rpr.metadataVector);
   crP->providingApplication = rpr.providingApplication;
 
   crP->entityIdVector.push_back(entityIdP);
   crP->entityIdVectorPresent = true;
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
-    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "", "false");
+    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
 
     crP->contextRegistrationAttributeVector.push_back(attributeP);
   }

@@ -1,0 +1,253 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with array in URI param 'type'
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Not a number for q, op == (OK, as == can compare with strings as well)
+# 02. Not a number for q, op != (OK, as == can compare with strings as well)
+# 03. Not a number for q op == and range, lower limit
+# 04. Not a number for q op == and range, upper limit
+# 05. Not a number for q op != and range, lower limit
+# 06. Not a number for q op != and range, upper limit
+# 07. Not a number for circle center latitude
+# 08. Not a number for circle center longitude
+# 09. Not a number for polygon vertex latitude
+# 10. Not a number for polygon vertex longitude
+#
+
+
+echo "01. Not a number for q, op == (OK, as == can compare with strings as well)"
+echo "=========================================================================="
+orionCurl --url '/v2/entities?q=A==B'
+echo
+echo
+
+
+echo "02. Not a number for q, op != (OK, as != can compare with strings as well)"
+echo "=========================================================================="
+orionCurl --url '/v2/entities?q=A!=B'
+echo
+echo
+
+
+echo "03. Not a number for q op == and range, lower limit"
+echo "==================================================="
+orionCurl --url '/v2/entities?q=A==B..14'
+echo
+echo
+
+
+echo "04. Not a number for q op == and range, upper limit"
+echo "==================================================="
+orionCurl --url '/v2/entities?q=A==0..B'
+echo
+echo
+
+
+echo "05. Not a number for q op != and range, lower limit"
+echo "==================================================="
+orionCurl --url '/v2/entities?q=A!=B..14'
+echo
+echo
+
+
+echo "06. Not a number for q op != and range, upper limit"
+echo "==================================================="
+orionCurl --url '/v2/entities?q=A!=0..B'
+echo
+echo
+
+
+echo "07. Not a number for circle center latitude"
+echo "==========================================="
+orionCurl --url '/v2/entities?georel=near;maxDistance:10&geometry=point&coords=B,5'
+echo
+echo
+
+
+echo "08. Not a number for circle center longitude"
+echo "============================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:10&geometry=point&coords=5,B'
+echo
+echo
+
+
+echo "09. Not a number for polygon vertex latitude"
+echo "============================================"
+orionCurl --url '/v2/entities?geometry=polygon&coords=B,1.2;2.1,2.2;3.1,3.2'
+echo
+echo
+
+
+echo "10. Not a number for polygon vertex longitude"
+echo "============================================="
+orionCurl --url '/v2/entities?geometry=polygon&coords=1.1,B;2.1,2.2;3.1,3.2'
+echo
+echo
+
+
+--REGEXPECT--
+01. Not a number for q, op == (OK, as == can compare with strings as well)
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. Not a number for q, op != (OK, as != can compare with strings as well)
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. Not a number for q op == and range, lower limit
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid range: types mixed",
+    "error": "BadRequest"
+}
+
+
+04. Not a number for q op == and range, upper limit
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid range: types mixed",
+    "error": "BadRequest"
+}
+
+
+05. Not a number for q op != and range, lower limit
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid range: types mixed",
+    "error": "BadRequest"
+}
+
+
+06. Not a number for q op != and range, upper limit
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid range: types mixed",
+    "error": "BadRequest"
+}
+
+
+07. Not a number for circle center latitude
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid coordinates",
+    "error": "BadRequest"
+}
+
+
+08. Not a number for circle center longitude
+============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid coordinates",
+    "error": "BadRequest"
+}
+
+
+09. Not a number for polygon vertex latitude
+============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid coordinates",
+    "error": "BadRequest"
+}
+
+
+10. Not a number for polygon vertex longitude
+=============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: invalid coordinates",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

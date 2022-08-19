@@ -41,27 +41,19 @@ typedef struct ContextRegistrationResponseVector
   std::vector<ContextRegistrationResponse*>  vec;
 
   void                          push_back(ContextRegistrationResponse* item);
-  unsigned int                  size(void);
-  ContextRegistrationResponse*  get(int ix);
-  std::string                   render(Format format, const std::string& indent, bool comma = false);
-  void                          present(const std::string& indent);
+  unsigned int                  size(void) const;
+  std::string                   toJsonV1(bool comma);
   void                          release(void);
 
-  ContextRegistrationResponse*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  ContextRegistrationResponse*  operator[](unsigned int ix) const;
 
-    return NULL;
-  }
 
-  std::string                   check(RequestType         requestType,
-                                      Format              format,
-                                      const std::string&  indent,
+  std::string                   check(ApiVersion          apiVersion,
+                                      RequestType         requestType,
                                       const std::string&  predetectedError,
                                       int                 counter);
+
 } ContextRegistrationResponseVector;
+
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONRESPONSEVECTOR_H_

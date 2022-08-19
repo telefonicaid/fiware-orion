@@ -1,7 +1,0 @@
-<updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: bad tag-name of vector item: /vecitem6/, should be /vecitem/</details>
-  </errorCode>
-</updateContextResponse>

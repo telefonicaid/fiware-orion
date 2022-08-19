@@ -1,5 +1,5 @@
-#ifndef DISCOVER_CONTEXT_AVAILABILITY_REQUEST_H
-#define DISCOVER_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef SRC_LIB_NGSI9_DISCOVERCONTEXTAVAILABILITYREQUEST_H_
+#define SRC_LIB_NGSI9_DISCOVERCONTEXTAVAILABILITYREQUEST_H_
 
 /*
 *
@@ -29,7 +29,7 @@
 
 #include "ngsi/Request.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/Restriction.h"
 #include "rest/EntityTypeInfo.h"
 
@@ -42,7 +42,7 @@
 typedef struct DiscoverContextAvailabilityRequest
 {
   EntityIdVector       entityIdVector; // Mandatory
-  AttributeList        attributeList;  // Optional
+  StringList           attributeList;  // Optional
   Restriction          restriction;    // Optional
 
   int                  restrictions;  // Auxiliar - the parameter for check should be removed
@@ -50,13 +50,8 @@ typedef struct DiscoverContextAvailabilityRequest
   DiscoverContextAvailabilityRequest();
 
   void                 release(void);
-  void                 present(const std::string& indent);
 
-  std::string          check(RequestType         requestType,
-                             Format              format,
-                             const std::string&  indent,
-                             const std::string&  predetectedError,
-                             int                 counter);
+  std::string          check(const std::string&  predetectedError);
 
   void                 fill(EntityId&                        eid,
                             const std::vector<std::string>&  attributeV,
@@ -72,4 +67,4 @@ typedef struct DiscoverContextAvailabilityRequest
 
 } DiscoverContextAvailabilityRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_DISCOVERCONTEXTAVAILABILITYREQUEST_H_

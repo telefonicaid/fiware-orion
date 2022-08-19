@@ -22,17 +22,20 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "rest/OrionError.h"
+#include "rest/ConnectionInfo.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* all - 
+* all -
 */
 TEST(OrionError, all)
 {
@@ -42,12 +45,12 @@ TEST(OrionError, all)
   OrionError    e3(sc);
   OrionError    e4(SccOk, "Good Request");
   std::string   out;
-  const char*   outfile1 = "orion.orionError.all1.valid.xml";
-  const char*   outfile2 = "orion.orionError.all1.valid.json";
-  const char*   outfile5 = "orion.orionError.all3.valid.xml";
-  const char*   outfile6 = "orion.orionError.all3.valid.json";
-  const char*   outfile7 = "orion.orionError.all4.valid.xml";
-  const char*   outfile8 = "orion.orionError.all4.valid.json";
+  const char*   outfile1 = "orion.orionError.all1.valid.json";
+  const char*   outfile2 = "orion.orionError.all3.valid.json";
+  const char*   outfile3 = "orion.orionError.all4.valid.json";
+  ConnectionInfo ci;
+
+  ci.outMimeType = JSON;
 
   EXPECT_EQ(SccNone, e0.code);
   EXPECT_EQ("",      e0.reasonPhrase);
@@ -65,27 +68,24 @@ TEST(OrionError, all)
   EXPECT_EQ("OK",           e4.reasonPhrase);
   EXPECT_EQ("Good Request", e4.details);
 
-  out = e1.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  ci.outMimeType = JSON;
+
+  out = e1.toJsonV1();
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
+  out = e3.toJsonV1();
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e4.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile7)) << "Error getting test data from '" << outfile7 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  out = e4.toJsonV1();
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile3)) << "Error getting test data from '" << outfile3 << "'";
 
-  out = e1.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e3.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile6)) << "Error getting test data from '" << outfile6 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e4.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile8)) << "Error getting test data from '" << outfile8 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

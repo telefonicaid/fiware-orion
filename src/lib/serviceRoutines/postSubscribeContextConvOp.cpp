@@ -49,7 +49,6 @@
 * URI parameters
 *   - !exist=entity::type
 *   - exist=entity::type
-*   - notifyFormat=XXX     (handled by std-op postSubscribeContext)
 *   x entity::type=TYPE    (NOT TREATED)
 */
 std::string postSubscribeContextConvOp

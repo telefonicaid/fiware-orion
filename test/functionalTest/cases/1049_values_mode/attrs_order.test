@@ -1,0 +1,152 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URI param attrs order
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with attributes A, B, C, D
+# 02. Get entity without attrs param -> A, B, C, D
+# 03. Get entity without attrs param (keyValues) -> A, B, C, D
+# 04. Get entity ordering B, D, C
+# 05. Get entity ordering (keyValues) B, D, C
+#
+
+echo "01. Create entity with attributes A, B, C, D"
+echo "============================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "type": "AT",
+    "value": 1
+  },
+  "B": {
+    "type": "BT",
+    "value": 2
+  },
+  "C": {
+    "type": "CT",
+    "value": 3
+  },
+  "D": {
+    "type": "DT",
+    "value": 4
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Get entity without attrs param -> A, B, C, D"
+echo "================================================"
+orionCurl --url /v2/entities/E --noPayloadCheck
+echo
+echo
+
+
+echo "03. Get entity without attrs param (keyValues) -> A, B, C, D"
+echo "============================================================"
+orionCurl --url '/v2/entities/E?options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Get entity ordering B, D, C"
+echo "==============================="
+orionCurl --url '/v2/entities/E?attrs=B,D,C' --noPayloadCheck
+echo
+echo
+
+
+echo "05. Get entity ordering (keyValues) B, D, C"
+echo "==========================================="
+orionCurl --url '/v2/entities/E?attrs=B,D,C&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with attributes A, B, C, D
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Get entity without attrs param -> A, B, C, D
+================================================
+HTTP/1.1 200 OK
+Content-Length: 189
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"id":"E","type":"T","A":{"type":"AT","value":1,"metadata":{}},"B":{"type":"BT","value":2,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}}}
+
+
+03. Get entity without attrs param (keyValues) -> A, B, C, D
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 45
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"id":"E","type":"T","A":1,"B":2,"C":3,"D":4}
+
+
+04. Get entity ordering B, D, C
+===============================
+HTTP/1.1 200 OK
+Content-Length: 147
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"id":"E","type":"T","B":{"type":"BT","value":2,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}}}
+
+
+05. Get entity ordering (keyValues) B, D, C
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 39
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"id":"E","type":"T","B":2,"D":4,"C":3}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -34,19 +34,17 @@ const char* requestType(RequestType rt)
 {
   switch (rt)
   {
+  case NoRequest:                                   return "NoRequest";
   case RegisterContext:                             return "RegisterContextRequest";
   case RegisterResponse:                            return "RegisterContextResponse";
-  case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";
-  case SubscribeContextAvailability:                return "SubscribeContextAvailabilityRequest";
-  case UpdateContextAvailabilitySubscription:       return "UpdateContextAvailabilitySubscriptionRequest";
-  case UnsubscribeContextAvailability:              return "UnsubscribeContextAvailabilityRequest";
-  case NotifyContextAvailability:                   return "NotifyContextAvailabilityRequest";
+  case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";   
   case QueryContext:                                return "QueryContextRequest";
   case RtQueryContextResponse:                      return "QueryContextResponse";
   case SubscribeContext:                            return "SubscribeContextRequest";
   case UpdateContextSubscription:                   return "UpdateContextSubscriptionRequest";
   case UnsubscribeContext:                          return "UnsubscribeContextRequest";
   case NotifyContext:                               return "NotifyContextRequest";
+  case NotifyContextSent:                           return "NotifyContextRequestSent";
   case UpdateContext:                               return "UpdateContextRequest";
   case RtUpdateContextResponse:                     return "UpdateContextResponse";
 
@@ -56,7 +54,6 @@ const char* requestType(RequestType rt)
   case ContextEntityTypes:                          return "ContextEntityTypes";
   case ContextEntityTypeAttributeContainer:         return "ContextEntityTypeAttributeContainer";
   case ContextEntityTypeAttribute:                  return "ContextEntityTypeAttribute";
-  case Ngsi9SubscriptionsConvOp:                    return "Ngsi9SubscriptionsConvOp";
 
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
@@ -72,16 +69,16 @@ const char* requestType(RequestType rt)
   case Ngsi10ContextEntityTypesAttribute:           return "Ngsi10ContextEntityTypesAttribute";
   case Ngsi10SubscriptionsConvOp:                   return "Ngsi10SubscriptionsConvOp";
 
-  case LogRequest:                                  return "Log";
+  case LogTraceRequest:                             return "LogTrace";
+  case LogLevelRequest:                             return "LogLevel";
+  case SemStateRequest:                             return "SemState";
+  case MetricsRequest:                              return "Metrics";
   case VersionRequest:                              return "Version";
   case StatisticsRequest:                           return "Statistics";
   case ExitRequest:                                 return "Exit";
   case LeakRequest:                                 return "Leak";
   case InvalidRequest:                              return "InvalidRequest";
 
-  case RtSubscribeContextAvailabilityResponse:           return "SubscribeContextAvailabilityResponse";
-  case RtUpdateContextAvailabilitySubscriptionResponse:  return "UpdateContextAvailabilitySubscriptionResponse";
-  case RtUnsubscribeContextAvailabilityResponse:         return "UnsubscribeContextAvailabilityResponse";
   case RtUnsubscribeContextResponse:                     return "UnsubscribeContextResponse";
   case RtSubscribeResponse:                              return "SubscribeResponse";
   case RtSubscribeError:                                 return "SubscribeError";
@@ -101,7 +98,63 @@ const char* requestType(RequestType rt)
 
   case EntryPointsRequest:                               return "EntryPointsRequest";
   case EntryPointsResponse:                              return "EntryPointsResponse";
+
+  case EntityRequest:                                    return "EntityRequest";
+  case EntityResponse:                                   return "EntityResponse";
+  case EntityAttributeRequest:                           return "EntityAttributeRequest";
+  case EntityAttributeResponse:                          return "EntityAttributeResponse";
+  case EntityAttributeValueRequest:                      return "EntityAttributeValueRequest";
+  case EntityAttributeValueResponse:                     return "EntityAttributeValueResponse";
+
+  case EntityTypeRequest:                                return "EntityTypeRequest";
+  case EntityAllTypesRequest:                            return "EntityAllTypesRequest";
+  case SubscriptionsRequest:                             return "SubscriptionsRequest";
+  case IndividualSubscriptionRequest:                    return "IndividualSubscriptionRequest";
+  case BatchQueryRequest:                                return "BatchQueryRequest";
+  case BatchUpdateRequest:                               return "BatchUpdateRequest";
+
+  case RegistrationRequest:                              return "RegistrationRequest";
+  case RegistrationsRequest:                             return "RegistrationsRequest";
   }
 
   return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* requestTypeForCounter -
+*/
+const char* requestTypeForCounter(RequestType rt)
+{
+  // It supports only NGSIv2 and administrative requests (as are the ones that may appear in statistics counters)
+  switch (rt)
+  {
+  case EntryPointsRequest:             return "entryPoint";
+  case EntitiesRequest:                return "entities";
+  case EntityRequest:                  return "entity";
+  case EntityAttributeRequest:         return "attribute";
+  case EntityAttributeValueRequest:    return "attributeValue";
+  case EntityAllTypesRequest:          return "entityTypes";
+  case EntityTypes:                    return "entityType";
+  case SubscriptionsRequest:           return "subscriptions";
+  case IndividualSubscriptionRequest:  return "subscription";
+  case RegistrationsRequest:           return "registrations";
+  case RegistrationRequest:            return "registration";
+  case BatchQueryRequest:              return "batchQuery";
+  case BatchUpdateRequest:             return "batchUpdate";
+  case NotifyContext:                  return "notify";
+
+  case LogTraceRequest:                return "logTrace";
+  case StatisticsRequest:              return "statistics";
+  case LogLevelRequest:                return "logLevel";
+  case SemStateRequest:                return "semState";
+  case MetricsRequest:                 return "metrics";
+  case ExitRequest:                    return "exit";
+  case LeakRequest:                    return "leak";
+
+  default:
+    return "notNgsiv2Request";
+  }
 }

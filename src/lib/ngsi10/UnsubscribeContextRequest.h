@@ -1,5 +1,5 @@
-#ifndef UNSUBSCRIBE_CONTEXT_REQUEST_H
-#define UNSUBSCRIBE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTREQUEST_H_
 
 /*
 *
@@ -39,10 +39,9 @@ typedef struct UnsubscribeContextRequest
 {
   SubscriptionId  subscriptionId;    // Mandatory
 
-  std::string     render(RequestType requestType, Format format, const std::string& indent);
-  std::string     check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void            present(const std::string& indent);
+  std::string     toJsonV1(void);
+  std::string     check(void);
   void            release(void);
 } UnsubscribeContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTREQUEST_H_

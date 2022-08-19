@@ -28,9 +28,12 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/orionReply.h"
+#include "rest/orionLogReply.h"
 #include "rest/OrionError.h"
 #include "serviceRoutines/logTraceTreat.h"
 
@@ -62,41 +65,42 @@ std::string logTraceTreat
   if ((components == 2) && (ciP->method == "DELETE"))
   {
     lmTraceSet(NULL);
-    out = orionReply(ciP, "tracelevels", "all trace levels off");
+    out = orionLogReply(ciP, "tracelevels", "all trace levels off");
   }
   else if ((components == 3) && (ciP->method == "DELETE"))
   {
     if (strspn(compV[2].c_str(), "0123456789-,'") != strlen(compV[2].c_str()))
     {
-      out = orionReply(ciP, "tracelevels", "poorly formatted trace level string");
+      out = orionLogReply(ciP, "tracelevels", "poorly formatted trace level string");
       return out;
     }
 
     lmTraceSub(compV[2].c_str());
-    out = orionReply(ciP, "tracelevels removed", compV[2]);
+    out = orionLogReply(ciP, "tracelevels_removed", compV[2]);
   }
   else if ((components == 2) && (ciP->method == "GET"))
   {
     char tLevels[256];
     lmTraceGet(tLevels, sizeof(tLevels));
-    out = orionReply(ciP, "tracelevels", tLevels);
+    out = orionLogReply(ciP, "tracelevels", tLevels);
   }
   else if ((components == 3) && (ciP->method == "PUT"))
   {
     if (strspn(compV[2].c_str(), "0123456789-,'") != strlen(compV[2].c_str()))
     {
-      out = orionReply(ciP, "tracelevels", "poorly formatted trace level string");
+      out = orionLogReply(ciP, "tracelevels", "poorly formatted trace level string");
       return out;
     }
 
     lmTraceSet(NULL);
     lmTraceSet(compV[2].c_str());
-    out = orionReply(ciP, "tracelevels", compV[2]);
+    out = orionLogReply(ciP, "tracelevels", compV[2]);
   }
   else
   {
     OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + ciP->method + " " + path);
-    out = error.render(ciP->outFormat, "");
+
+    TIMED_RENDER(out = error.toJsonV1());
   }
 
   return out;

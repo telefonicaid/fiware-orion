@@ -39,7 +39,7 @@
 
 /* ****************************************************************************
 *
-* getContextEntitiesByEntityId - 
+* getContextEntitiesByEntityId -
 *
 * GET /v1/registry/contextEntities/{entityId::id}
 * GET /NGSI9/contextEntities/{entityId::id}
@@ -50,7 +50,7 @@
 *
 * However, if the URI parameter '!exist=entity::type', then instead only
 * entities with EMPTY types will be discovered.
-* 
+*
 * Service routine to call: postDiscoverContextAvailability.
 *
 * As this convop shares output format (DiscoverContextAvailabilityResponse) with its
@@ -64,7 +64,7 @@ std::string getContextEntitiesByEntityId
   ParseData*                 parseDataP
 )
 {
-  std::string  entityId = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  entityId = (compV.size() == 4)? compV[3] : compV[2];
   std::string  answer;
 
   //
@@ -78,7 +78,7 @@ std::string getContextEntitiesByEntityId
 
 
   //
-  // Call the standard operation 
+  // Call the standard operation
   //
   answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
 

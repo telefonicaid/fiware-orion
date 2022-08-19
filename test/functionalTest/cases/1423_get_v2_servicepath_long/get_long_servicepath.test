@@ -1,0 +1,130 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity V2 long servicepath
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities to create entity
+# 02. GET /v2/entities
+#
+
+SP_LONG=/F_n_F4elhADVuCbEK4DDXlmi8lcV1b81OIhOpiubSD2jO6BZGM/9WNRpTC7Citc4c3qPbrHBUB7YhMxr1jenFM3JMhBHshBT5PcKl/2UAwWWAKBHI_0zU7sLfjozmcyhEcVle2c6mHQFZFkvswiyH2nb/6QaTP24vcPf4GozreIJnqZUN7WHYoOoCLz2dcgdVUOJ3sdiIh3/uf8uPlJanFCgkSiYnPwzTbIMc637zTK2ND_MsBK9BwMcEbQ9Xr/au_RXEqbjEMNRIelgPjosLpV_ZZ_JZqBg0UC1L8wlbsgYPLQEc/knywh8I1Ke41Cs1rcT4AZfoI0F6EsGyuVcgJTP3VJRqpRfTv7j/HTbaBPgyw4Z94_kzb40tCMzAWzYnerChJQmMeGND_kX6zXnBAO/QjyQLjX3OPyApIg0s4nwAqFGIoGmytUVOt2k4o0qpWNqvwxufg/RtEgL9yEQBp1wSX4bYwze7kf_BMh0sISAJBPNFnH5c9r6ydxsX
+
+echo "01. POST /v2/entities to create entity"
+echo "======================================"
+payload='{
+  "id": "8787GHY",
+  "type": "Car",
+  "brand":{
+    "type": "string",
+    "value": "Mercedes Benz"
+  },
+  "speed":{
+    "type": "number",
+    "value" : "150"
+  },
+  "plateCountry": {
+    "value" : "ES"
+  },
+  "madeInCountry": {
+    "value" : "DE"
+  },
+  "model" : {
+    "type": "myString",
+    "value" : "Klasse C"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"  --servicePath "$SP_LONG"
+echo
+echo
+
+
+echo "02. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities  --servicePath "$SP_LONG"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities to create entity
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/8787GHY?type=Car
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 327
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "brand": {
+            "metadata": {},
+            "type": "string",
+            "value": "Mercedes Benz"
+        },
+        "id": "8787GHY",
+        "madeInCountry": {
+            "metadata": {},
+            "type": "Text",
+            "value": "DE"
+        },
+        "model": {
+            "metadata": {},
+            "type": "myString",
+            "value": "Klasse C"
+        },
+        "plateCountry": {
+            "metadata": {},
+            "type": "Text",
+            "value": "ES"
+        },
+        "speed": {
+            "metadata": {},
+            "type": "number",
+            "value": "150"
+        },
+        "type": "Car"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

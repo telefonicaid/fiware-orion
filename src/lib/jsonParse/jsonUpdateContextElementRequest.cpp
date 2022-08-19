@@ -35,19 +35,7 @@
 #include "parse/nullTreat.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
-
-
-
-/* ****************************************************************************
-*
-* attributeDomainName - 
-*/
-static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an attributeDomainName"));
-  reqData->ucer.res.attributeDomainName.set(value);
-  return "OK";
-}
+#include "rest/uriParamNames.h"
 
 
 
@@ -72,7 +60,7 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 static std::string contextAttributeName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an attribute name: %s", value.c_str()));
-  reqData->ucer.attributeP->name = value;
+  reqData->ucer.attributeP->name = safeValue(value);
   return "OK";
 }
 
@@ -99,7 +87,8 @@ static std::string contextAttributeValue(const std::string& path, const std::str
 {
   reqData->lastContextAttribute = reqData->ucer.attributeP;
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
-  reqData->ucer.attributeP->value = value;
+  reqData->ucer.attributeP->stringValue = value;
+  reqData->ucer.attributeP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -126,7 +115,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
-  reqData->ucer.metadataP->name = value;
+  reqData->ucer.metadataP->name = safeValue(value);
   return "OK";
 }
 
@@ -152,7 +141,8 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-  reqData->ucer.metadataP->value = value;
+  reqData->ucer.metadataP->stringValue = value;
+  reqData->ucer.metadataP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -164,8 +154,6 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 */
 JsonNode jsonUcerParseVector[] =
 {
-  { "/attributeDomainName",                            attributeDomainName   },
-
   { "/attributes",                                     jsonNullTreat         },
   { "/attributes/attribute",                           contextAttribute      },
   { "/attributes/attribute/name",                      contextAttributeName  },
@@ -187,8 +175,6 @@ JsonNode jsonUcerParseVector[] =
 */
 void jsonUcerInit(ParseData* reqData)
 {
-  reqData->ucer.res.attributeDomainName.set("");
-
   reqData->ucer.attributeP = NULL;
   reqData->ucer.metadataP  = NULL;
 }
@@ -212,16 +198,6 @@ void jsonUcerRelease(ParseData* reqData)
 */
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->ucer.res.check(ciP, UpdateContextElement, "", reqData->errorString, 0);
-}
-
-
-
-/* ****************************************************************************
-*
-* ucerPresent - 
-*/
-void jsonUcerPresent(ParseData* reqData)
-{
-  reqData->ucer.res.present("");
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+  return reqData->ucer.res.check(ciP->apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }

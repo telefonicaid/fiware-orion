@@ -36,12 +36,17 @@
 #include "rest/rest.h"
 #include "rest/restReply.h"
 #include "serviceRoutines/exitTreat.h"
+#include "cache/subCache.h"
 
 
 
 /* ****************************************************************************
 *
-* exitTreat - 
+* exitTreat -
+*
+* FIXME P5: this function maybe is no longer needed. The only known user was the exit logic
+* in valgrind test pass (functional test has been using SIGTERM since a long term or maybe
+* always) that has changed to SIGTERM due to issue https://github.com/telefonicaid/fiware-orion/issues/3809
 */
 std::string exitTreat
 (
@@ -59,7 +64,7 @@ std::string exitTreat
     OrionError orionError(SccBadRequest, "no such service");
 
     ciP->httpStatusCode = SccOk;
-    out = orionError.render(ciP->outFormat, "");
+    out = orionError.toJsonV1();
     return out;
   }
 
@@ -72,13 +77,13 @@ std::string exitTreat
   {
     OrionError orionError(SccBadRequest, "Password requested");
     ciP->httpStatusCode = SccOk;
-    out = orionError.render(ciP->outFormat, "");
+    out = orionError.toJsonV1();
   }
   else if (password != "harakiri")
   {
     OrionError orionError(SccBadRequest, "Request denied - password erroneous");
     ciP->httpStatusCode = SccOk;
-    out = orionError.render(ciP->outFormat, "");
+    out = orionError.toJsonV1();
   }
   else
   {

@@ -1,6 +1,0 @@
-mongoOntimeintervalOperations.mongoGetContextElementResponses_ok     (x3)
-mongoOntimeintervalOperations.mongoUpdateCsubNewNotification_dbfail  (x7)
-mongoRegisterContext_update.updateCase1                              (x6)
-mongoUnsubscribeContext.MongoDbFindOneFail                           (x4)
-mongoUnsubscribeContext.MongoDbRemoveFail                            (x8)
-mongoUnsubscribeContextAvailability.MongoDbFindOneFail               (x4)

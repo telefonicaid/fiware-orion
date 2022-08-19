@@ -1,5 +1,5 @@
-#ifndef REGISTER_CONTEXT_REQUEST_H
-#define REGISTER_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_
 
 /*
 *
@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "convenience/RegisterProviderRequest.h"
 #include "ngsi/ContextRegistrationVector.h"
 #include "ngsi/Duration.h"
@@ -48,11 +47,10 @@ typedef struct RegisterContextRequest
 
   std::string                servicePath;                // Not part of payload, just an internal field
 
-  std::string   render(RequestType requestType, Format format, const std::string& indent);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(void);
+  std::string   toJsonV1(void);
+  std::string   check(ApiVersion apiVersion, const std::string& predetectedError, int counter);
   void          release(void);
   void          fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName);
 } RegisterContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_

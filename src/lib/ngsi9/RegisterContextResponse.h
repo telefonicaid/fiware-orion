@@ -1,5 +1,5 @@
-#ifndef REGISTER_CONTEXT_RESPONSE_H
-#define REGISTER_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_
 
 /*
 *
@@ -30,7 +30,6 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/RegistrationId.h"
 #include "ngsi/Duration.h"
-#include "common/Format.h"
 #include "ngsi9/RegisterContextRequest.h"
 
 
@@ -51,10 +50,9 @@ typedef struct RegisterContextResponse
   RegisterContextResponse(const std::string& _registrationId, const std::string& _duration);
   RegisterContextResponse(const std::string& _registrationId, StatusCode& _errorCode);
 
-  std::string render(RequestType requestType, Format format, const std::string& indent);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void        present(const std::string& indent);
+  std::string toJsonV1(void);
+  std::string check(const std::string& predetectedError);
   void        release(void);
 } RegisterContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI9_REGISTERCONTEXTRESPONSE_H_

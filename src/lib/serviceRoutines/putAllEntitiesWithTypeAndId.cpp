@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "rest/ConnectionInfo.h"
@@ -75,9 +79,7 @@ extern std::string putAllEntitiesWithTypeAndId
   std::string                   answer;
   UpdateContextElementResponse  response;
 
-  // FIXME P1: AttributeDomainName skipped
-  // FIXME P1: domainMetadataVector skipped
-
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   // 01. Get values from URL (entityId::type, esist, !exist)
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
@@ -93,20 +95,16 @@ extern std::string putAllEntitiesWithTypeAndId
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
-
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIMED_RENDER(answer = response.toJsonV1(asJsonObject, AllEntitiesWithTypeAndId));
     return answer;
   }
-  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
-
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", typeNameFromUriParam);
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIMED_RENDER(answer = response.toJsonV1( asJsonObject, AllEntitiesWithTypeAndId));
     return answer;
   }
 
@@ -116,7 +114,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 04. Call Standard Operation
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+ postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 05. Fill in response from UpdateContextResponse
@@ -124,7 +122,8 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  answer = response.render(ciP, IndividualContextEntity, "");
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
+
   parseDataP->upcr.res.release();
   response.release();
 

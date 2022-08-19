@@ -1,5 +1,5 @@
-#ifndef MONGO_SUBSCRIBE_CONTEXT_H
-#define MONGO_SUBSCRIBE_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOSUBSCRIBECONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGOSUBSCRIBECONTEXT_H_
 
 /*
 *
@@ -26,9 +26,9 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
-#include <map>
+#include <vector>
 
-#include "common/Format.h"
+#include "rest/HttpStatusCode.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 
@@ -40,12 +40,10 @@
 */
 extern HttpStatusCode mongoSubscribeContext
 (
-  SubscribeContextRequest*                   requestP,
-  SubscribeContextResponse*                  responseP,
-  const std::string&                         tenant,
-  std::map<std::string, std::string>&        uriParam,
-  const std::string&                         xauthToken,
-  const std::vector<std::string>&            servicePathV
+  SubscribeContextRequest*         requestP,
+  SubscribeContextResponse*        responseP,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOSUBSCRIBECONTEXT_H_

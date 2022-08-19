@@ -1,0 +1,138 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Get entity types passes the first 2000 types batch
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create 2005 entities which times from T0001 to T2005
+# 02. GET /v2/types?offset=2000 and get types from T2001 to T2005
+#
+
+echo "01. Create 2005 entities which times from T0001 to T2005"
+echo "========================================================"
+for i in $(seq -f "%04g" 1 2005)
+do
+   payload='{
+     "id": "E'$i'",
+     "type": "T'$i'",
+     "A'$i'": {
+       "value": 1,
+       "type": "Number"
+     }
+   }'
+   orionCurl --url /v2/entities --payload "$payload" > /dev/null
+done
+echo "creation completed"
+echo
+echo
+
+
+echo "02. GET /v2/types?offset=2000 and get types from T2001 to T2005"
+echo "==============================================================="
+orionCurl --url '/v2/types?offset=2000&options=count'
+echo
+echo
+
+--REGEXPECT--
+01. Create 2005 entities which times from T0001 to T2005
+========================================================
+creation completed
+
+
+02. GET /v2/types?offset=2000 and get types from T2001 to T2005
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 331
+Content-Type: application/json
+Fiware-Total-Count: 2005
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A2001": {
+                "types": [
+                    "Number"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2001"
+    },
+    {
+        "attrs": {
+            "A2002": {
+                "types": [
+                    "Number"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2002"
+    },
+    {
+        "attrs": {
+            "A2003": {
+                "types": [
+                    "Number"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2003"
+    },
+    {
+        "attrs": {
+            "A2004": {
+                "types": [
+                    "Number"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2004"
+    },
+    {
+        "attrs": {
+            "A2005": {
+                "types": [
+                    "Number"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2005"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

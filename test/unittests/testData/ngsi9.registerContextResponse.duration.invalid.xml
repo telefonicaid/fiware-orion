@@ -1,8 +1,0 @@
-<registerContextResponse>
-  <registrationId>000000000000000000000000</registrationId>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>syntax error in duration string</details>
-  </errorCode>
-</registerContextResponse>

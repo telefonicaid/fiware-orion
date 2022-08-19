@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_RESPONSE_H
-#define NOTIFY_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -44,9 +44,8 @@ typedef struct NotifyContextResponse
   NotifyContextResponse();
   NotifyContextResponse(StatusCode& sc);
 
-  std::string   render(RequestType requestType, Format format, const std::string& indent);
-  void          present(const std::string& indent);
+  std::string   toJsonV1(void);
   void          release(void);
 } NotifyContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_

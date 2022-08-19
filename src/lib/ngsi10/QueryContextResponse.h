@@ -1,5 +1,5 @@
-#ifndef QUERY_CONTEXT_RESPONSE_H
-#define QUERY_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -30,15 +30,14 @@
 #include <sstream>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "common/Format.h"
+#include "apiTypesV2/Entities.h"
 #include "ngsi/StatusCode.h"
-#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* QueryContextResponse - 
+* QueryContextResponse -
 *
 * NOTE
 * Both contextElementResponseV and statusCode are optional, but a response
@@ -54,16 +53,12 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string            check(ConnectionInfo*     ciP,
-                               RequestType         requestType,
-                               const std::string&  indent,
-                               const std::string&  predetectedError,
-                               int                 counter);
-  void                   present(const std::string& indent, const std::string& caller);
-  void                   release(void);  
+  std::string            toJsonV1(bool asJsonObject);
+  std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
+  void                   release(void);
   void                   fill(QueryContextResponse* qcrsP);
+  void                   fill(const Entities& entities);
   QueryContextResponse*  clone(void);
 } QueryContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_

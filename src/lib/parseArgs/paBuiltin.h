@@ -35,7 +35,7 @@
 */
 extern char            paHome[512];
 extern bool            paNoClear;
-extern bool            paClearAt;
+extern int             paClearAt;
 extern bool            paAssertAtExit;
 extern int             paKeepLines;
 extern int             paLastLines;
@@ -59,6 +59,7 @@ extern char            paTerm[128];
 extern char            paSystem[128];
 extern char            paVisual[128];
 extern char            paLogDir[256];
+extern char            paLogLevel[256];
 
 
 

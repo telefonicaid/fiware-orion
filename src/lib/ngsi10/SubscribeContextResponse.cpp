@@ -26,8 +26,8 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/Format.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "ngsi10/SubscribeContextResponse.h"
 
 /* ****************************************************************************
@@ -44,7 +44,7 @@ SubscribeContextResponse::~SubscribeContextResponse() {
 */
 SubscribeContextResponse::SubscribeContextResponse()
 {
-   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.errorCode.keyNameSet("errorCode");
    subscribeError.subscriptionId.set("000000000000000000000000");
 }
 
@@ -56,26 +56,52 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 {
    subscribeError.subscriptionId.set("000000000000000000000000");
    subscribeError.errorCode.fill(&errorCode);
-   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
 *
-* SubscribeContextResponse::render - 
+* SubscribeContextResponse::toJson -
 */
-std::string SubscribeContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string SubscribeContextResponse::toJson(void)
+{
+  if (subscribeError.errorCode.code == SccNone)
+  {
+    std::string out;
+    // FIXME P5: it is a bit weird to call a toJsonV1() method from a toJson() method. However,
+    // SubscribeResponse doesn't have another option. This should be looked into detail.
+    out += "{";
+    out += subscribeResponse.toJsonV1(false);
+    out += "}";
+    return out;
+  }
+  else
+  {
+    return subscribeError.toJson();
+  }
+
+}
+
+/* ****************************************************************************
+*
+* SubscribeContextResponse::toJsonV1 -
+*/
+std::string SubscribeContextResponse::toJsonV1(void)
 {
   std::string out     = "";
-  std::string tag     = "subscribeContextResponse";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag();
 
   if (subscribeError.errorCode.code == SccNone)
-     out += subscribeResponse.render(format, indent + "  ", false);
+  {
+    out += subscribeResponse.toJsonV1(false);
+  }
   else
-     out += subscribeError.render(SubscribeContext, format, indent + "  ", false);
+  {
+    out += subscribeError.toJsonV1(SubscribeContext, false);
+  }
 
-  out += endTag(indent, tag, format, false);
+  out += endTag(false);
 
   return out;
 }

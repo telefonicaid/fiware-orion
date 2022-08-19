@@ -22,24 +22,36 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+#include <map>
+
+#include "cache/subCache.h"
 #include "rest/uriParamNames.h"
 
-#include "unittest.h"
-#include "testInit.h"
+#include "unittests/unittest.h"
+#include "unittests/testInit.h"
 
 
 
 /* ****************************************************************************
 *
-* debugging - 
+* USING
+*/
+using ::testing::Return;
+
+
+
+/* ****************************************************************************
+*
+* debugging -
 *
 * FIXME P4 - these counters are useful (only visible if UT_DEBUG is defined)
 *            to detect calls to utInit without respective call to utExit.
 *            All of it should be removed as soon as we implement the new
 *            more complete TRST macro (I_TEST?)
-* 
 */
-//#define UT_DEBUG
+// #define UT_DEBUG
 #ifdef UT_DEBUG
 static int noOfInits = 0;
 static int noOfExits = 0;
@@ -60,7 +72,7 @@ static TimerMock*    timerMock    = NULL;
 
 /* ****************************************************************************
 *
-* uriParams - 
+* uriParams -
 */
 std::map<std::string, std::string> uriParams;
 
@@ -68,15 +80,15 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
-* servicePathV - 
+* options -
 */
-std::vector<std::string> servicePathV;
+std::map<std::string, bool> options;
 
- 
+
 
 /* ****************************************************************************
 *
-* servicePathVector - 
+* servicePathVector -
 */
 std::vector<std::string> servicePathVector;
 
@@ -87,34 +99,40 @@ std::vector<std::string> servicePathVector;
 * utInit - unit test init
 *
 */
-void utInit(void)
+void utInit(bool notifierMocked, bool timerMocked)
 {
 #ifdef UT_DEBUG
   ++noOfInits;
   printf("**************** IN utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
 #endif
 
-  notifierMock = new NotifierMock();
-  if (notifierMock == NULL)
+  if (notifierMocked)
   {
-    fprintf(stderr, "error allocating NotifierMock: %s\n", strerror(errno));
-    exit(1);
+    notifierMock = new NotifierMock();
+    if (notifierMock == NULL)
+    {
+      fprintf(stderr, "error allocating NotifierMock: %s\n", strerror(errno));
+      exit(1);
+    }
+    setNotifier(notifierMock);
   }
-  setNotifier(notifierMock);
-  
-  timerMock = new TimerMock();
-  if (timerMock == NULL)
+
+  if (timerMocked)
   {
-    fprintf(stderr, "error allocating TimerMock: %s\n", strerror(errno));
-    exit(1);
+    timerMock = new TimerMock();
+    if (timerMock == NULL)
+    {
+      fprintf(stderr, "error allocating TimerMock: %s\n", strerror(errno));
+      exit(1);
+    }
+    ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
+    setTimer(timerMock);
   }
-  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
-  setTimer(timerMock);
 
   startTime       = getCurrentTime();
   statisticsTime  = getCurrentTime();
 
-  setupDatabase();
+  // setupDatabase(); // FIXME #3775: pending on mongo unit test re-enabling
 
 #ifdef UT_DEBUG
   printf("**************** FROM utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
@@ -122,18 +140,21 @@ void utInit(void)
 
   //
   // URI parameters used for unit testing
-  //   Default mime type for notifications: application/xml
+  //   Default mime type for notifications: application/json
   //
-  uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = DEFAULT_PAGINATION_DETAILS;
-  uriParams[URI_PARAM_NOT_EXIST]           = ""; // FIXME P7: we need this to implement "restriction-based" filters
+  uriParams[URI_PARAM_NOT_EXIST]           = "";  // FIXME P7: we need this to implement "restriction-based" filters
 
   //
   // Resetting servicePathVector
   //
   servicePathVector.clear();
+  servicePathVector.push_back("");
+
+  // Init subs cache (this initialization is overridden in tests that use csubs)
+  subCacheInit();
 }
 
 
@@ -161,6 +182,8 @@ void utExit(void)
 
   setTimer(NULL);
   setNotifier(NULL);
+
+  subCacheDisable();
 
 #ifdef UT_DEBUG
   printf("**************** FROM utExit (%d inits, %d exits)\n", noOfInits, noOfExits);

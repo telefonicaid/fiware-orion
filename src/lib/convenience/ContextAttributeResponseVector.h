@@ -41,28 +41,18 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
-  void                       present(std::string indent);
+  std::string                toJsonV1(bool asJsonObject, RequestType request);
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);
-  ContextAttributeResponse*  get(int ix);
   void                       release(void);
-  std::string                check(ConnectionInfo*  ciP,
-                                   RequestType      requestType,
-                                   std::string      indent,
-                                   std::string      predetectedError,
-                                   int              counter);
-  void                       fill(ContextAttributeVector* cavP, const StatusCode& statusCode);
+  std::string                check(ApiVersion          apiVersion,
+                                   bool                asJsonObject,
+                                   RequestType         requestType,
+                                   const std::string&  predetectedError);
+  void                       fill(const ContextAttributeVector& caV, const StatusCode& statusCode);
 
-  ContextAttributeResponse*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  ContextAttributeResponse*  operator[](unsigned int ix) const;
 
-    return NULL;
-  }
 } ContextAttributeResponseVector;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSEVECTOR_H_

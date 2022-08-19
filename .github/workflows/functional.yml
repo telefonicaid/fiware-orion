@@ -1,0 +1,60 @@
+name: Functional Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+   TEST_IMAGE_NAME: fiware/orion-ci:deb
+
+jobs:
+  functional:
+    runs-on: ubuntu-18.04
+    continue-on-error: true
+
+    services:
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.7
+        ports:
+        - 1884:1883
+
+    name: functional - ${{ matrix.payload.name }}
+
+    strategy:
+      matrix:
+        payload:
+          - { name: 'batch 1 - cache', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - cache', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - cache', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - cache', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - cache', range: '-e FT_FROM_IX=1201' }
+          - { name: 'batch 1 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run functional test
+        run: |
+          docker run  --network host -t --rm ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional

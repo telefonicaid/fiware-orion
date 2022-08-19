@@ -1,5 +1,5 @@
-#ifndef TESTINIT_H
-#define TESTINIT_H
+#ifndef TEST_UNITTESTS_TESTINIT_H_
+#define TEST_UNITTESTS_TESTINIT_H_
 
 /*
 *
@@ -25,24 +25,28 @@
 *
 * Author: Fermin Galan
 */
-
-#include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 
+
+
 /* Collection names used for testing */
-#define DBPREFIX                    "unittest"
+#define DBPREFIX                    "utest"
 #define REGISTRATIONS_COLL          DBPREFIX ".registrations"
 #define ENTITIES_COLL               DBPREFIX ".entities"
 #define SUBSCRIBECONTEXT_COLL       DBPREFIX ".csubs"
-#define SUBSCRIBECONTEXTAVAIL_COLL  DBPREFIX ".casubs"
-#define ASSOCIATIONS_COLL           DBPREFIX ".associations"
+
+
 
 /* Some useful macros to avoid to long and verbose lines in asserts */
-#define RES_CNTX_REG(i)         res.responseVector.get(i)->contextRegistration
-#define RES_CNTX_REG_ATTR(i, j) res.responseVector.get(i)->contextRegistration.contextRegistrationAttributeVector.get(j)
-#define RES_CER(i)              res.contextElementResponseVector.get(i)->contextElement
-#define RES_CER_STATUS(i)       res.contextElementResponseVector.get(i)->statusCode
-#define RES_CER_ATTR(i, j)      res.contextElementResponseVector.get(i)->contextElement.contextAttributeVector.get(j)
+#define RES_CNTX_REG(i)         res.responseVector[i]->contextRegistration
+#define RES_CNTX_REG_ATTR(i, j) res.responseVector[i]->contextRegistration.contextRegistrationAttributeVector[j]
+#define RES_CER(i)              res.contextElementResponseVector[i]->entity
+#define RES_CER_STATUS(i)       res.contextElementResponseVector[i]->statusCode
+#define RES_CER_ATTR(i, j)      res.contextElementResponseVector[i]->entity.attributeVector[j]
+
+#define C_STR_FIELD(b, f)       getStringField(b, f).c_str()
+
+
 
 /* ****************************************************************************
 *
@@ -54,18 +58,12 @@
 extern void setupDatabase(void);
 
 
+
 /* ****************************************************************************
 *
 * matchNotifyContextRequest -
-*
 */
 extern bool matchNotifyContextRequest(NotifyContextRequest* expected, NotifyContextRequest* arg);
 
-/* ****************************************************************************
-*
-* matchNotifyContextAvailabilityRequest -
-*
-*/
-extern bool matchNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* expected, NotifyContextAvailabilityRequest* arg);
 
-#endif
+#endif  // TEST_UNITTESTS_TESTINIT_H_

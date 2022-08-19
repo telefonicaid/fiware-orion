@@ -36,40 +36,13 @@ TEST(EntityId, render)
 {
   EntityId     eId;
   std::string  out;
-  const char*  outfile1 = "ngsi.entityId.render.middle.xml";
-  const char*  outfile2 = "ngsi.entityId.render.middle.json";
+  const char*  outfile1 = "ngsi.entityId.render.middle.json";
 
   utInit();
 
-  eId.tagSet("eId");
-  EXPECT_STREQ("eId", eId.tag.c_str());
-
-  out = eId.render(XML, "");
+  out = eId.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = eId.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(EntityId, present)
-{
-  EntityId     eId;
-
-  utInit();
-
-  eId.tagSet("entityId");
-  eId.present("", -1);
-  eId.present("", 0);
 
   utExit();
 }

@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/Metadata.h"
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
 
@@ -42,18 +41,17 @@ typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
-  std::string  render(Format format, const std::string& indent, bool comma);
-  void         present(const std::string& indent);
+  std::string  toJsonV1(bool comma);
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);
-  std::string  get(int ix);
+  void         fill(ConditionValueList& cvlP);
 
-  std::string  check(RequestType         requestType,
-                     Format              format,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
+
+  std::string operator[] (unsigned int ix) const;
+
+
 } ConditionValueList;
 
 #endif  // SRC_LIB_NGSI_CONDITIONVALUELIST_H_

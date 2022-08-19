@@ -39,27 +39,19 @@ TEST(ContextRegistrationResponse, render)
 {
   ContextRegistrationResponse  crr;
   std::string                  rendered;
-  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.xml";
-  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
-  const char*                  outfile3 = "ngsi.contextRegistrationResponse.renderError.middle.xml";
-  const char*                  outfile4 = "ngsi.contextRegistrationResponse.renderError.middle.json";
+  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
+  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderError.middle.json";
 
   utInit();
 
   crr.errorCode.fill(SccNone);
-  rendered = crr.render(XML, "");
+  rendered = crr.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   crr.errorCode.fill(SccBadRequest);
-  rendered = crr.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  rendered = crr.toJsonV1(false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();
@@ -79,25 +71,8 @@ TEST(ContextRegistrationResponse, check)
 
   utInit();
 
-  checked = crr.check(RegisterContext, XML, "", "", 0);
+  checked = crr.check(V1, RegisterContext, "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(ContextRegistrationResponse, present)
-{
-  ContextRegistrationResponse  crr;
-
-  utInit();
-
-  crr.present("");
 
   utExit();
 }

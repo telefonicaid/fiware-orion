@@ -1,0 +1,242 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Order by proximity
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity Barcelona
+# 02. Create entity Guadalajara
+# 03. Create entity Lleida
+# 04. Create entity Madrid
+# 05. Create entity Zaragoza
+# 06. Get entities sorted by proximity to Spain center: Madrid, Guadalajara, Zaragora, Lleida, Barcelona
+# 07. Get entities reserved sorted by proximity to Spain center: Barcelona, Lleida, Zaragoza, Guadalajara, Madrid
+#
+
+echo "01. Create entity Barcelona"
+echo "==========================="
+payload='{
+  "id": "Barcelona",
+  "type": "City",
+  "location": {
+    "value": "41.3825, 2.176944",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity Guadalajara"
+echo "============================="
+payload='{
+  "id": "Guadalajara",
+  "type": "City",
+  "location": {
+    "value": "40.633333, -3.166667",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity Lleida"
+echo "========================"
+payload='{
+  "id": "Lleida",
+  "type": "City",
+  "location": {
+    "value": "41.616667, 0.633333",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity Madrid"
+echo "========================"
+payload='{
+  "id": "Madrid",
+  "type": "City",
+  "location": {
+    "value": "40.418889, -3.691944",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity Zaragoza"
+echo "=========================="
+payload='{
+  "id": "Zaragoza",
+  "type": "City",
+  "location": {
+    "value": "41.65, -0.883333",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. Get entities sorted by proximity to Spain center: Madrid, Guadalajara, Zaragora, Lleida, Barcelona"
+echo "======================================================================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:700000&geometry=point&coords=40.641944,-4.155278&orderBy=geo:distance' -X GET
+echo
+echo
+
+
+# FIXME P8: it is not clear how to get reverse order. It is being investigated: http://stackoverflow.com/questions/35572755/reverse-distance-order-with-near-operator-in-mongodb
+#echo "07. Get entities reserved sorted by proximity to Spain center: Barcelona, Lleida, Zaragoza, Guadalajara, Madrid"
+#echo "==============================================================================================================="
+#orionCurl --url '/v2/entities?georel=near;maxDistance:700000&geometry=point&coords=40.641944,-4.155278&orderBy=!geo:distance' -X GET
+#echo
+#echo
+
+
+--REGEXPECT--
+01. Create entity Barcelona
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Barcelona?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity Guadalajara
+=============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Guadalajara?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity Lleida
+========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Lleida?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity Madrid
+========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Madrid?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create entity Zaragoza
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Zaragoza?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Get entities sorted by proximity to Spain center: Madrid, Guadalajara, Zaragora, Lleida, Barcelona
+======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 538
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Guadalajara",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.633333, -3.166667"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Zaragoza",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "41.65, -0.883333"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Lleida",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "41.616667, 0.633333"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Barcelona",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "41.3825, 2.176944"
+        },
+        "type": "City"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

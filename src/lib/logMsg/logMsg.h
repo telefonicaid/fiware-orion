@@ -38,8 +38,13 @@
 #include <time.h>
 #include <stdint.h>             /* int64, ...                                */
 
-#include "common/globals.h"     /* transactionIdSet                          */
+#include <string>               /* std::string                               */
 
+#include "common/globals.h"     /* transactionIdSet,correlatorIdSet          */
+
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
+#include "logMsg/traceLevels.h"
 
 
 /******************************************************************************
@@ -49,6 +54,10 @@
 extern int             inSigHandler;
 extern char*           progName;
 extern __thread char   transactionId[64];
+extern __thread char   correlatorId[64];
+
+// comes from -logLineMaxSize at the end (default 32 * 1024)
+extern unsigned long   logLineMaxSize;
 
 
 
@@ -235,6 +244,41 @@ typedef struct LogMsg
 
 /* ****************************************************************************
 *
+* LogLevelMask - 
+*/
+typedef enum LogLevelMask
+{
+  LogLevelExit       = 0x40000,
+  LogLevelError      = 0x20000,
+  LogLevelWarning    = 0x10000,
+  LogLevelForce      = 0x08000,
+  LogLevelMsg        = 0x04000,
+  LogLevelInfo       = 0x02000,
+  LogLevelVerbose    = 0x01000,
+  LogLevelDebug      = 0x00800,
+  LogLevelTrace      = 0x00400,
+  LogLevelHidden     = 0x00200,
+  LogLevelTimestamp  = 0x00100,
+  LogLevelReads      = 0x00080,
+  LogLevelWrites     = 0x00040,
+  LogLevelBuf        = 0x00020,
+  LogLevelFix        = 0x00010,
+  LogLevelRaw        = 0x00008,
+  LogLevelToDo       = 0x00004,
+  LogLevelDoubt      = 0x00002,
+  LogLevelBug        = 0x00001
+} LogLevelMask;
+
+extern int         lmLevelMask;
+extern void        lmLevelMaskSet(int levelMask);
+extern void        lmLevelMaskSetString(char* level);
+extern int         lmLevelMaskGet(void);
+extern std::string lmLevelMaskStringGet(void);
+
+
+
+/* ****************************************************************************
+*
 *
 */
 #ifdef LM_OFF
@@ -265,6 +309,7 @@ typedef struct LogMsg
 
 #else
 
+#define LM_MASK(level) ((lmLevelMask & level) == level)
 /* ****************************************************************************
 *
 * LM_V - log verbose message
@@ -272,7 +317,7 @@ typedef struct LogMsg
 #define LM_V(s)                                                            \
 do                                                                         \
 {                                                                          \
-  if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelVerbose) && lmOk('V', 0) == LmsOk)                   \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -287,7 +332,7 @@ do                                                                         \
 #define LM_V2(s)                                                           \
 do                                                                         \
 {                                                                          \
-  if ((!lmSilent) && lmOk('2', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelVerbose) && lmOk('2', 0) == LmsOk)                   \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -303,7 +348,7 @@ do                                                                         \
 #define LM_V3(s)                                                           \
 do                                                                         \
 {                                                                          \
-  if ((!lmSilent) && lmOk('3', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelVerbose) && lmOk('3', 0) == LmsOk)                   \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -319,7 +364,7 @@ do                                                                         \
 #define LM_V4(s)                                                           \
 do                                                                         \
 {                                                                          \
-  if ((!lmSilent) && lmOk('4', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelVerbose) && lmOk('4', 0) == LmsOk)                   \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -335,7 +380,7 @@ do                                                                         \
 #define LM_V5(s)                                                           \
 do                                                                         \
 {                                                                          \
-  if ((!lmSilent) && lmOk('5', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelVerbose) && lmOk('5', 0) == LmsOk)                   \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -350,7 +395,7 @@ do                                                                         \
 #define LM_LV(s)                                                                 \
 do                                                                               \
 {                                                                                \
-  if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                      \
+  if (LM_MASK(LogLevelVerbose) && lmOk('V', 0) == LmsOk)                         \
   {                                                                              \
     char* text;                                                                  \
                                                                                  \
@@ -411,7 +456,7 @@ do                                                                        \
 {                                                                         \
   char* text;                                                             \
                                                                           \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
+  if (LM_MASK(LogLevelMsg) && (text = lmTextGet s) != NULL)               \
   {                                                                       \
     lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
@@ -425,20 +470,43 @@ do                                                                        \
 #else
 /* ****************************************************************************
 *
-* LM_I - log message
+* LM_I - log info
 */
 #define LM_I(s)                                                           \
 do                                                                        \
 {                                                                         \
   char* text;                                                             \
                                                                           \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
+  if (LM_MASK(LogLevelInfo) && (text = lmTextGet s) != NULL)              \
   {                                                                       \
     lmOut(text, 'I', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
   }                                                                       \
 } while (0)
 #endif
+
+
+
+#ifdef LM_NO_S
+#define LM_S(s)
+#else
+/* ****************************************************************************
+*
+* LM_S - log summary
+*/
+#define LM_S(s)                                                           \
+do                                                                        \
+{                                                                         \
+  char* text;                                                             \
+                                                                          \
+  if ((text = lmTextGet s) != NULL)                                       \
+  {                                                                       \
+    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
+} while (0)
+#endif
+
 
 
 #ifdef LM_NO_H
@@ -453,32 +521,11 @@ do                                                                        \
 {                                                                         \
   char* text;                                                             \
                                                                           \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
+  if (LM_MASK(LogLevelHidden) && (text = lmTextGet s) != NULL)            \
   {                                                                       \
     lmOut(text, 'H', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
   }                                                                       \
-} while (0)
-#endif
-
-
-#ifdef LM_NO_C
-#define LM_S(s)
-#else
-/* ****************************************************************************
-*
-* LM_S - log message with timestamp
-*/
-#define LM_S(s)                                                          \
-do                                                                       \
-{                                                                        \
-  char* text;                                                            \
-                                                                         \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
-  {                                                                      \
-    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-    ::free(text);                                                        \
-  }                                                                      \
 } while (0)
 #endif
 
@@ -495,11 +542,35 @@ do                                                                     \
 {                                                                      \
   char* text;                                                          \
                                                                        \
-  if ((text = lmTextGet s) != NULL)                                    \
+  if (LM_MASK(LogLevelForce) && (text = lmTextGet s) != NULL)          \
   {                                                                    \
     lmOut(text, 'F', "ForcedLog", 0, "***", 0, NULL);                  \
     ::free(text);                                                      \
   }                                                                    \
+} while (0)
+#endif
+
+
+#ifdef LM_NO_TMP
+#define LM_TMP(s)
+#else
+/* ****************************************************************************
+*
+* LM_TMP - temporal log message
+*
+* LM_TMP is meant *only* for temporal logging and all occurrencies of LM_TMP
+* should be removed before creating pull requests for review.
+*/
+#define LM_TMP(s)                                                        \
+do                                                                       \
+{                                                                        \
+  char* text;                                                            \
+                                                                         \
+  if (LM_MASK(LogLevelWarning) && (text = lmTextGet s) != NULL)          \
+  {                                                                      \
+    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+    ::free(text);                                                        \
+  }                                                                      \
 } while (0)
 #endif
 
@@ -516,7 +587,7 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
+  if (LM_MASK(LogLevelWarning) && (text = lmTextGet s) != NULL)          \
   {                                                                      \
     lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -533,13 +604,12 @@ do                                                                       \
 *
 * LM_E - log error message
 */
-
 #define LM_E(s)                                                           \
 do                                                                        \
 {                                                                         \
   char* text;                                                             \
                                                                           \
-  if ((text = lmTextGet s) != NULL)                                       \
+  if (LM_MASK(LogLevelError) && (text = lmTextGet s) != NULL)             \
   {                                                                       \
     lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
@@ -875,7 +945,7 @@ do                                                                       \
 #define LM_TODO(s)                                                         \
 do                                                                         \
 {                                                                          \
-  if ((!lmSilent) && (lmOk('t', 0) == LmsOk))                              \
+  if (LM_MASK(LogLevelToDo) && (lmOk('t', 0) == LmsOk))                    \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -898,7 +968,7 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
+  if (LM_MASK(LogLevelDoubt) && (text = lmTextGet s) != NULL)            \
   {                                                                      \
     lmOut(text, 'd', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -916,7 +986,7 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
+  if (LM_MASK(LogLevelFix) && (text = lmTextGet s) != NULL)              \
   {                                                                      \
     lmOut(text, 'F', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -934,7 +1004,7 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
+  if (LM_MASK(LogLevelBug) && (text = lmTextGet s) != NULL)              \
   {                                                                      \
     lmOut(text, 'B', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -946,11 +1016,14 @@ do                                                                       \
 /* ****************************************************************************
 *
 * LM_T - log trace message
+*
+* FIXME: temporal change, just for Orion contextBroker, use LogLevelDebug for LM_T
+*        instead of its correct level LogLevelTrace.
 */
 #define LM_T(tLev, s)                                                         \
 do                                                                            \
 {                                                                             \
-  if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
+  if (LM_MASK(LogLevelDebug) && lmOk('T', tLev) == LmsOk)                     \
   {                                                                           \
     char* text;                                                               \
                                                                               \
@@ -965,7 +1038,7 @@ do                                                                            \
 #define LM_LT(tLev, s)                                                               \
 do                                                                                   \
 {                                                                                    \
-  if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                       \
+  if (LM_MASK(LogLevelTrace) && lmOk('T', tLev) == LmsOk)                            \
   {                                                                                  \
     char* text;                                                                      \
                                                                                      \
@@ -988,7 +1061,7 @@ do                                                                         \
 {                                                                          \
   char* text;                                                              \
                                                                            \
-  if ((!lmSilent) && lmOk('D', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelDebug) && lmOk('D', 0) == LmsOk)                     \
   {                                                                        \
     if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
@@ -1009,7 +1082,7 @@ do                                                                    \
 {                                                                     \
   char* text;                                                         \
                                                                       \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                    \
+  if (LM_MASK(LogLevelRaw) && (text = lmTextGet s) != NULL)           \
   {                                                                   \
     lmOut(text, 'R', __FILE__, __LINE__, NULL, 0, NULL);              \
     ::free(text);                                                     \
@@ -1164,7 +1237,7 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
+  if (LM_MASK(LogLevelWarning) && (text = lmTextGet s) != NULL)          \
   {                                                                      \
     lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     if (lmxFp != NULL) lmxFp(xCode, text);                               \
@@ -1183,7 +1256,7 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
+  if (LM_MASK(LogLevelMsg) && (text = lmTextGet s) != NULL)              \
   {                                                                      \
     lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     if (lmxFp != NULL) lmxFp(xCode, text);                               \
@@ -1203,7 +1276,7 @@ do                                                                         \
 {                                                                          \
   char* text;                                                              \
                                                                            \
-  if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelVerbose) && lmOk('V', 0) == LmsOk)                   \
   {                                                                        \
     if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
@@ -1225,7 +1298,7 @@ do                                                                         \
 {                                                                          \
   char* text;                                                              \
                                                                            \
-  if ((!lmSilent) && lmOk('D', 0) == LmsOk)                                \
+  if (LM_MASK(LogLevelDebug) && lmOk('D', 0) == LmsOk)                     \
   {                                                                        \
     if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
@@ -1247,7 +1320,7 @@ do                                                                            \
 {                                                                             \
   char* text;                                                                 \
                                                                               \
-  if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
+  if (LM_MASK(LogLevelTrace) && lmOk('T', tLev) == LmsOk)                     \
   {                                                                           \
     if ((text = lmTextGet s) != NULL)                                         \
     {                                                                         \
@@ -1283,7 +1356,9 @@ extern bool lmAssertAtExit;
 extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
-extern __thread char   transactionId[64];
+extern __thread char   service[SERVICE_NAME_MAX_LEN + 1];
+extern __thread char   subService[101];                 // Using SERVICE_PATH_MAX_TOTAL will be too much
+extern __thread char   fromIp[IP_LENGTH_MAX + 1];
 
 
 /* ****************************************************************************
@@ -1735,51 +1810,66 @@ extern int lmLogLinesGet(void);
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_RESET -
+* lmTransactionReset -
 */
-#define LM_TRANSACTION_RESET()                            \
-do                                                        \
-{                                                         \
-  strncpy(transactionId, "N/A", sizeof(transactionId));   \
-} while (0)
+inline void lmTransactionReset()
+{
+  strncpy(transactionId, "N/A", sizeof(transactionId) - 1);
+  strncpy(correlatorId,  "N/A", sizeof(correlatorId) - 1);
+  strncpy(service,       "N/A", sizeof(service) - 1);
+  strncpy(subService,    "N/A", sizeof(subService) - 1);
+  strncpy(fromIp,        "N/A", sizeof(fromIp) - 1);
+}
 
 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START -
+* lmTransactionStart -
 */
-#define LM_TRANSACTION_START(keyword, ip, port, path)                  \
-do                                                                     \
-{                                                                      \
-  transactionIdSet();                                                  \
-  LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));  \
-} while (0)
+inline void lmTransactionStart(
+  const char* keyword,
+  const char* schema,
+  const char* ip,
+  int port,
+  const char* path,
+  const char* _service,
+  const char* _subService,
+  const char* _fromIp
+)
+{
+  transactionIdSet();
+
+  const char* __service    = strlen(_service)    == 0? "<none>" : _service;
+  const char* __subService = strlen(_subService) == 0? "<none>" : _subService;
+
+  strncpy(service,    __service,    sizeof(service) - 1);
+  strncpy(subService, __subService, sizeof(subService) - 1);
+  strncpy(fromIp,     _fromIp,      sizeof(fromIp) - 1);
+
+  fromIp[sizeof(fromIp) - 1] = 0;
+
+  LM_T(LmtOldInfo, ("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
+}
 
 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START_URL -
+* lmTransactionEnd -
 */
-#define LM_TRANSACTION_START_URL(url)                           \
-do                                                              \
-{                                                               \
-  transactionIdSet();                                           \
-  LM_I(("Starting transaction from %s", url));                  \
-} while (0)
+inline void lmTransactionEnd()
+{
+  LM_T(LmtOldInfo, ("Transaction ended"));
+  lmTransactionReset();
+}
 
 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_END -
+* lmSemGet - 
 */
-#define LM_TRANSACTION_END()                              \
-do                                                        \
-{                                                         \
-  LM_I(("Transaction ended"));                            \
-  LM_TRANSACTION_RESET();                                 \
-} while (0)
+extern const char* lmSemGet(void);
 
 #endif  // SRC_LIB_LOGMSG_LOGMSG_H_

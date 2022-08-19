@@ -27,7 +27,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
+#include "common/errorMessages.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
@@ -48,14 +49,10 @@ std::string badNgsi10Request
 )
 {
   std::string answer;
+  std::string details = std::string("service '") + ciP->url + "' not found";
 
-  LM_W(("Bad Input (service '%s' not found)", ciP->url.c_str()));
-  answer = restErrorReplyGet(ciP,
-                             ciP->outFormat,
-                             "",
-                             ciP->payloadWord,
-                             SccBadRequest,
-                             "service not found");
+  alarmMgr.badInput(clientIp, details);
+  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
 
   return answer;
 }

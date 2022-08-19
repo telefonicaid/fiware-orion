@@ -32,6 +32,17 @@
 #include "ngsi/ParseData.h"
 
 
+/* ****************************************************************************
+*
+* statisticsCacheTreat -
+*/
+extern std::string statisticsCacheTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
 /* ****************************************************************************
 *

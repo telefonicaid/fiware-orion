@@ -1,7 +1,0 @@
-<queryContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Radius zero for a circle area</details>
-  </errorCode>
-</queryContextResponse>

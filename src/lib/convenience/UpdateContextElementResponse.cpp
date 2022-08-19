@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
+#include "logMsg/traceLevels.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "convenience/UpdateContextElementResponse.h"
@@ -41,37 +41,35 @@
 */
 UpdateContextElementResponse::UpdateContextElementResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
 
 /* ****************************************************************************
 *
-* render -
+* toJsonV1 -
 */
-std::string UpdateContextElementResponse::render
+std::string UpdateContextElementResponse::toJsonV1
 (
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent
+  bool                asJsonObject,
+  RequestType         requestType
 )
 {
-  std::string tag = "updateContextElementResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag();
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.toJsonV1(false);
   }
   else
   {
-    out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
+    out += contextAttributeResponseVector.toJsonV1(asJsonObject, requestType);
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag();
 
   return out;
 }
@@ -84,20 +82,19 @@ std::string UpdateContextElementResponse::render
 */
 std::string UpdateContextElementResponse::check
 (
-  ConnectionInfo*     ciP,
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
   RequestType         requestType,
-  const std::string&  indent,
-  const std::string&  predetectedError,  // Predetected Error, normally during parsing
-  int                 counter
+  const std::string&  predetectedError  // Predetected Error, normally during parsing
 )
 {
   std::string res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -106,7 +103,7 @@ std::string UpdateContextElementResponse::check
     return "OK";
   }
 
-  return render(ciP, requestType, indent);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -146,12 +143,22 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     //
     // Remove values from the context attributes
     //
-    for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < cerP->entity.attributeVector.size(); ++aIx)
     {
-      cerP->contextElement.contextAttributeVector[aIx]->value = "";
+      //
+      // NOTE
+      //   Only stringValue is cleared here (not numberValue nor boolValue, which are new for v2).
+      //   This is OK for /v1, where all fields are strings.
+      //   For /v2, we would need to reset the valueType to STRING as well, but since this function is used only
+      //   in v1, this is not strictly necessary.
+      //   However, it doesn't hurt, so that modification is included as well: 
+      //     cerP->entity.attributeVector[aIx]->valueType = orion::ValueTypeString
+      //
+      cerP->entity.attributeVector[aIx]->stringValue = "";
+      cerP->entity.attributeVector[aIx]->valueType   = orion::ValueTypeString;
     }
 
-    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    contextAttributeResponseVector.fill(cerP->entity.attributeVector, cerP->statusCode);
   }
 
 
@@ -185,24 +192,11 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
   }
 
   // Now, if the external error code is 404 and 'details' is empty - add the name of the incoming entity::id as details
-  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details == ""))
+  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details.empty()))
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
-      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+      errorCode.details = ucrsP->contextElementResponseVector[0]->entity.id;
     }
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextElementResponse::present(const std::string& indent)
-{
-  LM_F(("%sUpdateContextElementResponse:", indent.c_str()));
-  contextAttributeResponseVector.present(indent + "  ");
-  errorCode.present(indent + "  ");
 }

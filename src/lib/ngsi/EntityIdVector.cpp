@@ -31,28 +31,53 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
+#include "alarmMgr/alarmMgr.h"
+#include "apiTypesV2/EntityVector.h"
+
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Request.h"
 
 
+
 /* ****************************************************************************
 *
-* EntityIdVector::render -
+* EntityIdVector::toJson -
 */
-std::string EntityIdVector::render(Format format, const std::string& indent, bool comma)
+std::string EntityIdVector::toJson(void)
 {
-  std::string out     = "";
-  std::string xmlTag  = "entityIdList";
-  std::string jsonTag = "entities";
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    jh.addRaw(vec[ix]->toJson());
+  }
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::toJsonV1 -
+*/
+std::string EntityIdVector::toJsonV1(bool comma)
+{
+  std::string out = "";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag("entities", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
+  {
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
+  }
 
-  out += endTag(indent, xmlTag, format, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -63,25 +88,16 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
 *
 * EntityIdVector::check -
 */
-std::string EntityIdVector::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string EntityIdVector::check(RequestType requestType)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == SubscribeContextAvailability)          ||
-      (requestType == UpdateContextAvailabilitySubscription) ||
       (requestType == QueryContext)                          ||
       (requestType == SubscribeContext))
   {
     if (vec.size() == 0)
     {
-      LM_W(("Bad Input (mandatory entity list missing)"));
+      alarmMgr.badInput(clientIp, "mandatory entity list missing");
       return "No entities";
     }
   }
@@ -90,30 +106,14 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of EntityIds)"));
+      alarmMgr.badInput(clientIp, "invalid vector of EntityIds", res);
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityIdVector::present -
-*/
-void EntityIdVector::present(const std::string& indent)
-{
-  LM_F(("%lu EntityIds:\n", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
 }
 
 
@@ -128,7 +128,7 @@ EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type,
   // isPattern:  "false" or "" is the same
   //
   std::string isPatternFromParam = isPattern;
-  if (isPatternFromParam == "")
+  if (isPatternFromParam.empty())
   {
     isPatternFromParam = "false";
   }
@@ -137,7 +137,7 @@ EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type,
   {
     std::string isPatternFromVec = vec[ix]->isPattern;
 
-    if (isPatternFromVec == "")
+    if (isPatternFromVec.empty())
     {
       isPatternFromVec = "false";
     }
@@ -167,23 +167,34 @@ void EntityIdVector::push_back(EntityId* item)
 /* ****************************************************************************
 *
 * EntityIdVector::push_back_if_absent -
+*
+* RETURN VALUE
+*   - true:  on successful push_back
+*   - false: if no push_back was made
 */
-void EntityIdVector::push_back_if_absent(EntityId* item)
+bool EntityIdVector::push_back_if_absent(EntityId* item)
 {
   if (lookup(item->id, item->type, item->isPattern) == NULL)
   {
     vec.push_back(item);
+    return true;
   }
+
+  return false;
 }
 
 
 /* ****************************************************************************
 *
-* EntityIdVector::get -
+* EntityIdVector::operator[] -
 */
-EntityId* EntityIdVector::get(int ix)
+EntityId* EntityIdVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 
@@ -192,7 +203,7 @@ EntityId* EntityIdVector::get(int ix)
 *
 * EntityIdVector::size -
 */
-unsigned int EntityIdVector::size(void)
+unsigned int EntityIdVector::size(void) const
 {
   return vec.size();
 }
@@ -212,4 +223,22 @@ void EntityIdVector::release(void)
   }
 
   vec.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::fill(EntityIdVector) -
+*
+*/
+void EntityIdVector::fill(EntityVector& _vec)
+{
+  for (unsigned int ix = 0; ix < _vec.size(); ++ix)
+  {
+    Entity*   entityP   = _vec[ix];
+    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern, entityP->isTypePattern);
+
+    vec.push_back(entityIdP);
+  }
 }

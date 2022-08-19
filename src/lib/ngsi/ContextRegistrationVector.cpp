@@ -47,45 +47,27 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::render -
+* ContextRegistrationVector::toJsonV1 -
 */
-std::string ContextRegistrationVector::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationVector::toJsonV1(bool comma)
 {
-  std::string  out     = "";
-  std::string  xmlTag  = "contextRegistrationList";
-  std::string  jsonTag = "contextRegistrations";
+  std::string  out = "";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag("contextRegistrations", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
   }
 
-  out += endTag(indent, xmlTag, format, comma, comma);
+  out += endTag(comma, comma);
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationVector::present -
-*/
-void ContextRegistrationVector::present(const std::string& indent)
-{
-  LM_F(("%lu ContextRegistrations", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent, ix);
-  }
 }
 
 
@@ -109,12 +91,17 @@ void ContextRegistrationVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::get -
+* ContextRegistrationVector::operator[] -
 */
-ContextRegistration* ContextRegistrationVector::get(int ix)
+ContextRegistration* ContextRegistrationVector::operator[](unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
+
 
 
 
@@ -135,9 +122,8 @@ unsigned int ContextRegistrationVector::size(void)
 */
 std::string ContextRegistrationVector::check
 (
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
+  ApiVersion          apiVersion,
+  RequestType         requestType, 
   const std::string&  predetectedError,
   int                 counter
 )
@@ -146,7 +132,7 @@ std::string ContextRegistrationVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Restriction.h"
 
@@ -38,14 +39,7 @@
 *
 * Restriction::check -
 */
-std::string Restriction::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Restriction::check(int counter)
 {
   std::string res;
 
@@ -58,15 +52,15 @@ std::string Restriction::check
 
   if ((scopeVector.size() == 0) && (attributeExpression.isEmpty()))
   {
-    LM_W(("Bad Input (empty restriction)"));
+    alarmMgr.badInput(clientIp, "empty restriction");
     return "empty restriction";
   }
 
-  if (((res = scopeVector.check(requestType, format, indent, predetectedError,  counter))         != "OK") ||
-      ((res = attributeExpression.check(requestType, format, indent, predetectedError,  counter)) != "OK"))
+  if (((res = scopeVector.check())         != "OK") ||
+      ((res = attributeExpression.check()) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
 
     return res;
   }
@@ -79,21 +73,9 @@ std::string Restriction::check
 
 /* ****************************************************************************
 *
-* Restriction::present -
+* Restriction::toJsonV1 -
 */
-void Restriction::present(const std::string& indent)
-{
-  attributeExpression.present(indent);
-  scopeVector.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* Restriction::render -
-*/
-std::string Restriction::render(Format format, const std::string& indent, int restrictions, bool comma)
+std::string Restriction::toJsonV1(int restrictions, bool comma)
 {
   std::string  tag = "restriction";
   std::string  out = "";
@@ -104,10 +86,10 @@ std::string Restriction::render(Format format, const std::string& indent, int re
     return "";
   }
 
-  out += startTag(indent, tag, format);
-  out += attributeExpression.render(format, indent + "  ", scopeVectorRendered);
-  out += scopeVector.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, comma);
+  out += startTag(tag);
+  out += attributeExpression.toJsonV1(scopeVectorRendered);
+  out += scopeVector.toJsonV1(false);
+  out += endTag(comma);
 
   return out;
 }
@@ -122,4 +104,21 @@ void Restriction::release(void)
 {
   attributeExpression.release();
   scopeVector.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* Restriction::fill - 
+*/
+void Restriction::fill(Restriction* rP)
+{
+  const std::string ae = rP->attributeExpression.get();
+  attributeExpression.set(ae);
+
+  for (unsigned int ix = 0; ix < rP->scopeVector.size(); ++ix)
+  {
+    scopeVector.push_back(new Scope(rP->scopeVector[ix]->type, rP->scopeVector[ix]->value, rP->scopeVector[ix]->oper));
+  }
 }

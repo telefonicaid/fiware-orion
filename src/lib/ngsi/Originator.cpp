@@ -38,14 +38,7 @@
 *
 * Originator::check -
 */
-std::string Originator::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Originator::check(void)
 {
   return "OK";
 }
@@ -58,7 +51,7 @@ std::string Originator::check
 */
 bool Originator::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -87,34 +80,16 @@ std::string Originator::get(void)
 
 /* ****************************************************************************
 *
-* Originator::present -
+* Originator::toJsonV1 -
 */
-void Originator::present(const std::string& indent)
+std::string Originator::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sOriginator: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo Originator", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Originator::render -
-*/
-std::string Originator::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
 
-  return valueTag(indent, "originator", string, format, comma);
+  return valueTag("originator", string, comma);
 }
 
 

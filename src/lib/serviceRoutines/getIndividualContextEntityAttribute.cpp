@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -77,6 +80,8 @@ std::string getIndividualContextEntityAttribute
   std::string               attributeName  = compV[4];
   ContextAttributeResponse  response;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 0. Take care of URI params
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
@@ -98,9 +103,9 @@ std::string getIndividualContextEntityAttribute
 
 
   // 3. Fill in ContextAttributeResponse from QueryContextResponse
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
+  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)
   {
-    response.contextAttributeVector.fill(&parseDataP->qcrs.res.contextElementResponseVector[0]->contextElement.contextAttributeVector);
+    response.contextAttributeVector.fill(parseDataP->qcrs.res.contextElementResponseVector[0]->entity.attributeVector);
     response.statusCode.fill(parseDataP->qcrs.res.contextElementResponseVector[0]->statusCode);
   }
   else
@@ -117,7 +122,7 @@ std::string getIndividualContextEntityAttribute
 
 
   // 5. Render the ContextAttributeResponse
-  answer = response.render(ciP, IndividualContextEntityAttribute, "");
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntityAttribute));
 
 
   // 6. Cleanup and return result

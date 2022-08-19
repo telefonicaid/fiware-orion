@@ -1,0 +1,726 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+String filters for compound values of metadata: greater_than
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with A1 with having a metadata M1 with compound value containing all JSON types
+#
+# FIXME P5: GT/GE only support strings and numbers, once more types are supported, add test cases here
+#
+# 02. Integer GT is true: GET /v2/entities?mq=A1.M1.i>9, see E1
+# 03. Integer GT is true: GET /v2/entities?mq=A1.M1.i>-1, see E1
+# 04. Integer GT is false: GET /v2/entities?mq=A1.M1.i>10, see nothing
+# 05. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=9, see E1
+# 06. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=-1, see E1
+# 07. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=10, see E1
+# 08. Integer GE is false: GET /v2/entities?mq=A1.M1.i>=11, see nothing
+#
+# 09. Float GT is true: GET /v2/entities?mq=A1.M1.f>2, see E1
+# 10. Float GT is true: GET /v2/entities?mq=A1.M1.f>-1, see E1
+# 11. Float GT is false: GET /v2/entities?mq=A1.M1.f>10, see nothing
+# 12. Float GE is true: GET /v2/entities?mq=A1.M1.f>=3.0, see E1
+# 13. Float GE is true: GET /v2/entities?mq=A1.M1.f>=-1.0, see E1
+# 14. Float GE is true: GET /v2/entities?mq=A1.M1.f>=3.14, see E1
+# 15. Float GE is false: GET /v2/entities?mq=A1.M1.f>=3.15, see nothing
+#
+# 16. String GT is true: GET /v2/entities?mq=A1.M1.s>fest_string, see E1
+# 17. String GT is false: GET /v2/entities?mq=A1.M1.s>uest_string, see nothing
+# 18. String GE is true: GET /v2/entities?mq=A1.M1.s>=fest_string, see E1
+# 19. String GE is true: GET /v2/entities?mq=A1.M1.s>=test_string, see E1
+# 20. String GE is false: GET /v2/entities?mq=A1.M1.s>=uest_string, see nothing
+#
+
+echo "01. Create E1 with A1 with having a metadata M1 with compound value containing all JSON types"
+echo "============================================================================================="
+payload='{
+  "id": "E1",
+  "A1": {
+    "value": "not important",
+    "metadata": {
+      "M1": {
+        "value": {
+          "i": 10,
+          "f": 3.14,
+          "s": "test_string",
+          "T": true,
+          "F": false,
+          "N": null
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "02. Integer GT is true: GET /v2/entities?mq=A1.M1.i>9, see E1"
+echo "============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>9'
+echo
+echo
+
+
+echo "03. Integer GT is true: GET /v2/entities?mq=A1.M1.i>-1, see E1"
+echo "=============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>-1'
+echo
+echo
+
+
+echo "04. Integer GT is false: GET /v2/entities?mq=A1.M1.i>10, see nothing"
+echo "===================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>10'
+echo
+echo
+
+
+echo "05. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=9, see E1"
+echo "=============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>=9'
+echo
+echo
+
+
+echo "06. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=-1, see E1"
+echo "==============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>=-1'
+echo
+echo
+
+
+echo "07. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=10, see E1"
+echo "==============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>=10'
+echo
+echo
+
+
+echo "08. Integer GE is false: GET /v2/entities?mq=A1.M1.i>=11, see nothing"
+echo "====================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.i>=11'
+echo
+echo
+
+
+echo "09. Float GT is true: GET /v2/entities?mq=A1.M1.f>2, see E1"
+echo "==========================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.f>2'
+echo
+echo
+
+
+echo "10. Float GT is true: GET /v2/entities?mq=A1.M1.f>-1, see E1"
+echo "============================================================"
+orionCurl --url '/v2/entities?mq=A1.M1.f>-1'
+echo
+echo
+
+
+echo "11. Float GT is false: GET /v2/entities?mq=A1.M1.f>10, see nothing"
+echo "=================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.f>10'
+echo
+echo
+
+
+echo "12. Float GE is true: GET /v2/entities?mq=A1.M1.f>=3.0, see E1"
+echo "=============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.f>=3.0'
+echo
+echo
+
+
+echo "13. Float GE is true: GET /v2/entities?mq=A1.M1.f>=-1.0, see E1"
+echo "==============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.f>=-1.0'
+echo
+echo
+
+
+echo "14. Float GE is true: GET /v2/entities?mq=A1.M1.f>=3.14, see E1"
+echo "==============================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.f>=3.14'
+echo
+echo
+
+
+echo "15. Float GE is false: GET /v2/entities?mq=A1.M1.f>=3.15, see nothing"
+echo "====================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.f>=3.15'
+echo
+echo
+
+
+echo "16. String GT is true: GET /v2/entities?mq=A1.M1.s>fest_string, see E1"
+echo "======================================================================"
+orionCurl --url '/v2/entities?mq=A1.M1.s>fest_string'
+echo
+echo
+
+
+echo "17. String GT is false: GET /v2/entities?mq=A1.M1.s>uest_string, see nothing"
+echo "============================================================================"
+orionCurl --url '/v2/entities?mq=A1.M1.s>uest_string'
+echo
+echo
+
+
+echo "18. String GE is true: GET /v2/entities?mq=A1.M1.s>=fest_string, see E1"
+echo "======================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.s>=fest_string'
+echo
+echo
+
+
+echo "19. String GE is true: GET /v2/entities?mq=A1.M1.s>=test_string, see E1"
+echo "======================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.s>=test_string'
+echo
+echo
+
+
+echo "20. String GE is false: GET /v2/entities?mq=A1.M1.s>=uest_string, see nothing"
+echo "============================================================================="
+orionCurl --url '/v2/entities?mq=A1.M1.s>=uest_string'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with A1 with having a metadata M1 with compound value containing all JSON types
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Integer GT is true: GET /v2/entities?mq=A1.M1.i>9, see E1
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+03. Integer GT is true: GET /v2/entities?mq=A1.M1.i>-1, see E1
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+04. Integer GT is false: GET /v2/entities?mq=A1.M1.i>10, see nothing
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+05. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=9, see E1
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+06. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=-1, see E1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+07. Integer GE is true: GET /v2/entities?mq=A1.M1.i>=10, see E1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+08. Integer GE is false: GET /v2/entities?mq=A1.M1.i>=11, see nothing
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+09. Float GT is true: GET /v2/entities?mq=A1.M1.f>2, see E1
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+10. Float GT is true: GET /v2/entities?mq=A1.M1.f>-1, see E1
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+11. Float GT is false: GET /v2/entities?mq=A1.M1.f>10, see nothing
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+12. Float GE is true: GET /v2/entities?mq=A1.M1.f>=3.0, see E1
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+13. Float GE is true: GET /v2/entities?mq=A1.M1.f>=-1.0, see E1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+14. Float GE is true: GET /v2/entities?mq=A1.M1.f>=3.14, see E1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+15. Float GE is false: GET /v2/entities?mq=A1.M1.f>=3.15, see nothing
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+16. String GT is true: GET /v2/entities?mq=A1.M1.s>fest_string, see E1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+17. String GT is false: GET /v2/entities?mq=A1.M1.s>uest_string, see nothing
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+18. String GE is true: GET /v2/entities?mq=A1.M1.s>=fest_string, see E1
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+19. String GE is true: GET /v2/entities?mq=A1.M1.s>=test_string, see E1
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 190
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "F": false,
+                        "N": null,
+                        "T": true,
+                        "f": 3.14,
+                        "i": 10,
+                        "s": "test_string"
+                    }
+                }
+            },
+            "type": "Text",
+            "value": "not important"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+20. String GE is false: GET /v2/entities?mq=A1.M1.s>=uest_string, see nothing
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

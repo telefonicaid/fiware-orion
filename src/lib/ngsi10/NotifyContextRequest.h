@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_REQUEST_H
-#define NOTIFY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_
 
 /*
 *
@@ -27,11 +27,11 @@
 */
 #include <string>
 
+#include "common/RenderFormat.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Originator.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
@@ -45,10 +45,17 @@ typedef struct NotifyContextRequest
   Originator                    originator;                    // Mandatory
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(const std::string& indent);
+  std::string   toJsonV1(bool                             asJsonObject,
+                         const std::vector<std::string>&  attrsFilter,
+                         bool                             blacklist,
+                         const std::vector<std::string>&  metadataFilter);
+  std::string   toJson(RenderFormat                     renderFormat,
+                       const std::vector<std::string>&  attrsFilter,
+                       bool                             blacklist,
+                       const std::vector<std::string>&  metadataFilter);
+  std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
   void          release(void);
+  NotifyContextRequest* clone(void);
 } NotifyContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_

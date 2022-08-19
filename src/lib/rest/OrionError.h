@@ -27,7 +27,8 @@
 */
 #include <string>
 
-#include "common/Format.h"
+#include "common/globals.h"
+
 #include "ngsi/StatusCode.h"
 #include "rest/HttpStatusCode.h"
 
@@ -39,15 +40,25 @@
 */
 typedef struct OrionError
 {
+public:
   HttpStatusCode  code;
   std::string     reasonPhrase;
   std::string     details;
 
   OrionError();
   OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "");
+  OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
 
-  std::string  render(Format format, const std::string& indent);
+  std::string  smartRender(ApiVersion apiVersion);
+  std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
+  std::string  toJson(void);
+  std::string  toJsonV1(void);
+  void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
+  void         fill(const StatusCode& sc);
+
+private:
+  void         shrinkReasonPhrase(void);
+
 } OrionError;
 
 #endif

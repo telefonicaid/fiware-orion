@@ -25,9 +25,12 @@
 #include <string>
 #include <vector>
 
-#include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
 #include "ngsi/ContextAttribute.h"
@@ -157,9 +160,9 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   reqDataP->dcar.res.restriction.attributeExpression.set(value);
 
-  if (value == "")
+  if (value.empty())
   {
-    LM_W(("Bad Input (empty attribute expression)"));
+    alarmMgr.badInput(clientIp, "empty attribute expression");
     return "Empty attribute expression";
   }
 
@@ -248,30 +251,9 @@ void jsonDcarRelease(ParseData* reqDataP)
 */
 std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->dcar.res.check(DiscoverContextAvailability,
-                                  ciP->outFormat,
-                                  "",
-                                  reqDataP->errorString,
-                                  reqDataP->dcar.res.restrictions);
+  return reqDataP->dcar.res.check(reqDataP->errorString);
 }
 
-
-
-
-/* ****************************************************************************
-*
-* jsonDcarPresent - 
-*/
-void jsonDcarPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtDump))
-  {
-    return;
-  }
-
-  LM_F(("\n\n"));
-  reqDataP->dcar.res.present("");
-}
 
 
 

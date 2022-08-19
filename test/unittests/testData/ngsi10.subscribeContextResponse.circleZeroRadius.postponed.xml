@@ -1,9 +1,0 @@
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: Radius zero for a circle area</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>

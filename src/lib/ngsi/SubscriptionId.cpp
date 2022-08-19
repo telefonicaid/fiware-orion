@@ -61,18 +61,11 @@ SubscriptionId::SubscriptionId(const std::string& subId)
 *
 * SubscriptionId::check -
 */
-std::string SubscriptionId::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string SubscriptionId::check(void)
 {
   std::string out = "OK";
 
-  if (string != "")
+  if (!string.empty())
   {
     out = idCheck(string);
   }
@@ -88,7 +81,7 @@ std::string SubscriptionId::check
 */
 bool SubscriptionId::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -108,7 +101,7 @@ void SubscriptionId::set(const std::string& value)
 *
 * SubscriptionId::get -
 */
-std::string SubscriptionId::get(void)
+std::string SubscriptionId::get(void) const
 {
   return string;
 }
@@ -117,37 +110,26 @@ std::string SubscriptionId::get(void)
 
 /* ****************************************************************************
 *
-* SubscriptionId::present -
+* SubscriptionId::c_str -
 */
-void SubscriptionId::present(const std::string& indent)
+const char* SubscriptionId::c_str(void) const
 {
-  if (string != "")
-  {
-    LM_F(("%sSubscriptionId: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo SubscriptionId\n", indent.c_str()));
-  }
+  return string.c_str();
 }
 
 
 
 /* ****************************************************************************
 *
-* SubscriptionId::render -
+* SubscriptionId::toJsonV1 -
 */
-std::string SubscriptionId::render(RequestType container, Format format, const std::string& indent, bool comma)
+std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
 {
   std::string xString = string;
 
-  if (xString == "")
+  if (xString.empty())
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||
@@ -163,7 +145,7 @@ std::string SubscriptionId::render(RequestType container, Format format, const s
     }
   }
 
-  return valueTag(indent, "subscriptionId", xString, format, comma);
+  return valueTag("subscriptionId", xString, comma);
 }
 
 
@@ -186,13 +168,9 @@ void SubscriptionId::release(void)
 */
 bool SubscriptionId::rendered(RequestType container)
 {
-  if ((string == "") || (string == "000000000000000000000000"))
+  if ((string.empty()) || (string == "000000000000000000000000"))
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||

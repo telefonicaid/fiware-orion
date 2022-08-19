@@ -30,6 +30,11 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
+#include "alarmMgr/alarmMgr.h"
+#include "parse/forbiddenChars.h"
+
+#include "orionTypes/OrionValueType.h"
 #include "parse/CompoundValueNode.h"
 
 
@@ -40,16 +45,12 @@ namespace orion
 *
 * CompoundValueNode - constructor for toplevel 'node'
 */
-CompoundValueNode::CompoundValueNode()
+CompoundValueNode::CompoundValueNode():
+  name        ("Unset"),
+  valueType   (orion::ValueTypeNotGiven),
+  numberValue (0.0),
+  boolValue   (false)
 {
-  rootP      = NULL;
-  type       = Unknown;
-  container  = NULL;
-  level      = 0;
-  name       = "Unset";
-  path       = "Unset";
-  siblingNo  = 0;
-
   LM_T(LmtCompoundValue, ("Created EMPTY compound node at %p", this));
 }
 
@@ -59,50 +60,107 @@ CompoundValueNode::CompoundValueNode()
 *
 * CompoundValueNode - constructor for toplevel 'node'
 */
-CompoundValueNode::CompoundValueNode(Type _type)
+CompoundValueNode::CompoundValueNode(orion::ValueType _type):
+  valueType   (_type),
+  numberValue (0.0),
+  boolValue   (false)
 {
-  rootP      = this;
-  type       = _type;
-  container  = this;
-  level      = 0;
-  name       = "toplevel";
-  path       = "/";
-  siblingNo  = 0;
-
-  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (type == Vector)? "Vector" : "Object", this));
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (valueType == orion::ValueTypeVector)? "Vector" : "Object", this));
 }
 
 
 
 /* ****************************************************************************
 *
-* CompoundValueNode - constructor for all nodes except toplevel
+* CompoundValueNode - constructor for all nodes except toplevel (string)
 */
 CompoundValueNode::CompoundValueNode
 (
-  CompoundValueNode*  _container,
-  const std::string&  _path,
   const std::string&  _name,
   const std::string&  _value,
-  int                 _siblingNo,
-  Type                _type,
-  int                 _level
-)
+  orion::ValueType    _type
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (_value),
+  numberValue (0.0),
+  boolValue   (false)
 {
-  container = _container;
-  rootP     = container->rootP;
-  name      = _name;
-  value     = _value;
-  path      = _path;
-  level     = container->level + 1;
-  siblingNo = _siblingNo;
-  type      = _type;
-
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
                           name.c_str(),
-                          level,
-                          siblingNo,
-                          typeName(type),
+                          orion::valueTypeName(valueType),
+                          this));
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for all nodes except toplevel (char*)
+*/
+CompoundValueNode::CompoundValueNode
+(
+  const std::string&  _name,
+  const char*         _value,
+  orion::ValueType    _type
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (std::string(_value)),
+  numberValue (0.0),
+  boolValue   (false)
+{
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
+                          name.c_str(),
+                          orion::valueTypeName(valueType),
+                          this));
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for all nodes except toplevel (number)
+*/
+CompoundValueNode::CompoundValueNode
+(
+  const std::string&  _name,
+  double              _value,
+  orion::ValueType    _type
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (),
+  numberValue (_value),
+  boolValue   (false)
+{
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
+                          name.c_str(),
+                          orion::valueTypeName(valueType),
+                          this));
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for all nodes except toplevel (bool)
+*/
+CompoundValueNode::CompoundValueNode
+(
+  const std::string&  _name,
+  bool                _value,
+  orion::ValueType    _type
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (""),
+  numberValue (0.0),
+  boolValue   (_value)
+{
+  LM_T(LmtCompoundValue, ("Created compound node '%s', type %s at %p",
+                          name.c_str(),
+                          orion::valueTypeName(valueType),
                           this));
 }
 
@@ -114,7 +172,7 @@ CompoundValueNode::CompoundValueNode
 */
 CompoundValueNode::~CompoundValueNode()
 {
-  LM_T(LmtCompoundValue, ("Destroying node %p: name: '%s', path '%s' at %p (with %d children)", this, name.c_str(), path.c_str(), this, childV.size()));
+  LM_T(LmtCompoundValue, ("Destroying node %p: name: '%s' at %p (with %d children)", this, name.c_str(), this, childV.size()));
 
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
@@ -126,6 +184,11 @@ CompoundValueNode::~CompoundValueNode()
     }
   }
 
+  while (childV.size() != 0)
+  {
+    childV.erase(childV.begin());
+  }
+
   childV.clear();
 }
 
@@ -133,39 +196,19 @@ CompoundValueNode::~CompoundValueNode()
 
 /* ****************************************************************************
 *
-* typeName -
-*/
-const char* CompoundValueNode::typeName(const Type _type)
-{
-  switch (_type)
-  {
-  case String:       return "String";
-  case Object:       return "Object";
-  case Vector:       return "Vector";
-  case Unknown:      return "Unknown";
-  }
-
-  return "Invalid";
-}
-
-
-
-/* ****************************************************************************
-*
 * finish -
+*
 */
 std::string CompoundValueNode::finish(void)
 {
-  error = "OK";
-
   LM_T(LmtCompoundValue, ("Finishing a compound"));
 
   if (lmTraceIsSet(LmtCompoundValueShow))
+  {
     show("");
+  }
 
-  check();  // sets 'error' for toplevel node
-
-  return error;
+  return check("");
 }
 
 
@@ -176,21 +219,16 @@ std::string CompoundValueNode::finish(void)
 */
 CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
-  node->container = this;
-  node->level     = level + 1;
-  node->siblingNo = childV.size();
-  node->rootP     = rootP;
-
-  if (node->type == String)
-    LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s' under '%s' (%s)",
+  if (node->valueType == orion::ValueTypeString)
+  {
+    LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s'",
                                node->name.c_str(),
-                               node->value.c_str(),
-                               node->container->path.c_str(),
-                               node->container->name.c_str()));
+                               node->stringValue.c_str()));
+  }
   else
-    LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(),
-                               node->container->path.c_str(),
-                               node->container->name.c_str()));
+  {
+    LM_T(LmtCompoundValueAdd, ("Adding %s '%s')", orion::valueTypeName(node->valueType), node->name.c_str()));
+  }
 
   childV.push_back(node);
   return node;
@@ -200,27 +238,70 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 
 /* ****************************************************************************
 *
-* add -
+* add - (string)
 */
 CompoundValueNode* CompoundValueNode::add
 (
-  const Type          _type,
-  const std::string&  _name,
-  const std::string&  _value
+  const orion::ValueType  _type,
+  const std::string&      _name,
+  const std::string&      _value
 )
 {
-  std::string newPath = path;
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
-  if (newPath == "/")
-  {
-    newPath += _name;
-  }
-  else
-  {
-    newPath += "/" + _name;
-  }
+  return add(node);
+}
 
-  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+
+
+/* ****************************************************************************
+*
+* add - (char*)
+*/
+CompoundValueNode* CompoundValueNode::add
+(
+  const orion::ValueType  _type,
+  const std::string&      _name,
+  const char*             _value
+)
+{
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
+
+  return add(node);
+}
+
+
+
+/* ****************************************************************************
+*
+* add - (double)
+*/
+CompoundValueNode* CompoundValueNode::add
+(
+  const orion::ValueType  _type,
+  const std::string&      _name,
+  double                  _value
+)
+{
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
+
+  return add(node);
+}
+
+
+
+/* ****************************************************************************
+*
+* add - (bool)
+*/
+CompoundValueNode* CompoundValueNode::add
+(
+  const orion::ValueType  _type,
+  const std::string&      _name,
+  bool                    _value
+)
+{
+  CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
   return add(node);
 }
@@ -233,25 +314,55 @@ CompoundValueNode* CompoundValueNode::add
 */
 void CompoundValueNode::shortShow(const std::string& indent)
 {
-  if ((rootP == this) && (type == Vector))
+  if (valueType == orion::ValueTypeVector)
   {
-    LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (vector)",
+                                 indent.c_str(),
+                                 name.c_str()));
   }
-  else if (rootP == this)
+  else if (valueType == orion::ValueTypeObject)
   {
-    LM_F(("%s%s (toplevel object)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (object)",
+                                 indent.c_str(),
+                                 name.c_str()));
   }
-  else if (type == Vector)
+  else if (valueType == orion::ValueTypeString)
   {
-    LM_F(("%s%s (vector)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (%s)",
+                                 indent.c_str(),
+                                 name.c_str(),
+                                 stringValue.c_str()));
+    return;
   }
-  else if (type == Object)
+  else if (valueType == orion::ValueTypeBoolean)
   {
-    LM_F(("%s%s (object)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (%s)",
+                                 indent.c_str(),
+                                 name.c_str(),
+                                 (boolValue == true)? "true" : "false"));
+    return;
   }
-  else
+  else if (valueType == orion::ValueTypeNull)
   {
-    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), value.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (null)",
+                                 indent.c_str(),
+                                 name.c_str()));
+    return;
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_T(LmtCompoundValue,      ("%s%s (not given)",
+                                 indent.c_str(),
+                                 name.c_str()));
+    return;
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    LM_T(LmtCompoundValue,      ("%s%s (%f)",
+                                 indent.c_str(),
+                                 name.c_str(),
+                                 numberValue));
+    return;
   }
 
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
@@ -268,24 +379,46 @@ void CompoundValueNode::shortShow(const std::string& indent)
 */
 void CompoundValueNode::show(const std::string& indent)
 {
-  if (name != "")
+  if (!name.empty())
   {
-    LM_F(("%sname:      %s", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValueShow, ("%sname:      %s",
+                                indent.c_str(),
+                                name.c_str()));
   }
 
-  if (value != "")
+  LM_T(LmtCompoundValueShow, ("%stype:      %s",
+                              indent.c_str(),
+                              orion::valueTypeName(valueType)));
+
+  if (valueType == orion::ValueTypeString)
   {
-    LM_F(("%svalue:     %s", indent.c_str(), value.c_str()));
+    LM_T(LmtCompoundValueShow, ("%sString Value:     %s",
+                                indent.c_str(),
+                                stringValue.c_str()));
   }
-
-  LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
-  LM_F(("%slevel:     %d", indent.c_str(), level));
-  LM_F(("%ssibling:   %d", indent.c_str(), siblingNo));
-  LM_F(("%stype:      %s", indent.c_str(), typeName(type)));
-  LM_F(("%spath:      %s", indent.c_str(), path.c_str()));
-  LM_F(("%srootP:     %s", indent.c_str(), rootP->name.c_str()));
-
-  if (childV.size() != 0)
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    LM_T(LmtCompoundValueShow, ("%sBool Value:     %s",
+                                indent.c_str(),
+                                (boolValue == false)? "false" : "true"));
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f",
+                                indent.c_str(),
+                                numberValue));
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNull",
+                                indent.c_str()));
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNotGiven",
+                                indent.c_str()));
+  }
+  else if (childV.size() != 0)
   {
     std::string childrenString;
 
@@ -298,7 +431,10 @@ void CompoundValueNode::show(const std::string& indent)
       }
     }
 
-    LM_F(("%s%lu children (%s)", indent.c_str(), childV.size(), childrenString.c_str()));
+    LM_T(LmtCompoundValueShow, ("%s%lu children (%s)",
+                                indent.c_str(),
+                                childV.size(),
+                                childrenString.c_str()));
 
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
@@ -306,7 +442,7 @@ void CompoundValueNode::show(const std::string& indent)
     }
   }
 
-  LM_F((""));
+  LM_T(LmtCompoundValueShow, (""));
 }
 
 
@@ -318,34 +454,31 @@ void CompoundValueNode::show(const std::string& indent)
 * A vector must have all its children with the same name.
 * An object cannot have two children with the same name.
 *
-* Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
-void CompoundValueNode::check(void)
+std::string CompoundValueNode::check(const std::string& path)
 {
-  if (type == Vector)
+  if (valueType == orion::ValueTypeVector)
   {
     if (childV.size() == 0)
     {
-      return;
+      return "OK";
     }
 
     for (uint64_t ix = 1; ix < childV.size(); ++ix)
     {
       if (childV[ix]->name != childV[0]->name)
       {
-        rootP->error =
-          std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
-
-        LM_W(("Bad Input (%s)", rootP->error.c_str()));
-        return;
+        std::string error = "bad tag-name of vector item: /" + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
+        alarmMgr.badInput(clientIp, error);
+        return error;
       }
     }
   }
-  else if (type == Object)
+  else if (valueType == orion::ValueTypeObject)
   {
     if (childV.size() == 0)
     {
-      return;
+      return "OK";
     }
 
     for (uint64_t ix = 0; ix < childV.size() - 1; ++ix)
@@ -354,173 +487,109 @@ void CompoundValueNode::check(void)
       {
         if (childV[ix]->name == childV[ix2]->name)
         {
-          rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
-          LM_W(("Bad Input (%s)", rootP->error.c_str()));
+          std::string fullPath = (path.empty() ? "/" : path + name + "/");
+          std::string error = "duplicated tag-name: /" + childV[ix]->name + "/ in path: " + fullPath;
+          alarmMgr.badInput(clientIp, error);
 
-          return;
+          return error;
         }
       }
     }
   }
   else
   {
-    // No check made for Strings
-    return;
+    if (forbiddenChars(stringValue.c_str()))
+    {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
+      return "Invalid characters in attribute value";
+    }
   }
 
   // 'recursively' call the check method for all children
+  std::string res;
+
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
-    childV[ix]->check();
+    res = childV[ix]->check(path + name + "/");
+    if (res !="OK")
+    {
+      return res;
+    }
   }
+  return "OK";
 }
 
 
 
 /* ****************************************************************************
 *
-* render -
-*/
-std::string CompoundValueNode::render(Format format, const std::string& indent)
-{
-  std::string  out       = "";
-  bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->type == Vector)? "item" : name;
-
-  if (type == String)
-  {
-    LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag(indent, tagName, value, format, jsonComma, false, container->type == Vector);
-  }
-  else if ((type == Vector) && (container != this))
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += startTag(indent, tagName, tagName, format, true, container->type == Object, true);
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->render(format, indent + "  ");
-    }
-
-    out += endTag(indent, tagName, format, jsonComma, true, true);
-  }
-  else if ((type == Vector) && (container == this))
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->render(format, indent);
-    }
-  }
-  else if ((type == Object) && (container->type == Vector))
-  {
-    LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
-    out += startTag(indent, "item", "", format, false, false);
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->render(format, indent + "  ");
-    }
-
-    out += endTag(indent, "item", format, jsonComma, false, true);
-  }
-  else if (type == Object)
-  {
-    if (rootP != this)
-    {
-      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
-      out += startTag(indent, tagName, tagName, format, false, true);
-
-      for (uint64_t ix = 0; ix < childV.size(); ++ix)
-      {
-        out += childV[ix]->render(format, indent + "  ");
-      }
-
-      out += endTag(indent, tagName, format, jsonComma, false, true);
-    }
-    else
-    {
-      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
-      for (uint64_t ix = 0; ix < childV.size(); ++ix)
-      {
-        out += childV[ix]->render(format, indent);
-      }
-    }
-  }
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
+* CompoundValueNode:toJson
 *
-* toJson -
 */
-std::string CompoundValueNode::toJson(bool isLastElement)
+std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replacementsP)
 {
-  std::string  out       = "";
-  bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->type == Vector)? "item" : name;
+  std::string      out;
+  JsonVectorHelper jvh;
+  JsonObjectHelper joh;
 
-  if (type == String)
+  switch (valueType)
   {
-    LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag("", tagName, value, JSON, jsonComma, false, container->type == Vector);
-  }
-  else if ((type == Vector) && (container != this))
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += "[";
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  case orion::ValueTypeString:
+    if ((replacementsP != NULL) && (stringValue.rfind("${", 0) == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
     {
-      out += childV[ix]->render(JSON, "");
-    }
-
-    out += "]";
-  }
-  else if ((type == Vector) && (container == this))
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->render(JSON, "");
-    }
-  }
-  else if ((type == Object) && (container->type == Vector))
-  {
-    LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
-    out += "{";
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->render(JSON, "");
-    }
-
-    out += "}";
-  }
-  else if (type == Object)
-  {
-    if (rootP != this)
-    {
-      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
-      out += "{";
-
-      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      // len("${") + len("}") = 3
+      std::string macroName = stringValue.substr(2, stringValue.size() - 3);
+      std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
+      if (iter == replacementsP->end())
       {
-        out += childV[ix]->render(JSON, "");
+        // macro doesn't exist in the replacement map, so we use null al failsafe
+        out += "null";
       }
-
-      out += "}";
+      else
+      {
+        out += iter->second;
+      }
     }
     else
     {
-      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
-      for (uint64_t ix = 0; ix < childV.size(); ++ix)
-      {
-        out += childV[ix]->render(JSON, "");
-      }
+      out = '"';
+      out += toJsonString(stringValue);
+      out += '"';
     }
-  }
 
-  return out;
+    return out;
+
+  case orion::ValueTypeNumber:
+    return double2string(numberValue);
+
+  case orion::ValueTypeBoolean:
+    return (boolValue? "true" : "false");
+
+  case orion::ValueTypeNull:
+    return "null";
+
+  case orion::ValueTypeVector:
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
+    {
+      jvh.addRaw(childV[ix]->toJson(replacementsP));
+    }
+    return jvh.str();
+
+  case orion::ValueTypeObject:
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
+    {
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson(replacementsP));
+    }
+    return joh.str();
+
+  case orion::ValueTypeNotGiven:
+    LM_E(("Runtime Error (value type not given (%s))", name.c_str()));
+    return "";
+
+  default:
+    LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
+    return "";
+  }
 }
 
 
@@ -531,10 +600,40 @@ std::string CompoundValueNode::toJson(bool isLastElement)
 */
 CompoundValueNode* CompoundValueNode::clone(void)
 {
+  CompoundValueNode* me;
+
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(type) :
-    new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+  switch (valueType)
+  {
+  case orion::ValueTypeString:
+  case orion::ValueTypeObject:
+  case orion::ValueTypeVector:
+    me = new CompoundValueNode(name, stringValue, valueType);
+    break;
+
+  case orion::ValueTypeNumber:
+    me = new CompoundValueNode(name, numberValue, valueType);
+    break;
+
+  case orion::ValueTypeBoolean:
+    me = new CompoundValueNode(name, boolValue, valueType);
+    break;
+
+  case orion::ValueTypeNull:
+    me = new CompoundValueNode(name, stringValue, valueType);
+    me->valueType = orion::ValueTypeNull;
+    break;
+
+  case orion::ValueTypeNotGiven:
+    me = NULL;
+    LM_E(("Runtime Error (value not given in compound node value)"));
+    break;
+
+  default:
+    me = NULL;
+    LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));
+  }
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {
@@ -553,7 +652,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
 */
 bool CompoundValueNode::isVector(void)
 {
-  return (type == Vector);
+  return (valueType == orion::ValueTypeVector);
 }
 
 
@@ -564,7 +663,7 @@ bool CompoundValueNode::isVector(void)
 */
 bool CompoundValueNode::isObject(void)
 {
-  return (type == Object);
+  return (valueType == orion::ValueTypeObject);
 }
 
 
@@ -575,7 +674,7 @@ bool CompoundValueNode::isObject(void)
 */
 bool CompoundValueNode::isString(void)
 {
-  return (type == String);
+  return (valueType == orion::ValueTypeString);
 }
 
 
@@ -587,27 +686,5 @@ bool CompoundValueNode::isString(void)
 const char* CompoundValueNode::cname(void)
 {
   return name.c_str();
-}
-
-
-
-/* ****************************************************************************
-*
-* cvalue -
-*/
-const char* CompoundValueNode::cvalue(void)
-{
-  return value.c_str();
-}
-
-
-
-/* ****************************************************************************
-*
-* cpath -
-*/
-const char* CompoundValueNode::cpath(void)
-{
-  return path.c_str();
 }
 }

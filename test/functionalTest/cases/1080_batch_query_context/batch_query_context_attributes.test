@@ -1,0 +1,311 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 batch query
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15
+# 02. Create an entity E of type T2, with attributes A2=22,A5=25
+# 03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35
+#
+# 04. POST /v2/op/query, with only A5 in payload, see 3 entities
+# 05. POST /v2/op/query, with E.* and A1 in payload, see 1 entity
+# 06. POST /v2/op/query, with E.* and A5 in payload, see 3 entities
+# 07. POST /v2/op/query, with E.* and A1,A2 in payload, see 2 entities
+#
+
+
+echo "01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15"
+echo "==================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A1": 11,
+  "A4": 14,
+  "A5": 15
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E of type T2, with attributes A2=22,A5=25"
+echo "=============================================================="
+payload='{
+  "id": "E",
+  "type": "T2",
+  "A2": 22,
+  "A5": 25
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35"
+echo "===================================================================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A3": 33,
+  "A4": 34,
+  "A5": 35
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "04. POST /v2/op/query, with only A5 in payload, see 3 entities"
+echo "=============================================================="
+payload='{
+  "attributes": [
+    "A5"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "05. POST /v2/op/query, with E.* and A1 in payload, see 1 entity"
+echo "==============================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E.*"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "06. POST /v2/op/query, with E.* and A5 in payload, see 3 entities"
+echo "================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E.*"
+    }
+  ],
+  "attributes": [
+    "A5"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "07. POST /v2/op/query, with E.* and A1,A2 in payload, see 2 entities"
+echo "===================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": "E.*"
+    }
+  ],
+  "attributes": [
+    "A1",
+    "A2"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create an entity E of type T2, with attributes A2=22,A5=25
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. POST /v2/op/query, with only A5 in payload, see 3 entities
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 213
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A5": {
+            "metadata": {},
+            "type": "Number",
+            "value": 15
+        },
+        "id": "E",
+        "type": "T"
+    },
+    {
+        "A5": {
+            "metadata": {},
+            "type": "Number",
+            "value": 25
+        },
+        "id": "E",
+        "type": "T2"
+    },
+    {
+        "A5": {
+            "metadata": {},
+            "type": "Number",
+            "value": 35
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+05. POST /v2/op/query, with E.* and A1 in payload, see 1 entity
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 11
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
+
+
+06. POST /v2/op/query, with E.* and A5 in payload, see 3 entities
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 213
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A5": {
+            "metadata": {},
+            "type": "Number",
+            "value": 15
+        },
+        "id": "E",
+        "type": "T"
+    },
+    {
+        "A5": {
+            "metadata": {},
+            "type": "Number",
+            "value": 25
+        },
+        "id": "E",
+        "type": "T2"
+    },
+    {
+        "A5": {
+            "metadata": {},
+            "type": "Number",
+            "value": 35
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+07. POST /v2/op/query, with E.* and A1,A2 in payload, see 2 entities
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 11
+        },
+        "id": "E",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 22
+        },
+        "id": "E",
+        "type": "T2"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,0 +1,140 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Rigth processing of error responses from CPrs in NGSIv2 mixed with local results
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E/A=1 on CB
+# 02. Register E/[A,B] on CB  with faulty (404) CPr
+# 03. POST /v2/op/query for E/[A,B] in CB and get only CB local info (E/A=1)
+#
+
+echo "01. Create E/A=1 on CB"
+echo "======================"
+payload='{
+  "type": "T",
+  "id":   "E",
+  "A": {
+    "type": "Number",
+    "value": 1
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Register E/[A,B] on CB  with faulty (404) CPr"
+echo "================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T",
+        "id": "E"
+      }
+    ],
+    "attrs": [ "A", "B" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/badresponse"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "03. POST /v2/op/query for E/A in CB and get only CB local info (E/A=1)"
+echo "======================================================================"
+payload='{
+  "entities": [
+    {
+      "id":   "E",
+      "type": "T"
+    }
+  ],
+  "attrs": [
+    "A", "B"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E/A=1 on CB
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Register E/[A,B] on CB  with faulty (404) CPr
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. POST /v2/op/query for E/A in CB and get only CB local info (E/A=1)
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

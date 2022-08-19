@@ -47,7 +47,7 @@ function vMsg()
 #
 function usage()
 {
-  echo $0 "[-u (usage)] [-U (extended usage)] [-v (verbose)] [-fast (fast run)] [-loops <loops (10 by default)>] [-cb (dont't start the broker)] [-acc (dont't start the accumulator)]"
+  echo $0 "[-u (usage)] [-U (extended usage)] [-v (verbose)] [-fast (fast run)] [-loops <loops (10 by default)>] [-cb (don't start the broker)] [-acc (don't start the accumulator)]"
 
   if [ "$1" != "continue" ]
   then
@@ -293,7 +293,7 @@ then
   fi
 
   vMsg "starting the accumulator"
-  ../../scripts/accumulator-server.py 6666 /test/sub > /tmp/accumulator-server.log 2>&1 &
+  ../../scripts/accumulator-server.py --port 6666 --url /test/sub > /tmp/accumulator-server.log 2>&1 &
   echo "accumulator started - log file in /tmp/accumulator-server.log"
   sleep 1
   vMsg "accumulator running"
@@ -301,7 +301,7 @@ else
   vMsg using external accumulator
 fi
 
-accPid=$(ps aux | grep 'accumulator-server.py 6666' | grep -v grep | awk '{ print $2 }')
+accPid=$(ps aux | grep 'accumulator-server.py --port 6666' | grep -v grep | awk '{ print $2 }')
 if [ "$accPid" == "" ]
 then
   echo "Sorry, cannot find the accumulator process"
@@ -419,24 +419,7 @@ do
   
   partTest 1   dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discovery"                                   "/NGSI9/discoverContextAvailability" "NO PATTERN"
   partTest 99  dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
-  partTest 400 dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
-  
-  partTest 1   scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscription"                    "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  partTest 99  scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  partTest 200 scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  
-  partTest 1   ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdate"              "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  partTest 99  ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  partTest 200 ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  
-  partTest 1   ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  partTest 99  ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  partTest 200 ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  
-  partTest 1   ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  partTest 99  ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  partTest 200 ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  
+  partTest 400 dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN" 
   
   
   # -----------------------------------------------------------------------------

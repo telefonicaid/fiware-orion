@@ -27,12 +27,20 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "apiTypesV2/EntityVector.h"
-#include "apiTypesV2/ErrorCode.h"
+#include "rest/OrionError.h"
 
 
+
+/* ****************************************************************************
+*
+* To avoid a problematic and not necessary include
+*/
 struct QueryContextResponse;
+
+
 
 /* ****************************************************************************
 *
@@ -40,18 +48,21 @@ struct QueryContextResponse;
 */
 class Entities
 {
-public:
-  EntityVector vec;          // Optional - mandatory if 200-OK
-  ErrorCode   errorCode;     // Optional - mandatory if not 200-OK
+ public:
+  EntityVector  vec;          // Mandatory
 
   Entities();
   ~Entities();
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType);
-  std::string  check(ConnectionInfo*  ciP, RequestType requestType);
-  void         present(const std::string& indent);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
+
+  std::string  check(RequestType requestType);
   void         release(void);
-  void         fill(QueryContextResponse* qcrsP);
+  void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
+  int          size(void) const { return vec.vec.size(); }
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITIES_H_

@@ -24,8 +24,8 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscribeError.h"
@@ -38,21 +38,36 @@
 */
 SubscribeError::SubscribeError()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
 
 /* ****************************************************************************
 *
-* SubscribeError::render -
+* SubscribeError::toJson -
 */
-std::string SubscribeError::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string SubscribeError::toJson(void)
+{
+  JsonObjectHelper jh;
+
+  jh.addString("error", errorCode.reasonPhrase);
+  jh.addString("description", errorCode.details);
+
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscribeError::toJsonV1 -
+*/
+std::string SubscribeError::toJsonV1(RequestType requestType, bool comma)
 {
   std::string out = "";
-  std::string tag = "subscribeError";
 
-  out += startTag(indent, tag, format, true);
+  out += startTag("subscribeError", false);
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
   // errorCode is Mandatory so, the JSON comma is always TRUE
@@ -62,22 +77,22 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
     // NOTE: the subscriptionId must have come from the request.
     //       If the field is empty, we are in unit tests and I here set it to all zeroes
     //
-    if (subscriptionId.get() == "")
+    if (subscriptionId.get().empty())
     {
       subscriptionId.set("000000000000000000000000");
     }
-    out += subscriptionId.render(requestType, format, indent + "  ", true);
+    out += subscriptionId.toJsonV1(requestType, true);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
-           (subscriptionId.get() != ""))
+           (!subscriptionId.get().empty()))
   {
-    out += subscriptionId.render(requestType, format, indent + "  ", true);
+    out += subscriptionId.toJsonV1(requestType, true);
   }
 
-  out += errorCode.render(format, indent + "  ");
+  out += errorCode.toJsonV1(false);
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -88,14 +103,7 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
 *
 * check -
 */
-std::string SubscribeError::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string SubscribeError::check(void)
 {
   return "OK";
 }

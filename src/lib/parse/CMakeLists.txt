@@ -25,6 +25,7 @@ SET (SOURCES
     compoundValue.cpp
     nullTreat.cpp
     forbiddenChars.cpp
+    textParse.cpp
 )
 
 SET (HEADERS
@@ -32,6 +33,7 @@ SET (HEADERS
     compoundValue.h
     nullTreat.h
     forbiddenChars.h
+    textParse.h
 )
 
 
@@ -39,7 +41,6 @@ SET (HEADERS
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-
 
 # Library declaration
 # -----------------------------------------------------------------

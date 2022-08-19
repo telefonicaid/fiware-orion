@@ -40,28 +40,15 @@ typedef struct ContextRegistrationAttributeVector
 {
   std::vector<ContextRegistrationAttribute*>  vec;
 
-  std::string                      render(Format format, const std::string& indent, bool comma = false);
-  void                             present(const std::string& indent);
+  std::string                      toJsonV1(bool comma);
   void                             push_back(ContextRegistrationAttribute* item);
   unsigned int                     size(void);
-  ContextRegistrationAttribute*    get(int ix);
   void                             release();
 
-  std::string                      check(RequestType         requestType,
-                                         Format              format,
-                                         const std::string&  indent,
-                                         const std::string&  predetectedError,
-                                         int                 counter);
+  std::string                      check(ApiVersion apiVersion);
 
-  ContextRegistrationAttribute*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  ContextRegistrationAttribute*  operator[](unsigned int ix) const;
 
-    return NULL;
-  }
 } ContextRegistrationAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTEVECTOR_H_

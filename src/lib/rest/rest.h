@@ -29,14 +29,31 @@
 #include <vector>
 
 #include "rest/RestService.h"
+#include "rest/StringFilter.h"
 
-#define  MAX_LEN_IP                      64
+
+
+/* ****************************************************************************
+*
+* MAX_LEN_IP -
+*/
+#define MAX_LEN_IP  64
+
+
+
+/* ****************************************************************************
+*
+* CONSTANTS RESTINIT -
+*/
+#define   NO_PORT 0
+
+
 
 /* ****************************************************************************
 *
 *  IpVersion -
 */
-typedef enum IpVersion 
+typedef enum IpVersion
 {
   IPV4     = 1,
   IPV6     = 2,
@@ -47,42 +64,75 @@ typedef enum IpVersion
 
 /* ****************************************************************************
 *
-* ipVersionUsed - 
+* Global vars -
 */
-extern IpVersion       ipVersionUsed;  
-extern std::string     rushHost;
-extern unsigned short  rushPort;
-extern bool            multitenant;
-extern char            restAllowedOrigin[64];
+extern IpVersion               ipVersionUsed;
+extern bool                    multitenant;
+extern bool                    corsEnabled;
+extern char                    corsOrigin[64];
+extern int                     corsMaxAge;
+extern RestService*            restBadVerbV;
 
 
 
 /* ****************************************************************************
 *
-* RestServeFunction - 
+* RestServeFunction -
 */
-typedef void (*RestServeFunction)(ConnectionInfo* ciP);
+typedef std::string (*RestServeFunction)(ConnectionInfo* ciP);
 
 
 
 /* ****************************************************************************
 *
-* restInit - 
+* restInit -
 */
 extern void restInit
 (
-   RestService*        _restServiceV,
+   RestService*        _getServiceV,
+   RestService*        _putServiceV,
+   RestService*        _postServiceV,
+   RestService*        _patchServiceV,
+   RestService*        _deleteServiceV,
+   RestService*        _optionsServiceV,
+   RestService*        _noServiceV,
    IpVersion           _ipVersion,
    const char*         _bindAddress,
    unsigned short      _port,
-   bool                _multitenant   = false,
-   const std::string&  _rushHost      = "",
-   unsigned short      _rushPort      = 0,
-   const char*         _allowedOrigin = NULL,
-   const char*         _httpsKey      = NULL,
-   const char*         _httpsCert     = NULL,
-   RestServeFunction   _serveFunction = NULL,
-   bool                _acceptTextXml = false
+   bool                _multitenant,
+   unsigned int        _connectionMemory,
+   unsigned int        _maxConnections,
+   unsigned int        _mhdThreadPoolSize,
+   const char*         _allowedOrigin,
+   int                 _corsMaxAge,
+   int                 _mhdTimeoutInSeconds,
+   const char*         _httpsKey          = NULL,
+   const char*         _httpsCert         = NULL
 );
+
+
+
+/* ****************************************************************************
+*
+* servicePathCheck -
+*/
+extern int servicePathCheck(ConnectionInfo* ciP, const char* servicePath);
+
+
+
+/* ****************************************************************************
+*
+* firstServicePath - extract first component of service-path
+*/
+extern void firstServicePath(const char* servicePath, char* servicePath0, int servicePath0Len);
+
+
+
+/* ****************************************************************************
+*
+* isOriginAllowedForCORS - checks the Origin header of the request and returns
+* true if that Origin is allowed to make a CORS request
+*/
+extern bool isOriginAllowedForCORS(const std::string& requestOrigin);
 
 #endif

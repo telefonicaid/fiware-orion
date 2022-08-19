@@ -25,24 +25,34 @@ SET (SOURCES
     string.cpp
     tag.cpp
     sem.cpp
-    Format.cpp
+    MimeType.cpp
+    RenderFormat.cpp
     Timer.cpp
     idCheck.cpp
     wsStrip.cpp
     statistics.cpp
     clockFunctions.cpp
+    JsonHelper.cpp
+    macroSubstitute.cpp
+    logTracing.cpp
 )
 
 SET (HEADERS
     globals.h
     string.h
     sem.h
-    Format.h
+    MimeType.h
+    RenderFormat.h
     Timer.h
     idCheck.h
     wsStrip.h
     statistics.h
     clockFunctions.h
+    JsonHelper.h
+    SyncQOverflow.h
+    errorMessages.h
+    macroSubstitute.h
+    logTracing.h
 )
 
 

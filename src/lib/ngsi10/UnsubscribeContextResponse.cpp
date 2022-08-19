@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -65,17 +64,16 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 
 /* ****************************************************************************
 *
-* UnsubscribeContextResponse::render - 
+* UnsubscribeContextResponse::toJsonV1 -
 */
-std::string UnsubscribeContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string UnsubscribeContextResponse::toJsonV1(void)
 {
   std::string out = "";
-  std::string tag = "unsubscribeContextResponse";
 
-  out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(RtUnsubscribeContextResponse, format, indent + "  ", true);
-  out += statusCode.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format);
+  out += startTag();
+  out += subscriptionId.toJsonV1(RtUnsubscribeContextResponse, true);
+  out += statusCode.toJsonV1(false);
+  out += endTag();
 
   return out;
 }

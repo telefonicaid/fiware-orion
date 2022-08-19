@@ -1,8 +1,0 @@
-<unsubscribeContextAvailabilityResponse>
-  <subscriptionId>000000000000000000000000</subscriptionId>
-  <statusCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>D</details>
-  </statusCode>
-</unsubscribeContextAvailabilityResponse>

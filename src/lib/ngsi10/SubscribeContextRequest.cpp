@@ -31,64 +31,19 @@
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "mongoBackend/dbConstants.h"
+#include "alarmMgr/alarmMgr.h"
 
-/* ****************************************************************************
-*
-* SubscribeContextRequest::SubscribeContextRequest
-*
-* Explicit constructor needed to initialize primitive types so they don't get
-* random values from the stack
-*/
-SubscribeContextRequest::SubscribeContextRequest()
-{
-  restrictions = 0;
-}
 
-/* ****************************************************************************
-*
-* SubscribeContextRequest::render - 
-*/
-std::string SubscribeContextRequest::render(RequestType requestType, Format format, const std::string& indent)
-{
-  std::string  out                             = "";
-  std::string  tag                             = "subscribeContextRequest";
-  std::string  indent2                         = indent + "  ";
-
-  bool         attributeListRendered           = attributeList.size() != 0;
-  bool         referenceRendered               = true;  // Mandatory
-  bool         durationRendered                = duration.get() != "";
-  bool         restrictionRendered             = restrictions != 0;
-  bool         notifyConditionVectorRendered   = notifyConditionVector.size() != 0;
-  bool         throttlingRendered              = throttling.get() != "";
-
-  bool         commaAfterThrottling            = false; // Last element;
-  bool         commaAfterNotifyConditionVector = throttlingRendered;
-  bool         commaAfterRestriction           = notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterDuration              = restrictionRendered || notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterReference             = durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterAttributeList         = referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
-  bool         commaAfterEntityIdVector        = attributeListRendered || referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
-
-  out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
-  out += attributeList.render(format, indent2, commaAfterAttributeList);
-  out += reference.render(format, indent2, commaAfterReference);
-  out += duration.render(format, indent2, commaAfterDuration);
-  out += restriction.render(format, indent2, restrictions, commaAfterRestriction);
-  out += notifyConditionVector.render(format, indent2, commaAfterNotifyConditionVector);
-  out += throttling.render(format, indent2, commaAfterThrottling);
-  out += endTag(indent, tag, format);
-
-  return out;
-}
+using namespace ngsiv2;
 
 
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::check - 
+* SubscribeContextRequest::check -
 */
-std::string SubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -96,15 +51,17 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
-      ((res = attributeList.check(SubscribeContext, format, indent, predetectedError, counter))         != "OK") ||      
-      ((res = duration.check(SubscribeContext, format, indent, predetectedError, counter))              != "OK") ||
-      ((res = restriction.check(SubscribeContext, format, indent, predetectedError, restrictions))      != "OK") ||
-      ((res = notifyConditionVector.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK") ||
-      ((res = throttling.check(SubscribeContext, format, indent, predetectedError, counter))            != "OK"))
+  if (((res = entityIdVector.check(SubscribeContext))                                   != "OK") ||
+      ((res = attributeList.check())                                                    != "OK") ||
+      ((res = reference.check(SubscribeContext))                                        != "OK") ||
+      ((res = duration.check())                                                         != "OK") ||
+      ((res = restriction.check(restrictions))                                          != "OK") ||
+      ((res = notifyConditionVector.check(SubscribeContext, predetectedError, counter)) != "OK") ||
+      ((res = throttling.check())                                                       != "OK"))
   {
+    alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render(SubscribeContext, format, indent);
+    return response.toJsonV1();
   }
 
   return "OK";
@@ -114,30 +71,24 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::present - 
-*/
-void SubscribeContextRequest::present(const std::string& indent)
-{
-  entityIdVector.present(indent + "  ");
-  attributeList.present(indent + "  ");
-  reference.present(indent + "  ");
-  duration.present(indent + "  ");
-  restriction.present(indent + "  ");
-  notifyConditionVector.present(indent + "  ");
-  throttling.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
+* SubscribeContextRequest::release -
 *
-* SubscribeContextRequest::release - 
+* Old versions of this method also include a 'restriction.release()' call. However, now each time
+* a SubscribeContextRequest is created, the method toNgsiv2Subscription() is used on it and the
+* 'ownership' of the Restriction is transferred to the corresponding NGSIv2 class. Thus, leaving
+* that 'restriction.release()' would cause double-free problems.
+*
+* What causes the problem is the following line in SubscribeContextRequest::toNgsiv2Subscription:
+*
+*  sub->restriction = restriction;
+*
+* After doing this, we have TWO vectors pointing to the same scopes.
+*
 */
 void SubscribeContextRequest::release(void)
 {
   entityIdVector.release();
   attributeList.release();
-  restriction.release();
   notifyConditionVector.release();
 }
 
@@ -145,7 +96,7 @@ void SubscribeContextRequest::release(void)
 
 /* ****************************************************************************
 *
-* SubscribeContextRequest::fill - 
+* SubscribeContextRequest::fill -
 */
 void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
 {
@@ -154,7 +105,84 @@ void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
+}
+
+
+/* ****************************************************************************
+*
+* SubscribeContextRequest::toNgsiv2Subscription -
+*/
+void SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
+{
+  // Convert entityIdVector
+  for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
+  {
+    EntityId* enP = entityIdVector[ix];
+    EntID en;
+
+    if (enP->isPatternIsTrue())
+    {
+      en.idPattern = enP->id;
+    }
+    else
+    {
+      en.id = enP->id;
+    }
+    en.type = enP->type;
+
+    sub->subject.entities.push_back(en);
+  }
+
+  // Convert attributeList
+  for (unsigned int ix = 0; ix < attributeList.size(); ++ix)
+  {
+    sub->notification.attributes.push_back(attributeList[ix]);
+  }
+
+  // Convert reference
+  sub->notification.httpInfo.url = reference.get();
+
+  // Convert duration
+  if (duration.isEmpty())
+  {
+    sub->expires = DEFAULT_DURATION_IN_SECONDS + getCurrentTime();
+  }
+  else
+  {
+    sub->expires = duration.parse() + getCurrentTime();
+  }
+
+  // Convert restriction
+  sub->restriction = restriction;
+
+  // Convert notifyConditionVector
+  for (unsigned int ix = 0; ix < notifyConditionVector.size(); ++ix)
+  {
+      NotifyCondition* ncP = notifyConditionVector[ix];
+      if (ncP->type == ON_CHANGE_CONDITION)    // this is just a sanity measure: all types should be ONCHANGE
+      {
+        for (unsigned int jx = 0; jx < ncP->condValueList.size(); ++jx)
+        {
+          sub->subject.condition.attributes.push_back(ncP->condValueList[jx]);
+        }
+      }
+  }
+
+  // Convert throttling
+  sub->throttling = throttling.parse();
+
+  // Note that we don't do anything with 'restrictions': it is not needed by the NGSIv2 logic
+
+  // Fill NGSIv2 fields not used in NGSIv1 with default values
+  // description and expression are not touched, so default empty string provided by constructor will be used
+  sub->status                         = STATUS_ACTIVE;
+  sub->descriptionProvided            = false;
+  sub->attrsFormat                    = NGSI_V1_LEGACY;
+  sub->notification.blacklist         = false;
+  sub->notification.httpInfo.custom   = false;
+
+  sub->notification.metadata.clear();
 }

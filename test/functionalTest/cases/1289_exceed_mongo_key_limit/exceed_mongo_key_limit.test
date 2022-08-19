@@ -1,0 +1,89 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+CREATE Entity V2 Exceed Mongo Key Limit
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Trying to create a entity with a type > 1024
+# 02. Making sure no entity was created in part 01
+#
+
+
+echo "01. POST /v2/entities (Room1)"
+echo "============================="
+payload='{
+  "id":   "TZQIpnz4YX7NgOo2DCSJ6llpviu6mG2Xc2H7MqPaJy9fGRtUcjg1UmguN39pwSKkFJpIJJ1n4RGwjJBkk5iGDl7OY1RW5dZRKQ6hKCSSufXZqm02ECdoqQWnjR6WZ5PGJMRpSmnrVbdZMKfXkJ04WiCUekxiLxgHM6ToydSt8XZ2yDdYcXpXBSVOx66bIi8CoImJAqLYc39apAF77hI1Y1RPksM1S8z9d5sVp0IxhnFN27Al72XXQDqwSTW7YUZ",
+  "type": "TZQIpnz4YX7NgOo2DCSJ6llpviu6mG2Xc2H7MqPaJy9fGRtUcjg1UmguN39pwSKkFJpIJJ1n4RGwjJBkk5iGDl7OY1RW5dZRKQ6hKCSSufXZqm02ECdoqQWnjR6WZ5PGJMRpSmnrVbdZMKfXkJ04WiCUekxiLxgHM6ToydSt8XZ2yDdYcXpXBSVOx66bIi8CoImJAqLYc39apAF77hI1Y1RPksM1S8z9d5sVp0IxhnFN27Al72XXQDqwSTW7YUZ",
+  "temp": "29"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --servicePath "/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/"
+echo
+echo
+
+
+echo "02. GET /v2/entities/Room1"
+echo "=========================="
+orionCurl --url /v2/entities/Room1 --servicePath "/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/12345678901234567890123456789012345678901234567890/"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities (Room1)
+=============================
+HTTP/1.1 400 Bad Request
+Content-Length: 86
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Too long entity id/type/servicePath combination",
+    "error": "BadRequest"
+}
+
+
+02. GET /v2/entities/Room1
+==========================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -79,6 +83,8 @@ std::string getAllEntitiesWithTypeAndId
   EntityTypeInfo          typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 00. Default value for response: OK
   response.statusCode.fill(SccOk);
 
@@ -103,17 +109,17 @@ std::string getAllEntitiesWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }
-  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", entityTypeFromUriParam);
   }
   else
   {
     // 03. Fill in QueryContextRequest
-    parseDataP->qcr.res.fill(entityId, entityType, "");
+    parseDataP->qcr.res.fill(entityId, entityType, "false", typeInfo, "");
 
 
     // 04. Call standard operation postQueryContext
@@ -127,11 +133,13 @@ std::string getAllEntitiesWithTypeAndId
     response.statusCode.details = "entityId::type/attribute::name pair not found";
   }
 
-
   // 06. Translate QueryContextResponse to ContextElementResponse
-  response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  answer = response.render(ciP, RtContextElementResponse, "");
 
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
+  response.fill(&parseDataP->qcrs.res, entityId, entityType);
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, RtContextElementResponse, emptyV, false, emptyV));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

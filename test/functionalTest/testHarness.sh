@@ -23,6 +23,23 @@
 # Author: Ken Zangelin
 
 
+date
+testStartTime=$(date +%s.%2N)
+MAX_TRIES=${CB_MAX_TRIES:-3}
+echo $testStartTime > /tmp/brokerStartCounter
+
+
+# -----------------------------------------------------------------------------
+#
+# DISABLED - funct tests that are disabled, for some reason
+#
+DISABLED=('test/functionalTest/cases/0000_bad_requests/exit.test' \
+          'test/functionalTest/cases/0917_queryContext_behaves_differently/query_with_and_without_forwarding.test' \
+          'test/functionalTest/cases/0000_ipv6_support/ipv4_only.test' \
+          'test/functionalTest/cases/0000_ipv6_support/ipv6_only.test' \
+          'test/functionalTest/cases/1310_suspect_200OK/suspect_200OK.test');
+
+
 
 # ------------------------------------------------------------------------------
 #
@@ -69,8 +86,33 @@ export LC_ALL=C
 export NAME="testFile"
 declare -A testErrorV
 typeset -i testError
+declare -A okOnSecondV
+typeset -i okOnSecond
+declare -A okOnThirdV
+typeset -i okOnThird
+declare -A okOnPlus3V
+typeset -i okOnPlus3
+declare -A skipV
+typeset -i skips
+declare -A disabledTestV
+typeset -i disabledTests
+
 export DIFF=$SCRIPT_HOME/testDiff.py
 testError=0
+okOnSecond=0
+okOnThird=0
+okOnPlus3=0
+skips=0
+disabledTests=0
+
+
+# -----------------------------------------------------------------------------
+#
+# Default value of skipList taken from an env var, to make things a little
+# easier in distros with constantly failing tests
+#
+skipList="$CB_SKIP_LIST"
+
 
 
 # -----------------------------------------------------------------------------
@@ -88,12 +130,34 @@ function usage()
   echo "$empty [--keep (don't remove output files)]"
   echo "$empty [--dryrun (don't execute any tests)]"
   echo "$empty [--dir <directory>]"
+  echo "$empty [--fromIx <index of test where to start (inclusive)>]"
+  echo "$empty [--toIx <index of test where to end (inclusive)>]"
+  echo "$empty [--ixList <list of test indexes>]"
+  echo "$empty [--skipList <list of indexes of test cases to be skipped>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
   echo "$empty [--no-duration (removes duration mark on successful tests)]"
+  echo "$empty [--noCache (force broker to be started with the option --noCache)]"
+  echo "$empty [--cache (force broker to be started without the option --noCache)]"
+  echo "$empty [--noThreadpool (do not use a threadpool, unless specified by a test case. If not set, a thread pool of 200:20 is used by default in test cases which do not set notificationMode options)]"
+  echo "$empty [--xbroker (use external brokers, i.e. this script will *not* start any brokers, including context providers)]"
   echo "$empty [ <directory or file> ]*"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
+  echo ""
+  echo "Env Vars:"
+  echo "CB_MAX_TRIES:             The number of tries before giving up on a failing test case"
+  echo "CB_SKIP_LIST:             Default value for option --skipList"
+  echo "CB_SKIP_FUNC_TESTS:       List of names of func tests to skip"
+  echo "CB_NO_CACHE:              Start the broker without subscription cache (if set to 'ON')"
+  echo "CB_THREADPOOL:            Start the broker without thread pool (if set to 'OFF')"
+  echo "CB_DIFF_TOOL:             To view diff of failing tests with diff/tkdiff/meld/... (e.g. export CB_DIFF_TOOL=tkdiff)"
+  echo "CB_WITH_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
+  echo ""
+  echo "FT_FROM_IX: alternative to commandline parameter  'fromIx', index of test where to start (inclusive) "
+  echo "FT_TO_IX: alternative to commandline parameter  'toIx', index of test where to end (inclusive)"
+  echo
+  echo "Please note that, if using CB_WITH_EXTERNAL_BROKER (or --xbroker, which is the same), only a single test case should be run."
   echo
   exit $1
 }
@@ -127,7 +191,7 @@ function exitFunction()
   errorFile=$5
   forced=$6
 
-  echo -n "(ERROR $exitCode - $errorText) "
+  echo -n "(FAIL $exitCode - $errorText) "
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
@@ -173,6 +237,8 @@ vMsg "$ME, in directory $SCRIPT_HOME"
 #
 # Argument parsing
 #
+typeset -i fromIx
+typeset -i toIx
 verbose=off
 dryrun=off
 keep=off
@@ -184,19 +250,33 @@ dirOrFile=""
 dirGiven=no
 filterGiven=no
 showDuration=on
+fromIx=0
+toIx=0
+ixList=""
+noCache=""
+threadpool=ON
+xbroker=off
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
 do
-  if   [ "$1" == "-u" ];            then usage 0;
-  elif [ "$1" == "-v" ];            then verbose=on;
-  elif [ "$1" == "--dryrun" ];      then dryrun=on;
-  elif [ "$1" == "--keep" ];        then keep=on;
-  elif [ "$1" == "--stopOnError" ]; then stopOnError=on;
-  elif [ "$1" == "--filter" ];      then testFilter="$2"; filterGiven=yes; shift;
-  elif [ "$1" == "--match" ];       then match="$2"; shift;
-  elif [ "$1" == "--dir" ];         then dir="$2"; dirGiven=yes; shift;
-  elif [ "$1" == "--no-duration" ]; then showDuration=off;
+  if   [ "$1" == "-u" ];             then usage 0;
+  elif [ "$1" == "-v" ];             then verbose=on;
+  elif [ "$1" == "--dryrun" ];       then dryrun=on;
+  elif [ "$1" == "--keep" ];         then keep=on;
+  elif [ "$1" == "--stopOnError" ];  then stopOnError=on;
+  elif [ "$1" == "--filter" ];       then testFilter="$2"; filterGiven=yes; shift;
+  elif [ "$1" == "--match" ];        then match="$2"; shift;
+  elif [ "$1" == "--dir" ];          then dir="$2"; dirGiven=yes; shift;
+  elif [ "$1" == "--fromIx" ];       then fromIx=$2; shift;
+  elif [ "$1" == "--toIx" ];         then toIx=$2; shift;
+  elif [ "$1" == "--ixList" ];       then ixList=$2; shift;
+  elif [ "$1" == "--skipList" ];     then skipList=$2; shift;
+  elif [ "$1" == "--no-duration" ];  then showDuration=off;
+  elif [ "$1" == "--noCache" ];      then noCache=ON;
+  elif [ "$1" == "--cache" ];        then noCache=OFF;
+  elif [ "$1" == "--noThreadpool" ]; then threadpool=OFF;
+  elif [ "$1" == "--xbroker" ];      then xbroker=ON;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -212,6 +292,48 @@ done
 
 vMsg "options parsed"
 
+# -----------------------------------------------------------------------------
+#
+# The function brokerStart looks at the env var CB_NO_CACHE to decide
+# whether to start the broker with the --noCache option or not
+#
+if [ "$noCache" != "" ]
+then
+  export CB_NO_CACHE=$noCache
+fi
+
+# -----------------------------------------------------------------------------
+#
+# The function brokerStart looks at the env var CB_THREADPOOL to decide
+# whether to start the broker with pool of threads or not.
+# Do not overwrite if a value is passed from environment
+#
+if [ "$CB_THREADPOOL" == "" ]
+then
+  export CB_THREADPOOL=$threadpool
+fi
+
+# -----------------------------------------------------------------------------
+#
+# Check if fromIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_FROM_IX" != "" ] && [ $fromIx == 0 ]
+then
+  fromIx=$FT_FROM_IX
+fi
+
+# -----------------------------------------------------------------------------
+#
+# Check if toIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_TO_IX" != "" ] && [ $toIx == 0 ]
+then
+  toIx=$FT_TO_IX
+fi
+
+echo "Run tests $fromIx to $toIx"
 
 # ------------------------------------------------------------------------------
 #
@@ -222,6 +344,7 @@ vMsg "options parsed"
 # 2. Else, it must be a file, or a filter.
 #    If the 
 #
+singleFile=No
 if [ "$dirOrFile" != "" ]
 then
   vMsg dirOrFile: $dirOrFile
@@ -245,6 +368,7 @@ then
       exit 1
     fi
 
+    singleFile=Yes
     #
     # If just a filename is given, keep the directory as is.
     # If a whole path is given, use the directory-part as directory and the file-part as filter
@@ -259,10 +383,30 @@ then
     then
       dir=$(dirname $dirOrFile)
       testFilter=$(basename $dirOrFile)
+
+      # Last dir + test file ?
+      if [ -d test/functionalTest/cases/$dirPart ]
+      then
+          dirOrFile=test/functionalTest/cases/$dirPart
+      fi
     else
       testFilter=$(basename $dirOrFile)
     fi
   fi
+fi
+
+#
+# The option of running against an external broker "--xbroker" only works (for now, at least) with a single test case.
+# Strange things may happen (due to the state inside the broker) if more that one test case are launched.
+# This check avoid this situation.
+#
+# If in the future we want to be able to run more than one test case against an external broker, we'd need to make sure
+# that each test case undoes all internal state inside the external broker. E.g. delete subscriptions, entities, etc.
+#
+if [ "$singleFile" == "No" ] && [ "$xbroker" == "ON" ]
+then
+    echo "External broker can only be used with individual test cases"
+    exit 1
 fi
 
 vMsg directory: $dir
@@ -279,6 +423,18 @@ toBeStopped=false
 
 
 
+# ------------------------------------------------------------------------------
+#
+# xbroker - if this CLI is set, then the broker is not to be started as part of
+#           the test suite - another broker is assumed to be running already
+#
+if [ "$xbroker" == "ON" ]
+then
+    export CB_WITH_EXTERNAL_BROKER=ON
+fi
+
+
+
 # -----------------------------------------------------------------------------
 #
 # Init files already sourced?
@@ -287,14 +443,13 @@ if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
 then  
   if [ -f "$SCRIPT_HOME/testEnv.sh" ]
   then
-    # First, we try with a testEnv.sh file in the script home (usual situation in the
-    # RPM deployment case)
+    # First, we try with a testEnv.sh file in the script home
     vMsg Sourcing $SCRIPT_HOME/testEnv.sh
     source $SCRIPT_HOME/testEnv.sh
   elif [ -f "$SCRIPT_HOME/../../scripts/testEnv.sh" ]
   then
     # Second, we try with a testEnv.sh file in the script/testEnv.sh (realtive to git repo home).
-    # Note that the script home in this case is test/functionaTest
+    # Note that the script home in this case is test/functionalTest
     vMsg Sourcing $SCRIPT_HOME/../../scripts/testEnv.sh
     source $SCRIPT_HOME/../../scripts/testEnv.sh
   else
@@ -326,6 +481,7 @@ fi
 # Preparations - cd to the test directory
 #
 dMsg Functional Tests Starting ...
+
 if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
 then
   cd $dirOrFile
@@ -335,7 +491,6 @@ then
 else
   cd $dir
 fi
-
 
 echo "Orion Functional tests starting" > /tmp/orionFuncTestLog
 date >> /tmp/orionFuncTestLog
@@ -506,6 +661,7 @@ function partExecute()
   what=$1
   path=$2
   forcedDie=$3
+  __tryNo=$4
 
   vMsg Executing $what part for $path
   dirname=$(dirname $path)
@@ -531,7 +687,13 @@ function partExecute()
   #
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
-    exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
+    if [ $__tryNo == $MAX_TRIES ]
+    then
+      exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
+    else
+      echo -n "(ERROR 7 - $what: output on stderr) "
+    fi
+
     partExecuteResult=7
     return
   fi
@@ -542,7 +704,13 @@ function partExecute()
   #
   if [ "$exitCode" != "0" ]
   then
-    exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr "$forcedDie"
+    if [ $__tryNo == $MAX_TRIES ]
+    then
+      exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr "$forcedDie"
+    else
+      echo -n "(ERROR 8 - $what: exited with code $exitCode) "
+    fi
+
     partExecuteResult=8
     return
   fi
@@ -554,6 +722,7 @@ function partExecute()
   if [ "$what" == "shell" ]
   then
     mv $dirname/$filename.$what.stdout $dirname/$filename.out # We are very much used to this name ...
+    sed -i 's/[[:space:]]*$//' $dirname/$filename.out         # Remove trailing whitespace in .out (reduces diff noise)
 
     #
     # Special sorted diff or normal REGEX diff ?
@@ -566,14 +735,20 @@ function partExecute()
       exitCode=$?
       blockDiff='yes'
     else
-      $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
+      PYTHONIOENCODING=utf8 $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
       exitCode=$?
     fi
 
     if [ "$exitCode" != "0" ]
     then
-      exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff
-      if [ "$CB_DIFF_TOOL" != "" ]
+      if [ $__tryNo == $MAX_TRIES ]
+      then
+        exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff
+      else
+        echo -n "(ERROR 9 - .out and .regexpect differ) "
+      fi
+
+      if [ "$CB_DIFF_TOOL" != "" ] && [ $__tryNo == $MAX_TRIES ]
       then
         endDate=$(date)
         if [ $blockDiff == 'yes' ]
@@ -613,6 +788,9 @@ function partExecute()
 function runTest()
 {
   path=$1
+  _tryNo=$2
+
+  runTestStatus="ok"
 
   vMsg path=$path
   dirname=$(dirname $path)
@@ -632,6 +810,7 @@ function runTest()
   if [ "$toBeStopped" == "yes" ]
   then
     echo toBeStopped == yes
+    runTestStatus="stopped"
     return
   fi
 
@@ -639,6 +818,7 @@ function runTest()
   fileCreation $path $filename
   if [ "$toBeStopped" == "yes" ]
   then
+    runTestStatus="stopped2"
     return
   fi
 
@@ -654,6 +834,7 @@ function runTest()
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
     exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr
+    runTestStatus="shell-init-error"
     return
   fi
 
@@ -667,7 +848,7 @@ function runTest()
     # a try to start a broker while the old one (from the previous functest) is still running.
     # No way to test this, except with some patience.
     #
-    # We have seem 'ERROR 11' around once every 500-1000 functests (the suite is of almost 400 tests)
+    # We have seen 'ERROR 11' around once every 500-1000 functests (the suite is of almost 400 tests)
     # and this fix, if working, will make us not see those 'ERROR 11' again.
     # If we keep seeing 'ERROR 11' after this change then we will need to investigate further.
     #
@@ -681,26 +862,29 @@ function runTest()
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
     then
       exitFunction 20 "SHELL-INIT II produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr
+      runTestStatus="shell-init-output-on-stderr"
       return
     fi
 
     if [ "$exitCode" != "0" ]
     then
       exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" "" DIE
+      runTestStatus="shell-init-exited-with-"$exitCode
       return
     fi
   fi
 
   # 4. Run the SHELL part (which also compares - FIXME P2: comparison should be moved to separate function)
-  partExecute shell $path "DontDie - only for SHELL-INIT"
+  partExecute shell $path "DontDie - only for SHELL-INIT" $_tryNo
   shellResult=$partExecuteResult
   if [ "$toBeStopped" == "yes" ]
   then
+    runTestStatus="shell-failed"
     return
   fi
 
   # 5. Run the TEARDOWN part
-  partExecute teardown $path "DIE"
+  partExecute teardown $path "DIE" 0
   teardownResult=$partExecuteResult
   vMsg "teardownResult: $teardownResult"
   vMsg "shellResult: $shellResult"
@@ -713,16 +897,51 @@ function runTest()
   else
     file=$(basename $path .test)
     cp /tmp/contextBroker.log $file.contextBroker.log
-
+    runTestStatus="test-failed"
   fi
 }
+
+
+
+# -----------------------------------------------------------------------------
+#
+# testDisabled
+#
+function testDisabled
+{
+  testcase=$1
+  typeset -i dIx
+  dIx=0
+  while [ $dIx -lt  ${#DISABLED[@]} ]
+  do
+    if [ test/functionalTest/cases/$testcase == ${DISABLED[$dIx]} ]
+    then
+      echo "Disabled"
+
+      #
+      # NOTE: In a non-disabled test, running inside the valgrind test suite, the function 'localBrokerStart()' (from harnessFunctions.sh)
+      #       redirects the output of "valgrind contextBroker" to the file /tmp/valgrind.out.
+      #       Later, the valgrind test suite uses the existence of this file (/tmp/valgrind.out) to detect errors in the valgrind execution.
+      #       But, in the case of a disabled func test, we will not start the test case. and thus we will not reach 'localBrokerStart()', so the
+      #       file will not be created and an error will be flagged by the valgrind test suite.
+      #       The simplest solution is to simply create the file here, in the case of a disabled test.
+      #
+      echo "Disabled" > /tmp/valgrind.out
+      return
+    fi
+    dIx=$dIx+1
+  done
+  echo NOT Disabled
+}
+
+
 
 # ------------------------------------------------------------------------------
 #
 # Main loop
 #
 vMsg Total number of tests: $noOfTests
-testNo=1
+testNo=0
 for testFile in $fileList
 do
   if [ -d "$testFile" ]
@@ -730,22 +949,122 @@ do
     continue
   fi
 
-  if [ "$verbose" == "off" ]
+  testNo=$testNo+1
+
+  if [ $fromIx != 0 ] && [ $testNo -lt $fromIx ]
   then
-    init=$testFile" ................................................................................................................."
-    init=${init:0:110}
-    printf "%03d/%d: %s " "$testNo" "$noOfTests" "$init"
-  else
-    printf "Running test %03d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
+    continue;
   fi
 
-  testNo=$testNo+1
+  if [ $toIx != 0 ] && [ $testNo -gt $toIx ]
+  then
+    continue;
+  fi
+
+  #
+  # Disabled test?
+  #
+  disabled=$(testDisabled $testFile)
+  if [ "$disabled" == "Disabled" ]
+  then
+    disabledTestV[$disabledTests]=$testNo': '$testFile
+    disabledTests=$disabledTests+1
+    continue
+  fi
+
+  if [ "$ixList" != "" ]
+  then
+    hit=$(echo ' '$ixList' ' | grep ' '$testNo' ')
+    if [ "$hit" == "" ]
+    then
+      # Test case not found in ix-list, so it is not executed
+      continue
+    fi
+  fi
+
+  if [ "$CB_SKIP_FUNC_TESTS" != "" ]
+  then
+    hit=$(echo ' '$CB_SKIP_FUNC_TESTS' ' | grep ' '$testFile' ')
+    if [ "$hit" != "" ]
+    then
+      # Test case found in skip-list, so it is skipped
+      skipV[$skips]=$testNo': '$testFile
+      skips=$skips+1
+      continue
+    fi
+  fi
+
+  if [ "$skipList" != "" ]
+  then
+    hit=$(echo ' '$skipList' ' | grep ' '$testNo' ')
+    if [ "$hit" != "" ]
+    then
+      # Test case found in skip-list, so it is skipped
+      skipV[$skips]=$testNo': '$testFile
+      skips=$skips+1
+      continue
+    fi
+  fi
+
   startDate=$(date)
   start=$(date --date="$startDate" +%s)
   endDate=""
+  typeset -i tryNo
+  tryNo=1
+
   if [ "$dryrun" == "off" ]
   then
-    runTest $testFile
+    while [ $tryNo -le $MAX_TRIES ]
+    do
+      if [ "$verbose" == "off" ]
+      then
+        tryNoInfo=""
+        if [ $tryNo != "1" ]
+        then
+           tryNoInfo="(intent $tryNo)"
+        fi
+
+        init=$testFile" ................................................................................................................."
+        init=${init:0:110}
+        printf "%04d/%d: %s %s " "$testNo" "$noOfTests" "$init" "$tryNoInfo"
+      else
+        printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
+      fi
+
+      runTest $testFile $tryNo
+      if [ "$shellResult" == "0" ]
+      then
+        if [ $tryNo != 1 ]
+        then
+          if [ $tryNo == 2 ]
+          then
+            okOnSecondV[$okOnSecond]=$testFile
+            okOnSecond=$okOnSecond+1
+          elif [ $tryNo == 3 ]
+          then
+            okOnThirdV[$okOnThird]=$testFile
+            okOnThird=$okOnThird+1
+          else
+            okOnPlus3V[$okOnPlus3]=$testFile
+            okOnPlus3=$okOnPlus3+1
+          fi
+          echo "OK"
+        fi
+        break
+      else
+        tryNo=$tryNo+1
+        echo
+      fi
+    done
+  else
+    if [ "$verbose" == "off" ]
+    then
+      init=$testFile" ................................................................................................................."
+      init=${init:0:110}
+      printf "%04d/%d: %s " "$testNo" "$noOfTests" "$init"
+    else
+      printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
+    fi
   fi
 
   if [ "$endDate" == "" ]  # Could have been set in 'partExecute'
@@ -771,7 +1090,13 @@ do
 done
 
 
+testEndTime=$(date +%s.%2N)
+testDiffTime=$(echo $testEndTime - $testStartTime | bc)" seconds"
+echo Total test time: $testDiffTime
 
+
+typeset -i ix
+exitCode=0
 # ------------------------------------------------------------------------------
 #
 # Check for errors - if any, print to stdout
@@ -785,15 +1110,83 @@ then
   echo "================================================================================"
   echo
   echo "----------- Failing tests ------------------"
-  typeset -i ix
+
   ix=0
-  while [ "$ix" != "$testError" ]
+  while [ $ix -lt $testError ]
   do
     echo "  o " ${testErrorV[$ix]}
     ix=$ix+1
   done
-
-  exit 1
+  exitCode=1
 fi
 
-exit 0
+
+
+# ------------------------------------------------------------------------------
+#
+# Check for reintents
+#
+if [ "$okOnSecond" != "0" ]
+then
+  echo
+  echo "$okOnSecond test cases OK in the second attempt:"
+
+  ix=0
+  while [ $ix -lt $okOnSecond ]
+  do
+    echo "  o " ${okOnSecondV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ "$okOnThird" != "0" ]
+then
+  echo
+  echo "$okOnThird test cases OK in the third attempt:"
+
+  ix=0
+  while [ $ix -lt $okOnThird ]
+  do
+    echo "  o " ${okOnThirdV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ "$okOnPlus3" != "0" ]
+then
+  echo
+  echo "$okOnPlus3 test cases OK after three or more failed attempts:"
+
+  ix=0
+  while [ $ix -lt $okOnPlus3 ]
+  do
+    echo "  o " ${okOnPlus3V[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ $skips != 0 ]
+then
+  echo
+  echo WARNING: $skips test cases skipped:
+  ix=0
+  while [ $ix -lt $skips ]
+  do
+    echo "  o " ${skipV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ $disabledTests != 0 ]
+then
+  echo
+  echo WARNING: $disabledTests test cases disabled:
+  ix=0
+  while [ $ix -lt $disabledTests ]
+  do
+    echo "  o " ${disabledTestV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+exit $exitCode

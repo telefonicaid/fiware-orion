@@ -25,11 +25,7 @@ SET (SOURCES
     jsonParse.cpp
 
     jsonRegisterContextRequest.cpp
-    jsonDiscoverContextAvailabilityRequest.cpp
-    jsonSubscribeContextAvailabilityRequest.cpp
-    jsonNotifyContextAvailabilityRequest.cpp
-    jsonUnsubscribeContextAvailabilityRequest.cpp
-    jsonUpdateContextAvailabilitySubscriptionRequest.cpp
+    jsonDiscoverContextAvailabilityRequest.cpp 
 
     jsonQueryContextRequest.cpp
     jsonQueryContextResponse.cpp
@@ -53,10 +49,6 @@ SET (HEADERS
 
     jsonRegisterContextRequest.h
     jsonDiscoverContextAvailabilityRequest.h
-    jsonSubscribeContextAvailabilityRequest.h
-    jsonNotifyContextAvailabilityRequest.h
-    jsonUnsubscribeContextAvailabilityRequest.h
-    jsonUpdateContextAvailabilitySubscriptionRequest.h
 
     jsonQueryContextRequest.h
     jsonQueryContextResponse.h

@@ -1,9 +1,0 @@
-<registerContextResponse>
-  <duration>PT1M</duration>
-  <registrationId>123456789012345678901234</registrationId>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>REASON</reasonPhrase>
-    <details>DETAILS</details>
-  </errorCode>
-</registerContextResponse>

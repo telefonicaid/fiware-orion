@@ -33,9 +33,6 @@
 
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "ngsi9/SubscribeContextAvailabilityResponse.h"
-#include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
-#include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -53,11 +50,8 @@ typedef struct ResponseData
   RegisterContextResponse                         rcr;
   DiscoverContextAvailabilityResponse             dcar;
   QueryContextResponse                            qcr;
-  SubscribeContextAvailabilityResponse            scar;
   SubscribeContextResponse                        scr;
-  UnsubscribeContextAvailabilityResponse          ucar;
   UnsubscribeContextResponse                      uncr;
-  UpdateContextAvailabilitySubscriptionResponse   ucas;
   UpdateContextResponse                           upcr;
   UpdateContextSubscriptionResponse               ucsr;
 } ResponseData;

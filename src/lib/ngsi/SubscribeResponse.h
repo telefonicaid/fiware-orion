@@ -29,7 +29,6 @@
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
-#include "common/Format.h"
 #include "ngsi/Throttling.h"
 
 
@@ -46,7 +45,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  std::string render(Format format, const std::string& indent, bool comma = false);
+  std::string toJsonV1(bool comma);
 } SubscribeResponse;
 
 #endif  // SRC_LIB_NGSI_SUBSCRIBERESPONSE_H_

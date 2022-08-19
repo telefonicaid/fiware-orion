@@ -22,36 +22,52 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* badVerbV -
 */
-static RestService rs[] = 
+#define ICEA   IndividualContextEntityAttribute
+#define IR     InvalidRequest
+
+static RestService badVerbV[] =
 {
-  { "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "", badVerbGetPostDeleteOnly                  },
-  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { ICEA, 5, { "ngsi10", "contextEntities", "*", "attributes", "*" }, badVerbGetPostDeleteOnly },
+  { IR,   0, {                                                     }, NULL                     }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(badVerbGetPostDeleteOnly, ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature",  "PUT", "1.1");
-  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
   std::string     out;
+  RestService     restService =
+    {
+      VersionRequest,
+      5, { "ngsi10", "contextEntities", "entityId01", "attributes", "temperature" },
+      NULL
+    };
 
-  out = restService(&ci, rs);
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
+
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

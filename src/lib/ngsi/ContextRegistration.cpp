@@ -26,6 +26,8 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -47,12 +49,11 @@ ContextRegistration::ContextRegistration()
 
 /* ****************************************************************************
 *
-* ContextRegistration::render -
+* ContextRegistration::toJsonV1 -
 */
-std::string ContextRegistration::render(Format format, const std::string& indent, bool comma, bool isInVector)
+std::string ContextRegistration::toJsonV1(bool comma, bool isInVector)
 {
   std::string out = "";
-  std::string tag = "contextRegistration";
 
   //
   // About JSON commas;
@@ -60,12 +61,12 @@ std::string ContextRegistration::render(Format format, const std::string& indent
   // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
   // All, except providingApplication of course :-)
   //
-  out += startTag(indent, tag, format, isInVector == false);
-  out += entityIdVector.render(format, indent + "  ", true);
-  out += contextRegistrationAttributeVector.render(format, indent + "  ", true);
-  out += registrationMetadataVector.render(format, indent + "  ", true);
-  out += providingApplication.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, comma);
+
+  out += startTag(!isInVector? "contextRegistration" : "");
+  out += entityIdVector.toJsonV1(true);
+  out += contextRegistrationAttributeVector.toJsonV1(true);
+  out += providingApplication.toJsonV1(false);
+  out += endTag(comma);
 
   return out;
 }
@@ -78,31 +79,25 @@ std::string ContextRegistration::render(Format format, const std::string& indent
 */
 std::string ContextRegistration::check
 (
+  ApiVersion          apiVersion,
   RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
   std::string res;
 
-  if ((res = entityIdVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityIdVector.check(requestType)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextRegistrationAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextRegistrationAttributeVector.check(apiVersion)) != "OK")
   {
     return res;
   }
 
-  if ((res = registrationMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
-  {
-    return res;
-  }
-
-  if ((res = providingApplication.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = providingApplication.check()) != "OK")
   {
     return res;
   }
@@ -119,35 +114,11 @@ std::string ContextRegistration::check
 
 /* ****************************************************************************
 *
-* ContextRegistration::present -
-*/
-void ContextRegistration::present(const std::string& indent, int ix)
-{
-  if (ix != -1)
-  {
-    LM_F(("%sContext Registration %d:\n", indent.c_str(), ix));
-  }
-  else
-  {
-    LM_F(("%scontext registration:\n", indent.c_str()));
-  }
-
-  entityIdVector.present(indent + "  ");
-  contextRegistrationAttributeVector.present(indent + "  ");
-  registrationMetadataVector.present("Registration", indent + "  ");
-  providingApplication.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistration::release -
 */
 void ContextRegistration::release(void)
 {
   entityIdVector.release();
   contextRegistrationAttributeVector.release();
-  registrationMetadataVector.release();
   providingApplication.release();
 }

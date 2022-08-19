@@ -63,12 +63,4 @@ extern void jsonRcrRelease(ParseData* reqDataP);
 */
 extern std::string jsonRcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonRcrPresent - 
-*/
-extern void jsonRcrPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONREGISTERCONTEXTREQUEST_H_

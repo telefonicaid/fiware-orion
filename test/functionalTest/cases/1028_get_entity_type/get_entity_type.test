@@ -1,0 +1,279 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity Type
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/types/T1 and get Not Found
+# 02. Create E1/T1/A1+A2
+# 03. GET /v2/types/T1 and get a non-empty list
+# 04. Create E2/T1/A1+A3
+# 05. Create E3/T1/A2+A4
+# 06. GET /v2/types/T1 and get a list of four attrs and three entities
+# 07. Create E4/T1/A4+A3
+# 08. GET /v2/types/T1 and get a list of four attrs and four entities
+#
+
+echo "01. GET /v2/types/T1 and get Not Found"
+echo "======================================"
+orionCurl --url /v2/types/T1
+echo
+echo
+
+
+echo "02. Create E1/T1/A1+A2"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E1",
+  "A1": { "type": "String", "value": "s" },
+  "A2": { "type": "Int", "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/types/T1 and get a non-empty list"
+echo "============================================="
+orionCurl --url /v2/types/T1
+echo
+echo
+
+
+echo "04. Create E2/T1/A1+A3"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E2",
+  "A1": { "type": "Cadena", "value": "s" },
+  "A3": { "type": "Bool", "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create E3/T1/A2+A4"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E3",
+  "A2": { "type": "Int", "value": 2 },
+  "A4": { "type": "String", "value": "a4" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET /v2/types/T1 and get a list of four attrs and three entities"
+echo "===================================================================="
+orionCurl --url /v2/types/T1
+echo
+echo
+
+
+
+echo "07. Create E4/T1/A4+A3"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E4",
+  "A4": { "type": "String", "value": "a4" },
+  "A3": { "type": "Booleano", "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GET /v2/types/T1 and get a list of four attrs and four entities"
+echo "==================================================================="
+orionCurl --url /v2/types/T1
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/types/T1 and get Not Found
+======================================
+HTTP/1.1 404 Not Found
+Content-Length: 58
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Entity type not found",
+    "error": "NotFound"
+}
+
+
+02. Create E1/T1/A1+A2
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET /v2/types/T1 and get a non-empty list
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attrs": {
+        "A1": {
+            "types": [
+                "String"
+            ]
+        },
+        "A2": {
+            "types": [
+                "Int"
+            ]
+        }
+    },
+    "count": 1
+}
+
+
+04. Create E2/T1/A1+A3
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E3/T1/A2+A4
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/types/T1 and get a list of four attrs and three entities
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attrs": {
+        "A1": {
+            "types": [
+                "Cadena",
+                "String"
+            ]
+        },
+        "A2": {
+            "types": [
+                "Int"
+            ]
+        },
+        "A3": {
+            "types": [
+                "Bool"
+            ]
+        },
+        "A4": {
+            "types": [
+                "String"
+            ]
+        }
+    },
+    "count": 3
+}
+
+
+07. Create E4/T1/A4+A3
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET /v2/types/T1 and get a list of four attrs and four entities
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 140
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attrs": {
+        "A1": {
+            "types": [
+                "Cadena",
+                "String"
+            ]
+        },
+        "A2": {
+            "types": [
+                "Int"
+            ]
+        },
+        "A3": {
+            "types": [
+                "Bool",
+                "Booleano"
+            ]
+        },
+        "A4": {
+            "types": [
+                "String"
+            ]
+        }
+    },
+    "count": 4
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

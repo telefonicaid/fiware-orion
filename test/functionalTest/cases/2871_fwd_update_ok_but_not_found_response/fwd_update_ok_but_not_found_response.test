@@ -1,0 +1,439 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Test of the fix for the problem of 404 Not Found responses when updating attribute using NGSIv2 and CB forwards it
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# Note we don't typically use direct creation of entities/registrations in DB, but in this case
+# in order to reproduce precicesly the situation that causes issue #2871 we are doing that way
+# in steps 1 and 2
+#
+# 01. Create registration directly in DB
+# 02. Create entity directly in DB
+# 03. Update turn attribute using PATCH on entity
+# 04. Update turn attribute using PUT on attribute
+# 05. Update turn attribute using batch update
+# 06. Update turn attribute using PUT on attribute value
+# 07. Update turn attribute using NGSIv1 update
+# 08. Dump accumulator and see five forwarded updates
+#
+
+echo "01. Create registration directly in DB"
+echo "======================================"
+doc='{
+   "_id":ObjectId("5b1ff2ee49597334c9b5efc7"),
+   "expiration":NumberLong(1845053934),
+   "servicePath":"/ss1",
+   "format":"JSON",
+   "contextRegistration":[
+      {
+         "entities":[
+            {
+               "id":"entity1",
+               "type":"device"
+            }
+         ],
+         "attrs":[
+            {
+               "name":"turn",
+               "type":"string"
+            }
+         ],
+         "providingApplication":"http://localhost:9997/bug2871"
+      }
+   ]
+}'
+mongoCmd ${CB_DB_NAME} "db.registrations.insert($doc)"
+echo
+echo
+
+
+echo "02. Create entity directly in DB"
+echo "================================"
+doc='{
+        "_id": {
+                "id": "entity1",
+                "type": "device",
+                "servicePath": "/ss1"
+        },
+        "attrNames": [
+                "power",
+                "turn_status",
+                "turn_info",
+                "TimeInstant"
+        ],
+        "attrs": {
+                "power": {
+                        "type": "float",
+                        "creDate": 1528820462,
+                        "modDate": 1528820462,
+                        "value": " ",
+                        "mdNames": []
+                },
+                "turn_status": {
+                        "value": "PENDING",
+                        "type": "commandStatus",
+                        "md": {
+                                "TimeInstant": {
+                                        "type": "DateTime",
+                                        "value": 1528820541
+                                }
+                        },
+                        "mdNames": [
+                                "TimeInstant"
+                        ],
+                        "creDate": 1528820462,
+                        "modDate": 1528820541
+                },
+                "turn_info": {
+                        "type": "commandResult",
+                        "creDate": 1528820462,
+                        "modDate": 1528820462,
+                        "value": " ",
+                        "mdNames": []
+                },
+                "TimeInstant": {
+                        "value": 1528820541,
+                        "type": "DateTime",
+                        "mdNames": [],
+                        "creDate": 1528820462,
+                        "modDate": 1528820541
+                }
+        },
+        "creDate": 1528820462,
+        "modDate": 1528820541,
+        "lastCorrelator": "c8bcef8a-6e5c-11e8-a06c-0242ac11000b"
+}'
+mongoCmd ${CB_DB_NAME} "db.entities.insert($doc)"
+echo
+echo
+
+
+echo "03. Update turn attribute using PATCH on entity"
+echo "==============================================="
+payload='{
+  "turn": {
+    "type": "string",
+    "value": "lalala"
+  }
+}'
+orionCurl --url '/v2/entities/entity1/attrs?type=device' --servicePath /ss1 -X PATCH --payload "${payload}"
+echo
+echo
+
+
+echo "04. Update turn attribute using PUT on attribute"
+echo "================================================"
+payload='{
+  "type": "string",
+  "value": "lelele"
+}'
+orionCurl --url '/v2/entities/entity1/attrs/turn?type=device' --servicePath /ss1 -X PUT --payload "${payload}"
+echo
+echo
+
+
+echo "05. Update turn attribute using batch update"
+echo "============================================"
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "id": "entity1",
+      "type": "device",
+      "turn": {
+        "type": "string",
+        "value": "lilili"
+      }
+    }
+  ]
+}'
+orionCurl --url '/v2/op/update' --servicePath /ss1 --payload "${payload}"
+echo
+echo
+
+
+echo "06. Update turn attribute using PUT on attribute value"
+echo "======================================================"
+payload='"lololo"'
+orionCurl --url /v2/entities/entity1/attrs/turn/value?type=device --payload "$payload" --servicePath /ss1 --in text/plain --out json -X PUT
+echo
+echo
+
+
+echo "07. Update turn attribute using NGSIv1 update"
+echo "============================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "device",
+      "isPattern": "false",
+      "id": "entity1",
+      "attributes": [
+      {
+        "name": "turn",
+        "type": "string",
+        "value": "lululu"
+      }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --servicePath /ss1 --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator and see five forwarded updates"
+echo "==================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create registration directly in DB
+======================================
+WriteResult({ "nInserted" : 1 })
+
+
+02. Create entity directly in DB
+================================
+WriteResult({ "nInserted" : 1 })
+
+
+03. Update turn attribute using PATCH on entity
+===============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Update turn attribute using PUT on attribute
+================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Update turn attribute using batch update
+============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Update turn attribute using PUT on attribute value
+======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Update turn attribute using NGSIv1 update
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 200
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "turn",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "entity1",
+                "isPattern": "false",
+                "type": "device"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Dump accumulator and see five forwarded updates
+===================================================
+POST http://localhost:REGEX(\d+)/bug2871/updateContext
+Fiware-Servicepath: /ss1
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
+
+{
+    "contextElements": [
+        {
+            "attributes": [
+                {
+                    "name": "turn",
+                    "type": "string",
+                    "value": "lalala"
+                }
+            ],
+            "id": "entity1",
+            "isPattern": "false",
+            "type": "device"
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/bug2871/updateContext
+Fiware-Servicepath: /ss1
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
+
+{
+    "contextElements": [
+        {
+            "attributes": [
+                {
+                    "name": "turn",
+                    "type": "string",
+                    "value": "lelele"
+                }
+            ],
+            "id": "entity1",
+            "isPattern": "false",
+            "type": "device"
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/bug2871/updateContext
+Fiware-Servicepath: /ss1
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
+
+{
+    "contextElements": [
+        {
+            "attributes": [
+                {
+                    "name": "turn",
+                    "type": "string",
+                    "value": "lilili"
+                }
+            ],
+            "id": "entity1",
+            "isPattern": "false",
+            "type": "device"
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/bug2871/updateContext
+Fiware-Servicepath: /ss1
+Content-Length: 156
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
+
+{
+    "contextElements": [
+        {
+            "attributes": [
+                {
+                    "name": "turn",
+                    "type": "",
+                    "value": "lololo"
+                }
+            ],
+            "id": "entity1",
+            "isPattern": "false",
+            "type": "device"
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/bug2871/updateContext
+Fiware-Servicepath: /ss1
+Content-Length: 162
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
+
+{
+    "contextElements": [
+        {
+            "attributes": [
+                {
+                    "name": "turn",
+                    "type": "string",
+                    "value": "lululu"
+                }
+            ],
+            "id": "entity1",
+            "isPattern": "false",
+            "type": "device"
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

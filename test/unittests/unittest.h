@@ -1,5 +1,5 @@
-#ifndef UNIT_TEST_H
-#define UNIT_TEST_H
+#ifndef TEST_UNITTESTS_UNITTEST_H_
+#define TEST_UNITTESTS_UNITTEST_H_
 
 /*
 *
@@ -25,44 +25,37 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+#include <map>
+
 #include "gtest/gtest.h"
-#include "testDataFromFile.h"
-#include "commonMocks.h"
-#include "testInit.h"
+
+#include "unittests/testDataFromFile.h"
+#include "unittests/commonMocks.h"
+#include "unittests/testInit.h"
 
 
 
 /* ****************************************************************************
 *
-* namespaces
-*/
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Invoke;
-using ::testing::Return;
-using ::testing::MatchesRegex;
-
-
-
-/* ****************************************************************************
-*
-* uriParams - 
+* uriParams -
 */
 extern std::map<std::string, std::string> uriParams;
 
- 
+
 
 /* ****************************************************************************
 *
-* servicePathV - 
+* options -
 */
-extern std::vector<std::string> servicePathV;
+extern std::map<std::string, bool> options;
 
- 
+
 
 /* ****************************************************************************
 *
-* servicePathVector - 
+* servicePathVector -
 */
 extern std::vector<std::string> servicePathVector;
 
@@ -72,7 +65,7 @@ extern std::vector<std::string> servicePathVector;
 *
 * utInit - unit test init
 */
-extern void utInit(void);
+extern void utInit(bool notifierMocked = true, bool timerMocked = true);
 
 
 
@@ -82,4 +75,4 @@ extern void utInit(void);
 */
 extern void utExit(void);
 
-#endif
+#endif  // TEST_UNITTESTS_UNITTEST_H_

@@ -1,0 +1,413 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Order by atribute with batch query op
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity User1: name=John, surname=Doe,      age=36
+# 02. Create entity User2: name=John, surname=Smith,    age=37
+# 03. Create entity User3: name=Jane, surname=Simpson,  age=27
+# 04. Create entity User4: name=Jane, surname=Thompson, age=18
+# 05. Get sorted by age: User4, User3, User1, User2
+# 06. Get sorted by age in reverse order: User2, User1, User3, User4
+# 07. Get sorted by name, then age: User4, User3, User1, User2
+# 08. Get sorted by reverse name, then age: User1, User2, User4, User3
+# 09. Get sorted by name, then reserve age: User3, User4, User2, User1
+#
+
+echo "01. Create entity User1: name=John, surname=Doe, age=36"
+echo "======================================================="
+payload='{
+  "id": "User1",
+  "type": "User",
+  "name": "John",
+  "surname": "Doe",
+  "age": 36
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity User2: name=John, surname=Smith, age=37"
+echo "========================================================="
+payload='{
+  "id": "User2",
+  "type": "User",
+  "name": "John",
+  "surname": "Smith",
+  "age": 37
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity User3: name=Jane, surname=Simpson, age=27"
+echo "==========================================================="
+payload='{
+  "id": "User3",
+  "type": "User",
+  "name": "Jane",
+  "surname": "Simpson",
+  "age": 27
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity User4: name=Jane, surname=Thomson, age=18"
+echo "==========================================================="
+payload='{
+  "id": "User4",
+  "type": "User",
+  "name": "Jane",
+  "surname": "Thompson",
+  "age": 18
+}'
+orionCurl --url /v2/entities?options=keyValues -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Get sorted by age: User4, User3, User1, User2"
+echo "================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=age' --payload "$payload"
+echo
+echo
+
+
+echo "06. Get sorted by age in reverse order: User2, User1, User3, User4"
+echo "=================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=!age' --payload "$payload"
+echo
+echo
+
+
+echo "07. Get sorted by name, then age: User4, User3, User1, User2"
+echo "============================================================"
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,age' --payload "$payload"
+echo
+echo
+
+
+echo "08. Get sorted by reverse name, then age: User1, User2, User4, User3"
+echo "===================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=!name,age' --payload "$payload"
+echo
+echo
+
+
+echo "09. Get sorted by name, then reserve age: User3, User4, User2, User1"
+echo "===================================================================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity User1: name=John, surname=Doe, age=36
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/User1?type=User
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity User2: name=John, surname=Smith, age=37
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/User2?type=User
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity User3: name=Jane, surname=Simpson, age=27
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/User3?type=User
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity User4: name=Jane, surname=Thomson, age=18
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/User4?type=User
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Get sorted by age: User4, User3, User1, User2
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 284
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "age": 18,
+        "id": "User4",
+        "name": "Jane",
+        "surname": "Thompson",
+        "type": "User"
+    },
+    {
+        "age": 27,
+        "id": "User3",
+        "name": "Jane",
+        "surname": "Simpson",
+        "type": "User"
+    },
+    {
+        "age": 36,
+        "id": "User1",
+        "name": "John",
+        "surname": "Doe",
+        "type": "User"
+    },
+    {
+        "age": 37,
+        "id": "User2",
+        "name": "John",
+        "surname": "Smith",
+        "type": "User"
+    }
+]
+
+
+06. Get sorted by age in reverse order: User2, User1, User3, User4
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 284
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "age": 37,
+        "id": "User2",
+        "name": "John",
+        "surname": "Smith",
+        "type": "User"
+    },
+    {
+        "age": 36,
+        "id": "User1",
+        "name": "John",
+        "surname": "Doe",
+        "type": "User"
+    },
+    {
+        "age": 27,
+        "id": "User3",
+        "name": "Jane",
+        "surname": "Simpson",
+        "type": "User"
+    },
+    {
+        "age": 18,
+        "id": "User4",
+        "name": "Jane",
+        "surname": "Thompson",
+        "type": "User"
+    }
+]
+
+
+07. Get sorted by name, then age: User4, User3, User1, User2
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 284
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "age": 18,
+        "id": "User4",
+        "name": "Jane",
+        "surname": "Thompson",
+        "type": "User"
+    },
+    {
+        "age": 27,
+        "id": "User3",
+        "name": "Jane",
+        "surname": "Simpson",
+        "type": "User"
+    },
+    {
+        "age": 36,
+        "id": "User1",
+        "name": "John",
+        "surname": "Doe",
+        "type": "User"
+    },
+    {
+        "age": 37,
+        "id": "User2",
+        "name": "John",
+        "surname": "Smith",
+        "type": "User"
+    }
+]
+
+
+08. Get sorted by reverse name, then age: User1, User2, User4, User3
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 284
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "age": 36,
+        "id": "User1",
+        "name": "John",
+        "surname": "Doe",
+        "type": "User"
+    },
+    {
+        "age": 37,
+        "id": "User2",
+        "name": "John",
+        "surname": "Smith",
+        "type": "User"
+    },
+    {
+        "age": 18,
+        "id": "User4",
+        "name": "Jane",
+        "surname": "Thompson",
+        "type": "User"
+    },
+    {
+        "age": 27,
+        "id": "User3",
+        "name": "Jane",
+        "surname": "Simpson",
+        "type": "User"
+    }
+]
+
+
+09. Get sorted by name, then reserve age: User3, User4, User2, User1
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 284
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "age": 27,
+        "id": "User3",
+        "name": "Jane",
+        "surname": "Simpson",
+        "type": "User"
+    },
+    {
+        "age": 18,
+        "id": "User4",
+        "name": "Jane",
+        "surname": "Thompson",
+        "type": "User"
+    },
+    {
+        "age": 37,
+        "id": "User2",
+        "name": "John",
+        "surname": "Smith",
+        "type": "User"
+    },
+    {
+        "age": 36,
+        "id": "User1",
+        "name": "John",
+        "surname": "Doe",
+        "type": "User"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

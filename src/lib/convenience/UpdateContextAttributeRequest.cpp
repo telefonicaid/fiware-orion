@@ -27,9 +27,9 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "ngsi/StatusCode.h"
@@ -43,46 +43,34 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
-  metadataVector.tagSet("metadata");
   compoundValueP = NULL;
+  valueType = orion::ValueTypeNotGiven;
 }
 
 
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string UpdateContextAttributeRequest::render(Format format, std::string indent)
+std::string UpdateContextAttributeRequest::toJsonV1(void)
 {
-  std::string tag = "updateContextAttributeRequest";
   std::string out = "";
-  std::string indent2 = indent + "  ";
-  bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent, tag, format, false);
-  out += valueTag(indent2, "type", type, format, true);
+  out += startTag();
+  out += valueTag("type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, format, true);
+    out += valueTag("contextValue", contextValue, true);
   }
   else
   {
-    bool isCompoundVector = false;
-
-    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
-    {
-      isCompoundVector = true;
-    }
-
-    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
+    out += JSON_STR("value") + ":" + compoundValueP->toJson();
   }
 
-  out += metadataVector.render(format, indent2);
-  out += endTag(indent, tag, format);
+  out += metadataVector.toJsonV1(metadataVector.vec, false);
+  out += endTag();
 
   return out;
 }
@@ -95,35 +83,18 @@ std::string UpdateContextAttributeRequest::render(Format format, std::string ind
 */
 std::string UpdateContextAttributeRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  predetectedError,
-  int          counter
+  ApiVersion          apiVersion,
+  const std::string&  predetectedError
 )
 {
   StatusCode       response;
   std::string      res;
 
-  if (format == (Format) 0)
-  {
-    format = XML;
-  }
-
-  if (format == JSON)
-  {
-    indent = "  ";
-  }
-
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((contextValue == "") && (compoundValueP == NULL))
-  {
-    response.fill(SccBadRequest, "empty context value");
-  }
-  else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  else if ((res = metadataVector.check(apiVersion)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }
@@ -132,27 +103,11 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(format, indent);
+  std::string out = response.toJsonV1(false);
 
-  if (format == JSON)
-  {
-    out = "{\n" + out + "}\n";
-  }
+  out = "{" + out + "}";
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextAttributeRequest::present(std::string indent)
-{
-  LM_F(("%stype:         %s", indent.c_str(), type.c_str()));
-  LM_F(("%scontextValue: %s", indent.c_str(), contextValue.c_str()));
-  metadataVector.present("ContextMetadata", indent);
 }
 
 

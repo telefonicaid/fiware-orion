@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* getContextEntityAttributes - 
+* getContextEntityAttributes -
 *
 * GET /v1/registry/contextEntities/{entityId::id}/attributes
 * GET /ngsi9/contextEntities/{entityId::id}/attributes
@@ -56,7 +56,7 @@ std::string getContextEntityAttributes
   ParseData*                 parseDataP
 )
 {
-  std::string   entityId = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string   entityId = (compV.size() == 5)? compV[3] : compV[2];
   std::string   answer;
 
   //
@@ -69,7 +69,7 @@ std::string getContextEntityAttributes
   parseDataP->dcar.res.fill(eId, attributeV, restriction);
 
   //
-  // 2. Call the standard operation 
+  // 2. Call the standard operation
   //
   answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
 

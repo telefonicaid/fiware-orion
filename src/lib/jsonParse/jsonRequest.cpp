@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 
@@ -37,10 +39,6 @@
 
 #include "jsonParse/jsonRegisterContextRequest.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
-#include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
-#include "jsonParse/jsonUnsubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonQueryContextResponse.h"
@@ -61,8 +59,7 @@
 
 
 #define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
-                      json##prefix##Check,       json##prefix##Present, \
-                      json##prefix##Release
+                      json##prefix##Check,       json##prefix##Release
 
 
 
@@ -75,10 +72,6 @@ static JsonRequest jsonRequest[] =
   // NGSI9
   { RegisterContext,                       "POST", "registerContextRequest",                        FUNCS(Rcr)   },
   { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            FUNCS(Dcar)  },
-  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           FUNCS(Scar)  },
-  { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         FUNCS(Ucar)  },
-  { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              FUNCS(Ncar)  },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
 
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           FUNCS(Qcr)   },
@@ -106,7 +99,7 @@ static JsonRequest jsonRequest[] =
 
   { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
-  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
+
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
@@ -153,7 +146,9 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
     }
   }
 
-  LM_W(("Bad Input (no request found for RequestType '%s', method '%s')", requestType(request), method.c_str()));
+  std::string extra = std::string("RequestType '") + requestType(request) + "'', method '" + method + "'";
+  alarmMgr.badInput(clientIp, "no request found", extra);
+
   return NULL;
 }
 
@@ -169,18 +164,19 @@ std::string jsonTreat
   ConnectionInfo*     ciP,
   ParseData*          parseDataP,
   RequestType         request,
-  const std::string&  payloadWord,
   JsonRequest**       reqPP
 )
 {
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
-
   //
-  // If the payload is empty, the XML parsing library does an assert
-  // and the broker dies. I don't know about the JSON library, but just in case ...
-  // 
+  // FIXME P4 #1862:
+  //
+  // This check comes from the old XML days, as the the XML parsing library did an assert
+  // and the broker died. We need to test what happen with the JSON library.
+  // If JSON library is "safer" with that regards, the check should be removed.
+  //
   // 'OK' is returned as there is no error to send a request without payload.
   //
   if ((content == NULL) || (*content == 0))
@@ -194,16 +190,16 @@ std::string jsonTreat
 
   if (reqP == NULL)
   {
-    std::string errorReply =
-      restErrorReplyGet(ciP,
-                        ciP->outFormat,
-                        "",
-                        requestType(request),
-                        SccBadRequest,
-                        std::string("Sorry, no request treating object found for RequestType /") +
-                        requestType(request) + "/");
+    std::string  details = std::string("Sorry, no request treating object found for RequestType /") + requestType(request) + "/";
+    std::string  errorReply;
+    char         reqTypeV[STRING_SIZE_FOR_INT];
 
-    LM_W(("Bad Input (no request treating object found for RequestType %d (%s))", request, requestType(request)));
+    restErrorReplyGet(ciP, SccBadRequest, details, &errorReply);
+    snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
+
+    std::string extra = std::string("RequestType ") + reqTypeV + " (" + requestType(request) + ")";
+    alarmMgr.badInput(clientIp, "no request treating object found for RequestType", extra);
+
     return errorReply;
   }
 
@@ -222,37 +218,26 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
-    LM_W(("Bad Input (JSON Parse Error)"));
-    std::string errorReply  = restErrorReplyGet(ciP,
-                                                ciP->outFormat,
-                                                "",
-                                                reqP->keyword,
-                                                SccBadRequest,
-                                                std::string("JSON Parse Error"));
-
-    LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
+    std::string errorReply;
+    restErrorReplyGet(ciP, SccBadRequest, "JSON Parse Error", &errorReply);
+    alarmMgr.badInput(clientIp, "JSON Parse Error", e.what());
     return errorReply;
   }
   catch (...)
   {
-    LM_W(("Bad Input (JSON Parse Error II)"));
-    std::string errorReply  = restErrorReplyGet(ciP,
-                                                ciP->outFormat,
-                                                "",
-                                                reqP->keyword,
-                                                SccBadRequest,
-                                                std::string("JSON Generic Error"));
+    std::string errorReply;
 
-    LM_W(("Bad Input (JSON parse generic error)"));
+    restErrorReplyGet(ciP, SccBadRequest, "JSON Generic Error", &errorReply);
+    alarmMgr.badInput(clientIp, "JSON parse generic error");
     return errorReply;
   }
 
   if (res != "OK")
   {
-    LM_W(("Bad Input (JSON parse error: %s)", res.c_str()));
+    std::string answer;
+    alarmMgr.badInput(clientIp, "JSON Parse Error", res);
     ciP->httpStatusCode = SccBadRequest;
-
-    std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
+    restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
     return answer;
   }
 
@@ -265,16 +250,11 @@ std::string jsonTreat
     ciP->compoundValueP->shortShow("after parse: ");
   }
 
-  reqP->present(parseDataP);
-
-  LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
   if (res != "OK")
   {
-    LM_W(("Bad Input (%s: %s)", reqP->keyword.c_str(), res.c_str()));
+    alarmMgr.badInput(clientIp, reqP->keyword, res);
   }
-
-  reqP->present(parseDataP);
 
   return res;
 }

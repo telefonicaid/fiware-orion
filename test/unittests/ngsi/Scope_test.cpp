@@ -33,23 +33,18 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(Scope, render)
 {
   Scope        scope("Type", "Value");
   std::string  out;
-  const char*  outfile1 = "ngsi.scope.render.middle.xml";
-  const char*  outfile2 = "ngsi.scope.render.middle.json";
+  const char*  outfile1 = "ngsi.scope.render.middle.json";
 
   utInit();
 
-  out = scope.render(XML, "", false);
+  out = scope.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = scope.render(JSON, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   scope.release();
@@ -74,38 +69,20 @@ TEST(Scope, check)
   std::string  expected1 = "Empty type in restriction scope";
   std::string  expected2 = "Empty value in restriction scope";
   std::string  expected3 = "OK";
-  
+
   utInit();
 
-  checked = scope.check(RegisterContext, XML, "", "", 0);
+  checked = scope.check();
   EXPECT_STREQ(checked.c_str(), expected.c_str());
 
-  checked = scope1.check(RegisterContext, XML, "", "", 0);
+  checked = scope1.check();
   EXPECT_STREQ(checked.c_str(), expected1.c_str());
 
-  checked = scope2.check(RegisterContext, XML, "", "", 0);
+  checked = scope2.check();
   EXPECT_STREQ(checked.c_str(), expected2.c_str());
 
-  checked = scope3.check(RegisterContext, XML, "", "", 0);
+  checked = scope3.check();
   EXPECT_STREQ(checked.c_str(), expected3.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(Scope, present)
-{
-  Scope   scope("Type", "Value");
-
-  utInit();
-
-  scope.present("", -1);
-  scope.present("", 0);
 
   utExit();
 }

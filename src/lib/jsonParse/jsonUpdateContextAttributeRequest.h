@@ -62,12 +62,4 @@ extern void jsonUpcarRelease(ParseData* reqData);
 */
 extern std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonUpcarPresent -
-*/
-extern void jsonUpcarPresent(ParseData* reqData);
-
 #endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTATTRIBUTEREQUEST_H_

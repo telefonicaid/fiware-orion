@@ -56,13 +56,12 @@ std::string postContextEntitiesByEntityId
   ParseData*                 parseDataP
 )
 {
-  std::string  entityId = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  entityId = (compV.size() == 4)? compV[3] : compV[2];
   std::string  answer;
 
   parseDataP->rcr.res.fill(parseDataP->rpr.res, entityId, "", "");
   answer = postRegisterContext(ciP, components, compV, parseDataP);
 
-  parseDataP->rpr.res.release();
   parseDataP->rcr.res.release();
 
   return answer;

@@ -1,7 +1,0 @@
-<unsubscribeContextAvailabilityResponse>
-  <subscriptionId>111222333444555666777888</subscriptionId>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </statusCode>
-</unsubscribeContextAvailabilityResponse>

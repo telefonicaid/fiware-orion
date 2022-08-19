@@ -1,17 +1,1 @@
-{
-  "subscriptionId" : "012345678901234567890123",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "EType",
-            "isPattern" : "false",
-            "id" : "E01"
-          }
-        ],
-        "providingApplication" : "http://www.tid.es/NotifyContextAvailabilityRequestTest"
-      }
-    }
-  ]
-}
+{"subscriptionId":"012345678901234567890123","contextRegistrationResponses":[{"contextRegistration":{"entities":[{"type":"EType","isPattern":"false","id":"E01"}],"providingApplication":"http://www.tid.es/NotifyContextAvailabilityRequestTest"}}]}

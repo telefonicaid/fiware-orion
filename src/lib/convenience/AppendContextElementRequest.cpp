@@ -25,11 +25,9 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 #include "rest/ConnectionInfo.h"
@@ -48,24 +46,29 @@ AppendContextElementRequest::AppendContextElementRequest()
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
+std::string AppendContextElementRequest::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType
+)
 {
-  std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag();
 
-  if (entity.id != "")
+  if (!entity.id.empty())
   {
-    out += entity.render(ciP->outFormat, indent + "  ");
+    out += entity.toJsonV1(false);
   }
 
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ");
-  out += domainMetadataVector.render(ciP->outFormat, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
+  out += contextAttributeVector.toJsonV1(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
+  out += endTag();
 
   return out;
 }
@@ -76,37 +79,23 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
 *
 * check - 
 *
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res):
-*   }
-*
 */
 std::string AppendContextElementRequest::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,     // Predetected Error, normally during parsing
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
   AppendContextElementResponse  response;
   std::string                   res;
-  Format                        fmt = ciP->outFormat;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
-  {
-    response.errorCode.fill(SccBadRequest, res);
-  }
-  else if ((res = domainMetadataVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(apiVersion, AppendContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -115,20 +104,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  return response.render(ciP, requestType, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void AppendContextElementRequest::present(std::string indent)
-{
-  attributeDomainName.present(indent);
-  contextAttributeVector.present(indent);
-  domainMetadataVector.present("Domain", indent);
+  return response.toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -140,5 +116,4 @@ void AppendContextElementRequest::present(std::string indent)
 void AppendContextElementRequest::release(void)
 {
   contextAttributeVector.release();
-  domainMetadataVector.release();
 }

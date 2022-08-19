@@ -1,5 +1,5 @@
-#ifndef MONGO_COMMON_UPDATE_H
-#define MONGO_COMMON_UPDATE_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
 
 /*
 *
@@ -25,24 +25,37 @@
 *
 * Author: Fermín Galán
 */
+#include <map>
+#include <string>
+#include <vector>
 
+#include "orionTypes/UpdateActionType.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "mongo/client/dbclient.h"
 
-using namespace mongo;
+#define MONGODB_ERROR_DUPLICATE_KEY  "duplicate key"
+#define MONGODB_ERROR_WRONGJSON      "Can't extract geo keys"
+
 
 /* ****************************************************************************
 *
 * processContextElement -
-*
 */
-extern void processContextElement(ContextElement*                      ceP,
-                                  UpdateContextResponse*               responseP,
-                                  const std::string&                   action,
-                                  const std::string&                   tenant,
-                                  const std::vector<std::string>&      servicePath,
-                                  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-                                  const std::string&                   xauthToken,
-                                  const std::string&                   caller = "");
+extern unsigned int processContextElement
+(
+  Entity*                              ceP,
+  UpdateContextResponse*               responseP,
+  ActionType                           action,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePath,
+  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+  const std::string&                   xauthToken,
+  const std::string&                   fiwareCorrelator,
+  const std::string&                   ngsiV2AttrsFormat,
+  const bool&                          forcedUpdate,
+  const bool&                          overrideMetadata,
+  unsigned int                         notifStartCounter,
+  ApiVersion                           apiVersion       = V1,
+  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
+);
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_

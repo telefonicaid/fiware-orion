@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
 
@@ -40,19 +39,14 @@ typedef struct AttributeExpression
 {
   std::string   string;
 
-  void          set(const std::string& value);
-  std::string   get(void);
-  bool          isEmpty(void);
-  std::string   render(Format format, const std::string& indent, bool comma);
-  void          present(const std::string& indent);
-  const char*   c_str();
-  void          release(void);
+  void                set(const std::string& value);
+  std::string         get(void);
+  bool                isEmpty(void);
+  std::string         toJsonV1(bool comma);
+  const char*         c_str();
+  void                release(void);
 
-  std::string   check(RequestType         requestType,
-                      Format              format,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  std::string         check(void);
 } AttributeExpression;
 
 #endif  // SRC_LIB_NGSI_ATTRIBUTEEXPRESSION_H_

@@ -1,7 +1,0 @@
-<notifyContextResponse>
-  <responseCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>detail</details>
-  </responseCode>
-</notifyContextResponse>

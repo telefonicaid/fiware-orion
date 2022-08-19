@@ -1,0 +1,281 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with Q and EQ strings inside quotes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with string attribute A1='10'
+# 02. Create an entity E2 with integer attribute A1=10
+# 03. GET all entities (2 entities)
+# 04. GET entities with q=A1==10 (1 hit)
+# 05. GET entities with q=A1=='10' (1 hit)
+# 06. GET entities with q=A1!=10 (1 hit)
+# 07. GET entities with q=A1!='10' (1 hit)
+# 08. GET entities with invalid q=A1=='10'x (error)
+# 09. GET entities with invalid q=A1=='10'x' (error)
+#
+
+
+echo "01. Create an entity E1 with string attribute A1='10'"
+echo "====================================================="
+payload='{
+    "id": "E1",
+    "A1": { "value": "10" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E2 with integer attribute A1=10"
+echo "===================================================="
+payload='{
+    "id": "E2",
+    "A1": { "value": 10 }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET all entities (2 entities)"
+echo "================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "04. GET entities with q=A1==10 (1 hit)"
+echo "======================================"
+orionCurl --url '/v2/entities?q=A1==10'
+echo
+echo
+
+
+echo "05. GET entities with q=A1=='10' (1 hit)"
+echo "========================================"
+orionCurl --url "/v2/entities?q=A1=='10'"
+echo
+echo
+
+
+echo "06. GET entities with q=A1!=10 (1 hit)"
+echo "======================================"
+orionCurl --url '/v2/entities?q=A1!=10'
+echo
+echo
+
+
+echo "07. GET entities with q=A1!='10' (1 hit)"
+echo "========================================"
+orionCurl --url "/v2/entities?q=A1!='10'"
+echo
+echo
+
+
+echo "08. GET entities with invalid q=A1=='10'x (error)"
+echo "================================================="
+orionCurl --url "/v2/entities?q=A1=='10'x"
+echo
+echo
+
+
+echo "09. GET entities with invalid q=A1=='10'x' (error)"
+echo "=================================================="
+orionCurl --url "/v2/entities?q=A1=='10'x'"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with string attribute A1='10'
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create an entity E2 with integer attribute A1=10
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET all entities (2 entities)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "10"
+        },
+        "id": "E1",
+        "type": "Thing"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 10
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+04. GET entities with q=A1==10 (1 hit)
+======================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 10
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+05. GET entities with q=A1=='10' (1 hit)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "10"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+06. GET entities with q=A1!=10 (1 hit)
+======================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "10"
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
+
+
+07. GET entities with q=A1!='10' (1 hit)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 10
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+08. GET entities with invalid q=A1=='10'x (error)
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 67
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "non-terminated forced string",
+    "error": "BadRequest"
+}
+
+
+09. GET entities with invalid q=A1=='10'x' (error)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "quote in forced string",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

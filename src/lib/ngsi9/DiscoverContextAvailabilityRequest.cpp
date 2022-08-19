@@ -29,7 +29,7 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
@@ -48,7 +48,7 @@ DiscoverContextAvailabilityRequest::DiscoverContextAvailabilityRequest()
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::release - 
+* DiscoverContextAvailabilityRequest::release -
 */
 void DiscoverContextAvailabilityRequest::release(void)
 {
@@ -61,14 +61,14 @@ void DiscoverContextAvailabilityRequest::release(void)
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::check - 
+* DiscoverContextAvailabilityRequest::check -
 */
-std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string DiscoverContextAvailabilityRequest::check(const std::string& predetectedError)
 {
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
@@ -76,36 +76,23 @@ std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, F
   {
     response.errorCode.fill(SccContextElementNotFound);
   }
-  else if (((res = entityIdVector.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions))                      != "OK") ||
-           ((res = attributeList.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions))                       != "OK") ||
-           ((restrictions != 0) && ((res = restriction.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions)) != "OK")))
+  else if (((res = entityIdVector.check(DiscoverContextAvailability))       != "OK") ||
+           ((res = attributeList.check())                                   != "OK") ||
+           ((restrictions != 0) && ((res = restriction.check(restrictions)) != "OK")))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(DiscoverContextAvailability, format, indent);
+  return response.toJsonV1();
 }
 
 
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::present - 
-*/
-void DiscoverContextAvailabilityRequest::present(const std::string& indent)
-{
-   entityIdVector.present(indent);
-   attributeList.present(indent);
-   restriction.present(indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill
 (
@@ -128,7 +115,7 @@ void DiscoverContextAvailabilityRequest::fill
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const std::string& entityType)
 {
@@ -141,7 +128,7 @@ void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityRequest::fill - 
+* DiscoverContextAvailabilityRequest::fill -
 */
 void DiscoverContextAvailabilityRequest::fill
 (
@@ -160,11 +147,11 @@ void DiscoverContextAvailabilityRequest::fill
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-      
+
     restriction.scopeVector.push_back(scopeP);
   }
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     attributeList.push_back(attributeName);
   }

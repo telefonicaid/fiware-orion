@@ -36,14 +36,18 @@ typedef enum HttpStatusCode
 {
   SccNone                   = 0,     // Undefined
   SccOk                     = 200,   // Success
+  SccCreated                = 201,   // Created
+  SccNoContent              = 204,   // No content
   SccBadRequest             = 400,   // The request is not well formed
   SccForbidden              = 403,   // The request is not allowed
   SccContextElementNotFound = 404,   // No context element found
   SccBadVerb                = 405,   // Request ok but verb/method NOT OK
   SccNotAcceptable          = 406,   // The Accept header in the request is not supported
-  SccLengthRequired         = 411,   // Content-Length header missing
+  SccConflict               = 409,
+  SccContentLengthRequired  = 411,   // Content-Length header missing
   SccRequestEntityTooLarge  = 413,   // Request Entity Too Large - over 1Mb of payload
-  SccUnsupportedMediaType   = 415,   // Unsupported Media Type (only support application/xml and application/json)
+  SccUnsupportedMediaType   = 415,   // Unsupported Media Type (only support and application/json and -in some cases- text/plain)
+  SccInvalidModification    = 422,   // InvalidModification (unprocessable entity)
   SccSubscriptionIdNotFound = 470,   // The subscriptionId does not correspond to an active subscription
   SccMissingParameter       = 471,   // A parameter is missing in the request
   SccInvalidParameter       = 472,   // A parameter of the request is invalid/not allowed

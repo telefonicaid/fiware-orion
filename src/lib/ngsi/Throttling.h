@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 
 
@@ -42,20 +41,16 @@ typedef struct Throttling
   std::string   string;
   int64_t       seconds;
 
-  Throttling();
-  void         set(const std::string& value);
-  std::string  get(void);
-  bool         isEmpty(void);
-  std::string  render(Format format, const std::string& indent, bool comma);
+  Throttling(): seconds(-1) {}
 
-  std::string  check(RequestType requestType,
-                     Format format,
-                     const std::string& indent,
-                     const std::string& predetectedError,
-                     int counter);
+  void               set(const std::string& value);
+  const std::string  get(void);
+  bool               isEmpty(void);
+  std::string        toJsonV1(bool comma);
 
-  int64_t      parse(void);
-  void         present(const std::string& indent);
+  std::string        check(void);
+
+  int64_t            parse(void);
 } Throttling;
 
 #endif  // SRC_LIB_NGSI_THROTTLING_H_

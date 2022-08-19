@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/SubscribeResponse.h"
@@ -39,7 +38,7 @@
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
 UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
-   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -49,7 +48,7 @@ UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
 UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode& errorCode) {
    subscribeError.subscriptionId.set("000000000000000000000000");
    subscribeError.errorCode.fill(&errorCode);
-   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -62,21 +61,24 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionResponse::render - 
+* UpdateContextSubscriptionResponse::toJsonV1 -
 */
-std::string UpdateContextSubscriptionResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string UpdateContextSubscriptionResponse::toJsonV1(void)
 {
   std::string out  = "";
-  std::string tag  = "updateContextSubscriptionResponse";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag();
 
   if (subscribeError.errorCode.code == SccNone)
-     out += subscribeResponse.render(format, indent + "  ", false);
+  {
+    out += subscribeResponse.toJsonV1(false);
+  }
   else
-     out += subscribeError.render(UpdateContextSubscription, format, indent + "  ", false);
+  {
+    out += subscribeError.toJsonV1(UpdateContextSubscription, false);
+  }
 
-  out += endTag(indent, tag, format);
+  out += endTag();
 
   return out;
 }

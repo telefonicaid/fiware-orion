@@ -1,0 +1,865 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSIv2 geo-queries for entities located with geo:point
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01.  Create point A (5, 5)
+# 02.  Create point B (9, 5)
+# 03.  Create point C (15, 5)
+# 04.  Create point D (15, 15)
+# 05.  Create point E (-4, 10)
+# 06.  Query coveredBy point (5, 5) -> not supported
+# 07.  Query coveredBy line (5, 5) (9, 5) -> not supported
+# 08.  Query coveredBy box (-5, 0) (6, 11) -> A, E
+# 08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E
+# 09.  Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+# 10.  Query intersects point (5, 5) -> A
+# 11.  Query intersects line (5, 5) (9, 5) -> A, B
+# 12.  Query intersects box (-5, 0) (6, 11) -> A, E
+# 12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E
+# 13.  Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+# 14.  Query disjoint point (5, 5) -> B, C, D, E
+# 15.  Query disjoint line (5, 5) (9, 5) -> C, D, E
+# 16.  Query disjoint box (-5, 0) (6, 11) -> B, C, D
+# 16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D
+# 17.  Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
+# 18.  Query equals point (15, 15) -> D
+# 19.  Query equals line (5, 5) (9, 5) -> none
+# 20.  Query equals box (-5, 0) (6, 11) -> none
+# 20b. Query equals (same) box (-5, 11) (6, 0) -> none
+# 21.  Query equals polygon (0, 0) (24, 0) (0, 20) -> none
+#
+
+echo "01. Create point A (5, 5)"
+echo "========================="
+payload='{
+  "id": "A",
+  "type": "T",
+  "location": {
+    "value": "5, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create point B (9, 5)"
+echo "========================="
+payload='{
+  "id": "B",
+  "type": "T",
+  "location": {
+    "value": "9, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create point C (15, 5)"
+echo "=========================="
+payload='{
+  "id": "C",
+  "type": "T",
+  "location": {
+    "value": "15, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create point D (15, 15)"
+echo "==========================="
+payload='{
+  "id": "D",
+  "type": "T",
+  "location": {
+    "value": "15, 15",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create point E (-4, 10)"
+echo "==========================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "location": {
+    "value": "-4, 10",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Query coveredBy point (5, 5) -> not supported"
+echo "================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=point&coords=5,5'
+echo
+echo
+
+
+echo "07. Query coveredBy line (5, 5) (9, 5) -> not supported"
+echo "======================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=line&coords=5,5;9,5'
+echo
+echo
+
+
+echo "08. Query coveredBy box (-5, 0) (6, 11) -> A, E"
+echo "==============================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,0;6,11'
+echo
+echo
+
+
+echo "08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E"
+echo "======================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,11;6,0'
+echo
+echo
+
+
+echo "09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
+echo "============================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;24,0;0,20;0,0'
+echo
+echo
+
+
+echo "10. Query intersects point (5, 5) -> A"
+echo "======================================"
+orionCurl --url '/v2/entities?georel=intersects&geometry=point&coords=5,5'
+echo
+echo
+
+
+echo "11. Query intersects line (5, 5) (9, 5) -> A, B"
+echo "==============================================="
+orionCurl --url '/v2/entities?georel=intersects&geometry=line&coords=5,5;9,5'
+echo
+echo
+
+
+echo "12. Query intersects box (-5, 0) (6, 11) -> A, E"
+echo "================================================"
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,0;6,11'
+echo
+echo
+
+
+echo "12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E"
+echo "========================================================"
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,11;6,0'
+echo
+echo
+
+
+echo "13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
+echo "=============================================================="
+orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=0,0;24,0;0,20;0,0'
+echo
+echo
+
+
+echo "14. Query disjoint point (5, 5) -> B, C, D, E"
+echo "============================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=point&coords=5,5'
+echo
+echo
+
+
+echo "15. Query disjoint line (5, 5) (9, 5) -> C, D, E"
+echo "================================================"
+orionCurl --url '/v2/entities?georel=disjoint&geometry=line&coords=5,5;9,5'
+echo
+echo
+
+
+echo "16. Query disjoint box (-5, 0) (6, 11) -> B, C, D"
+echo "================================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,0;6,11'
+echo
+echo
+
+
+echo "16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D"
+echo "========================================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,11;6,0'
+echo
+echo
+
+
+echo "17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E"
+echo "========================================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;24,0;0,20;0,0'
+echo
+echo
+
+
+echo "18. Query equals point (15, 15) -> D"
+echo "===================================="
+orionCurl --url '/v2/entities?georel=equals&geometry=point&coords=15,15'
+echo
+echo
+
+
+echo "19. Query equals line (5, 5) (9, 5) -> none"
+echo "==========================================="
+orionCurl --url '/v2/entities?georel=equals&geometry=line&coords=5,5;9,5'
+echo
+echo
+
+
+echo "20. Query equals box (-5, 0) (6, 11) -> none"
+echo "============================================"
+orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,0;6,11'
+echo
+echo
+
+
+echo "20b. Query equals (same) box (-5, 11) (6, 0) -> none"
+echo "===================================================="
+orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,11;6,0'
+echo
+echo
+
+
+echo "21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none"
+echo "======================================================="
+orionCurl --url '/v2/entities?georel=equals&geometry=polygon&coords=0,0;24,0;0,20;0,0'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create point A (5, 5)
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/A?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create point B (9, 5)
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/B?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create point C (15, 5)
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create point D (15, 15)
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/D?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create point E (-4, 10)
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Query coveredBy point (5, 5) -> not supported
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: point geometry cannot be used with coveredBy georel",
+    "error": "BadRequest"
+}
+
+
+07. Query coveredBy line (5, 5) (9, 5) -> not supported
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid query: line geometry cannot be used with coveredBy georel",
+    "error": "BadRequest"
+}
+
+
+08. Query coveredBy box (-5, 0) (6, 11) -> A, E
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 169
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 169
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 251
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    }
+]
+
+
+10. Query intersects point (5, 5) -> A
+======================================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    }
+]
+
+
+11. Query intersects line (5, 5) (9, 5) -> A, B
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    }
+]
+
+
+12. Query intersects box (-5, 0) (6, 11) -> A, E
+================================================
+HTTP/1.1 200 OK
+Content-Length: 169
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 169
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 251
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    }
+]
+
+
+14. Query disjoint point (5, 5) -> B, C, D, E
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 338
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+15. Query disjoint line (5, 5) (9, 5) -> C, D, E
+================================================
+HTTP/1.1 200 OK
+Content-Length: 255
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    }
+]
+
+
+16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    }
+]
+
+
+17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 171
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+18. Query equals point (15, 15) -> D
+====================================
+HTTP/1.1 200 OK
+Content-Length: 86
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    }
+]
+
+
+19. Query equals line (5, 5) (9, 5) -> none
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+20. Query equals box (-5, 0) (6, 11) -> none
+============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+20b. Query equals (same) box (-5, 11) (6, 0) -> none
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

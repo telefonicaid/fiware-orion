@@ -35,7 +35,8 @@
 
 /* ****************************************************************************
 *
-* constructors - 
+* constructors -
+*
 */
 TEST(RegisterContextResponse, constructors)
 {
@@ -48,10 +49,6 @@ TEST(RegisterContextResponse, constructors)
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 
   std::string              out;
-  const char*              outFile1  = "ngsi9.registerContextResponse.constructors1.valid.xml";
-  const char*              outFile2  = "ngsi9.registerContextResponse.constructors2.valid.xml";
-  const char*              outFile3  = "ngsi9.registerContextResponse.constructors3.valid.xml";
-  const char*              outFile4  = "ngsi9.registerContextResponse.constructors4.valid.xml";
 
   std::string              expected5 = "OK";
 
@@ -63,36 +60,18 @@ TEST(RegisterContextResponse, constructors)
   EXPECT_STREQ("", rcr3.registrationId.get().c_str());
   EXPECT_EQ("012345678901234567890123", rcr4.registrationId.get());
   EXPECT_EQ(SccBadRequest, rcr4.errorCode.code);
-  
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
-  out = rcr2.render(RegisterContext, XML, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
+    
+  out = rcr5.check("");
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rcr2.registrationId.set("12345");
-  out = rcr2.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
-  out = rcr2.check(RegisterContext, XML, "", "Forced Error", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
-  rcr2.duration.set("dddd");
-  out = rcr2.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  
-  out = rcr5.check(RegisterContext, XML, "", "", 0);
   EXPECT_EQ(expected5, out);
 
-  rcr2.present("");
 }
 
 
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(RegisterContextResponse, jsonRender)
 {
@@ -102,33 +81,33 @@ TEST(RegisterContextResponse, jsonRender)
   const char*             filename2 = "ngsi9.registerContextResponse.registrationIdAndDuration.valid.json";
   const char*             filename3 = "ngsi9.registerContextResponse.registrationIdAndErrorCode.valid.json";
   const char*             filename4 = "ngsi9.registerContextResponse.registrationIdAndDurationAndErrorCode.valid.json";
-   
+
   utInit();
 
   // 1. Only registrationId
   rcr.registrationId.set("012345678901234567890123");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = rcr.render(RegisterContext, JSON, "");
+  rendered = rcr.toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 2. registrationId and duration
   rcr.duration.set("PT1S");
-  
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = rcr.render(RegisterContext, JSON, "");
+  rendered = rcr.toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   // 3. registrationId and errorCode
   rcr.duration.set("");
   rcr.errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = rcr.render(RegisterContext, JSON, "");
+  rendered = rcr.toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  
+
   // 4. registrationId and duration and errorCode
   rcr.duration.set("PT2S");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = rcr.render(RegisterContext, JSON, "");
+  rendered = rcr.toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

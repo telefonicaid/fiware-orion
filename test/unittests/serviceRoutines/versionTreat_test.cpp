@@ -22,70 +22,90 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "serviceRoutines/versionTreat.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* getV -
 */
-static RestService rs[] = 
+static RestService getV[] =
 {
-   { "GET",    VersionRequest,                        1, { "version"                                                }, "", versionTreat                              },
-   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { VersionRequest, 1, { "version" }, versionTreat  },
+  { InvalidRequest, 0, {           }, NULL          }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* ok -
 */
 TEST(versionTreat, ok)
 {
   ConnectionInfo  ci("/version",  "GET", "1.1");
   std::string     out;
+  RestService     restService = { VersionRequest, 1, { "version" }, NULL };
 
-  out = restService(&ci, rs);
+  ci.apiVersion   = V1;
+  ci.restServiceP = &restService;
+
+  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);
+  out = orion::requestServe(&ci);
 
   // FIXME P2: Some day we'll do this ...
   //
   // char*    expected =
-  //   "<orion>\n"
-  //   "  <version>" ORION_VERSION "</version>\n"
-  //   "  <uptime>*</uptime>"
-  //   "  <git_hash>*</git_hash>\n"
-  //   "  <compile_time>*</compile_time>\n"
-  //   "  <compiled_by>*</compiled_by>\n"
-  //   "  <compiled_in>*</compiled_in>\n"
-  //   "</orion>\n";  
+  // "{\n"
+  // "  \"orion\" : {\n"
+  // "  \"version\" : \"" ORION_VERSION "\",\n"
+  // "  \"uptime\" : \".*\",\n"
+  // "  \"git_hash\" : \".*\",\n"
+  // "  \"compile_time\" : \".*\",\n"
+  // "  \"compiled_by\" : \".*\",\n"
+  // "  \"compiled_in\" : \".*\"\n"
+  // "  \"machine\" : \".*\"\n"
+  // "  \"doc\" : \".*\"\n"
+  // "  \"libversions\" : (drill down) "\n"
+  // "}\n"
+  // "}\n";
   // bool            match;
   // match = std::regex_match(expected, out.c_str());
 
-  EXPECT_TRUE(strstr(out.c_str(), "<orion>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "<version>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "</version>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "<uptime>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "</uptime>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "<git_hash>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "</git_hash>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "<compile_time>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "</compile_time>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "<compiled_in>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "</compiled_in>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "</orion>") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "orion") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "version") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "uptime") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "git_hash") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "compile_time") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "compiled_in") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "compiled_by") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "release_date") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "machine") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "doc") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libversions") != NULL);
+
+  EXPECT_TRUE(strstr(out.c_str(), "boost") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libcurl") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libmicrohttpd") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "openssl") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "rapidjson") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "mongoc") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "bson") != NULL);
 
   extern const char*  orionUnitTestVersion;
-  std::string         expected = std::string("<version>") + orionUnitTestVersion + "</version>";
+  std::string         expected = std::string("\"version\" : \"") + orionUnitTestVersion + "\"";
   EXPECT_TRUE(strstr(out.c_str(), expected.c_str()) != NULL);
 
   versionSet("1.2.3");
-  out       = restService(&ci, rs);
-  EXPECT_TRUE(strstr(out.c_str(), "<version>1.2.3</version>") != NULL);
+  out = orion::requestServe(&ci);
+  EXPECT_TRUE(strstr(out.c_str(), "\"version\" : \"1.2.3\"") != NULL);
 
   versionSet("1.2.3");
   std::string version = versionGet();

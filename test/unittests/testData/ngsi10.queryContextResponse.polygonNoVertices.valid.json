@@ -1,7 +1,1 @@
-{
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "too few vertices for a polygon"
-  }
-}
+{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"too few vertices for a polygon"}}

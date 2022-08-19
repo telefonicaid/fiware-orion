@@ -1,0 +1,274 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Invalid chars for attribute type
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E with attr A1, attr-type 'house:flat'
+# 02. Try to change A1 type to invalid 'house<flat>', with PUT /v2/entities/E/attrs/A1, see it fail
+# 03. Make sure step 2 DID NOT modify E/A1
+# 04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
+# 05. Make sure step 4 DID NOT modify E/A1
+# 06. Try to change A1 type to a string that is longer than 256 chars, see it fail
+# 07. Make sure step 5 DID NOT modify E/A1
+# 08. Try to change A1, adding a metadata with empty name, see it fail
+# 09. Make sure step 7 DID NOT modify E/A1
+#
+
+echo "01. Create entity E with attr A1, attr-type 'house:flat'"
+echo "========================================================"
+payload='{
+  "id": "E",
+  "A1": {
+    "value": 1,
+    "type": "house:flat"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Try to change A1 type to invalid 'house<flat>', with PUT /v2/entities/E/attrs/A1, see it fail"
+echo "================================================================================================="
+payload='{
+  "value": 2,
+  "type": "house<flat>"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "03. Make sure step 2 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail"
+echo "========================================================================================================"
+payload='{
+  "value": 4,
+  "type": "habitación"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "05. Make sure step 4 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "06. Try to change A1 type to a string that is longer than 256 chars, see it fail"
+echo "================================================================================"
+payload='{
+  "value": 4,
+  "type": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF=256+6"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "07. Make sure step 5 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "08. Try to change A1, adding a metadata with empty name, see it fail"
+echo "===================================================================="
+payload='{
+  "": "5678"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "09. Make sure step 7 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with attr A1, attr-type 'house:flat'
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Try to change A1 type to invalid 'house<flat>', with PUT /v2/entities/E/attrs/A1, see it fail
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in attribute type",
+    "error": "BadRequest"
+}
+
+
+03. Make sure step 2 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in attribute type",
+    "error": "BadRequest"
+}
+
+
+05. Make sure step 4 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+06. Try to change A1 type to a string that is longer than 256 chars, see it fail
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attribute type length: 262, max length supported: 256",
+    "error": "BadRequest"
+}
+
+
+07. Make sure step 5 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+08. Try to change A1, adding a metadata with empty name, see it fail
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "unrecognized property for context attribute",
+    "error": "BadRequest"
+}
+
+
+09. Make sure step 7 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "Thing"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

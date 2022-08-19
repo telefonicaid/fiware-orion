@@ -27,8 +27,8 @@
 
 #include "logMsg/logMsg.h"
 
-#include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -40,17 +40,24 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType request, std::string indent)
+std::string ContextAttributeResponse::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  request
+)
 {
-  std::string tag = "contextAttributeResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
-  out += contextAttributeVector.render(ciP, request, indent + "  ", true);
-  out += statusCode.render(ciP->outFormat, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
+  out += startTag();
+  out += contextAttributeVector.toJsonV1(asJsonObject, request, contextAttributeVector.vec, emptyMdV, true);
+  out += statusCode.toJsonV1(false);
+  out += endTag();
 
   return out;
 }
@@ -63,22 +70,22 @@ std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType re
 */
 std::string ContextAttributeResponse::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  const std::string&  predetectedError
 )
 {
   std::string  res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
   {
-    LM_W(("Bad Input (contextAttributeVector: '%s')", res.c_str()));
+    std::string details = std::string("contextAttributeVector: '") + res + "'";
+    alarmMgr.badInput(clientIp, details);
     statusCode.fill(SccBadRequest, res);
 
     //
@@ -95,19 +102,7 @@ std::string ContextAttributeResponse::check
     return "OK";
   }
 
-  return render(ciP, requestType, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void ContextAttributeResponse::present(std::string indent)
-{
-  contextAttributeVector.present(indent);
-  statusCode.present(indent);
+  return toJsonV1(asJsonObject, requestType);
 }
 
 
@@ -127,9 +122,9 @@ void ContextAttributeResponse::release(void)
 *
 * fill - 
 */
-void ContextAttributeResponse::fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode)
+void ContextAttributeResponse::fill(const ContextAttributeVector& caV, const StatusCode& _statusCode)
 {
-  contextAttributeVector.fill(_cavP);
+  contextAttributeVector.fill(caV);
   statusCode.fill(_statusCode);
 }
 
@@ -143,8 +138,7 @@ void ContextAttributeResponse::fill
   QueryContextResponse*  qcrP,
   const std::string&     entityId,
   const std::string&     entityType,
-  const std::string&     attributeName,
-  const std::string&     metaID
+  const std::string&     attributeName
 )
 {
   if (qcrP == NULL)
@@ -162,12 +156,9 @@ void ContextAttributeResponse::fill
       statusCode.fill(SccContextElementNotFound, "");
     }
 
-    if ((statusCode.code != SccOk) && (statusCode.details == ""))
+    if ((statusCode.code != SccOk) && (statusCode.details.empty()))
     {
-      if (metaID == "")
-        statusCode.details = "Entity-Attribute pair: /" + entityId + "-" + attributeName + "/";
-      else
-        statusCode.details = "Entity-Attribute-MetaID triplet: /" + entityId + "-" + attributeName + "-" + metaID + "/";
+      statusCode.details = "Entity-Attribute pair: /" + entityId + "-" + attributeName + "/";
     }
 
     return;
@@ -177,7 +168,7 @@ void ContextAttributeResponse::fill
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
   //           A better approach would be to change this convop to return a vector of responses.
-  //           Adding a warning with 'Bad Input' - with this I mean that the user that sends the 
+  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the 
   //           query needs to avoid using this conv op to make any queries that can give more than
   //           one unique context element :-).
   //           This FIXME is related to github issue #588 and (probably) #650.
@@ -185,39 +176,10 @@ void ContextAttributeResponse::fill
   //
   if (qcrP->contextElementResponseVector.size() > 1)
   {
-    LM_W(("Bad Input (more than one context element found in this query - selecting the first one"));
+    alarmMgr.badInput(clientIp, "more than one context element found in this query - selecting the first one");
   }
 
-  //
-  // If we have to match against Metadata::ID, then we have to through the entire ContextAttribute vector
-  // of the Context Element to find matches.
-  //
-  // If there is no metaID (metaID == ""), then we simply copy the vector
-  //
-  if (metaID != "")
-  {
-    for (unsigned int aIx = 0; aIx < qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size(); ++aIx)
-    {
-      ContextAttribute* caP  = qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector[aIx];
-      Metadata*         mP   = caP->metadataVector.lookupByName("ID");
-
-      if ((mP == NULL) || (mP->value != metaID))
-      {
-        continue;
-      }
-      contextAttributeVector.push_back(caP->clone());
-    }
-
-    if (contextAttributeVector.size() == 0)
-    {
-      std::string details = "Entity-Attribute-MetaID triplet: /" + entityId + "-" + attributeName + "-" + metaID + "/";
-      statusCode.fill(SccContextElementNotFound, details);
-    }
-  }
-  else
-  {
-    contextAttributeVector.fill(&qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector);
-  }
+  contextAttributeVector.fill(qcrP->contextElementResponseVector[0]->entity.attributeVector);
 
   if ((statusCode.code == SccNone) || (statusCode.code == SccOk))
   {

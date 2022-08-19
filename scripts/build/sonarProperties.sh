@@ -23,7 +23,7 @@ VERSION=$1
 ############################### SONAR_RUNNER ###############################
 ################################ COMMON PROPERTIES:BEGIN
 ### PROJECT PROPERTIES ###
-echo sonar.projectName=context-broker
+echo sonar.projectName=fiware-orion
 echo sonar.projectKey=com.telefonica.iot:orion
 echo sonar.projectVersion=$VERSION
 ### SOURCES
@@ -42,7 +42,7 @@ echo sonar.language=c++
 echo sonar.exclusions=**/lib/parseArgs/**,**/lib/logMsg/**,/usr/**
 ### TESTS 
 echo sonar.cxx.xunit.reportPath=BUILD_UNITTEST/unit_test.xml
-echo sonar.cxx.coverage.reportPath=coverage_sonar.xml
+echo sonar.cxx.coverage.reportPath=coverage.xml
 echo sonar.cxx.cppcheck.reportPath=cppcheck-result.xml
 ################################ SPECIFIC PROPERTIES:END"
 

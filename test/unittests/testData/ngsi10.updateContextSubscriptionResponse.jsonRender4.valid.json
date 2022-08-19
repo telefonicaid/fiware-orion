@@ -1,6 +1,1 @@
-{
-  "subscribeResponse" : {
-    "subscriptionId" : "012345678901234567890123",
-    "throttling" : "PT1M"
-  }
-}
+{"subscribeResponse":{"subscriptionId":"012345678901234567890123","throttling":"PT1M"}}

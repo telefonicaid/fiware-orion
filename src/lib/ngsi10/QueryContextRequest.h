@@ -1,5 +1,5 @@
-#ifndef QUERY_CONTEXT_REQUEST_H
-#define QUERY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_NGSI10_QUERYCONTEXTREQUEST_H_
+#define SRC_LIB_NGSI10_QUERYCONTEXTREQUEST_H_
 
 /*
 *
@@ -28,11 +28,20 @@
 #include <string>
 
 #include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
+#include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
-#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
+
+
+
+
+
+/* ****************************************************************************
+*
+* Forward types - instead of including in header file ...
+*/
+class BatchQuery;
 
 
 
@@ -42,20 +51,23 @@
 */
 typedef struct QueryContextRequest
 {
-  EntityIdVector    entityIdVector; // Mandatory
-  AttributeList     attributeList;  // Optional
-  Restriction       restriction;    // Optional
+  EntityIdVector    entityIdVector;  // Mandatory
+  StringList        attributeList;   // Optional
+  StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
+  Restriction       restriction;     // Optional
 
   int               restrictions;
+  StringList        metadataList;     // From URI param 'metadata'
   std::string       contextProvider;  // Not part of the payload - used internally only
+  ProviderFormat    providerFormat;   // Not part of the payload - used internally only
 
   QueryContextRequest();
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, AttributeList& attributeList);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList&  attributeList, ProviderFormat _providerFormat);
 
-  std::string   render(RequestType requestType, Format format, const std::string& indent);
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(const std::string& indent);
+  std::string   toJsonV1(void);
+  std::string   toJson(void);
+  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);
   void          fill(const std::string&  entityId,
@@ -63,6 +75,8 @@ typedef struct QueryContextRequest
                      const std::string&  isPattern,
                      EntityTypeInfo      typeInfo,
                      const std::string&  attributeName);
+  void          fill(BatchQuery* bqP);
+
 } QueryContextRequest;
 
-#endif
+#endif  // SRC_LIB_NGSI10_QUERYCONTEXTREQUEST_H_

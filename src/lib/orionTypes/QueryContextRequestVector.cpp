@@ -29,7 +29,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "orionTypes/QueryContextRequestVector.h"
@@ -39,32 +38,10 @@
 
 /* ****************************************************************************
 *
-* QueryContextRequestVector::QueryContextRequestVector - 
+* QueryContextRequestVector::QueryContextRequestVector -
 */
 QueryContextRequestVector::QueryContextRequestVector()
 {
-  xmls  = 0;
-  jsons = 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequestVector::format - 
-*/
-Format QueryContextRequestVector::format(void)
-{
-  if (xmls > jsons)
-  {
-    return XML;
-  }
-  else if (jsons > xmls)
-  {
-    return JSON;
-  }
-
-  return DEFAULT_FORMAT;
 }
 
 
@@ -78,6 +55,19 @@ unsigned int QueryContextRequestVector::size(void)
   return vec.size();
 }
 
+
+/* ****************************************************************************
+*
+* QueryContextRequestVector::operator[] -
+*/
+QueryContextRequest*  QueryContextRequestVector::operator[](unsigned int ix) const
+{
+   if (ix < vec.size())
+   {
+      return vec[ix];
+   }
+   return NULL;
+}
 
 
 /* ****************************************************************************
@@ -93,7 +83,7 @@ void QueryContextRequestVector::push_back(QueryContextRequest* item)
 
 /* ****************************************************************************
 *
-* entityIdMatch - 
+* entityIdMatch -
 */
 static bool entityIdMatch(EntityId* e1, EntityId* e2)
 {
@@ -102,7 +92,7 @@ static bool entityIdMatch(EntityId* e1, EntityId* e2)
     return false;
   }
 
-  if ((e2->type != "") && (e1->type != e2->type))
+  if ((!e2->type.empty()) && (e1->type != e2->type))
   {
     return false;
   }
@@ -143,32 +133,4 @@ void QueryContextRequestVector::release(void)
   }
 
   vec.clear();
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequestVector::present -
-*/
-void QueryContextRequestVector::present(void)
-{
-  LM_F(("Presenting QueryContextRequestVector of %d QueryContextRequests", vec.size()));
-  for (unsigned int qcrIx = 0; qcrIx < vec.size(); ++qcrIx)
-  {
-    LM_F(("QueryContextRequest %d:", qcrIx));
-    LM_F(("  context provider:    %s", vec[qcrIx]->contextProvider.c_str()));
-
-    for (unsigned int eIx = 0; eIx < vec[qcrIx]->entityIdVector.size(); ++eIx)
-    {
-      EntityId* eP = vec[qcrIx]->entityIdVector[eIx];
-
-      LM_F(("  entity %0d: { '%s', '%s', '%s' }", eIx, eP->id.c_str(),  eP->type.c_str(),  eP->isPattern.c_str()));
-    }
-
-    for (unsigned int aIx = 0; aIx < vec[qcrIx]->attributeList.size(); ++aIx)
-    {
-      LM_F(("  attribute %02d: %s", aIx, vec[qcrIx]->attributeList[aIx].c_str()));
-    }
-  }
 }

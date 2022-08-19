@@ -2,6 +2,9 @@
 *~
 *.bak
 .*
+!.travis.yml
+!.github
+*.autosave
 BUILD_*
 ToDo
 coverage
@@ -35,8 +38,11 @@ src/lib/common/compileInfo.h
 fiware-orion.config
 fiware-orion.creator
 fiware-orion.creator.user
+fiware-orion.creator.user.*
 fiware-orion.files
 fiware-orion.includes
+fiware-orion.cflags
+fiware-orion.cxxflags
 
 rpm/RPMS/
 rpm/SRPMS/

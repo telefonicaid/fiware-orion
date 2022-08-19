@@ -28,11 +28,13 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
-#include "common/Format.h"
+#include "common/JsonHelper.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -49,7 +51,7 @@ StatusCode::StatusCode()
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = "statusCode";
+  keyName      = "statusCode";
 }
 
 
@@ -58,12 +60,12 @@ StatusCode::StatusCode()
 *
 * StatusCode::StatusCode -
 */
-StatusCode::StatusCode(const std::string& _tag)
+StatusCode::StatusCode(const std::string& _keyName)
 {
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = _tag;
+  keyName      = _keyName;
 }
 
 
@@ -72,21 +74,21 @@ StatusCode::StatusCode(const std::string& _tag)
 *
 * StatusCode::StatusCode -
 */
-StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag)
+StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName)
 {
   code          = _code;
   reasonPhrase  = httpStatusCodeString(code);
   details       = _details;
-  tag           = _tag;
+  keyName       = _keyName;
 }
 
 
 
 /* ****************************************************************************
 *
-* StatusCode::render -
+* StatusCode::toJsonV1 -
 */
-std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
+std::string StatusCode::toJsonV1(bool comma, bool showKey)
 {
   std::string  out  = "";
 
@@ -106,16 +108,16 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, tag, format, showTag);
-  out += valueTag(indent + "  ", "code", code, format, true);
-  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
+  out += startTag(showKey? keyName : "");
+  out += valueTag("code", code, true);
+  out += valueTag("reasonPhrase", reasonPhrase, !details.empty());
 
-  if (details != "")
+  if (!details.empty())
   {
-    out += valueTag(indent + "  ", "details", details, format, false);
+    out += valueTag("details", details, false);
   }
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(comma);
 
   return out;
 }
@@ -126,43 +128,12 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 *
 * StatusCode::toJson -
 *
-* For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
+* For version 2 of the API, based on OrionError.
 */
-std::string StatusCode::toJson(bool isLastElement)
+std::string StatusCode::toJson(void)
 {
-  std::string  out  = "";
-
-  if (strstr(details.c_str(), "\"") != NULL)
-  {
-    int    len = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
-
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
-  }
-
-  char codeV[16];
-
-  snprintf(codeV, sizeof(codeV), "%d", code);
-
-  out += "{";
-
-  out += std::string("\"code\":\"") + codeV + "\"";
-  
-  if (details != "")
-  {
-    out += ",\"details\":\"" + details + "\"";
-  }
-
-  out += "}";
-
-  if (!isLastElement)
-  {
-    out += ",";
-  }
-
-  return out;
+  OrionError oe(code, details, reasonPhrase);
+  return oe.smartRender(V2);
 }
 
 
@@ -224,7 +195,7 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
   else
   {
     // Empty UpdateContextResponse::contextElementResponseVector AND unfilled UpdateContextResponse::errorCode
-    LM_E(("Internal Error (can't fill StatusCode from UpdateContextResponse)"));
+    LM_E(("Runtime Error (can't fill StatusCode from UpdateContextResponse)"));
     fill(SccReceiverInternalError, "can't fill StatusCode from UpdateContextResponse");
   }
 }
@@ -235,40 +206,19 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
 *
 * StatusCode::check -
 */
-std::string StatusCode::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string StatusCode::check(void)
 {
   if (code == SccNone)
   {
     return "no code";
   }
 
-  if (reasonPhrase == "")
+  if (reasonPhrase.empty())
   {
     return "no reason phrase";
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* StatusCode::present -
-*/
-void StatusCode::present(const std::string& indent)
-{
-  LM_F(("%s%s:", indent.c_str(), tag.c_str()));
-  LM_F(("%s  Code:            %d",   indent.c_str(), code));
-  LM_F(("%s  ReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str()));
-  LM_F(("%s  Detail:          '%s'", indent.c_str(), details.c_str()));
 }
 
 
@@ -282,16 +232,16 @@ void StatusCode::release(void)
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = "statusCode";
+  keyName      = "statusCode";
 }
 
 
 
 /* ****************************************************************************
 *
-* tagSet -
+* keyNameSet -
 */
-void StatusCode::tagSet(const std::string& _tag)
+void StatusCode::keyNameSet(const std::string& _keyName)
 {
-  tag = _tag;
+  keyName = _keyName;
 }

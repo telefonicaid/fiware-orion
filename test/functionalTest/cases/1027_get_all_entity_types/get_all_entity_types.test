@@ -1,0 +1,385 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity Types
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/types and get an empty list
+# 02. Create E1/T1/A1+A2
+# 03. GET /v2/types and get a non-empty list
+# 04. Create E2/T2/A1+A3
+# 05. Create E3/T3/A2+A4
+# 06. GET /v2/types and get a list of three types, each with one entity
+# 07. Create E4/T3/A4+A3
+# 08. GET /v2/types and get a list of three types, T3 now has two entities
+# 09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3
+#
+
+echo "01. GET /v2/types and get an empty list"
+echo "======================================="
+orionCurl --url /v2/types
+echo
+echo
+
+
+echo "02. Create E1/T1/A1+A2"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E1",
+  "A1": { "type": "String", "value": "s" },
+  "A2": { "type": "Int", "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/types and get a non-empty list"
+echo "=========================================="
+orionCurl --url /v2/types
+echo
+echo
+
+
+echo "04. Create E2/T2/A1+A3"
+echo "======================"
+payload='{
+  "type": "T2",
+  "id":   "E2",
+  "A1": { "type": "String", "value": "s" },
+  "A3": { "type": "Bool", "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create E3/T3/A2+A4"
+echo "======================"
+payload='{
+  "type": "T3",
+  "id":   "E3",
+  "A2": { "type": "Int", "value": 2 },
+  "A4": { "type": "String", "value": "a4" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET /v2/types and get a list of three types, each with one entity"
+echo "====================================================================="
+orionCurl --url /v2/types
+echo
+echo
+
+
+
+echo "07. Create E4/T3/A4+A3"
+echo "======================"
+payload='{
+  "type": "T3",
+  "id":   "E4",
+  "A4": { "type": "String", "value": "a4" },
+  "A3": { "type": "Bool", "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GET /v2/types and get a list of three types, T3 now has two entities"
+echo "========================================================================"
+orionCurl --url /v2/types?options=count
+echo
+echo
+
+
+echo "09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3"
+echo "================================================================="
+orionCurl --url '/v2/types?limit=2&options=count'
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/types and get an empty list
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+02. Create E1/T1/A1+A2
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET /v2/types and get a non-empty list
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T1"
+    }
+]
+
+
+04. Create E2/T2/A1+A3
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E3/T3/A2+A4
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/types and get a list of three types, each with one entity
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 251
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T1"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A3": {
+                "types": [
+                    "Bool"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2"
+    },
+    {
+        "attrs": {
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            },
+            "A4": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T3"
+    }
+]
+
+
+07. Create E4/T3/A4+A3
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. GET /v2/types and get a list of three types, T3 now has two entities
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 275
+Content-Type: application/json
+Fiware-Total-Count: 3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T1"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A3": {
+                "types": [
+                    "Bool"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2"
+    },
+    {
+        "attrs": {
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            },
+            "A3": {
+                "types": [
+                    "Bool"
+                ]
+            },
+            "A4": {
+                "types": [
+                    "String"
+                ]
+            }
+        },
+        "count": 2,
+        "type": "T3"
+    }
+]
+
+
+09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 168
+Content-Type: application/json
+Fiware-Total-Count: 3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T1"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A3": {
+                "types": [
+                    "Bool"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -23,14 +23,19 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>
+
 #include <string>
 #include <vector>
+#include <map>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "apiTypesV2/EntityVector.h"
 
@@ -38,25 +43,66 @@
 
 /* ****************************************************************************
 *
-* EntityVector::render -
+* EntityVector::toJson -
 */
-std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string EntityVector::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
+)
 {
-  if (vec.size() == 0)
-  {
-    return "[]";
-  }
-
-  std::string out;
-
-  out += "[";
+  JsonVectorHelper jh;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, ix != vec.size() - 1);
+    // This is to avoid spurious entities like '{"id": "E", "type": "T"}'
+    // typically generated when CPrs are in use. These entities have
+    // creation date equal to 0 and no attributes
+    if ((vec[ix]->creDate == 0) && (vec[ix]->attributeVector.size() == 0))
+    {
+      continue;
+    }
+    jh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
   }
 
-  out += "]";
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityVector::toJsonV1 -
+*
+* Ported from old class ContextElementVector
+*/
+std::string EntityVector::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         comma
+)
+{
+  std::string  out = "";
+
+  if (vec.size() == 0)
+  {
+    return "";
+  }
+
+  out += startTag("contextElements", true);
+
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, emptyV, false, emptyV, ix != vec.size() - 1);
+  }
+
+  out += endTag(comma, true);
 
   return out;
 }
@@ -67,40 +113,31 @@ std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, b
 *
 * EntityVector::check -
 */
-std::string EntityVector::check
-(
-  ConnectionInfo*     ciP,
-  RequestType         requestType
-)
+std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
 {
+  if ((apiVersion == V1) && (requestType == UpdateContext))
+  {
+    if (vec.size() == 0)
+    {
+      return "No context elements";
+    }
+  }
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of Entity)"));
+      if (apiVersion == V2)
+      {
+        alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
+      }
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityVector::present -
-*/
-void EntityVector::present(const std::string& indent)
-{
-  LM_F(("%lu Entities:\n", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ");
-  }
 }
 
 
@@ -118,11 +155,16 @@ void EntityVector::push_back(Entity* item)
 
 /* ****************************************************************************
 *
-* EntityVector::get -
+* EntityVector::operator[] -
 */
-Entity* EntityVector::get(int ix)
+Entity*  EntityVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+
+  return NULL;
 }
 
 
@@ -134,6 +176,25 @@ Entity* EntityVector::get(int ix)
 unsigned int EntityVector::size(void)
 {
   return vec.size();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityVector::lookup -
+*/
+Entity* EntityVector::lookup(const std::string& name, const std::string& type)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->id == name) && (vec[ix]->type == type))
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }
 
 

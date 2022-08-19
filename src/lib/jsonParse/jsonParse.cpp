@@ -24,6 +24,8 @@
 */
 #include <stdint.h>
 
+#include "common/limits.h"
+
 //
 // http://www.boost.org/doc/libs/1_31_0/libs/spirit/doc/grammar.html:
 //
@@ -44,6 +46,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 
@@ -55,6 +61,7 @@
 #include "jsonParse/jsonParse.h"
 
 using boost::property_tree::ptree;
+using namespace orion;
 
 
 
@@ -81,15 +88,14 @@ static const char* compoundRootV[] =
 * Also, it returns the root of the compound (found in 'compoundValueRootV') and also
 * the 'rest' of the path, i.e. its relative path inside the compound.
 *
-* If the path doesn't belong to any compond, FALSE is returned.
+* If the path doesn't belong to any compound, FALSE is returned.
 */
 static bool isCompoundPath(const char* path)
 {
-  unsigned int len;
 
   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
   {
-    len = strlen(compoundRootV[ix]);
+    size_t len = strlen(compoundRootV[ix]);
 
     if (strlen(path) < len)
     {
@@ -100,6 +106,33 @@ static bool isCompoundPath(const char* path)
     {
       return true;
     }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* isScopeValue - 
+*
+* A path is a scope value if the path ends with /scopes/scope/value
+*/
+static bool isScopeValue(const char* path)
+{
+  int          slen   = strlen(path);
+  const char*  end    = "/scopes/scope/value";
+  int          start  = slen - strlen(end);
+
+  if (start < 0)
+  {
+    return false;
+  }
+
+  if (strcmp(&path[start], end) == 0)
+  {
+    return true;
   }
 
   return false;
@@ -127,14 +160,18 @@ static bool treat
     //
     // Before treating a node, a check is made that the value of the node has no forbidden
     // characters.
-    // However, if the the node has attributes, then the values of the attributes are checked instead
+    // 
+    // For scopes, the check for forbiddenChars is postponed to the check() method of scope
     //
-    if (forbiddenChars(value.c_str()) == true)
+    if (!isScopeValue(path.c_str()))
     {
-      LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer = std::string("Illegal value for JSON field");
-      return false;
+      if (forbiddenChars(value.c_str()) == true)
+      {
+        alarmMgr.badInput(clientIp, "found a forbidden value", value);
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer = std::string("Illegal value for JSON field");
+        return false;
+      }
     }
 
     if (path == parseVector[ix].path)
@@ -181,27 +218,27 @@ static std::string getArrayElementName(const std::string& arrayName)
 *
 * nodeType -
 */
-std::string nodeType(const std::string& nodeName, const std::string& value, orion::CompoundValueNode::Type* typeP)
+std::string nodeType(const std::string& nodeName, const std::string& value, orion::ValueType* typeP)
 {
-  bool        isObject         = (nodeName == "") && (value == "");
-  bool        isString           = (nodeName != "") && (value != "");
-  bool        isVector         = (nodeName != "") && (value == "");
+  bool  isObject  = (nodeName.empty()) && (value.empty());
+  bool  isString  = (!nodeName.empty()) && (!value.empty());
+  bool  isVector  = (!nodeName.empty()) && (value.empty());
 
   if (isObject)
   {
-    *typeP = orion::CompoundValueNode::Object;
+    *typeP = orion::ValueTypeObject;
     return "Object";
   }
 
   if (isString)
   {
-    *typeP = orion::CompoundValueNode::String;
+    *typeP = orion::ValueTypeString;
     return "String";
   }
 
   if (isVector)
   {
-     *typeP = orion::CompoundValueNode::Vector;
+     *typeP = orion::ValueTypeVector;
      return "Vector";
   }
 
@@ -214,15 +251,29 @@ std::string nodeType(const std::string& nodeName, const std::string& value, orio
 /* ****************************************************************************
 *
 * eatCompound -
+*
+* This is a recusive function.
 */
-void eatCompound
+static void eatCompound
 (
   ConnectionInfo*                           ciP,
   orion::CompoundValueNode*                 containerP,
   boost::property_tree::ptree::value_type&  v,
-  const std::string&                        indent
+  const std::string&                        indent,
+  int                                       deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    std::string details = std::string("compound attribute value has overpassed maximum nesting limit");
+    alarmMgr.badInput(clientIp, details);
+
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer = details;
+
+    return;
+  }
+
   std::string                  nodeName     = v.first.data();
   std::string                  nodeValue    = v.second.data();
   boost::property_tree::ptree  subtree1     = (boost::property_tree::ptree) v.second;
@@ -231,59 +282,65 @@ void eatCompound
   if (containerP == NULL)
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
-    containerP = new CompoundValueNode(orion::CompoundValueNode::Object);
+    containerP = new CompoundValueNode(ValueTypeObject);
     ciP->compoundValueRoot = containerP;
   }
   else
   {
-    if ((nodeName != "") && (nodeValue != ""))  // Named String
+    if ((!nodeName.empty()) && (!nodeValue.empty()))  // Named String
     {
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
-        LM_W(("Bad Input (found a forbidden value in compound '%s')", nodeValue.c_str()));
+        alarmMgr.badInput(clientIp, "found a forbidden value in compound", nodeValue);
+
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return;
       }
 
-      containerP->add(orion::CompoundValueNode::String, nodeName, nodeValue);
-      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'",
+      containerP->add(orion::ValueTypeString, nodeName, nodeValue);
+      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s')",
                               nodeName.c_str(),
-                              nodeValue.c_str(),
-                              containerP->cpath()));
+                              nodeValue.c_str()));
     }
-    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
+    else if ((nodeName.empty()) && (nodeValue.empty()) && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
     {
       LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
-      containerP->add(orion::CompoundValueNode::String, "item", "");
+      containerP->add(orion::ValueTypeString, "item", "");
     }
-    else if ((nodeName != "") && (nodeValue == ""))  // Named Container
+    else if ((!nodeName.empty()) && (nodeValue.empty()) && (noOfChildren == 0))  // Named Empty string
     {
-      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
-      containerP = containerP->add(orion::CompoundValueNode::Object, nodeName);
+      LM_T(LmtCompoundValue, ("Adding container '%s'", nodeName.c_str()));
+      containerP = containerP->add(ValueTypeString, nodeName, "");
     }
-    else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
+    else if ((!nodeName.empty()) && (nodeValue.empty()))  // Named Container
     {
-      LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
-      containerP->type = orion::CompoundValueNode::Vector;
-      containerP = containerP->add(orion::CompoundValueNode::Object, "item");
+      LM_T(LmtCompoundValue, ("Adding container '%s'", nodeName.c_str()));
+      containerP = containerP->add(ValueTypeObject, nodeName, "");
     }
-    else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
+    else if ((nodeName.empty()) && (nodeValue.empty()))  // Name-Less container
     {
-      containerP->type = orion::CompoundValueNode::Vector;
-      LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
-      containerP->add(orion::CompoundValueNode::String, "item", nodeValue);
-      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",
-                              nodeValue.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Adding name-less container (parent may be a Vector!)"));
+      containerP->valueType = ValueTypeVector;
+      containerP = containerP->add(ValueTypeObject, "item", "");
+    }
+    else if ((nodeName.empty()) && (!nodeValue.empty()))  // Name-Less String + its container is a vector
+    {
+      containerP->valueType = ValueTypeVector;
+      LM_T(LmtCompoundValue, ("Set to be a vector"));
+      containerP->add(orion::ValueTypeString, "item", nodeValue);
+      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s')", nodeValue.c_str()));
     }
     else
-      LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
+    {
+      LM_E(("Runtime Error (impossible siutation)"));
+    }
   }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
   {
-    eatCompound(ciP, containerP, v2, indent + "  ");
+    eatCompound(ciP, containerP, v2, indent + "  ", deep + 1);
   }
 }
 
@@ -310,7 +367,7 @@ static std::string jsonParse
 
   // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
-  if (nodeName != "")
+  if (!nodeName.empty())
   {
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
@@ -334,12 +391,11 @@ static std::string jsonParse
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   int                         noOfChildren = subtree.size();
-  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue.empty()) && (noOfChildren != 0) && (treated == true))
   {
-    std::string s;
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
-    eatCompound(ciP, NULL, v, "");
+    eatCompound(ciP, NULL, v, "", 0);
     compoundValueEnd(ciP, parseDataP);
 
     if (ciP->httpStatusCode != SccOk)
@@ -352,12 +408,12 @@ static std::string jsonParse
   else if (treated == false)
   {
     ciP->httpStatusCode = SccBadRequest;
-    if (ciP->answer == "")
+    if (ciP->answer.empty())
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
     }
 
-    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+    alarmMgr.badInput(clientIp, ciP->answer);
     return ciP->answer;
   }
 
@@ -372,13 +428,83 @@ static std::string jsonParse
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
     if (out != "OK")
     {
-      LM_W(("Bad Input (JSON parse error: '%s')", out.c_str()));
+      alarmMgr.badInput(clientIp, "JSON Parse Error", out);
       return out;
     }
   }
 
   return "OK";
 }
+
+
+
+/* ****************************************************************************
+*
+* backslashFix - 
+*/
+static void backslashFix(char* content)
+{
+  char* newContent = strdup(content);
+  if (newContent == NULL)
+  {
+    // strdup could return NULL if we run of of memory. Very unlikely, but
+    // theoretically possible (and static code analysis tools complaint about it ;)
+    LM_E(("Runtime Error (strdup returns NULL)"));
+    return;
+  }
+
+  int   nIx        = 0;
+
+  for (unsigned int ix = 0; ix < strlen(content); ++ix)
+  {
+    if (content[ix] != '\\')
+    {
+      newContent[nIx] = content[ix];
+      ++nIx;
+    }
+    else  // Found a backslash!
+    {
+      //
+      // Valid chars after backslash, according to http://www.json.org/:
+      //   - "   Error in json v1 parse
+      //   - \   OK
+      //   - /   Error in json v1 parse
+      //   - b   OK
+      //   - f   OK
+      //   - n   OK
+      //   - r   OK
+      //   - t   OK
+      //   - u + four-hex-digits  OK
+      //
+      // What we will do here is to replace backslash+slash with 'just slash' as
+      // otherwise this JSON parser gives a parse error.
+      //
+      // Nothing can be done with with backslash+citation-mark, that would have to be 
+      // taken care of inside the parser, and that we will not do.
+      // We will just let it pass and provoke a JSON Parse Error.
+      //
+      char next =  content[ix + 1];
+
+      if (next == '/')
+      {
+        // Eat the backslash
+      }
+      else
+      {
+        // Keep the backslash
+        newContent[nIx] = content[ix];
+        ++nIx;
+      }
+    }
+  }
+
+  newContent[nIx] = 0;
+  strcpy(content, newContent);
+
+  free(newContent);
+}
+
+
 
 /* ****************************************************************************
 *
@@ -397,6 +523,22 @@ std::string jsonParse
   ptree              tree;
   ptree              subtree;
   std::string        path;
+  struct timespec    start;
+  struct timespec    end;
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
+  //
+  // Does 'content' contain any '\/' (escaped slashes) ?
+  // If so, change all '\/' to '/'
+  //
+  if ((strstr(content, "\\/") != NULL))
+  {
+    backslashFix((char*) content);
+  }
 
   ss << content;
   read_json(ss, subtree);
@@ -409,10 +551,40 @@ std::string jsonParse
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);
     if (res != "OK")
     {
-      LM_W(("Bad Input (JSON Parse error: '%s')", res.c_str()));
+      alarmMgr.badInput(clientIp, "JSON Parse Error", res);
       return res;
     }
   }
 
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &threadLastTimeStat.jsonV1ParseTime);
+  }
+
   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* safeValue -
+*
+* If the string passed as argument has \0, truncates to the first \0. Not doing
+* so can cause problems when that value is used as field in mongo backend.
+*
+*/
+std::string safeValue(const std::string& s)
+{
+  unsigned int pos = s.find('\0');
+  if (pos != std::string::npos)
+  {
+     return s.substr(0, pos);
+  }
+  else
+  {
+    return s;
+  }
+
 }

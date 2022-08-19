@@ -19,7 +19,6 @@
 # iot_support at tid dot es
 
 # Default prefix for installation
-# Used by RPM generation
 ifndef DESTDIR
 	DESTDIR=/
 endif
@@ -37,11 +36,6 @@ ifndef ORION_WS
 	ORION_WS:=$(shell pwd)
 endif
 
-# Directory for the rpm stage
-ifndef TOPDIR
-	RPM_TOPDIR=$(ORION_WS)/rpm
-endif
-
 # Version for the contextBroker-* packages 
 ifndef BROKER_VERSION
 	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//' | sed -e 's/-/_/g')
@@ -56,12 +50,8 @@ ifndef BUILD_ARCH
     BUILD_ARCH:=$(shell uname -m)
 endif
 
-ifndef MOCK_CONFIG
-    MOCK_CONFIG=epel-6-tid
-endif
-
-ifndef XSD_DIR
-    XSD_DIR=/tmp/xsd
+ifndef MONGO_HOST
+    MONGO_HOST=localhost
 endif
 
 all: prepare_release release
@@ -91,7 +81,6 @@ prepare_unit_test: compile_info
 	mkdir -p  BUILD_UNITTEST || true
 	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 	@echo '------------------------------- prepare_unit_test ended ---------------------------------'
-
 
 release: prepare_release
 	cd BUILD_RELEASE && make -j$(CPU_COUNT)
@@ -178,6 +167,10 @@ post_install_libs:
 	cp src/lib/parse/*.h /usr/local/include/contextBroker/parse
 	cp $(CMAKE_BUILD_TYPE)/src/lib/parse/libparse.a  /usr/local/lib
 
+	cd /usr/local/include/contextBroker  && rm -rf mqtt && mkdir -p mqtt
+	cp src/lib/mqtt/*.h /usr/local/include/contextBroker/mqtt         
+	cp $(CMAKE_BUILD_TYPE)/src/lib/mqtt/libmqtt.a  /usr/local/lib
+
 
 # Requires root access, i.e. use 'sudo make install_libs' to install
 install_libs: release
@@ -186,67 +179,6 @@ install_libs: release
 # Requires root access, i.e. use 'sudo make install_debug_libs' to install
 install_debug_libs: debug
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_DEBUG
-
-rpm-ts:
-	# This target assumes that scripts/build/timestampVersion.sh has been previously called before "make rpm-ts"
-	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	# It seems that git archive doesn't take into account changes in the local copy not commited. Thus, we need to do this "in place" .tar.gz
-	# replacement to inject the modified version.sh file
-	cd $(RPM_TOPDIR)/SOURCES && tar xfvz contextBroker-$(BROKER_VERSION).tar.gz && cd -
-	cp src/app/contextBroker/version.h $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)/src/app/contextBroker/version.h
-	rm $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	cd $(RPM_TOPDIR)/SOURCES && tar cfvz contextBroker-$(BROKER_VERSION).tar.gz contextBroker-$(BROKER_VERSION) && cd -
-	rm -rf $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)
-	# -------------
-	git checkout src/app/contextBroker/version.h
-	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
-		--define '_topdir $(RPM_TOPDIR)' \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
-
-rpm: 
-	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
-		--define '_topdir $(RPM_TOPDIR)' \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
-
-mock: 
-	mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}
-	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(HOME)/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -bs rpm/contextBroker.spec \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
-	/usr/bin/mock -r $(MOCK_CONFIG)-$(BUILD_ARCH) ~/rpmbuild/SRPMS/contextBroker-$(BROKER_VERSION)-$(BROKER_RELEASE).src.rpm -v \
-		--define='broker_version $(BROKER_VERSION)' \
-		--define='broker_release $(BROKER_RELEASE)' \
-		--define='build_arch $(BUILD_ARCH)'
-	mkdir -p packages
-	cp /var/lib/mock/$(MOCK_CONFIG)-$(BUILD_ARCH)/result/*.rpm packages
-
-mock64: /var/lib/mock/$(MOCK_CONFIG)-x86_64
-	make mock BUILD_ARCH=x86_64 MOCK_CONFIG=$(MOCK_CONFIG)
-
-mock32: /var/lib/mock/$(MOCK_CONFIG)-i386
-	make mock BUILD_ARCH=i386  MOCK_CONFIG=$(MOCK_CONFIG)
-
-/var/lib/mock/$(MOCK_CONFIG)-x86_64:
-ifeq ($(MOCK_CONFIG),epel-6-tid)
-	sudo cp rpm/epel-6-tid-x86_64.cfg /etc/mock/epel-6-tid-x86_64.cfg
-endif
-	/usr/bin/mock --init -r $(MOCK_CONFIG)-x86_64 -v
-
-/var/lib/mock/$(MOCK_CONFIG)-i386:
-ifeq ($(MOCK_CONFIG),epel-6-tid)
-	sudo cp rpm/epel-6-tid-i386.cfg /etc/mock/epel-6-tid-i386.cfg
-endif
-	/usr/bin/mock --init -r $(MOCK_CONFIG)-i386 -v
 
 deb: clean
 	rm -rf package/deb
@@ -258,6 +190,11 @@ clean:
 	rm -rf BUILD_DEBUG
 	rm -rf BUILD_COVERAGE
 	rm -rf BUILD_UNITTEST
+
+style:
+	./scripts/style_check_in_makefile.sh
+	rm LINT LINT_ERRORS
+
 
 style_check:
 	@scripts/style_check.sh
@@ -279,9 +216,9 @@ build_unit_test: prepare_unit_test
 unit_test: build_unit_test
 	@echo '------------------------------- unit_test starts ---------------------------------'
 	if [ -z "${TEST_FILTER}" ]; then \
-	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
         else \
-	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
@@ -304,7 +241,7 @@ coverage: install_coverage
 	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
-	BUILD_COVERAGE/test/unittests/unitTest --gtest_output=xml:BUILD_COVERAGE/unit_test.xml
+	BUILD_COVERAGE/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_COVERAGE/unit_test.xml
 	if [ -z "${CONTEXTBROKER_TESTENV_SOURCED}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \
@@ -324,9 +261,9 @@ coverage: install_coverage
 	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
 	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
 coverage_unit_test: build_unit_test
@@ -337,7 +274,7 @@ coverage_unit_test: build_unit_test
 	lcov --capture --initial --directory BUILD_UNITTEST -b BUILD_UNITTEST --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
-	BUILD_UNITTEST/test/unittests/unitTest --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
+	BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
 	# Generate test report
 	echo "Generating coverage report"
 	lcov --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
@@ -346,11 +283,11 @@ coverage_unit_test: build_unit_test
 	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
 	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info	
-	lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
 	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
-	lcov -r coverage/broker.info "src/app/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
@@ -368,7 +305,7 @@ coverage_functional_test: install_coverage
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
 	@if [ -e test/functionalTest/cases/*.diff ]; then \
            echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases" manually to find the problem."; \
+           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases\" manually to find the problem."; \
 	   exit 1; \
 	fi
 	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
@@ -380,9 +317,9 @@ coverage_functional_test: install_coverage
 	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
 	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info	
-	lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
 valgrind: install_debug
@@ -392,20 +329,10 @@ valgrind: install_debug
 files_compliance:
 	scripts/check_files_compliance.py .
 
-xml_check:
-	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
-
 json_check:
 	test/jsonCheck/jsonCheck.sh
 
-check_delimiter:
-	@echo
-	@echo
-	@echo
-	@echo "==========================  JSON PAYLOAD CHECK ============================================="
-	@echo
-
-payload_check: xml_check check_delimiter json_check
+payload_check: json_check
 
 cppcheck:
 	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml
@@ -414,8 +341,6 @@ cppcheck:
 sonar_metrics: coverage
 	scripts/build/sonarProperties.sh $(BROKER_VERSION) > sonar-project.properties 
 	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
-	# The JOB_NAME var will be injected automatically by Jenkins at the job execution
-	sed 's#filename="/var/develenv/jenkins/jobs/ContextBroker-Build-UnitTests/workspace#filename="/var/develenv/jenkins/jobs/metrics-queue-consumer/workspace/workspace#g' coverage.xml > coverage_sonar.xml
 	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
-.PHONY: rpm mock mock32 mock64 valgrind
+.PHONY: valgrind

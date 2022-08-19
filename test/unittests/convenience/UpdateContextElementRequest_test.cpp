@@ -27,7 +27,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "rest/ConnectionInfo.h"
@@ -38,35 +37,7 @@
 
 /* ****************************************************************************
 *
-* render_xml - 
-*/
-TEST(UpdateContextElementRequest, render_xml)
-{
-  UpdateContextElementRequest     ucer;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  std::string                     out;
-  const char*                     outfile = "ngsi10.updateContextElementRequest.render.valid.xml";
-  ConnectionInfo                  ci(XML);
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  // Just the normal case
-  ucer.attributeDomainName.set("ADN");
-  ucer.contextAttributeVector.push_back(&ca);
-
-  out = ucer.render(&ci, UpdateContext, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* render_json - 
+* render_json -
 */
 TEST(UpdateContextElementRequest, render_json)
 {
@@ -74,17 +45,15 @@ TEST(UpdateContextElementRequest, render_json)
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
   const char*                     outfile = "ngsi10.updateContextElementRequest.render.valid.json";
-  ConnectionInfo                  ci(JSON);
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   // Just the normal case
-  ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(&ca);
 
-  out = ucer.render(&ci, UpdateContext, "");
+  out = ucer.toJsonV1(false, UpdateContext);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -94,50 +63,7 @@ TEST(UpdateContextElementRequest, render_json)
 
 /* ****************************************************************************
 *
-* check_xml - 
-*/
-TEST(UpdateContextElementRequest, check_xml)
-{
-  UpdateContextElementRequest     ucer;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  std::string                     out;
-  const char*                     outfile1  = "ngsi10.updateContextElementRequest.check1.valid.xml";
-  const char*                     outfile2  = "ngsi10.updateContextElementRequest.check2.valid.xml";
-  ConnectionInfo                  ci(XML);
-
-  utInit();
-
-  ucer.attributeDomainName.set("ADN");
-
-  // 1. predetectedError
-  ucer.contextAttributeVector.push_back(&ca);
-  out = ucer.check(&ci, UpdateContextElement, "", "PRE Error", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  // 2. ok
-  out = ucer.check(&ci, UpdateContextElement, "", "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-  // 3. bad attributeDomainName
-  ucer.attributeDomainName.set("");
-  EXPECT_STREQ("OK", out.c_str());
-
-  // 4. bad contextAttributeVector
-  ContextAttribute                ca2("", "caType", "caValue");
-  ucer.contextAttributeVector.push_back(&ca2);
-  out = ucer.check(&ci, UpdateContextElement, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* check_json - 
+* check_json -
 */
 TEST(UpdateContextElementRequest, check_json)
 {
@@ -146,30 +72,23 @@ TEST(UpdateContextElementRequest, check_json)
   std::string                     out;
   const char*                     outfile1  = "ngsi10.updateContextElementRequest.check1.valid.json";
   const char*                     outfile2  = "ngsi10.updateContextElementRequest.check2.valid.json";
-  ConnectionInfo                  ci(JSON);
 
   utInit();
 
-  ucer.attributeDomainName.set("ADN");
-
   // 1. predetectedError
   ucer.contextAttributeVector.push_back(&ca);
-  out = ucer.check(&ci, UpdateContextElement, "", "PRE Error", 0);
+  out = ucer.check(V1, false, UpdateContextElement, "PRE Error");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. ok
-  out = ucer.check(&ci, UpdateContextElement, "", "", 0);
+  out = ucer.check(V1, false, UpdateContextElement, "");
   EXPECT_STREQ("OK", out.c_str());
 
-  // 3. bad attributeDomainName
-  ucer.attributeDomainName.set("");
-  EXPECT_STREQ("OK", out.c_str());
-
-  // 4. bad contextAttributeVector
+  // 3. bad contextAttributeVector
   ContextAttribute                ca2("", "caType", "caValue");
   ucer.contextAttributeVector.push_back(&ca2);
-  out = ucer.check(&ci, UpdateContextElement, "", "", 0);
+  out = ucer.check(V1, false, UpdateContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -180,33 +99,15 @@ TEST(UpdateContextElementRequest, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(UpdateContextElementRequest, present)
-{
-  UpdateContextElementRequest     ucer;
-  ContextAttribute                ca("caName", "caType", "caValue");
-
-  ucer.attributeDomainName.set("ADN");
-  ucer.contextAttributeVector.push_back(&ca);
-
-  ucer.present("");
-}
-
-
-
-/* ****************************************************************************
-*
-* release - 
+* release -
 */
 TEST(UpdateContextElementRequest, release)
 {
   UpdateContextElementRequest     ucer;
   ContextAttribute*               caP = new ContextAttribute("caName", "caType", "caValue");
 
-  ucer.attributeDomainName.set("ADN");
   ucer.contextAttributeVector.push_back(caP);
-  
+
   ASSERT_EQ(1, ucer.contextAttributeVector.size());
 
   ucer.release();

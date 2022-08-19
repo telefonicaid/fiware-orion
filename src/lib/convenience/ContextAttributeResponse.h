@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -52,20 +51,17 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  std::string render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
-  void        present(std::string indent);
+  std::string toJsonV1(bool asJsonObject, RequestType request);
   void        release(void);
-  std::string check(ConnectionInfo*  ciP,
-                    RequestType      requestType,
-                    std::string      indent,
-                    std::string      predetectedError,
-                    int              counter);
-  void        fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode);
+  std::string check(ApiVersion          apiVersion,
+                    bool                asJsonObject,
+                    RequestType         requestType,
+                    const std::string&  predetectedError);
+  void        fill(const ContextAttributeVector& caV, const StatusCode& _statusCode);
   void        fill(QueryContextResponse*  qcrP,
                    const std::string&     entityId,
                    const std::string&     entityType,
-                   const std::string&     attributeName,
-                   const std::string&     metaID);
+                   const std::string&     attributeName);
 } ContextAttributeResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_

@@ -23,6 +23,7 @@
 * Author: developer
 */
 #include <unistd.h>                             // close()
+#include <string.h>                             // strchr()
 #include <sys/types.h>                          // system types ...
 #include <sys/socket.h>                         // socket, bind, listen
 #include <sys/un.h>                             // sockaddr_un
@@ -37,37 +38,26 @@
 #include <iostream>
 #include <sstream>
 
-#include "common/string.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/string.h"
+#include "common/limits.h"
+#include "common/defaultValues.h"
+#include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
+#include "rest/HttpHeaders.h"
 #include "rest/rest.h"
+#include "rest/curlSem.h"
 #include "serviceRoutines/versionTreat.h"
 
 
 
 /* ****************************************************************************
 *
-* HTTP header maximum lengths
-*/
-#define CURL_VERSION_MAX_LENGTH             128
-#define HTTP_HEADER_USER_AGENT_MAX_LENGTH   256
-#define HTTP_HEADER_HOST_MAX_LENGTH         256
-
-
-
-/* ****************************************************************************
-*
-* Default timeout - 5000 milliseconds
-*/
-#define DEFAULT_TIMEOUT     5000
-
-
-
-/* ****************************************************************************
-*
-* defaultTimeout - 
+* defaultTimeout -
 */
 static long defaultTimeout = DEFAULT_TIMEOUT;
 
@@ -75,7 +65,7 @@ static long defaultTimeout = DEFAULT_TIMEOUT;
 
 /* ****************************************************************************
 *
-* httpRequestInit - 
+* httpRequestInit -
 */
 void httpRequestInit(long defaultTimeoutInMilliseconds)
 {
@@ -87,7 +77,7 @@ void httpRequestInit(long defaultTimeoutInMilliseconds)
 
 
 
-/* **************************************************************************** 
+/* ****************************************************************************
 *
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
 * to provide a way to do asynchronous HTTP transactions in the way we intended
@@ -96,8 +86,6 @@ void httpRequestInit(long defaultTimeoutInMilliseconds)
 *
 * [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
 */
-//#define USE_OLD_SENDHTTPSOCKET
-#ifndef USE_OLD_SENDHTTPSOCKET
 
 struct MemoryStruct
 {
@@ -134,7 +122,7 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
 
 /* ****************************************************************************
 *
-* curlVersionGet - 
+* curlVersionGet -
 */
 static char* curlVersionGet(char* buf, int bufLen)
 {
@@ -151,225 +139,424 @@ static char* curlVersionGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
-* httpRequestSend -
+* httpHeaderAdd - add HTTP header to the list of HTTP headers for curl
+*
+* PARAMETERS
+*   o headersP            pointer to the list of HTTP headers, to be used by curl
+*   o headerName          The name of the header, e.g. "Content-Type"
+*   o headerValue         The value of the header, e.g. "application/json"
+*   o headerTotalSizeP    Pointer to a variable holding the total size of the list of headers,
+*                         the string length of the list. To this variable, the string length of the added header must be added.
+*   o extraHeaders        list of extra headers that were asked for when creating the subscription.
+*                         We need this variable here in case the user overloaded any standard header.
+*   o usedExtraHeaders    list of headers already used, so that any overloaded standard header are not present twice in the notification.
+*
 */
-std::string httpRequestSend
+static void httpHeaderAdd
 (
-   const std::string&     _ip,
-   unsigned short         port,
-   const std::string&     protocol,
-   const std::string&     verb,
-   const std::string&     tenant,
-   const std::string&     servicePath,
-   const std::string&     xauthToken,
-   const std::string&     resource,
-   const std::string&     content_type,
-   const std::string&     content,
-   bool                   useRush,
-   bool                   waitForResponse,
-   const std::string&     acceptFormat,
-   long                   timeoutInMilliseconds
+  struct curl_slist**                        headersP,
+  const std::string&                         headerName,
+  const std::string&                         headerValue,
+  int*                                       headerTotalSizeP,
+  const std::map<std::string, std::string>&  extraHeaders,
+  std::map<std::string, bool>&               usedExtraHeaders
 )
 {
-  char                       portAsString[16];
-  static unsigned long long  callNo             = 0;
-  std::string                result;
-  std::string                ip                 = _ip;
-  struct curl_slist*         headers            = NULL;
-  MemoryStruct*              httpResponse       = NULL;
-  CURLcode                   res;
-  int                        outgoingMsgSize       = 0;
-  CURL*                      curl;
+
+  std::string headerNameLowerCase = headerName;
+  std::transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
+
+  std::string  h = headerName + ": " + headerValue;
+
+  // Fiware-Correlator and Ngsiv2-AttrsFormat cannot be overwritten, so we don't
+  // search in extraHeaders in these cases
+  if ((headerName != HTTP_FIWARE_CORRELATOR) && (headerName != HTTP_NGSIV2_ATTRSFORMAT))
+  {
+    std::map<std::string, std::string>::const_iterator it;
+    it = extraHeaders.find(headerNameLowerCase);
+    if (it != extraHeaders.end())  // headerName found in extraHeaders, use matching map value
+    {
+      h = headerName + ": " + it->second;
+      usedExtraHeaders[headerNameLowerCase.c_str()] = true;
+    }
+  }
+
+  *headersP           = curl_slist_append(*headersP, h.c_str());
+  *headerTotalSizeP  += h.size();
+}
+
+
+/* ****************************************************************************
+*
+* contentLenParse - extract content length fromn HTTP header string
+*
+* To get the size of the payload, simply search for "Content-Length"
+* inside the HTTP headers and extract the number.
+*/
+static int contentLenParse(char* s)
+{
+  char* contentLenP  = strstr(s, "Content-Length:");             // Point to beginning of 'Content-Length:'
+
+  if (contentLenP == NULL)
+  {
+    return 0;
+  }
+
+  int offset = strlen("Content-Length:");
+
+  while ((contentLenP[offset] == ' ') || (contentLenP[offset] == '\t'))        // Step over spaces and tabs ...
+  {
+    ++offset;
+  }
+
+
+  return atoi(&contentLenP[offset]);  // ... and get the number
+}
+
+
+
+/* ****************************************************************************
+*
+* httpRequestSend -
+*
+* NOTE
+* We are using a hybrid approach, consisting of a static thread-local buffer of a
+* small size that copes with most notifications to avoid expensive
+* calloc/free syscalls if the notification payload is not very large.
+*
+* RETURN VALUES
+*   httpRequestSendWithCurl returns 0 on success and a negative number on failure:
+*     -1: Invalid port
+*     -2: Invalid IP
+*     -3: Invalid verb
+*     -4: Invalid resource
+*     -5: No Content-Type BUT content present
+*     -6: Content-Type present but there is no content
+*     -7: Total outgoing message size is too big
+*     -8: Unable to initialize libcurl (NOTE: only possible if actual curl is not provided as first argument)
+*     -9: Error making HTTP request
+*
+*/
+int httpRequestSend
+(
+   CURL*                                      _curl,
+   const std::string&                         idStringForLogs,
+   const std::string&                         from,
+   const std::string&                         _ip,
+   unsigned short                             port,
+   const std::string&                         _protocol,
+   const std::string&                         verb,
+   const std::string&                         tenant,
+   const std::string&                         servicePath,
+   const std::string&                         xauthToken,
+   const std::string&                         resource,
+   const std::string&                         orig_content_type,
+   const std::string&                         content,
+   const std::string&                         fiwareCorrelation,
+   const std::string&                         ngsiv2AttrFormat,
+   std::string*                               outP,
+   long long*                                 statusCodeP,
+   const std::map<std::string, std::string>&  extraHeaders,
+   const std::string&                         acceptFormat,
+   long                                       timeoutInMilliseconds
+)
+{
+  CURL*                curl;
+  struct curl_context  cc;
+  char                 servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
+
+  firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
+
+  if (_curl == NULL)
+  {
+    // if curl object has not been provided as paramter, then we create it
+    get_curl_context(_ip, &cc);
+
+    if (cc.curl == NULL)
+    {
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+
+      release_curl_context(&cc);
+      LM_E(("Runtime Error (could not get curl context)"));
+
+      *outP = "unable to get curl context";
+      return -8;
+    }
+
+    curl = cc.curl;
+  }
+  else
+  {
+    curl = _curl;
+  }
+
+  char                            portAsString[STRING_SIZE_FOR_INT];
+  static unsigned long long       callNo             = 0;
+  std::string                     ip                 = _ip;
+  struct curl_slist*              headers            = NULL;
+  MemoryStruct*                   httpResponse       = NULL;
+  CURLcode                        res;
+  int                             outgoingMsgSize    = 0;
+  std::string                     content_type(orig_content_type);
+  std::map<std::string, bool>     usedExtraHeaders;
+
+  metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
   ++callNo;
 
-  if (timeoutInMilliseconds == -1)
+  // For content-type application/json we add charset=utf-8
+  if ((orig_content_type == "application/json") || (orig_content_type == "text/plain"))
+  {
+    content_type += "; charset=utf-8";
+  }
+
+  if (timeoutInMilliseconds <= 0)
   {
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
+  // Note that the corresponding lmTransactionEnd() is not done in this function, but in the caller, as we
+  // need to wait to subNotificationErrorStatus() before ending (or the logs in this operation
+  // will show unwanted N/A fields)
+  std::string protocol = _protocol + "//";
+  correlatorIdSet(fiwareCorrelation.c_str());
+  lmTransactionStart("to", protocol.c_str(), + ip.c_str(), port, resource.c_str(),
+                     tenant.c_str(), servicePath.c_str(), from.c_str());
 
   // Preconditions check
   if (port == 0)
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (port is ZERO)"));
-    LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "invalid port";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -1;
   }
 
   if (ip.empty())
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (ip is empty)"));
-    LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "invalid IP";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -2;
   }
 
   if (verb.empty())
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (verb is empty)"));
-    LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "invalid verb";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -3;
   }
 
   if (resource.empty())
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (resource is empty)"));
-    LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "invalid resource";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -4;
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "no Content-Type but content present";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -5;
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "Content-Type present but there is no content";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -6;
   }
 
-  if ((curl = curl_easy_init()) == NULL)
-  {
-    LM_E(("Runtime Error (could not init libcurl)"));
-    LM_TRANSACTION_END();
-    return "error";
-  }
 
 
   // Allocate to hold HTTP response
-  httpResponse = new MemoryStruct;
+  httpResponse         = new MemoryStruct;
   httpResponse->memory = (char*) malloc(1); // will grow as needed
-  httpResponse->size = 0; // no data at this point
+  httpResponse->size   = 0; // no data at this point
 
-  //
-  // Rush
-  // Every call to httpRequestSend specifies whether RUSH should be used or not.
-  // But, this depends also on how the broker was started, so here the 'useRush'
-  // parameter is cancelled in case the broker was started without rush.
-  //
-  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
-  // after that, the host and port of rush is set as ip/port for the message, that is
-  // now sent to rush instead of to its final destination.
-  // Also, a few HTTP headers for rush must be setup.
-  //
-  if ((rushPort == 0) || (rushHost == ""))
-    useRush = false;
-
-  if (useRush)
-  {
-    char         rushHeaderPortAsString[16];
-    uint16_t     rushHeaderPort     = 0;
-    std::string  rushHeaderIP       = "";
-    std::string  headerRushHttp     = "";
-
-    rushHeaderIP   = ip;
-    rushHeaderPort = port;
-    ip             = rushHost;
-    port           = rushPort;
-
-    snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
-    headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
-    LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
-    headers = curl_slist_append(headers, headerRushHttp.c_str());
-    outgoingMsgSize += headerRushHttp.size();
-
-    if (protocol == "https:")
-    {
-      headerRushHttp = "X-relayer-protocol: https";
-      LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
-      headers = curl_slist_append(headers, headerRushHttp.c_str());
-      outgoingMsgSize += headerRushHttp.size();
-    }
-  }
-
-  snprintf(portAsString, sizeof(portAsString), "%d", port);
+  snprintf(portAsString, sizeof(portAsString), "%u", port);
 
   // ----- User Agent
-  char cvBuf[CURL_VERSION_MAX_LENGTH];
-  char headerUserAgent[HTTP_HEADER_USER_AGENT_MAX_LENGTH];
+  char        cvBuf[CURL_VERSION_MAX_LENGTH];
+  char        userAgentHeaderValue[HTTP_HEADER_USER_AGENT_MAX_LENGTH];
+  std::string userAgentHeaderName = HTTP_USER_AGENT;
 
-  snprintf(headerUserAgent, sizeof(headerUserAgent), "User-Agent: orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerUserAgent));
-  headers = curl_slist_append(headers, headerUserAgent);
-  outgoingMsgSize += strlen(headerUserAgent) + 1;
+  snprintf(userAgentHeaderValue, sizeof(userAgentHeaderValue), "orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
+  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (userAgentHeaderName + ": " + userAgentHeaderValue).c_str()));
+  httpHeaderAdd(&headers, userAgentHeaderName, userAgentHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Host
-  char headerHost[HTTP_HEADER_HOST_MAX_LENGTH];
+  char        hostHeaderValue[HTTP_HEADER_HOST_MAX_LENGTH];
+  std::string hostHeaderName = HTTP_HOST;
 
-  snprintf(headerHost, sizeof(headerHost), "Host: %s:%d", ip.c_str(), (int) port);
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerHost));
-  headers = curl_slist_append(headers, headerHost);
-  outgoingMsgSize += strlen(headerHost) + 1;
+  snprintf(hostHeaderValue, sizeof(hostHeaderValue), "%s:%d", ip.c_str(), (int) port);
+  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (hostHeaderName + ": " + hostHeaderValue).c_str()));
+  httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
-  if (tenant != "")
+  if (!tenant.empty())
   {
-    headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
-    outgoingMsgSize += tenant.size() + 16; // "fiware-service: "
+    std::string fiwareServiceHeaderValue = tenant;
+    httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Service-Path
-  if (servicePath != "")
-  {
-    headers = curl_slist_append(headers, ("Fiware-ServicePath: " + servicePath).c_str());
-    outgoingMsgSize += servicePath.size() + strlen("Fiware-ServicePath: ");
-  }
+  std::string fiwareServicePathHeaderValue =  (servicePath.empty())? "/" : servicePath;
+  httpHeaderAdd(&headers, HTTP_FIWARE_SERVICEPATH, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
-  if (xauthToken != "")
+  if (!xauthToken.empty())
   {
-    headers = curl_slist_append(headers, ("X-Auth-Token: " + xauthToken).c_str());
-    outgoingMsgSize += xauthToken.size() + strlen("X-Auth-Token: ");
+    std::string xauthTokenHeaderValue = xauthToken;
+    httpHeaderAdd(&headers, HTTP_X_AUTH_TOKEN, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
   }
 
   // ----- Accept
-  std::string acceptedFormats = "application/xml, application/json";
-  if (acceptFormat != "")
+  std::string acceptedFormats = "application/json";
+  if (!acceptFormat.empty())
   {
     acceptedFormats = acceptFormat;
   }
 
-  std::string acceptString = "Accept: " + acceptedFormats;
-  headers = curl_slist_append(headers, acceptString.c_str());
-  outgoingMsgSize += acceptString.size();
+  std::string acceptHeaderValue = acceptedFormats;
+  httpHeaderAdd(&headers, HTTP_ACCEPT, acceptHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Expect
-  headers = curl_slist_append(headers, "Expect: ");
-  outgoingMsgSize += 8; // from "Expect: "
+  httpHeaderAdd(&headers, HTTP_EXPECT, " ", &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Content-length
   std::stringstream contentLengthStringStream;
   contentLengthStringStream << content.size();
-  std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
-  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerContentLength.c_str()));
-  headers = curl_slist_append(headers, headerContentLength.c_str());
-  outgoingMsgSize += contentLengthStringStream.str().size() + 16; // from "Content-length: "
-  outgoingMsgSize += content.size();
+  std::string contentLengthHeaderName  = HTTP_CONTENT_LENGTH;
+  std::string contentLengthHeaderValue = contentLengthStringStream.str();
+
+  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (contentLengthHeaderName + ": " + contentLengthHeaderValue).c_str()));
+  httpHeaderAdd(&headers, contentLengthHeaderName, contentLengthHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+
+  //
+  // Add the size of the actual payload
+  //
+  // Note that 'outgoingMsgSize' is the TOTAL size of the outgoing message,
+  // including HTTP headers etc, while 'payloadSize' is the size of just
+  // the payload of the message.
+  //
+  unsigned long long payloadSize = content.size();
+  outgoingMsgSize += payloadSize;
+
 
   // ----- Content-type
-  headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
-  outgoingMsgSize += content_type.size() + 14; // from "Content-type: "
+  std::string contentTypeHeaderValue = content_type;
 
+  httpHeaderAdd(&headers, HTTP_CONTENT_TYPE, contentTypeHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
-  // Check if total outgoing message size is too big
-  if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
+  // Fiware-Correlator
+  std::string correlationHeaderValue = fiwareCorrelation;
+  httpHeaderAdd(&headers, HTTP_FIWARE_CORRELATOR, correlationHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+
+  // Notify Format
+  if ((!ngsiv2AttrFormat.empty()) && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
   {
+    std::string nFormatHeaderValue = ngsiv2AttrFormat;
+
+    httpHeaderAdd(&headers, HTTP_NGSIV2_ATTRSFORMAT, nFormatHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
+  }
+
+  // Extra headers
+  for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin(); it != extraHeaders.end(); ++it)
+  {
+    std::string headerNameLowerCase = it->first;
+    transform(headerNameLowerCase.begin(), headerNameLowerCase.end(), headerNameLowerCase.begin(), ::tolower);
+
+    // Ngsiv2-AttrsFormat and Fiware-Correlator cannot be overwritten
+    if ((headerNameLowerCase == "ngsiv2-attrsformat") || (headerNameLowerCase == "fiware-correlator"))
+    {
+      continue;
+    }
+
+    if (!usedExtraHeaders[headerNameLowerCase])
+    {
+      std::string header = it->first + ": " + it->second;
+
+      headers            = curl_slist_append(headers, header.c_str());
+      outgoingMsgSize   += header.size();
+    }
+  }
+
+
+  //
+  // FIXME: outgoingMsgSize is a signed int. Max size ~2GB. Might not be enough.
+  //        Might be a good idea to change it to 'unsigned long long'
+  //
+
+  //
+  // Check if total outgoing message size is too big
+  //
+  if ((unsigned long long) outgoingMsgSize > outReqMsgMaxSize)
+  {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
 
-    // Cleanup curl environment
     curl_slist_free_all(headers);
-    curl_easy_cleanup(curl);
 
     free(httpResponse->memory);
     delete httpResponse;
 
-    LM_TRANSACTION_END();
-    return "error";
+    *outP = "total outgoing message size is too big";
+
+    if (_curl == NULL)
+    {
+      release_curl_context(&cc);
+    }
+
+    return -7;
   }
 
   // Contents
@@ -379,10 +566,20 @@ std::string httpRequestSend
   // Set up URL
   std::string url;
   if (isIPv6(ip))
+  {
     url = "[" + ip + "]";
+  }
   else
+  {
     url = ip;
-  url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  }
+  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  if (insecureNotif)
+  {
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+  }
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -394,387 +591,84 @@ std::string httpRequestSend
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) httpResponse); // Custom data for response handling
 
   //
-  // Timeout 
+  // There is a known problem in libcurl (see http://stackoverflow.com/questions/9191668/error-longjmp-causes-uninitialized-stack-frame)
+  // which is solved using CURLOPT_NOSIGNAL. If we update some day from libcurl 7.19 (the one that comes with CentOS 6.x) to a newer version
+  // (there are some reports about the bug is no longer in libcurl 7.32), using CURLOPT_NOSIGNAL could be not necessary and this be removed).
+  // See issue #1016 for more details.
+  //
+  curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+
+  //
+  // Timeout
   //
   // The parameter timeoutInMilliseconds holds the timeout time in milliseconds.
   // If the timeout time requested is 0, then no timeuot is used.
   //
-  if (timeoutInMilliseconds != 0) 
+  if (timeoutInMilliseconds > 0)
   {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
   }
 
 
+  //
   // Synchronous HTTP request
-  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
-  res = curl_easy_perform(curl);
+  //
+  // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed
+  // to check logs in a .test case (case 000 notification_different_sizes.test)
+  //
+  LM_T(LmtOldInfo, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
 
+  res = curl_easy_perform(curl);
   if (res != CURLE_OK)
   {
     //
     // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
-    LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
-    result = "";
+    *outP = std::string(curl_easy_strerror(res));
+
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
   }
   else
   {
+    //
     // The Response is here
-    LM_I(("Notification Successfully Sent to %s", url.c_str()));
-    result.assign(httpResponse->memory, httpResponse->size);
+    //
+    int   payloadLen  = contentLenParse(httpResponse->memory);
+
+    LM_T(LmtOldInfo, ("Notification Successfully Sent to %s", url.c_str()));
+    outP->assign(httpResponse->memory, httpResponse->size);
+
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
+
+    // Get and log response code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, statusCodeP);
+    if ((*statusCodeP < 300) && (*statusCodeP > 199))
+    {
+      LM_T(LmtOldInfo, ("Notification (%s) response OK, http code: %d", idStringForLogs.c_str(), *statusCodeP));
+    }
+    else
+    {
+      LM_W(("Notification (%s) response NOT OK, http code: %d", idStringForLogs.c_str(), *statusCodeP));
+    }
+  }
+
+  if (payloadSize > 0)
+  {
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_REQ_SIZE, payloadSize);
   }
 
   // Cleanup curl environment
+
   curl_slist_free_all(headers);
-  curl_easy_cleanup(curl);
 
   free(httpResponse->memory);
   delete httpResponse;
 
-  LM_TRANSACTION_END();
+  if (_curl == NULL)
+  {
+    release_curl_context(&cc);
+  }
 
-  return result;
+  return res == CURLE_OK ? 0 : -9;
 }
-
-#else // Old functionality()
-
-/* ****************************************************************************
-*
-* httpRequestConnect -
-*/
-int httpRequestConnect(const std::string& host, unsigned short port)
-{
-  int                 fd;
-  struct addrinfo     hints;
-  struct addrinfo*    peer;
-  char                port_str[10];
-
-  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
-
-  memset(&hints, 0, sizeof(struct addrinfo));
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_protocol = 0;
-
-  if (ipVersionUsed == IPV4)
-  {
-    hints.ai_family = AF_INET;
-    LM_T(LmtIpVersion, ("Allow IPv4 only"));
-  }
-  else if (ipVersionUsed == IPV6)
-  {
-    hints.ai_family = AF_INET6;
-    LM_T(LmtIpVersion, ("Allow  IPv6 only"));
-  }
-  else
-  {
-    hints.ai_family = AF_UNSPEC;
-    LM_T(LmtIpVersion, ("Allow IPv4 or IPv6"));
-  }
-
-  snprintf(port_str, sizeof(port_str), "%d" , (int) port);
-
-  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
-  {
-    LM_W(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
-    LM_TRANSACTION_END();
-    return -1;
-  }
-
-  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
-  {
-    LM_W(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
-    LM_TRANSACTION_END();
-    return -1;
-  }
-
-  if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
-  {
-    freeaddrinfo(peer);
-    close(fd);
-    LM_W(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
-    LM_TRANSACTION_END();
-    return -1;
-  }
-
-  freeaddrinfo(peer);
-  LM_TRANSACTION_END();
-  return fd;
-}
-
-
-
-/* ****************************************************************************
-*
-* httpRequestSend -
-*
-* The waitForResponse arguments specifies if the method has to wait for response
-* before return. If this argument is false, the return string is ""
-*
-* FIXME: I don't like too much "reusing" natural output to return "error" in the
-* case of error. I think it would be smarter to use "std::string* error" in the
-* arguments or (even better) an exception. To be solved in the future in a hardening
-* period.
-*
-* Note, we are using a hybrid approach, consisting in an static thread-local buffer of
-* small size that copes with most notifications to avoid expensive
-* calloc/free syscalls if the notification payload is not very large.
-*
-*/
-std::string httpRequestSend
-(
-   const std::string&     _ip,
-   unsigned short         port,
-   const std::string&     protocol,
-   const std::string&     verb,
-   const std::string&     tenant,
-   const std::string&     resource,
-   const std::string&     content_type,
-   const std::string&     content,
-   bool                   useRush,
-   bool                   waitForResponse,
-   const std::string&     acceptFormat,
-   int                    timeoutInMilliseconds
-)
-{  
-  char                       buffer[TAM_BUF];
-  char                       response[TAM_BUF];
-  char                       preContent[TAM_BUF];
-  char                       msgStatic[MAX_STA_MSG_SIZE];
-  char*                      what               = (char*) "static";
-  char*                      msgDynamic         = NULL;
-  char*                      msg                = msgStatic;   // by default, use the static buffer
-  std::string                rushHeaderIP       = "";
-  unsigned short             rushHeaderPort     = 0;
-  std::string                rushHttpHeaders    = "";
-  static unsigned long long  callNo             = 0;
-  std::string                result;
-  std::string                ip                 = _ip;
-
-  ++callNo;
-
-  // Preconditions check
-  if (port == 0)
-  {
-    LM_E(("Runtime Error (port is ZERO)"));
-    return "error";
-  }
-
-  if (ip.empty())
-  {
-    LM_E(("Runtime Error (ip is empty)"));
-    return "error";
-  }
-
-  if (verb.empty())
-  {
-    LM_E(("Runtime Error (verb is empty)"));
-    return "error";
-  }
-
-  if (resource.empty())
-  {
-    LM_E(("Runtime Error (resource is empty)"));
-    return "error";
-  }
-
-  if ((content_type.empty()) && (!content.empty()))
-  {
-    LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    return "error";
-  }
-
-  if ((!content_type.empty()) && (content.empty()))
-  {
-    LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    return "error";
-  }
-
-  if (timeoutInMilliseconds == -1)
-  {
-    timeoutInMilliseconds = defaultTimeout;
-  }
-
-  //
-  // Rush
-  // Every call to httpRequestSend specifies whether RUSH should be used or not.
-  // But, this depends also on how the broker was started, so here the 'useRush'
-  // parameter is cancelled in case the broker was started without rush.
-  //
-  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
-  // after that, the host and port of rush is set as ip/port for the message, that is
-  // now sent to rush instead of to its final destination.
-  // Also, a few HTTP headers for rush must be setup.
-  //
-  if (useRush)
-  {
-    if ((rushPort == 0) || (rushHost == ""))
-      useRush = false;
-    else
-    {
-      char portAsString[16];
-
-      rushHeaderIP   = ip;
-      rushHeaderPort = port;
-      ip             = rushHost;
-      port           = rushPort;
-
-      sprintf(portAsString, "%d", (int) rushHeaderPort);
-      rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
-      if (protocol == "https:")
-        rushHttpHeaders += "X-relayer-protocol: https\n";
-    }
-  }
-
-  // Buffers clear
-  memset(buffer, 0, TAM_BUF);
-  memset(response, 0, TAM_BUF);
-  memset(msg, 0, MAX_STA_MSG_SIZE);
-
-  char cvBuf[128];
-
-  //
-  // Accepted mime-types
-  //
-  if (acceptFormat == "")
-    acceptFormat = "application/xml, application/json";
-
-
-  snprintf(preContent,
-           sizeof(preContent),
-           "%s %s HTTP/1.1\n"
-           "User-Agent: orion/%s libcurl/%s\n"
-           "Host: %s:%d\n"
-           "Accept: %s\n%s",
-           verb.c_str(),
-           resource.c_str(),
-           versionGet(),
-           curlVersionGet(cvBuf, sizeof(cvBuf)),
-           ip.c_str(),
-           (int) port,
-           acceptFormat.c_str(),
-           rushHttpHeaders.c_str());
-
-  LM_T(LmtRush, ("'PRE' HTTP headers:\n--------------\n%s\n-------------", preContent));
-
-  if (tenant != "")
-  {
-    char tenantHeader[128];
-
-    snprintf(tenantHeader, sizeof(tenantHeader), "fiware-service: %s\n", tenant.c_str());
-
-    strncat(preContent, tenantHeader, sizeof(preContent) - strlen(preContent));
-  }
-
-  if (!content.empty())
-  {
-    char   headers[512];
-    sprintf(headers,
-            "Content-Type: %s\n"
-            "Content-Length: %zu\n",
-            content_type.c_str(), content.length() + 1);
-    strncat(preContent, headers, sizeof(preContent) - strlen(preContent));
-
-    /* Choose the right buffer (static or dynamic) to use. Note we are using +3 due to:
-     *    + 1, for the \n between preContent and content
-     *    + 1, for the \n at the end of the message
-     *    + 1, for the \0 by the trailing character in C strings
-     */
-    int neededSize = content.length() + strlen(preContent) + 3;
-    if (neededSize > MAX_DYN_MSG_SIZE)
-    {
-      LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", content.length() + strlen(preContent)));
-      return "error";
-    }
-    else if (neededSize > MAX_STA_MSG_SIZE)
-    {
-        msgDynamic = (char*) calloc(sizeof(char), neededSize);
-        if (msgDynamic == NULL)
-        {
-          LM_E(("Runtime Error (dynamic memory allocation failure)"));
-          return "error";
-        }
-
-        msg  = msgDynamic;
-        what = (char*) "dynamic";
-    }
-
-    /* The above checking should ensure that the three parts fit, so we are using
-     * sprint() instead of snprintf() */
-    sprintf(msg, "%s\n%s", preContent, content.c_str());
-  }
-  else
-  {
-    /* In the case of no-content we assume that MAX_STA_MSG_SIZE is enough to send the message */
-    LM_T(LmtClientOutputPayload, ("Using static buffer to send HTTP request (empty content)"));
-    sprintf(msg, "%s\n", preContent);
-  }
-
-  /* We add a final newline (I guess that HTTP protocol needs it) */
-  strcat(msg, "\n");
-
-  int fd = httpRequestConnect(ip, port); // Connecting to HTTP server
-
-  if (fd == -1)
-  {
-    return "error";
-  }
-
-  int nb;
-  int sz = strlen(msg);
-
-  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending %s message of %d bytes to HTTP server", callNo, what, sz));
-  LM_T(LmtClientOutputPayloadDump, ("Sending to HTTP server payload:\n%s", msg));
-  nb = send(fd, msg, sz, 0);
-  if (msgDynamic != NULL)
-  {
-      free(msgDynamic);
-  }
-
-  if (nb == -1)
-  {
-    LM_W(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
-    return "error";
-  }
-  else if (nb != sz)
-  {
-    LM_W(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
-    return "error";
-  }
-
-  if (waitForResponse)
-  {
-      nb = recv(fd, &buffer, TAM_BUF - 1, 0);
-
-      if (nb == -1)
-      {
-        LM_W(("Notification failure for %s:%d (error receiving ACK from HTTP server: %s)", _ip.c_str(), port, strerror(errno)));
-        return "error";
-      }
-      else if ( nb >= TAM_BUF)
-      {
-        LM_W(("Notification failure for %s:%d (message size of HTTP server reply is too big: %d (max allowed %d)) ", _ip.c_str(), port, nb, TAM_BUF));
-        return "error";
-      }
-      else
-      {
-          memcpy(response, buffer, nb);
-          LM_I(("Notification Successfully Sent to %s:%d%s", ip.c_str(), port, resource.c_str()));
-          LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
-      }
-
-      if (strlen(response) > 0)
-          result = response;
-  }
-  else
-  {
-     LM_T(LmtClientInputPayload, ("not waiting for response"));
-     LM_I(("Notification Successfully Sent to %s:%d%s", ip.c_str(), port, resource.c_str()));
-     result = "";
-  }
-
-  close(fd);
-  return result;
-}
-
-#endif

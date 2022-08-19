@@ -25,10 +25,15 @@ SET (SOURCES
     restReply.cpp
     RestService.cpp
     Verb.cpp
+    curlSem.cpp
     httpRequestSend.cpp
-    orionReply.cpp
+    orionLogReply.cpp
     OrionError.cpp
     HttpStatusCode.cpp
+    ConnectionInfo.cpp
+    StringFilter.cpp
+    HttpHeaders.cpp
+    restServiceLookup.cpp
 )
 
 SET (HEADERS
@@ -39,10 +44,13 @@ SET (HEADERS
     restReply.h
     RestService.h
     Verb.h
+    curlSem.h
     httpRequestSend.h
-    orionReply.h
+    orionLogReply.h
     OrionError.h
     HttpStatusCode.h
+    StringFilter.h
+    restServiceLookup.h
 )
 
 
@@ -50,7 +58,6 @@ SET (HEADERS
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-include_directories("${RAPIDXML_INCLUDE}")
 
 
 # Library declaration

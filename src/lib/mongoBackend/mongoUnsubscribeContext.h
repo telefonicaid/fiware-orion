@@ -1,5 +1,5 @@
-#ifndef MONGO_UNSUBSCRIBE_CONTEXT_H
-#define MONGO_UNSUBSCRIBE_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXT_H_
 
 /*
 *
@@ -27,6 +27,7 @@
 */
 #include <string>
 
+#include "rest/HttpStatusCode.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
@@ -36,6 +37,11 @@
 *
 * mongoUnsubscribeContext - 
 */
-extern HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoUnsubscribeContext
+(
+  UnsubscribeContextRequest*   requestP,
+  UnsubscribeContextResponse*  responseP,
+  const std::string&           tenant = ""
+);
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXT_H_

@@ -31,14 +31,22 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
+#include "jsonParseV2/jsonRequestTreat.h"
+
+
+
+/* *****************************************************************************
+*
+* restServiceGet -
+*/
+extern RestService* restServiceGet(Verb verb);
 
 
 
 /* ****************************************************************************
 *
-* RestServiceHandler - 
+* RestServiceHandler -
 */
 typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, std::vector<std::string>& compV);
 
@@ -46,33 +54,68 @@ typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, s
 
 /* ****************************************************************************
 *
-* RestService - 
+* RestService -
 */
 typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* reqDataP);
 typedef struct RestService
 {
-  std::string   verb;
-  RequestType   request;
-  int           components;
-  std::string   compV[10];
-  std::string   payloadWord;
-  RestTreat     treat;
+  RequestType   request;          // The type of the request
+  int           components;       // Number of components in the URL path
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }
+  RestTreat     treat;            // service function pointer
 } RestService;
 
 
 
 /* ****************************************************************************
 *
-* restService - 
+* payloadParse -
 */
-extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
+extern std::string payloadParse
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RestService*               service,
+  JsonRequest**              jsonPP,
+  JsonDelayedRelease*        jsonReleaseP,
+  std::vector<std::string>&  compV
+);
 
 
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* tenantCheck -
 */
-extern std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService* service, XmlRequest** reqPP, JsonRequest** jsonPP);
+extern std::string tenantCheck(const std::string& tenant);
+
+
+
+/* ****************************************************************************
+*
+* serviceVectorsSet -
+*/
+extern void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV
+);
+
+
+
+namespace orion
+{
+/* ****************************************************************************
+*
+* orion::requestServe -
+*/
+extern std::string requestServe(ConnectionInfo* ciP);
+
+}
 
 #endif

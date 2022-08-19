@@ -1,0 +1,216 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Restict chars in id
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities to create España/T1
+# 02. GET /v2/entities/España to see that A2 has not been added
+# 03. POST /v2/entities to create E1/Olé
+# 04. GET /v2/entities/E1 to see that E1 has not been added
+# 05. POST /v2/entities to create E#/T1""
+# 06. GET /v2/entities/E# that E# has not been added
+# 07. POST /v2/entities to create E1/A#
+# 08. GET /v2/entities/E1 to see that E1 has not been added
+#
+
+echo '01. POST /v2/entities to create España/T1'
+echo "========================================="
+payload='{ "id": "España", "type": "T1", "A1": "" }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo '02. GET /v2/entities/España to see that A2 has not been added'
+echo "============================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+echo '03. POST /v2/entities to create E1/Olé'
+echo "======================================"
+payload='{ "id": "E1", "type": "Olé", "A2": { "value": "" }}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '04. GET /v2/entities/E1 to see that E1 has not been added'
+echo "========================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+echo '05. POST /v2/entities to create E#/T1'
+echo "======================================"
+payload='{ "id": "E#", "type": "T1", "A2": { "value": "" }}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '06. GET /v2/entities/E# that E# has not been added'
+echo "=================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+echo '07. POST /v2/entities to create E1/A#'
+echo "====================================="
+payload='{ "id": "E1", "type": "A#", "A2": { "value": "" }}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '08. GET /v2/entities/E1 to see that E1 has not been added'
+echo "========================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities to create España/T1
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in entity id",
+    "error": "BadRequest"
+}
+
+
+02. GET /v2/entities/España to see that A2 has not been added
+=============================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. POST /v2/entities to create E1/Olé
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in entity type",
+    "error": "BadRequest"
+}
+
+
+04. GET /v2/entities/E1 to see that E1 has not been added
+=========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+05. POST /v2/entities to create E#/T1
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in entity id",
+    "error": "BadRequest"
+}
+
+
+06. GET /v2/entities/E# that E# has not been added
+==================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+07. POST /v2/entities to create E1/A#
+=====================================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in entity type",
+    "error": "BadRequest"
+}
+
+
+08. GET /v2/entities/E1 to see that E1 has not been added
+=========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

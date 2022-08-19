@@ -27,108 +27,95 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
-#include "common/Format.h"
+#include "common/globals.h"
+
+#include "orionTypes/OrionValueType.h"
 
 
 namespace orion
 {
 /* ****************************************************************************
 *
-* CompoundValueNode - 
+* CompoundValueNode -
 *
 * The class fields:
 * -------------------------------------------------------------------------------
-* o name         When parsing an XML payload, each node in the tree has a tag.
-*                The name of the node is taken from the tag-name.
-*                When parsing a JSON payload, not necessarily all nodes have a
-*                tag, so 'name' can be empty.
-*                Also, when creating the tree from mongo BSON, there will often
-*                be no 'name', just like the case of JSON payload parsing.
+* o name         Note that not all nodes have a name, not in JSON payloads, nor when
+*                getting the info from mongo BSON
 *
-* o type         There are only three types of nodes: Vectors, Objects and Strings.
+* o valueType    There are the following types of nodes: Vectors, Objects, Strings, Numbers and Bools
 *                The root node is somehow special, but is always either Vector or Object.
 *
-* o value        The value of a String in the tree. Always stored as a string, as the
-*                payload always comes in as a string.
+* o stringValue  The value of a String in the tree.
+*
+* o numberValue  The value of a Number in the tree.
+*
+* o boolValue    The value of a Bool in the tree.
 *
 * o childV       A vector of the children of a Vector or Object.
 *                Contains pointers to CompoundValueNode.
 *
-* o container    A pointer to the father of the node. The father is the Object/Vector node
-*                that owns this node.
-*
-* o rootP        A pointer to the owner of the entire tree
-*
-* o error        This string is used by the 'check' function to save any errors detected during
-*                the 'check' phase.
-*                FIXME P1: May be removed if the check function is modified.
-*
-* o path         Absolute path of the node in the tree.
-*                Used for error messages, e.g. duplicated tag-name in a struct.
-*
-* o level        The depth or nesting level in which this node lives.
-*
-* o siblingNo:   This field is used for rendering JSON. It tells us whether a comma should
-*                be added after a field (a comma is added unless the sibling number is
-*                equal to the number of siblings (the size of the containers child vector).
 */
 class CompoundValueNode
 {
  public:
-  enum Type
-  {
-    Unknown,
-    String,
-    Object,
-    Vector
-  };
-
   // Tree fields
   std::string                        name;
-  Type                               type;
-  std::string                        value;
+  orion::ValueType                   valueType;
+  std::string                        stringValue;
+  double                             numberValue;
+  bool                               boolValue;
   std::vector<CompoundValueNode*>    childV;
-
-
-  // Auxiliar fields for creation of the tree
-  CompoundValueNode*                 container;
-  CompoundValueNode*                 rootP;
-  std::string                        error;
-
-  // Needed for JSON rendering
-  int                                siblingNo;
-
-  // Fields that may not be necessary
-  // FIXME P4: when finally sure, remove the unnecessary fields
-  std::string                        path;
-  int                                level;
 
   // Constructors/Destructors
   CompoundValueNode();
-  explicit CompoundValueNode(Type _type);
+  explicit CompoundValueNode(orion::ValueType _type);
 
   CompoundValueNode
   (
-    CompoundValueNode*  _container,
-    const std::string&  _path,
     const std::string&  _name,
     const std::string&  _value,
-    int                 _siblingNo,
-    Type                _type,
-    int                 _level = -1);
+    orion::ValueType    _type
+  );
+
+
+  CompoundValueNode
+  (
+    const std::string&  _name,
+    const char*         _value,
+    orion::ValueType    _type
+  );
+
+
+  CompoundValueNode
+  (
+    const std::string&  _name,
+    double              _value,
+    orion::ValueType    _type
+  );
+
+  CompoundValueNode
+  (
+    const std::string&  _name,
+    bool                 _value,
+    orion::ValueType    _type
+  );
 
   ~CompoundValueNode();
 
   CompoundValueNode*  clone(void);
   CompoundValueNode*  add(CompoundValueNode* node);
-  CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
-  void                check(void);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const std::string& _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const char* _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
+  std::string         check(const std::string& path);
   std::string         finish(void);
-  std::string         render(Format format, const std::string& indent);
-  std::string         toJson(bool isLastElement);
 
-  static const char*  typeName(const Type _type);
+  std::string         toJson(std::map<std::string, std::string>* replacementsP = NULL);
+
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);
 
@@ -137,8 +124,6 @@ class CompoundValueNode
   bool                isString(void);
 
   const char*         cname(void);
-  const char*         cvalue(void);
-  const char*         cpath(void);
 };
 
 }  // namespace orion

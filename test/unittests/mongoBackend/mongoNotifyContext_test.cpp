@@ -22,31 +22,44 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+#include <vector>
 
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
+#include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoNotifyContext.h"
+#include "ngsi10/NotifyContextRequest.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/commonMocks.h"
+#include "unittests/unittest.h"
 
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
 
 
 /* ****************************************************************************
 *
-* servicePathV - empty service path vector used for these tests 
+* USING
 */
-static const std::vector<std::string> servicePathV;
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+using ::testing::_;
+using ::testing::Throw;
+using ::testing::Return;
+
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 
 
@@ -73,8 +86,8 @@ static const std::vector<std::string> servicePathV;
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -107,49 +120,40 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("A1" << "A2") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1") <<
-                        "A2" << BSON("type" << "TA2")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1") <<
+                       "A2" << BSON("type" << "TA2")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrNames" << BSON_ARRAY("A3" << "A4") <<
                      "attrs" << BSON(
-                        "A3" << BSON("type" << "TA3" << "value" << "val3") <<
-                        "A4" << BSON("type" << "TA4")
-                        )
-                    );
+                       "A3" << BSON("type" << "TA3" << "value" << "val3") <<
+                       "A4" << BSON("type" << "TA4")));
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
                      "attrNames" << BSON_ARRAY("A5" << "A6") <<
                      "attrs" << BSON(
-                        "A5" << BSON("type" << "TA5" << "value" << "val5") <<
-                        "A6" << BSON("type" << "TA6")
-                        )
-                    );
+                       "A5" << BSON("type" << "TA5" << "value" << "val5") <<
+                       "A6" << BSON("type" << "TA6")));
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1bis2")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1bis2")));
 
   BSONObj en1nt = BSON("_id" << BSON("id" << "E1") <<
-                     "attrNames" << BSON_ARRAY("A1" << "A2") <<
-                     "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1-nt") <<
-                        "A2" << BSON("type" << "TA2")
-                        )
-                    );
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                         "A1" << BSON("type" << "TA1" << "value" << "val1-nt") <<
+                         "A2" << BSON("type" << "TA2")));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
   connection->insert(ENTITIES_COLL, en3);
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en1nt);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -158,7 +162,6 @@ static void prepareDatabase(void) {
 */
 static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 {
-
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     if (attrs[ix].str() == name)
@@ -166,9 +169,11 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
       return true;
     }
   }
-  return false;
 
+  return false;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -176,6 +181,8 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 */
 TEST(mongoNotifyContextRequest, Ent1Attr1)
 {
+    utInit();
+
     HttpStatusCode         ms;
     NotifyContextRequest   req;
     NotifyContextResponse  res;
@@ -184,23 +191,17 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer;
+    ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    cer.statusCode.fill(SccOk, "");
-    req.contextElementResponseVector.push_back(&cer);
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    cerP->entity.fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    cerP->entity.attributeVector.push_back(caP);
+    cerP->statusCode.fill(SccOk, "");
+    req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -232,7 +233,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
@@ -287,7 +288,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     ASSERT_EQ(1, attrs.nFields());
     a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
@@ -304,19 +305,14 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Release mock */
-    delete timerMock;
-
+    utExit();
 }
 
 /* ****************************************************************************
@@ -329,29 +325,25 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     NotifyContextRequest   req;
     NotifyContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer;
+    ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer);
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    cerP->entity.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    cerP->entity.attributeVector.push_back(ca1P);
+    cerP->entity.attributeVector.push_back(ca2P);
+    cerP->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -383,7 +375,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
@@ -438,7 +430,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
@@ -455,19 +447,14 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Release mock */
-    delete timerMock;
-
+    utExit();
 }
 
 /* ****************************************************************************
@@ -480,32 +467,30 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     NotifyContextRequest   req;
     NotifyContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer1, cer2;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A3", "TA3", "new_val2");
-    cer2.contextElement.contextAttributeVector.push_back(&ca2);
-    cer2.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer2);
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    cer1P->entity.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    cer1P->entity.attributeVector.push_back(ca1P);
+    cer1P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer1P);
+    cer2P->entity.fill("E2", "T2", "false");
+    ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val2");
+    cer2P->entity.attributeVector.push_back(ca2P);
+    cer2P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -537,7 +522,7 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
@@ -592,7 +577,7 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
@@ -609,19 +594,14 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Release mock */
-    delete timerMock;
-
+    utExit();
 }
 
 /* ****************************************************************************
@@ -634,36 +614,34 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     NotifyContextRequest   req;
     NotifyContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer1, cer2;
+    ContextElementResponse* cer1P = new ContextElementResponse();
+    ContextElementResponse* cer2P = new ContextElementResponse();
+
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A2", "TA2", "new_val2");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A3", "TA3", "new_val3");
-    ContextAttribute ca4("A4", "TA4", "new_val4");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer2);
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    cer1P->entity.fill("E1", "T1", "false");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
+    cer1P->entity.attributeVector.push_back(ca1P);
+    cer1P->entity.attributeVector.push_back(ca2P);
+    cer1P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer1P);
+    cer2P->entity.fill("E2", "T2", "false");
+    ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "new_val3");
+    ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
+    cer2P->entity.attributeVector.push_back(ca3P);
+    cer2P->entity.attributeVector.push_back(ca4P);
+    cer2P->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -695,7 +673,7 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
@@ -750,7 +728,7 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
@@ -767,19 +745,14 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Release mock */
-    delete timerMock;
-
+    utExit();
 }
 
 /* ****************************************************************************
@@ -792,27 +765,23 @@ TEST(mongoNotifyContextRequest, createEntity)
     NotifyContextRequest   req;
     NotifyContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request */
-    ContextElementResponse cer;
+    ContextElementResponse* cerP = new ContextElementResponse();
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.originator.set("localhost");
-    cer.contextElement.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1", "new_val");
-    cer.contextElement.contextAttributeVector.push_back(&ca);
-    cer.statusCode.fill(SccOk);
-    req.contextElementResponseVector.push_back(&cer);
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    cerP->entity.fill("E10", "T10", "false");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+    cerP->entity.attributeVector.push_back(caP);
+    cerP->statusCode.fill(SccOk);
+    req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector, "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -844,7 +813,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
@@ -899,7 +868,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
@@ -914,7 +883,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_TRUE(a1.hasField("creDate"));
     EXPECT_TRUE(a1.hasField("modDate"));
@@ -932,18 +901,12 @@ TEST(mongoNotifyContextRequest, createEntity)
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Release mock */
-    delete timerMock;
-
+    utExit();
 }
-

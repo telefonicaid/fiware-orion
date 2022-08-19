@@ -27,19 +27,18 @@
 */
 #include <string>
 
-#include "common/Format.h"
-
+/* FIXME P2: this file (along with some other places around all the code) uses
+ * the old term "tag", coming from the XML days. Now we only support JSON and
+ * all the terminology should use "key" or "keyName". We have changed terminology
+ * in many places, but there are yet some remains (not so important, anyway).
+ */
 
 
 /* ****************************************************************************
 *
 * Macros for JSON rendering
 */
-#define JSON_PROP(name)                std::string("\"" + std::string(name) + "\":")
 #define JSON_STR(value)                std::string("\"" + std::string(value) + "\"")
-#define JSON_NUMBER(value)             std::string(value)
-#define JSON_VALUE(name, value)        std::string(JSON_PROP(name) + JSON_STR(value))
-#define JSON_VALUE_NUMBER(name, value) std::string(JSON_PROP(name) + JSON_NUMBER(value))
 
 
 
@@ -49,30 +48,25 @@
 */
 extern char* htmlEscape(const char* s);
 
+/* ****************************************************************************
+*
+* jsonInvalidCharsTransformation -
+*
+* FIXME P5: this is a quick fix for #1172. A better fix should be developed.
+*/
+extern std::string jsonInvalidCharsTransformation(const std::string& input);
+
 
 
 /* ****************************************************************************
 *
 * startTag -  
+*
 */
 extern std::string startTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
-  bool                showTag    = true,
-  bool                isToplevel = false
-);
-
-extern std::string startTag
-(
-  const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
-  Format              format,
-  bool                isVector         = false,
-  bool                showTag          = true,
-  bool                isCompoundVector = false
+  const std::string&  key      = "",
+  bool                isVector = false
 );
 
 
@@ -83,13 +77,8 @@ extern std::string startTag
 */
 extern std::string endTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
   bool                comma      = false,
-  bool                isVector   = false,
-  bool                nl         = true,
-  bool                isToplevel = false
+  bool                isVector   = false
 );
 
 
@@ -97,37 +86,22 @@ extern std::string endTag
 /* ****************************************************************************
 *
 * valueTag -  
+*
 */
 extern std::string valueTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   const std::string&  value,
-  Format              format,
-  bool                showComma       = false,
-  bool                isAssociation   = false,
-  bool                isVectorElement = false
+  bool                showComma           = false,
+  bool                isVectorElement     = false,
+  bool                withoutQuotes       = false
 );
 
 extern std::string valueTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   int                 value,
-  Format              format,
-  bool                showComma     = false,
-  bool                isAssociation = false
-);
-
-extern std::string valueTag
-(
-  const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
-  const std::string&  value,
-  Format              format,
-  bool                showComma     = false,
-  bool                isAssociation = false
+  bool                showComma     = false
 );
 
 
@@ -138,10 +112,8 @@ extern std::string valueTag
 */
 extern std::string startArray
 (
-  const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
-  bool                showTag = true
+  const std::string&  key,
+  bool                showKey = true
 );
 
 
@@ -150,6 +122,6 @@ extern std::string startArray
 *
 * endArray -
 */
-extern std::string endArray(const std::string& indent, const std::string& tagName, Format format);
+extern std::string endArray(const std::string& key);
 
 #endif  // SRC_LIB_COMMON_TAG_H_

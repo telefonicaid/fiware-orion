@@ -1,9 +1,0 @@
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>000000000000000000000000</registrationId>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>missing name for registration attribute</details>
-  </errorCode>
-</registerContextResponse>

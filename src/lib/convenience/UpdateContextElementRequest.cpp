@@ -26,9 +26,7 @@
 #include <vector>
 
 #include "common/globals.h"
-#include "common/Format.h"
 #include "common/tag.h"
-#include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
@@ -38,17 +36,20 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
+*
 */
-std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
+std::string UpdateContextElementRequest::toJsonV1(bool asJsonObject, RequestType requestType)
 {
-  std::string tag = "updateContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  // No metadata filter in this case, an empty vector is used to fulfil method signature.
+  // For attribute filter, we use the ContextAttributeVector itself
+  std::vector<std::string> emptyMdV;
+
+  out += startTag();
+  out += contextAttributeVector.toJsonV1(asJsonObject, requestType, contextAttributeVector.vec, emptyMdV);
+  out += endTag();
 
   return out;
 }
@@ -59,34 +60,23 @@ std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType
 *
 * check - 
 *
-*
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
-*           in its place:
--
-*   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
-*   {
-*     response.errorCode.fill(SccBadRequest, res);
-*   }
-*
 */
 std::string UpdateContextElementRequest::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      requestType,
-  std::string      indent,
-  std::string      predetectedError,     // Predetected Error, normally during parsing
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         requestType,
+  const std::string&  predetectedError     // Predetected Error, normally during parsing
 )
 {
   UpdateContextElementResponse  response;
   std::string                   res;
-  Format                        fmt = ciP->outFormat;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = contextAttributeVector.check(UpdateContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  }  
+  else if ((res = contextAttributeVector.check(apiVersion, UpdateContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -95,19 +85,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(ciP, requestType, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-void UpdateContextElementRequest::present(std::string indent)
-{
-  attributeDomainName.present(indent);
-  contextAttributeVector.present(indent);
+  return response.toJsonV1(asJsonObject, requestType);
 }
 
 

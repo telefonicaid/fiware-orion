@@ -22,15 +22,25 @@
 *
 * Author: Fermin Galan
 */
-
-#include "testInit.h"
+#include "unittests/testInit.h"
 
 #include "logMsg/logMsg.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongo/client/dbclient.h"
+// #include "mongoBackend/mongoConnectionPool.h"
 
-using namespace mongo;
+
+
+#if 0
+// FIXME #3775: pending on mongo unit test re-enabling
+/* ****************************************************************************
+*
+* External declarations
+*/
+extern orion::DBClientBase mongoInitialConnectionGetForUnitTest();
+extern void                orion::setMongoConnectionForUnitTest(orion::DBClientBase* _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -38,185 +48,220 @@ using namespace mongo;
 *
 * This function (which is called before every test) cleans the database
 */
-extern DBClientBase* mongoInitialConnectionGetForUnitTest();
-extern void          setMongoConnectionForUnitTest(DBClientBase*);
 void setupDatabase(void)
 {
-    DBClientBase*  connection   = NULL;
-    static bool    mongoStarted = false;
+  DBClientBase*  connection   = NULL;
+  static bool    mongoStarted = false;
 
-    if (mongoStarted == false)
-    {
-      mongoStart("localhost", "", "", "", "", false, 0, 10);
+  /* mongoStart is needed one time to create the connection pool */
+  if (mongoStarted == false)
+  {
+    /* In fact, the mongoConnectionPoolInit() parameters related with the pool, e.g. pool size, are irrelevant,
+     * given that the connection creation is mocked under UNIT_TEST in the mongoBackend library
+     */
+    // FIXME #3775: mongoConnectionPoolInit() signature changed. Review this specially.
+    mongoConnectionPoolInit("localhost", "", "", "", "", "", "", false, false, 0, 10);
+    mongoStarted = true;
+  }
 
-      connection = mongoInitialConnectionGetForUnitTest();
-      setMongoConnectionForUnitTest(connection);
-      mongoStarted = true;
-    }
-    else
-    {
-      connection = getMongoConnection();
+  connection = getMongoConnection();
 
-      if (connection == NULL)
-      {
-        extern void setMongoConnectionForUnitTest(DBClientBase*);
-        connection = mongoInitialConnectionGetForUnitTest();
-        setMongoConnectionForUnitTest(connection);
-      }
-    }
+  connection->dropCollection(REGISTRATIONS_COLL);
+  connection->dropCollection(ENTITIES_COLL);
+  connection->dropCollection(SUBSCRIBECONTEXT_COLL);
 
-    connection->dropCollection(REGISTRATIONS_COLL);
-    connection->dropCollection(ENTITIES_COLL);
-    connection->dropCollection(SUBSCRIBECONTEXT_COLL);
-    connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
-    connection->dropCollection(ASSOCIATIONS_COLL);
-
-    setDbPrefix(DBPREFIX);
-    setRegistrationsCollectionName("registrations");
-    setEntitiesCollectionName("entities");
-    setSubscribeContextCollectionName("csubs");
-    setSubscribeContextAvailabilityCollectionName("casubs");
-    setAssociationsCollectionName("associations");
+  setDbPrefix(DBPREFIX);
+  setRegistrationsCollectionName("registrations");
+  setEntitiesCollectionName("entities");
+  setSubscribeContextCollectionName("csubs");
 }
+#endif
+
+
 
 /* ****************************************************************************
 *
 * equalEntity -
 */
-static bool equalEntity(EntityId enExpected, EntityId enArg) {
+static bool equalEntity(EntityId enExpected, EntityId enArg)
+{
+  LM_M(("enArg '%s', '%s', '%s'",
+        enArg.id.c_str(),
+        enArg.type.c_str(),
+        enArg.isPattern.c_str()));
 
-    LM_M(("enArg '%s', '%s', '%s'",
-          enArg.id.c_str(),
-          enArg.type.c_str(),
-          enArg.isPattern.c_str()
-          ));
-    LM_M(("enExpected '%s', '%s', '%s'",
-          enExpected.id.c_str(),
-          enExpected.type.c_str(),
-          enExpected.isPattern.c_str()
-          ));
-    if (enExpected.id == enArg.id &&
-        enExpected.type == enArg.type &&
-        enExpected.isPattern == enArg.isPattern) {
+  LM_M(("enExpected '%s', '%s', '%s'",
+        enExpected.id.c_str(),
+        enExpected.type.c_str(),
+        enExpected.isPattern.c_str()));
 
-        return true;
-    }
-    else {
-        return false;
-    }
-
+  if (enExpected.id == enArg.id && enExpected.type == enArg.type && enExpected.isPattern == enArg.isPattern)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
+
+
 
 /* ****************************************************************************
 *
 * equalContextAttribute -
 */
-static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute* caArg) {
+static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute* caArg)
+{
+  if (caArg->name != caExpected->name)
+  {
+    return false;
+  }
 
-    LM_M(("caArg '%s', '%s', '%s'",
-          caArg->name.c_str(),
-          caArg->type.c_str(),
-          caArg->value.c_str()
-          ));
-    LM_M(("caExpected '%s', '%s', '%s'",
-          caExpected->name.c_str(),
-          caExpected->type.c_str(),
-          caExpected->value.c_str()
-          ));
+  if (caArg->type != caExpected->type)
+  {
+    return false;
+  }
 
-    if (caArg->name == caExpected->name && caArg->type == caExpected->type && caArg->value == caExpected->value) {
-        return true;
-    }
-    else {
-        return false;
-    }
+  if (caArg->valueType != caExpected->valueType)
+  {
+    return false;
+  }
+
+  if ((caArg->valueType == orion::ValueTypeString) && (caArg->stringValue != caExpected->stringValue))
+  {
+    return false;
+  }
+
+  if ((caArg->valueType == orion::ValueTypeNumber) && (caArg->numberValue != caExpected->numberValue))
+  {
+    return false;
+  }
+
+  if ((caArg->valueType == orion::ValueTypeBoolean) && (caArg->boolValue != caExpected->boolValue))
+  {
+    return false;
+  }
+
+  LM_M(("caArg '%s', '%s', '%s'", caArg->name.c_str(), caArg->type.c_str(), caArg->getValue().c_str()));
+  LM_M(("caExpected '%s', '%s', '%s'",
+        caExpected->name.c_str(),
+        caExpected->type.c_str(),
+        caExpected->getValue().c_str()));
+
+  return true;
 }
+
+
 
 /* ****************************************************************************
 *
 * equalContextAttributeVector -
 */
-static bool equalContextAttributeVector(ContextAttributeVector caExpectedV, ContextAttributeVector caArgV) {
+static bool equalContextAttributeVector(ContextAttributeVector caExpectedV, ContextAttributeVector caArgV)
+{
+  /* Check vector size */
+  if (caExpectedV.size() != caArgV.size())
+  {
+    LM_M(("different sizes: expected %d, actual %d", caExpectedV.size(), caArgV.size()));
+    return false;
+  }
 
-    /* Check vector size */
-    if (caExpectedV.size() != caArgV.size()) {
-        LM_M(("different sizes: expected %d, actual %d", caExpectedV.size(), caArgV.size()));
-        return false;
+  /* Check that every attribute in 'caExpectedV' is in 'caArgV'. Order doesn't matter */
+  for (unsigned int ix = 0; ix < caArgV.size(); ++ix)
+  {
+    bool attributeMatch = false;
+
+    for (unsigned int jx = 0; jx < caExpectedV.size(); ++jx)
+    {
+      ContextAttribute* caArg = caArgV[ix];
+      ContextAttribute* caExpected = caExpectedV[jx];
+
+      LM_M(("%d == %d?", ix, jx));
+      if (equalContextAttribute(caExpected, caArg))
+      {
+        LM_M(("attribute matches in ContextAttributeVector comparison, check next one..."));
+        attributeMatch = true;
+        break; /* loop in jx */
+      }
     }
 
-    /* Check that every attribute in 'caExpectedV' is in 'caArgV'. Order doesn't matter */
-    for (unsigned int ix = 0; ix < caArgV.size(); ++ix) {
-        bool attributeMatch = false;
-        for (unsigned int jx = 0; jx < caExpectedV.size(); ++jx) {
-            ContextAttribute* caArg = caArgV.get(ix);
-            ContextAttribute* caExpected = caExpectedV.get(jx);
-            LM_M(("%d == %d?", ix, jx));
-            if (equalContextAttribute(caExpected, caArg)) {
-                LM_M(("attribute matches in ContextAttributeVector comparison, check next one..."));
-                attributeMatch = true;
-                break; /* loop in jx */
-            }
-        }
-        if (!attributeMatch) {
-            LM_M(("after looking everyone, attribute doesn't match in ContextAttributeVector comparison"));
-            return false;
-        }
+    if (!attributeMatch)
+    {
+      LM_M(("after looking everyone, attribute doesn't match in ContextAttributeVector comparison"));
+      return false;
     }
+  }
 
-    LM_M(("ContextAttributeVector comparison ok"));
-    return true;
-
+  LM_M(("ContextAttributeVector comparison ok"));
+  return true;
 }
+
+
 
 /* ****************************************************************************
 *
 * equalContextElementResponseVector -
-*
 */
-static bool equalContextElementResponseVector(ContextElementResponseVector cerExpectedV, ContextElementResponseVector cerArgV) {
+static bool equalContextElementResponseVector
+(
+  ContextElementResponseVector cerExpectedV,
+  ContextElementResponseVector cerArgV
+)
+{
+  /* Check vector size */
+  if (cerExpectedV.size() != cerArgV.size())
+  {
+    LM_M(("different sizes: expected %d, actual %d", cerExpectedV.size(), cerArgV.size()));
+    return false;
+  }
 
-    /* Check vector size */
-    if (cerExpectedV.size() != cerArgV.size()) {
-        LM_M(("different sizes: expected %d, actual %d", cerExpectedV.size(), cerArgV.size()));
-        return false;
+  /* Check that every entity in 'cerArgV' is in 'cerExpectedV'. Order doesn't matter */
+  for (unsigned int ix = 0; ix < cerArgV.size(); ++ix)
+  {
+    bool entityMatch = false;
+
+    for (unsigned int jx = 0; jx < cerExpectedV.size(); ++jx)
+    {
+      ContextElementResponse* cerArg      = cerArgV[ix];
+      ContextElementResponse* cerExpected = cerExpectedV[jx];
+
+      EntityId enExpected(cerExpected->entity.id, cerExpected->entity.type);
+      EntityId enArg(cerArg->entity.id, cerArg->entity.type);
+
+      if (!equalEntity(enExpected, enArg))
+      {
+        LM_M(("entity doesn't match in ContextElementResponseVector comparison, continue ..."));
+        continue; /* loop in jx */
+      }
+
+      /* If there aren't attributes to check, then early exits the loop */
+      if (cerExpected->entity.attributeVector.size() == 0)
+      {
+        LM_M(("entity (without attributes) matches in ContextElementResponseVector comparison, check next one..."));
+        entityMatch = true;
+        break; /* loop in jx */
+      }
+
+      if (equalContextAttributeVector(cerExpected->entity.attributeVector, cerArg->entity.attributeVector))
+      {
+        LM_M(("entity (with attributes) matches in ContextElementResponseVector comparison, check next one..."));
+        entityMatch = true;
+        break; /* loop in jx */
+      }
     }
 
-    /* Check that every entity in 'cerArgV' is in 'cerExpectedV'. Order doesn't matter */
-    for (unsigned int ix = 0; ix < cerArgV.size(); ++ix) {
-        bool entityMatch = false;
-        for (unsigned int jx = 0; jx < cerExpectedV.size(); ++jx) {
-            ContextElementResponse* cerArg = cerArgV.get(ix);
-            ContextElementResponse* cerExpected = cerExpectedV.get(jx);
-            LM_M(("%d == %d?", ix, jx));
-            if (!equalEntity(cerExpected->contextElement.entityId, cerArg->contextElement.entityId)) {
-                LM_M(("entity doesn't match in ContextElementResponseVector comparison, continue..."));
-                continue; /* loop in jx */
-            }
-
-            /* If there aren't attributes to check, then early exits the loop */
-            if (cerExpected->contextElement.contextAttributeVector.size() == 0) {
-                LM_M(("entity (without attributes) matches in ContextElementResponseVector comparison, check next one..."));
-                entityMatch = true;
-                break; /* loop in jx */
-            }
-
-            if (equalContextAttributeVector(cerExpected->contextElement.contextAttributeVector, cerArg->contextElement.contextAttributeVector)) {
-                LM_M(("entity (with attributes) matches in ContextElementResponseVector comparison, check next one..."));
-                entityMatch = true;
-                break; /* loop in jx */
-            }
-        }
-
-        if (!entityMatch) {
-            LM_M(("after looking everyone, entity doesn't matches in ContextElementResponseVector comparison"));
-            return false;
-        }
+    if (!entityMatch)
+    {
+      LM_M(("after checking everything, entity doesn't match in ContextElementResponseVector comparison"));
+      return false;
     }
+  }
 
-    LM_M(("ContextElementResponseVector comparison ok"));
-    return true;
-
+  LM_M(("ContextElementResponseVector comparison ok"));
+  return true;
 }
+
 
 
 /* ****************************************************************************
@@ -226,201 +271,27 @@ static bool equalContextElementResponseVector(ContextElementResponseVector cerEx
 * We need a matcher to compare NotifyContextRequest in EXPECT_CALL() for sendNotifyContextRequest, due
 * to NotifyContextRequest is not yet a full fledged object and we can not use the '==' method and
 * Eq() matcher. FIXME
-*
 */
-bool matchNotifyContextRequest(NotifyContextRequest* expected, NotifyContextRequest* arg) {
+bool matchNotifyContextRequest(NotifyContextRequest* expected, NotifyContextRequest* arg)
+{
+  LM_M(("inside MatchNcr"));
 
-    LM_M(("inside MatchNcr"));
+  /* The isEmpty() check is needed because, in some occasion, we don't have any expectations on
+   * subscriptionId and, in these cases, we don't check its value */
+  if (!expected->subscriptionId.isEmpty() && (expected->subscriptionId.get() != arg->subscriptionId.get()))
+  {
+    return false;
+  }
 
-    /* The isEmpty() check is needed because, in some occasion, we don't have any expectations on
-     * subscriptionId and, in these cases, we don't check its value */
-    if (!expected->subscriptionId.isEmpty() && (expected->subscriptionId.get() != arg->subscriptionId.get())) {
-        return false;
-    }
+  if (expected->originator.get() != arg->originator.get())
+  {
+    return false;
+  }
 
-    if (expected->originator.get() != arg->originator.get()) {
-        return false;
-    }
+  if (!equalContextElementResponseVector(expected->contextElementResponseVector, arg->contextElementResponseVector))
+  {
+    return false;
+  }
 
-    if (!equalContextElementResponseVector(expected->contextElementResponseVector, arg->contextElementResponseVector)) {
-        return false;
-    }
-
-    return true;
-
+  return true;
 }
-
-/* ****************************************************************************
-*
-* equalContextRegistrationAttribute -
-*
-*/
-static bool equalContextRegistrationAttribute(ContextRegistrationAttribute* craExpected, ContextRegistrationAttribute* craArg) {
-    LM_M(("craArg '%s', '%s'",
-          craArg->name.c_str(),
-          craArg->type.c_str()
-          ));
-    LM_M(("craExpected '%s', '%s'",
-          craExpected->name.c_str(),
-          craExpected->type.c_str()
-          ));
-
-    if (craArg->name == craExpected->name && craArg->type == craExpected->type) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-/* ****************************************************************************
-*
-* equalContextRegistrationAttributeVector -
-*
-*/
-static bool equalContextRegistrationAttributeVector(ContextRegistrationAttributeVector craExpectedV, ContextRegistrationAttributeVector craArgV) {
-
-    /* Check vector size */
-    if (craExpectedV.size() != craArgV.size()) {
-        LM_M(("different sizes: expected %d, actual %d", craExpectedV.size(), craArgV.size()));
-        return false;
-    }
-
-    /* Check that every context registration attribute in 'craArgV' is in 'craExpectedV'. Order doesn't matter */
-    for (unsigned int ix = 0; ix < craArgV.size(); ++ix) {
-        bool contextRegistrationAttributeMatches = false;
-        for (unsigned int jx = 0; jx < craExpectedV.size(); ++jx) {
-            ContextRegistrationAttribute* craArg = craArgV.get(ix);
-            ContextRegistrationAttribute* craExpected = craExpectedV.get(jx);
-            LM_M(("%d == %d?", ix, jx));
-            if (equalContextRegistrationAttribute(craExpected, craArg)) {
-                LM_M(("context registration attribute matches in ContextRegistrationAttributeVector comparison, check next one..."));
-                contextRegistrationAttributeMatches = true;
-                break; /* loop in jx */
-            }
-        }
-
-        if (!contextRegistrationAttributeMatches) {
-            LM_M(("after looking everyone, context registration attribute doesn't match in ContextRegistrationAttributeVector comparison"));
-            return false;
-        }
-    }
-
-    LM_M(("ContextRegistrationAttributeVector comparison ok"));
-    return true;
-}
-
-
-/* ****************************************************************************
-*
-* equalEntityIdVector -
-*
-*/
-static bool equalEntityIdVector(EntityIdVector enExpectedV, EntityIdVector enArgV) {
-
-    /* Check vector size */
-    if (enExpectedV.size() != enArgV.size()) {
-        LM_M(("different sizes: expected %d, actual %d", enExpectedV.size(), enArgV.size()));
-        return false;
-    }
-
-    /* Check that every entity in 'enArgV' is in 'enExpectedV'. Order doesn't matter */
-    for (unsigned int ix = 0; ix < enArgV.size(); ++ix) {
-        bool entityMatch = false;
-        for (unsigned int jx = 0; jx < enExpectedV.size(); ++jx) {
-            EntityId enArg = *enArgV.get(ix);
-            EntityId enExpected = *enExpectedV.get(jx);
-            LM_M(("%d == %d?", ix, jx));
-            if (equalEntity(enExpected, enArg)) {
-                LM_M(("entity matches in EntityIdVector comparison, check next one..."));
-                entityMatch = true;
-                break; /* loop in jx */
-            }
-        }
-
-        if (!entityMatch) {
-            LM_M(("after looking everyone, entity doesn't match in EntityIdVector"));
-            return false;
-        }
-    }
-
-    LM_M(("EntityIdVector comparison ok"));
-    return true;
-}
-
-/* ****************************************************************************
-*
-* equalContextRegistrationResponseVector -
-*
-*/
-static bool equalContextRegistrationResponseVector(ContextRegistrationResponseVector crrExpectedV, ContextRegistrationResponseVector crrArgV) {
-
-    /* Check vector size */
-    if (crrExpectedV.size() != crrArgV.size()) {
-        LM_M(("different sizes: expected %d, actual %d", crrExpectedV.size(), crrArgV.size()));
-        return false;
-    }
-
-    /* Check that every context registration in 'crrArgV' is in 'crrExpectedV'. Order doesn't matter */
-    for (unsigned int ix = 0; ix < crrArgV.size(); ++ix) {
-        bool contextRegistrationMatch = false;
-        for (unsigned int jx = 0; jx < crrExpectedV.size(); ++jx) {
-            ContextRegistration crArg = crrArgV.get(ix)->contextRegistration;
-            ContextRegistration crExpected = crrExpectedV.get(jx)->contextRegistration;
-            LM_M(("%d == %d?", ix, jx));
-            if (!equalEntityIdVector(crExpected.entityIdVector, crArg.entityIdVector)) {
-                LM_M(("entity vector doesn't match in ContextRegistrationResponseVector comparison, continue..."));
-                continue; /* loop in jx */
-            }
-
-            if (!equalContextRegistrationAttributeVector(crExpected.contextRegistrationAttributeVector, crArg.contextRegistrationAttributeVector)) {
-                LM_M(("context registration attribute vector doesn't match in ContextRegistrationResponseVector comparison, continue..."));
-                continue; /* loop in jx */
-            }
-
-            if (crExpected.providingApplication.get() == crArg.providingApplication.get()) {
-                contextRegistrationMatch = true;
-                LM_M(("context registration match in ContextRegistrationResponseVector comparison, check next one..."));
-                break; /* loop in jx */
-            }
-        }
-
-        if (!contextRegistrationMatch) {
-            LM_M(("after looking everyone, context registration doesn't matches in ContextElementResponseVector comparison"));
-            return false;
-        }
-    }
-
-    LM_M(("ContextElementResponseVector comparison ok"));
-    return true;
-
-}
-
-/* ****************************************************************************
-*
-* matchNotifyContextAvailabilityRequest -
-*
-* We need a matcher to compare NotifyContextAvailabilityRequest in EXPECT_CALL() for
-* sendNotifyContextAvailabilityRequest, due to NotifyContextAvailabilityRequest is
-* not yet a full fledged object and we can not use the '==' method and Eq() matcher.
-* FIXME
-*
-*/
-bool matchNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* expected, NotifyContextAvailabilityRequest* arg) {
-
-    LM_M(("inside MatchNcar"));
-
-    /* The isEmpty() check is needed because, in some occasion, we don't have any expectations on
-     * subscriptionId and, in these cases, we don't check its value */
-    if (!expected->subscriptionId.isEmpty() && (expected->subscriptionId.get() != arg->subscriptionId.get())) {
-        return false;
-    }
-
-    if (!equalContextRegistrationResponseVector(expected->contextRegistrationResponseVector, arg->contextRegistrationResponseVector)) {
-        return false;
-    }
-
-    return true;
-
-}
-

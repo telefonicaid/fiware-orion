@@ -23,7 +23,20 @@
 * Author: Ken Zangelin
 */
 #include "common/statistics.h"
+#include "common/tag.h"
 #include "ngsi/Request.h"
+#include "logMsg/logMsg.h"
+#include "common/JsonHelper.h"
+
+
+
+/* ****************************************************************************
+*
+* Statistic time counters -
+*/
+TimeStat           accTimeStat;
+TimeStat           lastTimeStat;
+__thread TimeStat  threadLastTimeStat;
 
 
 
@@ -31,94 +44,199 @@
 *
 * Statistic counters for NGSI REST requests
 */
-int noOfJsonRequests                                     = -1;
-int noOfXmlRequests                                      = -1;
-int noOfRegistrations                                    = -1;
-int noOfRegistrationErrors                               = -1;
-int noOfRegistrationUpdates                              = -1;
-int noOfRegistrationUpdateErrors                         = -1;
-int noOfDiscoveries                                      = -1;
-int noOfDiscoveryErrors                                  = -1;
-int noOfAvailabilitySubscriptions                        = -1;
-int noOfAvailabilitySubscriptionErrors                   = -1;
-int noOfAvailabilityUnsubscriptions                      = -1;
-int noOfAvailabilityUnsubscriptionErrors                 = -1;
-int noOfAvailabilitySubscriptionUpdates                  = -1;
-int noOfAvailabilitySubscriptionUpdateErrors             = -1;
-int noOfAvailabilityNotificationsReceived                = -1;
-int noOfAvailabilityNotificationsSent                    = -1;
+// By content
+int noOfJsonRequests           = -1;
+int noOfTextRequests           = -1;
+int noOfRequestsWithoutPayload = -1;
 
-int noOfQueries                                          = -1;
-int noOfQueryErrors                                      = -1;
-int noOfUpdates                                          = -1;
-int noOfUpdateErrors                                     = -1;
-int noOfSubscriptions                                    = -1;
-int noOfSubscriptionErrors                               = -1;
-int noOfSubscriptionUpdates                              = -1;
-int noOfSubscriptionUpdateErrors                         = -1;
-int noOfUnsubscriptions                                  = -1;
-int noOfUnsubscriptionErrors                             = -1;
-int noOfNotificationsReceived                            = -1;
-int noOfNotificationsSent                                = -1;
-int noOfQueryContextResponses                            = -1;
-int noOfUpdateContextResponses                           = -1;
+// By url
+// FIXME P3: EntityRequest is used both tor /v2/entities/{id} and /v2/entities/{id}/attrs although
+// not the same verbs are allowed in both. Thus, counters are not perfect in that case but I think
+// we can live with it...
+UrlCounter noOfRequestCounters[] =
+{
+  //                                                      GET    POST   PATCH  PUT    DELET  OPT
+  {EntryPointsRequest,            -1, -1, -1, -1, -1, -1, true,  false, false, false ,false, true},
+  {EntitiesRequest,               -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {EntityRequest,                 -1, -1, -1, -1, -1, -1, true,  true,  true,  true,  true,  true},
+  {EntityAttributeRequest,        -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  true},
+  {EntityAttributeValueRequest,   -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, true},
+  {EntityAllTypesRequest,         -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {EntityTypes,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {SubscriptionsRequest,          -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {IndividualSubscriptionRequest, -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
+  {RegistrationsRequest,          -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {RegistrationRequest,           -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
+  {BatchQueryRequest,             -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
+  {BatchUpdateRequest,            -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
+  // FIXME P5: NotifyContext is shared for v1 and v2, both use postNotifyContext(). Weird...
+  {NotifyContext,                 -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
 
-int noOfContextEntitiesByEntityId                        = -1;
-int noOfContextEntityAttributes                          = -1;
-int noOfEntityByIdAttributeByName                        = -1;
-int noOfContextEntityTypes                               = -1;
-int noOfContextEntityTypeAttributeContainer              = -1;
-int noOfContextEntityTypeAttribute                       = -1;
-int noOfNgsi9SubscriptionsConvOp                         = -1;
+  {LogTraceRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
+  {StatisticsRequest,             -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+  {LogLevelRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, false},
+  {SemStateRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {MetricsRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+  {ExitRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {LeakRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false}
+};
 
-int noOfIndividualContextEntity                          = -1;
-int noOfIndividualContextEntityAttributes                = -1;
-int noOfIndividualContextEntityAttribute                 = -1;
-int noOfAttributeValueInstance                           = -1;
-int noOfNgsi10ContextEntityTypes                         = -1;
-int noOfNgsi10ContextEntityTypesAttributeContainer       = -1;
-int noOfNgsi10ContextEntityTypesAttribute                = -1;
-int noOfNgsi10SubscriptionsConvOp                        = -1;
+// Special
+int noOfVersionRequests          = -1;
+int noOfLegacyNgsiv1Requests     = -1;
+int noOfInvalidRequests          = -1;
+int noOfMissedVerb               = -1;
+int noOfRegistrationUpdateErrors = -1;
+int noOfDiscoveryErrors          = -1;
+int noOfNotificationsSent        = -1;
+int noOfSimulatedNotifications   = -1;
 
-int noOfUpdateContextElement                             = -1;
-int noOfAppendContextElement                             = -1;
-int noOfUpdateContextAttribute                           = -1;
 
-int noOfAllContextEntitiesRequests                       = -1;
-int noOfAllEntitiesWithTypeAndIdRequests                 = -1;
-int noOfIndividualContextEntityAttributeWithTypeAndId    = -1;
-int noOfAttributeValueInstanceWithTypeAndId              = -1;
-int noOfEntityByIdAttributeByNameIdAndType               = -1;
+/* ****************************************************************************
+*
+* timeSpecToFloat -
+*
+*/
+inline float timeSpecToFloat(const struct timespec& t)
+{
+  return t.tv_sec + ((float) t.tv_nsec) / 1E9;
+}
 
-int noOfLogRequests                                      = -1;
-int noOfVersionRequests                                  = -1;
-int noOfExitRequests                                     = -1;
-int noOfLeakRequests                                     = -1;
-int noOfStatisticsRequests                               = -1;
-int noOfInvalidRequests                                  = -1;
-int noOfRegisterResponses                                = -1;
 
-int noOfRtSubscribeContextAvailabilityResponse           = -1;
-int noOfRtUpdateContextAvailabilitySubscriptionResponse  = -1;
-int noOfRtUnsubscribeContextAvailabilityResponse         = -1;
-int noOfRtUnsubscribeContextResponse                     = -1;
-int noOfRtSubscribeResponse                              = -1;
-int noOfRtSubscribeError                                 = -1;
-int noOfContextElementResponse                           = -1;
-int noOfContextAttributeResponse                         = -1;
 
-int noOfEntityTypesRequest                               = -1;
-int noOfEntityTypesResponse                              = -1;
-int noOfAttributesForEntityTypeRequest                   = -1;
-int noOfAttributesForEntityTypeResponse                  = -1;
-int noOfContextEntitiesByEntityIdAndType                 = -1;
+/* ****************************************************************************
+*
+* renderTimingStatistics -
+*
+* xxxReqTime           - the total time that the LAST request took.
+*                        Measuring from the first MHD callback to 'connectionTreat',
+*                        until the MHD callback to 'requestCompleted'.
+* xxxJsonV1ParseTime   - the time that the JSON parse+treat of the LAST request took.
+* xxxJsonV2ParseTime   - the time that the JSON parse+treat of the LAST request took.
+* xxxMongoBackendTime  - the time that the mongoBackend took to treat the last request
+* xxxReadWaitTime      - 
+* xxxWriteWaitTime     - 
+* xxxCommandWaitTime   - 
+* xxxRenderTime        - the time that the last render took to render the response
+*
+*/
+std::string renderTimingStatistics(void)
+{
 
-int noOfEntitiesRequests                                 = -1;
-int noOfEntitiesResponses                                = -1;
+  timeStatSemTake(__FUNCTION__, "putting stats together");
 
-int noOfEntryPointsRequests                              = -1;
-int noOfEntryPointsResponses                             = -1;
+  bool accJsonV1ParseTime      = (accTimeStat.jsonV1ParseTime.tv_sec != 0)        || (accTimeStat.jsonV1ParseTime.tv_nsec != 0);
+  bool accJsonV2ParseTime      = (accTimeStat.jsonV2ParseTime.tv_sec != 0)        || (accTimeStat.jsonV2ParseTime.tv_nsec != 0);
+  bool accMongoBackendTime     = (accTimeStat.mongoBackendTime.tv_sec != 0)       || (accTimeStat.mongoBackendTime.tv_nsec != 0);
+  bool accMongoReadWaitTime    = (accTimeStat.mongoReadWaitTime.tv_sec != 0)      || (accTimeStat.mongoReadWaitTime.tv_nsec != 0);
+  bool accMongoWriteWaitTime   = (accTimeStat.mongoWriteWaitTime.tv_sec != 0)     || (accTimeStat.mongoWriteWaitTime.tv_nsec != 0);
+  bool accMongoCommandWaitTime = (accTimeStat.mongoCommandWaitTime.tv_sec != 0)   || (accTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool accRenderTime           = (accTimeStat.renderTime.tv_sec != 0)             || (accTimeStat.renderTime.tv_nsec != 0);
+  bool accReqTime              = (accTimeStat.reqTime.tv_sec != 0)                || (accTimeStat.reqTime.tv_nsec != 0);
 
+  bool lastJsonV1ParseTime      = (lastTimeStat.jsonV1ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV1ParseTime.tv_nsec != 0);
+  bool lastJsonV2ParseTime      = (lastTimeStat.jsonV2ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV2ParseTime.tv_nsec != 0);
+  bool lastMongoBackendTime     = (lastTimeStat.mongoBackendTime.tv_sec != 0)     || (lastTimeStat.mongoBackendTime.tv_nsec != 0);
+  bool lastMongoReadWaitTime    = (lastTimeStat.mongoReadWaitTime.tv_sec != 0)    || (lastTimeStat.mongoReadWaitTime.tv_nsec != 0);
+  bool lastMongoWriteWaitTime   = (lastTimeStat.mongoWriteWaitTime.tv_sec != 0)   || (lastTimeStat.mongoWriteWaitTime.tv_nsec != 0);
+  bool lastMongoCommandWaitTime = (lastTimeStat.mongoCommandWaitTime.tv_sec != 0) || (lastTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool lastRenderTime           = (lastTimeStat.renderTime.tv_sec != 0)           || (lastTimeStat.renderTime.tv_nsec != 0);
+  bool lastReqTime              = (lastTimeStat.reqTime.tv_sec != 0)              || (lastTimeStat.reqTime.tv_nsec != 0);
+
+  bool last = lastJsonV1ParseTime || lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime;
+  bool acc  = accJsonV1ParseTime || accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime;
+
+  if (!acc && !last)
+  {
+    timeStatSemGive(__FUNCTION__, "no stats to report");
+    return "{}";
+  }
+
+  JsonObjectHelper jh;
+
+  if (acc)
+  {
+    JsonObjectHelper accJh;
+
+    if (accJsonV1ParseTime)      accJh.addNumber("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
+    if (accJsonV2ParseTime)      accJh.addNumber("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
+    if (accMongoBackendTime)     accJh.addNumber("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
+    if (accMongoReadWaitTime)    accJh.addNumber("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
+    if (accMongoWriteWaitTime)   accJh.addNumber("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
+    if (accMongoCommandWaitTime) accJh.addNumber("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
+    if (accRenderTime)           accJh.addNumber("render",           timeSpecToFloat(accTimeStat.renderTime));
+    if (accReqTime)              accJh.addNumber("total",            timeSpecToFloat(accTimeStat.reqTime));
+
+    jh.addRaw("accumulated", accJh.str());
+  }
+  if (last)
+  {
+    JsonObjectHelper lastJh;
+
+    if (lastJsonV1ParseTime)      lastJh.addNumber("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
+    if (lastJsonV2ParseTime)      lastJh.addNumber("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
+    if (lastMongoBackendTime)     lastJh.addNumber("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
+    if (lastMongoReadWaitTime)    lastJh.addNumber("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
+    if (lastMongoWriteWaitTime)   lastJh.addNumber("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
+    if (lastMongoCommandWaitTime) lastJh.addNumber("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
+    if (lastRenderTime)           lastJh.addNumber("render",           timeSpecToFloat(lastTimeStat.renderTime));
+    if (lastReqTime)              lastJh.addNumber("total",            timeSpecToFloat(lastTimeStat.reqTime));
+
+    jh.addRaw("last", lastJh.str());
+  }
+
+  timeStatSemGive(__FUNCTION__, "putting stats together");
+  return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* timingStatisticsReset - 
+*/
+void timingStatisticsReset(void)
+{
+  memset(&accTimeStat, 0, sizeof(accTimeStat));
+}
+
+bool isLegacyNgsiv1(RequestType request)
+{
+  switch(request)
+  {
+  case AllContextEntities:
+  case AllEntitiesWithTypeAndId:
+  case AttributesForEntityType:
+  case ContextEntitiesByEntityId:
+  case ContextEntitiesByEntityIdAndType:
+  case ContextEntityAttributes:
+  case ContextEntityTypeAttribute:
+  case ContextEntityTypeAttributeContainer:
+  case ContextEntityTypes:
+  case DiscoverContextAvailability:
+  case EntityByIdAttributeByName:
+  case EntityByIdAttributeByNameIdAndType:
+  case EntityTypes:
+  case IndividualContextEntity:
+  case IndividualContextEntityAttribute:
+  case IndividualContextEntityAttributes:
+  case IndividualContextEntityAttributeWithTypeAndId:
+  case Ngsi10ContextEntityTypes:
+  case Ngsi10ContextEntityTypesAttribute:
+  case Ngsi10ContextEntityTypesAttributeContainer:
+  case Ngsi10SubscriptionsConvOp:
+  //case NotifyContext:  //FIXME: this is also used for v2. Weird...
+  case QueryContext:
+  case RegisterContext:
+  case SubscribeContext:
+  case UnsubscribeContext:
+  case UpdateContext:
+  case UpdateContextSubscription:
+    return true;
+  default:
+    return false;
+  }
+}
 
 
 /* ****************************************************************************
@@ -127,89 +245,133 @@ int noOfEntryPointsResponses                             = -1;
 *
 * FIXME P6: No statistics for received QueryResponses (Response from Provider Application
 *           after forwarding a query)
+*
+* There are some counter that are not updated by this function (but are rendered
+* by the renderStatCounters() function). In particular:
+*
+* - noOfRegistrationUpdateErrors
+* - noOfDiscoveryErrors
+* - noOfNotificationsSent
+* - noOfSimulatedNotifications (this one not in renderStatCountersU(), but in statisticsTreat() directly)
 */
-void statisticsUpdate(RequestType request, Format inFormat)
+void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
 {
-  if (inFormat == XML)
+  // If statistics are not enabled at CLI, then there is no point of recording anything
+  // Performance will be increased in this case
+  if (!countersStatistics)
   {
-     ++noOfXmlRequests;
+    return;
   }
 
-  if (inFormat == JSON)
+  if (inMimeType == JSON)
   {
     ++noOfJsonRequests;
   }
-
-  switch (request)
+  else if (inMimeType == TEXT)
   {
-  case RegisterContext:                                  ++noOfRegistrations; break;
-  case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
-  case SubscribeContextAvailability:                     ++noOfAvailabilitySubscriptions; break;
-  case UpdateContextAvailabilitySubscription:            ++noOfAvailabilitySubscriptionUpdates; break;
-  case UnsubscribeContextAvailability:                   ++noOfAvailabilityUnsubscriptions; break;
-  case NotifyContextAvailability:                        ++noOfAvailabilityNotificationsReceived; break;
+    ++noOfTextRequests;
+  }
+  else  // inMimeType == NOMIMETYPE
+  {
+    ++noOfRequestsWithoutPayload;
+  }
 
-  case QueryContext:                                     ++noOfQueries; break;
-  case SubscribeContext:                                 ++noOfSubscriptions; break;
-  case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
-  case UnsubscribeContext:                               ++noOfUnsubscriptions; break;
-  case NotifyContext:                                    ++noOfNotificationsReceived; break;
-  case UpdateContext:                                    ++noOfUpdates; break;
-  case RtQueryContextResponse:                           ++noOfQueryContextResponses; break;
-  case RtUpdateContextResponse:                          ++noOfUpdateContextResponses; break;
+  bool requestFound = false;
+  for (unsigned int ix = 0; ; ++ix)
+  {
+    if (noOfRequestCounters[ix].request == request)
+    {
+      requestFound = true;
+      switch(verb)
+      {
+      case GET:
+        if (noOfRequestCounters[ix].getAllowed)
+        {
+          ++noOfRequestCounters[ix].get;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case ContextEntitiesByEntityId:                        ++noOfContextEntitiesByEntityId; break;
-  case ContextEntityAttributes:                          ++noOfContextEntityAttributes; break;
-  case EntityByIdAttributeByName:                        ++noOfEntityByIdAttributeByName; break;
-  case ContextEntityTypes:                               ++noOfContextEntityTypes; break;
-  case ContextEntityTypeAttributeContainer:              ++noOfContextEntityTypeAttributeContainer; break;
-  case ContextEntityTypeAttribute:                       ++noOfContextEntityTypeAttribute; break;
-  case IndividualContextEntity:                          ++noOfIndividualContextEntity; break;
-  case IndividualContextEntityAttributes:                ++noOfIndividualContextEntityAttributes; break;
-  case AttributeValueInstance:                           ++noOfAttributeValueInstance; break;
-  case IndividualContextEntityAttribute:                 ++noOfIndividualContextEntityAttribute; break;
-  case Ngsi9SubscriptionsConvOp:                         ++noOfNgsi9SubscriptionsConvOp; break;
+      case POST:
+        if (noOfRequestCounters[ix].postAllowed)
+        {
+          ++noOfRequestCounters[ix].post;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case UpdateContextElement:                             ++noOfUpdateContextElement; break;
-  case AppendContextElement:                             ++noOfAppendContextElement; break;
-  case UpdateContextAttribute:                           ++noOfUpdateContextAttribute; break;
-  case Ngsi10ContextEntityTypes:                         ++noOfNgsi10ContextEntityTypes; break;
-  case Ngsi10ContextEntityTypesAttributeContainer:       ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
-  case Ngsi10ContextEntityTypesAttribute:                ++noOfNgsi10ContextEntityTypesAttribute; break;
-  case Ngsi10SubscriptionsConvOp:                        ++noOfNgsi10SubscriptionsConvOp; break;
+      case PATCH:
+        if (noOfRequestCounters[ix].patchAllowed)
+        {
+          ++noOfRequestCounters[ix].patch;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case AllContextEntities:                               ++noOfAllContextEntitiesRequests; break;
-  case AllEntitiesWithTypeAndId:                         ++noOfAllEntitiesWithTypeAndIdRequests; break;
-  case IndividualContextEntityAttributeWithTypeAndId:    ++noOfIndividualContextEntityAttributeWithTypeAndId; break;
-  case AttributeValueInstanceWithTypeAndId:              ++noOfAttributeValueInstanceWithTypeAndId; break;
-  case ContextEntitiesByEntityIdAndType:                 ++noOfContextEntitiesByEntityIdAndType; break;
-  case EntityByIdAttributeByNameIdAndType:               ++noOfEntityByIdAttributeByNameIdAndType; break;
+      case PUT:
+        if (noOfRequestCounters[ix].putAllowed)
+        {
+          ++noOfRequestCounters[ix].put;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case LogRequest:                                       ++noOfLogRequests; break;
-  case VersionRequest:                                   ++noOfVersionRequests; break;
-  case ExitRequest:                                      ++noOfExitRequests; break;
-  case LeakRequest:                                      ++noOfLeakRequests; break;
-  case StatisticsRequest:                                ++noOfStatisticsRequests; break;
+      case DELETE:
+        if (noOfRequestCounters[ix].deleteAllowed)
+        {
+          ++noOfRequestCounters[ix]._delete;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
 
-  case InvalidRequest:                                   ++noOfInvalidRequests; break;
-  case RegisterResponse:                                 ++noOfRegisterResponses; break;
+      case OPTIONS:
+        if (noOfRequestCounters[ix].optionsAllowed)
+        {
+          ++noOfRequestCounters[ix].options;
+        }
+        else
+        {
+          ++noOfMissedVerb;
+        }
+        break;
+      default:
+        ++noOfMissedVerb;
+      }
+    }
 
-  case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
-  case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;
-  case RtUnsubscribeContextAvailabilityResponse:         ++noOfRtUnsubscribeContextAvailabilityResponse; break;
-  case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
-  case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
-  case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
-  case RtContextElementResponse:                         ++noOfContextElementResponse; break;
-  case RtContextAttributeResponse:                       ++noOfContextAttributeResponse; break;
-  case EntityTypes:                                      ++noOfEntityTypesRequest; break;
-  case AttributesForEntityType:                          ++noOfAttributesForEntityTypeRequest; break;
-  case RtEntityTypesResponse:                            ++noOfEntityTypesResponse; break;
-  case RtAttributesForEntityTypeResponse:                ++noOfAttributesForEntityTypeResponse; break;
+    // We know that LeakRequest is the last request type in the array, by construction
+    // FIXME P7: this is weak (but it works)
+    if ((requestFound) || (noOfRequestCounters[ix].request == LeakRequest))
+    {
+      break;
+    }
+  }
 
-  case EntitiesRequest:                                  ++noOfEntitiesRequests; break;
-  case EntitiesResponse:                                 ++noOfEntitiesResponses; break;
-  case EntryPointsRequest:                               ++noOfEntryPointsRequests; break;
-  case EntryPointsResponse:                              ++noOfEntryPointsResponses; break;
+  // If it is not a NGSIv2 request it has to be NGSIv1 or invalid
+  if (!requestFound)
+  {
+    if (isLegacyNgsiv1(request))
+    {
+      ++noOfLegacyNgsiv1Requests;
+    }
+    else
+    {
+      ++noOfInvalidRequests;
+    }
   }
 }

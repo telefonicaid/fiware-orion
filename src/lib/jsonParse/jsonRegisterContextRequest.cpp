@@ -34,6 +34,7 @@
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonParse.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
@@ -119,12 +120,12 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
     return "invalid isPattern value for entity: /" + value + "/";
   }
 
-  if (isTrue(value))
-  {
-    return "isPattern set to true for a registration";
-  }
-
   reqDataP->rcr.entityIdP->isPattern = value;
+
+  if (isTrue(reqDataP->rcr.entityIdP->isPattern))
+  {
+    return "isPattern set to true for registrations is currently not supported";
+  }
 
   return "OK";
 }
@@ -153,7 +154,7 @@ static std::string crAttribute(const std::string& path, const std::string& value
 */
 static std::string craName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->rcr.attributeP->name = value;
+  reqDataP->rcr.attributeP->name = safeValue(value);
   LM_T(LmtParse, ("Set 'name' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->name.c_str()));
 
   return "OK";
@@ -169,150 +170,6 @@ static std::string craType(const std::string& path, const std::string& value, Pa
 {
   reqDataP->rcr.attributeP->type = value;
   LM_T(LmtParse, ("Set 'type' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->type.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craIsDomain - 
-*/
-static std::string craIsDomain(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  if (!isTrue(value) && !isFalse(value))
-  {
-    return "invalid isDomain value for context registration attribute: /" + value + "/";
-  }
-
-  reqDataP->rcr.attributeP->isDomain = value;
-  LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute",
-                  reqDataP->rcr.attributeP->isDomain.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadata - 
-*/
-static std::string craMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Creating a metadata"));
-
-  reqDataP->rcr.attributeMetadataP = new Metadata();
-
-  reqDataP->rcr.attributeMetadataP->type  = "";
-  reqDataP->rcr.attributeMetadataP->name  = "";
-  reqDataP->rcr.attributeMetadataP->value = "";
-
-  reqDataP->rcr.attributeP->metadataVector.push_back(reqDataP->rcr.attributeMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadataName - 
-*/
-static std::string craMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->name = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadataType - 
-*/
-static std::string craMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->type = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* craMetadataValue - 
-*/
-static std::string craMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->value = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadata - 
-*/
-static std::string regMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Creating a reg metadata"));
-
-  reqDataP->rcr.registrationMetadataP = new Metadata();
-  reqDataP->rcr.registrationMetadataP->type  = "";
-  reqDataP->rcr.registrationMetadataP->name  = "";
-  reqDataP->rcr.registrationMetadataP->value = "";
-  reqDataP->rcr.crP->registrationMetadataVector.push_back(reqDataP->rcr.registrationMetadataP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadataName - 
-*/
-static std::string regMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata name: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->name = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadataType - 
-*/
-static std::string regMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata type: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->type = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* regMetadataValue - 
-*/
-static std::string regMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->value = value;
 
   return "OK";
 }
@@ -361,186 +218,6 @@ static std::string registrationId(const std::string& path, const std::string& va
 
 
 
-/* ****************************************************************************
-*
-* sourceEntityId -
-*/
-static std::string sourceEntityId(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
-
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.fill("", "", "false");
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* sourceEntityIdId -
-*/
-static std::string sourceEntityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", value.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* sourceEntityIdType -
-*/
-static std::string sourceEntityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* sourceEntityIdIsPattern -
-*/
-static std::string sourceEntityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-
-  if (!isTrue(value) && !isFalse(value))
-  {
-    return "invalid isPattern value for entity: /" + value + "/";
-  }
-
-  if (isTrue(value))
-  {
-    return "isPattern set to true for a registration";
-  }
-
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.isPattern = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* targetEntityId -
-*/
-static std::string targetEntityId(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
-
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.fill("", "", "false");
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* targetEntityIdId -
-*/
-static std::string targetEntityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", value.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* targetEntityIdType -
-*/
-static std::string targetEntityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* targetEntityIdIsPattern -
-*/
-static std::string targetEntityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-
-  if (!isTrue(value) && !isFalse(value))
-  {
-    return "invalid isPattern value for entity: /" + value + "/";
-  }
-
-  if (isTrue(value))
-  {
-    return "isPattern set to true for a registration";
-  }
-
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.isPattern = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeAssociation -
-*/
-static std::string attributeAssociation(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("got an attribute association"));
-  reqDataP->rcr.attributeAssociationP = new AttributeAssociation();
-
-  Association* aP = &reqDataP->rcr.registrationMetadataP->association;
-  aP->attributeAssociationList.push_back(reqDataP->rcr.attributeAssociationP);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* sourceAttribute -
-*/
-static std::string sourceAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("got a source attribute association"));
-  reqDataP->rcr.attributeAssociationP->source = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* targetAttribute -
-*/
-static std::string targetAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("got a target attribute association"));
-  reqDataP->rcr.attributeAssociationP->target = value;
-
-  return "OK";
-}
-
-
 #define CR "/contextRegistrations"
 /* ****************************************************************************
 *
@@ -560,33 +237,6 @@ JsonNode jsonRcrParseVector[] =
   { CR "/contextRegistration/attributes/attribute",                                     crAttribute              },
   { CR "/contextRegistration/attributes/attribute/name",                                craName                  },
   { CR "/contextRegistration/attributes/attribute/type",                                craType                  },
-  { CR "/contextRegistration/attributes/attribute/isDomain",                            craIsDomain              },
-
-  { CR "/contextRegistration/attributes/attribute/metadatas",                           jsonNullTreat            },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata",                  craMetadata              },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/name",             craMetadataName          },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/type",             craMetadataType          },
-  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/value",            craMetadataValue         },
-
-  { CR "/contextRegistration/metadatas",                                                jsonNullTreat            },
-  { CR "/contextRegistration/metadatas/metadata",                                       regMetadata              },
-  { CR "/contextRegistration/metadatas/metadata/name",                                  regMetadataName          },
-  { CR "/contextRegistration/metadatas/metadata/type",                                  regMetadataType          },
-  { CR "/contextRegistration/metadatas/metadata/value",                                 regMetadataValue         },
-
-  { CR "/contextRegistration/metadatas/metadata/value/source",                          sourceEntityId           },
-  { CR "/contextRegistration/metadatas/metadata/value/source/id",                       sourceEntityIdId         },
-  { CR "/contextRegistration/metadatas/metadata/value/source/type",                     sourceEntityIdType       },
-  { CR "/contextRegistration/metadatas/metadata/value/source/isPattern",                sourceEntityIdIsPattern  },
-  { CR "/contextRegistration/metadatas/metadata/value/target",                          targetEntityId           },
-  { CR "/contextRegistration/metadatas/metadata/value/target/id",                       targetEntityIdId         },
-  { CR "/contextRegistration/metadatas/metadata/value/target/type",                     targetEntityIdType       },
-  { CR "/contextRegistration/metadatas/metadata/value/target/isPattern",                targetEntityIdIsPattern  },
-
-  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations",                    jsonNullTreat            },
-  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations/attributeAssociation",        attributeAssociation     },
-  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations/attributeAssociation/source", sourceAttribute          },
-  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations/attributeAssociation/target", targetAttribute          },
 
   { CR "/contextRegistration/providingApplication",                                     providingApplication     },
   { "/duration",                                                                        duration                 },
@@ -630,25 +280,5 @@ void jsonRcrRelease(ParseData* reqDataP)
 */
 std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rcr.res.check(RegisterContext, ciP->outFormat, "", reqData->errorString, 0);
-}
-
-
-
-/* ****************************************************************************
-*
-* jsonRcrPresent - 
-*/
-void jsonRcrPresent(ParseData* reqDataP)
-{
-  if (!lmTraceIsSet(LmtDump))
-  {
-    return;
-  }
-
-  LM_F(("\n\n"));
-
-  reqDataP->rcr.res.contextRegistrationVector.present("");
-  reqDataP->rcr.res.duration.present("");
-  reqDataP->rcr.res.registrationId.present("");
+  return reqData->rcr.res.check(ciP->apiVersion, reqData->errorString, 0);
 }

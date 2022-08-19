@@ -251,6 +251,14 @@ void paUsage(void)
   LM_T(LmtPaUsage, ("presenting usage"));
 
   spacePad = (char*) strdup(progName);
+  if (spacePad == NULL)
+  {
+    // strdup could return NULL if we run of of memory. Very unlikely, but
+    // theoretically possible (and static code analysis tools complaint about it ;)
+    printf("FATAL ERROR: strdup returns NULL");
+    exit(1);
+  }
+
   memset(spacePad, 0x20202020, strlen(spacePad));  /* replace progName */
 
   if (paUsageProgName != NULL)
@@ -357,6 +365,14 @@ void paExtendedUsage(void)
 
   snprintf(progNAME, sizeof(progNAME), "Extended Usage: %s ", progName);
   spacePad = (char*) strdup(progNAME);
+
+  if (spacePad == NULL)
+  {
+    // strdup could return NULL if we run of of memory. Very unlikely, but
+    // theoretically possible (and static code analysis tools complaint about it ;)
+    printf("FATAL ERROR: strdup returns NULL");
+    exit(1);
+  }
   memset(spacePad, 0x20202020, strlen(spacePad));  /* replace progNAME */
 
   PA_M(("-------------- Preparing list for Extended usage -----------------"));
@@ -370,7 +386,6 @@ void paExtendedUsage(void)
     char  maxVal[20];
     char  realVal[80];
     char  out[256];
-    char  out2[256];
 
     PA_M(("processing '%s' for extended usage\n", aP->name));
 
@@ -430,6 +445,8 @@ void paExtendedUsage(void)
     }
     else
     {
+      char out2[256];
+
       snprintf(vals, sizeof(vals), "%s <= %s <= %s", escape(out, minVal), name, escape(out2, maxVal));
     }
 
@@ -450,10 +467,6 @@ void paExtendedUsage(void)
     char  varName[128];
     char  vals[128];
     char  from[128];
-    char  defVal[20];
-    char  minVal[20];
-    char  maxVal[20];
-    char  realVal[80];
     char  s[512];
 
     if (aP->sort == PaHid)
@@ -499,6 +512,10 @@ void paExtendedUsage(void)
     /* 3. Limits */
     if ((aP->type != PaSList) && (aP->type != PaIList))
     {
+      char defVal[20];
+      char minVal[20];
+      char maxVal[20];
+      char realVal[80];
       char valWithDef[128];
       char fromN[64];
 

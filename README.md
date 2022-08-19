@@ -1,350 +1,292 @@
-# Orion Context Broker
+# <a name="top"></a>Orion Context Broker
 
-This is the code repository for the Orion Context Broker, a C++ implementation of the NGSI9/10 REST API binding
-developed as a part of the FIWARE platform.
+<!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
+     release.sh needs to be changed also -->
 
-If this is your first contact with Orion Context Broker, it is highly recommended to have a look to the brief Quick Start guide:
+[![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
+[![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
+[![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
+[![Support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
+[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
+<br>
+[![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
+![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
+![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
+![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
+![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4520/badge)](https://bestpractices.coreinfrastructure.org/projects/4520)
 
-https://wiki.fiware.org/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Quick_Start_for_Programmers
+The Orion Context Broker is an implementation of the Publish/Subscribe Context
+Broker GE, providing an
+[NGSI](https://swagger.lab.fiware.org/?url=https://raw.githubusercontent.com/Fiware/specifications/master/OpenAPI/ngsiv2/ngsiv2-openapi.json)
+interface. Using this interface, clients can do several operations:
 
-You will find all the information on Orion Context Broker in its page in the FIWARE Catalogue:
+-   Query context information. The Orion Context Broker stores context
+    information updated from applications, so queries are resolved based
+    on that information. Context information consists on *entities* (e.g. a car)
+    and their *attributes* (e.g. the speed or location of the car).
+-   Update context information, e.g. send updates of temperature
+-   Get notified when changes on context information take place (e.g. the
+    temperature has changed)
+-   Register context provider applications, e.g. the provider for the temperature sensor within a
+    room
 
-http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
+This project is part of [FIWARE](https://www.fiware.org/). For more information
+check the FIWARE Catalogue entry for
+[Core Context Management](https://github.com/Fiware/catalogue/tree/master/core).
 
-Note that you don't need this repository code if you install the broker via its RPM package (check Orion Context
-Broker installation and administration manual about installing via RPM).
+| :books: [Documentation](https://fiware-orion.rtfd.io) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion/) | :dart: [Roadmap](doc/roadmap.md) |
+|---|---|---|---|
 
-## Vagrant support
-If you want yo have an Orion Context Broker ready to develop in your machine easily we provide a Vagrant file so that you can get up and running. Just run:
+## Content
 
-    vagrant up
+-   [Background](#background)
+    -   [Description](#gei-overall-description)
+    -   [Introductory presentations](#introductory-presentations)
+-   [Install](#install)
+-   [Running](#running)
+-   [Usage](#usage)
+-   [API](#api)
+-   [Reference Documentation](#reference-documentation)
+-   [Testing](#testing)
+    -   [End-to-end tests](#end-to-end-tests)
+    -   [Unit Tests](#unit-tests)
+-   [Advanced topics](#advanced-topics)
+-   [Support](#support)
+-   [License](#license)
 
-You just need to install Vagrant if you want to use this, and at least Virtualbox. Especially useful for those that use virtual machines to develop on a Mac or a Linux distribution that is not CentOS. Keep in mind that the Vagrant file specifies CentOS 6.5 as a base operating system.
+## Background
 
-For example, to compile in debug mode and install it in the home directory simply run:
+You can find the User & Programmer's Manual and the Installation &
+Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
-     vagrant ssh -c 'INSTALL_DIR=/home/vagrant make di -C fiware-orion'
+Any feedback on this documentation is highly welcome, including bugs, typos or
+things you think should be included but aren't. You can use
+[github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
+provide feedback.
 
-After a few minutes you can run contextBroker. Again, you can either ssh into the machine with 
+[Top](#top)
 
-    vagrant ssh
+### Description
 
-and run it from the command-line, or directly run the broker with something like
+Orion is a C++ implementation of the NGSIv2 REST API binding developed as a part
+of the FIWARE platform.
 
-    vagrant ssh -c 'contextBroker -multiservice -t 0-255'
+Orion Context Broker allows you to manage the entire lifecycle of context
+information including updates, queries, registrations and subscriptions. It is
+an NGSIv2 server implementation to manage context information and its availability.
+Context information consists on *entities* (e.g. a car) and their *attributes*
+(e.g. the speed or location of the car).
 
-Orion Context Broker will be accessible at `127.0.0.1:1026` (`5683` for CoAP).
+Using the Orion Context Broker, you are able to create context elements and manage
+them through updates and queries. In addition, you can subscribe to context
+information so when some condition occurs (e.g. the context elements have changed)
+you receive a notification. These usage scenarios and the Orion Context Broker
+features are described in this documentation.
 
-You can also use these commands to automate building and running from your favorite IDE.
+If this is your first contact with the Orion Context Broker, it is highly
+recommended to have a look to the brief
+[Quick Start guide](doc/manuals/quick_start_guide.md).
 
-*NOTE:* The virtualbox machine that is created uses additional resources to those from the broker itself. It uses around 512 MiB of RAM and around 1.20 GiB of disk space with Orion already compiled in debug mode.
+[Top](#top)
 
+### Introductory presentations
 
+-   Orion Context Broker
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220526)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220526-251860297)
+-   NGSIv2 Overview for Developers That Already Know NGSIv1
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)
 
-The bootstrap script basically goes through the installation instructions in the README.
-## Installing and Using the broker
+[Top](#top)
 
-The administration and programming manuals for Orion Context Broker are found in the FIWARE Catalogue page,
-under the "Documentation" tab.
+## Install
 
-http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
+Build and Install documentation for Orion Context Broker can be found at
+[the corresponding section of the Admin Manual](doc/manuals/admin/install.md).
 
-## Building Orion Context Broker
+> :point_right: If you want to run a production-grade instance of orion, carefully read all information in the [admin-section](doc/manuals/admin). 
 
-Orion Context Broker reference distribution is CentOS 6.3. This doesn't mean that the broker cannot be
-built in other distributions (actually, it can). This section also includes indications on how to build
-in other distributions, just in the case it may help people that don't use CentOS. However, note that
-the only "officially supported" procedure is the one for CentOS 6.3; the others are provided "as is"
-and can get obsolete from time to time.
+[Top](#top)
 
-**Note:** the build includes both contextBroker binary and proxyCoap. If you are not interested in proxyCoap
-at all, you can disable it just commenting out the following line in the CMakeList.txt file:
+## Running
 
-```
-ADD_SUBDIRECTORY(src/app/proxyCoap)
-```
+How to run Orion Context Broker can be found at
+[this document](docker/README.md).
 
-and removing the following files:
+[Top](#top)
 
-```
-test/functionalTest/cases/coap_basic.test
-test/functionalTest/cases/coap_command_line_options.test
-test/functionalTest/cases/coap_version.test
-```
+## Usage
 
-In that case, you can also ignore all the steps in the building process marked as "(Optional proxyCoap)"
+In order to create an entity (Room1) with two attributes (temperature and
+pressure):
 
-### CentOS 6.3 (official)
-
-The Orion Context Broker uses the following libraries as build dependencies:
-
-* boost: 1.41 (the one that comes in EPEL6 repository)
-* libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
-* libcurl: 7.19.7
-* Mongo Driver: legacy-1.0.2 (from source)
-* gtest (only for `make unit_test` building target): 1.5 (from sources)
-* gmock (only for `make unit_test` building target): 1.5 (from sources)
-* cantcoap (for proxyCoap)
-
-We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
-(check the procedure at http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F):
-
-The basic procedure is as follows (assuming you don't run commands as root, we use sudo for those
-commands that require root privilege):
-
-* Install the needed building tools (compiler, etc.).
-
-```
-sudo yum install make cmake gcc-c++ scons
-```
-
-* Install the required libraries (except the mongo driver and gmock, described in following steps).
-
-```
-sudo yum install libmicrohttpd-devel boost-devel libcurl-devel
-```
-
-* Install the Mongo Driver from source:
-
-```
-wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.2.tar.gz
-tar xfvz legacy-1.0.2.tar.gz
-cd mongo-cxx-driver-legacy-1.0.2
-scons                                         # The build/linux2/normal/libmongoclient.a library is generated as outcome
-sudo scons install --prefix=/usr/local        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
-```
-
-* Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the
-  current CMakeLists.txt configuration)
-
-```
-wget http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2
-tar xfvj gmock-1.5.0.tar.bz2
-cd gmock-1.5.0
-./configure
-make
-sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
-sudo ldconfig      # just in case... it doesn't hurt :)
-```
-
-* (Optional proxyCoap) Install cantcoap (with dependencies). Note that we are using a particular snapshot of the code (corresponding to around July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
-
-```
-sudo yum install clang CUnit-devel
-
-git clone https://github.com/staropram/cantcoap
-cd cantcoap
-git checkout 749e22376664dd3adae17492090e58882d3b28a7
-make
-sudo cp cantcoap.h /usr/local/include
-sudo cp dbg.h /usr/local/include
-sudo cp nethelper.h /usr/local/include
-sudo cp libcantcoap.a /usr/local/lib
+```console
+curl <orion_host>:1026/v2/entities -s -S --header 'Content-Type: application/json' \
+    -X POST -d @- <<EOF
+{
+  "id": "Room2",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Number"
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Number"
+  }
+}
+EOF
 ```
 
-* Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
+In order to query the entity:
 
-```
-sudo yum install git
-git clone https://github.com/telefonicaid/fiware-orion
-```
-
-* Build the source:
-
-```
-cd fiware-orion
-make
+```console
+    curl <orion_host>:1026/v2/entities/Room2 -s -S --header 'Accept: application/json' | python -mjson.tool
 ```
 
-* (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB (as the unit tests rely on mongod
-  running in localhost).
+In order to update one of the entity atributes (temperature):
 
-```
-sudo yum install mongodb-server
-sudo yum  update pcre            # otherwise, mongod crashes in CentOS 6.3
-sudo /etc/init.d/mongod start
-sudo /etc/init.d/mongod status   # to check that mongod is actually running
-make unit_test
-```
-
-* Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is
-/usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
-
-```
-sudo make install INSTALL_DIR=/usr
+```console
+curl <orion_host>:1026/v2/entities/Room2/attrs/temperature -s -S \
+    --header 'Content-Type: application/json' \
+    -X PUT -d @- <<EOF
+{
+  "value": 26.3,
+  "type": "Number"
+}
+EOF
 ```
 
-* Check that everything is ok, invoking the broker version message:
+or (more compact):
 
-```
-contextBroker --version
-```
-
-The Orion Context Broker comes with a suite of valgrind and end-to-end tests that you can also run,
-following the following procedure (optional):
-
-* Install the required tools:
-
-```
-sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt 
+```console
+curl <orion_host>:1026/v2/entities/Room2/attrs/temperature/value -s -S \
+    --header 'Content-Type: text/plain' \
+    -X PUT -d 26.3
 ```
 
-* (Optional proxyCoap) Install COAP client (an example application included in the libcoap sources).
+Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md)
+if you want to test these operations in an actual public instance of Orion
+Context Broker. In addition, have a look to the API Walkthrough and API
+Reference sections below in order to know more details about the API
+(subscriptions, registrations, etc.).
 
-```
-wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
-mv download libcoap-4.1.1.tar.gz
-tar xvzf libcoap-4.1.1.tar.gz
-cd libcoap-4.1.1
-./configure
-make
-sudo cp examples/coap-client /usr/local/bin
-```
+[Top](#top)
 
-* Run valgrind tests (it takes some time, please be patient):
+## API
 
-```
-make valgrind
-```
+-   FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
+    [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
+-   FIWARE NGSI v2
+    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook)
+    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook)
+    (Apiary)
+    -   See also NGSIv2 implementation notes
+        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
+        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
-* Prepare the environment for test harness. Basically, you have to install the accumulator-server.py script
-  and in a path under your control, ~/bin is the recommended one. Alternatively, you can install them in a
-  system directory such as /usr/bin but it could collide with an RPM installation, thus it is not
-  recommended. In addition, you have to set several environment variables used by the harness script
-  (see scripts/testEnv.sh file).
+[Top](#top)
 
-```
-mkdir ~/bin
-export PATH=~/bin:$PATH
-make install_scripts INSTALL_DIR=~
-. scripts/testEnv.sh
-```
+## Reference Documentation
 
-* Run test harness (it takes some time, arm yourself with patience).
+API Reference Documentation:
 
-```
-make functional_test INSTALL_DIR=~
-```
+-   FIWARE NGSI v2
+    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
+    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
+    -   See also NGSIv2 implementation notes
+        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
+        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
-You can generate coverage reports for the Orion Context Broker using the following procedure
-(optional):
+Orion Reference Documentation:
 
-* Install the required tools. You need lcov 1.10 - the one that comes with CentOS 6.3 (lcov 1.9) is
-  not valid.
+-   Orion Manuals in RTD [(en)](https://fiware-orion.readthedocs.org)
+    [(jp)](https://fiware-orion.letsfiware.jp/)
 
-```
-sudo rpm -Uhv http://downloads.sourceforge.net/ltp/lcov-1.10-1.noarch.rpm
-```
+[Top](#top)
 
-* Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
+## Testing
 
-* Run coverage
+### End-to-end tests
 
-```
-make coverage INSTALL_DIR=~
-```
+The functional_test makefile target is used for running end-to-end tests:
 
-You can generate the RPM for the source code (optional):
+    make functional_test INSTALL_DIR=~
 
-* Install the required tools
+Please have a look to the section
+[on building the source code](doc/manuals/admin/build_source.md) in order to get
+more information about how to prepare the environment to run the functional_test
+target.
 
-```
-sudo yum install rpm-build
-```
+### Unit Tests
 
-* Generate the RPM
+The unit_test makefile target is used for running the unit tests:
 
-```
-make rpm
-```
+    make unit_test
 
-* The generated RPMs are placed in directory ~/rpmbuild/RPMS/x86_64
+Please have a look to the section
+[on building the source code](doc/manuals/admin/build_source.md) in order to get
+more information about how to prepare the environment to run the unit_test
+target.
 
-### Debian 7 (unofficial)
+[Top](#top)
 
-To be polished.
+## Advanced topics
 
-The packages are basically the same described for RedHat/CentOS above, except that we need to
-install packages using apt-get instead of yum.
+-   Advanced Programming [(en)](doc/manuals/user/README.md)
+    [(jp)](doc/manuals.jp/user/README.md)
+-   Installation and administration [(en)](doc/manuals/admin/README.md)
+    [(jp)](doc/manuals.jp/admin/README.md)
+-   Container-based deployment
+    -   Docker [(en)](docker/README.md) [(jp)](docker/README.jp.md)
+    -   Docker Swarm and HA [(en)](docker/docker_swarm.md)
+        [(jp)](docker/docker_swarm.jp.md)
+-   Development Manual [(en)](doc/manuals/devel/README.md)
+    [(jp)](doc/manuals.jp/devel/README.md)
+-   Sample code contributions [(en)](doc/manuals/devel/code_contributions.md)
+    [(jp)](doc/manuals.jp/devel/code_contributions.md)
+-   Contribution guidelines [(en)](doc/manuals/devel/contribution_guidelines.md)
+    [(jp)](doc/manuals.jp/devel/contribution_guidelines.md), especially important if
+    you plan to contribute with code to Orion Context Broker
+-   Deprecated features [(en)](doc/manuals/deprecated.md)
+    [(jp)](doc/manuals.jp/deprecated.md)
 
-Install Google Test and Google Mock version 1.5 directly from sources.
+[Top](#top)
 
-The version of lcov that comes with Debian 7.0 (1.9) has a bug (see https://bugs.launchpad.net/ubuntu/+source/lcov/+bug/1163758).
-Install lcov 1.10 from sources.
+## Support
+
+Ask your thorough programming questions using
+[stackoverflow](http://stackoverflow.com/questions/ask) and your general
+questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the
+tag `fiware-orion`
+
+[Top](#top)
+
+---
 
 ## License
 
-Orion Context Broker is licensed under Affero General Public License (GPL) version 3.
+Orion Context Broker is licensed under [Affero General Public License (GPL)
+version 3](./LICENSE).
 
-## Troubleshooting
+© 2022 Telefonica Investigación y Desarrollo, S.A.U
 
-### Building MongoDB C++ Driver
+### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 
-#### Error at "boost/exception/detail/exception_ptr_base.hpp"
+There is absolutely no problem in using a product licensed under AGPL 3.0. Issues with GPL
+(or AGPL) licenses are mostly related with the fact that different people assign different
+interpretations on the meaning of the term “derivate work” used in these licenses. Due to this,
+some people believe that there is a risk in just _using_ software under GPL or AGPL licenses
+(even without _modifying_ it).
 
-* OS version: CentOS/RHEL release 6.4
-* GCC version: 4.4.7
+For the avoidance of doubt, the owners of this software licensed under an AGPL-3.0 license
+wish to make a clarifying public statement as follows:
 
-You can experience the following error when building the driver:
+> Please note that software derived as a result of modifying the source code of this
+> software in order to fix a bug or incorporate enhancements is considered a derivative
+> work of the product. Software that merely uses or aggregates (i.e. links to) an otherwise
+> unmodified version of existing software is not considered a derivative work, and therefore
+> it does not need to be released as under the same license, or even released as open source.
 
-```
-scons: Building targets ...
-g++ -o build/mongo/util/file_allocator.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS
--Ibuild -Isrc -Ibuild/mongo -Isrc/mongo src/mongo/util/file_allocator.cpp
-In file included from /usr/include/boost/thread/future.hpp:12,
-                 from /usr/include/boost/thread.hpp:24,
-                 from src/mongo/util/file_allocator.cpp:20:
-/usr/include/boost/exception_ptr.hpp:43: error: looser throw specifier for 'virtual
-boost::exception_ptr::~exception_ptr()'
-/usr/include/boost/exception/detail/exception_ptr_base.hpp:26: error:   overriding
-'virtual boost::exception_detail::exception_ptr_base::~exception_ptr_base() throw ()'
-scons: *** [build/mongo/util/file_allocator.o] Error 1
-scons: building terminated because of errors.
-```
-
-This is due to a virtual destructor within boost/exception/detail/exception_ptr_base.hpp (a boost library source file) added in order to avoid a warning appearing when using an old version of gcc. This virtual method must be commented (safe comment, see the references) if the above error wants to be avoided.
-
-```
-23:                         protected:
-24: /*
-25:                         virtual
-26:                         ~exception_ptr_base() throw()
-27:                             {
-28:                             }
-29: */
-30:                         };
-```
-
-Reference: https://groups.google.com/forum/?fromgroups=#!topic/boost-list/gBodhfp9LjI
-
-### Building Boost Libraries
-
-* OS version: openSUSE 13.1
-* GCC version: 4.8.1
-
-You may encounter this problem:
-
-```
-/usr/local/include/boost/atomic/atomic.hpp:202:16: error: ‘uintptr_t’ was not declared in this scope
-typedef atomic<uintptr_t> atomic_uintptr_t;
-
-/usr/local/include/boost/atomic/atomic.hpp:202:25: error: template argument 1 is invalid
-typedef atomic<uintptr_t> atomic_uintptr_t;
-```
-
-There seems to be a problem with boost libraries. It can be fixed changing /usr/local/include/boost/cstdint.hpp. Find the line
-
-```
-#if defined(BOOST_HAS_STDINT_H) && (!defined(__GLIBC__) || defined(__GLIBC_HAVE_LONG_LONG)) 
-```
-
-And change it for
-
-```
-#if defined(BOOST_HAS_STDINT_H)                                 \ 
-    && (!defined(__GLIBC__)                                       \ 
-        || defined(__GLIBC_HAVE_LONG_LONG)                        \ 
-        || (defined(__GLIBC__) && ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 17))))) 
-```
-
-Reference: https://svn.boost.org/trac/boost/changeset/84950

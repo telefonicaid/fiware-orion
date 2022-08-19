@@ -1,5 +1,5 @@
-#ifndef MONGO_UPDATE_CONTEXT_H
-#define MONGO_UPDATE_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_
 
 /*
 *
@@ -25,8 +25,9 @@
 *
 * Author: Fermin Galan Marquez
 */
-#include <map>
 #include <string>
+#include <vector>
+#include <map>
 
 #include "rest/HttpStatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
@@ -46,7 +47,13 @@ extern HttpStatusCode mongoUpdateContext
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                    xauthToken,
-  const std::string&                    caller = ""
+  const std::string&                    fiwareCorrelator,
+  const std::string&                    ngsiV2AttrsFormat,
+  const bool&                           forcedUpdate     = false,
+  const bool&                           overrideMetadata    = false,
+  ApiVersion                            apiVersion       = V1,
+  Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR,
+  bool                                  flowControl      = false
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_

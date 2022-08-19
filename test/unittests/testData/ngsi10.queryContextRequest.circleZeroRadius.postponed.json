@@ -16,6 +16,7 @@
     "occupancy",
     "lightstatus"
   ],
+  "reference": "http://127.0.0.1",
   "restriction": {
     "attributeExpression" : "Attribute Expression",
     "scopes": [

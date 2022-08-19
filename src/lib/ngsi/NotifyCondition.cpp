@@ -27,6 +27,8 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -36,24 +38,46 @@
 
 /* ****************************************************************************
 *
-* NotifyCondition::render -
+* NotifyCondition::NotifyCondition - 
 */
-std::string NotifyCondition::render(Format format, const std::string& indent, bool notLastInVector)
+NotifyCondition::NotifyCondition()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyCondition::NotifyCondition - 
+*/
+NotifyCondition::NotifyCondition(NotifyCondition* ncP)
+{
+  type = ncP->type;
+  condValueList.fill(ncP->condValueList);
+  restriction.set(ncP->restriction.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyCondition::toJsonV1 -
+*/
+std::string NotifyCondition::toJsonV1(bool notLastInVector)
 {
   std::string out = "";
-  std::string tag = "notifyCondition";
 
   bool condValueListRendered   = condValueList.size() != 0;
-  bool restrictionRendered     = restriction.get() != "";
+  bool restrictionRendered     = !restriction.get().empty();
   bool commaAfterRestriction   = false;  // last element
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", "type", type, format, commaAfterType);
-  out += condValueList.render(format, indent + "  ",   commaAfterCondValueList);
-  out += restriction.render(format,   indent + "  ",   commaAfterRestriction);
-  out += endTag(indent, tag, format);
+  out += startTag();
+  out += valueTag("type", type, commaAfterType);
+  out += condValueList.toJsonV1(commaAfterCondValueList);
+  out += restriction.toJsonV1(commaAfterRestriction);
+  out += endTag();
 
   return out;
 }
@@ -69,67 +93,35 @@ std::string NotifyCondition::render(Format format, const std::string& indent, bo
 std::string NotifyCondition::check
 (
   RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
   std::string res;
 
-  if (type == "")
+  if (type.empty())
   {
     return "empty type for NotifyCondition";
   }
-  else if (strcasecmp(type.c_str(), "ONTIMEINTERVAL") == 0)
-  {
-  }
-  else if (strcasecmp(type.c_str(), "ONCHANGE") == 0)
-  {
-  }
-  else if (strcasecmp(type.c_str(), "ONVALUE") == 0)
+  else if (strcasecmp(type.c_str(), ON_CHANGE_CONDITION) == 0)
   {
   }
   else
   {
-    return std::string("invalid notify condition type: '") + type + "'";
+    return std::string("invalid notify condition type: /") + type + "/";
   }
 
-  if ((res = condValueList.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = condValueList.check()) != "OK")
   {
     return res;
   }
 
-  if ((res = restriction.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = restriction.check()) != "OK")
   {
     return res;
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyCondition::present -
-*/
-void NotifyCondition::present(const std::string& indent, int ix)
-{
-  std::string indent2 = indent + "  ";
-
-  if (ix == -1)
-  {
-    LM_F(("%sNotify Condition:\n", indent2.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNotify Condition %d:\n", indent2.c_str(), ix));
-  }
-
-  LM_F(("%stype: %s\n", indent2.c_str(), type.c_str()));
-  condValueList.present(indent2);
-  restriction.present(indent2);
 }
 
 

@@ -28,15 +28,32 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/Association.h"
+#include "common/globals.h"
 
-/* Metadata interpreted by Orion Context Broker, i.e. not custom metadata */
-#define NGSI_MD_ID       "ID"
-#define NGSI_MD_LOCATION "location"
-#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
-#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
+#include "orionTypes/OrionValueType.h"
+#include "ngsi/Request.h"
+#include "parse/CompoundValueNode.h"
+
+#include "mongoDriver/BSONObj.h"
+
+
+
+/* ****************************************************************************
+*
+* Defines -
+*
+* Metadata interpreted by Orion Context Broker, i.e. not custom metadata
+*/
+#define NGSI_MD_LOCATION           "location"        // Deprecated (NGSIv1)
+#define NGSI_MD_IGNORE_TYPE        "ignoreType"
+#define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
+#define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata
+#define NGSI_MD_DATECREATED        "dateCreated"     // Special metadata
+#define NGSI_MD_DATEMODIFIED       "dateModified"    // Special metadata
+#define NGSI_MD_ALL                "*"               // Special metadata (alias meaning "all metadata")
+#define NGSI_MD_ACTIONTYPE_UPDATE  "update"
+#define NGSI_MD_ACTIONTYPE_APPEND  "append"
+#define NGSI_MD_ACTIONTYPE_DELETE  "delete"          // FIXME #1494: reserved for future use
 
 
 
@@ -44,33 +61,40 @@
 *
 * Metadata -
 *
-* FIXME
-*   The Association field should be added not in this class but in a class that inherits
-*   from Metadata.
-*    Once we start the next refactoring ...
 */
 typedef struct Metadata
 {
   std::string  name;         // Mandatory
   std::string  type;         // Optional
-  std::string  value;        // Mandatory
-  Association  association;  // Optional (used if type == 'Association')
+
+  bool         typeGiven;    // Was 'type' part of the incoming payload?
+
+  orion::ValueType           valueType;    // Type of value: taken from JSON parse
+  std::string                stringValue;  // "value" as a String
+  double                     numberValue;  // "value" as a Number
+  bool                       boolValue;    // "value" as a Boolean
+  orion::CompoundValueNode*  compoundValueP;
+
+  bool                       shadowed;     // shadowed true means that the metadata is rendered only if explicitly required
+                                           // in metadata filter (typically for builtin metadata)
 
   Metadata();
-  Metadata(Metadata* mP);
-  Metadata(const std::string& _name, const std::string& _type, const std::string& _value = "");
+  Metadata(Metadata* mP, bool useDefaultType = false);
+  Metadata(const std::string& _name, const std::string& _type, const char* _value);
+  Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
+  Metadata(const std::string& _name, const std::string& _type, double _value);
+  Metadata(const std::string& _name, const std::string& _type, bool _value);
+  Metadata(const std::string& _name, const orion::BSONObj& mdB);
+  ~Metadata();
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement);
-  void         present(const std::string& metadataType, int ix, const std::string& indent);
+  std::string  toJsonV1(bool comma);
+  std::string  toJson(void);
   void         release(void);
   void         fill(const struct Metadata& md);
+  std::string  toStringValue(void) const;
+  bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
-  std::string  check(RequestType         requestType,
-                     Format              format,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(ApiVersion apiVersion);
 } Metadata;
 
 #endif  // SRC_LIB_NGSI_METADATA_H_

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "common/globals.h"
+
 #include "ngsi/Metadata.h"
 
 
@@ -38,28 +40,27 @@
 */
 typedef struct MetadataVector
 {
+public:
   std::vector<Metadata*>  vec;
 
-  std::string             tag;        // Help variable for the 'render' method
+  MetadataVector(void);
 
-  MetadataVector(const std::string& _tag = "registrationMetadata");
+  std::string     toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma);
+  std::string     toJson(const std::vector<Metadata*>& orderedMetadata);
+  std::string     check(ApiVersion apiVersion);
 
-  void          tagSet(const std::string& tagName);
-  std::string   render(Format format, const std::string& indent, bool comma = false);
-  std::string   toJson(bool isLastElement);
-  std::string   check(RequestType requestType,
-                      Format format,
-                      const std::string& indent,
-                      const std::string& predetectedError,
-                      int counter);
+  void            push_back(Metadata* item);
+  unsigned int    size(void) const;
+  Metadata*       lookupByName(const std::string& _name) const;
+  void            release(void);
+  void            fill(MetadataVector* mV);
+ 
+  
+  Metadata* operator[](unsigned int ix) const;
 
-  void          present(const std::string& metadataType, const std::string& indent);
-  void          push_back(Metadata* item);
-  unsigned int  size(void);
-  Metadata*     get(int ix);
-  Metadata*     lookupByName(const std::string& _name);
-  void          release();
-  void          fill(MetadataVector* mV);
+private:
+  bool matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter);
+  
 } MetadataVector;
 
 #endif  // SRC_LIB_NGSI_METADATAVECTOR_H_

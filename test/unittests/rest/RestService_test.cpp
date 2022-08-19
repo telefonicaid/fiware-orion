@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -34,75 +37,95 @@
 #include "rest/restReply.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
-RestService rs[] =
+/* ****************************************************************************
+*
+* service routine vectors -
+*/
+#define RC   RegisterContext
+#define DCA  DiscoverContextAvailability
+
+RestService postV[] =
 {
-  // NGSI-9 Requests
-  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       postRegisterContext                       },
-  { "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       badVerbPostOnly                           },
-
-  // End marker for the array
-  { "",       InvalidRequest,                        0, {                                                      }, "",                                             NULL                                      }
+  { RC,             2, { "ngsi9", "registerContext" }, postRegisterContext },
+  { InvalidRequest, 0, {}, NULL }
 };
 
-
-RestService rs2[] =
+RestService badVerbs[] =
 {
-  // NGSI-9 Requests
-  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       postRegisterContext                       },
-  { "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "registerContextRequest",                       badVerbPostOnly                           },
-  { "POST",   DiscoverContextAvailability,           2, { "ngsi9",  "discoverContextAvailability"              }, "discoverContextAvailabilityRequest",           postDiscoverContextAvailability           },
-  { "*",      DiscoverContextAvailability,           2, { "ngsi9",  "discoverContextAvailability"              }, "discoverContextAvailabilityRequest",           badVerbPostOnly                           },
+  { RC,             2, { "ngsi9", "registerContext" }, badVerbPostOnly     },
+  { InvalidRequest, 0, {}, NULL }
+};
 
-  // End marker for the array
-  { "",       InvalidRequest,                        0, {                                                      }, "",                                             NULL                                      }
+RestService postV2[] =
+{
+  { RC,             2, { "ngsi9",  "registerContext"             }, postRegisterContext             },
+  { DCA,            2, { "ngsi9",  "discoverContextAvailability" }, postDiscoverContextAvailability },
+  { InvalidRequest, 0, {}, NULL }
+};
+
+RestService badVerbs2[] =
+{
+  { DCA,            2, { "ngsi9",  "discoverContextAvailability" }, badVerbPostOnly                 },
+  { RC,             2, { "ngsi9",  "registerContext"             }, badVerbPostOnly                 },
+  { InvalidRequest, 0, {}, NULL }
 };
 
 
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* payloadParse -
 */
 TEST(RestService, payloadParse)
 {
-  ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-  ParseData       parseData;
-  const char*     infile1  = "ngsi9.registerContext.ok.valid.json";
-  std::string     out;
+  ConnectionInfo            ci("/ngsi9/registerContext", "POST", "1.1");
+  ParseData                 parseData;
+  const char*               infile1  = "ngsi9.registerContext.ok.valid.json";
+  std::string               out;
+  std::vector<std::string>  compV;
+  JsonDelayedRelease        jsonRelease;
+
+  compV.push_back("ngsi9");
+  compV.push_back("registerContext");
 
   utInit();
 
   //
   // 1. JSON
   //
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inFormat     = JSON;
-  ci.outFormat    = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
+  ci.inMimeType     = JSON;
+  ci.outMimeType    = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL);
+  out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
   //
-  // 2. NOFORMAT
+  // 2. NOMIMETYPE
   //
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  ci.inFormat     = NOFORMAT;
-  ci.outFormat    = JSON;
-  ci.payload      = (char*) "123";
-  ci.payloadSize  = strlen(ci.payload);
+  ci.inMimeType     = NOMIMETYPE;
+  ci.outMimeType    = JSON;
+  ci.payload        = (char*) "123";
+  ci.payloadSize    = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL);  // Call restService?
-  EXPECT_EQ("Bad inFormat", out);
+  out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
+  EXPECT_EQ("Bad inMimeType", out);
 
   utExit();
 }
@@ -111,36 +134,55 @@ TEST(RestService, payloadParse)
 
 /* ****************************************************************************
 *
-* noSuchService - 
+* noSuchService -
 */
 TEST(RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
-  const char*    infile    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
-  const char*    outfile1  = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
-  const char*    outfile2  = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";
+  ci.servicePathV.push_back("");
+
+  const char*    infile      = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
+  const char*    outfile1    = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
+  const char*    outfile2    = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";
   std::string    out;
+  RestService    restService = { DiscoverContextAvailability, 2, { "ngsi9", "discoverContextAvailability" }, NULL };
 
   utInit();
 
   // No such service
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci.outFormat    = JSON;
-  ci.inFormat     = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
-  out             = restService(&ci, rs);
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile1)) << "Error getting test data from '" << outfile1 << "'";
+
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
+  ci.restServiceP   = &restService;
+
+  serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbs);
+  out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci.outFormat    = JSON;
-  ci.inFormat     = JSON;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
-  out             = restService(&ci, rs2);
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf,
+                                   sizeof(expectedBuf),
+                                   outfile2)) << "Error getting test data from '" << outfile2 << "'";
+
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
+
+  serviceVectorsSet(NULL, NULL, postV2, NULL, NULL, NULL, badVerbs2);
+  out = orion::requestServe(&ci);
+
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

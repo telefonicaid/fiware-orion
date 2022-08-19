@@ -33,29 +33,25 @@
 #include "ngsi/ProvidingApplication.h"
 
 
+
 /* ****************************************************************************
 *
 * ProvidingApplication::ProvidingApplication -
 */
 ProvidingApplication::ProvidingApplication()
 {
-  /* It is better to have a default constructor that leave format with a random value */
-  string = "";
-  format = NOFORMAT;
+  /* It is better to have a default constructor than to leave mimeType with a random value */
+  string         = "";
+  providerFormat = PfJson;
 }
+
+
 
 /* ****************************************************************************
 *
 * ProvidingApplication::check -
 */
-std::string ProvidingApplication::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ProvidingApplication::check(void)
 {
   if (isEmpty())
   {
@@ -73,7 +69,7 @@ std::string ProvidingApplication::check
 */
 bool ProvidingApplication::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -87,67 +83,75 @@ void ProvidingApplication::set(const std::string& value)
   string = value;
 }
 
+
+
 /* ****************************************************************************
 *
-* ProvidingApplication::setFormat -
+* ProvidingApplication::setProviderFormat -
 */
-void ProvidingApplication::setFormat(const Format& f)
+void ProvidingApplication::setProviderFormat(const ProviderFormat _providerFormat)
 {
-  format = f;
+  providerFormat = _providerFormat;
 }
 
 
 
 /* ****************************************************************************
 *
-* ProvidingApplication::get -
+* ProvidingApplication::setRegId -
+*/
+void ProvidingApplication::setRegId(const std::string& _regId)
+{
+  regId = _regId;
+}
+
+
+
+/* ****************************************************************************
+*
+* ProvidingApplication::getProviderFormat -
+*/
+ProviderFormat ProvidingApplication::getProviderFormat(void)
+{
+  return providerFormat;
+}
+
+
+
+/* ****************************************************************************
+*
+* ProvidingApplication::getRegId -
+*/
+std::string ProvidingApplication::getRegId(void)
+{
+  return regId;
+}
+
+
+
+/* ****************************************************************************
+*
+* ProvidingApplication::getRegId -
 */
 std::string ProvidingApplication::get(void)
 {
   return string;
 }
 
-/* ****************************************************************************
-*
-* ProvidingApplication::getFormat -
-*/
-Format ProvidingApplication::getFormat(void)
-{
-  return format;
-}
-
 
 
 /* ****************************************************************************
 *
-* ProvidingApplication::present -
+* ProvidingApplication::toJsonV1 -
 */
-void ProvidingApplication::present(const std::string& indent)
+std::string ProvidingApplication::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sProvidingApplication: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo ProvidingApplication\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* ProvidingApplication::render -
-*/
-std::string ProvidingApplication::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
 
-  return valueTag(indent, "providingApplication", string, format, comma);
+  return valueTag("providingApplication", string, comma);
 }
 
 

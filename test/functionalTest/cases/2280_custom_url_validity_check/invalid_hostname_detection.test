@@ -1,0 +1,385 @@
+# Copyright 2017 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Detection of Invalid hostnames
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# To check that the broker correctly detects invalid hostnames, subscription creation
+# is attempted with a number of invalid hostnames as notification::http::url.
+# None of these subscriptions should be allowed to be created.
+#
+# 01. hostname that is more than 253 chars long (254 to be exact)
+# 02. hostname that starts with a dot (empty label I)
+# 03. hostname that ends with a dot (empty label II)
+# 04. hostname that contains two consecutive dots (empty label III)
+# 05. hostname that starts with a hyphen
+# 06. hostname that contains a forbidden char (underscore)
+# 07. hostname with label that starts with a hyphen
+# 08. hostname with label that ends with a hyphen
+# 09. hostname with label that is longer than 63 chars
+# 10. GET /v2/subscriptions, see none
+#
+
+echo "01. hostname that is more than 253 chars long (254 to be exact)"
+echo "==============================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://12345678901234567890123456789.12345678901234567890123456789.12345678901234567890123456789.12345678901234567890123456789.12345678901234567890123456789.12345678901234567890123456789.12345678901234567890123456789.12345678901234567890123456789.12345678901234/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. hostname that starts with a dot (empty label I)"
+echo "==================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://.local.host/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. hostname that ends with a dot (empty label II)"
+echo "=================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://local.host./a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. hostname that contains two consecutive dots (empty label III)"
+echo "================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://local..host/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. hostname that starts with a hyphen"
+echo "======================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://-local.host/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. hostname that contains a forbidden char (underscore)"
+echo "========================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://local_host/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. hostname with label that starts with a hyphen"
+echo "================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://local.-host/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. hostname with label that ends with a hyphen"
+echo "==============================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://local.host-/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "09. hostname with label that is longer than 63 chars"
+echo "===================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://.local.1234567890123456789012345678901234567890123456789012345678901234/a"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. GET /v2/subscriptions, see none"
+echo "==================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. hostname that is more than 253 chars long (254 to be exact)
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+02. hostname that starts with a dot (empty label I)
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+03. hostname that ends with a dot (empty label II)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+04. hostname that contains two consecutive dots (empty label III)
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+05. hostname that starts with a hyphen
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+06. hostname that contains a forbidden char (underscore)
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+07. hostname with label that starts with a hyphen
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+08. hostname with label that ends with a hyphen
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+09. hostname with label that is longer than 63 chars
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL parsing notification url",
+    "error": "BadRequest"
+}
+
+
+10. GET /v2/subscriptions, see none
+===================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

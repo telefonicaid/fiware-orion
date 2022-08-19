@@ -1,0 +1,2410 @@
+FORMAT: 1A
+HOST: http://fiware-ngsi2.apiblueprint.org/
+
+# FIWARE-NGSI Simple API (v2) クックブック
+
+FIWARE-NGSI Simple API (v2) クックブック
+
+これは、FIWARE-NGSI v2 別名 FIWARE-NGSI Simple API を使用する方法を示すレシピを含むクックブックです。 
+このガイドの例は `Fiware-Service: tourguide` ヘッダを含んでいます。
+このヘッダは、Orion Context Broker に固有のもので、FIWARE ツアー・ガイド・アプリケーションに
+対して、クックブックの例をテストするために使用します。
+これらの例を学習してお楽しみください！
+
+これは進行中の作業であり、日々変化しています。
+あなたのコメントを fiware-ngsi@lists.fiware.org に送ってください。メールリストのアーカイブをチェックして、
+ディスカッションをトレースすることができます :
+https://lists.fiware.org/private/fiware-ngsi/ (リストの購読が必要)
+
+このドキュメントを使用する権利を理解するため、この [FIWARE Open Specification Legal Notice (implicit patents license)](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license)) を確認してください。
+
+# Group API Root
+
+このリソースを使用すると、API によって公開されるサブリソースのリストを取得できます : 
+
+* NGSI エンティティを扱うエンティティ
+* エンティティタイプを扱う型
+* コンテキスト変更に対するサブスクリプションを扱うサブスクリプション
+* 外部プロバイダをレジストレーションすることにより、コンテキスト・データを扱うためのレジストレーション
+
+### エントリ・ポイントを取得 [GET /v2]
+
++ Response 200 (application/json)
+
+        {
+            "entities_url":      "/v2/entities",
+            "types_url":         "/v2/types",
+            "subscriptions_url": "/v2/subscriptions"
+        }
+
+# Group Entity Collection
+
+## すべてのエンティティをリスト [/v2/entities]
+
+### 正規化モード [GET /v2/entities]
+
+     
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+        
+        [
+          {
+            "id": "fa6691deb80329d4a9daf9ea08cc6db87b060441",
+            "type": "Review",
+            "author":
+            {
+              "type": "Person",
+              "value": "user8",
+              "metadata":
+              {
+              }
+            },
+            "dateCreated":
+            {
+              "type": "DateTime",
+              "value": "2016-05-04T14:16:56.000Z",
+              "metadata":
+              {
+              }
+            },
+            "itemReviewed":
+            {
+              "type": "Restaurant",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "publisher":
+            {
+              "type": "Organization",
+              "value": "Bitergia",
+              "metadata":
+              {
+              }
+            },
+            "reviewBody":
+            {
+              "type": "none",
+              "value": "Body review",
+              "metadata":
+              {
+              }
+            },
+            "reviewRating":
+            {
+              "type": "Rating",
+              "value": 3,
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 120,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise2",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8404625, -2.5123277",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "DateTime",
+                  "value": "2016-05-04T14:10:30.135Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 0,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 400 868",
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 160,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise4",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8538811, -2.7006836",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Araba",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "DateTime",
+                  "value": "2016-05-04T14:10:30.160Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 42,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 222 669",
+              "metadata":
+              {
+              }
+            },
+            "url":
+            {
+              "type": "none",
+              "value": "http://www.restaurantearaba.com/",
+              "metadata":
+              {
+              }
+            }
+          }
+        ]
+
+### Key values モード [GET /v2/entities{?options}]
+
++ Parameters
+    
+    + options: keyValues (optional, string) - keyValues: このモードは、各エンティティ属性をその値だけで表し、型とメタデータに関する情報は除外します
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+          [
+            {
+              "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+              "type": "Restaurant",
+              "address":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "aggregateRating":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "capacity": 120,
+              "department": "Franchise2",
+              "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "location": "42.8404625, -2.5123277",
+              "name": "Elizalde",
+              "occupancyLevels": 0,
+              "priceRange": 0,
+              "telephone": "945 400 868"
+            },
+            {
+              "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+              "type": "Restaurant",
+              "address":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "aggregateRating":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "capacity": 160,
+              "department": "Franchise4",
+              "description": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "location": "42.8538811, -2.7006836",
+              "name": "Araba",
+              "occupancyLevels": 0,
+              "priceRange": 42,
+              "telephone": "945 222 669",
+              "url": "http://www.restaurantearaba.com/"
+            },
+            {
+                "id": "fa6691deb80329d4a9daf9ea08cc6db87b060441",
+                "type": "Review",
+                "author": "user8",
+                "dateCreated": "2016-05-04T14:16:56.000Z",
+                "itemReviewed": "Elizalde",
+                "publisher": "Bitergia",
+                "reviewBody": "Body review",
+                "reviewRating": 3
+            }
+          ]
+
+
+
+### ページネーション [GET /v2/entities{?limit,offset,options}]
+
++ Parameters
+    + options: count
+    + limit: 2
+    + offset: 1
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+    + Headers
+
+            Fiware-Total-Count: 2068
+
+    + Body
+
+            [
+              {
+                "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+                "type": "Restaurant",
+                "address":
+                {
+                  "type": "PostalAddress",
+                  "value":
+                  {
+                    "streetAddress": "Avenida de Los Huetos 17",
+                    "addressRegion": "Álava",
+                    "addressLocality": "Vitoria-Gasteiz",
+                    "postalCode": "01010"
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "aggregateRating":
+                {
+                  "type": "AggregateRating",
+                  "value":
+                  {
+                    "reviewCount": 1,
+                    "ratingValue": 2
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "capacity":
+                {
+                  "type": "PropertyValue",
+                  "value": 160,
+                  "metadata":
+                  {
+                  }
+                },
+                "department":
+                {
+                  "type": "none",
+                  "value": "Franchise4",
+                  "metadata":
+                  {
+                  }
+                },
+                "description":
+                {
+                  "type": "none",
+                  "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ....",
+                  "metadata":
+                  {
+                  }
+                },
+                "location":
+                {
+                  "type": "geo:point",
+                  "value": "42.8538811, -2.7006836",
+                  "metadata":
+                  {
+                  }
+                },
+                "name":
+                {
+                  "type": "none",
+                  "value": "Araba",
+                  "metadata":
+                  {
+                  }
+                },
+                "occupancyLevels":
+                {
+                  "type": "PropertyValue",
+                  "value": 0,
+                  "metadata":
+                  {
+                    "timestamp":
+                    {
+                      "type": "DateTime",
+                      "value": "2016-05-04T14:10:30.160Z"
+                    }
+                  }
+                },
+                "priceRange":
+                {
+                  "type": "none",
+                  "value": 42,
+                  "metadata":
+                  {
+                  }
+                },
+                "telephone":
+                {
+                  "type": "none",
+                  "value": "945 222 669",
+                  "metadata":
+                  {
+                  }
+                },
+                "url":
+                {
+                  "type": "none",
+                  "value": "http://www.restaurantearaba.com/",
+                  "metadata":
+                  {
+                  }
+                }
+              },
+              {
+                "id": "92e960de796a8cc48ed7c784119f7d5628e31a6f",
+                "type": "Restaurant",
+                "address":
+                {
+                  "type": "PostalAddress",
+                  "value":
+                  {
+                    "streetAddress": "Maskuribai Kalea",
+                    "addressRegion": "Araba",
+                    "addressLocality": "Amurrio",
+                    "postalCode": "01470"
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "aggregateRating":
+                {
+                  "type": "AggregateRating",
+                  "value":
+                  {
+                    "reviewCount": 1,
+                    "ratingValue": 2
+                  },
+                  "metadata":
+                  {
+                  }
+                },
+                "capacity":
+                {
+                  "type": "PropertyValue",
+                  "value": 120,
+                  "metadata":
+                  {
+                  }
+                },
+                "department":
+                {
+                  "type": "none",
+                  "value": "Franchise3",
+                  "metadata":
+                  {
+                  }
+                },
+                "description":
+                {
+                  "type": "none",
+                  "value": "Bodega adscrita a la Denominación de Origen Arabako Txakolina y que elabora el 95% de la producción total de esta denominación...",
+                  "metadata":
+                  {
+                  }
+                },
+                "location":
+                {
+                  "type": "geo:point",
+                  "value": "43.047415, -3.0007716",
+                  "metadata":
+                  {
+                  }
+                },
+                "name":
+                {
+                  "type": "none",
+                  "value": "Arabako Txakolina, S.L.",
+                  "metadata":
+                  {
+                  }
+                },
+                "occupancyLevels":
+                {
+                  "type": "PropertyValue",
+                  "value": 0,
+                  "metadata":
+                  {
+                    "timestamp":
+                    {
+                      "type": "DateTime",
+                      "value": "2016-05-04T14:10:30.161Z"
+                    }
+                  }
+                },
+                "priceRange":
+                {
+                  "type": "none",
+                  "value": 0,
+                  "metadata":
+                  {
+                  }
+                },
+                "telephone":
+                {
+                  "type": "none",
+                  "value": "645 713 355",
+                  "metadata":
+                  {
+                  }
+                },
+                "url":
+                {
+                  "type": "none",
+                  "value": "http://www.xarmant.net/",
+                  "metadata":
+                  {
+                  }
+                }
+              }
+            ]
+
+
+
+## エンティティをフィルタ [/v2/entities{?id}]
+
+### id でフィルタ [GET /v2/entities{?id,options}]
+
++ Parameters
+    + id: 0115206c51f60b48b77e4c937835795c33bb953f (optional, string) - この id を持つエンティティのみを取得します
+    + options: keyValues (optional, string) - レンダリング・オプション
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+          [
+            {
+              "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+              "type": "Restaurant",
+              "address":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "aggregateRating":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "capacity": 120,
+              "department": "Franchise2",
+              "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "location": "42.8404625, -2.5123277",
+              "name": "Elizalde",
+              "occupancyLevels": 0,
+              "priceRange": 0,
+              "telephone": "945 400 868"
+            }
+          ]
+
+
+
+### 型でフィルタ [GET /v2/entities{?type}]
+
++ Parameters
+    + type: Restaurant (optional, string) - この型のエンティティのみを取得します
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 120,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise2",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8404625, -2.5123277",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "DateTime",
+                  "value": "2016-05-04T14:10:30.135Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 0,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 400 868",
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 160,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise4",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8538811, -2.7006836",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Araba",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "DateTime",
+                  "value": "2016-05-04T14:10:30.160Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 42,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 222 669",
+              "metadata":
+              {
+              }
+            },
+            "url":
+            {
+              "type": "none",
+              "value": "http://www.restaurantearaba.com/",
+              "metadata":
+              {
+              }
+            }
+          }
+        ]
+
+### id リストでフィルタ [GET /v2/entities{?id,options}]
+
++ Parameters
+    + id: 0115206c51f60b48b77e4c937835795c33bb953f,34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6 (optional, string) - 取得するエンティティを含む Id リスト
+    + options: keyValues (optional, string) - レンダリング・オプション
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+
+
+        [
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 3
+            },
+            "capacity": 120,
+            "department": "Franchise2",
+            "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+            "location": "42.8404625, -2.5123277",
+            "name": "Elizalde",
+            "occupancyLevels": 0,
+            "priceRange": 0,
+            "telephone": "945 400 868"
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Avenida de Los Huetos 17",
+              "addressRegion": "Álava",
+              "addressLocality": "Vitoria-Gasteiz",
+              "postalCode": "01010"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 2
+            },
+            "capacity": 160,
+            "department": "Franchise4",
+            "description": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+            "location": "42.8538811, -2.7006836",
+            "name": "Araba",
+            "occupancyLevels": 0,
+            "priceRange": 42,
+            "telephone": "945 222 669",
+            "url": "http://www.restaurantearaba.com/"
+          }
+        ]
+
+
+
+### 型リストでフィルタ [GET /v2/entities{?type}]
+
++ Parameters
+    + type: Review,Restaurant (optional, string) - 型リスト
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id": "fa6691deb80329d4a9daf9ea08cc6db87b060441",
+            "type": "Review",
+            "author":
+            {
+              "type": "Person",
+              "value": "user8",
+              "metadata":
+              {
+              }
+            },
+            "dateCreated":
+            {
+              "type": "DateTime",
+              "value": "2016-05-04T14:16:56.000Z",
+              "metadata":
+              {
+              }
+            },
+            "itemReviewed":
+            {
+              "type": "Restaurant",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "publisher":
+            {
+              "type": "Organization",
+              "value": "Bitergia",
+              "metadata":
+              {
+              }
+            },
+            "reviewBody":
+            {
+              "type": "none",
+              "value": "Body review",
+              "metadata":
+              {
+              }
+            },
+            "reviewRating":
+            {
+              "type": "Rating",
+              "value": 3,
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                "addressRegion": "Araba",
+                "addressLocality": "Alegría-Dulantzi",
+                "postalCode": "01240"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 3
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 120,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise2",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8404625, -2.5123277",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Elizalde",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "DateTime",
+                  "value": "2016-05-04T14:10:30.135Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 0,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 400 868",
+              "metadata":
+              {
+              }
+            }
+          },
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "type": "PostalAddress",
+              "value":
+              {
+                "streetAddress": "Avenida de Los Huetos 17",
+                "addressRegion": "Álava",
+                "addressLocality": "Vitoria-Gasteiz",
+                "postalCode": "01010"
+              },
+              "metadata":
+              {
+              }
+            },
+            "aggregateRating":
+            {
+              "type": "AggregateRating",
+              "value":
+              {
+                "reviewCount": 1,
+                "ratingValue": 2
+              },
+              "metadata":
+              {
+              }
+            },
+            "capacity":
+            {
+              "type": "PropertyValue",
+              "value": 160,
+              "metadata":
+              {
+              }
+            },
+            "department":
+            {
+              "type": "none",
+              "value": "Franchise4",
+              "metadata":
+              {
+              }
+            },
+            "description":
+            {
+              "type": "none",
+              "value": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+              "metadata":
+              {
+              }
+            },
+            "location":
+            {
+              "type": "geo:point",
+              "value": "42.8538811, -2.7006836",
+              "metadata":
+              {
+              }
+            },
+            "name":
+            {
+              "type": "none",
+              "value": "Araba",
+              "metadata":
+              {
+              }
+            },
+            "occupancyLevels":
+            {
+              "type": "PropertyValue",
+              "value": 0,
+              "metadata":
+              {
+                "timestamp":
+                {
+                  "type": "DateTime",
+                  "value": "2016-05-04T14:10:30.160Z"
+                }
+              }
+            },
+            "priceRange":
+            {
+              "type": "none",
+              "value": 42,
+              "metadata":
+              {
+              }
+            },
+            "telephone":
+            {
+              "type": "none",
+              "value": "945 222 669",
+              "metadata":
+              {
+              }
+            },
+            "url":
+            {
+              "type": "none",
+              "value": "http://www.restaurantearaba.com/",
+              "metadata":
+              {
+              }
+            }
+          }
+        ]
+  
+
+### パターン・マッチングでフィルタ [GET /v2/entities{?idPattern,options}]
+
++ Parameters
+    + idPattern: ^0115206c51f60b48b77e4.* (optional, string) - 一致する id を持つエンティティのみを取得します。
+    + options: keyValues (optional, string) - レンダリング・オプション
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 3
+            },
+            "capacity": 120,
+            "department": "Franchise2",
+            "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+            "location": "42.8404625, -2.5123277",
+            "name": "Elizalde",
+            "occupancyLevels": 0,
+            "priceRange": 0,
+            "telephone": "945 400 868"
+          }
+        ]
+
+
+
+# Group Context Entity
+
+## エンティティ・データを取得 [/v2/entities/{entityId}]
+
+### Id で取得 [GET /v2/entities/{entityId}{?options}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ Id
+    + options: keyValues (optional, string) - レンダリング・オプション
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        {
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "address":
+          {
+            "streetAddress": "Cuesta de las Cabras Aldapa 2",
+            "addressRegion": "Araba",
+            "addressLocality": "Alegría-Dulantzi",
+            "postalCode": "01240"
+          },
+          "aggregateRating":
+          {
+            "reviewCount": 1,
+            "ratingValue": 3
+          },
+          "capacity": 120,
+          "department": "Franchise2",
+          "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además...",
+          "location": "42.8404625, -2.5123277",
+          "name": "Elizalde",
+          "occupancyLevels": 0,
+          "priceRange": 0,
+          "telephone": "945 400 868"
+        }
+
+
+
+### Id で取得。存在しない [GET /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: mistakenID (required, string) - エンティティ Id.
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 404 (application/json)
+
+        {
+          "error": "NotFound",
+          "description": "The requested entity has not been found. Check type and id"
+        }
+
+
+
+### id と type で取得 [GET /v2/entities/{entityId}{?type,options}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + type: Restaurant (required, string) - エンティティ型
+    + options: keyValues (optional, string) - レンダリング・オプション
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+
+        {
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "address":
+          {
+            "streetAddress": "Cuesta de las Cabras Aldapa 2",
+            "addressRegion": "Araba",
+            "addressLocality": "Alegría-Dulantzi",
+            "postalCode": "01240"
+          },
+          "aggregateRating":
+          {
+            "reviewCount": 1,
+            "ratingValue": 3
+          },
+          "capacity": 120,
+          "department": "Franchise2",
+          "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además...",
+          "location": "42.8404625, -2.5123277",
+          "name": "Elizalde",
+          "occupancyLevels": 0,
+          "priceRange": 0,
+          "telephone": "945 400 868"
+        }
+
+
+
+## 部分的なエンティティの取得 [/v2/entities/{entityId}{?attrs}]
+
+### 1つのエンティティ属性 [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrs: name (optional, string) - 取得する属性
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        {
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "name":
+          {
+            "type": "none",
+            "value": "Elizalde",
+            "metadata":
+            {
+            }
+          }
+        }
+
+
+<!--
+### 1つのエンティティ属性。存在しない [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrs: mistake (optional, string) - 取得する属性
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 404 (application/json)
+
+        {
+          "error": "NotFound",
+          "description": "The requested entity has not been found. Check type and id"
+        }
+-->
+### 複数のエンティティ属性 [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: '0115206c51f60b48b77e4c937835795c33bb953f' (required, string) - エンティティ ID
+    + attrs: name,telephone (optional, string) - 検索される属性。カンマ区切りリスト。
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        {
+          "id": "0115206c51f60b48b77e4c937835795c33bb953f",
+          "type": "Restaurant",
+          "name":
+          {
+            "type": "none",
+            "value": "Elizalde",
+            "metadata":
+            {
+            }
+          },
+          "telephone":
+          {
+            "type": "none",
+            "value": "945 400 868",
+            "metadata":
+            {
+            }
+          }
+        }
+
+
+            
+# Group Query Context
+
+## エンティティをクエリ [/v2/entities{?q,type,limit,offset,georel,coords,geometry,attrs,options}]
+
+### 属性の内容によるクエリ [Query by attribute content [GET /v2/entities{?q,limit,offset,attrs,options}]
+
++ Parameters
+    + q: capacity>50;priceRange==42 (optional, string) - 属性の内容でフィルタリングできる
+    一般的なクエリパラメータ。
+    + limit: 20 - Limit the number of results (optional, number) - 返す結果の最大数。
+    + attrs: name (optional, string) - 返される属性。
+    + options: keyValues (optional, string) - クエリ・オプション (`keyValues` モード)
+    + offset: 0
+
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "name": "Araba"
+          }
+        ]
+
+
+### ある点までの距離によるクエリ [GET /v2/entities{?type,coords,georel,geometry,options}]
+
++ Parameters
+    + type: Restaurant (optional, string) - リクエストされたエンティティ型
+    + coords: 42.8538811,-2.7006836 (optional, string) - 参照点の座標。
+    + geometry: point (optional, string) - `coords` パラメータで表されるジオメトリ (point, line, polygon)
+    + georel: near;maxDistance:100 (optional, string) - 地理空間リレーションシップ
+    この例では、参照点から最大100メートル離れた場所にあるエンティティを参照しています。
+    + options: keyValues (optional, string) - クエリ・オプション (`keyValues` mode)
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id": "34f036f9eef1f403c0ea66c55b8cdbace4b5f7a6",
+            "type": "Restaurant",
+            "address":
+            {
+              "streetAddress": "Avenida de Los Huetos 17",
+              "addressRegion": "Álava",
+              "addressLocality": "Vitoria-Gasteiz",
+              "postalCode": "01010"
+            },
+            "aggregateRating":
+            {
+              "reviewCount": 1,
+              "ratingValue": 2
+            },
+            "capacity": 160,
+            "department": "Franchise4",
+            "description": "El restaurante Araba cuenta con amplios salones para todo tipo de celebraciones, y además ...",
+            "location": "42.8538811, -2.7006836",
+            "name": "Araba",
+            "occupancyLevels": 0,
+            "priceRange": 42,
+            "telephone": "945 222 669",
+            "url": "http://www.restaurantearaba.com/"
+          }
+        ]
+
+
+### 結果なし [GET /v2/entities{?q}]
+
++ Parameters
+    + q: capacity>500 (optional, string) - 属性の内容でフィルタリングできる一般的なクエリ・パラメータ
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        []
+
+# Group Provide Context
+
+## 新しいエンティティを作成 [/v2/entities{?options}]
+
+### 正規化モード [POST /v2/entities]
+
++ Request (application/json)
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+    + Body
+
+            {
+                "type": "Review",
+                "id": "review-Elizalde-34",
+                "author": {
+                  "type":"Person",
+                  "value": "Client1234"
+                },
+                "itemReviewed": {
+                  "type": "Restaurant",
+                  "value": ""    
+                },
+                "reviewBody": {
+                  "value": "Cheap and nice place to eat."
+                },
+                "reviewRating":{
+                  "type": "Rating",
+                  "value": 4
+                }
+            }
+      
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/review-Elizalde-34?type=Review
+
+
+### keyValues モード [POST /v2/entities{?options}]
+
++ Parameters
+    + options: keyValues (optional, string) - オペレーションのオプション (`keyValues` モード)
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "type": "Review",
+                "id": "review-Elizalde-35",
+                "author": "client1234",
+                "itemReviewed": "0115206c51f60b48b77e4c937835795c33bb953f",
+                "reviewBody": "Cheap and nice place to eat",
+                "ratingValue": 4
+            }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/review-Elizalde-35?type=Review
+
+
+### シンプルなロケーション形式を使用した地理参照 [POST /v2/entities]
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+               "id":   "SampleRestaurant",
+               "type": "Restaurant",
+               "address": {
+                  "type": "PostalAddress",
+                  "value": {
+                    "streetAddress": "Cuesta de las Cabras Aldapa 2",
+                    "addressLocality": "Alegría-Dulantzi",
+                    "addressRegion":   "Araba",
+                    "postalCode": "01240"
+                  }
+               },
+               "name": {
+                  "value": "Sample restaurant"
+                },
+               "location": {              
+                  "type":  "geo:point",
+                  "value": "42.8404625, -2.5123277"
+               },
+               "priceRange": {
+                   "value": 10
+               },
+               "telephone": {
+                   "value": "555 55 55 55"
+               },
+               "capacity": {
+                   "type": "propertyValue",
+                   "value": 120
+               },
+               "description": {
+                  "value": "Sample restaurant"
+               }
+            }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/SampleRestaurant?type=Restaurant
+
+
+### GeoJSON を使用した地理参照 [POST /v2/entities]
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+               "id":   "Vitoria-Gasteiz-1",
+               "type": "comercialArea",
+               "name": {
+                "value": "Vitoria-Gasteiz-Comercial-Zone"
+               },
+               "location": {              
+                  "type": "geo:json",
+                  "value": {
+                     "type": "Polygon",
+                     "coordinates": [ [
+                        [-2.763969, 42.847476],
+                        [-2.743151, 42.826006],
+                        [-2.653740, 42.826485],
+                        [-2.630934, 42.867061],
+                        [-2.640617, 42.881801],
+                        [-2.726723, 42.867767],
+                        [-2.763969, 42.847476]
+                     ] ]
+                  }
+                }
+            }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/Vitoria-Gasteiz-1?type=comercialArea
+            
+            
+### 作成エラー。すでに存在 [POST /v2/entities?options=keyValues]
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "type": "Review",
+                "id": "review-Elizalde-35",
+                "author": "client1234",
+                "itemReviewed": "0115206c51f60b48b77e4c937835795c33bb953f",
+                "reviewBody": "Cheap and nice place to eat",
+                "ratingValue": 4
+            }
+
++ Response 422 (application/json)
+
+        {
+            "error": "AlreadyExists",
+            "description": "An entity with the same id and type is already present"
+        }
+
+
+## エンティティを削除 [/v2/entities/{entityId}]
+
+### Id で削除 [DELETE /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: `review-Elizalde-35` (required, string) - エンティティ ID
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 204
+
+
+# Group Context Attributes
+
+## 属性コレクション [/v2/entities/{entityId}/attrs{?options}]
+
+### すべてをリスト。正規化モード [GET /v2/entities/{entityId}/attrs]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+       
+        {
+          "address":
+          {
+            "type": "PostalAddress",
+            "value":
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            },
+            "metadata":
+            {
+            }
+          },
+          "aggregateRating":
+          {
+            "type": "AggregateRating",
+            "value":
+            {
+              "reviewCount": 1,
+              "ratingValue": 3
+            },
+            "metadata":
+            {
+            }
+          },
+          "capacity":
+          {
+            "type": "PropertyValue",
+            "value": 120,
+            "metadata":
+            {
+            }
+          },
+          "department":
+          {
+            "type": "none",
+            "value": "Franchise2",
+            "metadata":
+            {
+            }
+          },
+          "description":
+          {
+            "type": "none",
+            "value": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+            "metadata":
+            {
+            }
+          },
+          "location":
+          {
+            "type": "geo:point",
+            "value": "42.8404625, -2.5123277",
+            "metadata":
+            {
+            }
+          },
+          "name":
+          {
+            "type": "none",
+            "value": "Elizalde",
+            "metadata":
+            {
+            }
+          },
+          "occupancyLevels":
+          {
+            "type": "PropertyValue",
+            "value": 0,
+            "metadata":
+            {
+              "timestamp":
+              {
+                "type": "DateTime",
+                "value": "2016-05-04T14:10:30.135Z"
+              }
+            }
+          },
+          "priceRange":
+          {
+            "type": "none",
+            "value": 0,
+            "metadata":
+            {
+            }
+          },
+          "telephone":
+          {
+            "type": "none",
+            "value": "945 400 868",
+            "metadata":
+            {
+            }
+          }
+        }
+
+
+### すべてをリスト。keyValues モード [GET /v2/entities/{entityId}/attrs{?options}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + options: keyValues (optional, string) - ペイロードが `keyValues` モードのフラグです。
+
++ Request  
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
++ Response 200 (application/json)
+
+        {
+          "address":
+          {
+            "streetAddress": "Cuesta de las Cabras Aldapa 2",
+            "addressRegion": "Araba",
+            "addressLocality": "Alegría-Dulantzi",
+            "postalCode": "01240"
+          },
+          "aggregateRating":
+          {
+            "reviewCount": 1,
+            "ratingValue": 3
+          },
+          "capacity": 120,
+          "department": "Franchise2",
+          "description": "Restaurante de estilo sidrería ubicado en Alegria-Dulantzi. Además ...",
+          "location": "42.8404625, -2.5123277",
+          "name": "Elizalde",
+          "occupancyLevels": 0,
+          "priceRange": 0,
+          "telephone": "945 400 868"
+        }
+
+
+        
+### すべてを置換。keyValues モード [PUT /v2/entities/{entityId}/attrs{?options}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + options: keyValues (optional, string) - ペイロードが `keyValues` モードのフラグです。
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "priceRange": 10,
+                "capacity": 100
+            }
+
++ Response 200
+        
+
+## 単一の属性 [/v2/entities/{entityId}/attrs/{attrName}]
+
+### 取得 [GET /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: name (required, string) - 属性名。
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
++ Response 200 (application/json)
+
+        {
+          "type": "none",
+          "value": "Elizalde",
+          "metadata":
+          {
+          }
+        }
+
+
+### 取得。存在しない [GET /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: mistake (required, string) - 属性名。
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 404 (application/json)
+
+        {
+            "error": "NotFound",
+            "description": "The entity does not have such an attribute"
+        }
+        
+
+### 更新 [PUT /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: priceRange (required, string) - 属性名。
+
++ Request (application/json) 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
+    + Body
+
+            {
+                "value": 10.0
+            }
+
++ Response 200
+
+
+### 削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: priceRange (required, string) - 属性名。
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+            
++ Response 204
+        
+
+## 属性値 [/v2/entities/{entityId}/attrs/{attrName}/value]
+
+### 取得。テキストとして [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: name (required, string) - 属性名。
+    
++ Request
+
+    + Headers
+
+            Fiware-Service: tourguidee
+            Accept: text/plain
+
++ Response 200 (text/plain)
+
+        Elizalde
+
+
+### 取得。JSON として [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: address (required, string) - 属性名。
+
++ Request
+
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        {
+          "streetAddress": "Cuesta de las Cabras Aldapa 2",
+          "addressRegion": "Araba",
+          "addressLocality": "Alegría-Dulantzi",
+          "postalCode": "01240"
+        }
+
+
+### 更新。テキストとして [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: priceRange (required, string) - 属性名。
+
++ Request (text/plain)
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+    + Body
+
+            25.0
+
++ Response 204
+
+
+### 更新。JSON として [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: 0115206c51f60b48b77e4c937835795c33bb953f (required, string) - エンティティ ID
+    + attrName: address (required, string) - 属性名。
+
++ Request (application/json)
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+    + Body
+
+            {
+              "streetAddress": "Cuesta de las Cabras Aldapa 2",
+              "addressRegion": "Araba",
+              "addressLocality": "Alegría-Dulantzi",
+              "postalCode": "01240"
+            }
+
++ Response 204
+
+
+# Group Subscriptions
+
+## サブスクリプション [/v2/subscriptions]
+
+### システムに存在するすべてのサブスクリプションをリスト [GET /v2/subscriptions]
+
++ Request
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id": "57444cda25516d268e96c98c",
+            "description": "Update average rating",
+            "expires": "2020-04-05T14:00:00.00Z",
+            "status": "active",
+            "subject":
+            {
+              "entities":
+              [
+                {
+                  "id": "",
+                  "idPattern": ".*",
+                  "type": "Review"
+                }
+              ],
+              "condition":
+              {
+                "attrs":
+                [
+                  "ratingValue"
+                ]
+              }
+            },
+            "notification":
+            {
+              "attrs":
+              [
+                "ratingValue",
+                "itemReviewed"
+              ],
+              "attrsFormat": "normalized",
+              "http":
+              {
+                "url": "http://backend.niceeating.foo.com:1028/ratings4"
+              }
+            },
+            "throttling": 5
+          },
+          {
+            "id": "57444e1525516d268e96c98d",
+            "description": "Update average rating 3",
+            "expires": "2020-04-05T14:00:00.00Z",
+            "status": "active",
+            "subject":
+            {
+              "entities":
+              [
+                {
+                  "id": "",
+                  "idPattern": ".*",
+                  "type": "Review"
+                }
+              ],
+              "condition":
+              {
+                "attrs":
+                [
+                  "ratingValue"
+                ]
+              }
+            },
+            "notification":
+            {
+              "attrs":
+              [
+                "ratingValue",
+                "itemReviewed"
+              ],
+              "attrsFormat": "normalized",
+              "http":
+              {
+                "url": "http://backend.niceeating.foo.com:1028/ratings3"
+              }
+            },
+            "throttling": 5
+          }
+        ]
+
+### ページネーション [GET /v2/subscriptions{?limit,offset,options}]
+
++ Parameters
+    + options: count
+    + limit: 1
+    + offset: 1
+
++ Request 
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+
++ Response 200 (application/json)
+   
+   + Headers
+
+            Fiware-Total-Count: 2
+
+   + Body
+
+            [
+              {
+                "id": "57444e1525516d268e96c98d",
+                "description": "Update average rating 3",
+                "expires": "2020-04-05T14:00:00.00Z",
+                "status": "active",
+                "subject":
+                {
+                  "entities":
+                  [
+                    {
+                      "id": "",
+                      "idPattern": ".*",
+                      "type": "Review"
+                    }
+                  ],
+                  "condition":
+                  {
+                    "attrs":
+                    [
+                      "ratingValue"
+                    ]
+                  }
+                },
+                "notification":
+                {
+                  "attrs":
+                  [
+                    "ratingValue",
+                    "itemReviewed"
+                  ],
+                  "attrsFormat": "normalized",
+                  "http":
+                  {
+                    "url": "http://backend.niceeating.foo.com:1028/ratings3"
+                  }
+                },
+                "throttling": 5
+              }
+            ]
+
+### サブスクリプションの詳細を取得 [GET /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - サブスクリプション の ID
+
++ Request
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 200 (application/json)
+
+        {
+          "id": "57444cda25516d268e96c98c",
+          "description": "Update average rating",
+          "expires": "2020-04-05T14:00:00.00Z",
+          "status": "active",
+          "subject":
+          {
+            "entities":
+            [
+              {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Review"
+              }
+            ],
+            "condition":
+            {
+              "attrs":
+              [
+                "ratingValue"
+              ]
+            }
+          },
+          "notification":
+          {
+            "attrs":
+            [
+              "ratingValue",
+              "itemReviewed"
+            ],
+            "attrsFormat": "normalized",
+            "http":
+            {
+              "url": "http://backend.niceeating.foo.com:1028/ratings4"
+            }
+          },
+          "throttling": 5
+        }
+
+
+### 新しいサブスクリプションを作成 [POST /v2/subscriptions]
+
++ Request (application/json)
+    
+    + Headers
+
+            Fiware-Service: tourguide
+    + Body
+
+            {
+              "description": "Update average rating",
+              "subject": {
+                "entities": [
+                  {
+                    "idPattern": ".*",
+                    "type": "Review"
+                  }
+                ],
+                "condition": {
+                  "attrs": [
+                    "ratingValue"
+                  ]
+                }
+              },
+              "notification": {
+                "http": {
+                  "url": "http://backend.niceeating.foo.com:1028/ratings4"
+                },
+                "attrs": [
+                  "ratingValue",
+                  "itemReviewed"
+                ]
+              },
+              "expires": "2020-04-05T14:00:00.00Z",
+              "throttling": 5
+            }
+
++ Response 201
+
+    + Headers
+
+            Location: /v2/subscriptions/57444cda25516d268e96c98c
+
+### 部分的 - 既存のサブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - サブスクリプション の ID
+
++ Request (application/json)
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
+    + Body
+        
+            {
+                "expires": "2040-01-01T14:00:00.00Z"
+            }
+
++ Response 204
+
+### サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: 57444cda25516d268e96c98c (required, string) - サブスクリプション の ID
+
++ Request
+    
+    + Headers
+
+            Fiware-Service: tourguide
+
++ Response 204

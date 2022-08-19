@@ -35,7 +35,7 @@
 *   -cert: path to a file containing a certificate describing the server in human readable tokens
 *
 * These files are generated before starting the broker:
-* 
+*
 * o private key:
 *     % openssl genrsa -out server.key 1024
 *
@@ -52,7 +52,7 @@
 * To override the security added with the certificate, curl can always be called using the
 * CLI option '--insecure'.
 */
-#include <stdio.h>
+#include <stdio.h>                              // snprintf
 #include <unistd.h>                             // getppid, for, setuid, etc.
 #include <string.h>
 #include <fcntl.h>                              // open
@@ -60,124 +60,56 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <curl/curl.h>
+#include <openssl/ssl.h>
 #include <string>
 #include <vector>
+#include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
+#include "cache/subCache.h"
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
+#include "parseArgs/paIsSet.h"
+#include "parseArgs/paUsage.h"
+#include "parseArgs/paIterate.h"
+#include "parseArgs/paPrivate.h"
+#include "parseArgs/paLogSetup.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/curlSem.h"
 #include "rest/httpRequestSend.h"
 
 #include "common/sem.h"
 #include "common/globals.h"
 #include "common/Timer.h"
 #include "common/compileInfo.h"
+#include "common/SyncQOverflow.h"
 
-#include "orionTypes/EntityTypesResponse.h"
-
-#include "serviceRoutines/logTraceTreat.h"
-
+#include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
-#include "ngsiNotify/onTimeIntervalThread.h"
-
-#include "serviceRoutines/getEntityTypes.h"
-#include "serviceRoutines/getAttributesForEntityType.h"
-#include "serviceRoutines/getAllContextEntities.h"
-
-#include "serviceRoutines/versionTreat.h"
-#include "serviceRoutines/statisticsTreat.h"
-#include "serviceRoutines/exitTreat.h"
-#include "serviceRoutines/leakTreat.h"
-
-#include "serviceRoutines/postDiscoverContextAvailability.h"
-#include "serviceRoutines/postQueryContext.h"
-#include "serviceRoutines/postRegisterContext.h"
-#include "serviceRoutines/postSubscribeContext.h"
-#include "serviceRoutines/postSubscribeContextAvailability.h"
-#include "serviceRoutines/postUnsubscribeContextAvailability.h"
-#include "serviceRoutines/postUpdateContext.h"
-#include "serviceRoutines/postUpdateContextAvailabilitySubscription.h"
-#include "serviceRoutines/postUpdateContextSubscription.h"
-#include "serviceRoutines/postUnsubscribeContext.h"
-#include "serviceRoutines/postNotifyContext.h"
-#include "serviceRoutines/postNotifyContextAvailability.h"
-
-#include "serviceRoutines/postSubscribeContextConvOp.h"
-#include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
-#include "serviceRoutines/getContextEntitiesByEntityId.h"
-#include "serviceRoutines/postContextEntitiesByEntityId.h"
-#include "serviceRoutines/getContextEntityAttributes.h"
-#include "serviceRoutines/postContextEntityAttributes.h"
-#include "serviceRoutines/getEntityByIdAttributeByName.h"
-#include "serviceRoutines/postEntityByIdAttributeByName.h"
-#include "serviceRoutines/getContextEntityTypes.h"
-#include "serviceRoutines/postContextEntityTypes.h"
-#include "serviceRoutines/getContextEntityTypeAttribute.h"
-#include "serviceRoutines/postContextEntityTypeAttribute.h"
-#include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
-#include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
-
-#include "serviceRoutines/getIndividualContextEntity.h"
-#include "serviceRoutines/putIndividualContextEntity.h"
-#include "serviceRoutines/badVerbPostOnly.h"
-#include "serviceRoutines/badVerbPutDeleteOnly.h"
-#include "serviceRoutines/badVerbGetPostOnly.h"
-#include "serviceRoutines/postIndividualContextEntity.h"
-#include "serviceRoutines/deleteIndividualContextEntity.h"
-#include "serviceRoutines/badVerbAllFour.h"
-#include "serviceRoutines/putIndividualContextEntityAttribute.h"
-#include "serviceRoutines/getIndividualContextEntityAttribute.h"
-#include "serviceRoutines/getNgsi10ContextEntityTypes.h"
-#include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
-#include "serviceRoutines/postIndividualContextEntityAttribute.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
-#include "serviceRoutines/putSubscriptionConvOp.h"
-#include "serviceRoutines/deleteSubscriptionConvOp.h"
-#include "serviceRoutines/getAttributeValueInstance.h"
-#include "serviceRoutines/putAttributeValueInstance.h"
-#include "serviceRoutines/deleteAttributeValueInstance.h"
-#include "serviceRoutines/getAllEntitiesWithTypeAndId.h"
-#include "serviceRoutines/postAllEntitiesWithTypeAndId.h"
-#include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
-#include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
-#include "serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.h"
-#include "serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.h"
-#include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
-#include "serviceRoutines/getAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/postAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/putAttributeValueInstanceWithTypeAndId.h"
-#include "serviceRoutines/getContextEntitiesByEntityIdAndType.h"
-#include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
-#include "serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.h"
-#include "serviceRoutines/postEntityByIdAttributeByNameWithTypeAndId.h"
-
-#include "serviceRoutines/badVerbGetPutDeleteOnly.h"
-#include "serviceRoutines/badVerbGetPostDeleteOnly.h"
-#include "serviceRoutines/badVerbGetOnly.h"
-#include "serviceRoutines/badVerbGetDeleteOnly.h"
-#include "serviceRoutines/badNgsi9Request.h"
-#include "serviceRoutines/badNgsi10Request.h"
-#include "serviceRoutines/badRequest.h"
-
-#include "serviceRoutinesV2/getEntities.h"
-#include "serviceRoutinesV2/entryPointsTreat.h"
+#include "ngsiNotify/QueueNotifier.h"
+#include "ngsiNotify/QueueWorkers.h"
+#include "ngsiNotify/senderThread.h"
 
 #include "contextBroker/version.h"
-
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
+#include "mqtt/mqttMgr.h"
+#include "metricsMgr/metricsMgr.h"
+#include "logSummary/logSummary.h"
+
+#include "contextBroker/orionRestServices.h"
+
+using namespace orion;
 
 
 
@@ -191,20 +123,32 @@
 
 /* ****************************************************************************
 *
+* Global vars
+*/
+static bool isFatherProcess = false;
+
+
+
+/* ****************************************************************************
+*
 * Option variables
+*
+* No hint on max length for user and pwd (see see https://stackoverflow.com/questions/66671107/username-and-passwor-field-length-limit-in-mongo-uri),
+* but 256 seems to be a reasonable limit
 */
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[64];
+char            dbHost[256];
 char            rplSet[64];
 char            dbName[64];
-char            user[64];
-char            pwd[64];
+char            user[256];
+char            pwd[256];
+char            authMech[64];
+char            authDb[64];
+bool            dbSSL;
+bool            dbDisableRetryWrites;
 char            pidPath[256];
-char            fwdHost[64];
-int             fwdPort;
-bool            ngsi9Only;
 bool            harakiri;
 bool            useOnlyIPv4;
 bool            useOnlyIPv6;
@@ -212,14 +156,52 @@ char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
-char            rush[256];
 char            allowedOrigin[64];
+int             maxAge;
 long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
-bool            mutexTimeStat;
 int             writeConcern;
+unsigned int    cprForwardLimit;
+int             subCacheInterval;
+
+char                      notificationMode[512];  // FIXME P5: this will limit the number of service that can have a reserved queue...
+char                      notifFlowControl[64];
+int                       notificationQueueSize;
+int                       notificationThreadNum;
+std::vector<std::string>  serviceV;
+std::vector<int>          serviceQueueSizeV;
+std::vector<int>          serviceNumThreadV;
+
+bool            noCache;
+unsigned int    connectionMemory;
+unsigned int    maxConnections;
+unsigned int    reqPoolSize;
+bool            simulatedNotification;
+bool            statCounters;
+bool            statSemWait;
+bool            statTiming;
+bool            statNotifQueue;
+int             lsPeriod;
+bool            relogAlarms;
+bool            strictIdv1;
+bool            disableCusNotif;
+bool            logForHumans;
+unsigned long   logLineMaxSize;
+unsigned long   logInfoPayloadMaxSize;
+bool            disableMetrics;
+bool            disableFileLog;
+int             reqTimeout;
+bool            insecureNotif;
+bool            ngsiv1Autocast;
+
+bool            fcEnabled;
+double          fcGauge;
+unsigned long   fcStepDelay;
+unsigned long   fcMaxInterval;
+
+int             mqttMaxAge;
 
 
 
@@ -227,81 +209,172 @@ int             writeConcern;
 *
 * Definitions to make paArgs lines shorter ...
 */
-#define PIDPATH             _i "/tmp/contextBroker.pid"
-#define IP_ALL              _i "0.0.0.0"
-#define LOCALHOST           _i "localhost"
+#define PIDPATH                _i "/tmp/contextBroker.pid"
+#define IP_ALL                 _i "0.0.0.0"
+#define LOCALHOST              _i "localhost"
+#define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
-#define FG_DESC             "don't start as daemon"
-#define LOCALIP_DESC        "IP to receive new connections"
-#define PORT_DESC           "port to receive new connections"
-#define PIDPATH_DESC        "pid file path"
-#define DBHOST_DESC         "database host"
-#define RPLSET_DESC         "replica set"
-#define DBUSER_DESC         "database user"
-#define DBPASSWORD_DESC     "database password"
-#define DB_DESC             "database name"
-#define DB_TMO_DESC         "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
-#define FWDHOST_DESC        "host for forwarding NGSI9 regs"
-#define FWDPORT_DESC        "port for forwarding NGSI9 regs"
-#define NGSI9_DESC          "run as Configuration Manager"
-#define USEIPV4_DESC        "use ip v4 only"
-#define USEIPV6_DESC        "use ip v6 only"
-#define HARAKIRI_DESC       "commits harakiri on request"
-#define HTTPS_DESC          "use the https 'protocol'"
-#define HTTPSKEYFILE_DESC   "private server key file (for https)"
-#define HTTPSCERTFILE_DESC  "certificate key file (for https)"
-#define RUSH_DESC           "rush host (IP:port)"
-#define MULTISERVICE_DESC   "service multi tenancy mode"
-#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
-#define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
-#define DBPS_DESC           "database connection pool size"
-#define MAX_L               900000
-#define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
-#define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
-#define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
+#define FG_DESC                "don't start as daemon"
+#define LOCALIP_DESC           "IP to receive new connections"
+#define PORT_DESC              "port to receive new connections"
+#define PIDPATH_DESC           "pid file path"
+#define DBHOST_DESC            "database host"
+#define RPLSET_DESC            "replica set"
+#define DBUSER_DESC            "database user"
+#define DBPASSWORD_DESC        "database password"
+#define DBAUTHMECH_DESC        "database authentication mechanism (either SCRAM-SHA-1 or SCRAM-SHA-256)"
+#define DBAUTHDB_DESC          "database used for authentication"
+#define DBSSL_DESC             "enable SSL connection to DB"
+#define DBDISABLERETRYWRITES_DESC  "set retryWrite parameter to false in DB connections"
+#define DB_DESC                "database name"
+#define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
+#define USEIPV4_DESC           "use ip v4 only"
+#define USEIPV6_DESC           "use ip v6 only"
+#define HARAKIRI_DESC          "commits harakiri on request"
+#define HTTPS_DESC             "use the https 'protocol'"
+#define HTTPSKEYFILE_DESC      "private server key file (for https)"
+#define HTTPSCERTFILE_DESC     "certificate key file (for https)"
+#define MULTISERVICE_DESC      "service multi tenancy mode"
+#define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
+#define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
+#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC              "database connection pool size"
+#define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
+#define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
+#define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
+#define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n[,serv:q:n]*)"
+#define FLOW_CONTROL_DESC      "notification flow control parameters (gauge:stepDelay:maxInterval)"
+#define NO_CACHE               "disable subscription cache for lookups"
+#define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
+#define MAX_CONN_DESC          "maximum number of simultaneous connections"
+#define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define IN_REQ_PAYLOAD_MAX_SIZE_DESC   "maximum size (in bytes) of the payload of incoming requests"
+#define OUT_REQ_MSG_MAX_SIZE_DESC      "maximum size (in bytes) of outgoing forward and notification request messages"
+#define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
+#define STAT_COUNTERS          "enable request/notification counters statistics"
+#define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
+#define STAT_TIMING            "enable request-time-measuring statistics"
+#define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
+#define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
+#define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
+#define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
+#define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
+#define DISABLE_FILE_LOG       "disable logging into file"
+#define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
+#define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
+#define METRICS_DESC           "turn off the 'metrics' feature"
+#define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
+#define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
+#define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
+#define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
+
 
 
 /* ****************************************************************************
 *
-* parse arguments
+* paArgs - option vector for the Parse CLI arguments library
+*
+* A note about the default value of -maxConnections.
+* In older implementations of the broker, select was used in MHD and not poll/epoll.
+* The old default value (1024 - 4), that was a recommendation by MHD, has been kept.
+* More info about this can be found in the documentation of MHD.
 */
 PaArgument paArgs[] =
 {
-  { "-fg",            &fg,           "FOREGROUND",     PaBool,   PaOpt, false,      false,  true,  FG_DESC            },
-  { "-localIp",       bindAddress,   "LOCALIP",        PaString, PaOpt, IP_ALL,     PaNL,   PaNL,  LOCALIP_DESC       },
-  { "-port",          &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
-  { "-pidpath",       pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
+  { "-fg",                          &fg,                    "FOREGROUND",               PaBool,   PaOpt, false,                           false, true,                  FG_DESC                      },
+  { "-localIp",                     bindAddress,            "LOCALIP",                  PaString, PaOpt, IP_ALL,                          PaNL,  PaNL,                  LOCALIP_DESC                 },
+  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            PaNL,  PaNL,                  PORT_DESC                    },
+  { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
-  { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
-  { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
-  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
-  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
-  { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
-  { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
-  { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
+  { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
+  { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  RPLSET_DESC                  },
+  { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBUSER_DESC                  },
+  { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBPASSWORD_DESC              },
 
-  { "-fwdHost",       fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
-  { "-fwdPort",       &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
-  { "-ngsi9",         &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
-  { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
-  { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
-  { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
+  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHMECH_DESC              },
+  { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHDB_DESC                },
+  { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,                  DBSSL_DESC                   },
+  { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,                  DBDISABLERETRYWRITES_DESC    },
 
-  { "-https",         &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
-  { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
-  { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
+  { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,              DB_TMO_DESC                  },
+  { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,                 DBPS_DESC                    },
 
-  { "-rush",          rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
-  { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
+  { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV4_DESC                 },
+  { "-ipv6",                        &useOnlyIPv6,           "USEIPV6",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV6_DESC                 },
+  { "-harakiri",                    &harakiri,              "HARAKIRI",                 PaBool,   PaHid, false,                           false, true,                  HARAKIRI_DESC                },
 
-  { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
-  { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
+  { "-https",                       &https,                 "HTTPS",                    PaBool,   PaOpt, false,                           false, true,                  HTTPS_DESC                   },
+  { "-key",                         httpsKeyFile,           "HTTPS_KEYFILE",            PaString, PaOpt, _i "",                           PaNL,  PaNL,                  HTTPSKEYFILE_DESC            },
+  { "-cert",                        httpsCertFile,          "HTTPS_CERTFILE",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  HTTPSCERTFILE_DESC           },
 
-  { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
+  { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,                  MULTISERVICE_DESC            },
+
+  { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_HTTP_TIMEOUT,      HTTP_TMO_DESC                },
+  { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,                  REQ_TMO_DESC                 },
+  { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,                  MUTEX_POLICY_DESC            },
+  { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                     WRITE_CONCERN_DESC           },
+
+  { "-corsOrigin",                  allowedOrigin,          "CORS_ALLOWED_ORIGIN",      PaString, PaOpt, _i "",                           PaNL,  PaNL,                  ALLOWED_ORIGIN_DESC          },
+  { "-corsMaxAge",                  &maxAge,                "CORS_MAX_AGE",             PaInt,    PaOpt, 86400,                           -1,    86400,                 CORS_MAX_AGE_DESC            },
+  { "-cprForwardLimit",             &cprForwardLimit,       "CPR_FORWARD_LIMIT",        PaUInt,   PaOpt, 1000,                            0,     UINT_MAX,              CPR_FORWARD_LIMIT_DESC       },
+  { "-subCacheIval",                &subCacheInterval,      "SUBCACHE_IVAL",            PaInt,    PaOpt, 60,                              0,     3600,                  SUB_CACHE_IVAL_DESC          },
+  { "-noCache",                     &noCache,               "NOCACHE",                  PaBool,   PaOpt, false,                           false, true,                  NO_CACHE                     },
+  { "-connectionMemory",            &connectionMemory,      "CONN_MEMORY",              PaUInt,   PaOpt, 64,                              0,     1024,                  CONN_MEMORY_DESC             },
+  { "-maxConnections",              &maxConnections,        "MAX_CONN",                 PaUInt,   PaOpt, 1020,                            1,     PaNL,                  MAX_CONN_DESC                },
+  { "-reqPoolSize",                 &reqPoolSize,           "TRQ_POOL_SIZE",            PaUInt,   PaOpt, 0,                               0,     1024,                  REQ_POOL_SIZE                },
+
+  { "-inReqPayloadMaxSize",         &inReqPayloadMaxSize,   "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE, 0,     PaNL,                  IN_REQ_PAYLOAD_MAX_SIZE_DESC },
+  { "-outReqMsgMaxSize",            &outReqMsgMaxSize,      "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,    0,     PaNL,                  OUT_REQ_MSG_MAX_SIZE_DESC    },
+
+  { "-notificationMode",            &notificationMode,      "NOTIF_MODE",               PaString, PaOpt, _i "transient",                  PaNL,  PaNL,                  NOTIFICATION_MODE_DESC       },
+  { "-notifFlowControl",            &notifFlowControl,      "NOTIF_FLOW_CONTROL",       PaString, PaOpt, _i "",                           PaNL,  PaNL,                  FLOW_CONTROL_DESC            },
+  { "-simulatedNotification",       &simulatedNotification, "DROP_NOTIF",               PaBool,   PaOpt, false,                           false, true,                  SIMULATED_NOTIF_DESC         },
+
+  { "-statCounters",                &statCounters,          "STAT_COUNTERS",            PaBool,   PaOpt, false,                           false, true,                  STAT_COUNTERS                },
+  { "-statSemWait",                 &statSemWait,           "STAT_SEM_WAIT",            PaBool,   PaOpt, false,                           false, true,                  STAT_SEM_WAIT                },
+  { "-statTiming",                  &statTiming,            "STAT_TIMING",              PaBool,   PaOpt, false,                           false, true,                  STAT_TIMING                  },
+  { "-statNotifQueue",              &statNotifQueue,        "STAT_NOTIF_QUEUE",         PaBool,   PaOpt, false,                           false, true,                  STAT_NOTIF_QUEUE             },
+
+  { "-logSummary",                  &lsPeriod,              "LOG_SUMMARY_PERIOD",       PaInt,    PaOpt, 0,                               0,     ONE_MONTH_PERIOD,      LOG_SUMMARY_DESC             },
+  { "-relogAlarms",                 &relogAlarms,           "RELOG_ALARMS",             PaBool,   PaOpt, false,                           false, true,                  RELOGALARMS_DESC             },
+
+  { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,                  CHECK_v1_ID_DESC             },
+  { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,                  DISABLE_CUSTOM_NOTIF         },
+
+  { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,                  DISABLE_FILE_LOG             },
+  { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,                  LOG_FOR_HUMANS_DESC          },
+  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
+  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
+
+  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  METRICS_DESC                 },
+
+  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF               },
+
+  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST              },
+
+  { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
 
   PA_END_OF_ARGS
+};
+
+
+
+/* ****************************************************************************
+*
+* validLogLevels - to pass to parseArgs library for validation of --logLevel
+*/
+static const char* validLogLevels[] =
+{
+  "NONE",
+  "FATAL",
+  "ERROR",
+  "WARN",
+  "INFO",
+  "DEBUG",
+  NULL
 };
 
 
@@ -318,676 +391,53 @@ PaArgument paArgs[] =
 * "ngsi9" and "registerContext".
 *
 * Each line contains the necessary information for ONE service:
-*   std::string   verb        - GET/POST/PUT/DELETE
 *   RequestType   request     - The type of the request
 *   int           components  - Number of components in the following URL component vector
 *   std::string   compV       - Component vector of the URL
-*   std::string   payloadWord - first word in the payload for the request (to verify that the payload matches the URL). If empty, no check is performed)
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
 
 
-//
-// /v2 API
-//
-
-#define EPS                EntryPointsRequest
-#define EPS_COMPS_V2       1, { "v2"             }
-
-#define ENT                EntitiesRequest
-#define ENT_COMPS_V2       2, { "v2", "entities" }
-#define ENT_COMPS_WORD     ""
-
-//
-// NGSI9
-//
-#define RCR                RegisterContext
-#define DCAR               DiscoverContextAvailability
-#define SCAR               SubscribeContextAvailability
-#define UCAR               UnsubscribeContextAvailability
-#define UCAS               UpdateContextAvailabilitySubscription
-#define NCAR               NotifyContextAvailability
-
-#define RCR_COMPS_V0       2, { "ngsi9",          "registerContext" }
-#define RCR_COMPS_V1       3, { "v1", "registry", "registerContext" }
-#define RCR_POST_WORD      "registerContextRequest"
-
-#define DCAR_COMPS_V0      2, { "ngsi9",          "discoverContextAvailability" }
-#define DCAR_COMPS_V1      3, { "v1", "registry", "discoverContextAvailability" }
-#define DCAR_POST_WORD     "discoverContextAvailabilityRequest"
-
-#define SCAR_COMPS_V0      2, { "ngsi9",          "subscribeContextAvailability" }
-#define SCAR_COMPS_V1      3, { "v1", "registry", "subscribeContextAvailability" }
-#define SCAR_POST_WORD     "subscribeContextAvailabilityRequest"
-
-#define UCAR_COMPS_V0      2, { "ngsi9",          "unsubscribeContextAvailability" }
-#define UCAR_COMPS_V1      3, { "v1", "registry", "unsubscribeContextAvailability" }
-#define UCAR_POST_WORD     "unsubscribeContextAvailabilityRequest"
-
-#define UCAS_COMPS_V0      2, { "ngsi9",          "updateContextAvailabilitySubscription" }
-#define UCAS_COMPS_V1      3, { "v1", "registry", "updateContextAvailabilitySubscription" }
-#define UCAS_POST_WORD     "updateContextAvailabilitySubscriptionRequest"
-
-#define NCAR_COMPS_V0      2, { "ngsi9",          "notifyContextAvailability" }
-#define NCAR_COMPS_V1      3, { "v1", "registry", "notifyContextAvailability" }
-#define NCAR_POST_WORD     "notifyContextAvailabilityRequest"
-
-
-
-//
-// NGSI10
-//
-#define UPCR          UpdateContext
-#define QCR           QueryContext
-#define SCR           SubscribeContext
-#define UCSR          UpdateContextSubscription
-#define UNCR          UnsubscribeContext
-#define NCR           NotifyContext
-
-#define UPCR_COMPS_V0       2, { "ngsi10",  "updateContext" }
-#define UPCR_COMPS_V1       2, { "v1",      "updateContext" }
-#define UPCR_POST_WORD     "updateContextRequest"
-
-#define QCR_COMPS_V0        2, { "ngsi10",  "queryContext" }
-#define QCR_COMPS_V1        2, { "v1",      "queryContext" }
-#define QCR_POST_WORD      "queryContextRequest"
-
-#define SCR_COMPS_V0        2, { "ngsi10",  "subscribeContext" }
-#define SCR_COMPS_V1        2, { "v1",      "subscribeContext" }
-#define SCR_POST_WORD      "subscribeContextRequest"
-
-#define UCSR_COMPS_V0       2, { "ngsi10",  "updateContextSubscription" }
-#define UCSR_COMPS_V1       2, { "v1",      "updateContextSubscription" }
-#define UCSR_POST_WORD     "updateContextSubscriptionRequest"
-
-#define UNCR_COMPS_V0       2, { "ngsi10",  "unsubscribeContext" }
-#define UNCR_COMPS_V1       2, { "v1",      "unsubscribeContext" }
-#define UNCR_POST_WORD     "unsubscribeContextRequest"
-
-#define NCR_COMPS_V0        2, { "ngsi10",  "notifyContext" }
-#define NCR_COMPS_V1        2, { "v1",      "notifyContext" }
-#define NCR_POST_WORD      "notifyContextRequest"
-
-
-//
-// NGSI9 Convenience Operations
-//
-#define CE                 ContextEntitiesByEntityId
-#define CE_COMPS_V0        3, { "ngsi9",          "contextEntities", "*" }
-#define CE_COMPS_V1        4, { "v1", "registry", "contextEntities", "*" }
-#define CE_POST_WORD       "registerProviderRequest"
-
-#define CEA                ContextEntityAttributes
-#define CEA_COMPS_V0       4, { "ngsi9",          "contextEntities", "*", "attributes" }
-#define CEA_COMPS_V1       5, { "v1", "registry", "contextEntities", "*", "attributes" }
-#define CEA_POST_WORD      "registerProviderRequest"
-
-#define CEAA               EntityByIdAttributeByName
-#define CEAA_COMPS_V0      5, { "ngsi9",          "contextEntities", "*", "attributes", "*" }
-#define CEAA_COMPS_V1      6, { "v1", "registry", "contextEntities", "*", "attributes", "*" }
-#define CEAA_POST_WORD     "registerProviderRequest"
-
-#define CT                 ContextEntityTypes
-#define CT_COMPS_V0        3, { "ngsi9",          "contextEntityTypes", "*" }
-#define CT_COMPS_V1        4, { "v1", "registry", "contextEntityTypes", "*" }
-#define CT_POST_WORD       "registerProviderRequest"
-
-#define CTA                ContextEntityTypeAttributeContainer
-#define CTA_COMPS_V0       4, { "ngsi9",          "contextEntityTypes", "*", "attributes" }
-#define CTA_COMPS_V1       5, { "v1", "registry", "contextEntityTypes", "*", "attributes" }
-#define CTA_POST_WORD      "registerProviderRequest"
-
-#define CTAA               ContextEntityTypeAttribute
-#define CTAA_COMPS_V0      5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*" }
-#define CTAA_COMPS_V1      6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*" }
-#define CTAA_POST_WORD     "registerProviderRequest"
-
-#define SCA                SubscribeContextAvailability
-#define SCA_COMPS_V0       2, { "ngsi9",          "contextAvailabilitySubscriptions" }
-#define SCA_COMPS_V1       3, { "v1", "registry", "contextAvailabilitySubscriptions" }
-#define SCA_POST_WORD      "subscribeContextAvailabilityRequest"
-
-#define SCAS               Ngsi9SubscriptionsConvOp
-#define SCAS_COMPS_V0      3, { "ngsi9",          "contextAvailabilitySubscriptions", "*" }
-#define SCAS_COMPS_V1      4, { "v1", "registry", "contextAvailabilitySubscriptions", "*" }
-#define SCAS_PUT_WORD      "updateContextAvailabilitySubscriptionRequest"
-
-
-
-//
-// NGSI10 Convenience Operations
-//
-#define ICE                IndividualContextEntity
-#define ICE_COMPS_V0       3, { "ngsi10",  "contextEntities", "*" }
-#define ICE_COMPS_V1       3, { "v1",      "contextEntities", "*" }
-#define ICE_POST_WORD      "appendContextElementRequest"
-#define ICE_PUT_WORD       "updateContextElementRequest"
-
-#define ICEA               IndividualContextEntityAttributes
-#define ICEA_COMPS_V0      4, { "ngsi10",  "contextEntities", "*", "attributes" }
-#define ICEA_COMPS_V1      4, { "v1",      "contextEntities", "*", "attributes" }
-#define ICEA_POST_WORD     "appendContextElementRequest"
-#define ICEA_PUT_WORD      "updateContextElementRequest"
-
-#define ICEAA              IndividualContextEntityAttribute
-#define ICEAA_COMPS_V0     5, { "ngsi10",  "contextEntities", "*", "attributes", "*" }
-#define ICEAA_COMPS_V1     5, { "v1",      "contextEntities", "*", "attributes", "*" }
-// FIXME P10: funny having updateContextAttributeRequest for both ... Error in NEC-SPEC?
-#define ICEAA_POST_WORD    "updateContextAttributeRequest"
-#define ICEAA_PUT_WORD     "updateContextAttributeRequest"
-
-#define AVI                AttributeValueInstance
-#define AVI_COMPS_V0       6, { "ngsi10",  "contextEntities", "*", "attributes", "*", "*" }
-#define AVI_COMPS_V1       6, { "v1",      "contextEntities", "*", "attributes", "*", "*" }
-#define AVI_PUT_WORD       "updateContextAttributeRequest"
-
-#define CET                Ngsi10ContextEntityTypes
-#define CET_COMPS_V0       3, { "ngsi10",  "contextEntityTypes", "*" }
-#define CET_COMPS_V1       3, { "v1",      "contextEntityTypes", "*" }
-
-#define CETA               Ngsi10ContextEntityTypesAttributeContainer
-#define CETA_COMPS_V0      4, { "ngsi10",  "contextEntityTypes", "*", "attributes" }
-#define CETA_COMPS_V1      4, { "v1",      "contextEntityTypes", "*", "attributes" }
-
-#define CETAA              Ngsi10ContextEntityTypesAttribute
-#define CETAA_COMPS_V0     5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*" }
-#define CETAA_COMPS_V1     5, { "v1",      "contextEntityTypes", "*", "attributes", "*" }
-
-#define SC                 SubscribeContext
-#define SC_COMPS_V0        2, { "ngsi10",  "contextSubscriptions" }
-#define SC_COMPS_V1        2, { "v1",      "contextSubscriptions" }
-#define SC_POST_WORD       "subscribeContextRequest"
-
-#define SCS                Ngsi10SubscriptionsConvOp
-#define SCS_COMPS_V0       3, { "ngsi10",  "contextSubscriptions", "*" }
-#define SCS_COMPS_V1       3, { "v1",      "contextSubscriptions", "*" }
-#define SCS_PUT_WORD       "updateContextSubscriptionRequest"
-
-
-
-//
-// TID Convenience Operations
-//
-#define ET                 EntityTypes
-#define ET_COMPS_V1        2, { "v1", "contextTypes" }
-
-#define AFET               AttributesForEntityType
-#define AFET_COMPS_V1      3, { "v1", "contextTypes", "*" }
-
-#define ACE                AllContextEntities
-#define ACE_COMPS_V1       2, { "v1", "contextEntities" }
-#define ACE_POST_WORD     "appendContextElementRequest"
-
-#define ACET               AllEntitiesWithTypeAndId
-#define ACET_COMPS_V1      6, { "v1", "contextEntities", "type", "*", "id", "*" }
-#define ACET_POST_WORD     "appendContextElementRequest"
-#define ACET_PUT_WORD      "updateContextElementRequest"
-
-#define ICEAAT              IndividualContextEntityAttributeWithTypeAndId
-#define ICEAAT_COMPS_V1     8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
-#define ICEAAT_POST_WORD    "updateContextAttributeRequest"
-#define ICEAAT_PUT_WORD     "updateContextAttributeRequest"
-
-#define AVIT                AttributeValueInstanceWithTypeAndId
-#define AVIT_COMPS_V1       9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }
-#define AVIT_PUT_WORD       "updateContextAttributeRequest"
-#define AVIT_POST_WORD      "updateContextAttributeRequest"
-
-#define CEET                ContextEntitiesByEntityIdAndType
-#define CEET_COMPS_V1       7, { "v1", "registry", "contextEntities", "type", "*", "id", "*" }
-#define CEET_POST_WORD      "registerProviderRequest"
-
-#define CEAAT               EntityByIdAttributeByNameIdAndType
-#define CEAAT_COMPS_V1      9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
-#define CEAAT_POST_WORD     "registerProviderRequest"
-
-
-
-//
-// Log, version, statistics ...
-//
-#define LOG                LogRequest
-#define LOGT_COMPS_V0      2, { "log", "trace"                           }
-#define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
-#define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }
-#define LOG2TL_COMPS_V0    3, { "log", "traceLevel", "*"                 }
-#define LOGT_COMPS_V1      4, { "v1", "admin", "log", "trace"            }
-#define LOGTL_COMPS_V1     5, { "v1", "admin", "log", "trace",      "*"  }
-#define LOG2T_COMPS_V1     4, { "v1", "admin", "log", "traceLevel"       }
-#define LOG2TL_COMPS_V1    5, { "v1", "admin", "log", "traceLevel", "*"  }
-
-#define STAT               StatisticsRequest
-#define STAT_COMPS_V0      1, { "statistics"                             }
-#define STAT_COMPS_V1      3, { "v1", "admin", "statistics"              }
-
-
-
-//
-// Unversioned requests
-//
-#define VERS               VersionRequest
-#define VERS_COMPS         1, { "version"                                }
-
-#define EXIT               ExitRequest
-#define EXIT1_COMPS        1, { "exit"                                   }
-#define EXIT2_COMPS        2, { "exit", "*"                              }
-
-#define LEAK               LeakRequest
-#define LEAK1_COMPS        1, { "leak"                                   }
-#define LEAK2_COMPS        2, { "leak", "*"                              }
-
-#define INV                InvalidRequest
-#define INV9_COMPS         2, { "ngsi9",   "*"                           }
-#define INV10_COMPS        2, { "ngsi10",  "*"                           }
-#define INV_ALL_COMPS      0, { "*", "*", "*", "*", "*", "*"             }
-
-
-
-#define API_V2                                                                                           \
-  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
-  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
-  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
-  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
-
-
-
-
-#define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
-  { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \
-  { "*",      RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   DCAR,  DCAR_COMPS_V0,        DCAR_POST_WORD,  postDiscoverContextAvailability           }, \
-  { "*",      DCAR,  DCAR_COMPS_V0,        DCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   SCAR,  SCAR_COMPS_V0,        SCAR_POST_WORD,  postSubscribeContextAvailability          }, \
-  { "*",      SCAR,  SCAR_COMPS_V0,        SCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAR,  UCAR_COMPS_V0,        UCAR_POST_WORD,  postUnsubscribeContextAvailability        }, \
-  { "*",      UCAR,  UCAR_COMPS_V0,        UCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAS,  UCAS_COMPS_V0,        UCAS_POST_WORD,  postUpdateContextAvailabilitySubscription }, \
-  { "*",      UCAS,  UCAS_COMPS_V0,        UCAS_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCAR,  NCAR_COMPS_V0,        NCAR_POST_WORD,  postNotifyContextAvailability             }, \
-  { "*",      NCAR,  NCAR_COMPS_V0,        NCAR_POST_WORD,  badVerbPostOnly                           }
-
-
-
-#define REGISTRY_STANDARD_REQUESTS_V1                                                                      \
-  { "POST",   RCR,   RCR_COMPS_V1,           RCR_POST_WORD,   postRegisterContext                       }, \
-  { "*",      RCR,   RCR_COMPS_V1,           RCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   DCAR,  DCAR_COMPS_V1,          DCAR_POST_WORD,  postDiscoverContextAvailability           }, \
-  { "*",      DCAR,  DCAR_COMPS_V1,          DCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   SCAR,  SCAR_COMPS_V1,          SCAR_POST_WORD,  postSubscribeContextAvailability          }, \
-  { "*",      SCAR,  SCAR_COMPS_V1,          SCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAR,  UCAR_COMPS_V1,          UCAR_POST_WORD,  postUnsubscribeContextAvailability        }, \
-  { "*",      UCAR,  UCAR_COMPS_V1,          UCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAS,  UCAS_COMPS_V1,          UCAS_POST_WORD,  postUpdateContextAvailabilitySubscription }, \
-  { "*",      UCAS,  UCAS_COMPS_V1,          UCAS_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCAR,  NCAR_COMPS_V1,          NCAR_POST_WORD,  postNotifyContextAvailability             }, \
-  { "*",      NCAR,  NCAR_COMPS_V1,          NCAR_POST_WORD,  badVerbPostOnly                           }
-
-
-
-#define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  postUpdateContext                         }, \
-  { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
-  { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   SCR,   SCR_COMPS_V0,         SCR_POST_WORD,   postSubscribeContext                      }, \
-  { "*",      SCR,   SCR_COMPS_V0,         SCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   UCSR,  UCSR_COMPS_V0,        UCSR_POST_WORD,  postUpdateContextSubscription             }, \
-  { "*",      UCSR,  UCSR_COMPS_V0,        UCSR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UNCR,  UNCR_COMPS_V0,        UNCR_POST_WORD,  postUnsubscribeContext                    }, \
-  { "*",      UNCR,  UNCR_COMPS_V0,        UNCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCR,   NCR_COMPS_V0,         NCR_POST_WORD,   postNotifyContext                         }, \
-  { "*",      NCR,   NCR_COMPS_V0,         NCR_POST_WORD,   badVerbPostOnly                           }
-
-
-
-#define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  postUpdateContext                         }, \
-  { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
-  { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   SCR,   SCR_COMPS_V1,           SCR_POST_WORD,   postSubscribeContext                      }, \
-  { "*",      SCR,   SCR_COMPS_V1,           SCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   UCSR,  UCSR_COMPS_V1,          UCSR_POST_WORD,  postUpdateContextSubscription             }, \
-  { "*",      UCSR,  UCSR_COMPS_V1,          UCSR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UNCR,  UNCR_COMPS_V1,          UNCR_POST_WORD,  postUnsubscribeContext                    }, \
-  { "*",      UNCR,  UNCR_COMPS_V1,          UNCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCR,   NCR_COMPS_V1,           NCR_POST_WORD,   postNotifyContext                         }, \
-  { "*",      NCR,   NCR_COMPS_V1,           NCR_POST_WORD,   badVerbPostOnly                           }
-
-
-
-#define REGISTRY_CONVENIENCE_OPERATIONS_V0                                                               \
-  { "GET",    CE,    CE_COMPS_V0,          "",              getContextEntitiesByEntityId              }, \
-  { "POST",   CE,    CE_COMPS_V0,          CE_POST_WORD,    postContextEntitiesByEntityId             }, \
-  { "*",      CE,    CE_COMPS_V0,          "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CEA,   CEA_COMPS_V0,         "",              getContextEntityAttributes                }, \
-  { "POST",   CEA,   CEA_COMPS_V0,         CEA_POST_WORD,   postContextEntityAttributes               }, \
-  { "*",      CEA,   CEA_COMPS_V0,         "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CEAA,  CEAA_COMPS_V0,        "",              getEntityByIdAttributeByName              }, \
-  { "POST",   CEAA,  CEAA_COMPS_V0,        CEAA_POST_WORD,  postEntityByIdAttributeByName             }, \
-  { "*",      CEAA,  CEAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CT,    CT_COMPS_V0,          "",              getContextEntityTypes                     }, \
-  { "POST",   CT,    CT_COMPS_V0,          CT_POST_WORD,    postContextEntityTypes                    }, \
-  { "*",      CT,    CT_COMPS_V0,          "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CTA,   CTA_COMPS_V0,         "",              getContextEntityTypes                     }, \
-  { "POST",   CTA,   CTA_COMPS_V0,         CTA_POST_WORD,   postContextEntityTypes                    }, \
-  { "*",      CTA,   CTA_COMPS_V0,         "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "GET",    CTAA,  CTAA_COMPS_V0,        "",              getContextEntityTypeAttribute             }, \
-  { "POST",   CTAA,  CTAA_COMPS_V0,        CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
-  { "*",      CTAA,  CTAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
-                                                                                                         \
-  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailabilityConvOp    }, \
-  { "*",      SCA,   SCA_COMPS_V0,         "",              badVerbPostOnly                           }, \
-                                                                                                         \
-  { "PUT",    SCAS,  SCAS_COMPS_V0,        SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
-  { "DELETE", SCAS,  SCAS_COMPS_V0,        "",              deleteAvailabilitySubscriptionConvOp      }, \
-  { "*",      SCAS,  SCAS_COMPS_V0,        "",              badVerbPutDeleteOnly                      }
-
-
-
-#define REGISTRY_CONVENIENCE_OPERATIONS_V1                                                                 \
-  { "GET",    CE,    CE_COMPS_V1,            "",              getContextEntitiesByEntityId              }, \
-  { "POST",   CE,    CE_COMPS_V1,            CE_POST_WORD,    postContextEntitiesByEntityId             }, \
-  { "*",      CE,    CE_COMPS_V1,            "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CEA,   CEA_COMPS_V1,           "",              getContextEntityAttributes                }, \
-  { "POST",   CEA,   CEA_COMPS_V1,           CEA_POST_WORD,   postContextEntityAttributes               }, \
-  { "*",      CEA,   CEA_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CEAA,  CEAA_COMPS_V1,          "",              getEntityByIdAttributeByName              }, \
-  { "POST",   CEAA,  CEAA_COMPS_V1,          CEAA_POST_WORD,  postEntityByIdAttributeByName             }, \
-  { "*",      CEAA,  CEAA_COMPS_V1,          "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CT,    CT_COMPS_V1,            "",              getContextEntityTypes                     }, \
-  { "POST",   CT,    CT_COMPS_V1,            CT_POST_WORD,    postContextEntityTypes                    }, \
-  { "*",      CT,    CT_COMPS_V1,            "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CTA,   CTA_COMPS_V1,           "",              getContextEntityTypes                     }, \
-  { "POST",   CTA,   CTA_COMPS_V1,           CTA_POST_WORD,   postContextEntityTypes                    }, \
-  { "*",      CTA,   CTA_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "GET",    CTAA,  CTAA_COMPS_V1,          "",              getContextEntityTypeAttribute             }, \
-  { "POST",   CTAA,  CTAA_COMPS_V1,          CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
-  { "*",      CTAA,  CTAA_COMPS_V1,          "",              badVerbGetPostOnly                        }, \
-                                                                                                           \
-  { "POST",   SCA,   SCA_COMPS_V1,           SCA_POST_WORD,   postSubscribeContextAvailability          }, \
-  { "*",      SCA,   SCA_COMPS_V1,           "",              badVerbPostOnly                           }, \
-                                                                                                           \
-  { "PUT",    SCAS,  SCAS_COMPS_V1,          SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
-  { "DELETE", SCAS,  SCAS_COMPS_V1,          "",              deleteAvailabilitySubscriptionConvOp      }, \
-  { "*",      SCAS,  SCAS_COMPS_V1,          "",              badVerbPutDeleteOnly                      }
-
-
-
-#define CONVENIENCE_OPERATIONS_V0                                                                        \
-  { "GET",    ICE,   ICE_COMPS_V0,         "",              getIndividualContextEntity                }, \
-  { "PUT",    ICE,   ICE_COMPS_V0,         ICE_PUT_WORD,    putIndividualContextEntity                }, \
-  { "POST",   ICE,   ICE_COMPS_V0,         ICE_POST_WORD,   postIndividualContextEntity               }, \
-  { "DELETE", ICE,   ICE_COMPS_V0,         "",              deleteIndividualContextEntity             }, \
-  { "*",      ICE,   ICE_COMPS_V0,         "",              badVerbAllFour                            }, \
-                                                                                                         \
-  { "GET",    ICEA,  ICEA_COMPS_V0,        "",              getIndividualContextEntity                }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V0,        ICEA_PUT_WORD,   putIndividualContextEntity                }, \
-  { "POST",   ICEA,  ICEA_COMPS_V0,        ICEA_POST_WORD,  postIndividualContextEntity               }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V0,        "",              deleteIndividualContextEntity             }, \
-  { "*",      ICEA,  ICEA_COMPS_V0,        "",              badVerbAllFour                            }, \
-                                                                                                         \
-  { "GET",    ICEAA, ICEAA_COMPS_V0,       "",              getIndividualContextEntityAttribute       }, \
-  { "PUT",    ICEAA, ICEAA_COMPS_V0,       ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
-  { "POST",   ICEAA, ICEAA_COMPS_V0,       ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
-  { "DELETE", ICEAA, ICEAA_COMPS_V0,       "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbGetPostDeleteOnly                  }, \
-                                                                                                         \
-  { "GET",    AVI,   AVI_COMPS_V0,         "",              getAttributeValueInstance                 }, \
-  { "PUT",    AVI,   AVI_COMPS_V0,         AVI_PUT_WORD,    putAttributeValueInstance                 }, \
-  { "DELETE", AVI,   AVI_COMPS_V0,         "",              deleteAttributeValueInstance              }, \
-  { "*",      AVI,   AVI_COMPS_V0,         "",              badVerbGetPutDeleteOnly                   }, \
-                                                                                                         \
-  { "GET",    CET,   CET_COMPS_V0,         "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CET,   CET_COMPS_V0,         "",              badVerbGetOnly                            }, \
-                                                                                                         \
-  { "GET",    CETA,  CETA_COMPS_V0,        "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CETA,  CETA_COMPS_V0,        "",              badVerbGetOnly                            }, \
-                                                                                                         \
-  { "GET",    CETAA, CETAA_COMPS_V0,       "",              getNgsi10ContextEntityTypesAttribute      }, \
-  { "*",      CETAA, CETAA_COMPS_V0,       "",              badVerbGetOnly                            }, \
-                                                                                                         \
-  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContextConvOp                }, \
-  { "*",      SC,    SC_COMPS_V0,          "",              badVerbPostOnly                           }, \
-                                                                                                         \
-  { "PUT",    SCS,   SCS_COMPS_V0,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
-  { "DELETE", SCS,   SCS_COMPS_V0,         "",              deleteSubscriptionConvOp                  }, \
-  { "*",      SCS,   SCS_COMPS_V0,         "",              badVerbPutDeleteOnly                      }
-
-
-
-#define CONVENIENCE_OPERATIONS_V1                                                                          \
-  { "GET",    ICE,   ICE_COMPS_V1,           "",              getIndividualContextEntity                }, \
-  { "PUT",    ICE,   ICE_COMPS_V1,           ICE_PUT_WORD,    putIndividualContextEntity                }, \
-  { "POST",   ICE,   ICE_COMPS_V1,           ICE_POST_WORD,   postIndividualContextEntity               }, \
-  { "DELETE", ICE,   ICE_COMPS_V1,           "",              deleteIndividualContextEntity             }, \
-  { "*",      ICE,   ICE_COMPS_V1,           "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    ICEA,  ICEA_COMPS_V1,          "",              getIndividualContextEntity                }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V1,          ICEA_PUT_WORD,   putIndividualContextEntity                }, \
-  { "POST",   ICEA,  ICEA_COMPS_V1,          ICEA_POST_WORD,  postIndividualContextEntity               }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V1,          "",              deleteIndividualContextEntity             }, \
-  { "*",      ICEA,  ICEA_COMPS_V1,          "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    ICEAA, ICEAA_COMPS_V1,         "",              getIndividualContextEntityAttribute       }, \
-  { "PUT",    ICEAA, ICEAA_COMPS_V1,         ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
-  { "POST",   ICEAA, ICEAA_COMPS_V1,         ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
-  { "DELETE", ICEAA, ICEAA_COMPS_V1,         "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbGetPostDeleteOnly                  }, \
-                                                                                                           \
-  { "GET",    AVI,   AVI_COMPS_V1,           "",              getAttributeValueInstance                 }, \
-  { "PUT",    AVI,   AVI_COMPS_V1,           AVI_PUT_WORD,    putAttributeValueInstance                 }, \
-  { "DELETE", AVI,   AVI_COMPS_V1,           "",              deleteAttributeValueInstance              }, \
-  { "*",      AVI,   AVI_COMPS_V1,           "",              badVerbGetPutDeleteOnly                   }, \
-                                                                                                           \
-  { "GET",    CET,   CET_COMPS_V1,           "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CET,   CET_COMPS_V1,           "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    CETA,  CETA_COMPS_V1,          "",              getNgsi10ContextEntityTypes               }, \
-  { "*",      CETA,  CETA_COMPS_V1,          "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    CETAA, CETAA_COMPS_V1,         "",              getNgsi10ContextEntityTypesAttribute      }, \
-  { "*",      CETAA, CETAA_COMPS_V1,         "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContextConvOp                }, \
-  { "*",      SC,    SC_COMPS_V1,            "",              badVerbPostOnly                           }, \
-                                                                                                           \
-  { "PUT",    SCS,   SCS_COMPS_V1,           SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
-  { "DELETE", SCS,   SCS_COMPS_V1,           "",              deleteSubscriptionConvOp                  }, \
-  { "*",      SCS,   SCS_COMPS_V1,           "",              badVerbPutDeleteOnly                      }, \
-                                                                                                           \
-  { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
-  { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
-  { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
-  { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
-  { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
-                                                                                                           \
-  { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
-  { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
-  { "PUT",    ACET,  ACET_COMPS_V1,          ACET_PUT_WORD,   putAllEntitiesWithTypeAndId               }, \
-  { "DELETE", ACET,  ACET_COMPS_V1,          "",              deleteAllEntitiesWithTypeAndId            }, \
-  { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }, \
-                                                                                                           \
-  { "GET",    ICEAAT,  ICEAAT_COMPS_V1,      "",               getIndividualContextEntityAttributeWithTypeAndId    }, \
-  { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId   }, \
-  { "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId    }, \
-  { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId }, \
-  { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }, \
-                                                                                                                      \
-  { "GET",    AVIT,    AVIT_COMPS_V1,        "",               getAttributeValueInstanceWithTypeAndId              }, \
-  { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId             }, \
-  { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId              }, \
-  { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, \
-  { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }, \
-                                                                                                                      \
-  { "GET",    CEET,    CEET_COMPS_V1,        "",               getContextEntitiesByEntityIdAndType                 }, \
-  { "POST",   CEET,    CEET_COMPS_V1,        CEET_POST_WORD,   postContextEntitiesByEntityIdAndType                }, \
-  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbGetPostOnly                                  }, \
-                                                                                                                      \
-  { "GET",    CEAAT,   CEAAT_COMPS_V1,       "",               getEntityByIdAttributeByNameWithTypeAndId           }, \
-  { "POST",   CEAAT,   CEAAT_COMPS_V1,       CEAAT_POST_WORD,  postEntityByIdAttributeByNameWithTypeAndId          }, \
-  { "*",      CEAAT,   CEAAT_COMPS_V1,       "",               badVerbGetPostOnly                                  }
-
-
-
-/* *****************************************************************************
-*  
-* log requests
-* The documentation (Installation and Admin Guide) says /log/trace ...
-* ... and to maintain backward compatibility we keep supporting /log/traceLevel too
-*/
-#define LOG_REQUESTS_V0                                                              \
-  { "GET",    LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbAllFour                         }, \
-  { "PUT",    LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbAllFour                         }, \
-  { "GET",    LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbAllFour                         }, \
-  { "PUT",    LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbAllFour                         }
-
-#define LOG_REQUESTS_V1                                                              \
-  { "GET",    LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbAllFour                         }, \
-  { "PUT",    LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbAllFour                         }, \
-  { "GET",    LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbAllFour                         }, \
-  { "PUT",    LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "DELETE", LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbAllFour                         }
-
-#define STAT_REQUESTS_V0                                                             \
-  { "GET",    STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
-  { "DELETE", STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
-  { "*",      STAT, STAT_COMPS_V0,    "",  badVerbGetDeleteOnly                   }
-
-#define STAT_REQUESTS_V1                                                             \
-  { "GET",    STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
-  { "DELETE", STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
-  { "*",      STAT, STAT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }
-
-#define VERSION_REQUESTS                                                             \
-  { "GET",    VERS, VERS_COMPS,    "",  versionTreat                              }, \
-  { "*",      VERS, VERS_COMPS,    "",  badVerbGetOnly                            }
-
-#define EXIT_REQUESTS                                                                \
-  { "GET",    EXIT, EXIT2_COMPS,   "",  exitTreat                                 }, \
-  { "GET",    EXIT, EXIT1_COMPS,   "",  exitTreat                                 }
-
-#define LEAK_REQUESTS                                                                \
-  { "GET",    LEAK, LEAK2_COMPS,   "",  leakTreat                                 }, \
-  { "GET",    LEAK, LEAK1_COMPS,   "",  leakTreat                                 }
-
-#define INVALID_REQUESTS                             \
-  { "*", INV, INV9_COMPS,    "", badNgsi9Request  }, \
-  { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
-  { "*", INV, INV_ALL_COMPS, "", badRequest       }
-
-
 
 /* ****************************************************************************
 *
-* END_REQUEST - End marker for the array
+* fileExists -
 */
-#define END_REQUEST  { "", INV,  0, {}, "", NULL }
-
-
-
-/* ****************************************************************************
-*
-* restServiceV - services for BROKER (ngsi9/10)
-*
-* This is the default service vector, that is used if the broker is started without the -ngsi9 option
-*/
-RestService restServiceV[] =
+static bool fileExists(char* path)
 {
-  API_V2,
+  if (access(path, F_OK) == 0)
+  {
+    return true;
+  }
 
-  REGISTRY_STANDARD_REQUESTS_V0,
-  REGISTRY_STANDARD_REQUESTS_V1,
-  STANDARD_REQUESTS_V0,
-  STANDARD_REQUESTS_V1,
-
-  REGISTRY_CONVENIENCE_OPERATIONS_V0,
-  REGISTRY_CONVENIENCE_OPERATIONS_V1,
-  CONVENIENCE_OPERATIONS_V0,
-  CONVENIENCE_OPERATIONS_V1,
-  LOG_REQUESTS_V0,
-  LOG_REQUESTS_V1,
-  STAT_REQUESTS_V0,
-  STAT_REQUESTS_V1,
-  VERSION_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
-  END_REQUEST
-};
-
-
-
-/* ****************************************************************************
-*
-* restServiceNgsi9 - services for CONF MAN
-*
-* This service vector (configuration) is used if the broker is started as
-* CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
-* -multiservice option.
-*/
-RestService restServiceNgsi9[] =
-{
-  REGISTRY_STANDARD_REQUESTS_V0,   // FIXME P10:  NCAR is added here, is that OK?
-  REGISTRY_STANDARD_REQUESTS_V1,
-  REGISTRY_CONVENIENCE_OPERATIONS_V0,
-  REGISTRY_CONVENIENCE_OPERATIONS_V1,
-  LOG_REQUESTS_V0,
-  LOG_REQUESTS_V1,
-  STAT_REQUESTS_V0,
-  STAT_REQUESTS_V1,
-  VERSION_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
-  END_REQUEST
-};
+  return false;
+}
 
 
 
 /* ****************************************************************************
 *
 * pidFile -
+*
+* When run "interactively" (with the CLI option '-fg' set), the error messages get really ugly.
+* However, that is a minor bad, compared to what would happen to a 'nice printf message' when started as a service.
+* It would be lost. The log file is important and we can't just use 'fprintf(stderr, ...)' ...
 */
-int pidFile(void)
+int pidFile(bool justCheck)
 {
+  if ((!harakiri) && (fileExists(pidPath)))
+  {
+    // In harakiri mode, we skip pidFile existence checking for convenience
+    LM_E(("PID-file '%s' found. A broker seems to be running already", pidPath));
+    return 1;
+  }
+
+  if (justCheck == true)
+  {
+    return 0;
+  }
+
   int    fd = open(pidPath, O_WRONLY | O_CREAT | O_TRUNC, 0777);
   pid_t  pid;
   char   buffer[32];
@@ -996,8 +446,8 @@ int pidFile(void)
 
   if (fd == -1)
   {
-    LM_E(("PID File (open '%s': %s", pidPath, strerror(errno)));
-    return -1;
+    LM_E(("PID File (open '%s': %s)", pidPath, strerror(errno)));
+    return 2;
   }
 
   pid = getpid();
@@ -1008,7 +458,7 @@ int pidFile(void)
   if (nb != sz)
   {
     LM_E(("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
-    return -2;
+    return 3;
   }
 
   return 0;
@@ -1040,6 +490,7 @@ void daemonize(void)
   // Exiting father process
   if (pid > 0)
   {
+    isFatherProcess = true;
     exit(0);
   }
 
@@ -1059,9 +510,6 @@ void daemonize(void)
   {
     LM_X(1, ("Fatal Error (chdir: %s)", strerror(errno)));
   }
-
-  // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-  OID::justForked();
 }
 
 
@@ -1072,17 +520,20 @@ void daemonize(void)
 */
 void sigHandler(int sigNo)
 {
-  LM_I(("Signal Handler (caught signal %d)", sigNo));
+  LM_T(LmtOldInfo, ("Signal Handler (caught signal %d)", sigNo));
 
   switch (sigNo)
   {
   case SIGINT:
   case SIGTERM:
+  case SIGHUP:
     LM_I(("Orion context broker exiting due to receiving a signal"));
     exit(0);
     break;
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -1099,17 +550,6 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
-  //
-  // Cancel all threads to avoid false leaks in valgrind
-  //
-  std::vector<std::string> dbs;
-  getOrionDatabases(dbs);
-  for (unsigned int ix = 0; ix < dbs.size(); ++ix)
-  {
-    destroyAllOntimeIntervalThreads(dbs[ix]);
-  }
-
-  mongoDisconnect();
   exit(code);
 }
 
@@ -1121,19 +561,66 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
+  if (isFatherProcess)
+  {
+    isFatherProcess = false;
+    return;
+  }
+
+  metricsMgr.release();
+
+  if ((strcmp(notificationMode, "threadpool") == 0))
+  {
+    // Note the destructor in QueueNotifier will do the releasing work on service queues
+    if (getNotifier() != NULL)
+    {
+      delete getNotifier();
+    }
+  }
+
+  mqttMgr.teardown();
+
+  curl_context_cleanup();
   curl_global_cleanup();
+
+#ifdef DEBUG
+  // valgrind pass is done using DEBUG compilation, so we have to take care with
+  // the cache releasing to avoid false positives. In production this is not really
+  // needed
+
+  if (subCacheState == ScsSynchronizing)
+  {
+    //
+    // Subscription Cache is busy doing a synchronization.
+    // Two secs should be enough for it to finish.
+    //
+    // Not very important anyway. This 'hack' is just to avoid
+    // false leaks in the valgrind test suite.
+    //
+    LM_W(("Subscription cache is synchronizing, wait a few seconds before dying"));
+    sleep(2);
+  }
+
+  // Take mongo req-sem ?
+  LM_T(LmtSubCache, ("try-taking req semaphore"));
+  reqSemTryToTake();
+  LM_T(LmtSubCache, ("calling subCacheDestroy"));
+  subCacheDestroy();
+#endif
 
   if (unlink(pidPath) != 0)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
+
+  LM_I(("Orion shutdown completed"));
 }
 
 
 
 /* ****************************************************************************
 *
-* description - 
+* description -
 */
 const char* description =
   "\n"
@@ -1146,103 +633,43 @@ const char* description =
 
 
 
-
 /* ****************************************************************************
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multitenant)
+static void contextBrokerInit(void)
 {
+  Notifier* pNotifier = NULL;
+
+  /* If we use a queue for notifications, start worker threads */
+  if (strcmp(notificationMode, "threadpool") == 0)
+  {
+    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum, serviceV, serviceQueueSizeV, serviceNumThreadV);
+    int             rc         = pQNotifier->start();
+
+    if (rc != 0)
+    {
+      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
+    }
+
+    pNotifier = pQNotifier;
+  }
+  else
+  {
+    pNotifier = new Notifier();
+  }
+
   /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
+  setNotifier(pNotifier);
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
-  {
-    recoverOntimeIntervalThreads("");
-
-    if (multitenant)
-    {
-      /* We get tenant database names and recover ontime interval threads on each one */
-      std::vector<std::string> orionDbs;
-      getOrionDatabases(orionDbs);
-      for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-      {
-        std::string orionDb = orionDbs[ix];
-        std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-        recoverOntimeIntervalThreads(tenant);
-      }
-    }
-  }
-  else
-  {
-    LM_I(("Running in NGSI9 only mode"));
-  }
-
+  /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
-}
 
-
-
-/* ****************************************************************************
-*
-* mongoInit -
-*/
-static void mongoInit
-(
-  const char*  dbHost,
-  const char*  rplSet,
-  std::string  dbName,
-  const char*  user,
-  const char*  pwd,
-  long         timeout,
-  int          writeConcern,
-  int          dbPoolSize,
-  bool         mutexTimeStat
-)
-{
-  double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
-
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
-  {
-    LM_X(1, ("Fatal Error (MongoDB error)"));
-  }
-
-  if (user[0] != 0)
-  {
-    LM_I(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
-  }
-  else
-  {
-    LM_I(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
-  }
-
-  setDbPrefix(dbName);
-  setEntitiesCollectionName(COL_ENTITIES);
-  setRegistrationsCollectionName(COL_REGISTRATIONS);
-  setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
-  setAssociationsCollectionName(COL_ASSOCIATIONS);
-
-  //
-  // Note that index creation operation is idempotent.
-  // From http://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex:
-  // "If you call multiple ensureIndex() methods with the same index specification at the same time,
-  // only the first operation will succeed, all other operations will have no effect."
-  //
-  ensureLocationIndex("");
-  if (mtenant)
-  {
-    /* We get tenant database names and apply ensure the location index in each one */
-    std::vector<std::string> orionDbs;
-    getOrionDatabases(orionDbs);
-    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-    {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-      ensureLocationIndex(tenant);
-    }
-  }
+  //WARN about insecureNotifications mode
+  if (insecureNotif == true)
+   {
+      LM_W(("contextBroker started in insecure notifications mode (-insecureNotif)"));
+   }
 }
 
 
@@ -1251,92 +678,61 @@ static void mongoInit
 *
 * loadFile -
 */
-static int loadFile(char* path, char* out, int outSize)
+static char* loadFile(char* path)
 {
   struct stat  statBuf;
   int          nb;
   int          fd = open(path, O_RDONLY);
+  char*        buf;
 
   if (fd == -1)
   {
     LM_E(("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
   if (stat(path, &statBuf) != 0)
   {
     close(fd);
     LM_E(("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
-  if (statBuf.st_size > outSize)
+  buf = (char*) malloc(statBuf.st_size + 1);
+  if (buf == NULL)
   {
     close(fd);
-    LM_E(("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
-    return -1;
+    LM_E(("HTTPS Error (out of memory - unable to allocate %d bytes for out-buffer of key/cert file)", statBuf.st_size + 1));
+    return NULL;
   }
 
-  nb = read(fd, out, statBuf.st_size);
+  nb = read(fd, buf, statBuf.st_size);
   close(fd);
 
   if (nb == -1)
   {
     LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
-    return -1;
+    return NULL;
   }
 
   if (nb != statBuf.st_size)
   {
     LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
-    return -1;
+    return NULL;
   }
 
-  return 0;
+  buf[statBuf.st_size] = 0;  // Zero-terminate the string
+
+  return buf;
 }
 
 
 
 /* ****************************************************************************
 *
-* rushParse - parse rush host and port from CLI argument
-*
-* The '-rush' CLI argument has the format "host:port" and this function
-* splits that argument into rushHost and rushPort.
-* If there is a syntax error in the argument, the function exists the program
-* with an error message
+* policyGet -
 */
-static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
-{
-  char* colon = strchr(rush, ':');
-  char* copy  = strdup(rush);
-
-  if (colon == NULL)
-  {
-    LM_X(1, ("Fatal Error (Bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", rush));
-  }
-
-  *colon = 0;
-  ++colon;
-
-  *rushHostP = rush;
-  *rushPortP = atoi(colon);
-
-  if ((*rushHostP == "") || (*rushPortP == 0))
-  {
-    LM_X(1, ("Fatal Error (bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", copy));
-  }
-
-  free(copy);
-}
-
-
-
-/* ****************************************************************************
-*
-* policyGet - 
-*/
-static SemRequestType policyGet(std::string mutexPolicy)
+static SemOpType policyGet(std::string mutexPolicy)
 {
   if (mutexPolicy == "read")
   {
@@ -1363,20 +759,240 @@ static SemRequestType policyGet(std::string mutexPolicy)
 
 
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+/* ****************************************************************************
+*
+* notificationModeParse -
+*
+* Expected format is as follows:
+*
+* (persistent|transient|threadpool:q:n[,serv:qn]*)
+*/
+static void notificationModeParse
+(
+  char*                      notifModeArg,
+  int*                       pQueueSize,
+  int*                       pNumThreads,
+  std::vector<std::string>*  pServiceV,
+  std::vector<int>*          pServiceQueueSizeV,
+  std::vector<int>*          pServiceNumThreadV
+)
+{
+  std::vector<std::string> commaTokensV;
+  stringSplit(std::string(notifModeArg), ',', commaTokensV);
+
+  // First token processing
+  char* mode;
+  char* first_colon;
+  int   flds_num;
+
+  errno = 0;
+  // notifModeArg is a char[512], pretty sure not a huge input to break sscanf
+  // cppcheck-suppress invalidscanf
+  flds_num = sscanf(commaTokensV[0].c_str(), "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
+  if (errno != 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
+  }
+  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
+  {
+    if (*pQueueSize <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+    }
+    if (*pNumThreads <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+    }
+  }
+  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
+  {
+    *pQueueSize = DEFAULT_NOTIF_QS;
+    *pNumThreads = DEFAULT_NOTIF_TN;
+  }
+  else if (!(
+             flds_num == 1 &&
+             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
+             ))
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
+  }
+
+  free(mode);
+
+  // Potentially processing of second and further tokens, if any
+  for (unsigned int ix = 1; ix < commaTokensV.size(); ++ix)
+  {
+    // notifModeArg is a char[512], pretty sure not a huge input to break sscanf
+    // cppcheck-suppress invalidscanf
+    char* serviceName;
+    int   qSize;
+    int   numThreads;
+    if (sscanf(commaTokensV[ix].c_str(), "%m[^:]:%d:%d", &serviceName, &qSize, &numThreads) < 3)
+    {
+      LM_X(1, ("Fatal Error parsing service reserved queue: %s", commaTokensV[ix].c_str()));
+    }
+    pServiceV->push_back(std::string(serviceName));
+    pServiceQueueSizeV->push_back(qSize);
+    pServiceNumThreadV->push_back(numThreads);
+
+    free(serviceName);
+  }
+
+  // get rid of params, if any, in notifModeArg
+  first_colon = strchr(notifModeArg, ':');
+  if (first_colon != NULL)
+  {
+    *first_colon = '\0';
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* notifFlowControlParse -
+*/
+static void notifFlowControlParse
+(
+  char*           notifFlowControl,
+  double*         fcGaugeP,
+  unsigned long*  fcStepDelayP,
+  unsigned long*  fcMaxIntervalP
+)
+{
+  std::stringstream ss(notifFlowControl);
+  std::vector<std::string> tokens;
+  while(ss.good())
+  {
+    std::string substr;
+    getline(ss, substr, ':');
+    tokens.push_back(substr);
+  }
+
+  if (tokens.size() != 3)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: more tokens than expected (%d)", tokens.size()));
+  }
+
+  std::string error = "";
+  *fcGaugeP = atoF(tokens[0].c_str(), &error);
+  if (error != "")
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: error parsing gauge '%s': %s",
+             tokens[0].c_str(), error.c_str()));
+  }
+  if (*fcGaugeP > 1 || *fcGaugeP < 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: gauge must be between 0 and 1 and is %f", *fcGaugeP));
+  }
+
+  *fcStepDelayP = atoUL(tokens[1].c_str(), &error);
+  if (error != "")
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: error parsing stepDelay '%s': %s",
+             tokens[1].c_str(), error.c_str()));
+  }
+  if (*fcStepDelayP == 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: stepDelay must be strictly greater than 0", *fcStepDelayP));
+  }
+
+  *fcMaxIntervalP = atoUL(tokens[2].c_str(), &error);
+  if (error != "")
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: error parsing maxInterval '%s': %s",
+             tokens[2].c_str(), error.c_str()));
+  }
+  if (*fcMaxIntervalP == 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: maxInterval must be strictly greater than 0", *fcMaxIntervalP));
+  }
+}
+
+
+/* ****************************************************************************
+*
+* cmdLineString -
+*
+* Exceptionally, this function return value doesn't follow the coding style rule
+* of not returning objects. It is due to simplicity. Note this function is
+* used only at startup, so no impact in performance is expected
+*/
+static std::string cmdLineString(int argC, char* argV[])
+{
+  std::string s;
+  for (int ix =  0; ix < argC; ix++)
+  {
+    s += std::string(argV[ix]);
+    if (ix != argC -1)
+    {
+      s += " ";
+    }
+  }
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* logEnvVars -
+*
+* Print env var configuration in INFO traces
+*/
+static void logEnvVars(void)
+{
+  PaiArgument* aP;
+  paIterateInit();
+  while ((aP = paIterateNext(paiList)) != NULL)
+  {
+    if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
+    {
+      if (strcmp(aP->envName, "MONGO_PASSWORD") == 0)
+      {
+        // Offuscate sensible information
+        LM_I(("env var ORION_%s (%s): ******", aP->envName, aP->option));
+      }
+      else if (aP->type == PaString)
+      {
+        LM_I(("env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
+      }
+      else if (aP->type == PaBool)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
+      }
+      else if (aP->type == PaInt)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
+      }
+      else if (aP->type == PaDouble)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
+      }
+      else
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+      }
+    }
+  }
+}
+
+
+
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+  int s;
 
-  uint16_t       rushPort = 0;
-  std::string    rushHost = "";
+  lmTransactionReset();
 
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
+  signal(SIGHUP,  sigHandler);
 
   atexit(exitFunc);
 
@@ -1401,25 +1017,90 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("remove builtin", "--silent");
+  paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
+
+  std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
-  paConfig("man version",                   (void*) ORION_VERSION);
-  paConfig("log to screen",                 (void*) true);
-  paConfig("log to file",                   (void*) true);
+  paConfig("man version",                   (void*) versionString.c_str());
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
-  paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
+  paConfig("screen time format",            (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("builtin prefix",                (void*) "ORION_");
+  paConfig("prefix",                        (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
-  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
+  paConfig("valid log level strings",       validLogLevels);
+  paConfig("default value",                 "-logLevel", "WARN");
+
+
+  //
+  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
+  //
+  if (paIsSet(argC, argV, (PaArgument*) paArgs, "-fg"))
+  {
+    paConfig("log to screen",                 (void*) true);
+    if (paIsSet(argC, argV, (PaArgument*) paArgs, "-logForHumans"))
+    {
+      paConfig("screen line format", (void*) "TYPE@DATE  FILE[LINE]: TEXT");
+    }
+    else
+    {
+      paConfig("screen line format", LOG_FILE_LINE_FORMAT);
+    }
+  }
+
+  //
+  // disable file logging if the corresponding option is set.
+  //
+  if (paIsSet(argC, argV, (PaArgument *) paArgs, "-disableFileLog"))
+  {
+    paConfig("log to file", (void*) false);
+  }
+  else
+  {
+    paConfig("log to file", (void*) true);
+  }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  //
+  // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
+  //       The exit-function removes the PID-file and we don't want that. We want
+  //       the PID-file to remain.
+  //       Calling '_exit()' instead of 'exit()' makes sure that the exit-function is not called.
+  //
+  //       This call here is just to check for the existance of the PID-file.
+  //       If the file exists, the broker dies here.
+  //       The creation of the PID-file must be done AFTER "daemonize()" as here we still don't know the
+  //       PID of the broker. The father process dies and the son-process continues, in "daemonize()".
+  //
+  if ((s = pidFile(true)) != 0)
+  {
+    _exit(s);
+  }
+
+  // print startup info in logs
+  std::string cmdLine = offuscatePassword(cmdLineString(argC, argV), std::string(pwd));
+  LM_I(("start command line <%s>", cmdLine.c_str()));
+  logEnvVars();
+
+  // Argument consistency check (-t AND NOT -logLevel)
+  if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
+  {
+    printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
+    paUsage();
+    exit(1);
+  }
+
+  paCleanup();
 
 #ifdef DEBUG_develenv
   //
@@ -1434,7 +1115,10 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
-  LM_I(("Orion Context Broker is running"));
+  if ((strlen(authMech) > 0) && (strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "SCRAM-SHA-256", strlen("SCRAM-SHA-256")) != 0))
+  {
+    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or SCRAM-SHA-256"));
+  }
 
   if (useOnlyIPv6 && useOnlyIPv4)
   {
@@ -1453,9 +1137,42 @@ int main(int argC, char* argV[])
     }
   }
 
+  // This should be called before contextBrokerInit()
+  notificationModeParse(notificationMode,
+                        &notificationQueueSize,
+                        &notificationThreadNum,
+                        &serviceV,
+                        &serviceQueueSizeV,
+                        &serviceNumThreadV);
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d, services with dedicated queue: %d", notificationMode, notificationQueueSize, notificationThreadNum, serviceV.size()));
+
+  if ((strcmp(notifFlowControl, "") != 0) && (strcmp(notificationMode, "threadpool") != 0))
+  {
+      LM_X(1, ("Fatal Error ('-notifFlowControl' must be used in combination with threadpool notification mode)"));
+  }
+
+  if (strcmp(notifFlowControl, "") != 0)
+  {
+    fcEnabled = true;
+    notifFlowControlParse(notifFlowControl, &fcGauge, &fcStepDelay, &fcMaxInterval);
+    LM_T(LmtNotifier, ("notification flow control: enabled - gauge: %f, stepDelay: %d, maxInterval: %d", fcGauge, fcStepDelay, fcMaxInterval));
+  }
+  else
+  {
+    fcEnabled = false;
+    LM_T(LmtNotifier, ("notification flow control: disabled"));
+  }
+
+  LM_I(("Orion Context Broker is running"));
+
   if (fg == false)
   {
     daemonize();
+  }
+
+  if ((s = pidFile(false)) != 0)
+  {
+    _exit(s);
   }
 
 #if 0
@@ -1470,8 +1187,7 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP       = (ngsi9Only == true)? restServiceNgsi9 : restServiceV;
-  IpVersion    ipVersion = IPDUAL;
+  IpVersion    ipVersion        = IPDUAL;
 
   if (useOnlyIPv4)
   {
@@ -1482,50 +1198,133 @@ int main(int argC, char* argV[])
     ipVersion = IPV6;
   }
 
-  pidFile();
-  SemRequestType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
-  contextBrokerInit(ngsi9Only, dbName, mtenant);
-  curl_global_init(CURL_GLOBAL_NOTHING);
+  SemOpType policy = policyGet(reqMutexPolicy);
+  alarmMgr.init(relogAlarms);
+  mqttMgr.init();
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  metricsMgr.init(!disableMetrics, statSemWait);
+  logSummaryInit(&lsPeriod);
 
-  if (rush[0] != 0)
+  // According to http://stackoverflow.com/questions/28048885/initializing-ssl-and-libcurl-and-getting-out-of-memory/37295100,
+  // openSSL library needs to be initialized with SSL_library_init() before any use of it by any other libraries
+  SSL_library_init();
+
+  // Startup libcurl
+  if (curl_global_init(CURL_GLOBAL_SSL) != 0)
   {
-    rushParse(rush, &rushHost, &rushPort);
-    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
+    LM_X(1, ("Fatal Error (could not initialize libcurl)"));
   }
+
+  if (noCache == false)
+  {
+    subCacheInit(mtenant);
+
+    if (subCacheInterval == 0)
+    {
+      // Populate subscription cache from database
+      subCacheRefresh();
+    }
+    else
+    {
+      // Populate subscription cache AND start sub-cache-refresh-thread
+      subCacheStart();
+    }
+  }
+  else
+  {
+    LM_T(LmtSubCache, ("noCache == false"));
+  }
+
+  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
+  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
+  // Otherwise, we have empirically checked that CB may randomly crash
+  contextBrokerInit();
 
   if (https)
   {
-    char* httpsPrivateServerKey = (char*) malloc(2048);
-    char* httpsCertificate      = (char*) malloc(2048);
+    char* httpsPrivateServerKey = loadFile(httpsKeyFile);
+    char* httpsCertificate      = loadFile(httpsCertFile);
 
-    if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
+    if (httpsPrivateServerKey == NULL)
     {
+      if (httpsCertificate != NULL)
+      {
+        free(httpsCertificate);
+      }
+
       LM_X(1, ("Fatal Error (loading private server key from '%s')", httpsKeyFile));
     }
-    if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
+
+    if (httpsCertificate == NULL)
     {
+      if (httpsPrivateServerKey != NULL)
+      {
+        free(httpsPrivateServerKey);
+      }
+
       LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
     }
 
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    orionRestServicesInit(ipVersion,
+                          bindAddress,
+                          port,
+                          mtenant,
+                          connectionMemory,
+                          maxConnections,
+                          reqPoolSize,
+                          allowedOrigin,
+                          maxAge,
+                          reqTimeout,
+                          httpsPrivateServerKey,
+                          httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
+    orionRestServicesInit(ipVersion,
+                          bindAddress,
+                          port,
+                          mtenant,
+                          connectionMemory,
+                          maxConnections,
+                          reqPoolSize,
+                          allowedOrigin,
+                          maxAge,
+                          reqTimeout,
+                          NULL,
+                          NULL);
   }
 
   LM_I(("Startup completed"));
+  if (simulatedNotification)
+  {
+    LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
+  }
 
+  int times = 0;
   while (1)
   {
-    sleep(10);
+    // Sleep periodically during a minute
+    sleep(60);
+
+    // At the present moment MQTT max age checking is the only one periodic process we need to do
+    // If some other is introduced in the future, this part should be adapted.
+
+    // FIXME P5: note that the cache refresh process runs in its own thread (as it can be
+    // disabled with the -noCache switch). This is somehow non homogenoues: maybe the MQTT age
+    // checking should be moved to a separate thread or, the other way arround, the cache sync
+    // process be included as part of this sleep loop
+    times++;
+    if (times == mqttMaxAge)
+    {
+      times = 0;
+      mqttMgr.cleanup(mqttMaxAge*60);
+    }
   }
 }

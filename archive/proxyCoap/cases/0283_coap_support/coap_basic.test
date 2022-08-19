@@ -1,0 +1,158 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Coap Basic interaction
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+valgrindSleep 2
+proxyCoapStart
+
+--SHELL--
+
+valgrindSleep 5
+echo "+++++++ Create entity +++++++++"
+payload='{
+    "attributes": [
+        {
+            "name": "temperature", 
+            "type": "centigrade", 
+            "value": "30"
+        }
+    ]
+}'
+coapCurl --url /v1/contextEntities/Room1 --payload "$payload" --json -X post
+
+
+echo "+++++++ Query +++++++++"
+valgrindSleep 2
+coapCurl --url /v1/contextEntities/Room1 --json
+
+
+echo "+++++++ Update +++++++++"
+payload='{
+    "attributes": [
+        {
+            "name": "temperature", 
+            "type": "centigrade", 
+            "value": "29"
+        }
+    ]
+}'
+coapCurl --url /v1/contextEntities/Room1 --payload "$payload" --json -X put
+
+echo "+++++++ Query +++++++++"
+valgrindSleep 2
+coapCurl --url /v1/contextEntities/Room1 --json
+
+--REGEXPECT--
++++++++ Create entity +++++++++
+v:1 t:0 tkl:0 c:2 id:REGEX(\d+)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature", 
+                    "type": "centigrade", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "Room1", 
+    "isPattern": "false", 
+    "type": ""
+}
++++++++ Query +++++++++
+v:1 t:0 tkl:0 c:1 id:REGEX(\d+)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature", 
+                "type": "centigrade", 
+                "value": "30"
+            }
+        ], 
+        "id": "Room1", 
+        "isPattern": "false", 
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
++++++++ Update +++++++++
+v:1 t:0 tkl:0 c:3 id:REGEX(\d+)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature", 
+                    "type": "centigrade", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
++++++++ Query +++++++++
+v:1 t:0 tkl:0 c:1 id:REGEX(\d+)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature", 
+                "type": "centigrade", 
+                "value": "29"
+            }
+        ], 
+        "id": "Room1", 
+        "isPattern": "false", 
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+--TEARDOWN--
+proxyCoapStop
+brokerStop CB
+dbDrop CB

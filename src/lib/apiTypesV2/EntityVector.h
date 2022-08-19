@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI_ENTITYVECTOR_H_
-#define SRC_LIB_NGSI_ENTITYVECTOR_H_
+#ifndef SRC_LIB_APITYPESV2_ENTITYVECTOR_H_
+#define SRC_LIB_APITYPESV2_ENTITYVECTOR_H_
 
 /*
 *
@@ -27,6 +27,7 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "apiTypesV2/Entity.h"
 
@@ -34,30 +35,26 @@
 
 /* ****************************************************************************
 *
-* EntityVector - 
+* EntityVector -
 */
 typedef struct EntityVector
 {
   std::vector<Entity*>  vec;
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
-  std::string   check(ConnectionInfo*  ciP, RequestType requestType);
-  void          present(const std::string& indent);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      const std::vector<std::string>&  attrsFilter,
+                      bool                             blacklist,
+                      const std::vector<std::string>&  metadataFilter);
+
+  std::string   toJsonV1(bool asJsonObject, RequestType requestType, bool comma);
+
+  std::string   check(ApiVersion apiVersion, RequestType requestType);
   void          push_back(Entity* item);
   unsigned int  size(void);
-  Entity*       get(int ix);
-  Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);
+  Entity*       lookup(const std::string& name, const std::string& type);
   void          release();
 
-  Entity*       operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
+  Entity*  operator[](unsigned int ix) const;
 } EntityVector;
 
-#endif  // SRC_LIB_NGSI_ENTITYVECTOR_H_
+#endif  // SRC_LIB_APITYPESV2_ENTITYVECTOR_H_

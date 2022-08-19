@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/EntityId.h"
+#include "apiTypesV2/EntityVector.h"
 
 
 
@@ -48,30 +49,18 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
-  void         present(const std::string& indent);
+  std::string  toJsonV1(bool comma);
+  std::string  toJson(void);
   void         push_back(EntityId* item);
-  void         push_back_if_absent(EntityId* item);
-  unsigned int size(void);
-  EntityId*    get(int ix);
+  bool         push_back_if_absent(EntityId* item);
+  unsigned int size(void) const;
   EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void         release();
+  void         fill(EntityVector& _vec);
 
-  EntityId*    operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  EntityId* operator[](unsigned int ix) const;
 
-    return NULL;
-  }
-
-  std::string  check(RequestType         requestType,
-                     Format              format,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(RequestType requestType);
 } EntityIdVector;
 
 #endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_

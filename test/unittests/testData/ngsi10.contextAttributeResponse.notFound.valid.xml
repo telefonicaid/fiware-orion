@@ -1,8 +1,0 @@
-<contextAttributeResponse>
-  <contextAttributeList></contextAttributeList>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /E1/</details>
-  </statusCode>
-</contextAttributeResponse>

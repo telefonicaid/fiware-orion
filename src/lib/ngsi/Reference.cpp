@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/Request.h"
 #include "ngsi/Reference.h"
 
@@ -38,21 +39,25 @@
 *
 * Reference::check -
 */
-std::string Reference::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Reference::check(RequestType requestType)
 {
-  if (string == "")
+  if (string.empty())
   {
-    if ((requestType == SubscribeContextAvailability) || (requestType == SubscribeContext))
+    if (requestType == SubscribeContext)
     {
       return "Empty Reference";
     }
+  }
+
+  std::string  url = string;
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+
+  if (parseUrl(url, host, port, path, protocol) == false)
+  {
+    return "Invalid URL";
   }
 
   return "OK";
@@ -66,7 +71,7 @@ std::string Reference::check
 */
 bool Reference::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -95,34 +100,16 @@ std::string Reference::get(void)
 
 /* ****************************************************************************
 *
-* Reference::present -
+* Reference::toJsonV1 -
 */
-void Reference::present(const std::string& indent)
+std::string Reference::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sReference: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo Reference\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Reference::render -
-*/
-std::string Reference::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
 
-  return valueTag(indent, "reference", string, format, comma);
+  return valueTag("reference", string, comma);
 }
 
 

@@ -60,33 +60,19 @@ NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 
 /* ****************************************************************************
 *
-* NotifyContextResponse::render -
+* NotifyContextResponse::toJsonV1 -
 */
-std::string NotifyContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string NotifyContextResponse::toJsonV1(void)
 {
   std::string out = "";
-  std::string tag = "notifyContextResponse";
 
-  responseCode.tagSet("responseCode");
+  responseCode.keyNameSet("responseCode");
 
-  out += startTag(indent, tag, format, false);
-  out += responseCode.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag();
+  out += responseCode.toJsonV1(false);
+  out += endTag();
 
   return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextResponse::present - 
-*/
-void NotifyContextResponse::present(const std::string& indent)
-{
-  LM_F(("%sNotifyContextResponse:", indent.c_str()));
-  responseCode.present(indent + "  ");
-  LM_F(("\n"));
 }
 
 

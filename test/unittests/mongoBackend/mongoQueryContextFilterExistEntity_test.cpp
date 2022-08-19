@@ -22,19 +22,34 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi/Scope.h"
 #include "mongo/client/dbclient.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+
+
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -62,8 +77,8 @@
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -72,23 +87,18 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E1") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "TA1" << "value" << "val1b")
-                        )
-                    );
+                       "A1" << BSON("type" << "TA1" << "value" << "val1b")));
 
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
-
-
 }
+
 
 
 /* ****************************************************************************
@@ -112,7 +122,7 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -123,31 +133,28 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
-    EXPECT_EQ("E1", RES_CER(1).entityId.id);
-    EXPECT_EQ("", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(1).id);
+    EXPECT_EQ("", RES_CER(1).type);
+    EXPECT_EQ("false", RES_CER(1).isPattern);
+    ASSERT_EQ(1, RES_CER(1).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val1b", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val1b", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
-
-    /* Release connection */
-    mongoDisconnect();
 
     utExit();
 }
@@ -180,7 +187,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -191,19 +198,16 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-  /* Release connection */
-  mongoDisconnect();
 
   utExit();
 }
@@ -236,7 +240,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -247,19 +251,16 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("val1b", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("val1b", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-  /* Release connection */
-  mongoDisconnect();
 
   utExit();
 }

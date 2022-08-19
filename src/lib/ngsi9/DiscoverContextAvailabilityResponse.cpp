@@ -30,18 +30,17 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
+* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse -
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -57,60 +56,50 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
+* DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse -
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::render - 
+* DiscoverContextAvailabilityResponse::toJsonV1 -
 */
-std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string DiscoverContextAvailabilityResponse::toJsonV1(void)
 {
   std::string  out = "";
-  std::string  tag = "discoverContextAvailabilityResponse";
 
   //
   // JSON commas:
   // Exactly ONE of responseVector|errorCode is included in the discovery response so,
   // no JSON commas necessary
   //
-  out += startTag(indent, tag, format, false);
+  out += startTag();
   
   if (responseVector.size() > 0)
   {
     bool commaNeeded = (errorCode.code != SccNone);
-    out += responseVector.render(format, indent + "  ", commaNeeded);
+    out += responseVector.toJsonV1(commaNeeded);
   }
 
   if (errorCode.code != SccNone)
   {
-    out += errorCode.render(format, indent + "  ", false);
+    out += errorCode.toJsonV1(false);
   }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && responseVector.size() == 0)
   {
       errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-      out += errorCode.render(format, indent + "  ");
+      out += errorCode.toJsonV1(false);
   }
 
-#if 0
-  // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
-  // above re-factoring
-  if (errorCode.code == SccNone)
-     out += responseVector.render(format, indent + "  ", false);
-  else
-     out += errorCode.render(format, indent + "  ", false);
-#endif
-
-  out += endTag(indent, tag, format);
+  out += endTag();
 
   return out;
 }
@@ -119,11 +108,11 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse::release - 
+* DiscoverContextAvailabilityResponse::release -
 */
 void DiscoverContextAvailabilityResponse::release(void)
 {
   responseVector.release();
   errorCode.release();
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }

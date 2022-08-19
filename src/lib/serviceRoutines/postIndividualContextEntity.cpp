@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "ngsi/ParseData.h"
@@ -92,33 +96,39 @@ std::string postIndividualContextEntity
   std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   entityType;
   std::string                   answer;
+  std::string                   out;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   //
   // 01. Check that total input in consistent and correct
   //
 
   // 01.01. entityId::id
-  if ((entityIdFromPayload != "") && (entityIdFromURL != "") && (entityIdFromPayload != entityIdFromURL))
+  if ((!entityIdFromPayload.empty()) && (!entityIdFromURL.empty()) && (entityIdFromPayload != entityIdFromURL))
   {
     std::string error = "entityId::id differs in URL and payload";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error, "url: " + entityIdFromURL + ", payload: " + entityIdFromPayload);
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
-  }  
-  entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
+
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
+    return out;
+  }
+  entityId = (!entityIdFromPayload.empty())? entityIdFromPayload : entityIdFromURL;
 
   // 01.02. entityId::type
-  if ((entityTypeFromPayload != "") && (entityTypeFromURL != "") && (entityTypeFromPayload != entityTypeFromURL))
+  if ((!entityTypeFromPayload.empty()) && (!entityTypeFromURL.empty()) && (entityTypeFromPayload != entityTypeFromURL))
   {
     std::string error = "entityId::type differs in URL and payload";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error, "url: " + entityTypeFromURL + ", payload: " + entityTypeFromPayload);
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
+    return out;
   }
-  entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
+  entityType = (!entityTypeFromPayload.empty())? entityTypeFromPayload :entityTypeFromURL;
 
 
   // 01.03. entityId::isPattern
@@ -126,19 +136,23 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::isPattern set to true in contextUpdate convenience operation";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
+    return out;
   }
 
   // 01.04. Entity::id must be present, somewhere ...
-  if (entityId == "")
+  if (entityId.empty())
   {
     std::string error = "invalid request: mandatory entityId::id missing";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
+    return out;
   }
 
   // Now, forward Entity to response
@@ -152,14 +166,15 @@ std::string postIndividualContextEntity
 
 
   // 03. Call postUpdateContext standard service routine
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 04. Translate UpdateContextResponse to AppendContextElementResponse
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  answer = response.render(ciP, IndividualContextEntity, "");
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
+
   response.release();
   parseDataP->upcr.res.release();
 

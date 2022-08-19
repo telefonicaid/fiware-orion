@@ -24,60 +24,197 @@
 */
 #include <string>
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/string.h"
+#include "common/limits.h"
+#include "common/errorMessages.h"
+
+#include "alarmMgr/alarmMgr.h"
+#include "metricsMgr/metricsMgr.h"
+#include "ngsi/ParseData.h"
+#include "mongoBackend/mongoSubCache.h"
+#include "jsonParseV2/jsonRequestTreat.h"
+#include "parse/textParse.h"
+#include "serviceRoutines/badRequest.h"
+
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
-#include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
-#include "ngsi/ParseData.h"
+#include "rest/RestService.h"
 
 
 
 /* ****************************************************************************
 *
-* Tenant name max length
+* service vectors - 
 */
-#define MAX_TENANT_NAME_LEN            50
-#define MAX_TENANT_NAME_LEN_STRING    "50"
+static RestService*              getServiceV           = NULL;
+static RestService*              putServiceV           = NULL;
+static RestService*              postServiceV          = NULL;
+static RestService*              patchServiceV         = NULL;
+static RestService*              deleteServiceV        = NULL;
+static RestService*              optionsServiceV       = NULL;
+RestService*                     restBadVerbV          = NULL;
+
+
+
+/* *****************************************************************************
+*
+* restServiceGet -
+*
+* FIXME P2: Create a vector of service vectors, for faster access.
+*           E.g
+* RestService** serviceVV[7];
+* serviceVV[POST] = postServiceV;
+* serviceVV[GET]  = getServiceV;
+* etc.
+*
+* Then remove the switch to find the correct service vector, just do this:
+*
+* serviceV = restServiceVV[verb];
+* 
+*/
+RestService* restServiceGet(Verb verb)
+{
+  switch (verb)
+  {
+  case POST:       return postServiceV;
+  case PUT:        return putServiceV;
+  case GET:        return getServiceV;
+  case PATCH:      return patchServiceV;
+  case DELETE:     return deleteServiceV;
+  case OPTIONS:    return (optionsServiceV == NULL)? restBadVerbV : optionsServiceV;
+  default:         return restBadVerbV;
+  }
+}
 
 
 
 /* ****************************************************************************
 *
-* payloadParse - 
+* serviceVectorsSet
 */
-std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService* service, XmlRequest** reqPP, JsonRequest** jsonPP)
+void serviceVectorsSet
+(
+  RestService*        _getServiceV,
+  RestService*        _putServiceV,
+  RestService*        _postServiceV,
+  RestService*        _patchServiceV,
+  RestService*        _deleteServiceV,
+  RestService*        _optionsServiceV,
+  RestService*        _restBadVerbV
+)
+{
+  getServiceV      = _getServiceV;
+  putServiceV      = _putServiceV;
+  postServiceV     = _postServiceV;
+  patchServiceV    = _patchServiceV;
+  deleteServiceV   = _deleteServiceV;
+  optionsServiceV  = _optionsServiceV;
+  restBadVerbV     = _restBadVerbV;
+}
+
+#include "serviceRoutinesV2/postRegistration.h"
+
+
+/* ****************************************************************************
+*
+* delayedRelease -
+*/
+static void delayedRelease(JsonDelayedRelease* releaseP)
+{
+  if (releaseP->entity != NULL)
+  {
+    releaseP->entity->release();
+    releaseP->entity = NULL;
+  }
+
+  if (releaseP->attribute != NULL)
+  {
+    releaseP->attribute->release();
+    releaseP->attribute = NULL;
+  }
+
+  if (releaseP->scrP != NULL)
+  {
+    releaseP->scrP->release();
+    releaseP->scrP = NULL;
+  }
+
+  if (releaseP->ucsrP != NULL)
+  {
+    releaseP->ucsrP->release();
+    releaseP->ucsrP = NULL;
+  }
+
+  if (releaseP->subsP != NULL)
+  {
+    delete releaseP->subsP;
+    releaseP->subsP = NULL;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* payloadParse -
+*/
+std::string payloadParse
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RestService*               service,
+  JsonRequest**              jsonPP,
+  JsonDelayedRelease*        jsonReleaseP,
+  std::vector<std::string>&  compV
+)
 {
   std::string result = "NONE";
 
   LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
-  LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtParsedPayload, ("outMimeType: %s", mimeTypeToString(ciP->outMimeType)));
 
-  if (ciP->inFormat == XML)
+  ciP->requestType = service->request;
+
+  if (ciP->inMimeType == JSON)
   {
-    LM_T(LmtParsedPayload, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
-    result = xmlTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, reqPP);
+    if (ciP->apiVersion == V2)
+    {
+      //
+      // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
+      //              Same same for all underlying JSON APIv2 parsing functions
+      //              Not sure the same thing can be done for 'jsonTreat' in the else-part, but this should AT LEAST
+      //              be fixed for V2.
+      //
+      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
+    }
+    else
+    {
+      result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, jsonPP);
+    }
   }
-  else if (ciP->inFormat == JSON)
-    result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
+  else if (ciP->inMimeType == TEXT)
+  {
+    result = textRequestTreat(ciP, parseDataP, service->request);
+  }
   else
   {
-    LM_W(("Bad Input (payload mime-type is neither JSON nor XML)"));
-    return "Bad inFormat";
+    alarmMgr.badInput(clientIp, "payload mime-type is not JSON or TEXT");
+    return "Bad inMimeType";
   }
 
-  LM_T(LmtParsedPayload, ("result: '%s'", result.c_str()));
-  LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtParsedPayload, ("result:      '%s'", result.c_str()));
+  LM_T(LmtParsedPayload, ("outMimeType: '%s'", mimeTypeToString(ciP->outMimeType)));
 
   if (result != "OK")
   {
@@ -91,23 +228,38 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 
 /* ****************************************************************************
 *
-* tenantCheck - 
+* tenantCheck -
+*
+* This function used to be 'static', but as it is now used by MetricsMgr::serviceValid
+* it has been mede 'extern'.
+* This might change when github issue #2781 is looked into and if we stop using the
+* function, is should go back to being 'static'.
 */
-static std::string tenantCheck(const std::string& tenant)
+std::string tenantCheck(const std::string& tenant)
 {
-  char*        name    = (char*) tenant.c_str();
+  char*  name = (char*) tenant.c_str();
 
-  if (strlen(name) > MAX_TENANT_NAME_LEN)
+  if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
-    LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", MAX_TENANT_NAME_LEN, strlen(name)));
-    return "bad length - a tenant name can be max " MAX_TENANT_NAME_LEN_STRING " characters long";
+    char numV1[STRING_SIZE_FOR_INT];
+    char numV2[STRING_SIZE_FOR_LONG];
+
+    snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
+    snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
+
+    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long";
+    alarmMgr.badInput(clientIp, details, std::string("tenant length: ") + numV2);
+
+    return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
 
   while (*name != 0)
   {
     if ((!isalnum(*name)) && (*name != '_'))
     {
-      LM_W(("Bad Input (bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: %c)", *name));
+      std::string details = std::string("bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: ") + *name;
+
+      alarmMgr.badInput(clientIp, details);
       return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
@@ -121,7 +273,7 @@ static std::string tenantCheck(const std::string& tenant)
 
 /* ****************************************************************************
 *
-* commonFilters - 
+* commonFilters -
 */
 static void commonFilters
 (
@@ -208,7 +360,7 @@ static void commonFilters
 
 /* ****************************************************************************
 *
-* scopeFilter - 
+* scopeFilter -
 */
 static void scopeFilter
 (
@@ -217,30 +369,21 @@ static void scopeFilter
   RestService*      serviceP
 )
 {
-  std::string  payloadWord  = ciP->payloadWord;
   Restriction* restrictionP = NULL;
 
-  if (payloadWord == "discoverContextAvailabilityRequest")
+  if (ciP->restServiceP->request == DiscoverContextAvailability)
   {
     restrictionP = &parseDataP->dcar.res.restriction;
   }
-  else if (payloadWord == "subscribeContextAvailabilityRequest")
-  {
-    restrictionP = &parseDataP->scar.res.restriction;
-  }
-  else if (payloadWord == "updateContextAvailabilitySubscriptionRequest")
-  {
-    restrictionP = &parseDataP->ucas.res.restriction;
-  }
-  else if (payloadWord == "queryContextRequest")
+  else if (ciP->restServiceP->request == QueryContext)
   {
     restrictionP = &parseDataP->qcr.res.restriction;
   }
-  else if (payloadWord == "subscribeContextRequest")
+  else if (ciP->restServiceP->request == SubscribeContext)
   {
     restrictionP = &parseDataP->scr.res.restriction;
   }
-  else if (payloadWord == "updateContextSubscriptionRequest")
+  else if (ciP->restServiceP->request == UpdateContextSubscription)
   {
     restrictionP = &parseDataP->ucsr.res.restriction;
   }
@@ -265,7 +408,7 @@ static void scopeFilter
 
 /* ****************************************************************************
 *
-* filterRelease - 
+* filterRelease -
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
 {
@@ -288,22 +431,113 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 
 /* ****************************************************************************
 *
-* restService - 
+* compCheck -
 */
-std::string restService(ConnectionInfo* ciP, RestService* serviceV)
+static bool compCheck(int components, const std::vector<std::string>& compV)
+{
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (compV[ix].empty())
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* compErrorDetect -
+*/
+static bool compErrorDetect
+(
+  ApiVersion                       apiVersion,
+  int                              components,
+  const std::vector<std::string>&  compV,
+  OrionError*                      oeP
+)
+{
+  std::string  details;
+
+  if ((apiVersion == V2) && (compV[1] == "entities"))
+  {
+    if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
+    {
+      std::string entityId = compV[2];
+
+      if (entityId.empty())
+      {
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
+      }
+    }
+    else if ((components == 5) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs/<attr-name>
+    {
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId.empty())
+      {
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
+      }
+      else if (attrName.empty())
+      {
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ATTR_NAME;
+      }
+    }
+    else if ((components == 6) && (compV[3] == "attrs") && (compV[5] == "value")) // URL: /v2/entities/<entity-id>/attrs/<attr-name>/value
+    {
+      std::string entityId = compV[2];
+      std::string attrName = compV[4];
+
+      if (entityId.empty())
+      {
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
+      }
+      else if (attrName.empty())
+      {
+        details = ERROR_DESC_BAD_REQUEST_EMPTY_ATTR_NAME;
+      }
+    }
+  }
+
+  if (!details.empty())
+  {
+    oeP->fill(SccBadRequest, details);
+    return true;  // means: this was an error, make the broker stop this request
+  }
+
+  return false;  // No special error detected, let the broker continue with the request to detect the error later on
+}
+
+
+
+/* ****************************************************************************
+*
+* restService -
+*
+* This function is called with the appropriate RestService vector, depending on the VERB used in the request.
+* If no matching service is found in this RestService vector, then a recursive call in made, using the "badVerb RestService vector",
+* to see if we have a matching bad-verb-service-routine.
+* If there is no badVerb RestService vector, then the default error service routine (BadRequest) is used.
+* And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
+* response. See comments incrusted in the function as well.
+*/
+static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
-  XmlRequest*               reqP       = NULL;
   JsonRequest*              jsonReqP   = NULL;
   ParseData                 parseData;
+  JsonDelayedRelease        jsonRelease;
 
-  if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
+  if ((ciP->url.empty()) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
-    std::string response = error.render(ciP->outFormat, "");
+    std::string response = error.toJsonV1();
 
-    LM_W(("Bad Input (The Orion Context Broker is a REST service, not a 'web page')"));
+    alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response);
 
     return std::string("Empty URL");
@@ -311,8 +545,27 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   ciP->httpStatusCode = SccOk;
 
-  components = stringSplit(ciP->url, '/', compV);
 
+  //
+  // Split URI PATH into components
+  //
+  components = stringSplit(ciP->url, '/', compV);
+  if (!compCheck(components, compV))
+  {
+    OrionError oe;
+
+    if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
+    {
+      alarmMgr.badInput(clientIp, oe.details);
+      ciP->httpStatusCode = SccBadRequest;
+      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      return "URL PATH component error";
+    }
+  }
+
+  //
+  // Lookup the requested service
+  //
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
     if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
@@ -320,24 +573,31 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       continue;
     }
 
-    if ((ciP->method != serviceV[ix].verb) && (serviceV[ix].verb != "*"))
-    {
-      continue;
-    }
-
-    strncpy(ciP->payloadWord, serviceV[ix].payloadWord.c_str(), sizeof(ciP->payloadWord));
     bool match = true;
     for (int compNo = 0; compNo < components; ++compNo)
     {
-      if (serviceV[ix].compV[compNo] == "*")
+      const char* component = serviceV[ix].compV[compNo].c_str();
+      
+      if ((component[0] == '*') && (component[1] == 0))
       {
         continue;
       }
 
-      if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
+      if (ciP->apiVersion == V1)
       {
-        match = false;
-        break;
+        if (strcasecmp(component, compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
+      }
+      else
+      {
+        if (strcmp(component, compV[compNo].c_str()) != 0)
+        {
+          match = false;
+          break;
+        }
       }
     }
 
@@ -346,26 +606,35 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       continue;
     }
 
-    if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0) && (serviceV[ix].verb != "*"))
+
+    //
+    // If in restBadVerbV vector, no need to check the payload
+    //
+    if ((serviceV != restBadVerbV) && (ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0))
     {
       std::string response;
+      std::string spath = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP);
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
+      LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
+      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
       {
+        alarmMgr.badInput(clientIp, response);
         restReply(ciP, response);
 
-        if (reqP != NULL)
-        {
-          reqP->release(&parseData);
-        }
         if (jsonReqP != NULL)
         {
           jsonReqP->release(&parseData);
+        }
+
+        if (ciP->apiVersion == V2)
+        {
+          delayedRelease(&jsonRelease);
         }
 
         compV.clear();
@@ -373,8 +642,12 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
     }
 
-    LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
-    statisticsUpdate(serviceV[ix].request, ciP->inFormat);
+    LM_T(LmtService, ("Treating service %s %s", ciP->method.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    if (ciP->payloadSize == 0)
+    {
+      ciP->inMimeType = NOMIMETYPE;
+    }
+    statisticsUpdate(serviceV[ix].request, ciP->inMimeType, ciP->verb);
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;
@@ -384,29 +657,28 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // underscores and alphanumeric characters.
     //
     std::string result;
-    if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+    if ((!ciP->tenant.empty()) && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError  error(SccBadRequest,
-                        "tenant name not accepted - a tenant string must not be longer than " MAX_TENANT_NAME_LEN_STRING " characters"
-                        " and may only contain underscores and alphanumeric characters");
+      OrionError  oe(SccBadRequest, result);
 
-      std::string  response = error.render(ciP->outFormat, "");
+      std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
 
-      LM_W(("Bad Input (%s)", error.details.c_str()));
+      alarmMgr.badInput(clientIp, result);
+
       restReply(ciP, response);
-
-      if (reqP != NULL)
-      {
-        reqP->release(&parseData);
-      }
 
       if (jsonReqP != NULL)
       {
         jsonReqP->release(&parseData);
       }
 
+      if (ciP->apiVersion == V2)
+      {
+        delayedRelease(&jsonRelease);
+      }
+
       compV.clear();
-        
+
       return response;
     }
 
@@ -414,17 +686,29 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
-    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-    filterRelease(&parseData, serviceV[ix].request);
-
-    if (reqP != NULL)
+    //
+    // If we have gotten this far the Input is OK.
+    // Except for all the badVerb/badRequest, in the restBadVerbV vector.
+    //
+    // So, the 'Bad Input' alarm is cleared for this client.
+    //
+    if (serviceV != restBadVerbV)
     {
-      reqP->release(&parseData);
+      alarmMgr.badInputReset(clientIp);
     }
+
+    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+
+    filterRelease(&parseData, serviceV[ix].request);
 
     if (jsonReqP != NULL)
     {
       jsonReqP->release(&parseData);
+    }
+
+    if (ciP->apiVersion == V2)
+    {
+      delayedRelease(&jsonRelease);
     }
 
     compV.clear();
@@ -438,11 +722,61 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
-  LM_W(("Bad Input (service '%s' not recognized)", ciP->url.c_str()));
+  //
+  // No service routine found. Need to check bad-verb service vector.
+  // If there is no bad-verb service vector (restBadVerbV == NULL), then
+  // badRequest() is used as service routine ... 
+  //
+  if (restBadVerbV == NULL)
+  {
+    std::vector<std::string> cV;
+
+    return badRequest(ciP, 0, cV, NULL);
+  }
+
+  //
+  // ... but, if we have a non-NULL restBadVerbV, then we make a recursive call, using the
+  // restBadVerbV service vector.  But, only if the current service vector is NOT the restBadVerbV,
+  // of course. A situation like that would mean we are already in the recursive call and need to end
+  // the recursion and return an error  ...
+  //
+  if (serviceV != restBadVerbV)
+  {
+    return restService(ciP, restBadVerbV);
+  }
+
+  //
+  // ... and this here is the error that is returned. A 400 Bad Request with "service XXX not recognized" as payload
+  //
+  std::string  details = std::string("service '") + ciP->url + "' not recognized";
+  std::string  answer;
+
+  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
+  alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
-  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);
 
   compV.clear();
   return answer;
+}
+
+
+
+namespace orion
+{
+/* ****************************************************************************
+*
+* orion::requestServe -
+*/
+std::string requestServe(ConnectionInfo* ciP)
+{
+  if      ((ciP->verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
+  else if ((ciP->verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
+  else if ((ciP->verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
+  else if ((ciP->verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
+  else if ((ciP->verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
+  else if ((ciP->verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
+  else                                                             return restService(ciP, restBadVerbV);
+}
+
 }

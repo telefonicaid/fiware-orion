@@ -1,0 +1,553 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Expression field in POST /v2/op/query
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 t=20, t.acc=0.9, p=200, location=inside
+# 02. Create entity E2 t=40, t.acc=0.7, p=100, location=inside
+# 03. Create entity E3 t=10, t.acc=0.8, p=400, location=outise
+# 04. Create entity E4 t=70, t.acc=0.3, p=150, location=outise
+# 05. Query t<30 -> E1, E3
+# 06. Query t<30, p<250  -> E1
+# 07. Query t.acc<0.75 -> E2, E4
+# 08. Query inside -> E1, E2
+# 09. Query t>15, t.acc<0.85, inside -> E2
+#
+
+
+echo "01. Create entity E1 t=20, t.acc=0.9, p=200, location=inside"
+echo "============================================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "t": {
+    "value": 20,
+    "type": "Number",
+    "metadata": {
+      "acc": {
+        "value": 0.9,
+        "type": "Number"
+      }
+    }
+  },
+  "p": {
+    "value": 200,
+    "type": "Number"
+  },
+  "location": {
+    "value": "40.31,-3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2 t=40, t.acc=0.7, p=100, location=inside"
+echo "============================================================"
+payload='{
+  "id": "E2",
+  "type": "T",
+  "t": {
+    "value": 40,
+    "type": "Number",
+    "metadata": {
+      "acc": {
+        "value": 0.7,
+        "type": "Number"
+      }
+    }
+  },
+  "p": {
+    "value": 100,
+    "type": "Number"
+  },
+  "location": {
+    "value": "40.31,-3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3 t=10, t.acc=0.8, p=400, location=outise"
+echo "============================================================"
+payload='{
+  "id": "E3",
+  "type": "T",
+  "t": {
+    "value": 10,
+    "type": "Number",
+    "metadata": {
+      "acc": {
+        "value": 0.8,
+        "type": "Number"
+      }
+    }
+  },
+  "p": {
+    "value": 400,
+    "type": "Number"
+  },
+  "location": {
+    "value": "80.31,-3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E4 t=70, t.acc=0.3, p=150, location=outise"
+echo "============================================================"
+payload='{
+  "id": "E4",
+  "type": "T",
+  "t": {
+    "value": 70,
+    "type": "Number",
+    "metadata": {
+      "acc": {
+        "value": 0.3,
+        "type": "Number"
+      }
+    }
+  },
+  "p": {
+    "value": 150,
+    "type": "Number"
+  },
+  "location": {
+    "value": "80.31,-3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Query t<30 -> E1, E3"
+echo "========================"
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "expression": {
+    "q": "t<30"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "06. Query t<30, p<250  -> E1"
+echo "============================"
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "expression": {
+    "q": "t<30;p<250"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "07. Query t.acc<0.75 -> E2, E4"
+echo "=============================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "expression": {
+    "mq": "t.acc<0.75"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "08. Query inside -> E1, E2"
+echo "=========================="
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "expression": {
+    "georel": "near;maxDistance:2000",
+    "geometry": "point",
+    "coords": "40.31,-3.75"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+echo "09. Query t>15, t.acc<0.85, inside -> E2"
+echo "========================================"
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "expression": {
+    "q": "t>15",
+    "mq": "t.acc<0.85",
+    "georel": "near;maxDistance:2000",
+    "geometry": "point",
+    "coords": "40.31,-3.75"
+  }
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 t=20, t.acc=0.9, p=200, location=inside
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 t=40, t.acc=0.7, p=100, location=inside
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity E3 t=10, t.acc=0.8, p=400, location=outise
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity E4 t=70, t.acc=0.3, p=150, location=outise
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Query t<30 -> E1, E3
+========================
+HTTP/1.1 200 OK
+Content-Length: 443
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 200
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.9
+                }
+            },
+            "type": "Number",
+            "value": 20
+        },
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "80.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 400
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.8
+                }
+            },
+            "type": "Number",
+            "value": 10
+        },
+        "type": "T"
+    }
+]
+
+
+06. Query t<30, p<250  -> E1
+============================
+HTTP/1.1 200 OK
+Content-Length: 222
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 200
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.9
+                }
+            },
+            "type": "Number",
+            "value": 20
+        },
+        "type": "T"
+    }
+]
+
+
+07. Query t.acc<0.75 -> E2, E4
+==============================
+HTTP/1.1 200 OK
+Content-Length: 443
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E2",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 100
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.7
+                }
+            },
+            "type": "Number",
+            "value": 40
+        },
+        "type": "T"
+    },
+    {
+        "id": "E4",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "80.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 150
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.3
+                }
+            },
+            "type": "Number",
+            "value": 70
+        },
+        "type": "T"
+    }
+]
+
+
+08. Query inside -> E1, E2
+==========================
+HTTP/1.1 200 OK
+Content-Length: 443
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 200
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.9
+                }
+            },
+            "type": "Number",
+            "value": 20
+        },
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 100
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.7
+                }
+            },
+            "type": "Number",
+            "value": 40
+        },
+        "type": "T"
+    }
+]
+
+
+09. Query t>15, t.acc<0.85, inside -> E2
+========================================
+HTTP/1.1 200 OK
+Content-Length: 222
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E2",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.31,-3.75"
+        },
+        "p": {
+            "metadata": {},
+            "type": "Number",
+            "value": 100
+        },
+        "t": {
+            "metadata": {
+                "acc": {
+                    "type": "Number",
+                    "value": 0.7
+                }
+            },
+            "type": "Number",
+            "value": 40
+        },
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

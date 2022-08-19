@@ -1,0 +1,251 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding in NGSIv1 and NGSIv2 interoperability
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB
+brokerStart CP1
+brokerStart CP2
+
+--SHELL--
+
+#
+# Note that A1 is rendered in step 3 as string "11" although it was created as number 11 in NGSIv2
+# and forwarded POST /v1/queryContext for it returns 11. This is due to jsonTreat() is used for parsing
+# the response and NGSIv1 parsing always string-fy.
+#
+# 01. Register E1-A1 in NGSIv1-based CPr
+# 02. Register E1-A2 in NGSIv2-based CPr
+# 03. Create E1-A1 in NGSIv1-based CPr
+# 04. Create E1-A2 in NGSIv1-based CPr
+# 05. Query GET /v2/entities/E1 and get E-(A1,A2) seamlessly
+# 06. Query POST /v1/queryContext (for E1) and get E-(A1,A2) seamlessly
+#
+
+echo "01. Register E1-A1 in NGSIv1-based CPr"
+echo "======================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v1"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Register E1-A2 in NGSIv2-based CPr"
+echo "======================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP2_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E1-A1 in NGSIv1-based CPr"
+echo "===================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A1": { "value": 11 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Create E1-A2 in NGSIv1-based CPr"
+echo "===================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A2": { "value": 22 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "05. Query GET /v2/entities/E1 and get E-(A1,A2) seamlessly"
+echo "=========================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+
+echo "06. Query POST /v1/queryContext (for E1) and get E-(A1,A2) seamlessly"
+echo "====================================================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1-A1 in NGSIv1-based CPr
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Register E1-A2 in NGSIv2-based CPr
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E1-A1 in NGSIv1-based CPr
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create E1-A2 in NGSIv1-based CPr
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Query GET /v2/entities/E1 and get E-(A1,A2) seamlessly
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Number",
+        "value": "11"
+    },
+    "A2": {
+        "metadata": {},
+        "type": "Number",
+        "value": 22
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+06. Query POST /v1/queryContext (for E1) and get E-(A1,A2) seamlessly
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 231
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "Number",
+                        "value": "11"
+                    },
+                    {
+                        "name": "A2",
+                        "type": "Number",
+                        "value": 22
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

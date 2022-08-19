@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -90,17 +94,17 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }
-  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     response.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL", entityTypeFromUriParam);
   }
   else
   {
     // 03. Fill in UpdateContextRequest
-    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "UPDATE");
+    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, ActionTypeUpdate);
 
     // 04. Call standard operation postUpdateContext
     postUpdateContext(ciP, components, compV, parseDataP);
@@ -111,7 +115,8 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
+
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();
   parseDataP->upcr.res.release();

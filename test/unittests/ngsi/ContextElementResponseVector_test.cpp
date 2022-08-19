@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -44,16 +43,16 @@ TEST(ContextElementResponseVector, check)
 
   utInit();
 
-  out = cerv.check(UpdateContext, XML, "", "", 0);
+  out = cerv.check(V1, UpdateContext, "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
-  cer.contextElement.entityId.id         = "ID";
-  cer.contextElement.entityId.type       = "Type";
-  cer.contextElement.entityId.isPattern  = "false";
+  cer.entity.id         = "ID";
+  cer.entity.type       = "Type";
+  cer.entity.isPattern  = "false";
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
-  out = cerv.check(UpdateContext, XML, "", "", 0);
+  out = cerv.check(V1, UpdateContext, "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();
@@ -64,55 +63,26 @@ TEST(ContextElementResponseVector, check)
 /* ****************************************************************************
 *
 * render - 
+*
 */
 TEST(ContextElementResponseVector, render)
 {
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
-  const char*                   outfile = "ngsi.contextElementResponseVector.render.middle.xml";
-  ConnectionInfo                ci(XML);
 
   utInit();
 
-  out = cerv.render(&ci, UpdateContextElement, "");
+  std::vector<std::string> emptyV;
+
+  // FIXME P2: "" is string, function signature says bool..
+  out = cerv.toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, "");
   EXPECT_STREQ("", out.c_str());
 
-  cer.contextElement.entityId.id         = "ID";
-  cer.contextElement.entityId.type       = "Type";
-  cer.contextElement.entityId.isPattern  = "false";
+  cer.entity.id         = "ID";
+  cer.entity.type       = "Type";
+  cer.entity.isPattern  = "false";
   cer.statusCode.fill(SccOk, "details");
-
-  cerv.push_back(&cer);
-  out = cerv.render(&ci, UpdateContextElement, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present -
-*
-* Just to exercise the code, nothing to be expected here ...
-*/
-TEST(ContextElementResponseVector, present)
-{
-  ContextElementResponseVector  cerv;
-  ContextElementResponse        cer;
-
-  utInit();
-
-  cer.contextElement.entityId.id         = "ID";
-  cer.contextElement.entityId.type       = "Type";
-  cer.contextElement.entityId.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "details");
-  cerv.push_back(&cer);
-
-  cerv.present("");
 
   utExit();
 }

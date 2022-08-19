@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ContextAttribute.h"
@@ -39,57 +39,26 @@
 
 /* ****************************************************************************
 *
-* render_xml - 
-*/
-TEST(ContextAttributeResponseVector, render_xml)
-{
-  ContextAttributeResponseVector  carV;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;  
-  std::string                     out;
-  const char*                     outfile = "ngsi10.contextResponseList.render.invalid.xml";
-  ConnectionInfo                  ci;
-
-  // 1. empty vector
-  car.statusCode.fill(SccBadRequest, "Empty Vector");
-  out = carV.render(&ci, ContextEntityAttributes, "");
-  EXPECT_STREQ("", out.c_str());
-
-  // 2. normal case
-  car.contextAttributeVector.push_back(&ca);
-  carV.push_back(&car);
-
-  out = carV.render(&ci, ContextEntityAttributes, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-}
-
-
-
-/* ****************************************************************************
-*
-* render_json - 
+* render_json -
 */
 TEST(ContextAttributeResponseVector, render_json)
 {
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;  
+  ContextAttributeResponse        car;
   std::string                     out;
   const char*                     outfile = "ngsi10.contextResponseList.render.invalid.json";
-  ConnectionInfo                  ci;
 
   // 1. empty vector
-  ci.outFormat = JSON;
   car.statusCode.fill(SccBadRequest, "Empty Vector");
-  out = carV.render(&ci, ContextEntityAttributes, "");
+  out = carV.toJsonV1(false, ContextEntityAttributes);
   EXPECT_STREQ("", out.c_str());
 
   // 2. normal case
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
 
-  out = carV.render(&ci, ContextEntityAttributes, "");
+  out = carV.toJsonV1(false, ContextEntityAttributes);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -98,72 +67,33 @@ TEST(ContextAttributeResponseVector, render_json)
 
 /* ****************************************************************************
 *
-* check_xml - 
-*/
-TEST(ContextAttributeResponseVector, check_xml)
-{
-  ContextAttributeResponseVector  carV;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;  
-  std::string                     out;
-  const char*                     outfile1 = "ngsi10.contextAttributeResponse.check1.valid.xml";
-  const char*                     outfile2 = "ngsi10.contextAttributeResponse.check2.valid.xml";
-  ConnectionInfo                  ci;
-
-  // 1. ok
-  car.contextAttributeVector.push_back(&ca);
-  carV.push_back(&car);
-  out = carV.check(&ci, UpdateContextAttribute, "", "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-  // 2. Predetected Error
-  out = carV.check(&ci, UpdateContextAttribute, "", "PRE ERROR", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  // 3. Bad ContextAttribute
-  ContextAttribute                ca2("", "caType", "caValue");
-
-  car.contextAttributeVector.push_back(&ca2);
-  out = carV.check(&ci, UpdateContextAttribute, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-}
-
-
-
-/* ****************************************************************************
-*
-* check_json - 
+* check_json -
 */
 TEST(ContextAttributeResponseVector, check_json)
 {
   ContextAttributeResponseVector  carV;
   ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;  
+  ContextAttributeResponse        car;
   std::string                     out;
   const char*                     outfile1 = "ngsi10.contextAttributeResponse.check1.valid.json";
   const char*                     outfile2 = "ngsi10.contextAttributeResponse.check2.valid.json";
-  ConnectionInfo                  ci(JSON);
 
   // 1. ok
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
-  out = carV.check(&ci, UpdateContextAttribute, "", "", 0);
+  out = carV.check(V1, false, UpdateContextAttribute, "");
   EXPECT_STREQ("OK", out.c_str());
 
   // 2. Predetected Error
-  out = carV.check(&ci, UpdateContextAttribute, "", "PRE ERROR", 0);
+  out = carV.check(V1, false, UpdateContextAttribute, "PRE ERROR");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
 
   // 3. Bad ContextAttribute
   ContextAttribute  ca2("", "caType", "caValue");
 
   car.contextAttributeVector.push_back(&ca2);
-  out = carV.check(&ci, UpdateContextAttribute, "", "", 0);
+  out = carV.check(V1, false, UpdateContextAttribute, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -172,25 +102,7 @@ TEST(ContextAttributeResponseVector, check_json)
 
 /* ****************************************************************************
 *
-* present - just exercise the code
-*/
-TEST(ContextAttributeResponseVector, present)
-{
-  ContextAttributeResponseVector  carV;
-  ContextAttribute                ca("caName", "caType", "caValue");
-  ContextAttributeResponse        car;
-
-  car.contextAttributeVector.push_back(&ca);
-  carV.push_back(&car);
-
-  carV.present("");
-}
-
-
-
-/* ****************************************************************************
-*
-* getAndSize - 
+* getAndSize -
 */
 TEST(ContextAttributeResponseVector, getAndSize)
 {
@@ -204,7 +116,7 @@ TEST(ContextAttributeResponseVector, getAndSize)
   carV.push_back(&car);
   ASSERT_EQ(1, carV.size());
 
-  ContextAttributeResponse* carP = carV.get(0);
+  ContextAttributeResponse* carP = carV[0];
   EXPECT_TRUE(carP != NULL);
 }
 

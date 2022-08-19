@@ -1,5 +1,5 @@
-#ifndef MONGO_QUERY_TYPES_H
-#define MONGO_QUERY_TYPES_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_
+#define SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_
 
 /*
 *
@@ -25,17 +25,23 @@
 *
 * Author: Fermin Galan Marquez
 */
-
 #include <string>
+#include <vector>
 #include <map>
 
-#include "orionTypes/EntityTypesResponse.h"
-#include "orionTypes/EntityTypeAttributesResponse.h"
+#include "rest/HttpStatusCode.h"
+#include "orionTypes/EntityTypeVectorResponse.h"
+#include "orionTypes/EntityTypeResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 
 
-/* Some string tokens used for aggregation commands */
+
+/* ****************************************************************************
+*
+* Some string tokens used for aggregation commands
+*/
 const std::string C_ID_ENTITY      = std::string("_id.") + "type";
 const std::string C_ID_SERVICEPATH = std::string("_id.") + "servicePath";
 const std::string CS_ID_ENTITY     = std::string("$_id.") + "type";
@@ -44,17 +50,38 @@ const std::string C_ID_TYPE        = std::string("_id.") + "type";
 const std::string S_ATTRNAMES      = std::string("$") + ENT_ATTRNAMES;
 
 
+
 /* ****************************************************************************
 *
 * mongoEntityTypes -
 */
 extern HttpStatusCode mongoEntityTypes
 (
-  EntityTypesResponse*                  responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  EntityTypeVectorResponse*            responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  ApiVersion                           apiVersion,
+  unsigned int*                        totalTypesP,
+  bool                                 noAttrDetail
 );
+
+
+
+/* ****************************************************************************
+*
+* mongoEntityTypesValues -
+*/
+extern HttpStatusCode mongoEntityTypesValues
+(
+  EntityTypeVectorResponse*            responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  unsigned int*                        totalTypesP
+);
+
+
 
 /* ****************************************************************************
 *
@@ -62,12 +89,13 @@ extern HttpStatusCode mongoEntityTypes
 */
 extern HttpStatusCode mongoAttributesForEntityType
 (
-  std::string                           entityType,
-  EntityTypeAttributesResponse*         responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  const std::string&                   entityType,
+  EntityTypeResponse*                  responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  bool                                 noAttrDetail,
+  ApiVersion                           apiVersion
 );
 
-#endif
-
+#endif  // SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_

@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -35,39 +34,23 @@
 /* ****************************************************************************
 *
 * render - 
+*
 */
 TEST(ContextAttributeVector, render)
 {
   ContextAttributeVector  cav;
-  ContextAttribute        ca("Name", "Type", "Value");
   std::string             out;
-  const char*             outfile = "ngsi.contextAttributeList.render.middle.xml";
-  ConnectionInfo          ci(XML);
 
   utInit();
 
-  out = cav.render(&ci, UpdateContextAttribute, "");
+  const std::vector<ContextAttribute*>  emptyAttrsV;
+  const std::vector<std::string>        emptyMdV;
+
+  // FIXME P3: "" is a string, signature tells bool...
+  out = cav.toJsonV1(false, UpdateContextAttribute, emptyAttrsV, emptyMdV, "");
   EXPECT_STREQ("", out.c_str());
 
-  cav.push_back(&ca);
-  out = cav.render(&ci, UpdateContextAttribute, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  // Just to exercise the code ...
-  cav.present("");
-
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* present - 
-*/
-TEST(ContextAttributeVector, present)
-{
 }
 
 

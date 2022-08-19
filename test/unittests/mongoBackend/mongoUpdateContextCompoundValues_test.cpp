@@ -22,14 +22,19 @@
 *
 * Author: Fermin Galan
 */
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextElementResponse.h"
@@ -37,7 +42,23 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "parse/CompoundValueNode.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+
 
 
 /* ****************************************************************************
@@ -48,6 +69,12 @@
 * - createEntityCompoundValue2
 * - createEntityCompoundValue1PlusSimpleValue
 * - createEntityCompoundValue2PlusSimpleValue
+*
+* - createEntityCompoundValue1Native
+* - createEntityCompoundValue2Native
+* - createEntityCompoundValue1PlusSimpleValueNative
+* - createEntityCompoundValue2PlusSimpleValueNative
+*
 * - appendCompoundValue1
 * - appendCompoundValue2
 * - appendCompoundValue1PlusSimpleValue
@@ -71,52 +98,99 @@
 
 
 // Compound1: [ 22, { x: [x1, x2], y: 3 }, [ z1, z2 ] ]
-#define CREATE_COMPOUND1(cv)                                                       \
-    orion::CompoundValueNode*  str;                                                \
-    orion::CompoundValueNode*  vec;                                                \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);           \
-                                                                                   \
-    leaf = cv->add(orion::CompoundValueNode::String,  "",  "22");                  \
-    str  = cv->add(orion::CompoundValueNode::Object,  "",  "");                    \
-    vec  = cv->add(orion::CompoundValueNode::Vector,  "",  "");                    \
-                                                                                   \
-    x    = str->add(orion::CompoundValueNode::Vector, "x", "");                    \
-    leaf = str->add(orion::CompoundValueNode::String, "y", "3");                   \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x1");                  \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x2");                  \
-                                                                                   \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z1");                  \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow1: ");                                                 \
+#define CREATE_COMPOUND1(cv)                                             \
+    orion::CompoundValueNode*  str;                                      \
+    orion::CompoundValueNode*  vec;                                      \
+    orion::CompoundValueNode*  x;                                        \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
+                                                                         \
+    cv->add(orion::ValueTypeString,         "",  "22");                  \
+    str = cv->add(orion::ValueTypeObject,   "",  "");                    \
+    vec = cv->add(orion::ValueTypeVector,   "",  "");                    \
+                                                                         \
+    x = str->add(orion::ValueTypeVector,    "x", "");                    \
+    str->add(orion::ValueTypeString,        "y", "3");                   \
+                                                                         \
+    x->add(orion::ValueTypeString,          "",  "x1");                  \
+    x->add(orion::ValueTypeString,          "",  "x2");                  \
+                                                                         \
+    vec->add(orion::ValueTypeString,        "",  "z1");                  \
+    vec->add(orion::ValueTypeString,        "",  "z2");                  \
+                                                                         \
+    cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
-    
+
 
 // Compound2: { x: { x1: a, x2: b }, y: [ y1, y2 ] }
-#define CREATE_COMPOUND2(cv)                                                       \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  y;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Object); \
-                                                                                   \
-    x    = cv->add(orion::CompoundValueNode::Object, "x",  "");                    \
-    y    = cv->add(orion::CompoundValueNode::Vector, "y",  "");                    \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x1", "a");                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x2", "b");                   \
-                                                                                   \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y1");                  \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow2: ");                                                 \
+#define CREATE_COMPOUND2(cv)                                             \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  y;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
+                                                                         \
+    x = cv->add(orion::ValueTypeObject, "x",  "");                       \
+    y = cv->add(orion::ValueTypeVector, "y",  "");                       \
+                                                                         \
+    x->add(orion::ValueTypeString,      "x1", "a");                      \
+    x->add(orion::ValueTypeString,      "x2", "b");                      \
+                                                                         \
+    y->add(orion::ValueTypeString,      "",   "y1");                     \
+    y->add(orion::ValueTypeString,      "",   "y2");                     \
+                                                                         \
+    cv->shortShow("shortShow2: ");                                       \
     cv->show("show2: ");
+
+
+// Compound1 native: [ 22.0, { x: [x1, x2], y: 3.0, z: null}, [ z1, false, null ] ]
+#define CREATE_COMPOUND1_NATIVE(cv)                                      \
+    orion::CompoundValueNode*  str;                                      \
+    orion::CompoundValueNode*  vec;                                      \
+    orion::CompoundValueNode*  x;                                        \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
+                                                                         \
+    cv->add(orion::ValueTypeNumber,         "",  22.0);                  \
+    str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
+    vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
+                                                                         \
+    x    = str->add(orion::ValueTypeVector, "x", "");                    \
+    str->add(orion::ValueTypeNumber,        "y", 3.0);                   \
+    str->add(orion::ValueTypeNull,          "z", "");                    \
+                                                                         \
+    x->add(orion::ValueTypeString,          "",  "x1");                  \
+    x->add(orion::ValueTypeString,          "",  "x2");                  \
+                                                                         \
+    vec->add(orion::ValueTypeString,        "",  "z1");                  \
+    vec->add(orion::ValueTypeBoolean,       "",  false);                 \
+    vec->add(orion::ValueTypeNull,          "",  "");                    \
+                                                                         \
+    cv->shortShow("shortShow1: ");                                       \
+    cv->show("show1: ");
+
+
+// Compound2 native: { x: { x1: a, x2: true }, y: [ y1, y2 ], z: null }
+#define CREATE_COMPOUND2_NATIVE(cv)                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  y;                                        \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
+                                                                         \
+    x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
+    y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+    cv->add(orion::ValueTypeNull,          "z",  "");                    \
+                                                                         \
+    x->add(orion::ValueTypeString,         "x1", "a");                   \
+    x->add(orion::ValueTypeBoolean,        "x2", true);                  \
+                                                                         \
+    y->add(orion::ValueTypeString,         "",   "y1");                  \
+    y->add(orion::ValueTypeString,         "",   "y2");                  \
+                                                                         \
+    cv->shortShow("shortShow2: ");                                       \
+    cv->show("show2: ");
+
+
 
 /* ****************************************************************************
 *
@@ -125,8 +199,8 @@
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseSimple(void) {
-
+static void prepareDatabaseSimple(void)
+{
   /* Set database */
   setupDatabase();
 
@@ -135,14 +209,12 @@ static void prepareDatabaseSimple(void) {
   BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrNames" << BSON_ARRAY("AX") <<
                      "attrs" << BSON(
-                        "AX" << BSON("type" << "TAX" << "value" << "valX")
-                        )
-                    );
-
+                       "AX" << BSON("type" << "TAX" << "value" << "valX")));
 
   connection->insert(ENTITIES_COLL, en);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -151,23 +223,22 @@ static void prepareDatabaseSimple(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseCompoundVector(void) {
-
+static void prepareDatabaseCompoundVector(void)
+{
   /* Set database */
   setupDatabase();
 
   DBClientBase* connection = getMongoConnection();
 
   BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrNames" << BSON_ARRAY("AX") <<
-                     "attrs" << BSON(
-                        "AX" << BSON("type" << "TAX" << "value" << BSON_ARRAY("A" << "B"))
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("AX") <<
+                    "attrs" << BSON(
+                      "AX" << BSON("type" << "TAX" << "value" << BSON_ARRAY("A" << "B"))));
 
   connection->insert(ENTITIES_COLL, en);
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -176,35 +247,32 @@ static void prepareDatabaseCompoundVector(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-static void prepareDatabaseCompoundObject(void) {
-
+static void prepareDatabaseCompoundObject(void)
+{
   /* Set database */
   setupDatabase();
 
   DBClientBase* connection = getMongoConnection();
 
   BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrNames" << BSON_ARRAY("AX") <<
-                     "attrs" << BSON(
-                        "AX" << BSON("type" << "TAX" << "value" << BSON("x" << "A" << "y" << "B"))
-                        )
-                    );
+                    "attrNames" << BSON_ARRAY("AX") <<
+                    "attrs" << BSON(
+                      "AX" << BSON("type" << "TAX" << "value" << BSON("x" << "A" << "y" << "B"))));
 
 
   connection->insert(ENTITIES_COLL, en);
-
 }
+
+
 
 /* ****************************************************************************
 *
 * findAttr -
 *
 * FIXME P4: this functions is repeated in several places (e.g. mongoUpdateContext_test.cpp). Factorice in a common place.
-*
 */
 static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 {
-
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     if (attrs[ix].str() == name)
@@ -212,9 +280,11 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
       return true;
     }
   }
-  return false;
 
+  return false;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -229,18 +299,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -251,13 +321,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -285,7 +355,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -312,18 +382,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -334,13 +404,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -368,7 +438,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -393,20 +463,20 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -417,17 +487,17 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -457,7 +527,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -466,8 +536,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
 
@@ -488,20 +558,20 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E3", "T3", "false");
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -512,17 +582,17 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E3", RES_CER(0).entityId.id);
-    EXPECT_EQ("T3", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -552,15 +622,373 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
+    EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue1Native -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND1_NATIVE(cv)
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
+    EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
+    EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
+    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
+    EXPECT_TRUE(a1.getField("value").Array()[1].embeddedObject().getField("z").isNull());
+    EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
+    EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
+    EXPECT_TRUE(a1.getField("value").Array()[2].Array()[2].isNull());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue2Native -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND2_NATIVE(cv)
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
+    EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
+    EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("z").isNull());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue1PlusSimpleValueNative -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValueNative)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND1_NATIVE(cv)
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
+    EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
+    EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
+    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
+    EXPECT_TRUE(a1.getField("value").Array()[1].embeddedObject().getField("z").isNull());
+    EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
+    EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
+    EXPECT_TRUE(a1.getField("value").Array()[2].Array()[2].isNull());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
+    EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue2PlusSimpleValueNative -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValueNative)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    Entity* eP = new Entity();
+    eP->fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND2_NATIVE(cv)
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).id);
+    EXPECT_EQ("T3", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
+    EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
+    EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("z").isNull());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
 
@@ -582,18 +1010,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -604,13 +1032,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -640,7 +1068,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -649,8 +1077,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -672,18 +1100,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("A1", "TA1", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* caP = new ContextAttribute("A1", "TA1", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -694,13 +1122,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -730,15 +1158,15 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -760,20 +1188,20 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -784,17 +1212,17 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -826,7 +1254,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("22", a1.getField("value").Array()[0].str());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -835,12 +1263,12 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -862,20 +1290,20 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca1("A1", "TA1", cv);
-    ContextAttribute ca2("A2", "TA2", "simple2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", cv);
+    ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "simple2");
+    eP->attributeVector.push_back(ca1P);
+    eP->attributeVector.push_back(ca2P);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -886,17 +1314,17 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(2, RES_CER(0).attributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -928,19 +1356,19 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_EQ(1360232700, a2.getIntField("creDate"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("valX",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("valX", C_STR_FIELD(aX, "value"));
     EXPECT_FALSE(aX.hasField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -962,18 +1390,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("UPDATE");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -984,13 +1412,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1011,14 +1439,14 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));    
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("a", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", aX.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -1044,16 +1472,16 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     prepareDatabaseCompoundObject();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("UPDATE");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1064,13 +1492,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1098,8 +1526,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1121,18 +1549,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1143,13 +1571,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1177,7 +1605,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("a", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", aX.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
     EXPECT_EQ("y1", aX.getField("value").embeddedObject().getField("y").Array()[0].str());
@@ -1203,16 +1631,16 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     prepareDatabaseCompoundObject();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1223,13 +1651,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1257,8 +1685,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1281,18 +1709,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("UPDATE");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1303,13 +1731,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1337,7 +1765,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("22", aX.getField("value").Array()[0].str());
     EXPECT_EQ("x1", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -1365,16 +1793,16 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     prepareDatabaseCompoundVector();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("UPDATE");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1385,13 +1813,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1419,8 +1847,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 
@@ -1442,18 +1870,18 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     prepareDatabaseSimple();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
     orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("AX", "TAX", cv);
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", cv);
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1464,13 +1892,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1498,7 +1926,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
     EXPECT_EQ("22", aX.getField("value").Array()[0].str());
     EXPECT_EQ("x1", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", aX.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
@@ -1526,16 +1954,16 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     prepareDatabaseCompoundObject();
 
     /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("AX", "TAX", "new_value");
-    ce.contextAttributeVector.push_back(&ca);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("APPEND");
+    Entity* eP = new Entity();
+    eP->fill("E1", "T1", "false");
+    ContextAttribute* caP = new ContextAttribute("AX", "TAX", "new_value");
+    eP->attributeVector.push_back(caP);
+    req.entityVector.push_back(eP);
+    req.updateActionType = ActionTypeAppend;
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1546,13 +1974,13 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("E1", RES_CER(0).id);
+    EXPECT_EQ("T1", RES_CER(0).type);
+    EXPECT_EQ("false", RES_CER(0).isPattern);
+    ASSERT_EQ(1, RES_CER(0).attributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1580,8 +2008,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     ASSERT_EQ(1, attrNames.size());
     BSONObj aX = attrs.getField("AX").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "AX"));
-    EXPECT_STREQ("TAX",C_STR_FIELD(aX, "type"));
-    EXPECT_STREQ("new_value",C_STR_FIELD(aX, "value"));
+    EXPECT_STREQ("TAX", C_STR_FIELD(aX, "type"));
+    EXPECT_STREQ("new_value", C_STR_FIELD(aX, "value"));
     EXPECT_EQ(1360232700, aX.getIntField("modDate"));
     EXPECT_FALSE(aX.hasField("creDate"));
 

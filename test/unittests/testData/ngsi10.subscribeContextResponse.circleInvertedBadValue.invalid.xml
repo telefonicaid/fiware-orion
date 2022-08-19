@@ -1,9 +1,0 @@
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: bad value for circle/inverted: /truhe/</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>

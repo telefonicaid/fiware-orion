@@ -1,28 +1,12 @@
 FORMAT: 1A
+HOST: http://telefonicaid.github.io/fiware-orion/api/v1/
+TITLE: Orion Context Broker NGSI API v1 Specification
+DATE: 08 September 2015
+VERSION: v1.0
+PREVIOUS_VERSION: v0.9
+APIARY_PROJECT: orioncontextbroker
 
-# Orion Context Broker
-
-<!--
- Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
-
- This file is part of Orion Context Broker.
-
- Orion Context Broker is free software: you can redistribute it and/or
- modify it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- Orion Context Broker is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
- General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
-
- For those usages not covered by this license please contact with
- iot_support at tid dot es
--->
+# Orion Context Broker NGSI API v1 Specification
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE, providing the NGSI9 and NGSI10 interfaces. Using these interfaces, clients can do several operations:
 
@@ -31,8 +15,20 @@ The Orion Context Broker is an implementation of the Publish/Subscribe Context B
 * Being notified when changes on context information take place (e.g. the temperature has changed) or with a given frequency (e.g. get the temperature each minute).
 * Query context information. The Orion Context Broker stores context information updated from applications, so queries are resolved based on that information.
 
+## Editors
 
-* <b>Multi service tenancy</b>  
+  + Fermín Galán, Telefónica I+D.
+
+## Copyright
+
+This specification is licensed under the
+[FIWARE Open Specification License (implicit patents license)](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license)).
+
+## Status
+
+Final version aligned with FIWARE Release 4.
+
+## Multi service tenancy
 
 Fiware-Service and Fiware-ServicePath are set at entity creation time using HTTP headers in the entity creation REST request.
 
@@ -41,7 +37,7 @@ The Orion Context Broker implements a simple multitenant/multiservice model base
 Multitenant/multiservice ensures that the entities/attributes/subscriptions of one service/tenant are "invisible" to other services/tentants. For example, queryContext on tenantA space will never return entities/attributes from tenantB space.
    
    
-* <b>Entity service paths</b>   
+## Entity service paths
    
 Orion Context Broker supports hierarchical scopes, so entities can be assigned to a scope at creation time with updateContext (or related convenience operation). Then, queryContext (and related convenience operations)can be also scoped to locate entities in the corresponding scopes.
 
@@ -50,7 +46,7 @@ For example, consider an Orion-based application using the following scopes (sho
 + Madrid, as first level scope
 + Gardens and Districts, as second-level scope (children of Madrid)
 + ParqueNorte, ParqueOeste and ParqueSur (children of Gardens) and Fuencarral and Latina (children of Districts)
-Parterre1 and Parterre2 (children of ParqueNorte)
++ Parterre1 and Parterre2 (children of ParqueNorte)
 
 ![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/c/ce/ServicePathExample.png)
 
@@ -117,7 +113,7 @@ The entity Car has been created with the specific attribute speed.
 
 # Context management using NGSI10 
 
-### Tutorial on NGSI10 convenience operations   
+### NGSI10 convenience operations
 
 This section describes the different convenience operations described as part of the FI-WARE NGSI REST API NGSI10 that Orion Context Broker supports, showing examples of requests and responses. 
 Convenience operations are a set of operations that have been defined by FI-WARE project to ease the usage of NGSI implementations as a complement to the standard operations defined in the OMA NGSI specification. 
@@ -135,7 +131,7 @@ At the end, you will have the basic knowledge to create applications (both conte
 + /v1/contextSubscriptions
 + /v1/contextSubscriptions/{subscriptionID}
 
-### Tutorial on NGSI10 standard operations 
+### NGSI10 standard operations
 
 This section describes the different standard NGSI10 operations that the Orion Context Broker supports, showing examples of requests and responses. We use the term "standard" as they are directly derived from the OMA NGSI specification, to distinguish them from the other family of operations ("convenience") which has been defined by the FI-WARE project to ease the usage of NGSI implementations
 
@@ -190,7 +186,6 @@ You can use "POST /v1/contextEntitites" to create entities. In this case, the en
 </table>
  
  So the corresponding elements and the values, that we have to include in the payload request will be;
-<center>
 
 |Payload Information Request  |Description   |Value          |
 |:----------------------------|:-------------|:--------------|
@@ -224,12 +219,11 @@ And the response will be;
 |                                  |                      | Code        |              |200            |
 |                                  |                      | ReasonPhrase|              |OK             |
 
-</center>
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+                Accept: application/json
         
     + Body
             
@@ -253,9 +247,9 @@ And the response will be;
 
 + Response 200 
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
 
     + Body 
       
@@ -312,8 +306,6 @@ On the other hand, to get all the entities stored, we use the GET method.Here ar
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
-
 |Payload Information Response      |Description           |             |              | Value         |
 |:---------------------------------|:---------------------|:------------|:-------------|:--------------|
 |<b>ContextResponses</b>           |                      |             |              |               |
@@ -331,8 +323,6 @@ On the other hand, to get all the entities stored, we use the GET method.Here ar
 |                                  |<b>StatusCode</b>     |             |              |               |
 |                                  |                      |             | Code         |200            |
 |                                  |                      |             | ReasonPhrase |OK             |
-
-</center>
 
 + Response 200 (application/json)
     
@@ -411,16 +401,12 @@ For example, we will use POST to create Room1 entity with temperature and pressu
 </table>
 
 The entity information (ID and type) is included in the URL;
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity ID</b>             |Room1          |
 
-</center>
-
 The fields included in the payload will be;
-<center>
 
 |Payload Information Request  |Description   |Value          |
 |:----------------------------|:-------------|:--------------|
@@ -432,9 +418,6 @@ The fields included in the payload will be;
 |                             | Type         |Integer        |
 |                             | Value        |720            |
 
-</center>
-
-<center>
 
 |Payload Information Response      |Description           |             |              | Value         |
 |:---------------------------------|:---------------------|:------------|:-------------|:--------------|
@@ -453,14 +436,13 @@ The fields included in the payload will be;
 |                                  |                      | Code        |              |200            |
 |                                  |                      | ReasonPhrase|              |OK             |
 
-</center>
 
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -483,9 +465,9 @@ The fields included in the payload will be;
 
 + Response 200
     
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
 
     + Body 
     
@@ -552,17 +534,14 @@ We can query all the attribute values of a given entity,by using GET method:
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity ID</b>             |Room1          |
 
-</center>
 
 The Context Broker will return the corresponding values;
 
-<center>
 
 | Payload Information Response     | Description    |              | Value         |
 |:---------------------------------|:---------------|:-------------|:--------------|
@@ -581,7 +560,6 @@ The Context Broker will return the corresponding values;
 |                                  |                | Code         |200            |
 |                                  |                | ReasonPhrase |OK             |
 
-</center>
 
 
 + Response 200 (application/json)
@@ -655,16 +633,13 @@ To update or to replace  a number of attribute values  of the entity requested, 
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity ID</b>             |Room1          |
 
-</center>
 
 We want to change the value of the temperature and pressure for Room1,as it is shown in the table;
-<center>
 
 |Payload Information Request  |Description   |Value          |
 |:----------------------------|:-------------|:--------------|
@@ -676,11 +651,9 @@ We want to change the value of the temperature and pressure for Room1,as it is s
 |                             | Type         |Integer        |
 |                             | Value        |763            |
 
-</center>
 
 So, the response of the Context Broker will be;
 
-<center>
 
 | Payload Information Response     | Description    |              | Value         |
 |:---------------------------------|:---------------|:-------------|:--------------|
@@ -696,13 +669,12 @@ So, the response of the Context Broker will be;
 |                                  |                | Code         |200            |
 |                                  |                | ReasonPhrase |OK             |
 
-</center>
 
 + Request (application/json)
     
     + Headers 
     
-            Accept: application/json
+                Accept: application/json
         
     + Body
                
@@ -771,16 +743,13 @@ Finally DELETE method which is used to delete all the information, of the entity
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity ID</b>             |Room1          |
 
-</center>
 
 The Context Broker returns the confirmation;
-<center>
 
 | Payload Information Response     | Description  | Value         |
 |:---------------------------------|:-------------|:--------------|
@@ -788,7 +757,6 @@ The Context Broker returns the confirmation;
 |                                  | Code         |200            |
 |                                  | ReasonPhrase |OK             |
 
-</center>
 
 + Response 200 (application/json)
 
@@ -840,24 +808,19 @@ using the POST method;
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity ID</b>             |Room1          |
 |<b>AttributeName</b>         |Temperature    |
 
-</center>
 
-<center>
 
 | Payload Information Request      | Value      |
 |:---------------------------------|:-----------|
 |<b>Value</b>                      |21          |
 
-</center>
 
-<center>
 
 | Payload Information Response     | Description  | Value         |
 |:---------------------------------|:-------------|:--------------|
@@ -865,13 +828,12 @@ using the POST method;
 |                                  | Code         |200            |
 |                                  | ReasonPhrase |OK             |
 
-</center>
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -917,7 +879,6 @@ We can also query a single attribute of a given entity:
 </table>
 
 For example, we want to know the value of the temperature of Room1;
-<center>
 
 
 |URL information              |Value          |
@@ -925,9 +886,7 @@ For example, we want to know the value of the temperature of Room1;
 |<b>Entity ID</b>             |Room1          |
 |<b>AttributeName</b>         |Temperature    |   
 
-</center>
 
-</center>
 
 | Payload Information Response     | Description    | Value         |
 |:---------------------------------|:---------------|:--------------|
@@ -939,7 +898,6 @@ For example, we want to know the value of the temperature of Room1;
 |                                  | Code           |200            |
 |                                  | ReasonPhrase   |OK             |
 
-</center>
 
 
 + Response 200 (application/json)
@@ -1000,7 +958,6 @@ To update/change an attribute value of an entity, it is used PUT method and we w
 
 In this case we want to change the temperature of Room1 to 26.3;
 
-<center>
 
 
 |URL information              |Value          |
@@ -1008,17 +965,13 @@ In this case we want to change the temperature of Room1 to 26.3;
 |<b>Entity ID</b>             |Room1          |
 |<b>AttributeName</b>         |Temperature    | 
 
-</center>
 
-<center>
 
 | Payload Information Request      | Value      |
 |:---------------------------------|:-----------|
 |<b>Value</b>                      |26.3        |
 
-</center>
 
-<center>
 
 | Payload Information Response     | Description  | Value         |
 |:---------------------------------|:-------------|:--------------|
@@ -1026,14 +979,13 @@ In this case we want to change the temperature of Room1 to 26.3;
 |                                  | Code         |200            |
 |                                  | ReasonPhrase |OK             |
 
-</center>
 
 + Request (application/json)
     
                
-    + Headers (application/json)
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -1078,17 +1030,14 @@ Finally, to delete an attribute it is use DELETE method:
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity ID</b>             |Room1          |
 |<b>AttributeName</b>         |Temperature    | 
 
-</center>
 
 
-<center>
 
 | Payload Information Response     | Description  | Value         |
 |:---------------------------------|:-------------|:--------------|
@@ -1096,7 +1045,6 @@ Finally, to delete an attribute it is use DELETE method:
 |                                  | Code         |200            |
 |                                  | ReasonPhrase |OK             |
 
-</center>
 
 + Response 200 (application/json)
 
@@ -1153,7 +1101,6 @@ In order  to retrieve a specific attribute value is used GET method:
 </table>
 
 In this case, we want the value of the temperature on the ground of the Room1;
-<center>
 
 |URL information              |Value                    |
 |:----------------------------|:------------------------|
@@ -1161,10 +1108,8 @@ In this case, we want the value of the temperature on the ground of the Room1;
 |<b>AttributeName</b>         | Temperature             |
 |<b>ValueID</b>               | Ground                  |
 
-</center>
 
 
-<center>
 
 |Payload Information Response      |Description     |           | Value      |
 |:---------------------------------|:---------------|:----------|:-----------|
@@ -1180,7 +1125,6 @@ In this case, we want the value of the temperature on the ground of the Room1;
 |                                  | Code           | 200       |            |
 |                                  | ReasonPhrase   | Ok        |            |
 
-</center>
 
 + Parameters
 
@@ -1258,7 +1202,6 @@ In order to replace attribute value, it is used PUT method:
 </table>
 
 So to change the value of the temperature on the ground of the Room1 we will add the corresponding values where is shown;
-<center>
 
 |URL information              |Value                    |
 |:----------------------------|:------------------------|
@@ -1266,18 +1209,14 @@ So to change the value of the temperature on the ground of the Room1 we will add
 |<b>AttributeName</b>         | Temperature             |
 |<b>ValueID</b>               | Ground                  |
 
-</center>
 
-<center>
 
 |Payload Information Request  |Value                    |
 |:----------------------------|:------------------------|
 |<b>Value</b>                 | 26.3                    |
 
 
-</center>
 
-<center>
 
 |Payload Information Response      |Description     |           | Value      |
 |:---------------------------------|:---------------|:----------|:-----------|
@@ -1285,7 +1224,6 @@ So to change the value of the temperature on the ground of the Room1 we will add
 |                                  | Code           | 200       |            |
 |                                  | ReasonPhrase   | Ok        |            |
 
-</center>
 
 + Parameters
 
@@ -1298,9 +1236,10 @@ So to change the value of the temperature on the ground of the Room1 we will add
 
 
 + Request (application/json)
-    + Headers (application/json)
+
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -1350,7 +1289,6 @@ Finally  to remove a value of a specific attribute identified by ID:
 </table>
 
 The tables have the corresponding information defined with the values;
-<center>
 
 |URL information              |Value                    |
 |:----------------------------|:------------------------|
@@ -1358,11 +1296,9 @@ The tables have the corresponding information defined with the values;
 |<b>AttributeName</b>         | Temperature             |
 |<b>ValueID</b>               | Ground                  |
 
-</center>
 
 
 
-<center>
 
 |Payload Information Response      |Description     |           | Value      |
 |:---------------------------------|:---------------|:----------|:-----------|
@@ -1370,7 +1306,6 @@ The tables have the corresponding information defined with the values;
 |                                  | Code           | 200       |            |
 |                                  | ReasonPhrase   | Ok        |            |
 
-</center>
 
 + Response 200 (application/json)
 
@@ -1402,7 +1337,6 @@ The following operation can be used to get a list of all entity types existing a
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 
 | Payload Information Response     | Description    |              | Value         |
@@ -1418,7 +1352,6 @@ The following operation can be used to get a list of all entity types existing a
 |                                  |                | Code         |200            |
 |                                  |                | ReasonPhrase |OK             |
 
-</center>
 
 + Response 200 (application/json)
 
@@ -1480,15 +1413,12 @@ In addition, you can use the following operation to get detailed information of 
 </table>
 
 In this case we want to know the attributes associated to the entity requested, Room1;
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>Entity Type</b>           |Room           |
 
-</center>
 
-<center>
 
 | Payload Information Response     | Description    |              | Value         |
 |:---------------------------------|:---------------|:-------------|:--------------|
@@ -1502,7 +1432,6 @@ In this case we want to know the attributes associated to the entity requested, 
 |                                  |                | Code         |200            |
 |                                  |                | ReasonPhrase |OK             |
 
-</center>
 + Parameters
 
     + entityType (required, string,`Room`) ... Type of the entity
@@ -1561,15 +1490,12 @@ In order to retrieve all available information  about all context entities havin
   </tr>
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |<b>TypeName</b>              |Room           |
 
-</center>
 
-<center>
 
 |Payload Information Response      |Description            |             |              | Value         |
 |:---------------------------------|:----------------------|:------------|:-------------|:--------------|
@@ -1604,7 +1530,6 @@ In order to retrieve all available information  about all context entities havin
 |                                  |                       | Type        |              |Room           |
 
 
-</center>
 
 + Parameters
 
@@ -1700,17 +1625,14 @@ To retrieve all attribute values of the context entities of the specific entity 
 </table>
 
 For example, in this case we want to know all the entities with type Room in which is defined the attribute temperature;
-<center>
 
 |URL information              |Value          |
 |:----------------------------|:--------------|
 |TypeName                     |Room           |
 |AttributeName                |Temperature    |
 
-</center>
 
 
-<center>
 
 |Payload Information Response      |Description            |             |              | Value         |
 |:---------------------------------|:----------------------|:------------|:-------------|:--------------|
@@ -1738,7 +1660,6 @@ For example, in this case we want to know all the entities with type Room in whi
 |                                  |                       | IsPattern   |              |false          |
 |                                  |                       | Type        |              |Room           |
 
-</center>
 
 + Parameters
 
@@ -1812,7 +1733,7 @@ In order to star the accumulator server;
 
     cd /dir/where/accumulator-server/is/downloaded
     chmod a+x accumulator-server.py
-    ./accumulator-server.py 1028 /accumulate ::1 on
+    ./accumulator-server.py --port 1028 --url /accumulate --host ::1 -v
 
 
 # Create a new subscription [POST]
@@ -1841,7 +1762,7 @@ In order to star the accumulator server;
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue element</td>
   </tr>
   <tr>
     <th>Payload Information Response</th>
@@ -1855,7 +1776,6 @@ In order to star the accumulator server;
 </table>
 
 The following is the request corresponding to an ONTIMEINTERVAL subscription:
-<center>
 
 |Payload Information Request       |Description     | Value                           |
 |:---------------------------------|:---------------|:--------------------------------|
@@ -1870,9 +1790,8 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |<b>NotifyConditions</b>           |                |                                 |
 |                                  | Type           | ONTIMEINTERVAL                  |
 |                                  | CondValues     | PT10S                           |
-</center>
 
-<center>
+
 
 |Payload Information Response      |Description     | Value                   |
 |:---------------------------------|:---------------|:------------------------|
@@ -1880,7 +1799,6 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |                                  | duration       | P1M                     | 
 |                                  | subscriptionId | 552f7481983d79a38fbd5a74|                           |              
 
-</center>
 
 Let's examine in detail the different elements included in the payload:
 
@@ -1890,7 +1808,7 @@ Let's examine in detail the different elements included in the payload:
         http://localhost:1028.
 
 * Subscriptions have a duration, specified using the ISO 8601 standard format. Once that duration is expired, the subscription is simply ignored (however, it is still stored in the broker database and needs to be purged). You can extend the duration of a subscription by updating it. We are using "P1M" which means "one month".
-* The notifyCondition element defines the "trigger" for the subscription. There is a type element (which value in this case is ONTIMERINTERVAL) and a condValueList element. The condValueList element structure depends on the type. In the case of ONTIMEINTERVAL, it includes exactly one condValue child element whose value is a time interval (using again, as usual in NGSI, the ISO 8601 format). A notification is sent with a frequency equal to that interval. In the example above we are using 10 seconds as interval.
+* The notifyCondition element defines the "trigger" for the subscription. There is a type element (which value in this case is ONTIMERINTERVAL) and a condValue element. The condValue vector structure depends on the type. In the case of ONTIMEINTERVAL, it includes exactly one condValue child element whose value is a time interval (using again, as usual in NGSI, the ISO 8601 format). A notification is sent with a frequency equal to that interval. In the example above we are using 10 seconds as interval.
 * Actually, there are two kinds of contextSubscriptions: ONTIMEINTERVAL and ONCHANGE subscription.
 * If you look at the accumulator-script.py terminal window, you will see that a message resembling the following one is received each 10 seconds:
         
@@ -1929,9 +1847,9 @@ Let's examine in detail the different elements included in the payload:
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -2001,7 +1919,7 @@ Subscriptions can be updated.The request includes a subscriptionId that identifi
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue vector</td>
   </tr>
   <tr>
     <th>Payload Information Response</th>
@@ -2015,15 +1933,12 @@ Subscriptions can be updated.The request includes a subscriptionId that identifi
 </table>
 
 For example, if we want to change the notification interval to 5 seconds we will use the following values; 
-<center>
 
 |URL information              |Value                    |
 |:----------------------------|:------------------------|
 |<b>SubscriptionID</b>        | 552f7481983d79a38fbd5a74|
 
-</center>
 
-<center>
 
 |Payload Information Request       |Description     | Value                           |
 |:---------------------------------|:---------------|:--------------------------------|
@@ -2032,23 +1947,21 @@ For example, if we want to change the notification interval to 5 seconds we will
 |                                  | Type           | ONTIMEINTERVAL                  |
 |                                  | CondValues     | PT5S                            |
 
-</center>
 
-<center>
 
 |Payload Information Response      |Description     | Value                   |
 |:---------------------------------|:---------------|:------------------------|
 |<b>SubscribeResponse</b>          |                |                         | 
 |                                  | subscriptionId | 552f7481983d79a38fbd5a74|                                    
 
-</center>
 
 The ID in the payload must match the ID in the URL.
 
 + Request (application/json)
-    + Headers (application/json)
+
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -2105,15 +2018,12 @@ In this case, payload  request is not used.
 </table>
 
 We want to cancel a subscription identified by an ID, here are the corresponding values;
-<center>
 
 |URL information              |Value                    |
 |:----------------------------|:------------------------|
 |<b>SubscriptionID</b>        | 552f7481983d79a38fbd5a74|
 
-</center>
 
-<center>
 
 |Payload Information Response      |Description     | Value                           |
 |:---------------------------------|:---------------|:--------------------------------|
@@ -2122,7 +2032,6 @@ We want to cancel a subscription identified by an ID, here are the corresponding
 |                                  | Code           | 200                             |
 |                                  | ReasonPhrase   | Ok                              |
 
-</center> 
 
 + Response 200 (application/json)
 
@@ -2178,7 +2087,6 @@ As on the previous section for the convenience operations,Orion Context Broker w
 
 
 The updateContext request payload contains a list of contextElement element and the updateAction element; 
-<center>
 
 |Payload Information Request  |Description  |              |Value          |
 |:----------------------------|:------------|:-------------|:--------------|
@@ -2215,11 +2123,10 @@ Upon receipt of this request, the broker will create the entity in its internal 
 |                                  |                | Code         |200            |
 |                                  |                | ReasonPhrase |OK             |
 
-</center>
 
 * <b>Geolocation capabilities</b>
 
-Orion Context Broker has several capabilities related to geolocation that are described in this section. It is strictly required to use MongoDB 2.4 or higher in order to use geolocation features 
+Orion Context Broker has several capabilities related to geolocation that are described in this section.
 
 Entities can have a location, specified by one of its attributes. In order to state which attribute (among all the ones belonging to the entity) defines the location, the "location" metadata is used
 <table width="600">
@@ -2263,7 +2170,6 @@ Entities can have a location, specified by one of its attributes. In order to st
 
 For example, the following updateContext request creates the entity "Madrid" (of type "City") with attribute "position" defined as location
 
-<center>
 
 | Payload Information Request      | Description  |            |            |Value                  |
 |:---------------------------------|:-------------|:-----------|:-----------|:----------------------|
@@ -2281,11 +2187,9 @@ For example, the following updateContext request creates the entity "Madrid" (of
 |                                  | Type         |            |            | City                  |
 | <b>UpdateAction</b>              |              |            |            |                       |
 
-</center>
 
 
 
-<center>
 
 | Payload Information Response     | Description  |            |            |Value     |
 |:---------------------------------|:-------------|:-----------|:-----------|:---------|
@@ -2304,15 +2208,15 @@ For example, the following updateContext request creates the entity "Madrid" (of
 | <b>StatusCode</b>                |              |            |            |          |
 |                                  | Code         |            |            | 200      |
 |                                  | ReasonPhrase |            |            | OK       |
-</center>
+
 
         
 
 + Request Entity creation  (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body   
     
@@ -2374,9 +2278,9 @@ For example, the following updateContext request creates the entity "Madrid" (of
 
 + Request Defining location attribute (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body
     
@@ -2467,8 +2371,7 @@ Apart from deleting individual attributes from a given entity,  you can also del
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
- In order to delete an entity, the updateContext operation is used, with DELETE as actionType and with an empty attributeList:
-<center>
+ In order to delete an entity, the updateContext operation is used, with DELETE as actionType and with an empty attribute vector:
 
 |Payload Information Request  |Description  |              |Value          |
 |:----------------------------|:------------|:-------------|:--------------|
@@ -2478,25 +2381,22 @@ Apart from deleting individual attributes from a given entity,  you can also del
 |                             | Type        |              |Room           |
 | <b>UpdateAction</b>         |             |              |DELETE         |
 
-</center>
 
 
 
-<center>
 
 |Payload Information Response      | Value      |
 |:---------------------------------|:-----------|
 |<b>Code</b>                       |200         | 
 |<b>ReasonPhrase</b>               |Ok          |
 
-</center>
 
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body
     
@@ -2513,10 +2413,10 @@ Apart from deleting individual attributes from a given entity,  you can also del
 
 + Response 200 (application/json)
 
-        {
-            "code": "200", 
-            "reasonPhrase": "OK"
-        }
+            {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
      
 
 
@@ -2561,7 +2461,6 @@ The NGSI10 queryContext request is used  to access the context information store
 
 For example, in this case we want to get context information for Room1:
 
-<center>
 
 |Payload Information Request       |Description     | Value   |
 |:---------------------------------|:---------------|:--------|
@@ -2570,9 +2469,7 @@ For example, in this case we want to get context information for Room1:
 |                                  | IsPattern      | False   |
 |                                  | Id             | Room1   |
 
-</center> 
 
-<center>
 
 |Payload Information Response      |Description            |             |              | Value         |
 |:---------------------------------|:----------------------|:------------|:-------------|:--------------|
@@ -2593,7 +2490,6 @@ For example, in this case we want to get context information for Room1:
 |                                  |                       |             |ReasonPhrase  |OK             |
 
 
-</center>
 
  * <b>Get an attribute of an entity</b>
     
@@ -2634,7 +2530,6 @@ In other case you can use an empty attributes element in the request,the respons
 </table>
 
 
-<center>
 
 |Payload Information Request       |Description     | Value      |
 |:---------------------------------|:---------------|:-----------|
@@ -2643,9 +2538,8 @@ In other case you can use an empty attributes element in the request,the respons
 |                                  | IsPattern      | False      |
 |                                  | Id             | Room1      |
 |<b>Attributes</b>                 |                | Temperature|
-</center> 
 
-<center>
+
 
 |Payload Information Response      |Description            |             |              | Value         |
 |:---------------------------------|:----------------------|:------------|:-------------|:--------------|
@@ -2663,14 +2557,12 @@ In other case you can use an empty attributes element in the request,the respons
 |                                  |                       |             |ReasonPhrase  |OK             |
 
 
-</center>
 
  * <b>Get an specific attribute for all the entities with the same type</b>
  
 Moreover, a powerful feature of Orion Context Broker is that you can use a regular expression for the entity ID. For example, you can query entities which ID starts with "Room" using the regex "Room.*". In this case, you have to set isPattern to "true".
 
 The only that changes is the id element of the payload request:
-<center>
 
 |Payload Information Request       |Description     | Value      |
 |:---------------------------------|:---------------|:-----------|
@@ -2679,7 +2571,7 @@ The only that changes is the id element of the payload request:
 |                                  | IsPattern      | False      |
 |                                  | Id             | Room.*     |
 |<b>Attributes</b>                 |                | Temperature|
-</center> 
+
 
 Finally, note that you will get an error in case you try to query a non-existing entity or attribute, as shown in the last response.
 
@@ -2720,7 +2612,6 @@ In order to illustrate geo-located queries with polygons, let's consider the fol
 
 Let's consider a query whose scope is the internal area to the square defined by coordinates (0, 0), (0, 6), (6, 6) and (6, 0):
 
-<center>
 
 |Payload Information Request  |Description  |              |               |          |           | Value            |
 |:----------------------------|:------------|:-------------|:--------------|:---------|:----------|:-----------------|
@@ -2743,7 +2634,6 @@ Let's consider a query whose scope is the internal area to the square defined by
 |                             |             |              |               |          | Latitude  | 6                |
 |                             |             |              |               |          | Longitude | 0                |
 
-</center>
 
 The result of the query would be A and B:
 
@@ -2798,7 +2688,6 @@ To define a circle, we use the circle element which, in sequence, include a thre
     
 Let's consider a query whose scope is inside a radius of 15 km (15000 meters) centred in Madrid;
 
-<center>
 
 |Payload Information Request  |Description  |              |               |                 | Value            |
 |:----------------------------|:------------|:-------------|:--------------|:----------------|:-----------------|
@@ -2816,13 +2705,11 @@ Let's consider a query whose scope is inside a radius of 15 km (15000 meters) ce
 |                             |             |              |               | radius          | 15000            |
 
 
-</center>
 
 The result of the query would be Madrid, Leganes and Alcobendas.As shown in the picture:
 
 ![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/9/97/Orion-geo-circle-14-in.png)
 
-<center>
 
 |Payload Information Response      |Description            |              |          |          |Value                 |
 |:---------------------------------|:----------------------|:-------------|:---------|:---------|:---------------------|
@@ -2858,17 +2745,16 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 |                                  |                       | Code         |          |          | 200                  |
 |                                  |                       | ReasonPhrase |          |          | OK                   |
 
-</center>                            
 
 
 + Request Get Information for Room1 (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body
-    
+
             {
                 "entities": [
                     {
@@ -2911,11 +2797,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
             
 + Request Get Information for Temperature Room1  (application/json)
 
-        + Headers (application/json)
-    
+    + Headers 
+
             Accept: application/json
-        
-        + Body
+    
+    + Body
+    
             {
                 "entities": [
                 {
@@ -2954,16 +2841,16 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
                     }
                 ]
             }
-            
+
 
 + Request Get Information for Temperature all Rooms  (application/json)
 
-        + Headers (application/json)
-    
+    + Headers 
+
             Accept: application/json
-        
-        + Body
-        
+    
+    + Body
+    
             {
                 "entities": [
                 {
@@ -3006,12 +2893,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Request Get Information for a non-exisiting room  (application/json)
 
-        + Headers (application/json)
-    
+    + Headers 
+
             Accept: application/json
 
-        + Body
-        
+    + Body
+    
             {
                 "entities": [
                 {
@@ -3025,12 +2912,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Response 404 (application/json)
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
         
-        + Body 
-        
+    + Body 
+    
             {
                 "errorCode": {
                 "code": "404",
@@ -3040,145 +2927,147 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Request Defining a polygon (application/json)
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
-        + Body 
+
+    + Body 
         
-        {
-            "entities": [
             {
-                "type": "Point",
-                "isPattern": "true",
-                "id": ".*"
-            }
-            ],
-            "restriction": {
-                "scopes": [
+                "entities": [
                 {
-                    "type" : "FIWARE::Location",
-                    "value" : {
-                    "polygon": {
-                    "vertices": [
-                        {
-                        "latitude": "0",
-                        "longitude": "0"
-                        },
-                        {
-                        "latitude": "0",
-                        "longitude": "6"
-                        },
-                        {
-                        "latitude": "6",
-                        "longitude": "6"
-                        },
-                        {
-                        "latitude": "6",
-                        "longitude": "0"
-                        }
-                    ]
-                    }
-                    }
+                    "type": "Point",
+                    "isPattern": "true",
+                    "id": ".*"
                 }
-                ]
+                ],
+                "restriction": {
+                    "scopes": [
+                    {
+                        "type" : "FIWARE::Location",
+                        "value" : {
+                        "polygon": {
+                        "vertices": [
+                            {
+                            "latitude": "0",
+                            "longitude": "0"
+                            },
+                            {
+                            "latitude": "0",
+                            "longitude": "6"
+                            },
+                            {
+                            "latitude": "6",
+                            "longitude": "6"
+                            },
+                            {
+                            "latitude": "6",
+                            "longitude": "0"
+                            }
+                        ]
+                        }
+                        }
+                    }
+                    ]
+                }
             }
-        }
 
 + Response 200 (application/json)
 
 + Request Defining a circle (application/json)
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
-        + Body 
+
+    + Body 
         
-         {
-           "entities": [
-                {
-                "type": "City",
-                "isPattern": "true",
-                "id": ".*"
-                }
-                ],
-            "restriction": {
-                "scopes": [
+            {
+               "entities": [
                     {
-                    "type" : "FIWARE::Location",
-                    "value" : {
-                    "circle": {
-                    "centerLatitude": "40.418889",
-                    "centerLongitude": "-3.691944",
-                    "radius": "15000"
+                    "type": "City",
+                    "isPattern": "true",
+                    "id": ".*"
                     }
+                    ],
+                "restriction": {
+                    "scopes": [
+                        {
+                        "type" : "FIWARE::Location",
+                        "value" : {
+                        "circle": {
+                        "centerLatitude": "40.418889",
+                        "centerLongitude": "-3.691944",
+                        "radius": "15000"
+                        }
+                    }
+                    }
+                    ]
                 }
-                }
-                ]
             }
-        }
         
 
 + Response 200 (application/json)  
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
         
-        + Body 
-    
-        "contextResponses": [
-            {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "metadatas": [
-                                {
-                                    "name": "location", 
-                                    "type": "string", 
-                                    "value": "WGS84"
-                                }
-                            ], 
-                            "name": "position", 
-                            "type": "coords", 
-                            "value": "40.418889, -3.691944"
-                        }
-                    ], 
-                    "id": "Madrid", 
-                    "isPattern": "false", 
-                    "type": "City"
-                }, 
-                "statusCode": {
-                    "code": "200", 
-                    "reasonPhrase": "OK"
-                }
-            }, 
-            {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "metadatas": [
-                                {
-                                    "name": "location", 
-                                    "type": "string", 
-                                    "value": "WGS84"
-                                }
-                            ], 
-                            "name": "position", 
-                            "type": "coords", 
-                            "value": "40.316667, -3.75"
-                        }
-                    ], 
-                    "id": "Leganes", 
-                    "isPattern": "false", 
-                    "type": "City"
-                }, 
-                "statusCode": {
-                    "code": "200", 
-                    "reasonPhrase": "OK"
+    + Body 
+
+            "contextResponses": [
+                {
+                    "contextElement": {
+                        "attributes": [
+                            {
+                                "metadatas": [
+                                    {
+                                        "name": "location", 
+                                        "type": "string", 
+                                        "value": "WGS84"
+                                    }
+                                ], 
+                                "name": "position", 
+                                "type": "coords", 
+                                "value": "40.418889, -3.691944"
+                            }
+                        ], 
+                        "id": "Madrid", 
+                        "isPattern": "false", 
+                        "type": "City"
+                    }, 
+                    "statusCode": {
+                        "code": "200", 
+                        "reasonPhrase": "OK"
                     }
-                }
-            ]
-        }
+                }, 
+                {
+                    "contextElement": {
+                        "attributes": [
+                            {
+                                "metadatas": [
+                                    {
+                                        "name": "location", 
+                                        "type": "string", 
+                                        "value": "WGS84"
+                                    }
+                                ], 
+                                "name": "position", 
+                                "type": "coords", 
+                                "value": "40.316667, -3.75"
+                            }
+                        ], 
+                        "id": "Leganes", 
+                        "isPattern": "false", 
+                        "type": "City"
+                    }, 
+                    "statusCode": {
+                        "code": "200", 
+                        "reasonPhrase": "OK"
+                        }
+                    }
+                ]
+            }
     
 
         
@@ -3220,7 +3109,7 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue vector</td>
   </tr>
   <tr>
     <th>Payload Information Response</th>
@@ -3234,7 +3123,6 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 </table>
 
 The following is the request corresponding to an ONTIMEINTERVAL subscription:
-<center>
 
 |Payload Information Request       |Description     | Value                           |
 |:---------------------------------|:---------------|:--------------------------------|
@@ -3249,9 +3137,8 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |<b>NotifyConditions</b>           |                |                                 |
 |                                  | Type           | ONTIMEINTERVAL                  |
 |                                  | CondValues     | PT10S                           |
-</center>
 
-<center>
+
 
 |Payload Information Response      |Description     | Value                   |
 |:---------------------------------|:---------------|:------------------------|
@@ -3259,7 +3146,6 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |                                  | duration       | P1M                     | 
 |                                  | subscriptionId | 552f7481983d79a38fbd5a74|                           |              
 
-</center>
 
 If you look at the accumulator-script.py terminal window, you will see that a message resembling the following one is received each 10 seconds:
 
@@ -3295,7 +3181,7 @@ If you look at the accumulator-script.py terminal window, you will see that a me
                 ]
         }
 
-Orion Context Broker notifies NGSI10 subscribeContext using the POST HTTP method (on the URL used as reference for the subscription) with a notifyContextRequest payload. Apart from the subscriptionId element (that matches the one in the response to subscribeContext request) and the originator element, there is a contextResponseList element which is the same that the one used in the queryContext responses.
+Orion Context Broker notifies NGSI10 subscribeContext using the POST HTTP method (on the URL used as reference for the subscription) with a notifyContextRequest payload. Apart from the subscriptionId element (that matches the one in the response to subscribeContext request) and the originator element, there is a contextResponse vector which is the same that the one used in the queryContext responses.
 
 + ONCHANGE
 
@@ -3328,7 +3214,7 @@ The following is the request corresponding to an ONCHANGE subscription:
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue vector</td>
   </tr>
   <tr>
     <td><b>Throttling</b></td>
@@ -3345,12 +3231,11 @@ The following is the request corresponding to an ONCHANGE subscription:
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-*The notifyCondition element uses the type ONCHANGE (obviously :) but, in this case the condValueList contains an actual list of condValue elements, each one with an attribute name. They define the "triggering attributes", i.e. attributes that upon creation/change due to entity creation or update trigger the notification. The rule is that if at least one of the attributes in the list changes (e.g. some kind of "OR" condition), then a notification is sent. But note that that notification includes the attributes in the attributeList part, which doesn't necessarily include any attribute in the condValue.
+*The notifyCondition element uses the type ONCHANGE (obviously :) but, in this case the condValue vector contains an actual list of condValue elements, each one with an attribute name. They define the "triggering attributes", i.e. attributes that upon creation/change due to entity creation or update trigger the notification. The rule is that if at least one of the attributes in the list changes (e.g. some kind of "OR" condition), then a notification is sent. But note that that notification includes the attributes in the attribute vector part, which doesn't necessarily include any attribute in the condValue.
 
 *The throttling element is used to specify a minimum inter-notification arrival time. So, setting throttling to 5 seconds as in the example above makes that a notification will not be sent if a previous notification was sent less than 5 seconds ago, no matter how many actual changes take place in that period.his is to not stress the notification receptor in case of having context producers that update attribute values too frequently. Actually, throttling is not an "exclusive" field for ONCHANGE subscriptions: from a theoretical point of view it can be used in ONTIMEINTERVAL subscriptions but, given that in that case you can precisely control the notification frequency it doesn't have any practical sense.
 
 
-<center>
 
 |Payload Information Request       |Description     | Value                           |
 |:---------------------------------|:---------------|:--------------------------------|
@@ -3367,7 +3252,6 @@ The following is the request corresponding to an ONCHANGE subscription:
 |                                  | CondValues     | Pressure                        |
 |<b>Throttling</b>                 |                | PT5S                            |
 
-</center>
 
 As in ONTIMEINTERVAL subscriptions, the response consists of a subscription ID, a duration acknowledgement and (given that we used throttling in the request) a throttling acknowledgement.
 
@@ -3411,9 +3295,9 @@ You may wonder why accumulator-server.py is getting this message if you don't ac
 
 + Request ONTIMEINTERVAL (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3443,20 +3327,20 @@ You may wonder why accumulator-server.py is getting this message if you don't ac
             
 + Response 200 (application/json)
 
-        {
-            "subscribeResponse": {
-            "duration": "P1M", 
-            "subscriptionId": "552f7481983d79a38fbd5a74"
+            {
+                "subscribeResponse": {
+                "duration": "P1M", 
+                "subscriptionId": "552f7481983d79a38fbd5a74"
+                }
             }
-        }
 
 
 
 + Request ONCHANGE (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3542,7 +3426,6 @@ As you can see, the structure of the request is exactly the same we used for upd
 </table>
 
 The following is the request corresponding to an ONTIMEINTERVAL subscription:
-<center>
 
 |Payload Information Request  |Description  |              |Value          |
 |:----------------------------|:------------|:-------------|:--------------|
@@ -3560,9 +3443,7 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 | <b>UpdateAction</b>         |             |              |UPDATE         |
 
 
-</center>
 
-<center>
 
 |Payload Information Response      |Description            |             |              | Value         |
 |:---------------------------------|:----------------------|:------------|:-------------|:--------------|
@@ -3583,7 +3464,6 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |                                  |                       |             |ReasonPhrase  |OK             |
 
 
-</center>
 
 Again, the structure of the response is exactly the same one we used for updateContext with APPEND for creating entities.
 The updateContext operation is quite flexible as it allows you to update as many entities and attributes as you want: it is just a matter of which contextElements you include in the list. You could even update the whole database of Orion Context Broker (maybe including thousands of entities/attributes) in just one updateContext operation (at least in theory).
@@ -3593,9 +3473,9 @@ The updateContext operation is quite flexible as it allows you to update as many
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3625,33 +3505,33 @@ The updateContext operation is quite flexible as it allows you to update as many
             
 + Response 200 (application/json)
 
-        {
-            "contextResponses": [
             {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "name": "temperature",
-                            "type": "float",
-                            "value": ""
+                "contextResponses": [
+                {
+                    "contextElement": {
+                        "attributes": [
+                            {
+                                "name": "temperature",
+                                "type": "float",
+                                "value": ""
+                            },
+                            {
+                                "name": "pressure",
+                                "type": "integer",
+                                "value": ""
+                            }
+                        ],
+                            "id": "Room1",
+                            "isPattern": "false",
+                            "type": "Room"
                         },
-                        {
-                            "name": "pressure",
-                            "type": "integer",
-                            "value": ""
-                        }
-                    ],
-                        "id": "Room1",
-                        "isPattern": "false",
-                        "type": "Room"
-                    },
-                        "statusCode": {
-                            "code": "200",
-                            "reasonPhrase": "OK"
-                        }
-                }
-            ]
-        }
+                            "statusCode": {
+                                "code": "200",
+                                "reasonPhrase": "OK"
+                            }
+                    }
+                ]
+            }
         
 
 ## /v1/unsubscribeContext
@@ -3685,16 +3565,13 @@ Finally, you can cancel a subscription using the NGSI10 unsubscribeContext opera
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-<center>
 
 |Payload Information Request      |Description     | Value                    |
 |:--------------------------------|:---------------|:-------------------------|
 |<b>SubscriptionId</b>            |                | 552f7481983d79a38fbd5a74 |                        
                                    
 
-</center>
 
-<center>
 
 |Payload Information Response      |Description      | Value                    |
 |:---------------------------------|:----------------|:-------------------------|
@@ -3702,15 +3579,15 @@ Finally, you can cancel a subscription using the NGSI10 unsubscribeContext opera
 |                                  | Code            | 200                      | 
 |                                  | ReasonPhrase    | Ok                       |              
 |<b>SubscriptionId</b>             |                 | 552f7481983d79a38fbd5a74 |   
-</center>
+
 
 
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3721,10 +3598,10 @@ Finally, you can cancel a subscription using the NGSI10 unsubscribeContext opera
         
 + Response 200 (application/json)
 
-         {
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            },
-            "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-         }
+            {
+                "statusCode": {
+                    "code": "200",
+                    "reasonPhrase": "OK"
+                },
+                "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+            }

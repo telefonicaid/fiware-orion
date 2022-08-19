@@ -62,12 +62,4 @@ extern void jsonDcarRelease(ParseData* reqDataP);
 */
 extern std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-
-
-/* ****************************************************************************
-*
-* jsonDcarPresent - 
-*/
-extern void jsonDcarPresent(ParseData* reqDataP);
-
 #endif  // SRC_LIB_JSONPARSE_JSONDISCOVERCONTEXTAVAILABILITYREQUEST_H_

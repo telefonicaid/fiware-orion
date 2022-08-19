@@ -31,7 +31,8 @@
 
 /* ****************************************************************************
 *
-* constructorsAndRender - 
+* constructorsAndRender -
+*
 */
 TEST(UnsubscribeContextResponse, constructorsAndRender)
 {
@@ -41,17 +42,12 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
   StatusCode                  ec(SccBadRequest, "D");
   UnsubscribeContextResponse  uncr3(ec);
   std::string                 out;
-  const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok.valid.xml";
 
   utInit();
 
   EXPECT_EQ(0,             uncr1.statusCode.code);
   EXPECT_EQ(SccOk,         uncr2.statusCode.code);
   EXPECT_EQ(SccBadRequest, uncr3.statusCode.code);
-
-  out = uncr3.render(UnsubscribeContext, XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   uncr1.release();
 
@@ -62,7 +58,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
 
 /* ****************************************************************************
 *
-* jsonRender - 
+* jsonRender -
 */
 TEST(UnsubscribeContextResponse, jsonRender)
 {
@@ -81,7 +77,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
   uncrP->statusCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
-  out = uncrP->render(QueryContext, JSON, "");
+  out = uncrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -90,7 +86,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
   uncrP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
-  out = uncrP->render(QueryContext, JSON, "");
+  out = uncrP->toJsonV1();
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   delete uncrP;

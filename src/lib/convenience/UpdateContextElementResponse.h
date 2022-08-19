@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -59,14 +58,12 @@ typedef struct UpdateContextElementResponse
 
   UpdateContextElementResponse();
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  void         present(const std::string& indent);
+  std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release();
-  std::string  check(ConnectionInfo*     ciP,
+  std::string  check(ApiVersion          apiVersion,
+                     bool                asJsonObject,
                      RequestType         requestType,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+                     const std::string&  predetectedError);
   void         fill(UpdateContextResponse* ucrsP);
 } UpdateContextElementResponse;
 

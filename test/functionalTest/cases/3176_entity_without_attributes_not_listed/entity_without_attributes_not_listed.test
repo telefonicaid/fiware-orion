@@ -1,0 +1,125 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST Entities V2 No Attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+#
+# 01. POST /v2/registrations
+# 02. POST /v2/entities
+# 03. GET /v2/entities
+#
+
+
+echo "01. POST /v2/registrations"
+echo "=========================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "urn:ngsi-ld:Vehicle:A456",
+        "type": "Vehicle"
+      }
+    ],
+    "attrs": [
+      "brandName",
+      "speed",
+      "isParked"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://contextsource.example.org"
+    },
+    "supportedForwardingMode": "all",
+    "legacyForwarding": true
+  },
+  "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/entities"
+echo "====================="
+payload='{
+  "id": "E1",
+  "type": "T1"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/registrations
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/entities
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 25
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

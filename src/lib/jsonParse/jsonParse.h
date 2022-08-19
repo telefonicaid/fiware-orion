@@ -46,4 +46,10 @@ extern std::string jsonParse
   ParseData*          reqDataP
 );
 
+/* ****************************************************************************
+*
+* safeValue -
+*/
+extern std::string safeValue(const std::string& s);
+
 #endif  // SRC_LIB_JSONPARSE_JSONPARSE_H_

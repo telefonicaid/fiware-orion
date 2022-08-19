@@ -23,26 +23,42 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/commonMocks.h"
 
-#include "commonMocks.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -62,8 +78,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Set database */
     setupDatabase();
 
@@ -75,15 +91,7 @@ static void prepareDatabase(void) {
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 100
-                                                       ))
-                        );
+                        "conditions" << BSON_ARRAY("AX1" << "AY1"));
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
                         "expiration" << 20000000 <<
@@ -91,19 +99,10 @@ static void prepareDatabase(void) {
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY(BSON(
-                                                       "type" << "ONCHANGE" <<
-                                                       "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
-                                                       ))
-                        );
+                        "conditions" << BSON_ARRAY("AX2" << "AY2"));
 
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
-
 }
 
 /* ****************************************************************************
@@ -118,11 +117,7 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -146,9 +141,6 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
 
-    /* Release connection */
-    mongoDisconnect();
-
     /* Release mock */
     delete notifierMock;
 }
@@ -165,11 +157,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -195,9 +183,6 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
 
-    /* Release connection */
-    mongoDisconnect();
-
     /* Release mock */
     delete notifierMock;
 }
@@ -217,15 +202,11 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -235,7 +216,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object).
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -246,20 +227,22 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.csubs "
-              "- findOne() _id: 51307b66f481db11bf860001 "
-              "- exception: boom!!", res.statusCode.details);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
+              "- exception: boom!!)", res.statusCode.details);
 
     // Sleeping a little to "give mongod time to process its input".
     // Without this sleep, this tests fails around 10% of the times (in Ubuntu 13.04)
     usleep(1000);
 
-    int count = connection->count(SUBSCRIBECONTEXT_COLL, BSONObj());
+    int count = connectionDb->count(SUBSCRIBECONTEXT_COLL, BSONObj());
 
     ASSERT_EQ(2, count);
 
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
     /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
 }
@@ -277,25 +260,25 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
 
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
-    BSONObj fakeSub = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                                       "expiration" << 10000000 <<
-                                       "lastNotification" << 15000000 <<
-                                       "reference" << "http://notify1.me" <<
-                                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
-                                       "attrs" << BSONArray() <<
-                                       "conditions" << BSONArray());
+
+    BSONObj fakeSub = BSON("_id"              << OID("51307b66f481db11bf860001")            <<
+                           "expiration"       << 10000000                                   <<
+                           "lastNotification" << 15000000                                   <<
+                           "reference"        << "http://notify1.me"                        <<
+                           "entities"         << BSON_ARRAY(BSON("id"          << "E1" <<
+                                                                 "type"        << "T1" <<
+                                                                 "isPattern"   << "false")) <<
+                           "attrs" << BSONArray()                                           <<
+                           "conditions" << BSONArray());
+
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs", _, _, _))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, remove("utest.csubs", _, _, _))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -305,7 +288,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object).
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -316,17 +299,19 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.csubs "
-              "- remove() _id: 51307b66f481db11bf860001 "
-              "- exception: boom!!", res.statusCode.details);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- remove(): { _id: ObjectId('51307b66f481db11bf860001') } "
+              "- exception: boom!!)", res.statusCode.details);
 
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
 
-    ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
+    ASSERT_EQ(2, connectionDb->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
+
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
 
     /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
 }

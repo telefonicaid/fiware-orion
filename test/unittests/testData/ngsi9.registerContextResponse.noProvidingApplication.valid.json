@@ -1,9 +1,1 @@
-{
-  "duration" : "PT1M",
-  "registrationId" : "000000000000000000000000",
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "no providing application"
-  }
-}
+{"registrationId":"000000000000000000000000","errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"no providing application"}}

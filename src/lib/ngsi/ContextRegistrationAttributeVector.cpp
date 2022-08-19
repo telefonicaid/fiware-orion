@@ -27,6 +27,8 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttributeVector.h"
@@ -35,21 +37,23 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::render -
+* ContextRegistrationAttributeVector::toJsonV1 -
 */
-std::string ContextRegistrationAttributeVector::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationAttributeVector::toJsonV1(bool comma)
 {
-  std::string xmlTag   = "contextRegistrationAttributeList";
-  std::string jsonTag  = "attributes";
-  std::string out      = "";
+  std::string out = "";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag("attributes", true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
-  out += endTag(indent, xmlTag, format, comma, true);
+  {
+    out += vec[ix]->toJsonV1(ix != vec.size() - 1);
+  }
+  out += endTag(comma, true);
 
   return out;
 }
@@ -60,42 +64,19 @@ std::string ContextRegistrationAttributeVector::render(Format format, const std:
 *
 * ContextRegistrationAttributeVector::check -
 */
-std::string ContextRegistrationAttributeVector::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ContextRegistrationAttributeVector::check(ApiVersion apiVersion)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion)) != "OK")
     {
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttributeVector::present -
-*/
-void ContextRegistrationAttributeVector::present(const std::string& indent)
-{
-  LM_F(("%lu ContextRegistrationAttributes", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(ix, indent);
-  }
 }
 
 
@@ -113,11 +94,15 @@ void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute*
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::get -
+* ContextRegistrationAttributeVector::operator[] -
 */
-ContextRegistrationAttribute* ContextRegistrationAttributeVector::get(int ix)
+ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+    return NULL;  
 }
 
 
@@ -141,7 +126,6 @@ void ContextRegistrationAttributeVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
     delete(vec[ix]);
   }
 

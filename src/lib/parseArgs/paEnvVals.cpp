@@ -125,25 +125,17 @@ int paEnvVals(PaiArgument* paList)
         break;
 
       case PaBoolean:
-        if ((strcmp(val, "TRUE") == 0) ||
-            (strcmp(val, "ON")   == 0) ||
-            (strcmp(val, "1")    == 0) ||
-            (strcmp(val, "yes")  == 0)
-          )
+        if ((strcmp(val, "TRUE") == 0) || (strcmp(val, "true") == 0))
         {
           *((bool*) (int64_t) aP->varP) = true;
         }
-        else if ((strcmp(val, "FALSE") == 0) ||
-                 (strcmp(val, "OFF")   == 0) ||
-                 (strcmp(val, "0")     == 0) ||
-                 (strcmp(val, "no")    == 0)
-          )
+        else if ((strcmp(val, "FALSE") == 0) || (strcmp(val, "false") == 0))
         {
           *((bool*) (int64_t) aP->varP) = false;
         }
         else
         {
-          snprintf(w, sizeof(w), "bad value '%s' for boolean variable %s", val, envVarName);
+          snprintf(w, sizeof(w), "Bad Value '%s' for boolean variable '%s' - only 'TRUE', 'true', 'FALSE' and 'false' allowed as value for booleans", val, envVarName);
           PA_WARNING(PasNoSuchBooleanValue, w);
         }
         break;

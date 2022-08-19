@@ -38,14 +38,7 @@
 *
 * RestrictionString::check -
 */
-std::string RestrictionString::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string RestrictionString::check(void)
 {
   return "OK";
 }
@@ -58,7 +51,7 @@ std::string RestrictionString::check
 */
 bool RestrictionString::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -87,34 +80,16 @@ std::string RestrictionString::get(void)
 
 /* ****************************************************************************
 *
-* RestrictionString::present -
+* RestrictionString::toJsonV1 -
 */
-void RestrictionString::present(const std::string& indent)
+std::string RestrictionString::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sRestrictionString: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo RestrictionString\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* RestrictionString::render -
-*/
-std::string RestrictionString::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
 
-  return valueTag(indent, "restriction", string, format, comma);
+  return valueTag("restriction", string, comma);
 }
 
 

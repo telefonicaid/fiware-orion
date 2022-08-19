@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "common/Format.h"
 #include "ngsi/Request.h"
 #include "rest/HttpStatusCode.h"
 
@@ -51,27 +50,22 @@ typedef struct StatusCode
   std::string     reasonPhrase;     // Mandatory
   std::string     details;          // Optional
 
-  std::string     tag;              // tag to be rendered
+  std::string     keyName;          // tag to be rendered
 
   StatusCode();
-  StatusCode(const std::string& _tag);
-  StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag = "statusCode");
+  StatusCode(const std::string& _keyName);
+  StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName = "statusCode");
 
-  std::string  render(Format format, const std::string& indent, bool comma = false, bool showTag = true);
-  std::string  toJson(bool isLastElement);
+  std::string  toJsonV1(bool comma, bool showKey = true);
+  std::string  toJson(void);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
   void         fill(const StatusCode& sc);
   void         fill(const struct UpdateContextResponse& ucrs);
-  void         present(const std::string& indent);
   void         release(void);
-  void         tagSet(const std::string& _tag);
+  void         keyNameSet(const std::string& _tag);
 
-  std::string  check(RequestType         requestType,
-                     Format              format,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
+  std::string  check(void);
 } StatusCode;
 
 #endif  // SRC_LIB_NGSI_STATUSCODE_H_

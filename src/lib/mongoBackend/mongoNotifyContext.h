@@ -1,5 +1,5 @@
-#ifndef MONGO_NOTIFY_CONTEXT_H
-#define MONGO_NOTIFY_CONTEXT_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXT_H_
+#define SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXT_H_
 
 /*
 *
@@ -25,9 +25,13 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+#include <vector>
 
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
+
+
 
 /* ****************************************************************************
 *
@@ -39,7 +43,9 @@ extern HttpStatusCode mongoNotifyContext
   NotifyContextResponse*           responseP,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               fiwareCorrelator,
+  const std::string&               ngsiV2AttrsFormat
 );
 
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGONOTIFYCONTEXT_H_

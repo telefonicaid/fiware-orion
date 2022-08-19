@@ -22,13 +22,16 @@
 *
 * Author: Fermin Galan
 */
-#include "unittest.h"
+#include <string>
+#include <vector>
+
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/EntityId.h"
@@ -36,7 +39,28 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/unittest.h"
+
+
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
+using mongo::BSONObjBuilder;
+using mongo::BSONNULL;
+
+
+
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -74,7 +98,6 @@
 * Cases involving more than one CPR:
 *
 * - severalCprs
-* - severalCprsFormat
 *
 * Failing cases
 *
@@ -87,14 +110,14 @@
 *
 */
 
+
+
 /* ****************************************************************************
 *
 * findAttr -
-*
 */
 static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 {
-
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     if (attrs[ix].str() == name)
@@ -102,9 +125,10 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
       return true;
     }
   }
-  return false;
 
+  return false;
 }
+
 
 
 /* ****************************************************************************
@@ -116,7 +140,6 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 */
 static void prepareDatabase(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -140,83 +163,62 @@ static void prepareDatabase(void)
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T1") <<
                        BSON("id" << "E2" << "type" << "T2") <<
-                       BSON("id" << "E3" << "type" << "T3")
-                       ) <<
+                       BSON("id" << "E3" << "type" << "T3")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1" << "type" << "T1")
-                       ) <<
+                       BSON("id" << "E1" << "type" << "T1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A4" << "type" << "TA4")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E2" << "type" << "T2")
-                       ) <<
+                       BSON("id" << "E2" << "type" << "T2")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1" << "type" << "T1bis")
-                       ) <<
+                       BSON("id" << "E1" << "type" << "T1bis")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1bis" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1bis")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1")
-                       ) <<
+                       BSON("id" << "E1")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-        "_id" << OID("51307b66f481db11bf860001") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-        );
 
-  BSONObj reg2 = BSON(
-        "_id" << OID("51307b66f481db11bf860002") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr3)
-        );
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg3 = BSON(
-        "_id" << OID("51307b66f481db11bf860003") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr4)
-        );
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg4 = BSON(
-        "_id" << OID("51307b66f481db11bf860004") <<
-        "expiration" << 1879048191 <<
-        "contextRegistration" << BSON_ARRAY(cr5)
-        );
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
+
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
+                      "expiration" << 1879048191 <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
-
 }
+
 
 /* ****************************************************************************
 *
@@ -227,7 +229,6 @@ static void prepareDatabase(void)
 */
 static void prepareDatabasePatternTrue(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -251,79 +252,59 @@ static void prepareDatabasePatternTrue(void)
                      "entities" << BSON_ARRAY(
                        BSON("id" << "E1" << "type" << "T") <<
                        BSON("id" << "E2" << "type" << "T") <<
-                       BSON("id" << "E3" << "type" << "T")
-                       ) <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E1" << "type" << "T")
-                       ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true") <<
-                       BSON("name" << "A4" << "type" << "TA4" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A1" << "type" << "TA1") <<
+                       BSON("name" << "A4" << "type" << "TA4")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E2" << "type" << "T")
-                       ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false") <<
-                       BSON("name" << "A3" << "type" << "TA3" << "isDomain" << "true")
-                       )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2") <<
+                       BSON("name" << "A3" << "type" << "TA3")));
 
   BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E2" << "type" << "Tbis")
-                       ) <<
+                       BSON("id" << "E2" << "type" << "Tbis")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2bis" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2bis")));
 
   BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" <<
                      "entities" << BSON_ARRAY(
-                       BSON("id" << "E3")
-                       ) <<
+                       BSON("id" << "E3")) <<
                      "attrs" << BSON_ARRAY(
-                       BSON("name" << "A2" << "type" << "TA2" << "isDomain" << "false")
-                       )
-                     );
+                       BSON("name" << "A2" << "type" << "TA2")));
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
-        "_id" << "ff37" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr1 << cr2)
-        );
 
-  BSONObj reg2 = BSON(
-        "_id" << "ff48" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr3)
-        );
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf86ff37") <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
-  BSONObj reg3 = BSON(
-        "_id" << "ff80" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr4)
-        );
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf86ff48") <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr3));
 
-  BSONObj reg4 = BSON(
-        "_id" << "ff90" <<
-        "expiration" << 1879048191 <<
-        "subscriptions" << BSONArray() <<
-        "contextRegistration" << BSON_ARRAY(cr5)
-        );
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf86ff80") <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr4));
+
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf86ff90") <<
+                      "expiration" << 1879048191 <<
+                      "subscriptions" << BSONArray() <<
+                      "contextRegistration" << BSON_ARRAY(cr5));
 
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
@@ -331,14 +312,15 @@ static void prepareDatabasePatternTrue(void)
   connection->insert(REGISTRATIONS_COLL, reg4);
 }
 
+
+
 /* ****************************************************************************
 *
 * prepareDatabaseSeveralCprs1 -
 *
 */
-static void prepareDatabaseSeveralCprs(bool withFormat = false)
+static void prepareDatabaseSeveralCprs(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -361,84 +343,57 @@ static void prepareDatabaseSeveralCprs(bool withFormat = false)
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
-                        "A1" << BSON("type" << "T" << "value" << "1")
-                        )
-                    );
+                       "A1" << BSON("type" << "T" << "value" << "1")));
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("A3") <<
                      "attrs" << BSON(
-                        "A3" << BSON("type" << "T" << "value" << "3")
-                        )
-                    );
+                       "A3" << BSON("type" << "T" << "value" << "3")));
 
   BSONObj cr1 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E1" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E1" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A2" << "type" << "T")));
+
   BSONObj cr2 = BSON("providingApplication" << "http://cpr3.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E2" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E2" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A4" << "type" << "T")));
+
   BSONObj cr3 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E3" << "type" << "T")
-                         ) <<
+                       BSON("id" << "E3" << "type" << "T")) <<
                      "attrs" << BSON_ARRAY(
-                         BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")
-                         )
-                     );
+                       BSON("name" << "A5" << "type" << "T")));
+
   BSONObj cr4 = BSON("providingApplication" << "http://cpr1.com" <<
                      "entities" << BSON_ARRAY(
-                         BSON("id" << "E4" << "type" << "T")
-                         ) <<
-                     "attrs" << BSONArray()
-                     );
+                       BSON("id" << "E4" << "type" << "T")) <<
+                     "attrs" << BSONArray());
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObjBuilder reg1;
-  reg1.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr1)
-                        ));
+
+  reg1.appendElements(BSON("_id" << OID("51307b66f481db11bf860001") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr1)));
 
   BSONObjBuilder reg2;
-  reg2.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr2)
-                        ));
+  reg2.appendElements(BSON("_id" << OID("51307b66f481db11bf860002") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr2)));
 
   BSONObjBuilder reg3;
-  reg3.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860003") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr3)
-                        ));
+  reg3.appendElements(BSON("_id" << OID("51307b66f481db11bf860003") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr3)));
 
   BSONObjBuilder reg4;
-  reg4.appendElements(BSON(
-                        "_id" << OID("51307b66f481db11bf860004") <<
-                        "expiration" << 1879048191 <<
-                        "contextRegistration" << BSON_ARRAY(cr4)
-                        ));
-
-  if (withFormat)
-  {
-    reg1.appendElements(BSON("format" << "JSON"));
-    reg2.appendElements(BSON("format" << "XML"));
-    reg3.appendElements(BSON("format" << "JSON"));
-    reg4.appendElements(BSON("format" << "XML"));
-  }
+  reg4.appendElements(BSON("_id" << OID("51307b66f481db11bf860004") <<
+                           "expiration" << 1879048191 <<
+                           "contextRegistration" << BSON_ARRAY(cr4)));
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
@@ -446,7 +401,6 @@ static void prepareDatabaseSeveralCprs(bool withFormat = false)
   connection->insert(REGISTRATIONS_COLL, reg2.obj());
   connection->insert(REGISTRATIONS_COLL, reg3.obj());
   connection->insert(REGISTRATIONS_COLL, reg4.obj());
-
 }
 
 
@@ -474,13 +428,13 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
    * it is legal from the point of view of OMA spec */
-  ContextElement ce;
-  ce.entityId.fill("E3", "T3", "false");
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E3", "T3", "false");
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -489,18 +443,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("T3", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("T3", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-  EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
-
-  /* Release connection */
-  mongoDisconnect();
+  EXPECT_EQ(0, RES_CER(0).attributeVector.size());
 
   utExit();
 }
@@ -523,15 +474,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A4", "TA4", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -542,17 +493,16 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -560,11 +510,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -590,15 +536,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -609,17 +555,16 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -627,11 +572,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 
@@ -653,17 +594,17 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E3", "T3", "false");
-  ContextAttribute ca1("A1", "TA1", "new_val");
-  ContextAttribute ca2("A2", "TA2", "new_val");
-  ce.contextAttributeVector.push_back(&ca1);
-  ce.contextAttributeVector.push_back(&ca2);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E3", "T3", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
+  eP->attributeVector.push_back(ca1P);
+  eP->attributeVector.push_back(ca2P);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -674,25 +615,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("T3", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("T3", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
@@ -700,11 +639,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 
@@ -726,15 +661,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A5", "TA5", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A5", "TA5", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -745,29 +680,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -795,15 +725,16 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce1, ce2;
-  ce1.entityId.fill("E1", "T1", "false");
-  ce2.entityId.fill("E2", "T2", "false");
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
-  req.updateActionType.set("UPDATE");
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  e1P->fill("E1", "T1", "false");
+  e2P->fill("E2", "T2", "false");
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -812,30 +743,26 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(2,res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-  EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ(0, RES_CER(0).attributeVector.size());
 
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T2", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("T2", RES_CER(1).type);
+  EXPECT_EQ("false", RES_CER(1).isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(1).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(1).details);
-  EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
-
-  /* Release connection */
-  mongoDisconnect();
+  EXPECT_EQ(0, RES_CER(1).attributeVector.size());
 
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -858,19 +785,19 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca1("A3", "TA3", "new_val");
-  ContextAttribute ca2("A4", "TA4", "new_val");
-  ContextAttribute ca3("A5", "TA5", "new_val");
-  ce.contextAttributeVector.push_back(&ca1);
-  ce.contextAttributeVector.push_back(&ca2);
-  ce.contextAttributeVector.push_back(&ca3);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A3", "TA3", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
+  ContextAttribute* ca3P = new ContextAttribute("A5", "TA5", "new_val");
+  eP->attributeVector.push_back(ca1P);
+  eP->attributeVector.push_back(ca2P);
+  eP->attributeVector.push_back(ca3P);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -881,33 +808,30 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(3, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(0, 2)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
 
@@ -915,11 +839,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -949,27 +869,28 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce1, ce2;
-  ce1.entityId.fill("E1", "T1", "false");
-  ce2.entityId.fill("E2", "T2", "false");
-  ContextAttribute ca1("A3", "TA3", "new_val");
-  ContextAttribute ca2("A4", "TA4", "new_val");
-  ContextAttribute ca3("A5", "TA5", "new_val");
-  ContextAttribute ca4("A3", "TA3", "new_val");
-  ContextAttribute ca5("A4", "TA4", "new_val");
-  ContextAttribute ca6("A5", "TA5", "new_val");
-  ce1.contextAttributeVector.push_back(&ca1);
-  ce1.contextAttributeVector.push_back(&ca2);
-  ce1.contextAttributeVector.push_back(&ca3);
-  ce2.contextAttributeVector.push_back(&ca4);
-  ce2.contextAttributeVector.push_back(&ca5);
-  ce2.contextAttributeVector.push_back(&ca6);
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
-  req.updateActionType.set("UPDATE");
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  e1P->fill("E1", "T1", "false");
+  e2P->fill("E2", "T2", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A3", "TA3", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A4", "TA4", "new_val");
+  ContextAttribute* ca3P = new ContextAttribute("A5", "TA5", "new_val");
+  ContextAttribute* ca4P = new ContextAttribute("A3", "TA3", "new_val");
+  ContextAttribute* ca5P = new ContextAttribute("A4", "TA4", "new_val");
+  ContextAttribute* ca6P = new ContextAttribute("A5", "TA5", "new_val");
+  e1P->attributeVector.push_back(ca1P);
+  e1P->attributeVector.push_back(ca2P);
+  e1P->attributeVector.push_back(ca3P);
+  e2P->attributeVector.push_back(ca4P);
+  e2P->attributeVector.push_back(ca5P);
+  e2P->attributeVector.push_back(ca6P);
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -980,33 +901,30 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(3, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(0, 2)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
 
@@ -1015,33 +933,30 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T2", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("T2", RES_CER(1).type);
+  EXPECT_EQ("false", RES_CER(1).isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  ASSERT_EQ(3, RES_CER(1).contextAttributeVector.size());
+  ASSERT_EQ(3, RES_CER(1).attributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(1, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(1, 2)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 2)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 2)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(1, 2)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 2)->metadataVector.size());
 
@@ -1049,11 +964,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(1).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1088,15 +999,15 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1107,17 +1018,16 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr5.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -1125,11 +1035,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1159,23 +1065,19 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce;
-  ce.entityId.fill("E[2-3]", "T", "true");
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E[2-3]", "T", "true");
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1199,25 +1101,21 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[1-3]", "T", "true");
-  ContextAttribute ca("A4", "TA4", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E[1-3]", "T", "true");
+  ContextAttribute* caP = new ContextAttribute("A4", "TA4", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1243,25 +1141,21 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[1-2]", "T", "true");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E[1-2]", "T", "true");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1287,27 +1181,23 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[1-2]", "T", "true");
-  ContextAttribute ca1("A1", "TA1", "new_val");
-  ContextAttribute ca2("A2", "TA2", "new_val");
-  ce.contextAttributeVector.push_back(&ca1);
-  ce.contextAttributeVector.push_back(&ca2);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E[1-2]", "T", "true");
+  ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
+  ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val");
+  eP->attributeVector.push_back(ca1P);
+  eP->attributeVector.push_back(ca2P);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1333,23 +1223,19 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce;
-  ce.entityId.fill("R.*", "T", "true");
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("R.*", "T", "true");
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  //TBD
-
-  /* Release connection */
-  mongoDisconnect();
+  // TBD
 
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1379,25 +1265,21 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E[2-3]", "", "true");
-  ContextAttribute ca("A2", "TA2", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E[2-3]", "", "true");
+  ContextAttribute* caP = new ContextAttribute("A2", "TA2", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1426,25 +1308,22 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   /* Forge the request (from "inside" to "outside") */
   /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
-  ContextElement ce1, ce2;
-  ce1.entityId.fill("E[2-3]", "T", "true");
-  ce2.entityId.fill("E1", "T", "false");
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
-  req.updateActionType.set("UPDATE");
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  e1P->fill("E[2-3]", "T", "true");
+  e2P->fill("E1", "T", "false");
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  //TBD
-
-  /* Release connection */
-  mongoDisconnect();
+  // TBD
 
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1475,33 +1354,37 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   prepareDatabaseSeveralCprs();
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce1, ce2, ce3, ce4;
-  ce1.entityId.fill("E1", "T", "false");
-  ContextAttribute ca1("A1", "T", "10");
-  ContextAttribute ca2("A2", "T", "20");
-  ce1.contextAttributeVector.push_back(&ca1);
-  ce1.contextAttributeVector.push_back(&ca2);
-  ce2.entityId.fill("E2", "T", "false");
-  ContextAttribute ca3("A4", "T", "40");
-  ContextAttribute ca4("A3", "T", "30");
-  ce2.contextAttributeVector.push_back(&ca3);
-  ce2.contextAttributeVector.push_back(&ca4);
-  ce3.entityId.fill("E3", "T", "false");
-  ContextAttribute ca5("A5", "T", "50");
-  ContextAttribute ca6("A6", "T", "60");
-  ce3.contextAttributeVector.push_back(&ca5);
-  ce3.contextAttributeVector.push_back(&ca6);
-  ce4.entityId.fill("E4", "T", "false");
-  ContextAttribute ca7("A7", "T", "70");
-  ce4.contextAttributeVector.push_back(&ca7);
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
-  req.contextElementVector.push_back(&ce3);
-  req.contextElementVector.push_back(&ce4);
-  req.updateActionType.set("UPDATE");
+  Entity* e1P = new Entity();
+  Entity* e2P = new Entity();
+  Entity* e3P = new Entity();
+  Entity* e4P = new Entity();
+
+  e1P->fill("E1", "T", "false");
+  ContextAttribute* ca1P = new ContextAttribute("A1", "T", "10");
+  ContextAttribute* ca2P = new ContextAttribute("A2", "T", "20");
+  e1P->attributeVector.push_back(ca1P);
+  e1P->attributeVector.push_back(ca2P);
+  e2P->fill("E2", "T", "false");
+  ContextAttribute* ca3P = new ContextAttribute("A4", "T", "40");
+  ContextAttribute* ca4P = new ContextAttribute("A3", "T", "30");
+  e2P->attributeVector.push_back(ca3P);
+  e2P->attributeVector.push_back(ca4P);
+  e3P->fill("E3", "T", "false");
+  ContextAttribute* ca5P = new ContextAttribute("A5", "T", "50");
+  ContextAttribute* ca6P = new ContextAttribute("A6", "T", "60");
+  e3P->attributeVector.push_back(ca5P);
+  e3P->attributeVector.push_back(ca6P);
+  e4P->fill("E4", "T", "false");
+  ContextAttribute* ca7P = new ContextAttribute("A7", "T", "70");
+  e4P->attributeVector.push_back(ca7P);
+  req.entityVector.push_back(e1P);
+  req.entityVector.push_back(e2P);
+  req.entityVector.push_back(e3P);
+  req.entityVector.push_back(e4P);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1512,25 +1395,23 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   ASSERT_EQ(4, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
@@ -1539,25 +1420,23 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("action: UPDATE - entity: [E1, T] - offending attribute: A2", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("T", RES_CER(1).type);
+  EXPECT_EQ("false", RES_CER(1).isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(1).attributeVector.size());
 
   EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
 
@@ -1566,25 +1445,23 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("action: UPDATE - entity: [E2, T] - offending attribute: A4", RES_CER_STATUS(1).details);
 
   /* Context Element response # 3 */
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
-  EXPECT_EQ("T", RES_CER(2).entityId.type);
-  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
+  EXPECT_EQ("E3", RES_CER(2).id);
+  EXPECT_EQ("T", RES_CER(2).type);
+  EXPECT_EQ("false", RES_CER(2).isPattern);
   EXPECT_EQ(0, RES_CER(2).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
+  ASSERT_EQ(2, RES_CER(2).attributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(2, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(2, 0)->metadataVector.size());
 
   EXPECT_EQ("A6", RES_CER_ATTR(2, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(2, 1)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(2, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(2, 1)->metadataVector.size());
 
@@ -1593,17 +1470,16 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("", RES_CER_STATUS(2).details);
 
   /* Context Element response # 4 */
-  EXPECT_EQ("E4", RES_CER(3).entityId.id);
-  EXPECT_EQ("T", RES_CER(3).entityId.type);
-  EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
+  EXPECT_EQ("E4", RES_CER(3).id);
+  EXPECT_EQ("T", RES_CER(3).type);
+  EXPECT_EQ("false", RES_CER(3).isPattern);
   EXPECT_EQ(0, RES_CER(3).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(3).attributeVector.size());
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->stringValue.size());
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(3, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(3, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(3, 0)->metadataVector.size());
 
@@ -1632,7 +1508,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(1, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
   EXPECT_TRUE(findAttr(attrNames, "A1"));
-  EXPECT_STREQ("T",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("T", C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("10", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
@@ -1646,226 +1522,13 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(1, attrNames.size());
   BSONObj a3 = attrs.getField("A3").embeddedObject();
   EXPECT_TRUE(findAttr(attrNames, "A3"));
-  EXPECT_STREQ("T",C_STR_FIELD(a3, "type"));
+  EXPECT_STREQ("T", C_STR_FIELD(a3, "type"));
   EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
-/* ****************************************************************************
-*
-* severalCprsFormat -
-*
-* Update: E1 - (A1, A2)
-*         E2 - (A3, A4)
-*         E3 - (A5, A6)
-*         E4 - A7
-* Result: E1 - A1 - Up Ok
-*              A2 - fwd CPR2 / JSON
-*         E2 - A3 - Up ok
-*              A4 - fwd CPR3 / XML
-*         E3 - A5 - fwd CPR2 / JSON
-*              A6 - Not found
-*         E4 - A7 - fwd CPR1 / XML
-*
-*/
-TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
-{
-  HttpStatusCode         ms;
-  UpdateContextRequest   req;
-  UpdateContextResponse  res;
-
-  /* Prepare database */
-  utInit();
-  prepareDatabaseSeveralCprs(true);
-
-  /* Forge the request (from "inside" to "outside") */
-  ContextElement ce1, ce2, ce3, ce4;
-  ce1.entityId.fill("E1", "T", "false");
-  ContextAttribute ca1("A1", "T", "10");
-  ContextAttribute ca2("A2", "T", "20");
-  ce1.contextAttributeVector.push_back(&ca1);
-  ce1.contextAttributeVector.push_back(&ca2);
-  ce2.entityId.fill("E2", "T", "false");
-  ContextAttribute ca3("A4", "T", "40");
-  ContextAttribute ca4("A3", "T", "30");
-  ce2.contextAttributeVector.push_back(&ca3);
-  ce2.contextAttributeVector.push_back(&ca4);
-  ce3.entityId.fill("E3", "T", "false");
-  ContextAttribute ca5("A5", "T", "50");
-  ContextAttribute ca6("A6", "T", "60");
-  ce3.contextAttributeVector.push_back(&ca5);
-  ce3.contextAttributeVector.push_back(&ca6);
-  ce4.entityId.fill("E4", "T", "false");
-  ContextAttribute ca7("A7", "T", "70");
-  ce4.contextAttributeVector.push_back(&ca7);
-  req.contextElementVector.push_back(&ce1);
-  req.contextElementVector.push_back(&ce2);
-  req.contextElementVector.push_back(&ce3);
-  req.contextElementVector.push_back(&ce4);
-  req.updateActionType.set("UPDATE");
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ("", res.errorCode.details);
-
-  ASSERT_EQ(4, res.contextElementResponseVector.size());
-  /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-
-  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
-  EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-
-  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
-  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
-  EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
-
-  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("action: UPDATE - entity: [E1, T] - offending attribute: A2", RES_CER_STATUS(0).details);
-
-  /* Context Element response # 2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-  EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
-
-  EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
-  EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
-  EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
-
-  EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
-  EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
-  EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
-
-  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
-  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ("action: UPDATE - entity: [E2, T] - offending attribute: A4", RES_CER_STATUS(1).details);
-
-  /* Context Element response # 3 */
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
-  EXPECT_EQ("T", RES_CER(2).entityId.type);
-  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-  EXPECT_EQ(0, RES_CER(2).providingApplicationList.size());
-  ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
-
-  EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->value.size());
-  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
-  EXPECT_TRUE(RES_CER_ATTR(2, 0)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->metadataVector.size());
-
-  EXPECT_EQ("A6", RES_CER_ATTR(2, 1)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(2, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->value.size());
-  EXPECT_EQ("", RES_CER_ATTR(2, 1)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(2, 1)->providingApplication.getFormat());
-  EXPECT_FALSE(RES_CER_ATTR(2, 1)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->metadataVector.size());
-
-  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
-  EXPECT_EQ("", RES_CER_STATUS(2).details);
-
-  /* Context Element response # 4 */
-  EXPECT_EQ("E4", RES_CER(3).entityId.id);
-  EXPECT_EQ("T", RES_CER(3).entityId.type);
-  EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
-  EXPECT_EQ(0, RES_CER(3).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
-
-  EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->value.size());
-  EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(3, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
-  EXPECT_TRUE(RES_CER_ATTR(3, 0)->found);
-  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->metadataVector.size());
-
-  EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
-  EXPECT_EQ("", RES_CER_STATUS(3).details);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* entities collection */
-  BSONObj ent, attrs;
-  std::vector<BSONElement> attrNames;
-  ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T"));
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-  attrs = ent.getField("attrs").embeddedObject();
-  attrNames = ent.getField("attrNames").Array();
-  ASSERT_EQ(1, attrs.nFields());
-  ASSERT_EQ(1, attrNames.size());
-  BSONObj a1 = attrs.getField("A1").embeddedObject();
-  EXPECT_TRUE(findAttr(attrNames, "A1"));
-  EXPECT_STREQ("T",C_STR_FIELD(a1, "type"));
-  EXPECT_STREQ("10", C_STR_FIELD(a1, "value"));
-  EXPECT_EQ(1360232700, a1.getIntField("modDate"));
-
-  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T"));
-  EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-  attrs = ent.getField("attrs").embeddedObject();
-  attrNames = ent.getField("attrNames").Array();
-  ASSERT_EQ(1, attrs.nFields());
-  ASSERT_EQ(1, attrNames.size());
-  BSONObj a3 = attrs.getField("A3").embeddedObject();
-  EXPECT_TRUE(findAttr(attrNames, "A3"));
-  EXPECT_STREQ("T",C_STR_FIELD(a3, "type"));
-  EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
-  EXPECT_EQ(1360232700, a3.getIntField("modDate"));
-
-  /* Release connection */
-  mongoDisconnect();
-
-  utExit();
-
-}
 
 
 /* ****************************************************************************
@@ -1883,15 +1546,15 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   /* empty database, no preparation step */
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("UPDATE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1900,28 +1563,25 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-  /* Release connection */
-  mongoDisconnect();
 
   utExit();
 }
@@ -1941,15 +1601,15 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   /* empty database, no preparation step */
 
   /* Forge the request (from "inside" to "outside") */
-  ContextElement ce;
-  ce.entityId.fill("E1", "T1", "false");
-  ContextAttribute ca("A1", "TA1", "new_val");
-  ce.contextAttributeVector.push_back(&ca);
-  req.contextElementVector.push_back(&ce);
-  req.updateActionType.set("DELETE");
+  Entity* eP = new Entity();
+  eP->fill("E1", "T1", "false");
+  ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
+  eP->attributeVector.push_back(caP);
+  req.entityVector.push_back(eP);
+  req.updateActionType = ActionTypeDelete;
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1958,18 +1618,18 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("T1", RES_CER(0).type);
+  EXPECT_EQ("false", RES_CER(0).isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  ASSERT_EQ(1, RES_CER(0).attributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
@@ -1977,9 +1637,6 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-  /* Release connection */
-  mongoDisconnect();
 
   utExit();
 }

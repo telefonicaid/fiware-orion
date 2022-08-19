@@ -28,8 +28,19 @@
 
 
 
-#define  DEFAULT_SERVICE_PATH            "/"
-#define  DEFAULT_SERVICE_PATH_RECURSIVE  "/#"
+/* ****************************************************************************
+*
+* Default Service Paths
+*/
+#define  SERVICE_PATH_ROOT      "/"
+#define  SERVICE_PATH_ALL       "/#"
 
+
+
+/* ****************************************************************************
+*
+* API Documentation - The link to the the GEri documentation, either in the gh-pages (.github.io/) inside the fiware organization in GitHub or ReadTheDocs manual.
+*/
+#define API_DOC                               "https://fiware-orion.rtfd.io/"
 
 #endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_

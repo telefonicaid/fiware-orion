@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Duration.h"
 
@@ -57,16 +58,9 @@ Duration::Duration()
 *
 * Duration::check -
 */
-std::string Duration::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Duration::check(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "OK";
   }
@@ -74,7 +68,7 @@ std::string Duration::check
   if (parse() == -1)
   {
     valid = false;
-    LM_W(("Bad Input (syntax error in duration string)"));
+    alarmMgr.badInput(clientIp, "syntax error in duration string", string);
 
     return "syntax error in duration string";
   }
@@ -115,7 +109,7 @@ std::string Duration::get(void)
 */
 bool Duration::isEmpty(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return true;
   }
@@ -142,29 +136,11 @@ int64_t Duration::parse(void)
 
 /* ****************************************************************************
 *
-* Duration::present
+* Duration::toJsonV1 -
 */
-void Duration::present(const std::string& indent)
+std::string Duration::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sDuration: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo Duration\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Duration::render -
-*/
-std::string Duration::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
@@ -174,7 +150,7 @@ std::string Duration::render(Format format, const std::string& indent, bool comm
     return "";
   }
 
-  return valueTag(indent, "duration", string, format, comma);
+  return valueTag("duration", string, comma);
 }
 
 

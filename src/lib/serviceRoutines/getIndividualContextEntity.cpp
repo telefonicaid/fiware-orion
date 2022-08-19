@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -76,6 +79,8 @@ std::string getIndividualContextEntity
   EntityTypeInfo          typeInfo    = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 0. Take care of URI params
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
@@ -104,13 +109,17 @@ std::string getIndividualContextEntity
   // 4. If 404 Not Found - enter request entity data into response context element
   if (response.statusCode.code == SccContextElementNotFound)
   {
-    response.contextElement.entityId.fill(entityId, entityType, "false");
+    response.entity.fill(entityId, entityType, "false");
     response.statusCode.details = "Entity id: /" + entityId + "/";
   }
 
 
   // 5. Render the ContextElementResponse
-  answer = response.render(ciP, IndividualContextEntity, "");
+
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
+
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity, emptyV, false, emptyV));
 
 
   // 6. Cleanup and return result

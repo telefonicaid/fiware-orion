@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_SUBSCRIPTION_REQUEST_H
-#define UPDATE_CONTEXT_SUBSCRIPTION_REQUEST_H
+#ifndef SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
+#define SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_
 
 /*
 *
@@ -35,28 +35,22 @@
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/Throttling.h"
-
+#include "ngsi10/SubscribeContextRequest.h"
+#include "apiTypesV2/SubscriptionUpdate.h"
 
 
 /* ****************************************************************************
 *
-* UpdateContextSubscriptionRequest - 
+* UpdateContextSubscriptionRequest -
 */
-typedef struct UpdateContextSubscriptionRequest
+struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
 {
-  Duration                       duration;               // Optional
-  Restriction                    restriction;            // Optional
-  SubscriptionId                 subscriptionId;         // Mandatory 
-  NotifyConditionVector          notifyConditionVector;  // Optional
-  Throttling                     throttling;             // Optional
+  SubscriptionId                 subscriptionId;         // Mandatory
 
-  int                            restrictions;           // Number of restrictions
-
-  UpdateContextSubscriptionRequest();
-  std::string render(RequestType requestType, Format format, const std::string& indent);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void        present(const std::string& indent);
+  UpdateContextSubscriptionRequest();  
+  std::string check(const std::string& predetectedError, int counter);
   void        release(void);
-} UpdateContextSubscriptionRequest;
+  void        toNgsiv2Subscription(ngsiv2::SubscriptionUpdate* subUp);
+};
 
-#endif
+#endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_

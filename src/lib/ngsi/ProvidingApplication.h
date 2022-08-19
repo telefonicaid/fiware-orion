@@ -27,36 +27,46 @@
 */
 #include <string>
 
-#include "common/Format.h"
+#include "common/MimeType.h"
 #include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* ProvidingApplication - 
+* ProviderFormat -
+*/
+typedef enum ProviderFormat
+{
+  PfNone,
+  PfJson,
+  PfV2
+} ProviderFormat;
+
+
+
+/* ****************************************************************************
+*
+* ProvidingApplication -
 */
 typedef struct ProvidingApplication
 {
-  std::string   string;
-  Format        format;                  // Not part of NGSI itself, used by the CB to specify the preferred format for CPr interaction
+  std::string     string;
+  ProviderFormat  providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
+  std::string     regId;           // RegId associated to the provider (for log purposes)
 
   ProvidingApplication();
-  void          set(const std::string& value);
-  void          setFormat(const Format& f);
-  std::string   get(void);
-  Format        getFormat(void);
-  bool          isEmpty(void);
-  std::string   render(Format format, const std::string& indent, bool comma);
-  void          present(const std::string& indent);
-  const char*   c_str(void);
-  void          release(void);
-
-  std::string   check(RequestType         requestType,
-                      Format              format,
-                      const std::string&  indent,
-                      const std::string&  predetectedError,
-                      int                 counter);
+  void            set(const std::string& value);
+  void            setProviderFormat(const ProviderFormat _providerFormat);
+  void            setRegId(const std::string& _regId);
+  std::string     get(void);
+  ProviderFormat  getProviderFormat(void);
+  std::string     getRegId(void);
+  bool            isEmpty(void);
+  std::string     toJsonV1(bool comma);
+  const char*     c_str(void);
+  void            release(void);
+  std::string     check(void);
 } ProvidingApplication;
 
 #endif  // SRC_LIB_NGSI_PROVIDINGAPPLICATION_H_

@@ -21,19 +21,25 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    doNotify.cpp
     Notifier.cpp
-    onTimeIntervalThread.cpp
     senderThread.cpp
     ContextSubscriptionInfo.cpp
+    QueueWorkers.cpp
+    ServiceQueue.cpp
+    QueueNotifier.cpp
+    QueueStatistics.cpp
 )
 
 SET (HEADERS
+    doNotify.h
     ContextSubscriptionInfo.h
     Notifier.h
-    onTimeIntervalThread.h
     senderThread.h
-    ThreadData.h
-    OnIntervalThreadParams.h
+    QueueWorkers.h
+    ServiceQueue.h
+    QueueNotifier.h
+    QueueStatistics.h
 )
 
 

@@ -28,9 +28,6 @@ logTraceTreat.cpp
 postRegisterContext.cpp
 postDiscoverContextAvailability.cpp
 getContextEntitiesByEntityId.cpp
-postUnsubscribeContextAvailability.cpp
-postSubscribeContextAvailability.cpp
-postUpdateContextAvailabilitySubscription.cpp
 postUpdateContext.cpp
 postQueryContext.cpp
 postSubscribeContext.cpp
@@ -57,25 +54,21 @@ getNgsi10ContextEntityTypes.cpp
 getNgsi10ContextEntityTypesAttribute.cpp
 putSubscriptionConvOp.cpp
 deleteSubscriptionConvOp.cpp
-putAvailabilitySubscriptionConvOp.cpp
-deleteAvailabilitySubscriptionConvOp.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
+badVerbAllFive.cpp
 badVerbGetPostOnly.cpp
 badVerbGetPostDeleteOnly.cpp
 badVerbGetOnly.cpp
 badVerbGetDeleteOnly.cpp
 badVerbPutDeleteOnly.cpp
-badVerbGetPutDeleteOnly
+badVerbGetPutDeleteOnly.cpp
+badVerbPutOnly.cpp
 badNgsi9Request.cpp
 badNgsi10Request.cpp
 badRequest.cpp
 postNotifyContext.cpp
-postNotifyContextAvailability.cpp
 statisticsTreat.cpp
-getAttributeValueInstance.cpp
-putAttributeValueInstance.cpp
-deleteAttributeValueInstance.cpp
 getEntityTypes.cpp
 getAttributesForEntityType.cpp
 getAllContextEntities.cpp
@@ -87,16 +80,12 @@ getIndividualContextEntityAttributeWithTypeAndId.cpp
 deleteIndividualContextEntityAttributeWithTypeAndId.cpp
 postIndividualContextEntityAttributeWithTypeAndId.cpp
 putIndividualContextEntityAttributeWithTypeAndId.cpp
-getAttributeValueInstanceWithTypeAndId.cpp
-deleteAttributeValueInstanceWithTypeAndId.cpp
-postAttributeValueInstanceWithTypeAndId.cpp
-putAttributeValueInstanceWithTypeAndId.cpp
 getContextEntitiesByEntityIdAndType.cpp
 postContextEntitiesByEntityIdAndType.cpp
 getEntityByIdAttributeByNameWithTypeAndId.cpp
 postEntityByIdAttributeByNameWithTypeAndId.cpp
 postSubscribeContextConvOp.cpp
-postSubscribeContextAvailabilityConvOp.cpp
+optionsVersionRequest.cpp
 )
 
 SET (HEADERS
@@ -106,9 +95,6 @@ logTraceTreat.h
 postRegisterContext.h
 postDiscoverContextAvailability.h
 getContextEntitiesByEntityId.h
-postUnsubscribeContextAvailability.h
-postSubscribeContextAvailability.h
-postUpdateContextAvailabilitySubscription.h
 postUpdateContext.h
 postQueryContext.h
 postSubscribeContext.h
@@ -134,16 +120,18 @@ deleteIndividualContextEntity.h
 getNgsi10ContextEntityTypes.h
 badVerbPostOnly.h
 badVerbAllFour.h
+badVerbAllFive.h
 badVerbGetPostOnly.h
 badVerbGetPostDeleteOnly.h
 badVerbGetOnly.h
 badVerbGetDeleteOnly.h
 badVerbPutDeleteOnly.h
+badVerbGetPutDeleteOnly.h
+badVerbPutOnly.h
 badNgsi9Request.h
 badNgsi10Request.h
 badRequest.h
 postNotifyContext.h
-postNotifyContextAvailability.h
 statisticsTreat.h
 getEntityTypes.h
 getAttributesForEntityType.h
@@ -152,15 +140,12 @@ getIndividualContextEntityAttributeWithTypeAndId.h
 deleteIndividualContextEntityAttributeWithTypeAndId.h
 postIndividualContextEntityAttributeWithTypeAndId.h
 putIndividualContextEntityAttributeWithTypeAndId.h
-getAttributeValueInstanceWithTypeAndId.h
-deleteAttributeValueInstanceWithTypeAndId.h
-postAttributeValueInstanceWithTypeAndId.h
-putAttributeValueInstanceWithTypeAndId.h
 getContextEntitiesByEntityIdAndType.h
 postContextEntitiesByEntityIdAndType.h
 getEntityByIdAttributeByNameWithTypeAndId.h
 postEntityByIdAttributeByNameWithTypeAndId.h
 postSubscribeContextConvOp.h
+optionsVersionRequest.h
 )
 
 
@@ -168,7 +153,6 @@ postSubscribeContextConvOp.h
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-include_directories("${RAPIDXML_INCLUDE}")
 
 # Library declaration
 # -----------------------------------------------------------------

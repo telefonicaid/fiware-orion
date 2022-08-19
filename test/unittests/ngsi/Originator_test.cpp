@@ -42,15 +42,15 @@ TEST(Originator, check)
 
   utInit();
 
-  checked = originator.check(RegisterContext, XML, "", "", 0);
+  checked = originator.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   originator.string = "String";
 
-  checked = originator.check(RegisterContext, XML, "", "", 0);
+  checked = originator.check();
   EXPECT_STREQ("OK", checked.c_str());
 
-  checked = originator.check(RegisterContext, JSON, "", "", 0);
+  checked = originator.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
@@ -60,7 +60,7 @@ TEST(Originator, check)
 
 /* ****************************************************************************
 *
-* isEmptSetAndGet - 
+* isEmptSetAndGet -
 */
 TEST(Originator, isEmptySetAndGet)
 {
@@ -83,30 +83,25 @@ TEST(Originator, isEmptySetAndGet)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(Originator, render)
 {
   Originator   originator;
   std::string  out;
-  const char*  outfile1 = "ngsi.originator.render.middle.xml";
-  const char*  outfile2 = "ngsi.originator.render.middle.json";
+  const char*  outfile1 = "ngsi.originator.render.middle.json";
 
   utInit();
 
-  out = originator.render(XML, "");
+  out = originator.toJsonV1(false);
   EXPECT_STREQ("", out.c_str());
 
   originator.string = "String";
 
-  out = originator.render(XML, "");
+  out = originator.toJsonV1(false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = originator.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   utExit();
 }
 
@@ -114,28 +109,7 @@ TEST(Originator, render)
 
 /* ****************************************************************************
 *
-* present - no output expected, just exercising the code
-*/
-TEST(Originator, present)
-{
-  Originator   originator;
-
-  utInit();
-
-  originator.set("");
-  originator.present("");
-
-  originator.set("STR");
-  originator.present("");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* c_str - 
+* c_str -
 */
 TEST(Originator, c_str)
 {

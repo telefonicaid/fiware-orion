@@ -24,46 +24,58 @@ SET (SOURCES
     MongoGlobal.cpp
     MongoCommonUpdate.cpp
     MongoCommonRegister.cpp
+    MongoCommonSubscription.cpp
     mongoRegisterContext.cpp
-    mongoDiscoverContextAvailability.cpp
-    mongoSubscribeContextAvailability.cpp
-    mongoUnsubscribeContextAvailability.cpp
-    mongoUpdateContextAvailabilitySubscription.cpp
+    mongoDiscoverContextAvailability.cpp   
     mongoUpdateContext.cpp
     mongoQueryContext.cpp
     mongoSubscribeContext.cpp
     mongoUnsubscribeContext.cpp
     mongoUpdateContextSubscription.cpp
-    mongoOntimeintervalOperations.cpp
-    mongoConfManOperations.cpp
     mongoNotifyContext.cpp
-    mongoNotifyContextAvailability.cpp
     mongoQueryTypes.cpp
+    mongoCreateSubscription.cpp
+    mongoUpdateSubscription.cpp
     TriggeredSubscription.cpp
-    mongoConnectionPool.cpp
+    mongoGetSubscriptions.cpp
+    mongoRegistrationGet.cpp
+    mongoRegistrationCreate.cpp
+    mongoRegistrationDelete.cpp
+    mongoSubCache.cpp
+    compoundResponses.cpp
+    location.cpp
+    compoundValueBson.cpp
+    dateExpiration.cpp
 )
 
 SET (HEADERS
+    dbConstants.h
     MongoGlobal.h
     MongoCommonUpdate.h
     MongoCommonRegister.h
+    MongoCommonSubscription.h
     mongoRegisterContext.h
     mongoDiscoverContextAvailability.h
-    mongoSubscribeContextAvailability.h
-    mongoUnsubscribeContextAvailability.h
-    mongoUpdateContextAvailabilitySubscription.h
     mongoUpdateContext.h
     mongoQueryContext.h
     mongoSubscribeContext.h
     mongoUnsubscribeContext.h
     mongoUpdateContextSubscription.h
-    mongoOntimeintervalOperations.h
-    mongoConfManOperations.h
     mongoNotifyContext.h
-    mongoNotifyContextAvailability.h
     mongoQueryTypes.h
+    mongoCreateSubscription.h
+    mongoUpdateSubscription.h
     TriggeredSubscription.h
-    mongoConnectionPool.h
+    mongoGetSubscriptions.h
+    mongoRegistrationGet.h
+    mongoRegistrationCreate.h
+    mongoRegistrationDelete.h
+    mongoSubCache.h
+    dbFieldEncoding.h
+    compoundResponses.h
+    location.h
+    compoundValueBson.h
+    dateExpiration.h
 )
 
 

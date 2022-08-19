@@ -1,7 +1,0 @@
-<appendContextElementResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Error is predetected</details>
-  </errorCode>
-</appendContextElementResponse>

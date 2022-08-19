@@ -27,44 +27,13 @@
 */
 #include <string>
 
-#include "rest/ConnectionInfo.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/ParseData.h"
 
 
 
 namespace orion
 {
-/* ****************************************************************************
-*
-* compoundValueStart - 
-*/
-extern void compoundValueStart
-(
-  ConnectionInfo*          ciP,
-  const std::string&       path,
-  const std::string&       name,
-  const std::string&       value,
-  const std::string&       rest,
-  CompoundValueNode::Type  type,
-  bool                     fatherIsVector
-);
-
-
-
-/* ****************************************************************************
-*
-* compoundValueMiddle - 
-*/
-extern void compoundValueMiddle
-(
-  ConnectionInfo*          ciP,
-  const std::string&       relPath,
-  const std::string&       name,
-  const std::string&       value,
-  CompoundValueNode::Type  type
-);
-
-
 
 /* ****************************************************************************
 *

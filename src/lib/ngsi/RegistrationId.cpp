@@ -37,20 +37,33 @@
 
 /* ****************************************************************************
 *
+* RegistrationId::RegistrationId -
+*/
+RegistrationId::RegistrationId()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* RegistrationId::RegistrationId -
+*/
+RegistrationId::RegistrationId(const std::string& regId) : string(regId)
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * RegistrationId::check -
 */
-std::string RegistrationId::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string RegistrationId::check(void)
 {
   std::string out = "OK";
 
-  if (string != "")
+  if (!string.empty())
   {
     out = idCheck(string);
   }
@@ -66,7 +79,7 @@ std::string RegistrationId::check
 */
 bool RegistrationId::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -86,7 +99,7 @@ void RegistrationId::set(const std::string& value)
 *
 * RegistrationId::get -
 */
-std::string RegistrationId::get(void)
+std::string RegistrationId::get(void) const
 {
   return string;
 }
@@ -95,34 +108,16 @@ std::string RegistrationId::get(void)
 
 /* ****************************************************************************
 *
-* RegistrationId::present -
+* RegistrationId::toJsonV1 -
 */
-void RegistrationId::present(const std::string& indent)
+std::string RegistrationId::toJsonV1(RequestType requestType, bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sRegistrationId: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo RegistrationId\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* RegistrationId::render -
-*/
-std::string RegistrationId::render(RequestType requestType, Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     if (requestType == RegisterResponse)  // registrationId is MANDATORY for RegisterContextResponse
     {
       string = "000000000000000000000000";
-      LM_I(("No registrationId - setting the registrationId to 24 zeroes"));
+      LM_T(LmtOldInfo, ("No registrationId - setting the registrationId to 24 zeroes"));
     }
     else
     {
@@ -130,7 +125,7 @@ std::string RegistrationId::render(RequestType requestType, Format format, const
     }
   }
 
-  return valueTag(indent, "registrationId", string, format, comma);
+  return valueTag("registrationId", string, comma);
 }
 
 

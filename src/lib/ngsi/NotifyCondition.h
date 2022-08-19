@@ -31,9 +31,7 @@
 #include "ngsi/RestrictionString.h"
 #include "ngsi/ConditionValueList.h"
 
-#define ON_TIMEINTERVAL_CONDITION "ONTIMEINTERVAL"
-#define ON_CHANGE_CONDITION "ONCHANGE"
-#define ON_VALUE_CONDITION "ONVALUE"
+#define ON_CHANGE_CONDITION  "ONCHANGE"
 
 
 
@@ -47,13 +45,13 @@ typedef struct NotifyCondition
   ConditionValueList        condValueList;   // Optional
   RestrictionString         restriction;     // Optional
 
-  std::string   render(Format format, const std::string& indent, bool notLastInVector);
-  void          present(const std::string& indent, int ix);
+  NotifyCondition();
+  NotifyCondition(NotifyCondition* ncP);
+
+  std::string   toJsonV1(bool notLastInVector);
   void          release(void);
 
   std::string   check(RequestType         requestType,
-                      Format              format,
-                      const std::string&  indent,
                       const std::string&  predetectedError,
                       int                 counter);
 } NotifyCondition;

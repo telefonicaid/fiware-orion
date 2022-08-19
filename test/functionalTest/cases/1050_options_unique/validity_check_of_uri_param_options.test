@@ -1,0 +1,105 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Validity check of URI param Options
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. URI param options with both 'keyValues' and 'values', see error
+# 02. URI param options with both 'keyValues' and 'unique', see error
+# 03. URI param options with both 'values' and 'unique', see error
+#
+
+
+echo "01. URI param options with both 'keyValues' and 'values', see error"
+echo "==================================================================="
+orionCurl --url '/v2/entities/CarPool?options=keyValues,values'
+echo
+echo
+
+
+echo "02. URI param options with both 'keyValues' and 'unique', see error"
+echo "==================================================================="
+orionCurl --url '/v2/entities/CarPool?options=keyValues,unique'
+echo
+echo
+
+
+echo "03. URI param options with both 'values' and 'unique', see error"
+echo "================================================================"
+orionCurl --url '/v2/entities/CarPool?options=values,unique'
+echo
+echo
+
+
+--REGEXPECT--
+01. URI param options with both 'keyValues' and 'values', see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid value for URI param /options/",
+    "error": "BadRequest"
+}
+
+
+02. URI param options with both 'keyValues' and 'unique', see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid value for URI param /options/",
+    "error": "BadRequest"
+}
+
+
+03. URI param options with both 'values' and 'unique', see error
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid value for URI param /options/",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

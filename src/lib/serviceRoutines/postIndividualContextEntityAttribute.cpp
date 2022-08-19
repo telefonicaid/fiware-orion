@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -40,7 +43,7 @@
 
 /* ****************************************************************************
 *
-* postIndividualContextEntityAttribute - 
+* postIndividualContextEntityAttribute -
 *
 * POST /v1/contextEntities/{entityId::id}/attributes/{attributeName}
 * POST /ngsi10/contextEntities/{entityId::id}/attributes/{attributeName}
@@ -53,7 +56,7 @@
 *   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
 *     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
 *   [ attributesFormat=object: makes no sense for this operation as StatusCode is returned ]
-*   
+*
 * 0. Take care of URI params
 * 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
 * 2. Call postUpdateContext standard service routine
@@ -75,11 +78,11 @@ std::string postIndividualContextEntityAttribute
   StatusCode   response;
 
   // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
-  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "APPEND");
-  
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, ActionTypeAppend);
+
 
   // 2. Call postUpdateContext standard service routine
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 3. Translate UpdateContextResponse to StatusCode
@@ -87,7 +90,8 @@ std::string postIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.toJsonV1(false, false));
+
   response.release();
   parseDataP->upcr.res.release();
 

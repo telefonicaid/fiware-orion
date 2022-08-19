@@ -37,14 +37,7 @@
 *
 * AttributeExpression::check - 
 */
-std::string AttributeExpression::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string AttributeExpression::check(void)
 {
   return "OK";
 }
@@ -57,7 +50,7 @@ std::string AttributeExpression::check
 */
 bool AttributeExpression::isEmpty(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return true;
   }
@@ -91,34 +84,16 @@ std::string AttributeExpression::get(void)
 
 /* ****************************************************************************
 *
-* AttributeExpression::present - 
+* AttributeExpression::toJsonV1 -
 */
-void AttributeExpression::present(const std::string& indent)
+std::string AttributeExpression::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sAttributeExpression: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo AttributeExpression\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* AttributeExpression::render - 
-*/
-std::string AttributeExpression::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
 
-  return valueTag(indent, "attributeExpression", string, format, comma);
+  return valueTag("attributeExpression", string, comma);
 }
 
 

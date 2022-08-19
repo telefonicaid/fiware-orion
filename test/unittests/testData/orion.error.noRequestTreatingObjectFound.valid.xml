@@ -1,5 +1,0 @@
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Sorry, no request treating object found for RequestType //, method /POST/</details>
-</orionError>

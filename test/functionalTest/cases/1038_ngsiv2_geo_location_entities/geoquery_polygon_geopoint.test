@@ -1,0 +1,292 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query test (polygon) with geo:point (NGSIv2)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# Inspired by 0000_ngsi10_geolocation_query tests
+#
+# 01. Create Point A
+# 02. Create Point B
+# 03. Create Point C
+# 04. Rectangle in: A, B
+# 05. Rectangle in: B, C
+# 06. Triangle in: A
+# 07. Rectangle out: A
+# 08. Triangle out: B, C
+#
+
+echo "01. Create Point A"
+echo "=================="
+payload='{
+  "id": "A",
+  "type": "Point",
+  "location": {
+    "value": "3, 2",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "02. Create Point B"
+echo "=================="
+payload='{
+  "id": "B",
+  "type": "Point",
+  "location": {
+    "value": "5, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "03. Create Point C"
+echo "=================="
+payload='{
+  "id": "C",
+  "type": "Point",
+  "location": {
+    "value": "7, 4",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "04. Rectangle in: A, B"
+echo "======================"
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;0,6;6,6;6,0;0,0'
+echo
+echo
+
+
+echo "05. Rectangle in: B, C"
+echo "======================"
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=3,3;3,8;11,8;11,3;3,3'
+echo
+echo
+
+
+echo "06. Triangle in: A"
+echo "=================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;0,6;6,0;0,0'
+echo
+echo
+
+
+echo "07. Rectangle out: A"
+echo "===================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=3,3;3,8;11,8;11,3;3,3'
+echo
+echo
+
+
+echo "08. Triangle out: B, C"
+echo "======================"
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;0,6;6,0;0,0'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Point A
+==================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/A?type=Point
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create Point B
+==================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/B?type=Point
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create Point C
+==================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C?type=Point
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Rectangle in: A, B
+======================
+HTTP/1.1 200 OK
+Content-Length: 175
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "3, 2"
+        },
+        "type": "Point"
+    },
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "Point"
+    }
+]
+
+
+05. Rectangle in: B, C
+======================
+HTTP/1.1 200 OK
+Content-Length: 175
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "Point"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "7, 4"
+        },
+        "type": "Point"
+    }
+]
+
+
+06. Triangle in: A
+==================
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "3, 2"
+        },
+        "type": "Point"
+    }
+]
+
+
+07. Rectangle out: A
+====================
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "3, 2"
+        },
+        "type": "Point"
+    }
+]
+
+
+08. Triangle out: B, C
+======================
+HTTP/1.1 200 OK
+Content-Length: 175
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "Point"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "7, 4"
+        },
+        "type": "Point"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

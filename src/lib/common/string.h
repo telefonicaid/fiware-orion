@@ -26,9 +26,15 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include <vector>
+#include <regex.h>
 
+#include "common/limits.h"
 
+// the same macro in parseArg library
+#define FT(x) (x == true)? "true" : "false"
 
 /* ****************************************************************************
 *
@@ -42,14 +48,13 @@ extern bool isIPv6(const std::string& in);
 *
 * stringSplit - 
 */
-extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV);
+extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV, bool unique = false);
 
 
 
 /* ****************************************************************************
 *
 * parseUrl -
-*
 */
 extern bool parseUrl
 (
@@ -59,6 +64,14 @@ extern bool parseUrl
   std::string&        path,
   std::string&        protocol
 );
+
+
+
+/* ****************************************************************************
+*
+* validUrl - check validity of a URL
+*/
+extern bool validUrl(const std::string& url);
 
 
 
@@ -96,20 +109,6 @@ extern bool string2coords(const std::string& s, double& latitude, double& longit
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-extern void coords2string
-(
-  std::string*  s,
-  double        latitude,
-  double        longitude,
-  int           decimals = 6
-);
-
-
-
-/* ****************************************************************************
-*
 * versionParse -
 */
 bool versionParse
@@ -127,6 +126,15 @@ bool versionParse
 * atoF - 
 */
 extern double atoF(const char* string, std::string* errorMsg);
+
+
+
+
+/* ****************************************************************************
+*
+* atoUL -
+*/
+extern unsigned long atoUL(const char* string, std::string* errorMsg);
 
 
 
@@ -158,5 +166,54 @@ extern void strReplace
 * servicePathCheck - 
 */
 extern std::string servicePathCheck(const char* servicePath);
+
+
+
+/* ****************************************************************************
+*
+* str2double - is the string a correct float (double)?
+*/
+extern bool str2double(const char* s, double* dP = NULL);
+
+
+/*****************************************************************************
+*
+* double2string -
+*
+*/
+extern std::string double2string(double f);
+
+
+
+/*****************************************************************************
+*
+* isodate2str -
+*
+*/
+extern std::string isodate2str(double timestamp);
+
+
+
+/* ****************************************************************************
+*
+* toLowercase - convert string to lowercase
+*/
+extern void toLowercase(char* s);
+
+
+
+/* ****************************************************************************
+*
+* offuscatePassword -
+*/
+extern std::string offuscatePassword(const std::string& uri, const std::string& pwd);
+
+
+
+/* ****************************************************************************
+*
+* regComp -
+*/
+extern bool regComp(regex_t* re, const char* pattern, int flags);
 
 #endif  // SRC_LIB_COMMON_STRING_H_

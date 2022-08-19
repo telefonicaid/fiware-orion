@@ -24,10 +24,11 @@
 */
 #include <stdio.h>
 #include <string>
+#include <sstream>
 
 #include "logMsg/logMsg.h"
-#include "common/Format.h"
 #include "common/tag.h"
+#include "common/JsonHelper.h"
 
 
 
@@ -52,7 +53,7 @@ char* htmlEscape(const char* s)
   
   if (out == NULL)
   {
-    LM_E(("Internal Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    LM_E(("Runtime Error (allocating %d bytes: %s)", newLen, strerror(errno)));
     return NULL;
   }
 
@@ -143,97 +144,35 @@ char* htmlEscape(const char* s)
 
 /* ****************************************************************************
 *
-* startTag -  
+* startTag -
 */
 std::string startTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
-  bool                showTag,
-  bool                isToplevel
+  const std::string&  key,
+  bool                isVector
 )
 {
-  if (format == XML)
+  // Empty key is legal JSON. However, Orion doesn't use that kind of keys,
+  // so we can use an empty key string as argument instead of a showkey boolean
+  // parameter, keeping the function signature simpler
+  bool showKey = (!key.empty());
+
+  if (isVector && showKey)
   {
-    return indent + "<" + tagName + ">\n";
+    return "\"" + key + "\":[";
   }
-  else if (format == JSON)
+  else if (isVector && !showKey)
   {
-    if (isToplevel)
-    {
-      if (showTag == false)
-      {
-        return indent + "{\n" + indent + "  {\n";
-      }
-      else
-      {
-        return indent + "{\n" + indent + "  " + "\"" + tagName + "\" : {\n";
-      }
-    }
-    else
-    {
-      if (showTag == false)
-      {
-        return indent + "{\n";
-      }
-      else
-      {
-        return indent + "\"" + tagName + "\" : {\n";
-      }
-    }
+    return "[";
+  }
+  else if (!isVector && showKey)
+  {
+    return "\"" + key + "\":{";
   }
 
-  return "Format not supported";
-}
+  // else: !isVector && !showKey
 
-
-
-/* ****************************************************************************
-*
-* startTag -  
-*/
-std::string startTag
-(
-  const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
-  Format              format,
-  bool                isVector,
-  bool                showTag,
-  bool                isCompoundVector
-)
-{
-  if (format == XML)
-  {
-    if (isCompoundVector)
-    {
-      return indent + "<" + xmlTag + " type=\"vector\">\n";
-    }
-
-    return indent + "<" + xmlTag + ">\n";
-  }
-  else if (format == JSON)
-  {
-    if (isVector && showTag)
-    {
-       return indent + "\"" + jsonTag + "\" : [\n";
-    }
-    else if (isVector && !showTag)
-    {
-      return indent + "[\n";
-    }
-    else if (!isVector && showTag)
-    {
-      return indent + "\"" + jsonTag + "\" : {\n";
-    }
-    else if (!isVector && !showTag)
-    {
-      return indent + "{\n";
-    }
-  }
-
-  return "Format not supported";
+  return "{";
 }
 
 
@@ -244,31 +183,14 @@ std::string startTag
 */
 std::string endTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
   bool                comma,
-  bool                isVector,
-  bool                nl,
-  bool                isToplevel
+  bool                isVector
 )
 {
-  if (format == XML)
-  {
-    return indent + "</" + tagName + ">\n";
-  }
+  std::string out = "";
 
-  if (isToplevel)
-  {
-    return indent + "}\n}\n";
-  }
-
-  std::string out = indent;
-
-  out += isVector?    "]"  : "}";
-  out += comma?       ","  : "";
-  out += nl?          "\n" : "";
-  out += isToplevel?  "}"  : "";
+  out += isVector?  "]"  : "}";
+  out += comma?     ","  : "";
 
   return out;
 }
@@ -279,24 +201,21 @@ std::string endTag
 *
 * valueTag -  
 *
-* NOTE
-* The value of the tag is not HTML-escaped if the value is an Association.
-* In the case of Associations, the specific values must be HTML-escaped instead.
+* Function version for string values
+*
 */
 std::string valueTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   const std::string&  unescapedValue,
-  Format              format,
   bool                showComma,
-  bool                isAssociation,
-  bool                isVectorElement
+  bool                isVectorElement,
+  bool                withoutQuotes
 )
 {
   char* value;
 
-  if (unescapedValue == "")
+  if (unescapedValue.empty())
   {
     value = (char*) malloc(1);
 
@@ -304,15 +223,7 @@ std::string valueTag
   }
   else
   {
-    if (isAssociation == false)
-    {
-      value = htmlEscape(unescapedValue.c_str());
-    }
-    else
-    {
-      // unnecessary malloc, but this way I can always free => easier to read
-      value = strdup(unescapedValue.c_str());
-    }
+    value = htmlEscape(unescapedValue.c_str());
   }
 
   if (value == NULL)
@@ -320,134 +231,60 @@ std::string valueTag
     return "ERROR: no memory";
   }
 
-  if (format == XML)
-  {
-    std::string out = indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
+  std::string effectiveValue = toJsonString(value);
+  free(value);
 
-    free(value);
-    return out;
-  }
+  effectiveValue = withoutQuotes ? effectiveValue : std::string("\"") + effectiveValue + "\"";
 
   if (showComma == true)
   {
-    if (isAssociation == true)
+    if (isVectorElement == true)
     {
-      std::string out = indent + "\"" + tagName + "\" : " + value + ",\n";
-
-      free(value);
-      return out;
-    }
-    else if (isVectorElement == true)
-    {
-      std::string out = indent + "\"" + value + "\",\n";
-
-      free(value);
+      std::string out = effectiveValue + ",";
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\",\n";
-
-      free(value);
+      std::string out = "\"" + key + "\":" + effectiveValue + ",";
       return out;
     }
   }
   else
   {
-    if (isAssociation == true)
+    if (isVectorElement == true)
     {
-      std::string out = indent + "\"" + tagName + "\" : " + value + "\n";
-
-      free(value);
-      return out;
-    }
-    else if (isVectorElement == true)
-    {
-      std::string out = indent + "\"" + value + "\"\n";
-
-      free(value);
+      std::string out = effectiveValue;
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\"\n";
-
-      free(value);
+      std::string out = "\"" + key + "\":" + effectiveValue;
       return out;
     }
   }
 }
 
 
+
 /* ****************************************************************************
 *
-* valueTag -  
+* valueTag -
+*
+* Function version for integer values
+*
 */
 std::string valueTag
 (
-  const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   int                 value,
-  Format              format,
-  bool                showComma,
-  bool                isAssociation
+  bool                showComma
 )
 {
   char val[32];
 
   snprintf(val, sizeof(val), "%d", value);
 
-  if (format == XML)
-  {
-    return indent + "<" + tagName + ">" + val + "</" + tagName + ">" + "\n";
-  }
-
-  if (showComma == true)
-  {
-    return indent + "\"" + tagName + "\" : \"" + val + "\",\n";
-  }
-
-  return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
+  return valueTag(key, val, showComma, false, false);
 }
 
 
-
-/* ****************************************************************************
-*
-* valueTag -  
-*/
-std::string valueTag
-(
-  const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
-  const std::string&  value,
-  Format              format,
-  bool                showComma,
-  bool                isAssociation
-)
-{
-  if (format == XML)
-  {
-    return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";
-  }
-
-  if (jsonTag == "")
-  {
-    if (showComma == true)
-    {
-      return indent + "\"" + value + "\",\n";
-    }
-    else
-    {
-      return indent + "\"" + value + "\"\n";
-    }
-  }
-
-  if (showComma == true)
-  {
-    return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
-  }
-
-  return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
-}

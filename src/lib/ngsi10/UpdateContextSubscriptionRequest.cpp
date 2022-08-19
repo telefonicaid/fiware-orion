@@ -30,6 +30,11 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
+#include "ngsi10/SubscribeContextRequest.h"
+
+using namespace ngsiv2;
+
+
 
 /* ****************************************************************************
 *
@@ -44,58 +49,26 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
 }
 
 
-/* ****************************************************************************
-*
-* UpdateContextSubscriptionRequest::render - 
-*/
-std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Format format, const std::string& indent)
-{
-  std::string out                             = "";
-  std::string tag                             = "updateContextSubscriptionRequest";
-
-  bool        restrictionRendered             = restrictions != 0;
-  bool        subscriptionIdRendered          = true; // Mandatory
-  bool        notifyConditionVectorRendered   = notifyConditionVector.size() != 0;
-  bool        throttlingRendered              = throttling.get() != "";
-
-  bool        commaAfterThrottling            = false; // Last element
-  bool        commaAfterNotifyConditionVector = throttlingRendered;
-  bool        commaAfterSubscriptionId        = notifyConditionVectorRendered || throttlingRendered;
-  bool        commaAfterRestriction           = subscriptionIdRendered || notifyConditionVectorRendered || throttlingRendered;
-  bool        commaAfterDuration              = restrictionRendered || subscriptionIdRendered || notifyConditionVectorRendered || throttlingRendered;
-  
-  out += startTag(indent, tag, format, false);
-  out += duration.render(format, indent + "  ", commaAfterDuration);
-  out += restriction.render(format, indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(UpdateContextSubscription, format, indent + "  ", commaAfterSubscriptionId);
-  out += notifyConditionVector.render(format, indent + "  ", commaAfterNotifyConditionVector);
-  out += throttling.render(format, indent + "  ", commaAfterThrottling);
-  out += endTag(indent, tag, format);
-
-  return out;
-}
-
-
 
 /* ****************************************************************************
 *
 * UpdateContextSubscriptionRequest::check - 
 */
-std::string UpdateContextSubscriptionRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextSubscriptionRequest::check(const std::string& predetectedError, int counter)
 {
   std::string                       res;
   UpdateContextSubscriptionResponse response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.subscribeError.subscriptionId = subscriptionId;
     response.subscribeError.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = duration.check(UpdateContextSubscription, format, indent, predetectedError, counter))              != "OK") ||
-           ((res = restriction.check(UpdateContextSubscription, format, indent, predetectedError, restrictions))      != "OK") ||
-           ((res = subscriptionId.check(UpdateContextSubscription, format, indent, predetectedError, counter))        != "OK") ||
-           ((res = notifyConditionVector.check(UpdateContextSubscription, format, indent, predetectedError, counter)) != "OK") ||
-           ((res = throttling.check(UpdateContextSubscription, format, indent, predetectedError, counter))            != "OK"))
+  else if (((res = duration.check())                                                                  != "OK") ||
+           ((res = restriction.check(restrictions))                                                   != "OK") ||
+           ((res = subscriptionId.check())                                                            != "OK") ||
+           ((res = notifyConditionVector.check(UpdateContextSubscription, predetectedError, counter)) != "OK") ||
+           ((res = throttling.check())                                                                != "OK"))
   {
     response.subscribeError.subscriptionId = subscriptionId;
     response.subscribeError.errorCode.fill(SccBadRequest, res);
@@ -103,22 +76,7 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, For
   else
     return "OK";
 
-  return response.render(UpdateContextSubscription, format, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextSubscriptionRequest::present - 
-*/
-void UpdateContextSubscriptionRequest::present(const std::string& indent)
-{
-  duration.present(indent);
-  restriction.present(indent);
-  subscriptionId.present(indent);
-  notifyConditionVector.present(indent);
-  throttling.present(indent);
+  return response.toJsonV1();
 }
 
 
@@ -129,6 +87,42 @@ void UpdateContextSubscriptionRequest::present(const std::string& indent)
 */
 void UpdateContextSubscriptionRequest::release(void)
 {
-  restriction.release();
+  // Old versions of this method also include a 'restriction.release()' call. However, now each time
+  // a UpdateContextSubscriptionRequest is created, the method toNgsiv2Subscription() is used on it and the
+  // 'ownership' of the Restriction is transferred to the corresponding NGSIv2 class. Thus, leaving
+  // that 'restriction.release()' would cause double-free problems
+
   notifyConditionVector.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextSubscriptionRequest::toNgsiv2Subscription -
+*/
+void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* subUp)
+{
+  // Parent method will do most of the work
+  SubscribeContextRequest::toNgsiv2Subscription(subUp);
+
+  // Fill remaining fields in SubscriptionUpdate
+  subUp->id         = subscriptionId.get();
+  subUp->fromNgsiv1 = true;
+
+  // Fields that can be modified in a NGSIv1 subscription
+  // (See https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html)
+  //
+  //  * notifyConditions (within subject in NGSIv2)
+  //  * throttling       (root field in NGSIv2)
+  //  * duration         (root field -as 'expires'- in NGSIv2)
+  //  * restriction      (already processed in the parent method)
+
+  subUp->subjectProvided      = (notifyConditionVector.size() > 0);
+  subUp->expiresProvided      = !duration.isEmpty();
+  subUp->statusProvided       = false;  // not supported in NGSIv1
+  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that part
+  subUp->attrsFormatProvided  = true;   // updating in NGSIv1 involves and implicit change to NGSIv1 legacy format
+  subUp->throttlingProvided   = !throttling.isEmpty();
+
 }

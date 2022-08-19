@@ -1,5 +1,5 @@
-#ifndef CLIENT_SOCKET_HTTP_H
-#define CLIENT_SOCKET_HTTP_H
+#ifndef SRC_LIB_REST_HTTPREQUESTSEND_H_
+#define SRC_LIB_REST_HTTPREQUESTSEND_H_
 
 /*
 *
@@ -32,8 +32,6 @@
 
 #define URI_BUF          (256)
 #define TAM_BUF          (8 * 1024)            // 8 KB  (for HTTP responses and pre-payload bytes in request, which will be very small)
-#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
-#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
 
 
 
@@ -45,34 +43,34 @@ extern void httpRequestInit(long defaultTimeoutInMilliseconds);
 
 
 
-/***************************************************************************
+/* ****************************************** **********************************
 *
-* httpRequestConnect -
+* httpRequestSend -
 */
-extern int httpRequestConnect(const std::string& host, unsigned short port);
-
-
-
-/* ****************************************************************************
-*
-* httpRequestSend - 
-*/
-extern std::string httpRequestSend
+extern int httpRequestSend
 (
-  const std::string&     ip,
-  unsigned short         port, 
-  const std::string&     protocol,
-  const std::string&     verb,
-  const std::string&     tenant,
-  const std::string&     servicePath,
-  const std::string&     xauthToken,
-  const std::string&     resource, 
-  const std::string&     content_type, 
-  const std::string&     content,
-  bool                   useRush,
-  bool                   waitForResponse,
-  const std::string&     acceptFormat          = "",
-  long                   timeoutInMilliseconds = -1
+  CURL*                                      curl,
+  const std::string&                         idStringForLogs,
+  const std::string&                         from,
+  const std::string&                         ip,
+  unsigned short                             port,
+  const std::string&                         protocol,
+  const std::string&                         verb,
+  const std::string&                         tenant,
+  const std::string&                         servicePath,
+  const std::string&                         xauthToken,
+  const std::string&                         resource,
+  const std::string&                         content_type,
+  const std::string&                         content,
+  const std::string&                         fiwareCorrelation,
+  const std::string&                         ngisv2AttrFormat,
+  std::string*                               outP,
+  long long*                                 statusCodeP,
+  const std::map<std::string, std::string>&  extraHeaders,
+  const std::string&                         acceptFormat          = "",
+  long                                       timeoutInMilliseconds = -1
 );
 
-#endif
+
+
+#endif  // SRC_LIB_REST_HTTPREQUESTSEND_H_

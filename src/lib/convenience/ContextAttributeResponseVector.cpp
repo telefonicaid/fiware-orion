@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
@@ -35,26 +36,28 @@
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::render - 
+* ContextAttributeResponseVector::toJsonV1 -
 */
-std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestType request, std::string indent)
+std::string ContextAttributeResponseVector::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  request
+)
 {
-  std::string out     = "";
-  std::string xmlTag  = "contextResponseList";
-  std::string jsonTag = "contextResponses";
+  std::string out = "";
+  std::string key = "contextResponses";
 
   if (vec.size() == 0)
   {
-    if (request == IndividualContextEntityAttributes)
-      return indent + "<contextAttributeList></contextAttributeList>\n";
-
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true);
+  out += startTag(key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(ciP, request, indent + "  ");
-  out += endTag(indent, xmlTag, ciP->outFormat, false, true);
+  {
+    out += vec[ix]->toJsonV1(asJsonObject, request);
+  }
+  out += endTag(false, true);
 
   return out;
 }
@@ -67,40 +70,23 @@ std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestT
 */
 std::string ContextAttributeResponseVector::check
 (
-  ConnectionInfo*  ciP,
-  RequestType      request,
-  std::string      indent,
-  std::string      predetectedError,
-  int              counter
+  ApiVersion          apiVersion,
+  bool                asJsonObject,
+  RequestType         request,
+  const std::string&  predetectedError
 )
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, request, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, predetectedError)) != "OK")
     {
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextAttributeResponseVector::present - 
-*/
-void ContextAttributeResponseVector::present(std::string indent)
-{
-  LM_F(("%lu ContextAttributeResponses", (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ");
-  }
 }
 
 
@@ -118,13 +104,16 @@ void ContextAttributeResponseVector::push_back(ContextAttributeResponse* item)
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::get - 
+* ContextAttributeResponseVector::operator[] -
 */
-ContextAttributeResponse* ContextAttributeResponseVector::get(int ix)
+ContextAttributeResponse* ContextAttributeResponseVector::operator[](unsigned int ix) const
 {
-  return vec[ix];
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+  return NULL;
 }
-
 
 
 /* ****************************************************************************
@@ -159,8 +148,8 @@ void ContextAttributeResponseVector::release(void)
 *
 * ContextAttributeResponseVector::fill -
 */
-void ContextAttributeResponseVector::fill(ContextAttributeVector* cavP, const StatusCode& statusCode)
+void ContextAttributeResponseVector::fill(const ContextAttributeVector& caV, const StatusCode& statusCode)
 {
   vec.push_back(new ContextAttributeResponse());
-  vec[0]->fill(cavP, statusCode);
+  vec[0]->fill(caV, statusCode);
 }

@@ -1,8 +1,0 @@
-{
-  "orion" : {
-    "xmlRequests" : "2",
-    "statisticsRequests" : "2",
-    "uptime_in_secs" : "0",
-    "measuring_interval_in_secs" : "0"
-  }
-}

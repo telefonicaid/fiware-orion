@@ -27,46 +27,72 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/RenderFormat.h"
+#include "common/JsonHelper.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render -
+* ContextElementResponseVector::toJsonV1 -
 */
-std::string ContextElementResponseVector::render
+std::string ContextElementResponseVector::toJsonV1
 (
-  ConnectionInfo*     ciP,
-  RequestType         requestType,
-  const std::string&  indent,
-  bool                comma,
-  bool                omitAttributeValues
+  bool                             asJsonObject,
+  RequestType                      requestType,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  bool                             comma,
+  bool                             omitAttributeValues
 )
 {
-  std::string xmlTag   = "contextResponseList";
-  std::string jsonTag  = "contextResponses";
-  std::string out      = "";
+  std::string out = "";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+  out += startTag("contextResponses", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
   }
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+  out += endTag(comma, true);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponseVector::toJson - 
+*/
+std::string ContextElementResponseVector::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
+)
+{
+  JsonVectorHelper jvh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
+  }
+
+  return jvh.str();
 }
 
 
@@ -77,9 +103,8 @@ std::string ContextElementResponseVector::render
 */
 std::string ContextElementResponseVector::check
 (
+  ApiVersion          apiVersion,
   RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
@@ -88,29 +113,13 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::present -
-*/
-void ContextElementResponseVector::present(const std::string& indent)
-{
-  LM_F(("%s%lu ContextElementResponses", indent.c_str(), (uint64_t) vec.size()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    vec[ix]->present(indent + "  ", ix);
-  }
 }
 
 
@@ -124,33 +133,30 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
   vec.push_back(item);
 }
 
+/* ****************************************************************************
+*
+* ContextElementResponseVector::size -
+*/
+unsigned int ContextElementResponseVector::size(void) const
+{
+    
+  return vec.size();
+
+}
 
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::get -
+* ContextElementResponseVector::operator[] -
 */
-ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
+ContextElementResponse*  ContextElementResponseVector::operator[] (unsigned int ix) const
 {
   if (ix < vec.size())
   {
     return vec[ix];
   }
-
   return NULL;
 }
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::size -
-*/
-unsigned int ContextElementResponseVector::size(void)
-{
-  return vec.size();
-}
-
 
 
 /* ****************************************************************************
@@ -174,11 +180,11 @@ void ContextElementResponseVector::release(void)
 *
 * ContextElementResponseVector::lookup -
 */
-ContextElementResponse* ContextElementResponseVector::lookup(EntityId* eP, HttpStatusCode code)
+ContextElementResponse* ContextElementResponseVector::lookup(Entity* eP, HttpStatusCode code)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix]->contextElement.entityId.equal(eP) == true)
+    if (vec[ix]->entity.equal(eP) == true)
     {
       if ((code == SccNone) || (vec[ix]->statusCode.code == code))
       {
@@ -201,6 +207,24 @@ void ContextElementResponseVector::fill(ContextElementResponseVector& cerV)
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
     ContextElementResponse* cerP = new ContextElementResponse(cerV[ix]);
+
+    push_back(cerP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponseVector::fill -
+*/
+void ContextElementResponseVector::fill(EntityVector& erV, HttpStatusCode sc)
+{
+  for (unsigned int ix = 0; ix < erV.size(); ++ix)
+  {
+    ContextElementResponse* cerP = new ContextElementResponse(erV[ix]);
+
+    cerP->statusCode.fill(sc, erV[ix]->id);
 
     push_back(cerP);
   }

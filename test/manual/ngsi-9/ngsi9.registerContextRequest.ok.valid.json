@@ -19,29 +19,7 @@
         "contextRegistrationAttributeList": {
           "contextRegistrationAttribute": {
             "name": "temperature",
-            "type": "degree",
-            "isDomain": "false",
-            "metadata": {
-              "contextMetadata": [
-                {
-                  "name": "ID",
-                  "type": "string",
-                  "value": "1110"
-                },
-                {
-                  "name": "nn",
-                  "type": "tt",
-                  "value": "vv"
-                }
-              ]
-            }
-          }
-        },
-        "registrationMetadata": {
-          "contextMetadata": {
-            "name": "ID",
-            "type": "string",
-            "value": "2212"
+            "type": "degree"
           }
         },
         "providingApplication": "http://192.168.100.1:70/application"

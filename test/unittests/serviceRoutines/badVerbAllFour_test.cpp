@@ -22,60 +22,61 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "serviceRoutines/badVerbAllFour.h"
 #include "rest/RestService.h"
+#include "rest/rest.h"
 
-#include "unittest.h"
+#include "unittests/unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* rs - 
+* badVerbV -
 */
-static RestService rs[] = 
+static RestService badVerbV[] =
 {
-   { "*",      IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                         }, "", badVerbAllFour                            },
-   { "*",      IndividualContextEntity,               2, { "ngsi10", "contextEntities"                              }, "", badVerbAllFour                            },
-   { "*",      IndividualContextEntity,               1, { "ngsi10"                                                 }, "", badVerbAllFour                            },
-   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { IndividualContextEntity, 3, { "ngsi10", "contextEntities", "*" }, badVerbAllFour },
+  { IndividualContextEntity, 2, { "ngsi10", "contextEntities"      }, badVerbAllFour },
+  { IndividualContextEntity, 1, { "ngsi10"                         }, badVerbAllFour },
+  { InvalidRequest,          0, {                                  }, NULL           }
 };
 
 
 
 /* ****************************************************************************
 *
-* error - 
+* error -
 */
 TEST(badVerbAllFour, error)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
-  ConnectionInfo ci3("/ngsi10/",                     "PUST", "1.1");
-  ConnectionInfo ci4("/ngsi10/1/2/3/4",              "PUST", "1.1");
-  const char*    outfile1 = "orion.serviceNotRecognized.valid.xml";
-  const char*    outfile2 = "orion.serviceNotRecognized2.valid.xml";
   std::string    out;
+  RestService    restService1 = { VersionRequest, 3, { "ngsi10", "contextEntities", "123" }, NULL };
+  RestService    restService2 = { VersionRequest, 2, { "ngsi10", "contextEntities" },        NULL };
 
   utInit();
 
-  out = restService(&ci1, rs);
+  ci1.apiVersion   = V1;
+  ci1.restServiceP = &restService1;
+
+  serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);
+  out = orion::requestServe(&ci1);
+
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
-  out = restService(&ci2, rs);
+  ci2.apiVersion = V1;
+  ci2.restServiceP = &restService2;
+
+  out = orion::requestServe(&ci2);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = restService(&ci3, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = restService(&ci4, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

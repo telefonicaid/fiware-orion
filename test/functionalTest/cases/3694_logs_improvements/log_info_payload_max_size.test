@@ -1,0 +1,191 @@
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log INFO payload max size
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -multiservice -logInfoPayloadMaxSize 70
+
+--SHELL--
+
+#
+# 01. Request with payload size 69: it fits
+# 02. Request with payload size 70: it fits
+# 03. Request with payload size 71: it doesn't fit
+# 04. Request with payload size 72: it doesn't fit
+# 05. Request with payload size 80: it doesn't fit
+# 06. Get logs
+#
+
+
+echo "01. Request with payload size 69: it fits"
+echo "========================================="
+payload='
+{
+   "id":"E1",
+   "type":"T",
+   "A1":{
+      "value":"fooooooo",
+      "type":"Text"
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Request with payload size 70: it fits"
+echo "========================================="
+payload='
+{
+   "id":"E2",
+   "type":"T",
+   "A1":{
+      "value":"foooooooo",
+      "type":"Text"
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Request with payload size 71: it doesn't fit"
+echo "================================================"
+payload='
+{
+   "id":"E3",
+   "type":"T",
+   "A1":{
+      "value":"fooooooooo",
+      "type":"Text"
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Request with payload size 72: it doesn't fit"
+echo "================================================"
+payload='
+{
+   "id":"E4",
+   "type":"T",
+   "A1":{
+      "value":"foooooooooo",
+      "type":"Text"
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Request with payload size 80: it doesn't fit"
+echo "================================================"
+payload='
+{
+   "id":"E5",
+   "type":"T",
+   "A1":{
+      "value":"foooooooooooooooooo",
+      "type":"Text"
+   }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Get logs and see both traces"
+echo "================================"
+cat /tmp/contextBroker.log | grep INFO | grep 'Request' | awk -F '|' '{print $10}'
+echo
+echo
+
+
+--REGEXPECT--
+01. Request with payload size 69: it fits
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Request with payload size 70: it fits
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Request with payload size 71: it doesn't fit
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Request with payload size 72: it doesn't fit
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Request with payload size 80: it doesn't fit
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Get logs and see both traces
+================================
+ msg=Request received: POST /v2/entities, request payload (69 bytes): { "id":"E1", "type":"T", "A1":{ "value":"fooooooo", "type":"Text" } }, response code: 201
+ msg=Request received: POST /v2/entities, request payload (70 bytes): { "id":"E2", "type":"T", "A1":{ "value":"foooooooo", "type":"Text" } }, response code: 201
+ msg=Request received: POST /v2/entities, request payload (71 bytes): { "id":"E3", "type":"T", "A1":{ "value":"fooooooooo", "type":"Text" } (...), response code: 201
+ msg=Request received: POST /v2/entities, request payload (72 bytes): { "id":"E4", "type":"T", "A1":{ "value":"foooooooooo", "type":"Text" }(...), response code: 201
+ msg=Request received: POST /v2/entities, request payload (80 bytes): { "id":"E5", "type":"T", "A1":{ "value":"foooooooooooooooooo", "type":(...), response code: 201
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,5 +1,5 @@
-#ifndef UNSUBSCRIBE_CONTEXT_RESPONSE_H
-#define UNSUBSCRIBE_CONTEXT_RESPONSE_H
+#ifndef SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_
 
 /*
 *
@@ -29,7 +29,8 @@
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/StatusCode.h"
-#include "common/Format.h"
+
+#include "rest/OrionError.h"
 
 
 
@@ -42,12 +43,14 @@ typedef struct UnsubscribeContextResponse
   SubscriptionId  subscriptionId;    // Mandatory
   StatusCode      statusCode;        // Mandatory
 
+  OrionError      oe;                // Used by NGSIv2
+
   UnsubscribeContextResponse();
   UnsubscribeContextResponse(StatusCode& statusCode);
   ~UnsubscribeContextResponse();
 
-  std::string     render(RequestType requestType, Format format, const std::string& indent);
+  std::string     toJsonV1(void);
   void            release(void);
 } UnsubscribeContextResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI10_UNSUBSCRIBECONTEXTRESPONSE_H_

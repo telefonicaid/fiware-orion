@@ -51,6 +51,14 @@ find_path(GMOCK_INCLUDE_DIR gmock/gmock.h
           PATHS /usr/includes
           PATH_SUFFIXES gmock)
 
+
+#
+# Stack protection is activated only in debug compilation.
+# However, our unit tests don't pass the compilation with "stack protection", so we turn it off using
+# remove_definitions().
+#
+remove_definitions(-fstack-check -fstack-protector)
+
 SET (SOURCES
     main_UnitTest.cpp
     testDataFromFile.cpp
@@ -64,51 +72,11 @@ SET (SOURCES
     serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
     serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/deleteIndividualContextEntity_test.cpp
-    serviceRoutines/deleteIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/getContextEntitiesByEntityId_test.cpp
-    serviceRoutines/getEntityByIdAttributeByName_test.cpp
-    serviceRoutines/getContextEntityTypes_test.cpp
-    serviceRoutines/postContextEntityTypes_test.cpp
-    serviceRoutines/getContextEntityTypeAttributeContainer_test.cpp
-    serviceRoutines/postContextEntityTypeAttributeContainer_test.cpp
-    serviceRoutines/getContextEntityTypeAttribute_test.cpp
-    serviceRoutines/postContextEntityTypeAttribute_test.cpp
-    serviceRoutines/getIndividualContextEntity_test.cpp
-    serviceRoutines/getContextEntityAttributes_test.cpp
-    serviceRoutines/getIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/postContextEntitiesByEntityId_test.cpp
-    serviceRoutines/postContextEntityAttributes_test.cpp
-    serviceRoutines/postDiscoverContextAvailability_test.cpp
-    serviceRoutines/postEntityByIdAttributeByName_test.cpp
-    serviceRoutines/postIndividualContextEntity_test.cpp
-    serviceRoutines/postIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/logTraceTreat_test.cpp
-    serviceRoutines/postRegisterContext_test.cpp
-    serviceRoutines/postSubscribeContext_test.cpp
-    serviceRoutines/postSubscribeContextAvailability_test.cpp
-    serviceRoutines/postUnsubscribeContext_test.cpp
-    serviceRoutines/postUnsubscribeContextAvailability_test.cpp
-    serviceRoutines/postUpdateContext_test.cpp
-    serviceRoutines/postUpdateContextAvailabilitySubscription_test.cpp
-    serviceRoutines/postUpdateContextSubscription_test.cpp
-    serviceRoutines/putIndividualContextEntity_test.cpp
     serviceRoutines/putIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/postQueryContext_test.cpp
-    serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
-    serviceRoutines/getNgsi10ContextEntityTypesAttribute_test.cpp
     serviceRoutines/putSubscriptionConvOp_test.cpp
-    serviceRoutines/badNgsi10Request_test.cpp
-    serviceRoutines/badNgsi9Request_test.cpp
-    serviceRoutines/badRequest_test.cpp
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
-    serviceRoutines/leakTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
-    serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
-    serviceRoutines/deleteAttributeValueInstance_test.cpp
-    serviceRoutines/putAttributeValueInstance_test.cpp
-    serviceRoutines/getAttributeValueInstance_test.cpp
 
     convenience/Convenience_test.cpp
     convenience/AppendContextElementRequest_test.cpp
@@ -124,21 +92,16 @@ SET (SOURCES
     common/commonString_test.cpp
     common/commonTag_test.cpp
     common/commonSem_test.cpp
-    common/commonStatistics_test.cpp
+    # FIXME P3: this test is aligned with the old version of the statistics logic for NGSIv1
+    # it should be moved to NGSIv2 or, alternatively, removed the file at the end
+    #common/commonStatistics_test.cpp
     common/commonWsStrip_test.cpp
+    common/commonMacroSubstitute_test.cpp
 
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
     ngsi9/DiscoverContextAvailabilityResponse_test.cpp
-    ngsi9/SubscribeAvailabilityRequest_test.cpp
-    ngsi9/SubscribeContextAvailabilityResponse_test.cpp
-    ngsi9/NotifyContextAvailabilityRequest_test.cpp
-    ngsi9/NotifyContextAvailabilityResponse_test.cpp
-    ngsi9/UnsubscribeContextAvailabilityRequest_test.cpp
-    ngsi9/UnsubscribeContextAvailabilityResponse_test.cpp
-    ngsi9/UpdateContextAvailabilitySubscriptionRequest_test.cpp
-    ngsi9/UpdateContextAvailabilitySubscriptionResponse_test.cpp
 
     ngsi10/QueryContextRequest_test.cpp
     ngsi10/QueryContextResponse_test.cpp
@@ -153,12 +116,7 @@ SET (SOURCES
     ngsi10/UpdateContextSubscriptionResponse_test.cpp
 
     ngsi/ContextAttribute_test.cpp
-    ngsi/ContextElement_test.cpp
     ngsi/NotifyCondition_test.cpp
-    ngsi/AttributeAssociation_test.cpp
-    ngsi/Association_test.cpp
-    ngsi/AttributeAssociationList_test.cpp
-    ngsi/AttributeDomainName_test.cpp
     ngsi/AttributeList_test.cpp
     ngsi/ConditionValueList_test.cpp
     ngsi/ContextAttributeVector_test.cpp
@@ -170,8 +128,6 @@ SET (SOURCES
     ngsi/ProvidingApplication_test.cpp
     ngsi/Duration_test.cpp
     ngsi/AttributeExpression_test.cpp
-    ngsi/ContextElementVector_test.cpp
-    ngsi/ContextRegistration_test.cpp
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
@@ -189,44 +145,45 @@ SET (SOURCES
     ngsi/SubscribeError_test.cpp
     ngsi/SubscriptionId_test.cpp
     ngsi/Throttling_test.cpp
-    ngsi/UpdateActionType_test.cpp
 
-    mongoBackend/mongoConfManOperations_test.cpp
-    mongoBackend/mongoDiscoverContextAvailability_test.cpp
-    mongoBackend/mongoOntimeintervalOperations_test.cpp
-    mongoBackend/mongoQueryContext_test.cpp
-    mongoBackend/mongoQueryContextCompoundValues_test.cpp
-    mongoBackend/mongoQueryContextGeo_test.cpp
-    mongoBackend/mongoRegisterContext_test.cpp
-    mongoBackend/mongoRegisterContext_update_test.cpp
-    mongoBackend/mongoSubscribeContextAvailability_test.cpp
-    mongoBackend/mongoSubscribeContext_test.cpp
-    mongoBackend/mongoUnsubscribeContextAvailability_test.cpp
-    mongoBackend/mongoUnsubscribeContext_test.cpp
-    mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
-    mongoBackend/mongoUpdateContextSubscription_test.cpp
-    mongoBackend/mongoUpdateContext_test.cpp
-    mongoBackend/mongoUpdateContextGeo_test.cpp
-    mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
-    mongoBackend/mongoUpdateContextCompoundValues_test.cpp
-    mongoBackend/mongoNotifyContext_test.cpp
-    mongoBackend/mongoNotifyContextAvailability_test.cpp
-    mongoBackend/mongoContextProvidersQuery_test.cpp
-    mongoBackend/mongoContextProvidersUpdate_test.cpp
-    mongoBackend/mongoQueryTypes_test.cpp
-    mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
+    orionTypes/EntityType_test.cpp
+    orionTypes/EntityTypeResponse_test.cpp
+    orionTypes/EntityTypeVector_test.cpp
+    orionTypes/EntityTypeVectorResponse_test.cpp
+
+    apiTypesV2/Entities_test.cpp
+    apiTypesV2/Entity_test.cpp  
+    apiTypesV2/EntityVector_test.cpp
+
+    # FIXME #3775: pending on mongo unit test re-enabling
+    #mongoBackend/mongoDiscoverContextAvailability_test.cpp
+    #mongoBackend/mongoQueryContext_test.cpp
+    #mongoBackend/mongoQueryContext_filters_test.cpp
+    #mongoBackend/mongoQueryContextCompoundValues_test.cpp
+    #mongoBackend/mongoQueryContextGeo_test.cpp
+    #mongoBackend/mongoRegisterContext_test.cpp
+    #mongoBackend/mongoRegisterContext_update_test.cpp
+    #mongoBackend/mongoSubscribeContext_test.cpp
+    #mongoBackend/mongoUnsubscribeContext_test.cpp
+    #mongoBackend/mongoUpdateContextSubscription_test.cpp
+    #mongoBackend/mongoUpdateContext_test.cpp
+    #mongoBackend/mongoUpdateContext_2_test.cpp
+    #mongoBackend/mongoUpdateContextGeo_test.cpp
+    #mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
+    #mongoBackend/mongoUpdateContext_withOnchangeSubscriptionsNoCache_test.cpp
+    #mongoBackend/mongoUpdateContextCompoundValues_test.cpp
+    #mongoBackend/mongoNotifyContext_test.cpp
+    #mongoBackend/mongoContextProvidersQuery_test.cpp
+    #mongoBackend/mongoContextProvidersUpdate_test.cpp
+    #mongoBackend/mongoQueryTypes_test.cpp
+    #mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
+    #mongoBackend/mongoGetSubscriptions_test.cpp
+    #mongoBackend/mongoCreateSubscription_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
     parse/nullTreat_test.cpp
     jsonParse/jsonRequest_test.cpp
-
-    xmlParse/xmlAppendContextElementRequest_test.cpp
-    xmlParse/xmlRegisterContextRequest_test.cpp
-    xmlParse/xmlRegisterContextResponse_test.cpp
-    xmlParse/xmlRequest_test.cpp
-    xmlParse/xmlUpdateContextElementRequest_test.cpp
-    xmlParse/xmlUpdateContextRequest_test.cpp
 
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
@@ -245,23 +202,8 @@ SET (STATIC_LIBS
     ${GTESTMAIN_LIBRARY}
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
-    mongoBackend
-    ngsiNotify
-    jsonParse
-    xmlParse
-    parse
-    convenience
-    serviceRoutines
-    rest
-    ngsi9
-    ngsi10
-    ngsi
-    orionTypes
-    common
-    lm
-    pa
-    pthread
-    curl
+    ${ORION_LIBS}
+    ${COMMON_STATIC_LIBS}
 )
 
 # Include directories
@@ -270,7 +212,13 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/test/unittests")
-include_directories("${RAPIDXML_INCLUDE}")
+include_directories("${PROJECT_SOURCE_DIR}/test")
+
+# Needed for the new C driver
+# FIXME: why do we need this declared here if they are also declared
+# in the main CMakeFiles.txt?
+include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libbson-1.0")
 
 # Lib directories
 # ------------------------------------------------------------
@@ -278,8 +226,6 @@ link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
 
-# FIXME P4: Issue #476: remove or keep?
-link_directories("/opt/lib/")
 
 
 # flags
@@ -293,33 +239,42 @@ add_definitions(-DUNIT_TEST)
 
 ADD_EXECUTABLE(unitTest ${SOURCES} ${HEADERS})
 
-IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
-  # FIXME P4: Issue #476: remove or keep?
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
-  # ADDED FOR UBUNTU 14.10
-  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
-  MESSAGE("unitTest: openSUSE DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
-ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
-  MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient
--lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
-ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
-ELSE()
-  MESSAGE("unitTest: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
-ENDIF()
+MESSAGE("unitTest distro: '${DISTRO}'")
 
+# The following ones are distros that we have checked are built correctly
+
+IF(${DISTRO} MATCHES "CentOS_6.*")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+ELSEIF((${DISTRO} MATCHES "Debian_8.*") OR (${DISTRO} MATCHES "Debian_9.*") OR (${DISTRO} MATCHES "Debian_10.*") OR (${DISTRO} MATCHES "Debian_11.*"))
+  # It seems that Debian 8.x/9.x doesn't like -mt libraries for unit tests... not sure about other Debian versions
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} MATCHES "Debian_.*")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+
+# The following ones are distros that haven't been checked since the refactoring in
+# PR #2062. They should be "promoted" as soon as we have positive feedback about
+# them or fixed (maybe based in the version of this file previous to
+# the aforementioned PR)
+
+ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+  # Pending to check after the refactor
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS"))
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+
+# Finally this is a "best effort" option to try to build on distros that don't have a
+# specify switch
+
+ELSE()
+  # Pending to check after the refactor
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ENDIF()

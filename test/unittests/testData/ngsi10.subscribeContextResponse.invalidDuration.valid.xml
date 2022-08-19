@@ -1,9 +1,0 @@
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: syntax error in duration string</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>

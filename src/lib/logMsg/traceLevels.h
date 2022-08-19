@@ -56,25 +56,27 @@ typedef enum TraceLevels
   LmtHttps = 35,
   LmtIpVersion,
   LmtCtxProviders,
+  LmtRequest = 38,          // ONLY to be used in ONE place - incoming requests
+  LmtPayload,
 
   /* Parser (40-59) */
   LmtParse    = 40,
   LmtParsedPayload,
   LmtParseCheck,
-  LmtPresent,
   LmtNew,
-  LmtTreat = 45,
-  LmtDump,
+  LmtTreat,
+  LmtDump = 45,
   LmtNullNode,
   LmtCompoundValue,
   LmtCompoundValueAdd,
-  LmtCompoundValueLookup = 50,
-  LmtCompoundValueRender,
+  LmtCompoundValueLookup,
+  LmtCompoundValueRender = 50,
   LmtCompoundValueRaw,
   LmtCompoundValueContainer,
   LmtCompoundValueStep,
-  LmtCompoundValueShow = 55,
-  LmtJsonAttributes,
+  LmtCompoundValueShow,
+  LmtJsonAttributes = 55,
+  LmtRegexError,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,
@@ -97,7 +99,9 @@ typedef enum TraceLevels
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
-  LmtOntimeIntervalThreads,
+  LmtNotificationRequestPayload,
+  LmtNotificationResponsePayload,
+  LmtMqttNotif,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,
@@ -106,19 +110,29 @@ typedef enum TraceLevels
   LmtClientOutputPayload = 183,  // Very important for harness test notification_different_sizes
   LmtPartialPayload,
   LmtClientOutputPayloadDump,
+  LmtCPrForwardRequestPayload,
+  LmtCPrForwardResponsePayload,
 
-  /* Semaphores (200-202) */
+  /* Semaphores (200-204) */
   LmtReqSem = 200,
   LmtMongoSem,
   LmtTransSem,
+  LmtCacheSem,
+  LmtTimeStatSem,
 
-  /* Others (>=210) */
-  LmtCm = 210,
-  LmtIotaXmlReg,
-  LmtIotaXmlObs,
-  LmtRush,
+  /* Cache (210 - 230) */
+  LmtSubCache = 210,
+  LmtSubCacheMatch,
+  LmtCacheSync,
+
+  /* Others (>=230) */
+  LmtCm = 230,
   LmtSoftError,
   LmtNotImplemented,
+  LmtCurlContext,
+  LmtThreadpool,
+
+  LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
 
   LmtBug = 250
 } TraceLevels;

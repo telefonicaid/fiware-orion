@@ -1,5 +1,5 @@
-#ifndef NOTIFIER_H
-#define NOTIFIER_H
+#ifndef SRC_LIB_NGSINOTIFY_NOTIFIER_H_
+#define SRC_LIB_NGSINOTIFY_NOTIFIER_H_
 
 /*
 *
@@ -25,31 +25,54 @@
 *
 * Author: Fermin Galan
 */
-
 #include <map>
 #include <pthread.h>
 
-#include "ngsi9/NotifyContextAvailabilityRequest.h"
+#include "apiTypesV2/Subscription.h"
+#include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 
-#include "ThreadData.h"
+#include "ngsiNotify/senderThread.h"
 
-class Notifier {
 
-private:
-    /* This field is used to store the list of existing thread, ordered by subscrition ID
-     * (the key in the map). Note that each subscription can include several threads (one
-     * for each ONTIMEINTERVAL notific contition) so we are using a multimap */
-    std::multimap<std::string, ThreadData> threadsMap;
 
+/* ****************************************************************************
+*
+* Notifier -
+*/
+class Notifier
+{
 public:
-   
-    virtual ~Notifier(void);
+  virtual ~Notifier(void);
 
-    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format);
-    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr, const std::string& url, const std::string& tenant, Format format = XML);
-    virtual void createIntervalThread(const std::string& subId, int interval, const std::string& tenant);
-    virtual void destroyOntimeIntervalThreads(const std::string& subId);
+  virtual void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+                                        const ngsiv2::Notification&      notification,
+                                        const std::string&               tenant,
+                                        long long                        maxFailsLimit,
+                                        long long                        failsCounter,
+                                        const std::string&               xauthToken,
+                                        const std::string&               fiwareCorrelator,
+                                        unsigned int                     correlatorCounter,
+                                        RenderFormat                     renderFormat,
+                                        const std::vector<std::string>&  attrsFilter,
+                                        bool                             blacklist,
+                                        bool                             covered,
+                                        const std::vector<std::string>&  metadataFilter);
+
+protected:
+  static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest&            ncr,
+                                                             const ngsiv2::Notification&      notification,
+                                                             const std::string&               tenant,
+                                                             long long                        maxFailsLimit,
+                                                             long long                        failsCounter,
+                                                             const std::string&               xauthToken,
+                                                             const std::string&               fiwareCorrelator,
+                                                             unsigned int                     correlatorCounter,
+                                                             RenderFormat                     renderFormat,
+                                                             const std::vector<std::string>&  attrsFilter,
+                                                             bool                             blacklist,
+                                                             bool                             covered,
+                                                             const std::vector<std::string>&  metadataFilter);
 };
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

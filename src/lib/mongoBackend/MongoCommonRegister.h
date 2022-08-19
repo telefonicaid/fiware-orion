@@ -1,5 +1,5 @@
-#ifndef MONGO_COMMON_REGISTER_H
-#define MONGO_COMMON_REGISTER_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
 
 /*
 *
@@ -25,27 +25,28 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
 
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
-#include "mongo/client/dbclient.h"
+#include "apiTypesV2/Registration.h"
 
-using namespace mongo;
+#include "mongoDriver/OID.h"
+
 
 /* ****************************************************************************
 *
 * processRegisterContext -
-*
 */
 extern HttpStatusCode processRegisterContext
 (
   RegisterContextRequest*   requestP,
   RegisterContextResponse*  responseP,
-  OID*                      id,
+  orion::OID*               id,
   const std::string&        tenant,
   const std::string&        servicePath,
-  const std::string&        format
+  const std::string&        format,
+  const std::string&        fiwareCorrelator
 );
 
-
-#endif
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_

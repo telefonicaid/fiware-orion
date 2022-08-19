@@ -1,9 +1,0 @@
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: bad value for polygon/inverted: /not true/</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>

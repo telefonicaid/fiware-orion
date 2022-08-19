@@ -44,7 +44,6 @@ typedef struct UpdateContextRequestVector
   void                   push_back(UpdateContextRequest* item);
   UpdateContextRequest*  lookup(const std::string& contextProvider);
   void                   release(void);
-  void                   present(const std::string& indent);
 
   UpdateContextRequest*  operator[](unsigned int ix)
   {

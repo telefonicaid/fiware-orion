@@ -23,18 +23,18 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <vector>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-#include "common/globals.h"
-#include "common/Format.h"
-#include "common/sem.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoSubscribeContext.h"
+#include "rest/OrionError.h"
+#include "ngsi/Duration.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
-#include "ngsi/StatusCode.h"
-#include "rest/uriParamNames.h"
+#include "apiTypesV2/Subscription.h"
+
+#include "mongoBackend/mongoCreateSubscription.h"
+#include "mongoBackend/mongoSubscribeContext.h"
+
+
 
 /* ****************************************************************************
 *
@@ -45,140 +45,36 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   xauthToken,
   const std::vector<std::string>&      servicePathV
 )
 {
-    const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    Format             notifyFormat          = stringToFormat(notifyFormatAsString);
-    std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
-    DBClientBase*      connection            = NULL;
-    bool               reqSemTaken           = false;
+  OrionError            oe;
+  ngsiv2::Subscription  sub;
 
-    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
+  requestP->toNgsiv2Subscription(&sub);
+  std::string subId = mongoCreateSubscription(sub, &oe, tenant, servicePathV);
 
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
-
-    /* If expiration is not present, then use a default one */
-    if (requestP->duration.isEmpty()) {
-        requestP->duration.set(DEFAULT_DURATION);
-    }
-
-    /* Calculate expiration (using the current time and the duration field in the request) */
-    long long expiration = getCurrentTime() + requestP->duration.parse();
-    LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
-
-    /* Create the mongoDB subscription document */
-    BSONObjBuilder sub;
-    OID oid;
-    oid.init();
-    sub.append("_id", oid);
-    sub.append(CSUB_EXPIRATION, expiration);
-    sub.append(CSUB_REFERENCE, requestP->reference.get());
-
-    /* Throttling */
-    if (!requestP->throttling.isEmpty()) {
-      sub.append(CSUB_THROTTLING, (long long) requestP->throttling.parse());
-    }
-
-    if (servicePath != "")
+  if (!subId.empty())
+  {
+    if (requestP->duration.isEmpty())
     {
-      sub.append(CSUB_SERVICE_PATH, servicePath);
+      responseP->subscribeResponse.duration.set(DEFAULT_DURATION);
     }
-
-    
-    /* Build entities array */
-    BSONArrayBuilder entities;
-    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+    else
     {
-        EntityId* en = requestP->entityIdVector.get(ix);
-
-        if (en->type == "")
-        {
-          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                               CSUB_ENTITY_ISPATTERN << en->isPattern));
-        }
-        else
-        {
-          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                               CSUB_ENTITY_TYPE << en->type <<
-                               CSUB_ENTITY_ISPATTERN << en->isPattern));
-        }
+      responseP->subscribeResponse.duration = requestP->duration;
     }
-    sub.append(CSUB_ENTITIES, entities.arr());
-
-    /* Build attributes array */
-    BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList.get(ix));
-    }
-    sub.append(CSUB_ATTRS, attrs.arr());
-
-    /* Build conditions array (including side-effect notifications and threads creation) */
-    bool notificationDone = false;
-    BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
-                                             requestP->entityIdVector,
-                                             requestP->attributeList, oid.toString(),
-                                             requestP->reference.get(),
-                                             &notificationDone,
-                                             notifyFormat,
-                                             tenant,
-                                             xauthToken,
-                                             servicePathV);
-    sub.append(CSUB_CONDITIONS, conds);
-    if (notificationDone) {
-        sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
-        sub.append(CSUB_COUNT, 1);
-    }
-
-    /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notifyFormatAsString);
-
-    /* Insert document in database */
-    BSONObj subDoc = sub.obj();
-    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), subDoc.toString().c_str()));
-
-    try
-    {
-        connection = getMongoConnection();
-        connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
-        releaseMongoConnection(connection);
-        LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)", reqSemTaken);
-
-        responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                                 std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                                 " - insert(): " + subDoc.toString() +
-                                                 " - exception: " + e.what());
-
-        LM_E(("Database Error ('insert %s into %s', '%s'", subDoc.toString().c_str(), getSubscribeContextCollectionName(tenant).c_str(), e.what()));
-        return SccOk;
-    }    
-    catch (...)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)", reqSemTaken);
-
-        responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                                 std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                                 " - insert(): " + subDoc.toString() +
-                                                 " - exception: " + "generic");
-
-        LM_E(("Database Error ('insert %s into %s', '%s'", subDoc.toString().c_str(), getSubscribeContextCollectionName(tenant).c_str(), "generic exception"));
-        return SccOk;
-    }    
-
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
-
-    /* Fill the response element */
-    responseP->subscribeResponse.duration = requestP->duration;
-    responseP->subscribeResponse.subscriptionId.set(oid.toString());
+    responseP->subscribeResponse.subscriptionId.set(subId);
     responseP->subscribeResponse.throttling = requestP->throttling;
+  }
+  else
+  {
+    // Check OrionError
+    responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+  }
 
-    return SccOk;
+  // free sub memory associated to subscription
+  sub.release();
+
+  return SccOk;
 }

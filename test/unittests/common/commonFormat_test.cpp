@@ -26,86 +26,71 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/Format.h"
+#include "common/MimeType.h"
 
 
 /* ****************************************************************************
 *
-* formatToString - 
+* mimeTypeToString -
 */
-TEST(commonFormat, formatToString)
+TEST(commonMimeType, mimeTypeToString)
 {
-   char* format;
+   char* mimeType;
 
-   format = (char*) formatToString(XML);
-   EXPECT_STREQ("XML", format) << "bad string translation for XML format";
+   mimeType = (char*) mimeTypeToString(JSON);
+   EXPECT_STREQ("JSON", mimeType) << "bad string translation for JSON mimeType";
 
-   format = (char*) formatToString(JSON);
-   EXPECT_STREQ("JSON", format) << "bad string translation for JSON format";
-   
-   format = (char*) formatToString(TEXT);
-   EXPECT_STREQ("TEXT", format) << "bad string translation for TEXT format";
+   mimeType = (char*) mimeTypeToString(TEXT);
+   EXPECT_STREQ("TEXT", mimeType) << "bad string translation for TEXT mimeType";
 
-   format = (char*) formatToString(HTML);
-   EXPECT_STREQ("HTML", format) << "bad string translation for HTML format";
+   mimeType = (char*) mimeTypeToString(NOMIMETYPE);
+   EXPECT_STREQ("NOMIMETYPE", mimeType) << "bad string translation for NOMIMETYPE mimeType";
 
-   format = (char*) formatToString(NOFORMAT);
-   EXPECT_STREQ("NOFORMAT", format) << "bad string translation for NOFORMAT format";
-
-   format = (char*) formatToString((Format) 0);
-   EXPECT_STREQ("Unknown format", format) << "bad string translation for unknown format";
+   mimeType = (char*) mimeTypeToString((MimeType) 0);
+   EXPECT_STREQ("Unknown mimeType", mimeType) << "bad string translation for unknown mimeType";
 }
 
 
 
 /* ****************************************************************************
 *
-* stringToformat - 
+* stringTomimeType -
 */
-TEST(commonFormat, stringToformat)
+TEST(commonMimeType, stringTomimeType)
 {
-  Format format;
+  MimeType mimeType;
 
-  format = stringToFormat("XML");
-  EXPECT_EQ(XML, format);
+  mimeType = stringToMimeType("JSON");
+  EXPECT_EQ(JSON, mimeType);
 
-  format = stringToFormat("JSON");
-  EXPECT_EQ(JSON, format);
-
-  format = stringToFormat("noFormat");
-  EXPECT_EQ(NOFORMAT, format);
+  mimeType = stringToMimeType("noMimeType");
+  EXPECT_EQ(NOMIMETYPE, mimeType);
 }
 
 
 
 /* ****************************************************************************
 *
-* formatParse - 
+* mimeTypeParse -
 */
-TEST(commonFormat, formatParse)
+TEST(commonMimeType, mimeTypeParse)
 {
-   Format format;
+   MimeType mimeType;
 
-   format = formatParse("*/*", NULL);
-   EXPECT_EQ(XML, format) << "bad translation for XML format (*/*)";
+   mimeType = mimeTypeParse("*/*", NULL);
+   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (*/*)";
 
-   format = formatParse("application/xml", NULL);
-   EXPECT_EQ(XML, format) << "bad translation for XML format (application/xml)";
+   mimeType = mimeTypeParse("text/json", NULL);
+   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (text/json)";
 
-   format = formatParse("text/xml", NULL);
-   EXPECT_EQ(XML, format) << "bad translation for XML format (text/xml)";
+   mimeType = mimeTypeParse("application/json", NULL);
+   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
 
-   format = formatParse("text/json", NULL);
-   EXPECT_EQ(JSON, format) << "bad translation for JSON format (text/json)";
-
-   format = formatParse("application/json", NULL);
-   EXPECT_EQ(JSON, format) << "bad translation for JSON format (application/json)";
-
-   format = formatParse("XXX", NULL);
-   EXPECT_EQ(XML, format) << "bad translation for XML format (XXX - unknown )";
+   mimeType = mimeTypeParse("XXX", NULL);
+   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (XXX - unknown )";
 
    std::string charset;
-   format = formatParse("application/json; charset=CHSET", &charset);
-   EXPECT_EQ(JSON, format) << "bad translation for JSON format (application/json)";
+   mimeType = mimeTypeParse("application/json; charset=CHSET", &charset);
+   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
    EXPECT_EQ("CHSET", charset);
 }

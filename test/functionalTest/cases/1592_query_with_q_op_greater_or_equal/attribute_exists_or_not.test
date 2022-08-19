@@ -1,0 +1,177 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with existence checks of attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with attrs A1,A2,A3
+# 02. Create E2 with attrs A2,A3,A4
+# 03. Create E3 with attrs A1,A2,A4,A5
+# 04. GET entities that has A1 (see E1,E3)
+# 05. GET entities that does NOT have A1 (see E2)
+#
+
+
+echo "01. Create E1 with attrs A1,A2,A3"
+echo "================================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": 1,
+  "A2": 2,
+  "A3": 3
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E2 with attrs A2,A3,A4"
+echo "================================="
+payload='{
+  "id": "E2",
+  "type": "T1",
+  "A2": 1,
+  "A3": 3,
+  "A4": 4
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E3 with attrs A1,A2,A4,A5"
+echo "===================================="
+payload='{
+  "id": "E3",
+  "type": "T1",
+  "A1": 1,
+  "A2": 2,
+  "A4": 4,
+  "A5": 5
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "04. GET entities that has A1 (see E1,E3)"
+echo "========================================"
+orionCurl --url '/v2/entities?q=A1&options=keyValues'
+echo
+echo
+
+
+echo "05. GET entities that does NOT have A1 (see E2)"
+echo "==============================================="
+orionCurl --url '/v2/entities?q=!A1&options=keyValues'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with attrs A1,A2,A3
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E2 with attrs A2,A3,A4
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create E3 with attrs A1,A2,A4,A5
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET entities that has A1 (see E1,E3)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 98
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": 1,
+        "A2": 2,
+        "A3": 3,
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "A1": 1,
+        "A2": 2,
+        "A4": 4,
+        "A5": 5,
+        "id": "E3",
+        "type": "T1"
+    }
+]
+
+
+05. GET entities that does NOT have A1 (see E2)
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A2": 1,
+        "A3": 3,
+        "A4": 4,
+        "id": "E2",
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,9 +1,1 @@
-{
-  "subscribeError" : {
-    "errorCode" : {
-      "code" : "400",
-      "reasonPhrase" : "Bad Request",
-      "details" : "invalid payload: Radius zero for a circle area"
-    }
-  }
-}
+{"subscribeError":{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"invalid payload: Radius zero for a circle area"}}}

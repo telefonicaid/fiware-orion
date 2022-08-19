@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright 201[3|4|5] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0|1|2] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -77,12 +77,16 @@ def check_file(file):
 
 
 def ignore(root, file):
-    # Files in the BUILD_* or .git directories are not processed
+    # Files in the BUILD_* or .git directories (including .github) are not processed
     if 'BUILD_' in root or '.git' in root:
         return True
 
-    # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
-    if 'SRPMS' in root or 'SOURCES' in root or 'RPMS' in root:
+    # PNG files in manuals o functionalTest are ignored
+    if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and (file.endswith('.png') or file.endswith('.ico')):
+        return True
+
+    # Files in etc directories are not processed
+    if 'etc' in root:
         return True
 
     # Files in the test/valdring directory ending with .out are not processed
@@ -101,6 +105,20 @@ def ignore(root, file):
     if 'heavyTest' in root and (file.endswith('.json') or file.endswith('.xml')):
         return True
 
+    # Some files in docker/ directory are not processed
+    if 'docker' in root and file in ['Dockerfile', 'Dockerfile.alpine', 'docker-compose.yml']:
+        return True
+    if 'hooks' in root and file in ['build']:
+        return True
+
+    # Some file in CI are not processed
+    if 'ci' in root and file in ['Dockerfile', 'mongodb.repo']:
+        return True
+
+    # Some files in test/acceptance/behave directory are not processed
+    if 'behave' in root and file in ['behave.ini', 'logging.ini', 'properties.json.base']:
+        return True
+
     # Files used by the Qt IDE (they start with contextBroker.*) are not processed
     if file.endswith('.creator') or file.endswith('.creator.user') or file.endswith('.config') \
             or file.endswith('.files') or file.endswith('.includes'):
@@ -110,16 +128,24 @@ def ignore(root, file):
     if '.idea' in root:
         return True
 
+    # Apib files have an "inline" license, so they are ignored
+    extensions_to_ignore = [ 'apib', 'md' ]
+    if os.path.splitext(file)[1][1:] in extensions_to_ignore:
+        return True
+
     # Particular cases of files that are also ignored
-    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'README.md', 'LICENSE',
-                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
-                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu']
+    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
+                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'Changelog', 'compileInfo.h',
+                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
+                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml', 'uncrustify.cfg' ]
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
                                       or file == 'cmake2junit.xsl'):
         return True
-    if 'acceptance' in root and (file.endswith('.txt') or file.endswith('.json')):
+    
+    # For several requirements.txt files we have in this repo
+    if ('acceptance' in root or 'doc' in root) and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False
@@ -132,8 +158,8 @@ def supported_extension(root, file):
     :param file:
     :return:
     """
-    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'apib']
+    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'cfg', 'DISABLED', 'xtest',
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'conf']
     names = ['makefile', 'Makefile']
 
     # Check extensions

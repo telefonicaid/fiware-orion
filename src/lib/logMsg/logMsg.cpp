@@ -53,6 +53,8 @@
 #include "logMsg/time.h"
 #include "logMsg/logMsg.h"      /* Own interface                             */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
 extern "C" pid_t gettid(void);
 
 
@@ -171,7 +173,8 @@ do                                         \
                                            \
   xin[0] = c;                              \
   xin[1] = 0;                              \
-  strncat(line, xin, sizeof(xin) - 1);     \
+  strncat(line, xin,                       \
+          lineLen - strlen(line) - 1);     \
                                            \
   fi += l;                                 \
 } while (0)
@@ -187,11 +190,11 @@ do                                                \
 {                                                 \
   if (s != NULL)                                  \
   {                                               \
-    strncat(line, s, lineLen - 1);                \
+    strncat(line, s, lineLen - strlen(line) - 1); \
   }                                               \
   else                                            \
   {                                               \
-    strncat(line, "noprogname", lineLen - 1);     \
+    strncat(line, "noprogname", lineLen - strlen(line) - 1); \
   }                                               \
                                                   \
   fi += l;                                        \
@@ -209,7 +212,8 @@ do                                         \
   char xin[20];                            \
                                            \
   snprintf(xin, sizeof(xin), "%d", i);     \
-  strncat(line, xin, lineLen - 1);         \
+  strncat(line, xin,                       \
+          lineLen - strlen(line) - 1);     \
                                            \
   fi += l;                                 \
 } while (0)
@@ -234,7 +238,7 @@ do                                                \
     snprintf(xin, sizeof(xin), "%03d", tLev);     \
   }                                               \
                                                   \
-  strncat(line, xin, lineLen - 1);                \
+  strncat(line, xin, lineLen - strlen(line) - 1); \
   fi += 4;                                        \
 } while (0)
 
@@ -248,25 +252,19 @@ do                                                \
 * TRACE_LEVELS - number of trace levels
 */
 
-// The LINE_MAX definition concflicts with sys/syslimits.h
-#ifdef LINE_MAX
-#undef LINE_MAX
-#endif
-
 #define DELIMITER        ','
 #define ADD              0
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LINE_MAX         (32 * 1024)
 #define TEXT_MAX         512
 #define FORMAT_LEN       1024
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
-#define F_LEN            128
+#define F_LEN            200
 #define TF_LEN           64
-#define INFO_LEN         512
+#define INFO_LEN         256
 #define TMS_LEN          20
 #define TME_LEN          20
 #define TMS_DEF          "<trace "
@@ -339,11 +337,14 @@ typedef struct Line
 *
 * globals
 */
-int             inSigHandler      = 0;
-char*           progName;                   /* needed for messages (and by lmLib) */
-char            progNameV[512];             /* where to store progName            */
-__thread char   transactionId[64] = "N/A";
-extern char*    progName;
+int             inSigHandler                      = 0;
+char*           progName;                         /* needed for messages (and by lmLib) */
+char            progNameV[512];                   /* where to store progName            */
+__thread char   transactionId[64]                 = "N/A";
+__thread char   correlatorId[64]                  = "N/A";
+__thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
+__thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
+__thread char   fromIp[IP_LENGTH_MAX + 1]         = "N/A";
 
 
 
@@ -396,6 +397,7 @@ bool  lmWrites                     = false;
 bool  lmBug                        = false;
 bool  lmBuf                        = false;
 bool  lmFix                        = false;
+int   lmLevelMask                  = 0xFFFFFFFF;  /* All "masked in" by default */
 bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
@@ -411,6 +413,29 @@ bool  lmPreamble                   = true;
 static void lmSemInit(void)
 {
   sem_init(&sem, 0, 1);
+}
+
+
+
+/* ****************************************************************************
+*
+* lmSemGet - 
+*/
+const char* lmSemGet(void)
+{
+  int value;
+
+  if (sem_getvalue(&sem, &value) == -1)
+  {
+    return "error";
+  }
+
+  if (value == 0)
+  {
+    return "taken";
+  }
+
+  return "free";
 }
 
 
@@ -490,19 +515,149 @@ char* lmProgName(char* pn, int levels, bool pid, const char* extra)
   if (pid == true)
   {
     char  pid[8];
-    strncat(pName, "_", sizeof(pName) - 1);
+    strncat(pName, "_", sizeof(pName) - strlen(pName) - 1);
     snprintf(pid, sizeof(pid), "%d", (int) getpid());
-    strncat(pName, pid, sizeof(pName) - 1);
+    strncat(pName, pid, sizeof(pName) - strlen(pName) - 1);
   }
 
   if (extra != NULL)
   {
-    strncat(pName, extra, sizeof(pName) - 1);
+    strncat(pName, extra, sizeof(pName) - strlen(pName) - 1);
   }
 
   printf("pName: %s\n", pName);
 
   return pName;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskSet - 
+*/
+void lmLevelMaskSet(int levelMask)
+{
+  lmLevelMask = levelMask;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskSetString - 
+*/
+void lmLevelMaskSetString(char* level)
+{
+  if (strcasecmp(level, "NONE") == 0)
+  {
+    lmLevelMask = 0;
+  }
+  else if (strcasecmp(level, "FATAL") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+  }
+  else if (strcasecmp(level, "ERROR") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+  }
+  else if (strcasecmp(level, "WARN") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+  }
+  else if (strcasecmp(level, "INFO") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+  }
+  else if (strcasecmp(level, "VERBOSE") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+  }
+  else if (strcasecmp(level, "DEBUG") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+    lmLevelMask |= LogLevelDebug;
+  }
+  else if (strcasecmp(level, "TRACE") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+    lmLevelMask |= LogLevelDebug;
+    lmLevelMask |= LogLevelTrace;
+  }
+  else if (strcasecmp(level, "ALL") == 0)
+  {
+    lmLevelMask  = 0xFFFFFFFF;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskGet - 
+*/
+int lmLevelMaskGet(void)
+{
+  return lmLevelMask;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskStringGet -
+*/
+std::string lmLevelMaskStringGet(void)
+{
+  /* Check masks, in incresing severity order */
+
+  if (lmLevelMask == 0)
+  {
+    return "NONE";
+  }
+  else if (lmLevelMask & LogLevelDebug)
+  {
+    return "DEBUG";
+  }
+  else if (lmLevelMask & LogLevelInfo)
+  {
+    return "INFO";
+  }
+  else if (lmLevelMask & LogLevelWarning)
+  {
+    return "WARN";
+  }
+  else if (lmLevelMask & LogLevelError)
+  {
+    return "ERROR";
+  }
+  else if (lmLevelMask & LogLevelExit)
+  {
+    return "FATAL";
+  }
+  else
+  {
+    // Reaching would be an error in the log level management logic...
+    return "UNKNOWN";
+  }
 }
 
 
@@ -804,15 +959,12 @@ static char* dateGet(int index, char* line, int lineSize)
   {
     struct timeb timebuffer;
     struct tm    tm;
-    char         line_tmp[80];
-    char         timeZone[20];
+    char         line_buf[80];
 
     ftime(&timebuffer);
-    localtime_r(&secondsNow, &tm);
-    strftime(line_tmp, 80, fds[index].timeFormat, &tm);
-    strftime(timeZone, sizeof(timeZone), "%Z", &tm);
-
-    snprintf(line, lineSize, "%s.%.3d%s", line_tmp, timebuffer.millitm, timeZone);
+    gmtime_r(&secondsNow, &tm);
+    strftime(line_buf, 80, fds[index].timeFormat, &tm);
+    snprintf(line, lineSize, "%s.%.3dZ", line_buf, timebuffer.millitm);
   }
 
   return line;
@@ -881,10 +1033,17 @@ static char* timeGet(int index, char* line, int lineSize)
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * timeStampGet -
+*
+* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
+* has been removed for the Orion Context Broker implementation, to make room for
+* a new LM_S macro, the 'S' standing for 'Summary'.
+*
+* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
+* some other project.
 */
 static char* timeStampGet(char* line, int len)
 {
@@ -896,7 +1055,7 @@ static char* timeStampGet(char* line, int len)
 
   return line;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -907,7 +1066,7 @@ const char* longTypeName(char type)
 {
   switch (type)
   {
-  case 'W':  return "WARNING";
+  case 'W':  return "WARN";
   case 'E':  return "ERROR";
   case 'P':  return "ERROR";
   case 'X':  return "FATAL";
@@ -921,6 +1080,7 @@ const char* longTypeName(char type)
   case 'M':  return "DEBUG";
   case 'F':  return "DEBUG";
   case 'I':  return "INFO";
+  case 'S':  return "SUMMARY";
   }
 
   return "N/A";
@@ -955,9 +1115,6 @@ static char* lmLineFix
   fLen = strlen(format);
   while (fi < fLen)
   {
-    pid_t tid;
-
-    tid = syscall(SYS_gettid);
     if (strncmp(&format[fi], "TYPE", 4) == 0)
     {
       STRING_ADD(longTypeName(type), 4);
@@ -976,11 +1133,29 @@ static char* lmLineFix
     }
     else if (strncmp(&format[fi], "TID", 3) == 0)
     {
+      pid_t tid;
+      tid = syscall(SYS_gettid);
       INT_ADD((int) tid, 3);
     }
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
     {
       STRING_ADD(transactionId, 8);
+    }
+    else if (strncmp(&format[fi], "CORR_ID", 7) == 0)
+    {
+      STRING_ADD(correlatorId, 7);
+    }
+    else if (strncmp(&format[fi], "SERVICE", 7) == 0)
+    {
+      STRING_ADD(service, 7);
+    }
+    else if (strncmp(&format[fi], "SUB_SERVICE", 11) == 0)
+    {
+      STRING_ADD(subService, 11);
+    }
+    else if (strncmp(&format[fi], "FROM_IP", 7) == 0)
+    {
+      STRING_ADD(fromIp, 7);
     }
     else if (strncmp(&format[fi], "EXEC", 4) == 0)
     {
@@ -1029,7 +1204,7 @@ static char* lmLineFix
     strncpy(xin, "\n", sizeof(xin));
   }
 
-  strncat(line, xin, lineLen - 1);
+  strncat(line, xin, lineLen - strlen(line) - 1);
 
   return line;
 }
@@ -1109,7 +1284,7 @@ static void asciiToLeft
 
   while (offset-- >= 0)
   {
-    strncat(line, " ", lineLen - 1);
+    strncat(line, " ", lineLen - strlen(line) - 1);
   }
 
   for (i = 0; i < size; i++)
@@ -1127,7 +1302,7 @@ static void asciiToLeft
       strncpy(tmp, ".", sizeof(tmp));
     }
 
-    strncat(line, tmp, lineLen - 1);
+    strncat(line, tmp, lineLen - strlen(line) - 1);
   }
 }
 
@@ -1349,6 +1524,8 @@ char* lmTraceGet(char* levelString, int levelStringSize)
   int       j = 0;
   int       levels[256];
 
+  bzero(levels, sizeof(levels));
+
   if (levelString == NULL)
   {
     LOG_OUT(("returning NULL"));
@@ -1380,8 +1557,8 @@ char* lmTraceGet(char* levelString, int levelStringSize)
     int   prev   = levels[i - 1];
     int   diss   = levels[i];
     int   next   = levels[i + 1];
-    bool  before = (diss == prev + 1);
-    bool  after  = (diss == next - 1);
+    bool  before = (diss == (prev + 1));
+    bool  after  = (diss == (next - 1));
     char  str[12];
 
     if (i == 255)
@@ -1393,17 +1570,17 @@ char* lmTraceGet(char* levelString, int levelStringSize)
     else if (before && !after)
     {
       snprintf(str, sizeof(str), "-%d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && !after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
   }
 
@@ -1467,17 +1644,17 @@ char* lmTraceGet(char* levelString, int levelStringSize, char* traceV)
     else if (before && !after)
     {
       snprintf(str, sizeof(str), "-%d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
     else if (!before && !after)
     {
       snprintf(str, sizeof(str), ", %d", diss);
-      strncat(levelString, str, levelStringSize - 1);
+      strncat(levelString, str, levelStringSize - strlen(levelString) - 1);
     }
   }
 
@@ -1748,13 +1925,13 @@ LmStatus lmAux(char* a)
 char* lmTextGet(const char* format, ...)
 {
   va_list  args;
-  char*    vmsg = (char*) calloc(1, LINE_MAX);
+  char*    vmsg = (char*) calloc(1, logLineMaxSize);
 
   /* "Parse" the varible arguments */
   va_start(args, format);
 
   /* Print message to variable */
-  vsnprintf(vmsg, LINE_MAX, format, args);
+  vsnprintf(vmsg, logLineMaxSize, format, args);
   va_end(args);
 
   return vmsg;
@@ -1866,9 +2043,6 @@ LmStatus lmFdRegister
   int*         indexP
 )
 {
-  char       startMsg[256];
-  char       dt[256];
-  int        sz;
   int        index;
   time_t     secsNow;
   struct tm tmP;
@@ -1906,6 +2080,10 @@ LmStatus lmFdRegister
   {
     if (lmPreamble == true)
     {
+      char  startMsg[256];
+      char  dt[256];
+      int   sz;
+
       strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
       snprintf(startMsg, sizeof(startMsg),
                "%s log\n-----------------\nStarted %s\nCleared at ...\n",
@@ -2098,11 +2276,22 @@ LmStatus lmOut
   bool         use_hook
 )
 {
+  INIT_CHECK();
+  POINTER_CHECK(text);
+
   int   i;
-  char* line = (char*) calloc(1, LINE_MAX);
+  char* line = (char*) calloc(1, logLineMaxSize);
   int   sz;
   char* format = (char*) calloc(1, FORMAT_LEN + 1);
   char* tmP;
+
+  if ((line == NULL) || (format == NULL))
+  {
+    if (line   != NULL)   free(line);
+    if (format != NULL)   free(format);
+
+    return LmsNull;
+  }
 
   tmP = strrchr((char*) file, '/');
   if (tmP != NULL)
@@ -2118,10 +2307,6 @@ LmStatus lmOut
 
     return LmsOk;
   }
-
-  INIT_CHECK();
-  POINTER_CHECK(format);
-  POINTER_CHECK(text);
 
   memset(format, 0, FORMAT_LEN + 1);
 
@@ -2160,17 +2345,12 @@ LmStatus lmOut
     {
       if (text[1] != ':')
       {
-        snprintf(line, LINE_MAX, "R: %s\n%c", text, 0);
+        snprintf(line, logLineMaxSize, "R: %s\n%c", text, 0);
       }
       else
       {
-        snprintf(line, LINE_MAX, "%s\n%c", text, 0);
+        snprintf(line, logLineMaxSize, "%s\n%c", text, 0);
       }
-    }
-    else if (type == 'S')
-    {
-      char stampStr[128];
-      snprintf(line, LINE_MAX, "%s:%s", text, timeStampGet(stampStr, 128));
     }
     else
     {
@@ -2180,19 +2360,19 @@ LmStatus lmOut
         continue;
       }
 
-      if ((strlen(format) + strlen(text) + strlen(line)) > LINE_MAX)
+      if ((strlen(format) + strlen(text) + strlen(line)) > logLineMaxSize)
       {
-        snprintf(line, LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
+        snprintf(line, logLineMaxSize, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
       }
       else
       {
-        snprintf(line, LINE_MAX, format, text);
+        snprintf(line, logLineMaxSize, format, text);
       }
     }
 
     if (stre != NULL)
     {
-      strncat(line, stre, LINE_MAX - 1);
+      strncat(line, stre, logLineMaxSize - strlen(stre) - 1);
     }
 
     sz = strlen(line);
@@ -2420,7 +2600,6 @@ int lmBufferPresent
   int   start      = 0;
   char  line[160];
   char  tmp[80];
-  char  msg[160];
 
   if (size > 0x800)
   {
@@ -2446,6 +2625,8 @@ int lmBufferPresent
 
   if (to != NULL)
   {
+    char  msg[160];
+
     snprintf(msg, sizeof(msg), "%s %s %s (%d bytes) %s %s", progName,
              (type == 'r')? "reading" : "writing", description, size,
              (type == 'r')? "from"    : "to", to);
@@ -2466,14 +2647,14 @@ int lmBufferPresent
       if (bIndex + 4 <= size)
       {
         snprintf(tmp, sizeof(tmp), "%.8x ", *((int*) &buffer[bIndex]));
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 4;
       }
       else if (bIndex + 1 == size)
       {
         snprintf(tmp, sizeof(tmp), "%.2xxxxxxx",
                  (*((int*) &buffer[bIndex]) & 0xFF000000) >> 24);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 1;
         xx      = 1;
       }
@@ -2481,14 +2662,14 @@ int lmBufferPresent
       {
         snprintf(tmp, sizeof(tmp), "%.4xxxxx",
                  (*((int*) &buffer[bIndex]) & 0xFFFF0000) >> 16);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 2;
         xx      = 2;
       }
       else if (bIndex + 3 == size)
       {
         snprintf(tmp, sizeof(tmp), "%.6xxx", (*((int*) &buffer[bIndex]) & 0xFFFFFF00) >> 8);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 3;
         xx      = 3;
       }
@@ -2498,13 +2679,13 @@ int lmBufferPresent
       if (bIndex + 2 <= size)
       {
         snprintf(tmp, sizeof(tmp), "%.4x ", *((int16_t*) &buffer[bIndex]) & 0xFFFF);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 2;
       }
       else
       {
         snprintf(tmp, sizeof(tmp), "%.2xxx", (*((int16_t*) &buffer[bIndex]) & 0xFF00) >> 8);
-        strncat(line, tmp, sizeof(line) - 1);
+        strncat(line, tmp, sizeof(line) - strlen(line) - 1);
         bIndex += 1;
         xx      = 1;
       }
@@ -2512,7 +2693,7 @@ int lmBufferPresent
 
     case LmfByte:
       snprintf(tmp, sizeof(tmp), "%.2x ", buffer[bIndex] & 0xFF);
-      strncat(line, tmp, sizeof(line) - 1);
+      strncat(line, tmp, sizeof(line) - strlen(line) - 1);
       bIndex += 1;
       break;
     }
@@ -2568,22 +2749,25 @@ LmStatus lmReopen(int index)
 
   s = LmsOk;
 
-  snprintf(tmpName, sizeof(tmpName), "%s_%d",
-           fds[index].info, (int) getpid());
+  snprintf(tmpName, sizeof(tmpName), "%s_%d", fds[index].info, (int) getpid());
 
   if ((fd = open(tmpName, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1)
   {
     lseek(fds[index].fd, fdPos, SEEK_SET);
+    fclose(fP);
     return LmsOpen;
   }
 
   while (true)
   {
-    char* line = (char*) calloc(1, LINE_MAX);
     int   len;
-    int   nb;
+    char* line = (char*) calloc(1, logLineMaxSize);
+    if (line == NULL)
+    {
+      break;
+    }
 
-    if (fgets(line, LINE_MAX, fP) == NULL)
+    if (fgets(line, logLineMaxSize, fP) == NULL)
     {
       s = LmsFgets;
       free(line);
@@ -2615,7 +2799,7 @@ LmStatus lmReopen(int index)
       break;
     }
 
-    if ((nb = write(fd, line, len)) != len)
+    if (write(fd, line, len) != len)
     {
       s = LmsWrite;
       free(line);
@@ -2684,12 +2868,16 @@ int64_t lmLogLineGet
   char**    allP
 )
 {
+  char* line = (char*) calloc(1, logLineMaxSize);
+  if (line == NULL)
+  {
+    return 0;
+  }
+
   static FILE*  fP     = NULL;
-  char*         line   = (char*) calloc(1, LINE_MAX);
   char*         lineP  = line;
   char*         delimiter;
   int64_t       ret;
-  char*         nada;
 
   if (allP != NULL)
   {
@@ -2718,12 +2906,16 @@ int64_t lmLogLineGet
       return -1;
     }
 
-    nada = fgets(line, 1024, fP);
-    nada = fgets(line, 1024, fP);
-    nada = fgets(line, 1024, fP);
-    nada = fgets(line, 1024, fP);
-    if (nada == NULL)
+    // Set file pointer to the beginning of the fifth line
+    char* fgP;
+
+    fgP = fgets(line, 1024, fP);
+    if (fgP != NULL) fgP = fgets(line, 1024, fP);
+    if (fgP != NULL) fgP = fgets(line, 1024, fP);
+    if (fgP != NULL) fgP = fgets(line, 1024, fP);
+    if (fgP == NULL)
     {
+      goto lmerror;
     }
   }
   else
@@ -2735,7 +2927,7 @@ int64_t lmLogLineGet
     }
   }
 
-  if (fgets(line, LINE_MAX, fP) == NULL)
+  if (fgets(line, logLineMaxSize, fP) == NULL)
   {
     fclose(fP);
     fP = NULL;
@@ -2845,9 +3037,12 @@ typedef struct LineRemove
 */
 LmStatus lmClear(int index, int keepLines, int lastLines)
 {
+  INIT_CHECK();
+  INDEX_CHECK(index);
+
   LineRemove* lrV;
   void*       initialLrv;
-  char*       line = (char*) calloc(1, LINE_MAX);
+  char*       line = (char*) calloc(1, logLineMaxSize);
   int         i;
   int         j = 0;
   FILE*       fP;
@@ -2861,11 +3056,11 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   int         fd;
   static int  headerLines = 4;
 
-  INIT_CHECK();
-  INDEX_CHECK(index);
+  POINTER_CHECK(line);
 
   if (logLines < (keepLines + lastLines))
   {
+    free(line);
     return LmsOk;
   }
 
@@ -2874,10 +3069,12 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     atLines += 1000;
     if (atLines > 20000)
     {
+      free(line);
       doClear = false;
       return LmsFopen;
     }
 
+    free(line);
     return LmsFopen;
   }
 
@@ -2888,6 +3085,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   if (lrV == NULL)
   {
     semGive();
+    free(line);
     return LmsMalloc;
   }
 
@@ -2896,7 +3094,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
   i = 0;
   oldOffset = 0;
-  while (fgets(line, LINE_MAX, fP) != NULL)
+  while (fgets(line, logLineMaxSize, fP) != NULL)
   {
     lrV[i].type   = (line[1] == ':')? line[0] : 'h';
     lrV[i].offset = oldOffset;
@@ -2970,6 +3168,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                                            \
   lrV = NULL;                              \
   unlink(tmpName);                         \
+  free(line);                              \
   semGive();                               \
                                            \
   return s;                                \
@@ -2979,14 +3178,14 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   {
     if (lrV[i].remove == false)
     {
-      char*  line  = (char*) calloc(1, LINE_MAX);
+      char*  line  = (char*) calloc(1, logLineMaxSize);
 
       if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
       {
         CLEANUP("fseek", LmsFseek);
       }
 
-      if (fgets(line, LINE_MAX, fP) == NULL)
+      if (fgets(line, logLineMaxSize, fP) == NULL)
       {
         break;
       }
@@ -3019,6 +3218,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
       ++newLogLines;
       free(line);
+      line = NULL;
     }
   }
 
@@ -3044,6 +3244,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   {
     fds[index].state = Free;
     semGive();
+    if (line) free(line);
     return LmsOpen;
   }
 
@@ -3051,7 +3252,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
   logLines = newLogLines;
   LOG_OUT(("Set logLines to %d", logLines));
-  free(line);
+  if (line) free(line);
 
   semGive();
   return LmsOk;
@@ -3143,8 +3344,7 @@ LmStatus lmOnlyErrors(int index)
 */
 const char* lmTraceLevel(int level)
 {
-  static char name[32];
-  char*       userName = NULL;
+  char* userName = NULL;
 
   switch (level)
   {
@@ -3166,6 +3366,7 @@ const char* lmTraceLevel(int level)
 
   if (userName == NULL)
   {
+    static char name[32];
     snprintf(name, sizeof(name), "trace level %d", level);
     return name;
   }
@@ -3195,6 +3396,7 @@ struct logMsg
   int  tLev;
   char stre[256];
   char transactionId[64];
+  char correlatorId[64];
   struct logMsg* next;
 };
 
@@ -3219,7 +3421,8 @@ void lmAddMsgBuf
   const char*  stre
 )
 {
-  struct logMsg *newMsg, *logP, *lastlogP;
+  struct logMsg* newMsg;
+  struct logMsg* logP;
 
   newMsg = (logMsg*) malloc(sizeof(struct logMsg));
   if (newMsg == NULL)
@@ -3259,6 +3462,8 @@ void lmAddMsgBuf
 
   if (logMsgs)
   {
+    struct logMsg* lastlogP;
+
     logP = logMsgs;
     while (logP)
     {

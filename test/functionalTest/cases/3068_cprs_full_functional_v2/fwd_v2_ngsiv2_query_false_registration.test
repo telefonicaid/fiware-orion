@@ -1,0 +1,122 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Query With a False Registration (NGSIv2 forwarding)
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+# Based in the test with same name (without fwd_v2 prefix in the file name) in cases/0787_cprs_full_functional_v2,
+# which used NGSIv1 registrations
+#
+# 01. Register E1/T1/A1-CP1 in CB
+# 02. Query E1/T1/A1 in CB, using NGSIv2
+# 03. Query E1/T1/{} in CB, using NGSIv2
+#
+
+echo "01. Register E1/T1/A1-CP1 in CB"
+echo "==============================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Query E1/T1/A1 in CB, using NGSIv2"
+echo "======================================"
+orionCurl --url /v2/entities/E1/attrs/A1?type=T1
+echo
+echo
+
+
+echo "03. Query E1/T1/{} in CB, using NGSIv2"
+echo "======================================"
+orionCurl --url /v2/entities/E1?type=T1
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1/T1/A1-CP1 in CB
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Query E1/T1/A1 in CB, using NGSIv2
+======================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. Query E1/T1/{} in CB, using NGSIv2
+======================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

@@ -57,10 +57,6 @@ function usage()
   verboseMsg "  rcr:    registerContext"
   verboseMsg "  rcrs:   registerContextResponse"
   verboseMsg "  dcar:   discoverContextAvailability"
-  verboseMsg "  scar:   subscribeContextAvailability"
-  verboseMsg "  ucas:   updateContextAvailabilitySubscription"
-  verboseMsg "  ucar:   unsubscribeContextAvailability"
-  verboseMsg "  ncar:   notifyContextAvailability"
 
   verboseMsg "  qcr:    queryContext"
   verboseMsg "  scr:    subscribeContext"
@@ -246,10 +242,6 @@ declare -A op
 op['rcr']='NGSI9/registerContext'
 op['rcrs']='NGSI9/registerContextResponse'
 op['dcar']='NGSI9/discoverContextAvailability'
-op['scar']='NGSI9/subscribeContextAvailability'
-op['ucas']='NGSI9/updateContextAvailabilitySubscription'
-op['ucar']='NGSI9/unsubscribeContextAvailability'
-op['ncar']='NGSI9/notifyContextAvailability'
 
 op['qcr']='NGSI10/queryContext'
 op['scr']='NGSI10/subscribeContext'

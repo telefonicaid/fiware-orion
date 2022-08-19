@@ -1,0 +1,324 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with Q and EQ/NEQ false or true
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attribute A1=true
+# 02. Create an entity E2 with attribute A1=false
+# 03. Create an entity E3 with attribute A1=true
+# 04. GET all entities (3 entities)
+# 05. GET entities with q=A1==true (2 hits)
+# 06. GET entities with q=A1==false (1 hit)
+# 07. GET entities with q=A2==true (0 hits)
+# 08. GET entities with q=A1!=true (1 hit)
+# 09. GET entities with q=A1!=false (2 hits)
+# 10. GET entities with q=A2!=true (0 hits)
+#
+
+
+echo "01. Create an entity E1 with attribute A1=true"
+echo "=============================================="
+payload='{
+    "id": "E1",
+    "A1": { "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E2 with attribute A1=false"
+echo "==============================================="
+payload='{
+    "id": "E2",
+    "A1": { "value": false }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an entity E3 with attribute A1=true"
+echo "=============================================="
+payload='{
+    "id": "E3",
+    "A1": { "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. GET all entities (3 entities)"
+echo "================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "05. GET entities with q=A1==true (2 hits)"
+echo "========================================="
+orionCurl --url '/v2/entities?q=A1==true'
+echo
+echo
+
+
+echo "06. GET entities with q=A1==false (1 hit)"
+echo "========================================="
+orionCurl --url '/v2/entities?q=A1==false'
+echo
+echo
+
+
+echo "07. GET entities with q=A2==true (0 hits)"
+echo "========================================="
+orionCurl --url '/v2/entities?q=A2==true'
+echo
+echo
+
+
+echo "08. GET entities with q=A1!=true (1 hit)"
+echo "========================================"
+orionCurl --url '/v2/entities?q=A1!=true'
+echo
+echo
+
+
+echo "09. GET entities with q=A1!=false (2 hits)"
+echo "=========================================="
+orionCurl --url '/v2/entities?q=A1!=false'
+echo
+echo
+
+
+echo "10. GET entities with q=A2!=true (0 hits)"
+echo "========================================="
+orionCurl --url '/v2/entities?q=A2!=true'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attribute A1=true
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create an entity E2 with attribute A1=false
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create an entity E3 with attribute A1=true
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET all entities (3 entities)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 236
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E1",
+        "type": "Thing"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": false
+        },
+        "id": "E2",
+        "type": "Thing"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+05. GET entities with q=A1==true (2 hits)
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 157
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E1",
+        "type": "Thing"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+06. GET entities with q=A1==false (1 hit)
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": false
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+07. GET entities with q=A2==true (0 hits)
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+08. GET entities with q=A1!=true (1 hit)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": false
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
+
+
+09. GET entities with q=A1!=false (2 hits)
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 157
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E1",
+        "type": "Thing"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Boolean",
+            "value": true
+        },
+        "id": "E3",
+        "type": "Thing"
+    }
+]
+
+
+10. GET entities with q=A2!=true (0 hits)
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

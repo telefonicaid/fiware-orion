@@ -1,0 +1,586 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geometry and Coordinates
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities, creating Madrid
+# 02. POST /v2/entities, creating Leganes
+# 03. POST /v2/entities, creating Alcobendas
+# 04. GET /v2/entities - see all three cities
+# 05. GET /v2/entities, circle with wide radius capturing all three cities
+# 06. GET /v2/entities, circle with not so wide radius capturing only Madrid and Leganes
+# 07. GET /v2/entities, circle with narrow radius capturing only Madrid
+# 08. GET /v2/entities, inverted circle with narrow radius capturing Leganes and Alcobendas
+# 09. GET /v2/entities, polygon capturing only Leganes
+# 10. GET /v2/entities, inverted polygon capturing all but Leganes
+# 11. GET /v2/entities, polygon capturing only Alcobendas
+# 12. GET /v2/entities, inverted polygon capturing all but Alcobendas
+# 13. GET /v2/entities, polygon capturing only Madrid
+# 14. GET /v2/entities, inverted polygon capturing all but Madrid
+# 15. GET /v2/entities, polygon capturing all three cities
+# 16. GET /v2/entities, inverted polygon capturing no city
+#
+
+
+echo "01. POST /v2/entities, creating Madrid"
+echo "======================================"
+payload='{
+  "id": "Madrid",
+  "type": "City",
+  "location":
+  {
+    "type":     "geo:point",
+    "value":    "40.418889, -3.691944"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/entities, creating Leganes"
+echo "======================================="
+payload='{
+  "id": "Leganes",
+  "type": "City",
+  "location":
+  {
+    "type":     "geo:point",
+    "value":    "40.316667, -3.75"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. POST /v2/entities, creating Alcobendas"
+echo "=========================================="
+payload='{
+  "id": "Alcobendas",
+  "type": "City",
+  "location":
+  {
+    "type":     "geo:point",
+    "value":    "40.533333, -3.633333"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. GET /v2/entities - see all three cities"
+echo "==========================================="
+orionCurl --url '/v2/entities'
+echo
+echo
+
+
+echo "05. GET /v2/entities, circle with wide radius capturing all three cities"
+echo "========================================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:15000&geometry=point&coords=40.418889,-3.691944'
+echo
+echo
+
+
+echo "06. GET /v2/entities, circle with not so wide radius capturing only Madrid and Leganes"
+echo "======================================================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:13500&geometry=point&coords=40.418889,-3.691944'
+echo
+echo
+
+
+echo "07. GET /v2/entities, circle with narrow radius capturing only Madrid"
+echo "====================================================================="
+orionCurl --url '/v2/entities?georel=near;maxDistance:1000&geometry=point&coords=40.418889,-3.691944'
+echo
+echo
+
+
+echo "08. GET /v2/entities, inverted circle with narrow radius capturing Leganes and Alcobendas"
+echo "========================================================================================="
+orionCurl --url '/v2/entities?georel=near;minDistance:1000&geometry=point&coords=40.418889,-3.691944'
+echo
+echo
+
+
+echo "09. GET /v2/entities, polygon capturing only Leganes"
+echo "===================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40.316667,-3.65;40.216667,-3.85;40.416667,-3.85;40.316667,-3.65'
+echo
+echo
+
+
+echo "10. GET /v2/entities, inverted polygon capturing all but Leganes"
+echo "================================================================"
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40.316667,-3.65;40.216667,-3.85;40.416667,-3.85;40.316667,-3.65'
+echo
+echo
+
+
+echo "11. GET /v2/entities, polygon capturing only Alcobendas"
+echo "======================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40.533333,-3.533333;40.433333,-3.733333;40.633333,-3.733333;40.533333,-3.533333'
+echo
+echo
+
+
+echo "12. GET /v2/entities, inverted polygon capturing all but Alcobendas"
+echo "==================================================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40.533333,-3.533333;40.433333,-3.733333;40.633333,-3.733333;40.533333,-3.533333'
+echo
+echo
+
+
+echo "13. GET /v2/entities, polygon capturing only Madrid"
+echo "==================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40.418889,-3.591944;40.318889,-3.791944;40.518889,-3.791944;40.418889,-3.591944'
+echo
+echo
+
+
+echo "14. GET /v2/entities, inverted polygon capturing all but Madrid"
+echo "==============================================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40.418889,-3.591944;40.318889,-3.791944;40.518889,-3.791944;40.418889,-3.591944'
+echo
+echo
+
+
+echo "15. GET /v2/entities, polygon capturing all three cities"
+echo "========================================================"
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40,-3;36,-4;44,-4;40,-3'
+echo
+echo
+
+
+echo "16. GET /v2/entities, inverted polygon capturing no city"
+echo "========================================================"
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40,-3;36,-4;44,-4;40,-3'
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities, creating Madrid
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Madrid?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/entities, creating Leganes
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Leganes?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. POST /v2/entities, creating Alcobendas
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Alcobendas?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities - see all three cities
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+05. GET /v2/entities, circle with wide radius capturing all three cities
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+06. GET /v2/entities, circle with not so wide radius capturing only Madrid and Leganes
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 212
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    }
+]
+
+
+07. GET /v2/entities, circle with narrow radius capturing only Madrid
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    }
+]
+
+
+08. GET /v2/entities, inverted circle with narrow radius capturing Leganes and Alcobendas
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 216
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+09. GET /v2/entities, polygon capturing only Leganes
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    }
+]
+
+
+10. GET /v2/entities, inverted polygon capturing all but Leganes
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 219
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+11. GET /v2/entities, polygon capturing only Alcobendas
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+12. GET /v2/entities, inverted polygon capturing all but Alcobendas
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 212
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    }
+]
+
+
+13. GET /v2/entities, polygon capturing only Madrid
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    }
+]
+
+
+14. GET /v2/entities, inverted polygon capturing all but Madrid
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 216
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+15. GET /v2/entities, polygon capturing all three cities
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+16. GET /v2/entities, inverted polygon capturing no city
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

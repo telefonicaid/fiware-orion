@@ -1,0 +1,111 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Missing citation mark error
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E entity, attribute A with textual value
+# 02. Try to update value missing one citation mark at the end, get error
+# 03. Try to update value missing one citation mark at the begining, get error
+#
+
+echo "01. Create E entity, attribute A with textual value"
+echo "==================================================="
+payload='
+{
+  "id": "E",
+  "type": "Thing",
+  "A": {
+    "value": "bar",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Try to update value missing citation mark at the end, get error"
+echo "==================================================================="
+payload='"foo'
+orionCurl --url /v2/entities/E/attrs/A/value --payload "$payload" --in text/plain -X PUT
+echo
+echo
+
+
+echo "03. Try to update value missing citation mark at the begining, get error"
+echo "==================================================================="
+payload='foo"'
+orionCurl --url /v2/entities/E/attrs/A/value --payload "$payload" --in text/plain -X PUT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E entity, attribute A with textual value
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=Thing
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Try to update value missing citation mark at the end, get error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Missing citation-mark at end of string",
+    "error": "BadRequest"
+}
+
+
+03. Try to update value missing citation mark at the begining, get error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attribute value type not recognized",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -37,22 +37,25 @@
 
 /* ****************************************************************************
 *
-* render - 
+* toJsonV1 -
 */
-std::string ConditionValueList::render(Format format, const std::string& indent, bool comma)
+std::string ConditionValueList::toJsonV1(bool comma)
 {
   std::string  out = "";
-  std::string  tag = "condValueList";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, tag, tag, format, true, true);
+  out += startTag("condValueList", true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += valueTag(indent + "  ", "condValue", "", vec[ix], format, ix != vec.size() - 1);
+  {
+    out += valueTag("", vec[ix], ix != vec.size() - 1, true);
+  }
 
-  out += endTag(indent, tag, format, comma, true);
+  out += endTag(comma, true);
 
   return out;
 }
@@ -63,36 +66,17 @@ std::string ConditionValueList::render(Format format, const std::string& indent,
 *
 * ConditionValueList::check - 
 */
-std::string ConditionValueList::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string ConditionValueList::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix] == "")
+    if (vec[ix].empty())
+    {
       return "empty condValue name";
+    }
   }
 
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ConditionValueList::present - 
-*/
-void ConditionValueList::present(const std::string& indent)
-{
-  LM_F(("%sConditionValue List\n",    indent.c_str()));
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    LM_F(("%s  %s\n", indent.c_str(), vec[ix].c_str()));
 }
 
 
@@ -132,9 +116,28 @@ unsigned int ConditionValueList::size(void)
 
 /* ****************************************************************************
 *
-* ConditionValueList::get - 
+* ConditionValueList::operator
 */
-std::string ConditionValueList::get(int ix)
+std::string ConditionValueList::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* ConditionValueList::fill - 
+*/
+void ConditionValueList::fill(ConditionValueList& list)
+{
+  for (unsigned int cvIx = 0; cvIx < list.size(); ++cvIx)
+  {
+    push_back(list[cvIx]);
+  }
 }

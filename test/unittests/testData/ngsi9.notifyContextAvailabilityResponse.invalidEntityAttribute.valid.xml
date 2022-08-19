@@ -1,7 +1,0 @@
-<notifyContextAvailabilityResponse>
-  <responseCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>unsupported attribute for EntityId</details>
-  </responseCode>
-</notifyContextAvailabilityResponse>

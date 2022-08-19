@@ -1,0 +1,474 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with array in URI param 'type'
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 of type T1
+# 02. Create an entity E1 of type T2
+# 03. Create an entity E1 of type T3
+# 04. GET all entities (3 entities)
+# 05. GET /v2/entities?type=T1, see E1/T1
+# 06. GET /v2/entities?type=T1,T2 see E1/T1 and E1/T2
+# 07. GET /v2/entities?type=T1,T3 see E1/T1 and E1/T3
+# 08. GET /v2/entities?type=T1,T2,T3 see E1/T1, E1/T2 and E1/T3
+# 09. GET /v2/entities?type=T1,T2,T3&id=E1, see E1/T1, E1/T2 and E1/T3
+# 10. Create an entity E2 of type T1
+# 11. Create an entity E2 of type T3
+# 12. GET /v2/entities?type=T1,T3, see E1/T1, E1/T3, E2/T1, and E2/T3
+# 13. Create an entity E12 of type T1
+# 14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1
+# 15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1
+# 16. GET /v2/entities?type=T1,T2&id=E1,E12, see E1/T1, E1/T2 and E12/T1
+#
+
+echo "01. Create an entity E1 of type T1"
+echo "=================================="
+payload='{
+    "id": "E1",
+    "type": "T1"
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E1 of type T2"
+echo "=================================="
+payload='{
+    "id": "E1",
+    "type": "T2"
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an entity E1 of type T3"
+echo "=================================="
+payload='{
+    "id": "E1",
+    "type": "T3"
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. GET all entities (3 entities)"
+echo "================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "05. GET /v2/entities?type=T1, see E1/T1"
+echo "======================================="
+orionCurl --url '/v2/entities?type=T1'
+echo
+echo
+
+
+echo "06. GET /v2/entities?type=T1,T2 see E1/T1 and E1/T2"
+echo "==================================================="
+orionCurl --url '/v2/entities?type=T1,T2'
+echo
+echo
+
+
+echo "07. GET /v2/entities?type=T1,T3 see E1/T1 and E1/T3"
+echo "==================================================="
+orionCurl --url '/v2/entities?type=T1,T3'
+echo
+echo
+
+
+echo "08. GET /v2/entities?type=T1,T2,T3 see E1/T1, E1/T2 and E1/T3"
+echo "============================================================="
+orionCurl --url '/v2/entities?type=T1,T2,T3'
+echo
+echo
+
+
+echo "09. GET /v2/entities?type=T1,T2,T3&id=E1, see E1/T1, E1/T2 and E1/T3"
+echo "===================================================================="
+orionCurl --url '/v2/entities?type=T1,T2,T3&id=E1'
+echo
+echo
+
+
+echo "10. Create an entity E2 of type T1"
+echo "=================================="
+payload='{
+    "id": "E2",
+    "type": "T1"
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. Create an entity E2 of type T3"
+echo "=================================="
+payload='{
+    "id": "E2",
+    "type": "T3"
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. GET /v2/entities?type=T1,T3, see E1/T1, E1/T3, E2/T1, and E2/T3"
+echo "==================================================================="
+orionCurl --url '/v2/entities?type=T1,T3'
+echo
+echo
+
+
+echo "13. Create an entity E12 of type T1"
+echo "==================================="
+payload='{
+    "id": "E12",
+    "type": "T1"
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1"
+echo "================================================================="
+orionCurl --url '/v2/entities?type=T1&idPattern=E1.*'
+echo
+echo
+
+
+echo "15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?type=T1,T2&idPattern=E1.*'
+echo
+echo
+
+
+echo "16. GET /v2/entities?type=T1,T2&id=E1,E12, see E1/T1, E1/T2 and E12/T1"
+echo "======================================================================"
+orionCurl --url '/v2/entities?type=T1,T2&id=E1,E12'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 of type T1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create an entity E1 of type T2
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create an entity E1 of type T3
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET all entities (3 entities)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    }
+]
+
+
+05. GET /v2/entities?type=T1, see E1/T1
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 25
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    }
+]
+
+
+06. GET /v2/entities?type=T1,T2 see E1/T1 and E1/T2
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    }
+]
+
+
+07. GET /v2/entities?type=T1,T3 see E1/T1 and E1/T3
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    }
+]
+
+
+08. GET /v2/entities?type=T1,T2,T3 see E1/T1, E1/T2 and E1/T3
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    }
+]
+
+
+09. GET /v2/entities?type=T1,T2,T3&id=E1, see E1/T1, E1/T2 and E1/T3
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    }
+]
+
+
+10. Create an entity E2 of type T1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Create an entity E2 of type T3
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. GET /v2/entities?type=T1,T3, see E1/T1, E1/T3, E2/T1, and E2/T3
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    },
+    {
+        "id": "E2",
+        "type": "T1"
+    },
+    {
+        "id": "E2",
+        "type": "T3"
+    }
+]
+
+
+13. Create an entity E12 of type T1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E12?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 50
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E12",
+        "type": "T1"
+    }
+]
+
+
+15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E12",
+        "type": "T1"
+    }
+]
+
+
+16. GET /v2/entities?type=T1,T2&id=E1,E12, see E1/T1, E1/T2 and E12/T1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E12",
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

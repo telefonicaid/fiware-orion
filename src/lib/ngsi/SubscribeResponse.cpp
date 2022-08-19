@@ -26,7 +26,6 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/Format.h"
 #include "ngsi/SubscribeResponse.h"
 
 
@@ -43,20 +42,20 @@ SubscribeResponse::SubscribeResponse()
 
 /* ****************************************************************************
 *
-* SubscribeResponse::render - 
+* SubscribeResponse::toJsonV1 -
 */
-std::string SubscribeResponse::render(Format format, const std::string& indent, bool comma)
+std::string SubscribeResponse::toJsonV1(bool comma)
 {
   std::string  out                 = "";
   std::string  tag                 = "subscribeResponse";
   bool         durationRendered    = !duration.isEmpty();
   bool         throttlingRendered  = !throttling.isEmpty();
 
-  out += startTag(indent, tag, format);
-  out += subscriptionId.render(RtSubscribeResponse, format, indent + "  ", durationRendered || throttlingRendered);
-  out += duration.render(format, indent + "  ", throttlingRendered);
-  out += throttling.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, comma);
+  out += startTag(tag);
+  out += subscriptionId.toJsonV1(RtSubscribeResponse, durationRendered || throttlingRendered);
+  out += duration.toJsonV1(throttlingRendered);
+  out += throttling.toJsonV1(false);
+  out += endTag(comma);
 
   return out;
 }

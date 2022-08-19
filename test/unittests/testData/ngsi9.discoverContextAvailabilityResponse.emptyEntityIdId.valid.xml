@@ -1,7 +1,0 @@
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>empty entityId:id</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>

@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -34,27 +33,27 @@
 
 /* ****************************************************************************
 *
-* checkOne - 
+* checkOne -
 */
 TEST(ContextAttribute, checkOne)
 {
-  ContextAttribute  ca;
+  ContextAttribute*  caP = new ContextAttribute();
   std::string       res;
 
   utInit();
 
-  ca.name = "";
-  res     = ca.check(RegisterContext, XML, "", "", 0);
+  caP->name = "";
+  res     = caP->check(V1, RegisterContext);
   EXPECT_TRUE(res == "missing attribute name");
 
-  ca.name  = "Algo, lo que sea!";
-  ca.value = "";
+  caP->name  = "Algo, lo que sea!";
+  caP->stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = ca.check(RegisterContext, XML, "", "", 0);
+  res     = caP->check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
-  
-  ca.value = "Algun valor cualquiera";
-  res     = ca.check(RegisterContext, XML, "", "", 0);
+
+  caP->stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
+  res     = caP->check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -64,26 +63,26 @@ TEST(ContextAttribute, checkOne)
 
 /* ****************************************************************************
 *
-* checkVector - 
+* checkVector -
 */
 TEST(ContextAttribute, checkVector)
 {
-  ContextAttributeVector  caVector;
-  ContextAttribute        ca0;
-  ContextAttribute        ca1;
-  std::string             res;
+  ContextAttributeVector*  caVectorP = new ContextAttributeVector();
+  ContextAttribute*        ca0P      = new ContextAttribute();
+  ContextAttribute*        ca1P      = new ContextAttribute();
+  std::string              res;
 
   utInit();
 
-  ca0.name  = "Algo, lo que sea!";
-  ca0.value = "Algo, lo que sea!";
-  ca1.name  = "Algo, lo que sea!";
-  ca1.value = "Algo, lo que sea!";
+  ca0P->name        = "Algo, lo que sea!";
+  ca0P->stringValue = "Algo, lo que sea!"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
+  ca1P->name        = "Algo, lo que sea!";
+  ca1P->stringValue = "Algo, lo que sea!"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  caVector.push_back(&ca0);
-  caVector.push_back(&ca1);
+  caVectorP->push_back(ca0P);
+  caVectorP->push_back(ca1P);
 
-  res     = caVector.check(RegisterContext, XML, "", "", 0);
+  res     = caVectorP->check(V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -93,27 +92,22 @@ TEST(ContextAttribute, checkVector)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 TEST(ContextAttribute, render)
 {
-  ContextAttribute  ca("NAME", "TYPE", "VALUE");
+  ContextAttribute* caP = new ContextAttribute("NAME", "TYPE", "VALUE");
   std::string       out;
-  const char*       outfile1 = "ngsi.contextAttribute.render.middle.xml";
-  const char*       outfile2 = "ngsi.contextAttribute.render.middle.json";
-  ConnectionInfo    ci(XML);
+  const char*       outfile1 = "ngsi.contextAttribute.render.middle.json";
 
   utInit();
 
-  out = ca.render(&ci, UpdateContext, "");
+  std::vector<std::string> emptyMdV;
+
+  out = caP->toJsonV1(false, UpdateContext, emptyMdV, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci.outFormat = JSON;
-  out = ca.render(&ci, UpdateContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   utExit();
 }
 
@@ -121,39 +115,21 @@ TEST(ContextAttribute, render)
 
 /* ****************************************************************************
 *
-* present - 
-*/
-TEST(ContextAttribute, present)
-{
-  // Just to exercise all the code ..
-  ContextAttribute  ca("NAME", "TYPE", "VALUE");
-
-  utInit();
-
-  ca.present("", 0);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* copyMetadatas - 
+* copyMetadatas -
 */
 TEST(ContextAttribute, copyMetadatas)
 {
-  ContextAttribute  ca;
-  Metadata          m1("m1", "int", "2");
-  Metadata          m2("m2", "string", "sss");
+  ContextAttribute* caP = new ContextAttribute();
+  Metadata*         m1P = new Metadata("m1", "int", "2");
+  Metadata*         m2P = new Metadata("m2", "string", "sss");
 
   utInit();
 
-  ca.metadataVector.push_back(&m1);
-  ca.metadataVector.push_back(&m2);
+  caP->metadataVector.push_back(m1P);
+  caP->metadataVector.push_back(m2P);
 
-  ContextAttribute ca2(&ca);
-  EXPECT_EQ(2, ca2.metadataVector.size());
+  ContextAttribute* ca2P = new ContextAttribute(caP);
+  EXPECT_EQ(2, ca2P->metadataVector.size());
 
   utExit();
 }

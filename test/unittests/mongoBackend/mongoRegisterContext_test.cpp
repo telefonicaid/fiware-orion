@@ -22,15 +22,18 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
-#include "testInit.h"
-#include "unittest.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/ContextRegistration.h"
@@ -40,15 +43,31 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 
-#include "mongo/client/dbclient.h"
+#include "unittests/testInit.h"
+#include "unittests/unittest.h"
+#include "unittests/commonMocks.h"
 
-#include "commonMocks.h"
 
+
+/* ****************************************************************************
+*
+* USING
+*/
+using mongo::DBClientBase;
+using mongo::BSONObj;
+using mongo::BSONArray;
+using mongo::BSONElement;
+using mongo::OID;
+using mongo::DBException;
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
-extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
+
+
 
 /* ****************************************************************************
 *
@@ -67,10 +86,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * In addition, we include some tests to check of notify context availability triggering upon
 * creation of context registration:
 *
-* - NotifyContextAvailability1
-* - NotifyContextAvailability2
-* - NotifyContextAvailability3
-*
 * In addition, we include a test to check default duration
 *
 * - defaultDuration
@@ -83,12 +98,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - MongoDbInsertEntityFail
 * - MongoDbUpsertRegistrationFail
 * - MongoDbEntitiesInconsistency
-* - MongoDbCAsubsFindFail
-*
-* In addition, we include some tests related with associations metadata processing
-*
-* - AssociationsOk
-* - AssociationsDbFail
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -96,33 +105,19 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 */
 
+
+
 /* ****************************************************************************
 *
 * prepareDatabase -
 */
-static void prepareDatabase(void) {
-
+static void prepareDatabase(void)
+{
     /* Clean database */
     setupDatabase();
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-    BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 1879048191 <<
-                        "reference" << "http://notify1.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5" << "isPattern" << "false")) <<
-                        "attrs" << BSONArray());
-
-    BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 1879048191 <<
-                        "reference" << "http://notify2.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5" << "isPattern" << "false")) <<
-                        "attrs" << BSON_ARRAY("A1"));
-
-    connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub1);
-    connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub2);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -167,75 +162,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();    
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));  
-
-  std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
-  EXPECT_EQ(0, attrs.size());
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Release connection */
-  mongoDisconnect();
-
-  utExit();
-
-}
-
-/* ****************************************************************************
-*
-* ce1_En1_At0_Ok_XML -
-*/
-TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_XML)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  utInit();
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().toString();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-  EXPECT_STREQ("XML", reg.getStringField("format"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
   std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
@@ -253,12 +179,10 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_XML)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -284,7 +208,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_JSON)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
   ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
@@ -322,11 +245,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_JSON)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -372,7 +291,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -389,11 +308,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -401,85 +316,6 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
 * ce1_En1_AtN_Ok -
 */
 TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
-{   
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res; 
-
-  utInit();
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra1("A1", "TA1", "false");
-  ContextRegistrationAttribute cra2("A2", "TA2", "true");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra1);
-  cr.contextRegistrationAttributeVector.push_back(&cra2);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().toString();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
-  ASSERT_EQ(2, regAttrs.size());
-  BSONObj rattr0 = regAttrs[0].embeddedObject();
-  BSONObj rattr1 = regAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
-  EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Release connection */
-  mongoDisconnect();
-
-  utExit();
-
-}
-
-/* ****************************************************************************
-*
-* ce1_En1_AtNnt_Ok -
-*/
-TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
 {
   HttpStatusCode           ms;
   RegisterContextRequest   req;
@@ -489,8 +325,8 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra1("A1", "", "false");
-  ContextRegistrationAttribute cra2("A2", "", "true");
+  ContextRegistrationAttribute cra1("A1", "TA1");
+  ContextRegistrationAttribute cra2("A2", "TA2");
   ContextRegistration cr;
   cr.entityIdVector.push_back(&en);
   cr.contextRegistrationAttributeVector.push_back(&cra1);
@@ -526,18 +362,16 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type")); 
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
 
   std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
   ASSERT_EQ(2, regAttrs.size());
   BSONObj rattr0 = regAttrs[0].embeddedObject();
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
+  EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
+  EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -547,12 +381,83 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  mongoDisconnect();
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* ce1_En1_AtNnt_Ok -
+*/
+TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
+{
+  HttpStatusCode           ms;
+  RegisterContextRequest   req;
+  RegisterContextResponse  res;
+
+  utInit();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T1");
+  ContextRegistrationAttribute cra1("A1", "");
+  ContextRegistrationAttribute cra2("A2", "");
+  ContextRegistration cr;
+  cr.entityIdVector.push_back(&en);
+  cr.contextRegistrationAttributeVector.push_back(&cra1);
+  cr.contextRegistrationAttributeVector.push_back(&cra2);
+  cr.providingApplication.set("http://dummy.com");
+  req.contextRegistrationVector.push_back(&cr);
+  req.duration.set("PT1M");
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoRegisterContext(&req, &res, uriParams);
+
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* registrations collection: */
+  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
+  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
+  std::string oid = reg.getField("_id").OID().toString();
+  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
+
+  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
+  ASSERT_EQ(1, contextRegistrationV.size());
+  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
+
+  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
+  ASSERT_EQ(1, entities.size());
+  BSONObj ent0 = entities[0].embeddedObject();
+  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
+
+  std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
+  ASSERT_EQ(2, regAttrs.size());
+  BSONObj rattr0 = regAttrs[0].embeddedObject();
+  BSONObj rattr1 = regAttrs[1].embeddedObject();
+  EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
+  EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
+  EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
+  EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ("PT1M", res.duration.get());
+  EXPECT_EQ(oid, res.registrationId.get());
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+  EXPECT_EQ(0, res.errorCode.details.size());
 
   utExit();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -567,8 +472,8 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
-  ContextRegistrationAttribute cra1("A1", "TA1", "false");
-  ContextRegistrationAttribute cra2("A2", "TA2", "true");
+  ContextRegistrationAttribute cra1("A1", "TA1");
+  ContextRegistrationAttribute cra2("A2", "TA2");
   ContextRegistration cr;
   cr.entityIdVector.push_back(&en);
   cr.contextRegistrationAttributeVector.push_back(&cra1);
@@ -600,7 +505,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -612,16 +517,10 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
   EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-  /* Release connection */
-  mongoDisconnect();
 
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -638,8 +537,8 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
-  ContextRegistrationAttribute cra1("A1", "", "false");
-  ContextRegistrationAttribute cra2("A2", "", "true");
+  ContextRegistrationAttribute cra1("A1", "");
+  ContextRegistrationAttribute cra2("A2", "");
   ContextRegistration cr;
   cr.entityIdVector.push_back(&en);
   cr.contextRegistrationAttributeVector.push_back(&cra1);
@@ -675,7 +574,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_FALSE(ent0.hasField("type"));  
+  EXPECT_FALSE(ent0.hasField("type"));
 
   std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
   ASSERT_EQ(2, regAttrs.size());
@@ -683,10 +582,8 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   BSONObj rattr1 = regAttrs[1].embeddedObject();
   EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -696,11 +593,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -755,9 +648,9 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));    
+    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
 
-    std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();    
+    std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
 
     /* Check response is as expected */
@@ -768,11 +661,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -827,7 +716,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
     EXPECT_FALSE(ent0.hasField("type"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_FALSE(ent1.hasField("type"));   
+    EXPECT_FALSE(ent1.hasField("type"));
 
     std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
@@ -840,11 +729,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -855,15 +740,15 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;    
+    RegisterContextResponse  res;
 
     utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en1);
     cr.entityIdVector.push_back(&en2);
@@ -912,10 +797,8 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -925,11 +808,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -947,8 +826,8 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en1);
     cr.entityIdVector.push_back(&en2);
@@ -997,10 +876,8 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1010,11 +887,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1032,8 +905,8 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en1);
     cr.entityIdVector.push_back(&en2);
@@ -1082,10 +955,8 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1095,11 +966,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1117,8 +984,8 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
     ContextRegistration cr;
     cr.entityIdVector.push_back(&en1);
     cr.entityIdVector.push_back(&en2);
@@ -1167,10 +1034,8 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     BSONObj rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1180,11 +1045,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1195,7 +1056,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;    
+    RegisterContextResponse  res;
 
     utInit();
 
@@ -1236,7 +1097,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     std::vector<BSONElement> entities, attrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1245,7 +1106,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     EXPECT_EQ(0, attrs.size());
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1261,11 +1122,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1317,7 +1174,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     std::vector<BSONElement> entities, attrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1326,7 +1183,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     EXPECT_EQ(0, attrs.size());
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1342,11 +1199,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1364,10 +1217,10 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1406,7 +1259,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     std::vector<BSONElement> entities, regAttrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1417,14 +1270,12 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
@@ -1435,10 +1286,8 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1448,11 +1297,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1470,10 +1315,10 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
     EntityId en2("E2", "T2");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1523,10 +1368,8 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1541,10 +1384,8 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1554,11 +1395,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1576,10 +1413,10 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1618,7 +1455,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     std::vector<BSONElement> entities, regAttrs;
     contextRegistration = contextRegistrationV[0].embeddedObject();
     EXPECT_STREQ("http://dummy1.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -1629,28 +1466,24 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-    entities = contextRegistration.getField("entities").Array();    
+    entities = contextRegistration.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E2", C_STR_FIELD(ent0, "id"));
     EXPECT_FALSE(ent0.hasField("type"));
-    regAttrs = contextRegistration.getField("attrs").Array();    
+    regAttrs = contextRegistration.getField("attrs").Array();
     ASSERT_EQ(2, regAttrs.size());
     rattr0 = regAttrs[0].embeddedObject();
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));;
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1660,11 +1493,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1682,10 +1511,10 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
     EntityId en2("E2", "");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.contextRegistrationAttributeVector.push_back(&cra1);
@@ -1735,10 +1564,8 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -1753,10 +1580,8 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1766,11 +1591,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1858,11 +1679,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1950,11 +1767,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1974,10 +1787,10 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     EntityId en2("E2", "T2");
     EntityId en3("E3", "T3");
     EntityId en4("E4", "T4");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.entityIdVector.push_back(&en2);
@@ -2032,10 +1845,8 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -2053,10 +1864,8 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2066,11 +1875,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2090,10 +1895,10 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     EntityId en2("E2", "T2");
     EntityId en3("E3", "T3");
     EntityId en4("E4", "T4");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.entityIdVector.push_back(&en2);
@@ -2148,10 +1953,8 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -2169,10 +1972,8 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2182,11 +1983,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2206,10 +2003,10 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     EntityId en2("E2", "");
     EntityId en3("E3", "");
     EntityId en4("E4", "");
-    ContextRegistrationAttribute cra1("A1", "TA1", "false");
-    ContextRegistrationAttribute cra2("A2", "TA2", "true");
-    ContextRegistrationAttribute cra3("A3", "TA3", "false");
-    ContextRegistrationAttribute cra4("A4", "TA4", "true");
+    ContextRegistrationAttribute cra1("A1", "TA1");
+    ContextRegistrationAttribute cra2("A2", "TA2");
+    ContextRegistrationAttribute cra3("A3", "TA3");
+    ContextRegistrationAttribute cra4("A4", "TA4");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.entityIdVector.push_back(&en2);
@@ -2264,10 +2061,8 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -2285,10 +2080,8 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("TA3", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2298,11 +2091,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2322,10 +2111,10 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     EntityId en2("E2", "");
     EntityId en3("E3", "");
     EntityId en4("E4", "");
-    ContextRegistrationAttribute cra1("A1", "", "false");
-    ContextRegistrationAttribute cra2("A2", "", "true");
-    ContextRegistrationAttribute cra3("A3", "", "false");
-    ContextRegistrationAttribute cra4("A4", "", "true");
+    ContextRegistrationAttribute cra1("A1", "");
+    ContextRegistrationAttribute cra2("A2", "");
+    ContextRegistrationAttribute cra3("A3", "");
+    ContextRegistrationAttribute cra4("A4", "");
     ContextRegistration cr1, cr2;
     cr1.entityIdVector.push_back(&en1);
     cr1.entityIdVector.push_back(&en2);
@@ -2380,10 +2169,8 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     contextRegistration = contextRegistrationV[1].embeddedObject();
     EXPECT_STREQ("http://dummy2.com", C_STR_FIELD(contextRegistration, "providingApplication"));
@@ -2401,10 +2188,8 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     rattr1 = regAttrs[1].embeddedObject();
     EXPECT_STREQ("A3", C_STR_FIELD(rattr0, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2414,219 +2199,10 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    mongoDisconnect();
-
     utExit();
-
 }
 
 
-/* ****************************************************************************
-*
-* NotifyContextAvailability1 -
-*/
-TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");  
-  expectedNcar.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
-
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", XML))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", XML))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_FALSE(res.registrationId.isEmpty());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability2 -
-*/
-TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar1, expectedNcar2;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationAttribute mockCra("A1", "TA1", "false");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.contextRegistrationAttributeVector.push_back(&mockCra);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar1.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar1.subscriptionId.set("51307b66f481db11bf860001");
-
-  expectedNcar2.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar2.subscriptionId.set("51307b66f481db11bf860002");
-
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", XML))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", XML))
-          .Times(1);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistrationAttribute cra("A1", "TA1", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_FALSE(res.registrationId.isEmpty());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability3 -
-*/
-TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationAttribute mockCra("A2", "TA2", "false");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.contextRegistrationAttributeVector.push_back(&mockCra);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
-
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", XML))
-          .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", XML))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistrationAttribute cra("A2", "TA2", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_FALSE(res.registrationId.isEmpty());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
 
 /* ****************************************************************************
 *
@@ -2670,7 +2246,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
 
   EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
   ASSERT_EQ(1, entities.size());
   BSONObj ent0 = entities[0].embeddedObject();
   EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
@@ -2687,11 +2263,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  mongoDisconnect();
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2703,7 +2275,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 {
     HttpStatusCode           ms;
     RegisterContextRequest   req;
-    RegisterContextResponse  res;   
+    RegisterContextResponse  res;
 
     utInit();
 
@@ -2711,17 +2283,12 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     const DBException e = DBException("boom!!", 33);
     BSONObj fakeEntity = BSON("_id" << BSON("id" << "E1" << "type" << "T1"));
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    DBClientCursorMock* cursorMockCAsub = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
-    ON_CALL(*connectionMock, count(_,_,_,_,_))
+    ON_CALL(*connectionMock, count(_, _, _, _, _))
             .WillByDefault(Return(1));
-    ON_CALL(*connectionMock, findOne(_,_,_,_))
+    ON_CALL(*connectionMock, findOne(_, _, _, _))
             .WillByDefault(Return(fakeEntity));
-    ON_CALL(*connectionMock, update("unittest.registrations",_,_,_,_,_))
-            .WillByDefault(Throw(e));    
-    ON_CALL(*cursorMockCAsub, more())
-            .WillByDefault(Return(false));
-    ON_CALL(*connectionMock, _query("unittest.casubs",_,_,_,_,_,_))
-            .WillByDefault(Return(cursorMockCAsub));
+    ON_CALL(*connectionMock, update("utest.registrations", _, _, _, _, _))
+            .WillByDefault(Throw(e));
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
@@ -2732,7 +2299,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     req.duration.set("PT1M");
 
     /* Set MongoDB connection mock (preserving the "actual" connection for later use) */
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -2749,168 +2316,34 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
      * random. ObjectId is 24 characters long.*/
     /* FIXME: a better approach would be to pass a regex filter to relace ObjectId by a constant string,
      * but I don't know how to work with regex in C++ */
-    std::string s1 = res.errorCode.details.substr(0, 71);
-    std::string s2 = res.errorCode.details.substr(71+24, res.errorCode.details.size()-71-24);
-    EXPECT_EQ("collection: unittest.registrations "
-              "- upsert update(): { _id: ObjectId('",s1);
-    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] } "
-              "- exception: boom!!", s2);
+    std::string s1 = res.errorCode.details.substr(0, 78);
+    std::string s2 = res.errorCode.details.substr(78+24, 22);
+    std::string s3 = res.errorCode.details.substr(78+24+22+24, res.errorCode.details.size()-78-24-22-24);
+    EXPECT_EQ("Database Error (collection: utest.registrations "
+              "- update(): <{ _id: ObjectId('", s1);
+    EXPECT_EQ("') },{ _id: ObjectId('", s2);
+
+    EXPECT_EQ("'), expiration: 1360232760, "
+              "servicePath: \"/\", "
+              "format: \"JSON\", "
+              "fwdMode: \"all\", "
+              "contextRegistration: [ "
+              "{ entities: [ { id: \"E1\", type: \"T1\" } ], "
+              "attrs: [], "
+              "providingApplication: \"http://dummy.com\" } ] }> "
+              "- exception: boom!!)", s3);
+
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
 
     /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 
-    /* check collection has not been touched */    
-    EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
-    EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-
-    utExit();
-
-}
-
-/* ****************************************************************************
-*
-* MongoDbCAsubsFindFail -
-*
-* FIXME: test disabled by the moment. The same comment done in
-* mongoUpdateContext_withOnchangeSubscriptions.MongoDbQueryFail applyes here
-*/
-TEST(mongoRegisterContextRequest, DISABLED_MongoDbCAsubsFindFail)
-{
-    //FIXME
-    EXPECT_EQ(1, 2);
-}
-
-/* ****************************************************************************
-*
-* AssociationsOk -
-*/
-TEST(mongoRegisterContextRequest, AssociationsOk)
-{
-    HttpStatusCode           ms;
-    RegisterContextRequest   req;
-    RegisterContextResponse  res;
-
-    utInit();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextRegistration cr;
-    AttributeAssociation aa1, aa2;
-    aa1.source = "A1";
-    aa1.target = "B1";
-    aa2.source = "A2";
-    aa2.target = "B2";
-    Metadata md("assoc1", "Association");;
-    md.association.entityAssociation.source = EntityId("E1", "T1", "false");
-    md.association.entityAssociation.target = EntityId("E2", "T2", "false");
-    md.association.attributeAssociationList.push_back(&aa1);
-    md.association.attributeAssociationList.push_back(&aa2);
-    cr.registrationMetadataVector.push_back(&md);
-    req.contextRegistrationVector.push_back(&cr);
-    req.duration.set("PT1M");
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res, uriParams);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("PT1M", res.duration.get());
-    EXPECT_FALSE(res.registrationId.isEmpty());
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    /* Check that associations collection at MongoDB is as expected. We don't check other collections
-     * (other tests in this suite cover it extensively) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(1, connection->count(ASSOCIATIONS_COLL, BSONObj()));
-    BSONObj asoc = connection->findOne(ASSOCIATIONS_COLL, BSONObj());
-    EXPECT_STREQ("assoc1", C_STR_FIELD(asoc, "_id"));
-    EXPECT_STREQ("E1", C_STR_FIELD(asoc.getObjectField("srcEnt"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(asoc.getObjectField("srcEnt"), "type"));
-    EXPECT_STREQ("E2", C_STR_FIELD(asoc.getObjectField("tgtEnt"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(asoc.getObjectField("tgtEnt"), "type"));
-
-    std::vector<BSONElement> attrAssocs = asoc.getField("attrs").Array();
-    ASSERT_EQ(2, attrAssocs.size());
-    BSONObj attrAssoc0 = attrAssocs[0].embeddedObject();
-    BSONObj attrAssoc1 = attrAssocs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(attrAssoc0, "src"));
-    EXPECT_STREQ("B1", C_STR_FIELD(attrAssoc0, "tgt"));
-    EXPECT_STREQ("A2", C_STR_FIELD(attrAssoc1, "src"));
-    EXPECT_STREQ("B2", C_STR_FIELD(attrAssoc1, "tgt"));
-
-    /* Release connection */
-    mongoDisconnect();
-
-    utExit();
-
-}
-
-/* ****************************************************************************
-*
-* AssociationsDbFail -
-*/
-TEST(mongoRegisterContextRequest, AssociationsDbFail)
-{
-    HttpStatusCode           ms;
-    RegisterContextRequest   req;
-    RegisterContextResponse  res;
-
-    utInit();
-
-    /* Prepare mock */   
-    const DBException e = DBException("boom!!", 33);
-    DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.associations",_,_,_))
-            .WillByDefault(Throw(e));
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextRegistration cr;
-    AttributeAssociation aa1, aa2;
-    aa1.source = "A1";
-    aa1.target = "B1";
-    aa2.source = "A2";
-    aa2.target = "B2";
-    Metadata md("assoc1", "Association");;
-    md.association.entityAssociation.source = EntityId("E1", "T1", "false");
-    md.association.entityAssociation.target = EntityId("E2", "T2", "false");
-    md.association.attributeAssociationList.push_back(&aa1);
-    md.association.attributeAssociationList.push_back(&aa2);
-    cr.registrationMetadataVector.push_back(&md);
-    req.contextRegistrationVector.push_back(&cr);
-    req.duration.set("PT1M");
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Set MongoDB connection mock (preserving "actual" connection for later use) */
-    DBClientBase* connection = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res, uriParams);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.duration.isEmpty());
-    EXPECT_TRUE(res.registrationId.isEmpty());
-    EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("", res.errorCode.details);    
-
-    /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
-    delete connectionMock;    
-
-    /* check collections have not been touched */  
-    EXPECT_EQ(0, connection->count(ASSOCIATIONS_COLL, BSONObj()));
-    EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
+    /* check collection has not been touched */
+    EXPECT_EQ(0, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
+    EXPECT_EQ(0, connectionDb->count(ENTITIES_COLL, BSONObj()));
 
     utExit();
 }
+
+

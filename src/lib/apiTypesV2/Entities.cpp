@@ -24,7 +24,10 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
+#include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Entities.h"
 
@@ -32,18 +35,17 @@
 
 /* ****************************************************************************
 *
-* Entities::Entities - 
+* Entities::Entities -
 */
 Entities::Entities()
 {
-  errorCode.fill("OK", "");
 }
 
 
 
 /* ****************************************************************************
 *
-* Entities::~Entities - 
+* Entities::~Entities -
 */
 Entities::~Entities()
 {
@@ -54,53 +56,40 @@ Entities::~Entities()
 
 /* ****************************************************************************
 *
-* Entities::render - 
+* Entities::toJson -
 *
-* If no error reported in errorCode, render the vector of entities.
-* Otherwise, render the errorCode.
 */
-std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::toJson
+(
+  RenderFormat                     renderFormat,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter
+)
 {
-  if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
-  {
-    return vec.render(ciP, requestType, false);
-  }
-
-  return errorCode.toJson(true);
-} 
+  return vec.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
+}
 
 
 
 /* ****************************************************************************
 *
-* Entities::check - 
+* Entities::check -
 *
 * NOTE
 *   The 'check' method is normally only used to check that incoming payload is correct.
 *   For now (at least), the Entities type is only used as outgoing payload ...
 */
-std::string Entities::check(ConnectionInfo* ciP, RequestType requestType)
+std::string Entities::check(RequestType requestType)
 {
-  return vec.check(ciP, requestType);
+  return vec.check(V2, requestType);
 }
 
 
 
 /* ****************************************************************************
 *
-* Entities::present - 
-*/
-void Entities::present(const std::string& indent)
-{
-  LM_F(("%s%d Entities:", indent.c_str(), vec.size()));
-  vec.present(indent + "  ");
-}
-
-
-
-/* ****************************************************************************
-*
-* Entities::release - 
+* Entities::release -
 */
 void Entities::release(void)
 {
@@ -111,46 +100,63 @@ void Entities::release(void)
 
 /* ****************************************************************************
 *
-* Entities::fill - 
+* Entities::fill -
 *
 * NOTE
-*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk. 
+*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk.
 *   This means that e.g. the "Count:" in errorCode::details (from v1 logic) will not be
-*   present in the Entities for v2 (that number is in the HTTP header X-Total-Count for v2).
+*   present in the Entities for v2 (that number is in the HTTP header Fiware-Total-Count for v2).
 *   Other values for "details" are lost as well, if errorCode::code equals SccOk.
 */
-void Entities::fill(QueryContextResponse* qcrsP)
+void Entities::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 {
-  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  if (qcrs.errorCode.code == SccContextElementNotFound)
   {
     //
     // If no entities are found, we respond with a 200 OK
     // and an empty vector of entities ( [] )
     //
 
-    errorCode.fill("OK", "");
+    oeP->fill(SccOk, "", "OK");
     return;
   }
-  else if (qcrsP->errorCode.code != SccOk)
+  else if (qcrs.errorCode.code != SccOk)
   {
     //
     // If any other error - use the error for the response
     //
 
-    errorCode.fill(qcrsP->errorCode);
+    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
     return;
   }
 
-  for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
   {
-    ContextElement* ceP = &qcrsP->contextElementResponseVector[ix]->contextElement;
-    Entity*         eP  = new Entity();
+    Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
+    StatusCode* scP = &qcrs.contextElementResponseVector[ix]->statusCode;
 
-    eP->id        = ceP->entityId.id;
-    eP->type      = ceP->entityId.type;
-    eP->isPattern = ceP->entityId.isPattern;
+    if (scP->code == SccReceiverInternalError)
+    {
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
+      // think so, as the releasing logic in the upper layer will deal with that but
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
+      oeP->fill(SccReceiverInternalError, scP->details, "InternalServerError");
+      vec.release();
+      return;
+    }
+    else
+    {
+      Entity*         newP  = new Entity();
 
-    eP->attributeVector.fill(&ceP->contextAttributeVector);
-    vec.push_back(eP);
+      newP->id        = eP->id;
+      newP->type      = eP->type;
+      newP->isPattern = eP->isPattern;
+      newP->creDate   = eP->creDate;
+      newP->modDate   = eP->modDate;
+
+      newP->attributeVector.fill(eP->attributeVector);
+      vec.push_back(newP);
+    }
   }
 }

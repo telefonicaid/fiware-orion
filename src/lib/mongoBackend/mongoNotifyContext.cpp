@@ -22,17 +22,26 @@
 *
 * Author: Fermín Galán
 */
+#include <string>
+#include <vector>
+#include <map>
 
 #include "common/sem.h"
 
-#include "mongoBackend/mongoNotifyContext.h"
+#include "ngsi10/UpdateContextResponse.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "mongoBackend/mongoNotifyContext.h"
+
+
 
 /* ****************************************************************************
 *
 * mongoNotifyContext -
+*
+* The fields "subscriptionId" and "originator" of the request are ignored,
+* as we don't have anything interesting to do with them
 */
 HttpStatusCode mongoNotifyContext
 (
@@ -40,30 +49,29 @@ HttpStatusCode mongoNotifyContext
   NotifyContextResponse*           responseP,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               fiwareCorrelator,
+  const std::string&               ngsiV2AttrsFormat
 )
 {
-    bool reqSemTaken;
+  bool reqSemTaken;
 
-    reqSemTake(__FUNCTION__, "ngsi10 notification", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "ngsi10 notification", SemWriteOp, &reqSemTaken);
 
-    /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
-     * to do with them */
+  // Process each ContextElement
+  for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix)
+  {
+    UpdateContextResponse               ucr;        // Unused, necessary for processContextElement()
+    std::map<std::string, std::string>  uriParams;  // Unused, necessary for processContextElement()
+    Entity*                             eP               = &requestP->contextElementResponseVector[ix]->entity;
+    bool                                forcedUpdate     = false;
+    bool                                overrideMetadata = false;
 
-    /* Process each ContextElement */
-    for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix)
-    {
-        // We use 'ucr' to conform to processContextElement signature but we are not doing anything with that
-        UpdateContextResponse  ucr;
-        ContextElement*        ceP = &requestP->contextElementResponseVector.get(ix)->contextElement;
-        // FIXME P10: we pass an empty uriParams in order to fulfill the processContextElement signature().
-        std::map<std::string, std::string> uriParams;
+    processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate, overrideMetadata, 0);
+  }
 
-        processContextElement(ceP, &ucr, "append", tenant, servicePathV, uriParams, xauthToken);
-    }
+  reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
+  responseP->responseCode.fill(SccOk);
 
-    reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
-    responseP->responseCode.fill(SccOk);
-
-    return SccOk;
+  return SccOk;
 }

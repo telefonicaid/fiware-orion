@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -39,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* putIndividualContextEntity - 
+* putIndividualContextEntity -
 *
 * Corresponding Standard Operation: UpdateContext/UPDATE
 *
@@ -74,6 +77,8 @@ std::string putIndividualContextEntity
   UpdateContextElementResponse  response;
   std::string                   entityType;
 
+  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
+
   // 01. Take care of URI params
   entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
@@ -82,11 +87,11 @@ std::string putIndividualContextEntity
   parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId, entityType);
 
   // And, set the UpdateActionType to UPDATE
-  parseDataP->upcr.res.updateActionType.set("UPDATE");
-  
+  parseDataP->upcr.res.updateActionType = ActionTypeUpdate;
+
 
   // 03. Call postUpdateContext standard service routine
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 04. Translate UpdateContextResponse to UpdateContextElementResponse
@@ -94,7 +99,9 @@ std::string putIndividualContextEntity
 
 
   // 05. Cleanup and return result
-  answer = response.render(ciP, IndividualContextEntity, "");
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity));
+
+
   response.release();
   parseDataP->upcr.res.release();
 

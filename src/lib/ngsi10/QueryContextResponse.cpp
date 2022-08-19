@@ -26,49 +26,50 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/string.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
 
 /* ****************************************************************************
 *
-* QueryContextResponse::QueryContextResponse - 
+* QueryContextResponse::QueryContextResponse -
 */
 QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
 {
   ContextElementResponse* cerP = new ContextElementResponse();
   ContextAttribute*       caP  = new ContextAttribute(aP);
 
-  cerP->contextElement.entityId.fill(eP);
-  cerP->contextElement.contextAttributeVector.push_back(caP);  
+  cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+  cerP->entity.attributeVector.push_back(caP);
   cerP->statusCode.fill(SccOk);
 
   contextElementResponseVector.push_back(cerP);
@@ -91,14 +92,13 @@ QueryContextResponse::~QueryContextResponse()
 
 /* ****************************************************************************
 *
-* QueryContextResponse::render - 
+* QueryContextResponse::toJsonV1 -
 */
-std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string QueryContextResponse::toJsonV1(bool asJsonObject)
 {
   std::string  out               = "";
-  std::string  tag               = "queryContextResponse";
   bool         errorCodeRendered = false;
-  
+
   //
   // 01. Decide whether errorCode should be rendered
   //
@@ -110,7 +110,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   {
     errorCodeRendered = true;
   }
-  else if (errorCode.details != "")
+  else if (!errorCode.details.empty())
   {
     if (errorCode.code == SccNone)
     {
@@ -122,18 +122,21 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
 
   //
-  // 02. render 
+  // 02. render
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag();
+
+  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
+  std::vector<std::string> emptyV;
 
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", errorCodeRendered);
+    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, emptyV, false, emptyV, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.toJsonV1(false);
   }
 
 
@@ -145,12 +148,12 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   //
   if ((errorCode.code == SccNone) && (contextElementResponseVector.size() == 0))
   {
-    LM_W(("Internal Error (Both error-code and response vector empty)"));
+    LM_E(("Runtime Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.toJsonV1(false);
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag();
 
   return out;
 }
@@ -161,36 +164,25 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
 {
-  std::string           res;
+  std::string  res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK")
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return render(ciP, QueryContext, indent);
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::present -
-*/
-void QueryContextResponse::present(const std::string& indent, const std::string& caller)
-{
-  LM_F(("QueryContextResponse presented by %s", caller.c_str()));
-  contextElementResponseVector.present(indent + "  ");
-  errorCode.present(indent + "  ");
+  return toJsonV1(asJsonObject);
 }
 
 
@@ -209,7 +201,7 @@ void QueryContextResponse::release(void)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::fill - 
+* QueryContextResponse::fill -
 */
 void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 {
@@ -229,7 +221,22 @@ void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 
 /* ****************************************************************************
 *
-* QueryContextResponse::clone - 
+* QueryContextResponse::fill -
+*/
+void QueryContextResponse::fill(const Entities& entities)
+{
+  for (int eIx = 0; eIx < entities.size(); eIx++)
+  {
+    ContextElementResponse* cerP = new ContextElementResponse(entities.vec.vec[eIx]);
+    contextElementResponseVector.push_back(cerP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::clone -
 */
 QueryContextResponse* QueryContextResponse::clone(void)
 {

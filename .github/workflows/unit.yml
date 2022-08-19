@@ -1,0 +1,31 @@
+name: Unit Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TEST_IMAGE_NAME: fiware/orion-ci:deb
+
+jobs:
+  unit:
+    runs-on: ubuntu-18.04
+
+    services:
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run unit tests
+        run: |
+          docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit

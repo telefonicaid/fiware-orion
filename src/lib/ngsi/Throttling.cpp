@@ -33,21 +33,6 @@
 #include "ngsi/Throttling.h"
 
 
-
-/* ****************************************************************************
-*
-* Throttling::Throttling
-*
-* Explicit constructor needed to initialize primitive types so they don't get
-* random values from the stack
-*/
-Throttling::Throttling()
-{
-  seconds = 0;
-}
-
-
-
 /* ****************************************************************************
 *
 * Throttling::parse -
@@ -64,19 +49,12 @@ int64_t Throttling::parse(void)
 *
 * Throttling::check -
 */
-std::string Throttling::check
-(
-  RequestType         requestType,
-  Format              format,
-  const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
-)
+std::string Throttling::check(void)
 {
   // FIXME - make Throttling and Duration inherit from same class
   //         that implements the 'parse' method
 
-  if (string == "")
+  if (string.empty())
   {
     return "OK";
   }
@@ -97,7 +75,7 @@ std::string Throttling::check
 */
 bool Throttling::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -117,7 +95,7 @@ void Throttling::set(const std::string& value)
 *
 * Throttling::get -
 */
-std::string Throttling::get(void)
+const std::string Throttling::get(void)
 {
   return string;
 }
@@ -126,32 +104,14 @@ std::string Throttling::get(void)
 
 /* ****************************************************************************
 *
-* Throttling::present -
+* Throttling::toJsonV1 -
 */
-void Throttling::present(const std::string& indent)
+std::string Throttling::toJsonV1(bool comma)
 {
-  if (string != "")
-  {
-    LM_F(("%sThrottling: %s\n", indent.c_str(), string.c_str()));
-  }
-  else
-  {
-    LM_F(("%sNo Throttling\n", indent.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Throttling::render -
-*/
-std::string Throttling::render(Format format, const std::string& indent, bool comma)
-{
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }
 
-  return valueTag(indent, "throttling", string, format, comma);
+  return valueTag("throttling", string, comma);
 }
