@@ -912,7 +912,7 @@ bool orionldPostBatchUpsert(void)
   orionldState.out.contentType = JSON;
   orionldState.noLinkHeader    = true;
 
-  if (orionldState.tenantP != &tenant0)  // Perhaps not if 204 ...
+  if ((orionldState.tenantP != &tenant0) && (orionldState.httpStatusCode != 204))
     orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
   return true;

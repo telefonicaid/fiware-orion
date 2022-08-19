@@ -141,7 +141,6 @@ bye
 =========================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
-NGSILD-Tenant: smartmaas001
 
 
 
