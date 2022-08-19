@@ -51,6 +51,8 @@ extern "C"
 //
 bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP)
 {
+  LM(("CA: Treating sub-attribute '%s'", saP->name));
+
   char* saEqName  = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
   char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
 
@@ -124,6 +126,8 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
       kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
   }
+  else if (strcmp(saDotName, "creDate") == 0) {}
+  else if (strcmp(saDotName, "modDate") == 0) {}
   else if (strcmp(saDotName, "createdAt") == 0)
   {
     // This is not a sub-attribute, it's the timestamp of the attribute, and it must be called "creDate"
