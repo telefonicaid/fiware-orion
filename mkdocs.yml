@@ -13,19 +13,16 @@ google_analytics: ['UA-83236805-1', 'fiware-orion.readthedocs.io']
 pages:
   - Home: index.md
   - 'Getting Started': 'quick_start_guide.md'
+  - 'API Reference:' 'orion-api.md'
   - 'User & Programmers Manual':
       - 'Introduction': 'user/index.md'
       - 'API Walkthrough': 'user/walkthrough_apiv2.md'
-      - 'API Reference': 'user/orion-api.md'      
       - 'Pagination': 'user/pagination.md'
       - 'CORS': 'user/cors.md'
-      - 'Geolocation': 'user/geolocation.md'
       - 'MQTT notifications': 'user/mqtt_notifications.md'
-      - 'Structured values for attributes': 'user/structured_attribute_valued.md'
       - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
       - 'Filtering': 'user/filtering.md'
-      - 'Update action types': 'user/update_action_types.md'
       - 'Context Broker federation': 'user/federation.md'
       - 'Using regular expressions': 'user/regex.md'
       - 'Security considerations': 'user/security.md'

@@ -257,7 +257,7 @@ Some possible values for `lastFailureReason` (non exahustive list):
   doesn't run in insecure mode (i.e. without `-insecureNotif` [CLI parameters](cli.md)).
 
 More detail about `status`, `lastFailureReason` and `lastSuccessCode` in the
-[Orion API document](../orion-api.md#subscription.notification).
+[Orion API specification](../orion-api.md#subscription.notification).
 
 In addition, you may find useful the notification log examples shown in
 [the corresponding section of the administration manual](logs.md#log-examples-for-notification-transactions).

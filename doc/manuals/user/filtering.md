@@ -20,7 +20,7 @@ on the attribute metadata, e.g. metadata "accuracy" of attribute "metadata" has 
 
 Examples are found in [this section of the API walkthrough](walkthrough_apiv2#query-entity).
 The full syntax definition is found in the "Simple Query Language"
-section of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+section of the [Orion API specification](../orion-api.md#simple-query-language).
 
 [Top](#top)
 
@@ -30,7 +30,7 @@ Geographical Queries allow to filter by geographical location, e.g. all the enti
 closer than 15 km from the center of Madrid. Of course, properly located entities are mandatory.
 
 Both topics (entity location and geographical queries) are dealt in detail in
-the "Geospacial properties of entities" and "Geographical Queries" sections of the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+the [Geospacial properties of entities](../orion-api.md#geospatial-properties-of-entities)
+and [Geographical Queries](../orion-api.md#geographical-queries) sections of the Orion API specification.
 
 [Top](#top)
