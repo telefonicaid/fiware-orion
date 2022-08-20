@@ -2562,7 +2562,6 @@ static bool deleteContextAttributeItem
   bool*                     entityModified,
   orion::BSONDate*          dateExpiration,
   ApiVersion                apiVersion,
-  const bool&               overrideMetadata,
   OrionError*               oe
 )
 {
@@ -2747,7 +2746,6 @@ static bool processContextAttributeVector
                                       &entityModified,
                                       dateExpiration,
                                       apiVersion,
-                                      overrideMetadata,
                                       oe))
       {
         return false;
