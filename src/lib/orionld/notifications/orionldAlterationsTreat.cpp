@@ -175,6 +175,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     LM(("ALT:   Entity Id:     %s", aP->entityId));
     LM(("ALT:   Entity Type:   %s", aP->entityType));
     LM(("ALT:   Attributes:    %d", aP->alteredAttributes));
+
 #if 0
     if (aP->patchedEntity != NULL)
     {
@@ -230,6 +231,9 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //   The original db entity is needed only to apply the patch.
   //   Would be better to apply the patch before so would not need "altList->dbEntityP"
   //
+
+#if 1
+  // Only orionldEntityPatch uses this ... Right?
   if (altList->dbEntityP != NULL)
   {
     LM(("Applying PATCH"));
@@ -240,15 +244,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       orionldPatchApply(altList->patchedEntity, patchP);
     }
   }
+#endif
 
   //
   // Timestamp for sending of notification - for stats in subscriptions
-  // OR: Should I use the request time instead?
+  // The request time is used instead of calling the system to ask for a new time
   //
-  struct timespec  notificationTime;
-  double           notificationTimeAsFloat;
-  kTimeGet(&notificationTime);
-  notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
+  double notificationTime = orionldState.requestTime;
 
   while (matchList != NULL)
   {
@@ -274,7 +276,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     LM(("Q: matchHead-list done - calling notificationSend"));
 
     CURL* curlHandleP;
-    int   fd = notificationSend(matchHead, notificationTimeAsFloat, &curlHandleP);  // curl handle as output param?
+    int   fd = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
     if (fd != -1)
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
@@ -350,8 +352,8 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       {
         if ((npP->fd >= 0) && (FD_ISSET(npP->fd, &rFds)))
         {
-          if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
-            notificationSuccess(npP->subP, notificationTimeAsFloat);
+          if (notificationResponseTreat(npP, notificationTime) == 0)
+            notificationSuccess(npP->subP, notificationTime);
 
           close(npP->fd);  // OR: close socket inside responseTreat?
           npP->fd = -1;
@@ -378,7 +380,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       // No response
       if (strncmp(npP->subP->protocolString, "mqtt", 4) != 0)
       {
-        notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
+        notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTime);
         close(npP->fd);
         npP->fd = -1;
       }
@@ -442,13 +444,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM(("Update Counters for subscription '%s'", npP->subP->subscriptionId));
 
       if (msgP->data.result == 0)
-        notificationSuccess(npP->subP, notificationTimeAsFloat);
+        notificationSuccess(npP->subP, notificationTime);
       else
       {
         char errorString[512];
 
         snprintf(errorString, sizeof(errorString), "CURL Error %d: %s", msgP->data.result, curl_easy_strerror(msgP->data.result));
-        notificationFailure(npP->subP, errorString, notificationTimeAsFloat);
+        notificationFailure(npP->subP, errorString, notificationTime);
       }
     }
   }

@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
@@ -47,6 +48,7 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
@@ -287,7 +289,7 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
       newPath = newPathV;
     }
 
-    orionldEntityPatchTree(oldItemP, newItemP, newPath, patchTree);
+    orionldEntityPatchTree(oldItemP, newItemP, newPath, patchTree);  // Recursive call
 
     newItemP = next;
   }
@@ -300,7 +302,7 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
 
 // -----------------------------------------------------------------------------
 //
-// orionldAlterationType - FIXME: move to to orionld/types/OrionldAlterationType.cpp?
+// orionldAlterationType - FIXME: move to to orionld/types/OrionldAlterationType.cpp?
 //
 const char* orionldAlterationType(OrionldAlterationType altType)
 {
@@ -440,11 +442,13 @@ bool orionldPatchEntity2(void)
 
   //
   // For TRoE we need a tree with all those attributes that have been patched (part of incoming tree)
-  // but, with their current value in the database.
-  // That tree needs to be trimmed
+  // but, with their current value in the database PATCHED with their new values
   //
   if (troe)
   {
+    // 1. Get from DB (dbAttrsP) all attributes that have been touched by the PATCH
+    // 2. Convert the attributes to API Model
+    // 3. Perform the PATCH on the attributes
     KjNode* troeTree = kjObject(orionldState.kjsonP, NULL);
 
     for (KjNode* patchedAttrP = orionldState.requestTree->value.firstChildP; patchedAttrP != NULL; patchedAttrP = patchedAttrP->next)
