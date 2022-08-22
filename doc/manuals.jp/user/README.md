@@ -14,8 +14,6 @@
   * [属性値の更新演算子](update_operators.md)
   * [コンテキスト・プロバイダとリクエスト転送](context_providers.md) (Context Providers registration and request forwarding)
   * [結果のフィルタリング](filtering.md) (Filtering results)
-  * [マルチテナンシー](multitenancy.md) (Multy tenancy)
-  * [エンティティ・サービス・パス](service_path.md) (Entity service paths)
   * [更新アクション・タイプ](update_action_types.md) (Update action types)
   * [Context broker のフェデレーション](federation.md) (Context broker federation)
   * [正規表現の使用](regex.md) (Using regular expressions)
