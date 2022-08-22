@@ -39,12 +39,12 @@
 //
 // notificationFailure -
 //
-void notificationFailure(CachedSubscription* subP, const char* errorReason, double timestamp)
+void notificationFailure(CachedSubscription* subP, const char* errorReason, double notificationTime)
 {
   bool forcedToPause = false;
 
-  subP->lastNotificationTime  = timestamp;
-  subP->lastFailure           = timestamp;
+  subP->lastNotificationTime  = notificationTime;
+  subP->lastFailure           = notificationTime;
   subP->consecutiveErrors    += 1;
   subP->count                += 1;
   subP->dirty                += 1;

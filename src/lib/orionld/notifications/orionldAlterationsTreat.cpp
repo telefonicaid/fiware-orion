@@ -65,14 +65,14 @@ typedef struct NotificationPending
 //
 // notificationResponseTreat -
 //
-static int notificationResponseTreat(NotificationPending* npP, double timestamp)
+static int notificationResponseTreat(NotificationPending* npP, double notificationTime)
 {
   char buf[2048];  // should be enough for the HTTP headers ...
   int  nb = read(npP->fd, buf, sizeof(buf) - 1);
 
   if (nb == -1)
   {
-    notificationFailure(npP->subP, "Unable to read from notification endpoint", timestamp);
+    notificationFailure(npP->subP, "Unable to read from notification endpoint", notificationTime);
     LM_E(("Internal Error (unable to read response for notification)"));
     return -1;
   }
@@ -81,7 +81,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 
   if (endOfFirstLine == NULL)
   {
-    notificationFailure(npP->subP, "Invalid response from notification endpoint", timestamp);
+    notificationFailure(npP->subP, "Invalid response from notification endpoint", notificationTime);
     LM_E(("Internal Error (unable to find end of first line from notification endpoint: %s)", strerror(errno)));
     return -1;
   }

@@ -37,7 +37,7 @@
 //
 // httpNotify - send a notification over http
 //
-int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp)
+int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double notificationTime)
 {
   // Connect
   LM(("Connecting to notification receptor for '%s' notification", cSubP->protocolString));
@@ -46,7 +46,7 @@ int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, dou
   if (fd == -1)
   {
     LM_E(("Internal Error (unable to connect to server for notification for subscription '%s': %s)", cSubP->subscriptionId, strerror(errno)));
-    notificationFailure(cSubP, "Unable to connect to notification endpoint", timestamp);
+    notificationFailure(cSubP, "Unable to connect to notification endpoint", notificationTime);
     return -1;
   }
 
@@ -57,7 +57,7 @@ int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, dou
     close(fd);
 
     LM_E(("Internal Error (unable to send to server for notification for subscription '%s' (fd: %d): %s", cSubP->subscriptionId, fd, strerror(errno)));
-    notificationFailure(cSubP, "Unable to write to notification endpoint", timestamp);
+    notificationFailure(cSubP, "Unable to write to notification endpoint", notificationTime);
     return -1;
   }
 
