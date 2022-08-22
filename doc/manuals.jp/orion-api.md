@@ -56,9 +56,19 @@
     - [ワンショット・サブスクリプション](#oneshot-subscription)
     - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
     - [通知メッセージ (Notification Messages)](#notification-messages)
+    - [通知トリガー (Notification triggering)](#notification-triggering)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
       - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
     - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
+    - [一時的なエンティティ (Transient entities)](#transient-entities)
+      - [`dateExpires` 属性 (The `dateExpires` attribute)](#the-dateexpires-attribute)
+      - [有効なトランジション (Valid transitions)](#valid-transitions)
+        - [`dateExpires` 属性を持つエンティティを作成 (Create entity with `dateExpires` attribute)](#create-entity-with-dateexpires-attribute)
+        - [`dateExpires` 属性をエンティティに追加 (Add `dateExpires` attribute to entity that previously doesn't have it)](#add-dateexpires-attribute-to-entity-that-previously-doesnt-have-it)
+        - [エンティティの `dateExpires` 属性を更新 (Update `dateExpires` attribute in entity that previously has it)](#update-dateexpires-attribute-in-entity-that-previously-has-it)
+        - [エンティティから `dateExpires` 属性を削除 (Remove `dateExpires` attribute from entity)](#remove-dateexpires-attribute-from-entity)
+      - [期限切れエンティティを削除 (Deletion of expired entities)](#deletion-of-expired-entities)
+      - [下位互換性に関する考慮事項 (Backward compatibility considerations)](#backward-compatibility-considerations)
 - [API ルート (API Routes)](#api-routes)
     - [API エントリ・ポイント (API Entry Point)](#api-entry-point)
         - [API リソースを取得 [GET /v2]](#retrieve-api-resources-get-v2)
@@ -326,14 +336,14 @@ NGSI では、メタデータにネストされたメタデータが含まれる
         ないことを意味します
 -   レスポンスでは、属性にメタデータがない場合、`metadata` は `{}` に設定されます
 
-Orion Context Broker で使用されるメタデータ更新セマンティクス (および関連する `overrideMetadata` オプションについては、
+Orion で使用されるメタデータ更新セマンティクス (および関連する `overrideMetadata` オプションについては、
 [ドキュメントのこのセクション](#metadata-update-semantics)で詳しく説明します)。
 
 <a name="special-attribute-types"></a>
 
 ## 特殊な属性型 (Special Attribute Types)
 
-一般に、ユーザ定義の属性型は有益です。それらは不透明な方法で NGSIv2 サーバによって処理されます。それにもかかわらず、
+一般に、ユーザ定義の属性型は有益です。それらは不透明な方法で Orion によって処理されます。それにもかかわらず、
 以下に説明する型は、特別な意味を伝えるために使用されます:
 
 -   `DateTime`: ISO8601 形式で日付を識別します。これらの属性は、クエリ演算子の greater-than, less-than,
@@ -360,8 +370,8 @@ Orion Context Broker で使用されるメタデータ更新セマンティク�
 
 ## 組み込み属性 (Builtin Attributes)
 
-NGSIv2 クライアントによって直接変更できないエンティティのプロパティがありますが、追加情報を提供するために NGSIv2
-サーバによってレンダリングすることができます。表現の観点から見ると、それらは名前、値、型とともに通常の属性と同じです。
+クライアントによって直接変更できないエンティティのプロパティがありますが、追加情報を提供するために Orion
+によってレンダリングすることができます。表現の観点から見ると、それらは名前、値、型とともに通常の属性と同じです。
 
 組み込み属性はデフォルトでレンダリングされません。特定の属性をレンダリングするには、URLs (または、POST /v2/op/query
 オペレーションのペイロード・フィールド) または、サブスクリプション (`notification` 内の `attrs` サブフィールド) の
@@ -371,8 +381,8 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 
 -   `dateCreated` (型: `DateTime`): エンティティ作成日。ISO 8601 文字列です
 -   `dateModified` (型: `DateTime`): エンティティ変更日。ISO 8601 文字列です
--   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。サーバがエンティティの有効期限を制御
-    する方法は、実装の固有側面です
+-   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。Orion がエンティティの有効期限を制御
+    する方法については、[一時エンティティのセクション](#transient-entities) で説明されています
 -   `alterationType` (タイプ: `Text`): 通知をトリガーする変更を指定します。これは、変更タイプの機能に基づく
     サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを
     参照)
@@ -391,7 +401,7 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 
 ## 特殊なメタデータ型 (Special Metadata Types)
 
-一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で NGSIv2 サーバによって処理されます。
+一般的に言えば、ユーザ定義のメタデータ型は参考になります。それらは、不透明な方法で Orion によって処理されます。
 それでも、以下に説明する型は、特別な意味を伝えるために使用されます:
 
 -   `DateTime`: ISO8601 形式で日付を識別します。 このメタデータは、クエリ演算子の reater-than, less-than,
@@ -412,8 +422,8 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 
 ## 組み込みメタデータ (Builtin Metadata)
 
-いくつかの属性プロパティは、NGSIv2 クライアントによって直接、変更可能ではありませんが、NGSIv2 サーバによってレンダリング
-されて追加情報を提供することができます。表現の観点から見ると、それらは名前、値、型ともに通常のメタデータと似ています。
+いくつかの属性プロパティは、クライアントによって直接、変更可能ではありませんが、Orion によってレンダリングされて
+追加情報を提供することができます。表現の観点から見ると、それらは名前、値、型ともに通常のメタデータと似ています。
 
 組み込みメタデータは、デフォルトではレンダリングされません。特定のメタデータをレンダリングするには、その名前を
 `metadata` URL パラメータ (または、POST /v2/op/query オペレーションのペイロード・フィールド) または、サブスクリプション
@@ -438,15 +448,16 @@ NGSIv2 クライアントによって直接変更できないエンティティ�
 ## 組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)
 
 (このセクションの内容は、`dateExpires` 属性を除くすべてのビルトインに適用されます。`dateExpires` に関する特定の情報に
-ついては、[一時エンティティに関するドキュメント](user/transient_entities.md) を確認してください)。
+ついては、[一時エンティティのセクション](#transient-entities) を確認してください)。
 
-まず第一に: **NGSIv2 ビルトインと同じ名前の属性またはメタデータを使用しないことを強くお勧めします**。実際、NGSIv2
-仕様はそれを禁止しています (仕様の "属性名の制限" および "メタデータ名の制限" セクションを確認してください)。
+まず第一に: **組み込み名と同じ名前の属性またはメタデータを使用しないことを強くお勧めします**。実際、
+この仕様はそれを禁止しています (仕様の [属性名の制限](#attribute-names-restrictions) および
+[メタデータ名の制限](#metadata-names-restrictions)のセクションを確認してください)。
 
 ただし、そのような属性またはメタデータを持たなければならない場合 (おそらく従来の理由により)、次の考慮事項を考慮
 してください:
 
--   NGSIv2 ビルトインと同じ名前の属性および/またはメタデータを作成/更新できます。Orion がそうさせてくれます
+-   組み込み名と同じ名前の属性および/またはメタデータを作成/更新できます。Orion がそうさせてくれます
 -   ユーザ定義の属性および/またはメタデータは、GET リクエストまたはサブスクリプションで明示的に宣言する必要なく
     表示されます。たとえば、エンティティ E1 で値が "2050-01-01" の `dateModified` 属性を作成した場合、
     `GET /v2/entities/E1` はそれを取得します。`?attrs=dateModified` を使用する必要はありません
@@ -581,7 +592,7 @@ GET /v2/entities/E%253C01%253E
 
 ## 識別子の構文制限 (Identifiers syntax restrictions)
 
-NGSIv2 API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
+この API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
 
 -   エンティティ id (Entity id)
 -   エンティティ型 (Entity type)
@@ -596,7 +607,7 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 -   最大フィールド長は 256文字です
 -   最小フィールド長は 1文字です
 
-さらに、[一般的な構文制限](#general-syntax-restrictions) も NGSIv2 識別子に適用されます。
+さらに、[一般的な構文制限](#general-syntax-restrictions) も これらの識別子に適用されます。
 
 クライアントが構文の観点から無効なフィールドを使用しようとすると、クライアントは、原因を説明する "Bad Request" エラーの
 レスポンスを受け取ります。
@@ -663,13 +674,13 @@ NGSIv2 API の識別子として使用されるフィールドは、許可され
 -   `error` (必須, 文字列): エラーのテキスト記述
 -   `description` (オプション, 文字列): エラーに関する追加情報
 
-すべての NGSIv2 サーバの実装では、この節で説明する以下の HTTP ステータス・コードと `error` テキストを使用する必要が
-あります。しかしながら、`description` フィールドのために使用される特定のテキストは実装の固有側面です。
+Oron の実装では、この節で説明する HTTP ステータス・コードと `error` テキストを使用する必要があります。
+しかしながら、`description` フィールドのために使用される特定のテキストは実装の固有側面です。
 
-NGSIv2 の `error` レポートは次のとおりです:
+`error` レポートは次のとおりです:
 
 -   着信 JSON ペイロードがパースできない場合、`ParseError` (`400`) が返されます
--   URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生するエラー (つまり、NGSIv2 サーバの
+-   URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生するエラー (つまり、Orion の
     ステータスに依存しないエラー) は、`BadRequest` (`400`) となります
     -   例外: 受信した JSON ペイロード・エラー。これには別の `error` メッセージがあります (前の箇条書きを参照)
 -   空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) になります。詳細は、"エンティティの
@@ -1140,7 +1151,7 @@ Cは値 `2` で作成されます。
 コンテキストのエンティティの地理空間プロパティは、通常のコンテキスト属性を用いて表すことができます。地理空間的
 プロパティの提供は、地理的クエリの解決を可能にします。
 
-準拠した実装では、2つの異なる構文をサポートする必要があります:
+Orion では 2 つの異なる構文がサポートされています:
 
 -   *Simple Location Format*。これは、開発者とユーザが既存のエンティティに素早く簡単に追加できる、非常に軽量な形式です
 -   *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、JSON (JavaScript Object Notation) に
@@ -1257,8 +1268,8 @@ Orion は、バックエンド・データベースによって課されるリ�
     -   `geo:polygon` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも4つのペアが存在
         しなければならず、最後のペアは最初のものと同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
         ポリゴンを構成する線分が定義された領域の外縁に残るように、座標ペアを適切に順序付けする必要があります。たとえば、
-        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。入力データによって前者の条件が
-        満たされていない場合、実装でエラーが発生するはずです
+        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。Orion は、入力データが前者の条件を
+        満たさない場合にエラーを発生させる必要があります
     -   `geo:box` 型: バウンディング・ボックスは矩形領域であり、地図の範囲や関心のある大まかな領域を定義するためによく
         使用されます。ボックスは、緯度経度ペアの2つの長さの文字列配列によって表現されます。最初のペアは下のコーナー、
         2番目のペアは上のコーナーです
@@ -1472,7 +1483,7 @@ color を一致させます。また、`q=title=='20'` は文字列 "20" にマ�
 
 ### クエリの解決 (Query Resolution)
 
-実装が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは ```422```, *Unprocessable Entity* で
+Orion が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは ```422```, *Unprocessable Entity* で
 なければなりません。エラー・ペイロードに存在するエラー名は、``NotSupportedQuery`` でなければなりません。
 
 地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、マッチング目的で使用される地理的位置を含む
@@ -1531,7 +1542,7 @@ color を一致させます。また、`q=title=='20'` は文字列 "20" にマ�
 -   `unit`: `"celsius"`
 -   `avg`: `25.4`
 
-次に、Context Broker は次のようなリクエストを受け取ります:
+次に、Orion は次のようなリクエストを受け取ります:
 
 ```
 PUT /v2/entities/E/attrs/temperature
@@ -1560,7 +1571,7 @@ PUT /v2/entities/E/attrs/temperature
 この既定の動作におけるメタデータの "粘着性" (stikyness) の背後にある理論的根拠は、
 [Orion リポジトリのこの Issue](https://github.com/telefonicaid/fiware-orion/issues/4033)で詳しく説明しています。
 
-現時点で、NGSIv2 では、導入された個々のメタデータ要素を削除することはできません。ただし、`metadata` を `{}` に設定して
+現時点で、Orion では、導入された個々のメタデータ要素を削除することはできません。ただし、`metadata` を `{}` に設定して
 属性を更新するすべてのメタデータを削除できます。
 
 <a name="overridemetadata-option"></a>
@@ -1821,7 +1832,7 @@ EOF
 ```
 
 `attrsFormat` が `legacy` の場合、サブスクリプション表現は NGSIv1 形式に従います。このようにして、ユーザは、NGSIv1
-レガシー通知レシーバによる NGSIv2 サブスクリプションの拡張 (フィルタリングなど) の恩恵を受けることができます。
+レガシー通知レシーバによる Orion サブスクリプションの拡張 (フィルタリングなど) の恩恵を受けることができます。
 
 NGSIv1 は非推奨であることに注意してください。したがって、`legacy` 通知形式を使用することはお勧めしません。
 
@@ -1856,11 +1867,28 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 通知には、関連するサブスクリプションの形式の値を含む `Ngsiv2-AttrsFormat` (`attrsFormat` が `legacy` の場合を想定) HTTP
 ヘッダを含める必要があります。これにより、通知受信者は通知ペイロードを処理しなくても形式を認識できます。
 
+<a name="notification-triggering"></a>
+
+## 通知トリガー (Notification triggering)
+
+[`condition` サブスクリプション・フィールド](#subscriptionsubjectcondition)に基づいて、エンティティの更新時に通知を
+トリガーするルールは次のとおりです。
+
+-   `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性のいずれかが変更され、同時に `expression`
+    が一致するたびに通知が送信されます
+-   `attrs` が使用され、`expression` が使用されていない場合、`attrs` リスト内のいずれかの属性が変更されるたびに通知が
+    送信されます
+-   `attrs` を使用せず、`expression` を使用すると、エンティティのいずれかの属性が変更され、同時に `expression`
+    が一致するたびに通知が送信されます
+-   `attrs` も `expression` も使用されていない場合、エンティティのいずれかの属性が変更されるたびに通知が送信されます
+
+特定の属性のメタデータを変更すると、属性値自体が変更されていなくても、変更と見なされることに注意してください。
+
 <a name="custom-notifications"></a>
 
 ## カスタム通知 (Custom Notifications)
 
-NGSIv2 クライアントは、`notification.httpCustom` または `notification.mqttCustom` が使用されている場合、単純な
+クライアントは、`notification.httpCustom` または `notification.mqttCustom` が使用されている場合、単純な
 テンプレート・メカニズムを使用して通知メッセージをカスタマイズできます。テンプレート化できるフィールドは、プロトコル・
 タイプによって異なります。
 
@@ -1872,7 +1900,7 @@ NGSIv2 クライアントは、`notification.httpCustom` または `notification
     (例: `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` は無視されます
 -   `qs` (パラメータ名と値の両方をテンプレート化できます)
 -   `payload`
--   `method` は、NGSIv2 クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
+-   `method` は、クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
     動詞のみを使用できることに注意してください: GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE および CONNECT
 
 `mqttCustom` の場合:
@@ -1965,7 +1993,7 @@ The temperature is 23.4 degrees
 
 カスタム通知を使用する際に考慮すべき考慮事項:
 
--   NGSIv2 クライアントは、置換後に通知が正しい HTTP メッセージであることを確認する責任があります。たとえば Content-Type
+-   クライアントは、置換後に通知が正しい HTTP メッセージであることを確認する責任があります。たとえば Content-Type
     ヘッダが application/xml の場合、ペイロードは 整形式 XML 文書に対応する必要があります。具体的には、テンプレート
     適用後の結果の URL の形式が誤っている場合、通知は送信されません
 -   通知するデータに複数のエンティティが含まれている場合は、エンティティごとに個別の通知 (HTTP メッセージ) が送信
@@ -2004,8 +2032,7 @@ The temperature is 23.4 degrees
 ### カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)
 
 [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
-NGSIv2 API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers`
-のヘッダ値にも同じ制限が適用されます。
+API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers` のヘッダ値にも同じ制限が適用されます。
 
 ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値に含まれる URL エンコード文字はすべてデコード
 されます。
@@ -2034,7 +2061,7 @@ NGSIv2 API 操作の `httpCustom.payload` フィールドにも適用されま�
 `"Basic ABC...ABC%3D%3D"` は、この文字列の URL エンコードされたバージョンであることに注意してください:
 `"Basic ABC...ABC=="`.
 
-ここで、NGSIv2 実装がこのサブスクリプションに関連付けられた通知をトリガーすることを考えてみましょう。 通知データは、
+ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすることを考えてみましょう。 通知データは、
 ID が `DC_S1-D41` でタイプが `Room` のエンティティ用で、値が 23.4 の `temperature` という名前の属性が含まれます。
 テンプレートを適用した後の結果の通知は次のようになります:
 
@@ -2083,6 +2110,161 @@ the value of the "temperature" attribute (of type Number) is 23.4
 `["entityCreate", "entityChange"]` です。
 
 特定の変更タイプは、[`alterationType` 組み込み属性](#builtin-attributes)を使用して通知で取得できます。
+
+<a name="transient-entities"></a>
+
+## 一時的なエンティティ (Transient entities)
+
+一時的なエンティティは、通常のエンティティです。つまり、id/type、属性のセットなどありますが、有効期限のタイムスタンプを
+持ちます。その時点に達すると、エンティティは Orion によって管理されるコンテキストから自動的に削除されます。
+
+したがって、最初の非常に重要なアドバイスです: **一時的なエンティティを使用して、期限切れになるとエンティティが自動的に
+データベースから削除され、回復する方法がないため注意が必要です**。エンティティの有効期限が切れた、つまり、
+削除された場合、一時的なエンティティで設定した情報が関係ないことを確認します。
+
+さらに、**すでに正確な名前 `dateExpires` の属性を使用している場合は、
+[下位互換性の考慮事項のセクション](#backward-compatibility-considerations)を参照してください**。
+
+<a name="the-dateexpires-attribute"></a>
+
+### `dateExpires` 属性 (The `dateExpires` attribute)
+
+エンティティの有効期限のタイムスタンプは、`dateExpires` [組み込み属性](#builtin-attributes)によって定義されます。 これは
+`DateTime` 型の属性で、値はエンティティの有効期限が切れる日時です。
+
+他の組み込み属性として、`dateExpires` はデフォルトでは表示されません。それを取得するには、`attrs` URI パラメータ (GET
+ベースのクエリの場合) または `"attrs"` フィールド (`POST /v2/op/query` の場合) を使用する必要があります。
+[属性とメタデータの除外セクション](#filtering-out-attributes-and-metadata)をご覧ください。
+
+<a name="valid-transitions"></a>
+
+### 有効なトランジション (Valid transitions)
+
+<a name="create-entity-with-dateexpires-attribute"></a>
+
+#### `dateExpires` 属性を持つエンティティを作成 (Create entity with `dateExpires` attribute)
+
+`dateExpires` 属性が含まれている場合、エンティティは一時的な性質 (transient nature) で作成されます。 例えば:
+
+```
+POST /v2/entities
+{
+  "id": "t1",
+  "type": "Ticket",
+  ...
+  "dateExpires": {
+    "value": "2028-07-07T21:35:00Z",
+    "type": "DateTime"
+  }
+}
+```
+
+2028年7月7日 21:35 UTC に有効期限が切れるエンティティを作成します。
+
+その他の考慮事項:
+
+-   `dateExpires` には有効な `DateTime` 値が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
+   を確認してください)。そうしないと、400 Bad Request が返されます
+
+-   `dateExpires` が過去に設定されている場合、エンティティは期限切れで作成されます
+    (少し奇妙ですが、機能的には正しいです)
+
+<a name="add-dateexpires-attribute-to-entity-that-previously-doesnt-have-it"></a>
+
+#### `dateExpires` 属性をエンティティに追加 (Add `dateExpires` attribute to entity that previously doesn't have it)
+
+`dateExpires` 属性を通常のエンティティ (例: "t2") に追加できます。例えば:
+
+```
+POST /v2/entities/t2/attrs
+{
+  "dateExpires": {
+    "value": "2028-10-12T14:23:00Z",
+    "type": "DateTime"
+  }
+}
+```
+
+そのエンティティは、2028年10月1日 14:23 UTC に期限切れになります。
+
+その他の考慮事項:
+
+-   `dateExpires` には有効な `DateTime` 構文が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
+    を確認してください)。そうしないと、400 Bad Request が返されます
+
+-   `dateExpires` が過去に設定されている場合、エンティティは自動的に期限切れになります
+
+<a name="update-dateexpires-attribute-in-entity-that-previously-has-it"></a>
+
+#### エンティティの `dateExpires` 属性を更新 (Update `dateExpires` attribute in entity that previously has it)
+
+Orion では、属性値を更新する方法がいくつかあります。たとえば、属性リソース URL で PUT を使用すると、次のようになります:
+
+```
+PUT /v2/entities/t2/attrs/dateExpires
+{
+  "value": "2028-12-31T23:59:00Z",
+  "type": "DateTime"
+}
+```
+
+有効期限が 2028年12月31日 23:59 UTC に変更されます。
+
+その他の考慮事項:
+
+-   `dateExpires` には有効な `DateTime` 構文が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
+    を確認してください)。そうしないと、400 Bad Request が返されます
+
+-   `dateExpires` が過去に設定されている場合、エンティティは自動的に期限切れになります
+
+<a name="remove-dateexpires-attribute-from-entity"></a>
+
+#### エンティティから `dateExpires` 属性を削除 (Remove `dateExpires` attribute from entity)
+
+最後に、一時的なエンティティから `dateExpires` 属性を削除できます:
+
+```
+DELETE /v2/entities/t2/attrs/dateExpires
+```
+
+これにより、エンティティは通常の (つまり、一時的ではない) エンティティになり、有効期限が切れても削除されません。
+
+<a name="deletion-of-expired-entities"></a>
+
+### 期限切れエンティティを削除 (Deletion of expired entities)
+
+有効期限は、MongoDB 機能に依存して、
+[特定のクロック時にドキュメントを期限切れ](https://docs.mongodb.com/manual/tutorial/expire-data/#expire-documents-at-a-specific-clock-time)
+にします。これは、60秒ごとに起動するバックグラウンド・スレッドに基づいているため、有効期限が過ぎると、
+一時的なエンティティがデータベースに60秒間、または MongoDB の負荷が高い場合はさらに多少、データベースに残る可能性が
+あります。詳細は、[MongoDB のドキュメント](https://docs.mongodb.com/manual/core/index-ttl/#timing-of-the-delete-operation)
+を参照してください。
+
+TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で変更できますが、そのトピックはこのドキュメントの範囲外です。
+詳細については、[このリンク](http://hassansin.github.io/working-with-mongodb-ttl-index#ttlmonitor-sleep-interval)
+をご覧ください。
+
+**一時的なエンティティが削除されると、それを回復することはできません**。
+
+<a name="backward-compatibility-considerations"></a>
+
+### 下位互換性に関する考慮事項 (Backward compatibility considerations)
+
+一時的なエンティティは Orion 1.15.0 に導入されました。Orion 1.14.0 まで `dateExpires` は特別な意味を持たない通常の属性
+として解釈されます。Orion 1.15.0 にアップグレードする前に、アプリケーションで `dateExpires` という名前の付いた属性を
+すでに使用している場合はどうなりますか？
+
+`dateExpires` を使用している既存のエンティティは、属性が更新されるまで同じ方法で使用し続けます。つまり、`dateExpires`
+が `DateTime` でない場合、例えば、GET オペレーションなどで、数値、通常の文字列など、同じ値を保持します。`dateExpires`
+が `DateTime` である場合、その日時は有効期限と解釈されません。つまり、エンティティは日時が経過しても削除されません。
+
+しかし、属性が特別な意味を持たずに前の値を保持する場合でも、`dataExpires` は組み込み属性になりますので、GET
+ベースのクエリでは `attrs` URI パラメータ または、`POST /v2/op/query` とサブスクリプションでは `"attrs"`
+フィールドで明示的にリクエストされている場合を除いては表示されません。
+
+`dateExpires` 属性が初めて更新されると、それは前のセクションで説明した振る舞いで、指定されたエンティティの有効期限を
+意味するようになります。 **エンティティが望ましくない方法で自動的に削除される可能性があるので、その属性の値に基づいて
+クライアント側の有効期限を実装している場合は、これを考慮してください**。
 
 <a name="api-routes"></a>
 
@@ -3233,15 +3415,8 @@ _**レスポンス・ペイロード**_
 | `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません |
 | `alterationTypes` | ✓          | array  | サブスクリプションがトリガーされる変更 (エンティティの作成、エンティティの変更など) を指定します ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを参照)                                                                               |
 
-`condition` フィールドに基づいて、通知トリガー・ルールは次のとおりです:
-
--   `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性の1つが変更され、同時に `expression` が一致する
-    たびに通知が送られます
--   `attrs` が使用され、`expression` が使用されない場合、`attrs` リスト内のいずれかの属性が変化するたびに通知が
-    送られます
--   `attrs` が使用されておらず、`expression` が使われている場合、エンティティの属性のいずれかが変更され、同時に
-    `expression` が一致すると通知が送られます
--   `attrs` と `expression` のどちらも使わない場合は、エンティティの属性のいずれかが変更されるたびに通知が送られます
+通知のトリガー (つまり、エンティティの更新に基づいて通知がトリガーされる場合) については、
+[この特定のセクション](#notification-triggering) で説明されています。
 
 <a name="subscriptionnotification"></a>
 
@@ -3429,7 +3604,7 @@ _**レスポンス・ペイロード**_
       "lastFailure": "2015-10-06T16:00:00.00Z"
     },
     "expires": "2025-04-05T14:00:00.00Z",
-    "status": "failed",
+    "status": "active",
     "throttling": 5
   }
 ]
@@ -3667,15 +3842,15 @@ NGSIv1 ベースのクエリ/更新が使用されます。NGSIv1 は非推奨�
 
 コンテキストのレジストレーションは、次のフィールドを持つ JSON オブジェクトで表されます:
 
-| パラメータ                                                    | オプション | タイプ  | 説明                                                                                                                           |
-|---------------------------------------------------------------|------------|---------|--------------------------------------------------------------------------------------------------------------------------------|
-| `id`                                                          |            | string  | レジストレーションに割り当てられた一意の識別子。作成時に自動的に生成されます                                                   |
-| `description`                                                 | ✓          | string  | このレジストレーションに与えられた説明                                                                                         |
-| [`provider`](#registrationprovider)                           |            | object  | レジストレーションされたコンテキストソースを説明するオブジェクト                                                               |
-| [`dataProvided`](#registrationdataprovided)                   |            | object  | このソースによって提供されるデータを説明するオブジェクト.                                                                      |
-| `status`                                                      | ✓          | string  | 現在の実装では常に `active` です                                                                                               |
-| `expires`                                                     | ✓          | ISO8601 | ISO8601 形式の登録有効期限。永続的な登録では、このフィールドを省略する必要があります                                           |
-| [`forwardingInformation`](#registrationforwardinginformation) |            | object  | プロバイダに対して行われた転送操作に関連する情報。そのような実装が転送機能をサポートする場合、実装によって自動的に提供されます |
+| パラメータ                                                    | オプション | タイプ  | 説明                                                                                 |
+|---------------------------------------------------------------|------------|---------|--------------------------------------------------------------------------------------|
+| `id`                                                          |            | string  | レジストレーションに割り当てられた一意の識別子。作成時に自動的に生成されます         |
+| `description`                                                 | ✓          | string  | このレジストレーションに与えられた説明                                               |
+| [`provider`](#registrationprovider)                           |            | object  | レジストレーションされたコンテキストソースを説明するオブジェクト                     |
+| [`dataProvided`](#registrationdataprovided)                   |            | object  | このソースによって提供されるデータを説明するオブジェクト.                            |
+| `status`                                                      | ✓          | string  | 現在の実装では常に `active` です                                                     |
+| `expires`                                                     | ✓          | ISO8601 | ISO8601 形式の登録有効期限。永続的な登録では、このフィールドを省略する必要があります |
+| [`forwardingInformation`](#registrationforwardinginformation) |            | object  | プロバイダに対して行われた転送操作に関連する情報。                                   |
 
 <a name="registrationprovider"></a>
 
@@ -3915,7 +4090,7 @@ _**レスポンス・ペイロード**_
         "supportedForwardingMode": "all"
       },
       "expires": "2017-10-31T12:00:00",
-      "status": "failed",
+      "status": "active",
       "forwardingInformation": {
         "timesSent": 12,
         "lastForwarding": "2017-10-06T16:00:00.00Z",
@@ -4192,8 +4367,8 @@ _**レスポンス・ペイロード**_
 #### 通知 [POST /v2/op/notify]
 
 このオペレーションは、通知ペイロードを消費し、その通知によって含まれるすべてのエンティティのデータが永続化され、必要に
-応じて上書きされるようにすることを目的としています。これは、ある NGSIv2 エンドポイントが別の NGSIv 2エンドポイントに
-サブスクライブされている場合に役立ちます (フェデレーション・シナリオ)。リクエスト・ペイロードは、NGSIv2
+応じて上書きされるようにすることを目的としています。これは、ある Orion エンドポイントが別の Orion エンドポイントに
+サブスクライブされている場合に役立ちます (フェデレーション・シナリオ)。リクエスト・ペイロードは、Orion
 通知ペイロードでなければなりません。その動作は、動作は `POST /v2/op/update` とまったく同じで、`actionType` は `append`
 と同じである必要があります。
 
@@ -4285,7 +4460,7 @@ NGSIv2 仕様では、サブスクリプションの `status` フィールドの
 つまり、ステータス `failed` を確認しても、サブスクリプションが現在アクティブであるか非アクティブで
 あるかを知ることはできません。
 
-したがって、`failed` は Orion Context Broker によって使用されず、サブスクリプションのステータスは、サブスクリプションが
+したがって、`failed` は Orion によって使用されず、サブスクリプションのステータスは、サブスクリプションが
 `active` (`failed` バリアント [`oneshot`](#oneshot-subscriptions) を含む) か `inactive` (バリアント `expired`
 を含むかを常に明確に指定します。サブスクリプションが最後の通知で失敗したかどうかを知るために、`failsCounter`
 の値をチェックできます (つまり、`failedCounter` が0より大きいことをチェックします)。
