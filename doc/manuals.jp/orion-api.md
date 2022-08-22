@@ -737,7 +737,7 @@ Orion 更新オペレーターは、MongoDB によって実装されたものの
 たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは：
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$inc": 2 },
   "type": "Number"
@@ -756,7 +756,7 @@ POST /v2/entities/E/attrs/A
 
 たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは：
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$mul": 2 },
   "type": "Number"
@@ -776,7 +776,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$min": 2 },
   "type": "Number"
@@ -786,7 +786,7 @@ POST /v2/entities/E/attrs/A
 属性Aの値を2に変更します。ただし、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$min": 20 },
   "type": "Number"
@@ -806,7 +806,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティEの属性Aの既存の値が10の場合、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$max": 12 },
   "type": "Number"
@@ -816,7 +816,7 @@ POST /v2/entities/E/attrs/A
 属性Aの値を12に変更します。ただし、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$max": 4 },
   "type": "Number"
@@ -836,7 +836,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$push": 3 },
   "type": "Array"
@@ -854,7 +854,7 @@ push に似ていますが、重複を避けます。
 たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 4 },
   "type": "Array"
@@ -864,7 +864,7 @@ POST /v2/entities/E/attrs/A
 属性Aの値を `[1, 2, 3, 4]` に変更します。ただし、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$addToSet": 3 },
   "type": "Array"
@@ -882,7 +882,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$pull": 2 },
   "type": "Array"
@@ -901,7 +901,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティEの属性Aの既存の値が `[1, 2, 3]` の場合、次のリクエストは:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$pullAll": [2, 3] },
   "type": "Array"
@@ -920,7 +920,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティ E の属性 A の既存の値が `{"X": 1, "Y": 2}` の場合、次のリクエストです:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": {"Y": 20, "Z": 30} },
   "type": "Object"
@@ -932,7 +932,7 @@ POST /v2/entities/E/attrs/A
 一貫性を保つために、`$set` は、次のようにオブジェクトではない値で使用できます:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": "foo" },
   "type": "Object"
@@ -942,7 +942,7 @@ POST /v2/entities/E/attrs/A
 これは通常の更新と同じ効果があります。たとえば、
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": "foo",
   "type": "Object"
@@ -971,7 +971,7 @@ POST /v2/entities/E/attrs/A
 あります:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$unset": {"X": 1} },
   "type": "Object"
@@ -984,7 +984,7 @@ POST /v2/entities/E/attrs/A
 次のリクエストも機能し、上記の要求と同等になります:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$unset": {"X": null} },
   "type": "Object"
@@ -1003,7 +1003,7 @@ POST /v2/entities/E/attrs/A
 たとえば、エンティティ E の属性 A の既存の値が `{"X": 1, "Y": 2}` の場合、次のリクエストがあります:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": {"Y": 20, "Z": 30}, "$unset": {"X": 1} },
   "type": "Object"
@@ -1016,7 +1016,7 @@ POST /v2/entities/E/attrs/A
 たとえば、次のリクエストです：
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$set": {"X": 20, "Z": 30}, "$unset": {"X": 1} },
   "type": "Object"
@@ -1039,7 +1039,7 @@ Orion は操作自体を実行しませんが、MongoDB に渡します。MongoD
 したがって、このリクエストを送信すると:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": { "$inc": "foo" },
   "type": "Number"
@@ -1070,7 +1070,7 @@ Cannot increment with non-numeric argument: {attrs.A.value: "foo"})"}
 想定していることに注意してください。 あなたがこのような奇妙なことをした場合:
 
 ```
-POST /v2/entities/E/attrs/A
+PUT /v2/entities/E/attrs/A
 {
   "value": {
     "x": 1
@@ -1104,7 +1104,7 @@ POST /v2/entities/E/attrs/A
 エンティティを作成する場合:
 
 ```
-POST /v2/entities/E/attrs/A
+POST /v2/entities
 {
   "id": "E",
   "type": "T",
@@ -1122,7 +1122,7 @@ POST /v2/entities/E/attrs/A
 たとえば、属性AとBを持つエンティティEがすでにあり、この方法でCを追加する場合:
 
 ```
-POST /v2/entities/E
+POST /v2/entities/E/attrs
 {
   "C": {
     "value": { "$inc": 2 },
