@@ -2431,14 +2431,14 @@ In order to search for `Tree1` in that scope, the same
 Fiware-ServicePath will be used.
 
 Scopes are hierarchical and hierarchical search can be done. In order to
-do that the `\#` special keyword is used. Thus, a queryContext with
+do that the `\#` special keyword is used. Thus, a query with
 pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
 Finally, you can query for disjoint scopes, using a comma-separated list
 in the `Fiware-ServicePath` header. For example, to get all trees in both
 `ParqueNorte` and `ParqueOeste` (but not `ParqueSur`) the following
-`Fiware-ServicePath` would be used in queryContext request:
+`Fiware-ServicePath` would be used in query request:
 
 ```
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte, /Madrid/Gardens/ParqueOeste
@@ -2467,10 +2467,10 @@ Some additional remarks:
     different Scopes. E.g. we can create entity ID `Tree1` of type
     `Tree` in `/Madrid/Gardens/ParqueNorte/Parterre1` and another entity
     with ID `Tree1` of type `Tree` in `Madrid/Gardens/ParqueOeste` without
-    getting any error. However, queryContext can be weird in this
-    scenario (e.g. a queryContext in `Fiware-ServicePath /Madrid/Gardens`
+    getting any error. However, query can be weird in this
+    scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
     will returns two entities with the same ID and type in the
-    queryContextResponse, making hard to distinguish to which scope
+    query respose, making hard to distinguish to which scope
     belongs each one)
 
 -   Entities belongs to one (and only one) scope.
@@ -2565,8 +2565,8 @@ This requests accepts the following URL parameters to customize the request resp
 |---------------|----------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | `id`          | ✓        | string | A comma-separated list of elements. Retrieve entities whose ID matches one of the elements in the list. Incompatible with `idPattern`.                                                                                 | Boe_Idearium                      |
 | `type`        | ✓        | string | A comma-separated list of elements. Retrieve entities whose type matches one of the elements in the list. Incompatible with `typePattern`.                                                                             | Room                              |
-| `idPattern`   | ✓        | string | A correctly formatted regular expression. Retrieve entities whose ID matches the regular expression. Incompatible with `id`.                                                                                           | Bode_.*                           |
-| `typePattern` | ✓        | string | A correctly formatted regular expression. Retrieve entities whose type matches the regular expression. Incompatible with `type`.                                                                                       | Room_.*                           |
+| `idPattern`   | ✓        | string | A correctly formatted regular expression (see more details in [regex document](user/regex.md)). Retrieve entities whose ID matches the regular expression. Incompatible with `id`.                                     | Bode_.*                           |
+| `typePattern` | ✓        | string | A correctly formatted regular expression (see more details in [regex document](user/regex.md)). Retrieve entities whose type matches the regular expression. Incompatible with `type`.                                 | Room_.*                           |
 | `q`           | ✓        | string | temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`, i.e., q=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language) | temperature>40                    |
 | `mq`          | ✓        | string | A query expression for attribute metadata, composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language)             | temperature.accuracy<0.9          |
 | `georel`      | ✓        | string | Spatial relationship between matching entities and a reference shape. See [Geographical Queries](#geographical-queries).                                                                                               | near                              |
@@ -3583,7 +3583,7 @@ A `subject` contains the following subfields:
 
 | Parameter                                    | Optional | Type   | Description                                                                     |
 |----------------------------------------------|----------|--------|---------------------------------------------------------------------------------|
-| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> These fields should follow the [restrictions for IDs and types](#identifiers-syntax-restrictions), be a valid regex (if pattern), and be not empty. |
+| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> These fields should follow the [restrictions for IDs and types](#identifiers-syntax-restrictions), be a valid regex (if pattern, see more details in [regex document](user/regex.md)), and be not empty. |
 | [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change will trigger condition". If present it must have a content, i.e. `{}` is not allowed. |
 
 #### `subscription.subject.condition`
@@ -4385,9 +4385,9 @@ The request payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entities to search for. Each element is represented by a JSON object with the
   following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+    + `id` or `idPattern`: Id or pattern (see more details in [regex document](user/regex.md)) of the affected entities. Both cannot be used at the same
       time, but one of them must be present.
-    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
+    + `type` or `typePattern`: Type or type pattern (see more details in [regex document](user/regex.md)) of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attrs`: List of attributes to be provided (if not specified, all attributes).
 + `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field).
