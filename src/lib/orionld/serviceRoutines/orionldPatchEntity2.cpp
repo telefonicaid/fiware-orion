@@ -42,7 +42,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
-#include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
+#include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -296,29 +296,6 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
 
   if (namesP != NULL)
     namesToPatchTree(patchTree, path, namesP, addedP, removedP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldAlterationType - FIXME: move to to orionld/types/OrionldAlterationType.cpp?
-//
-const char* orionldAlterationType(OrionldAlterationType altType)
-{
-  switch (altType)
-  {
-  case EntityCreated:               return "EntityCreated";
-  case EntityDeleted:               return "EntityDeleted";
-  case EntityModified:              return "EntityModified";
-  case AttributeAdded:              return "AttributeAdded";
-  case AttributeDeleted:            return "AttributeDeleted";
-  case AttributeValueChanged:       return "AttributeValueChanged";
-  case AttributeMetadataChanged:    return "AttributeMetadataChanged";
-  case AttributeModifiedAtChanged:  return "AttributeModifiedAtChanged";
-  }
-
-  return "Unknown";
 }
 
 

@@ -498,10 +498,8 @@ static KjNode* kjConcatenate(KjNode* destP, KjNode* srcP)
 //   Instances after this first ("creating") instance MUST have the same entity type. If not, they're erroneous.
 //   - Erroneous instances must be removed also for TRoE
 //
-static bool multipleInstances(const char* entityId, KjNode* updatedArrayP, KjNode* createdArrayP, bool* entityIsNewP)
+static bool multipleInstances(const char* entityId, KjNode* updatedArrayP, KjNode* createdArrayP)
 {
-  *entityIsNewP = false;
-
   for (KjNode* itemP = updatedArrayP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (strcmp(entityId, itemP->value.s) == 0)
@@ -511,10 +509,7 @@ static bool multipleInstances(const char* entityId, KjNode* updatedArrayP, KjNod
   for (KjNode* itemP = createdArrayP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (strcmp(entityId, itemP->value.s) == 0)
-    {
-      *entityIsNewP = true;
       return true;
-    }
   }
 
   return false;
@@ -801,16 +796,15 @@ bool orionldPostBatchUpsert(void)
     char*    entityType         = (typeNodeP != NULL)? typeNodeP->value.s : NULL;
     KjNode*  originalDbEntityP  = entityLookupBy_id_Id(dbEntityArray, entityId, NULL);
     KjNode*  finalDbEntityP;
-    bool     entityIsNew;
 
-    if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP, &entityIsNew) == true)
+    if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP) == true)
     {
       LM_W(("--------------------------------------------------------------------------------"));
       LM_W(("Multiple Instances of an Entity in New BATCH Upsert is not yet implemented"));
       LM_W(("For now, the first instance is used and the rest of the instances are ignored"));
       LM_W(("--------------------------------------------------------------------------------"));
 
-      if (entityIsNew == true)
+      if (originalDbEntityP == NULL)
       {
         //
         // The entity is created by a previous instance in the incoming entity array
@@ -820,6 +814,19 @@ bool orionldPostBatchUpsert(void)
         kjChildRemove(orionldState.requestTree, inEntityP);
         inEntityP = next;
         continue;
+      }
+      else if (orionldState.uriParamOptions.update == false)
+      {
+        //
+        // REPLACE operation.
+        // 1. Find the last entity instance in dbUpdateArray
+        // 2. Clone that - to be used as base
+        // 3. Perform the REPLACE
+        //
+
+      }
+      else  // Update - replace attributes
+      {
       }
 
       inEntityP = next;
