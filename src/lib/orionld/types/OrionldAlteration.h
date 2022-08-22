@@ -80,11 +80,12 @@ typedef struct OrionldAlteration
 {
   char*                        entityId;
   char*                        entityType;
-  KjNode*                      patchTree;            // Patch Info, to merge with 'dbEntityP' to create 'entityP'
-  KjNode*                      dbEntityP;            // Entity in DB before the modification - to apply the PATCH => get "patchedEntity"
-  KjNode*                      patchedEntity;        // Result of dbEntityP patched with patchTree
-  int                          alteredAttributes;
-  OrionldAttributeAlteration*  alteredAttributeV;
+  KjNode*                      inEntityP;          // Incoming payload body - normalized, expanded and perhaps complimented from DB (for merge+patch)
+  KjNode*                      dbEntityP;          // To be REMOVED (laster perhaps put back - for 'previousValue'
+  KjNode*                      finalApiEntityP;    // Final complete API entity - after the modification is applied
+  KjNode*                      deletedAttrV;       // Used for Replace operations - to inform about attributes that have been removed after a REPLACE
+  OrionldAttributeAlteration*  alteredAttributeV;  // Linked list of all altered attributes - for merge+patch
+  int                          alteredAttributes;  // No of altered attributes in alteredAttributeV - for merge+patch
   struct OrionldAlteration*    next;
 } OrionldAlteration;
 

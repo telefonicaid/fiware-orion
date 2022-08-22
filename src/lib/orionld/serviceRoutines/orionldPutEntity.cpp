@@ -297,9 +297,9 @@ bool orionldPutEntity(void)
   orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
   orionldState.alterations->entityId          = entityId;
   orionldState.alterations->entityType        = typeNodeP->value.s;
-  orionldState.alterations->patchTree         = NULL;
+  orionldState.alterations->inEntityP         = orionldState.requestTree;
   orionldState.alterations->dbEntityP         = NULL;
-  orionldState.alterations->patchedEntity     = orionldState.requestTree;  // entity id, createdAt, modifiedAt ...
+  orionldState.alterations->finalApiEntityP   = orionldState.requestTree;  // entity id, createdAt, modifiedAt ...
   orionldState.alterations->alteredAttributes = 0;
   orionldState.alterations->alteredAttributeV = NULL;
   orionldState.alterations->next              = NULL;

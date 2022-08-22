@@ -166,24 +166,17 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-  // ----------------------------  <DEBUG>
+  // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
     LM(("ALT: Alteration %d:", alterations));
-    LM(("ALT:   Entity In:     %p", aP->patchedEntity));
-    LM(("ALT:   Entity Id:     %s", aP->entityId));
-    LM(("ALT:   Entity Type:   %s", aP->entityType));
-    LM(("ALT:   Attributes:    %d", aP->alteredAttributes));
+    LM(("ALT:   Entity In:      %p", aP->inEntityP));
+    LM(("ALT:   CompleteEntity: %p", aP->finalApiEntityP));
+    LM(("ALT:   Entity Id:      %s", aP->entityId));
+    LM(("ALT:   Entity Type:    %s", aP->entityType));
+    LM(("ALT:   Attributes:     %d", aP->alteredAttributes));
 
-#if 0
-    if (aP->patchedEntity != NULL)
-    {
-      char patchedEntity[1024];  // ngsild_new_entity_query-with-concise.test: 1024 is not enough ...
-      kjFastRender(aP->patchedEntity, patchedEntity);
-      LM(("ALT:   patchedEntity: %s", patchedEntity));
-    }
-#endif
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
       LM(("ALT:   Attribute        %s", aP->alteredAttributeV[ix].attrName));
@@ -192,7 +185,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     ++alterations;
   }
   LM(("ALT: %d Alterations present", alterations));
-  // ----------------------------  </DEBUG>
+  // </DEBUG>
 
   OrionldAlterationMatch* matchList;
   int                     matches;
@@ -212,13 +205,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
 #ifdef DEBUG
   int ix = 1;
-  LM(("KZ: %d items in matchList:", matches));
+  LM(("%d items in matchList:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     if (matchP->altAttrP != NULL)
-      LM(("KZ: o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
+      LM(("o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
     else
-      LM(("KZ: o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+      LM(("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
     ++ix;
   }
 #endif
@@ -229,19 +222,23 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   // FIXME:
   //   The original db entity is needed only to apply the patch.
-  //   Would be better to apply the patch before so would not need "altList->dbEntityP"
+  //   Would be better to apply the patch before so we would not need "altList->dbEntityP"
   //
 
 #if 1
-  // Only orionldEntityPatch uses this ... Right?
+  //
+  // Only orionldPatchEntity2 uses this ... Right?
+  // Instead of having this function create finalApiEntityP, it should be done by the service routine
+  // And, after that, altList->dbEntityP is no longer needed
+  //
   if (altList->dbEntityP != NULL)
   {
     LM(("Applying PATCH"));
-    altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
+    altList->finalApiEntityP = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
 
-    for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+    for (KjNode* patchP = altList->inEntityP->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
-      orionldPatchApply(altList->patchedEntity, patchP);
+      orionldPatchApply(altList->finalApiEntityP, patchP);
     }
   }
 #endif

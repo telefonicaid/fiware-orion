@@ -384,9 +384,9 @@ void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* in
 
   alterationP->entityId          = entityId;
   alterationP->entityType        = entityType;
-  alterationP->patchTree         = incomingP;
+  alterationP->inEntityP         = incomingP;
   alterationP->dbEntityP         = NULL;
-  alterationP->patchedEntity     = apiEntityP;
+  alterationP->finalApiEntityP   = apiEntityP;
   alterationP->alteredAttributes = 0;
   alterationP->alteredAttributeV = NULL;
 

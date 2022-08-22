@@ -496,7 +496,7 @@ KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
   //
   // Filter out unwanted attributes, if so requested (by the Subscription)
   //
-  KjNode* apiEntityP = matchP->altP->patchedEntity;  // This is not correct - can be more than one entity
+  KjNode* apiEntityP = matchP->altP->finalApiEntityP;  // This is not correct - can be more than one entity
 
   if (matchP->subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, matchP);
@@ -545,7 +545,7 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    KjNode* apiEntityP = matchP->altP->patchedEntity;
+    KjNode* apiEntityP = matchP->altP->finalApiEntityP;
 
     //
     // Filter out unwanted attributes, if so requested (by the Subscription)
@@ -592,10 +592,10 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
   {
     LM(("Q: AlterationMatch %p", mP));
-    LM(("Q:   Subscription    %s", mP->subP->subscriptionId));
-    LM(("Q:   Entity:         %s", mP->altP->entityId));
-    LM(("Q:   patchTree:      %p", mP->altP->patchTree));
-    LM(("Q:   patchedEntity:  %p", mP->altP->patchedEntity));
+    LM(("Q:   Subscription     %s", mP->subP->subscriptionId));
+    LM(("Q:   Entity:          %s", mP->altP->entityId));
+    LM(("Q:   inEntityP:       %p", mP->altP->inEntityP));
+    LM(("Q:   finalApiEntityP: %p", mP->altP->finalApiEntityP));
     LM(("Q:"));
   }
   // </DEBUG>

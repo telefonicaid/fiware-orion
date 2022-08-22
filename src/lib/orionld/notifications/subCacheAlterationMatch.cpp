@@ -275,10 +275,10 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     LM(("Q: Subscription '%s' has %d watchedAttributes", subP->subscriptionId, watchAttrs));
 
-    if ((watchAttrs > 0) && (altP->patchTree != NULL))
+    if ((watchAttrs > 0) && (altP->inEntityP != NULL))
     {
-      LM(("Q: Alteration %p has a patchTree at %p", altP, altP->patchTree));
-      for (KjNode* attrP = altP->patchTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      LM(("Q: Alteration %p has a inEntityP at %p", altP, altP->inEntityP));
+      for (KjNode* attrP = altP->inEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         if (strcmp(attrP->name, "id")   == 0) continue;
         if (strcmp(attrP->name, "type") == 0) continue;
@@ -965,9 +965,9 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     // If it does not, then the result is always "false" (except for the case "q=!P1", of course :))
     //
     bool     isTimestamp = false;
-    KjNode*  lhsNode     = kjNavigate2(altP->patchTree, lhs->value.v, &isTimestamp);
+    KjNode*  lhsNode     = kjNavigate2(altP->inEntityP, lhs->value.v, &isTimestamp);
 
-    kjTreeLog(altP->patchTree, "Q2: patchTree");
+    kjTreeLog(altP->inEntityP, "Q2: inEntityP");
 
     //
     // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
