@@ -788,8 +788,13 @@ bool orionldPostBatchUpsert(void)
   KjNode* dbCreateArray = kjArray(orionldState.kjsonP, NULL);
   KjNode* dbUpdateArray = kjArray(orionldState.kjsonP, NULL);
 
-  for (KjNode* inEntityP = orionldState.requestTree->value.firstChildP; inEntityP != NULL; inEntityP = inEntityP->next)
+  KjNode* next;
+  KjNode* inEntityP = orionldState.requestTree->value.firstChildP;
+
+  while (inEntityP != NULL)
   {
+    next = inEntityP->next;
+
     KjNode*  idNodeP            = kjLookup(inEntityP, "id");    // pCheckEntity assures "id" is present (as a String and not named "@id")
     KjNode*  typeNodeP          = kjLookup(inEntityP, "type");  // pCheckEntity assures "type" if present is a String and not named "@type"
     char*    entityId           = idNodeP->value.s;
@@ -798,14 +803,27 @@ bool orionldPostBatchUpsert(void)
     KjNode*  finalDbEntityP;
     bool     entityIsNew;
 
-    if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP, &entityIsNew))
+    if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP, &entityIsNew) == true)
     {
       LM_W(("--------------------------------------------------------------------------------"));
       LM_W(("Multiple Instances of an Entity in New BATCH Upsert is not yet implemented"));
       LM_W(("For now, the first instance is used and the rest of the instances are ignored"));
       LM_W(("--------------------------------------------------------------------------------"));
 
-      continue;
+      if (entityIsNew == true)
+      {
+        //
+        // The entity is created by a previous instance in the incoming entity array
+        // Can't be created twice
+        //
+        entityErrorPush(outArrayErroredP, entityId, OrionldBadRequestData, "Entity already exists", "Created by a previous instance", 409, true);
+        kjChildRemove(orionldState.requestTree, inEntityP);
+        inEntityP = next;
+        continue;
+      }
+
+      inEntityP = next;
+      continue;  // All is good - I just need to implement the "multiple instance treatment"
     }
 
     if (originalDbEntityP == NULL)  // The entity did not exist before - CREATION
@@ -838,7 +856,10 @@ bool orionldPostBatchUpsert(void)
     }
 
     if (finalDbEntityP == NULL)
+    {
+      inEntityP = next;
       continue;
+    }
 
     //
     // Alterations need the complete API entity (I might change that for the complete DB Entity ...)
@@ -849,6 +870,8 @@ bool orionldPostBatchUpsert(void)
 
     kjTreeLog(finalApiEntityP, "MI: After dbModelToApiEntity");
     alteration(entityId, entityType, finalApiEntityP, inEntityP);
+
+    inEntityP = next;
   }
 
   //

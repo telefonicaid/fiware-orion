@@ -33,13 +33,13 @@ brokerStart CB 0 IPv4 -experimental
 --SHELL--
 
 #
-# 01. Create entities E1-E5 using Batch Upsert, but two copies of E4
+# 01. Create entities E1-E5 using Batch Upsert, but three copies of E4
 # 02. GET the entities
 #
 
 
-echo "01. Create entities E1-E5 using Batch Upsert, but two copies of E4"
-echo "=================================================================="
+echo "01. Create entities E1-E5 using Batch Upsert, but three copies of E4"
+echo "===================================================================="
 payload='[
   {
     "id": "urn:ngsi-ld:entity:E1",
@@ -88,6 +88,14 @@ payload='[
       "type": "Property",
       "value": "Step 1 - second copy"
     }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1 - third copy"
+    }
   }
 ]'
 orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
@@ -103,20 +111,33 @@ echo
 
 
 --REGEXPECT--
-01. Create entities E1-E5 using Batch Upsert, but two copies of E4
-==================================================================
-HTTP/1.1 201 Created
-Content-Length: 121
+01. Create entities E1-E5 using Batch Upsert, but three copies of E4
+====================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 338
 Content-Type: application/json
 Date: REGEX(.*)
 
-[
-    "urn:ngsi-ld:entity:E1",
-    "urn:ngsi-ld:entity:E2",
-    "urn:ngsi-ld:entity:E3",
-    "urn:ngsi-ld:entity:E4",
-    "urn:ngsi-ld:entity:E5"
-]
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E4",
+            "error": {
+                "detail": "Created by a previous instance",
+                "status": 409,
+                "title": "Entity already exists",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3",
+        "urn:ngsi-ld:entity:E4",
+        "urn:ngsi-ld:entity:E5"
+    ]
+}
 
 
 02. GET the entities

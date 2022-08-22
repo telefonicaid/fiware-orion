@@ -92,14 +92,27 @@ echo
 --REGEXPECT--
 01. Upsert+Update the entity E1, with four different instances of E1 in the array
 =================================================================================
-HTTP/1.1 201 Created
-Content-Length: 27
+HTTP/1.1 207 Multi-Status
+Content-Length: 246
 Content-Type: application/json
 Date: REGEX(.*)
 
-[
-    "urn:ngsi-ld:entities:E1"
-]
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "detail": "Created by a previous instance",
+                "status": 409,
+                "title": "Entity already exists",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E1"
+    ]
+}
 
 
 02. GET all entities and see the merged E1
