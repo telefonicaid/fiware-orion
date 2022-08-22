@@ -6,7 +6,6 @@
 ## Table of Contents
 
   * [API Walkthrough](walkthrough_apiv2.md)
-  * [Pagination](pagination.md)
   * [CORS](cors.md)
   * [MQTT notifications](mqtt_notifications.md)
   * [Update operators for attribute values](update_operators.md)

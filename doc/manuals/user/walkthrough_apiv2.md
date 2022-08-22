@@ -549,7 +549,7 @@ As a final comment, note that although our example is very simple (only 2 entiti
 can manage millions of entities in a real deployment. However, by default, only 20 entities
 are returned (which is fine for this tutorial, but probably not for a real utilization
 scenario). In order to learn about how to retrieve large sets of entities page by page,
-please refer to [the section on pagination](pagination.md#pagination) in this manual.
+please refer to [the section on pagination](../orion-api.md#pagination) in the Orion API specification.
 
 [Top](#top)
 
@@ -788,7 +788,7 @@ entity](#update-entity): perform the following four updates in sequence:
     is for Room1, not Room2.
 
 Subscriptions can be retrieved using `GET /v2/subscriptions` (which
-provides the whole list and [pagination](pagination.md) may be needed if the
+provides the whole list and [pagination](../orion-api.md#pagination) may be needed if the
 list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
 subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
 operation. Finally, subscriptions can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
@@ -952,7 +952,7 @@ and get:
 ]
 
 ```
-Note that the [pagination mechanism](pagination.md#pagination) also works in
+Note that the [pagination mechanism](../orion-api.md#pagination) also works in
 the `GET /v2/types` operation described above.
 
 In addition, you can use the following operation to get detailed
@@ -1065,7 +1065,7 @@ See [this section in the Orion API specification](../orion-api.md#update-post-v2
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
 specified in the payload. It is very similar to `GET /v2/entities` (in fact, the response
-payload is the same and it also supports [pagination](pagination.md) in the same way).
+payload is the same and it also supports [pagination](../orion-api.md#pagination) in the same way).
 However `POST /v2/op/query` can express queries that `GET /v2/entities` cannot (e.g.
 a list of entities of different type).
 

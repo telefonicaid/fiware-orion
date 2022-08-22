@@ -17,7 +17,6 @@ pages:
   - 'User & Programmers Manual':
       - 'Introduction': 'user/index.md'
       - 'API Walkthrough': 'user/walkthrough_apiv2.md'
-      - 'Pagination': 'user/pagination.md'
       - 'CORS': 'user/cors.md'
       - 'MQTT notifications': 'user/mqtt_notifications.md'
       - 'Update operators for attribute values': 'user/update_operators.md'

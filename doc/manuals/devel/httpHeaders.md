@@ -236,7 +236,7 @@ Fiware-ServicePath is an optional header used in any kind of HTTP transaction (i
 ## 19. Fiware-Total-Count
 
 It is an optional header used in outgoing HTTP responses sent by Orion.
-Its operation is related with pagination, see related documentation [about pagination in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/pagination.md#pagination).
+Its operation is related with pagination, see related documentation [about pagination in the user manual](../orion-api.md#pagination).
 	    
 [Top](#top)
 
