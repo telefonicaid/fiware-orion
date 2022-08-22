@@ -22,7 +22,6 @@ pages:
       - 'MQTT notifications': 'user/mqtt_notifications.md'
       - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
-      - 'Filtering': 'user/filtering.md'
       - 'Context Broker federation': 'user/federation.md'
       - 'Using regular expressions': 'user/regex.md'
       - 'Security considerations': 'user/security.md'

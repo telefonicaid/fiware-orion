@@ -11,7 +11,6 @@
   * [MQTT notifications](mqtt_notifications.md)
   * [Update operators for attribute values](update_operators.md)
   * [Context Providers registration and request forwarding](context_providers.md)
-  * [Filtering results](filtering.md)
   * [Context broker federation](federation.md)
   * [Using regular expressions](regex.md)
   * [Security considerations](security.md)
