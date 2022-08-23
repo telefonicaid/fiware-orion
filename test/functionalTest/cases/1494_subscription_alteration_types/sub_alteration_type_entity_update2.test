@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription alterationType entityUpdate (combined with forcedUpdate)
+Subscription alterationType entityUpdate (extra case)
 
 --SHELL-INIT--
 dbInit CB
@@ -87,7 +87,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/Sensor:001/attrs?options=forcedUpdate --payload "${payload}"
+orionCurl --url /v2/entities/Sensor:001/attrs --payload "${payload}"
 echo
 echo
 
@@ -100,7 +100,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/Sensor:001/attrs?options=forcedUpdate -X PATCH --payload "${payload}"
+orionCurl --url /v2/entities/Sensor:001/attrs -X PATCH --payload "${payload}"
 echo
 echo
 
@@ -167,7 +167,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "alterationType": {
                 "metadata": {},
                 "type": "Text",
-                "value": "entityChange"
+                "value": "entityUpdate"
             },
             "id": "Sensor:001",
             "temperature": {
@@ -197,7 +197,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "alterationType": {
                 "metadata": {},
                 "type": "Text",
-                "value": "entityChange"
+                "value": "entityUpdate"
             },
             "id": "Sensor:001",
             "temperature": {

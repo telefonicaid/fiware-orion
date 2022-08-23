@@ -291,7 +291,8 @@ extern void subCacheMatch
   const char*                        servicePath,
   const char*                        entityId,
   const char*                        entityType,
-  const std::vector<std::string>&    attrV,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    modifiedAttrs,
   ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );

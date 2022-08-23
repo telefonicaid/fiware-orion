@@ -149,7 +149,7 @@ following:
 -   For POST:
 
 ```
-curl localhost:1026/<operation_url> -s -S [headers]' -d @- <<EOF
+curl localhost:1026/<operation_url> -s -S [headers] -d @- <<EOF
 [payload]
 EOF
 ```
