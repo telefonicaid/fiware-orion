@@ -389,12 +389,17 @@ void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* in
   alterationP->finalApiEntityP   = apiEntityP;
   alterationP->alteredAttributes = 0;
   alterationP->alteredAttributeV = NULL;
+  alterationP->next              = NULL;
 
-  // Link it into the list
-  alterationP->next        = orionldState.alterations;
-  orionldState.alterations = alterationP;
+  // Link it into the end of the alteration list
+  if (orionldState.alterationsTail != NULL)
+    orionldState.alterationsTail->next = alterationP;
+  else
+    orionldState.alterations = alterationP;
 
-  LM(("MI: Added alteration for entity '%s'", entityId));
+  orionldState.alterationsTail = alterationP;
+
+  LM(("Added alteration for entity '%s'", entityId));
 }
 
 
@@ -662,6 +667,33 @@ static KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, c
 
 
 
+// -----------------------------------------------------------------------------
+//
+// dbEntityLookupInArray
+//
+static KjNode* dbEntityLookupInArray(KjNode* dbEntityArray, const char* entityId)
+{
+  for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
+  {
+    KjNode* _idP = kjLookup(dbEntityP, "_id");
+
+    if (_idP != NULL)
+    {
+      KjNode* idP = kjLookup(_idP, "id");
+
+      if ((idP != NULL) && (idP->type == KjString))
+      {
+        if (strcmp(idP->value.s, entityId) == 0)
+          return dbEntityP;
+      }
+    }
+  }
+
+  return NULL;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpsert -
@@ -796,41 +828,33 @@ bool orionldPostBatchUpsert(void)
     char*    entityType         = (typeNodeP != NULL)? typeNodeP->value.s : NULL;
     KjNode*  originalDbEntityP  = entityLookupBy_id_Id(dbEntityArray, entityId, NULL);
     KjNode*  finalDbEntityP;
+    KjNode*  dbArray            = dbUpdateArray;            // Points to either dbUpdateArray or dbCreateArray
+    bool     multipleEntities   = false;
 
     if (multipleInstances(entityId, outArrayUpdatedP, outArrayCreatedP) == true)
     {
-      LM_W(("--------------------------------------------------------------------------------"));
-      LM_W(("Multiple Instances of an Entity in New BATCH Upsert is not yet implemented"));
-      LM_W(("For now, the first instance is used and the rest of the instances are ignored"));
-      LM_W(("--------------------------------------------------------------------------------"));
+      multipleEntities = true;
 
       if (originalDbEntityP == NULL)
-      {
-        //
-        // The entity is created by a previous instance in the incoming entity array
-        // Can't be created twice
-        //
-        entityErrorPush(outArrayErroredP, entityId, OrionldBadRequestData, "Entity already exists", "Created by a previous instance", 409, true);
-        kjChildRemove(orionldState.requestTree, inEntityP);
-        inEntityP = next;
-        continue;
-      }
-      else if (orionldState.uriParamOptions.update == false)
-      {
-        //
-        // REPLACE operation.
-        // 1. Find the last entity instance in dbUpdateArray
-        // 2. Clone that - to be used as base
-        // 3. Perform the REPLACE
-        //
+        dbArray = dbCreateArray;
 
-      }
-      else  // Update - replace attributes
-      {
-      }
+      //
+      // If REPLACE, we need the Final API Entity before the REPLACE Operation to see if any attributes have been deleted
+      // (Present in the old Final API Entity but not present in the REPLACing Entity)
+      //
+      // The current state needs to be overwritten
+      // We can do that by:
+      // 1. Remove the item in its DB Array (either dbCreateArray or dbUpdateArray)
+      // 2. Let the function continue so a new item is inserted in the DB Array
+      //
+      KjNode* dbArrayItemP = dbEntityLookupInArray(dbArray, entityId);
+      if (dbArrayItemP == NULL)
+        LM_E(("MI: Internal Error (multiple instance entity '%s' not found in DB Array)", entityId));
+      else
+        kjChildRemove(dbArray, dbArrayItemP);
 
-      inEntityP = next;
-      continue;  // All is good - I just need to implement the "multiple instance treatment"
+      if (orionldState.uriParamOptions.update == true)
+        originalDbEntityP = dbArrayItemP;   // The previous "db entity" is now the base for this update
     }
 
     if (originalDbEntityP == NULL)  // The entity did not exist before - CREATION
@@ -840,7 +864,8 @@ bool orionldPostBatchUpsert(void)
       if (finalDbEntityP != NULL)
       {
         kjChildAdd(dbCreateArray, finalDbEntityP);
-        entitySuccessPush(outArrayCreatedP, entityId);
+        if (multipleEntities == false)  // Cause, "if multipleEntities == true", then the entityID is in the outArrayCreatedP array already
+          entitySuccessPush(outArrayCreatedP, entityId);
       }
     }
     else
@@ -857,8 +882,9 @@ bool orionldPostBatchUpsert(void)
 
       if (finalDbEntityP != NULL)
       {
-        kjChildAdd(dbUpdateArray, finalDbEntityP);
-        entitySuccessPush(outArrayUpdatedP, entityId);
+        kjChildAdd(dbArray, finalDbEntityP);
+        if (multipleEntities == false)
+          entitySuccessPush(outArrayUpdatedP, entityId);
       }
     }
 
@@ -875,7 +901,6 @@ bool orionldPostBatchUpsert(void)
     KjNode* dbEntityCopy    = kjClone(orionldState.kjsonP, finalDbEntityP);
     KjNode* finalApiEntityP = dbModelToApiEntity(dbEntityCopy, false, entityId);
 
-    kjTreeLog(finalApiEntityP, "MI: After dbModelToApiEntity");
     alteration(entityId, entityType, finalApiEntityP, inEntityP);
 
     inEntityP = next;

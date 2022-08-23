@@ -119,18 +119,18 @@ Ngsild-Attribute-Format: Normalized
             "P1": {
                 "type": "Property",
                 "unitCode": "CEL",
-                "value": 2
+                "value": 1
             },
-            "id": "urn:ngsi-ld:T:E2",
+            "id": "urn:ngsi-ld:T:E1",
             "type": "T"
         },
         {
             "P1": {
                 "type": "Property",
                 "unitCode": "CEL",
-                "value": 1
+                "value": 2
             },
-            "id": "urn:ngsi-ld:T:E1",
+            "id": "urn:ngsi-ld:T:E2",
             "type": "T"
         },
         {

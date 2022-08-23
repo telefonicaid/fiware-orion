@@ -81,7 +81,7 @@ typedef struct OrionldAlteration
   char*                        entityId;
   char*                        entityType;
   KjNode*                      inEntityP;          // Incoming payload body - normalized, expanded and perhaps complimented from DB (for merge+patch)
-  KjNode*                      dbEntityP;          // To be REMOVED (laster perhaps put back - for 'previousValue'
+  KjNode*                      dbEntityP;          // To be REMOVED (and perhaps put back later - for 'previousValue')
   KjNode*                      finalApiEntityP;    // Final complete API entity - after the modification is applied
   KjNode*                      deletedAttrV;       // Used for Replace operations - to inform about attributes that have been removed after a REPLACE
   OrionldAttributeAlteration*  alteredAttributeV;  // Linked list of all altered attributes - for merge+patch

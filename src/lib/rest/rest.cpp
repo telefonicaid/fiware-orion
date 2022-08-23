@@ -1304,7 +1304,6 @@ static MHD_Result connectionTreat
     orionldState.verb           = verbGet(method);
     orionldState.requestTime    = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
     orionldState.responseTree   = NULL;
-    orionldState.notify         = false;
     orionldState.urlPath        = (char*) url;
     orionldState.attrsFormat    = (char*) "normalized";
     orionldState.correlator     = (char*) "";

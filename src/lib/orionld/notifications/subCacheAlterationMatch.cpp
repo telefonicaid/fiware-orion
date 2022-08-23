@@ -174,9 +174,13 @@ static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* 
 //
 // matchListInsert -
 //
+// NOTE:  This function puts matches in reverse order.
+//        However, that is fixed later - the list is reversed back.
+//
 static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList, OrionldAlterationMatch* itemP)
 {
   OrionldAlterationMatch* matchP = matchList;
+  OrionldAlterationMatch* prev   = NULL;
 
   // Find the same subscription, to have all alteration-matches ordered
   while (matchP != NULL)
@@ -184,15 +188,24 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
     if (matchP->subP == itemP->subP)
     {
       //
-      // insert it in the list, right after matchP
+      // insert it in the list, right BEFORE matchP (matchP == first occurrence of the subscription)
       //
-      itemP->next = matchP->next;
-      matchP->next = itemP;
+      if (prev == NULL)
+      {
+        itemP->next = matchList;
+        matchList   = itemP;
+      }
+      else
+      {
+        itemP->next = prev->next;  // prev->next === matchP
+        prev->next = itemP;
+      }
 
-      LM(("Q: Inserting Alteration of entity '%s' for subscription '%s' (consecutive alteration)", itemP->altP->entityId, itemP->subP->subscriptionId));
+      LM(("Q: Inserted Alteration of entity '%s' for subscription '%s' (consecutive alteration)", itemP->altP->entityId, itemP->subP->subscriptionId));
       return matchList;
     }
 
+    prev   = matchP;
     matchP = matchP->next;
   }
 

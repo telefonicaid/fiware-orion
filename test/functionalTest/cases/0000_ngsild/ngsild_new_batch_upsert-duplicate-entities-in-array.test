@@ -71,7 +71,8 @@ payload='[
     "P1": {
       "type": "Property",
       "value": "Step 1 - first copy"
-    }
+    },
+    "P2": "first"
   },
   {
     "id": "urn:ngsi-ld:entity:E5",
@@ -87,7 +88,9 @@ payload='[
     "P1": {
       "type": "Property",
       "value": "Step 1 - second copy"
-    }
+    },
+    "P2": "second",
+    "P3": "second"
   },
   {
     "id": "urn:ngsi-ld:entity:E4",
@@ -95,7 +98,9 @@ payload='[
     "P1": {
       "type": "Property",
       "value": "Step 1 - third copy"
-    }
+    },
+    "P3": "third",
+    "P4": "third"
   }
 ]'
 orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
@@ -113,43 +118,29 @@ echo
 --REGEXPECT--
 01. Create entities E1-E5 using Batch Upsert, but three copies of E4
 ====================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 338
+HTTP/1.1 201 Created
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [
-        {
-            "entityId": "urn:ngsi-ld:entity:E4",
-            "error": {
-                "detail": "Created by a previous instance",
-                "status": 409,
-                "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        }
-    ],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2",
-        "urn:ngsi-ld:entity:E3",
-        "urn:ngsi-ld:entity:E4",
-        "urn:ngsi-ld:entity:E5"
-    ]
-}
+[
+    "urn:ngsi-ld:entity:E1",
+    "urn:ngsi-ld:entity:E2",
+    "urn:ngsi-ld:entity:E3",
+    "urn:ngsi-ld:entity:E4",
+    "urn:ngsi-ld:entity:E5"
+]
 
 
 02. GET the entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 324
+Content-Length: 364
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
-#SORT_START
     {
         "P1": "Step 1",
         "id": "urn:ngsi-ld:entity:E1",
@@ -171,11 +162,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Vehicle"
     },
     {
-        "P1": "Step 1 - first copy",
+        "P1": "Step 1 - third copy",
+        "P2": "second",
+        "P3": "third",
+        "P4": "third",
         "id": "urn:ngsi-ld:entity:E4",
         "type": "Vehicle"
     }
-#SORT_END
 ]
 
 

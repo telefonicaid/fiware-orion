@@ -1,0 +1,1178 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Create+Replace+Update with 3 instances of the same entity and two entities - AND Notifications
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. Create subscription S1 for everything (i.e. all entities with type T)
+# 02. Upsert+Replace with 3 instances of E1 and 3 instances of E2
+# 03. GET all entities and see the replaced E1 and E2
+# 04. Upsert+Update with 3 instances of E1 and 3 instances of E2
+# 05. GET all entities and see the merged E1 and E2
+# 06. Dump accumulator, see 2 notifications, with 6 entities each
+#
+
+echo "01. Create subscription S1 for everything (i.e. all entities with type T)"
+echo "========================================================================="
+payload='{
+  "type": "Subscription",
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Upsert+Replace with 3 instances of E1 and 3 instances of E2"
+echo "==============================================================="
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P1": "Step 2.1",
+    "P2": "Step 2.1",
+    "R1": { "object": "urn:E1" },
+    "R2": { "object": "urn:E1" },
+    "L1": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "L2": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "notificationOrder": 1
+  },
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P2": "Step 2.2",
+    "P3": "Step 2.2",
+    "R2": { "object": "urn:E2" },
+    "R3": { "object": "urn:E2" },
+    "L2": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "L3": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "notificationOrder": 2
+  },
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P3": "Step 2.3",
+    "P4": "Step 2.3",
+    "R3": { "object": "urn:E3" },
+    "R4": { "object": "urn:E3" },
+    "L3": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "L4": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "notificationOrder": 3
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P1": "Step 2.1",
+    "P2": "Step 2.1",
+    "R1": { "object": "urn:E1" },
+    "R2": { "object": "urn:E1" },
+    "L1": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "L2": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "notificationOrder": 4
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P2": "Step 2.2",
+    "P3": "Step 2.2",
+    "R2": { "object": "urn:E2" },
+    "R3": { "object": "urn:E2" },
+    "L2": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "L3": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "notificationOrder": 5
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P3": "Step 2.3",
+    "P4": "Step 2.3",
+    "R3": { "object": "urn:E3" },
+    "R4": { "object": "urn:E3" },
+    "L3": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "L4": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "notificationOrder": 6
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "03. GET all entities and see the replaced E1 and E2"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "04. Upsert+Update with 3 instances of E1 and 3 instances of E2"
+echo "=============================================================="
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P1": "step 4.1",
+    "P2": "step 4.1",
+    "R1": { "object": "urn:E1" },
+    "R2": { "object": "urn:E1" },
+    "L1": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "L2": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "notificationOrder": 7
+  },
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P2": "step 4.2",
+    "P3": "step 4.2",
+    "R2": { "object": "urn:E2" },
+    "R3": { "object": "urn:E2" },
+    "L2": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "L3": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "notificationOrder": 8
+  },
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P3": "step 4.3",
+    "P4": "step 4.3",
+    "R3": { "object": "urn:E3" },
+    "R4": { "object": "urn:E3" },
+    "L3": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "L4": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "notificationOrder": 9
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P1": "step 4.1",
+    "P2": "step 4.1",
+    "R1": { "object": "urn:E1" },
+    "R2": { "object": "urn:E1" },
+    "L1": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "L2": { "languageMap": { "en": "instance one", "es": "instancia uno" }},
+    "notificationOrder": 10
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P2": "step 4.2",
+    "P3": "step 4.2",
+    "R2": { "object": "urn:E2" },
+    "R3": { "object": "urn:E2" },
+    "L2": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "L3": { "languageMap": { "en": "instance two", "es": "instancia dos" }},
+    "notificationOrder": 11
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P3": "step 4.3",
+    "P4": "step 4.3",
+    "R3": { "object": "urn:E3" },
+    "R4": { "object": "urn:E3" },
+    "L3": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "L4": { "languageMap": { "en": "instance three", "es": "instancia tres" }},
+    "notificationOrder": 12
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
+echo
+echo
+
+
+echo "05. GET all entities and see the merged E1 and E2"
+echo "================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "06. Dump accumulator, see 2 notifications, with 6 entities each"
+echo "==============================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription S1 for everything (i.e. all entities with type T)
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. Upsert+Replace with 3 instances of E1 and 3 instances of E2
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 19
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:E1",
+    "urn:E2"
+]
+
+
+03. GET all entities and see the replaced E1 and E2
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 891
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "L3": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "L4": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "Step 2.3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "Step 2.3"
+        },
+        "R3": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "R4": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "notificationOrder": {
+            "type": "Property",
+            "value": 3
+        },
+        "type": "T"
+    },
+    {
+        "L3": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "L4": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "Step 2.3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "Step 2.3"
+        },
+        "R3": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "R4": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "notificationOrder": {
+            "type": "Property",
+            "value": 6
+        },
+        "type": "T"
+    }
+]
+
+
+04. Upsert+Update with 3 instances of E1 and 3 instances of E2
+==============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET all entities and see the merged E1 and E2
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 1616
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "L1": {
+            "languageMap": {
+                "en": "instance one",
+                "es": "instancia uno"
+            },
+            "type": "LanguageProperty"
+        },
+        "L2": {
+            "languageMap": {
+                "en": "instance two",
+                "es": "instancia dos"
+            },
+            "type": "LanguageProperty"
+        },
+        "L3": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "L4": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "P1": {
+            "type": "Property",
+            "value": "step 4.1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "step 4.2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "step 4.3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "step 4.3"
+        },
+        "R1": {
+            "object": "urn:E1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "R3": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "R4": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "notificationOrder": {
+            "type": "Property",
+            "value": 9
+        },
+        "type": "T"
+    },
+    {
+        "L1": {
+            "languageMap": {
+                "en": "instance one",
+                "es": "instancia uno"
+            },
+            "type": "LanguageProperty"
+        },
+        "L2": {
+            "languageMap": {
+                "en": "instance two",
+                "es": "instancia dos"
+            },
+            "type": "LanguageProperty"
+        },
+        "L3": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "L4": {
+            "languageMap": {
+                "en": "instance three",
+                "es": "instancia tres"
+            },
+            "type": "LanguageProperty"
+        },
+        "P1": {
+            "type": "Property",
+            "value": "step 4.1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "step 4.2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "step 4.3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "step 4.3"
+        },
+        "R1": {
+            "object": "urn:E1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "R3": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "R4": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "notificationOrder": {
+            "type": "Property",
+            "value": 12
+        },
+        "type": "T"
+    }
+]
+
+
+06. Dump accumulator, see 2 notifications, with 6 entities each
+===============================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 2835
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "Step 2.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "Step 2.1"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 1
+            },
+            "type": "T"
+        },
+        {
+            "L2": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "Step 2.2"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "Step 2.2"
+            },
+            "R2": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 2
+            },
+            "type": "T"
+        },
+        {
+            "L3": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "R3": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 3
+            },
+            "type": "T"
+        },
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "Step 2.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "Step 2.1"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "id": "urn:E2",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 4
+            },
+            "type": "T"
+        },
+        {
+            "L2": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "Step 2.2"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "Step 2.2"
+            },
+            "R2": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "id": "urn:E2",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 5
+            },
+            "type": "T"
+        },
+        {
+            "L3": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "R3": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E2",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 6
+            },
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 5028
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 7
+            },
+            "type": "T"
+        },
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "step 4.2"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "step 4.2"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 8
+            },
+            "type": "T"
+        },
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "step 4.2"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "step 4.3"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "step 4.3"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 9
+            },
+            "type": "T"
+        },
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E2",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 10
+            },
+            "type": "T"
+        },
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "step 4.2"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "step 4.2"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "Step 2.3"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E2",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 11
+            },
+            "type": "T"
+        },
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "instance one",
+                    "es": "instancia uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "L2": {
+                "languageMap": {
+                    "en": "instance two",
+                    "es": "instancia dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "L3": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "L4": {
+                "languageMap": {
+                    "en": "instance three",
+                    "es": "instancia tres"
+                },
+                "type": "LanguageProperty"
+            },
+            "P1": {
+                "type": "Property",
+                "value": "step 4.1"
+            },
+            "P2": {
+                "type": "Property",
+                "value": "step 4.2"
+            },
+            "P3": {
+                "type": "Property",
+                "value": "step 4.3"
+            },
+            "P4": {
+                "type": "Property",
+                "value": "step 4.3"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "R2": {
+                "object": "urn:E2",
+                "type": "Relationship"
+            },
+            "R3": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "R4": {
+                "object": "urn:E3",
+                "type": "Relationship"
+            },
+            "id": "urn:E2",
+            "notificationOrder": {
+                "type": "Property",
+                "value": 12
+            },
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

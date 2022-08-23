@@ -254,23 +254,23 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     //
     // 1. Extract first match from matchList, call it matchHead
     // 2. Extract all subsequent matches from matchList - add them to matchHead
-    // 3. Call notificationSend, whicvh will combine all of them into one single notification
+    // 3. Call notificationSend, which will combine all of them into one single notification
     //
     // The matches come in subscription order, so, we just need to break after the first non-same subscription
     //
     OrionldAlterationMatch* matchHead = matchList;
+
     matchList = matchList->next;
     matchHead->next = NULL;  // The matchHead-list is now NULL-terminated and separated from matchList
-    LM(("Q: inserting match in matchHead-list: sub: %s, entity: %s", matchHead->subP->subscriptionId, matchHead->altP->entityId));
+
     while ((matchList != NULL) && (matchList->subP == matchHead->subP))
     {
       OrionldAlterationMatch* current = matchList;
-      LM(("Q: inserting match in matchHead-list: sub: %s, entity: %s", current->subP->subscriptionId, current->altP->entityId));
+
       matchList     = matchList->next;
       current->next = matchHead;
       matchHead     = current;
     }
-    LM(("Q: matchHead-list done - calling notificationSend"));
 
     CURL* curlHandleP;
     int   fd = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?

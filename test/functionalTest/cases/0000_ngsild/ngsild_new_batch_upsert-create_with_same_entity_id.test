@@ -32,11 +32,6 @@ brokerStart CB 0 IPv4 -experimental
 --SHELL--
 
 #
-# WARNING:
-#   Multiple instances of one and the same entity in batch arrays is NOT YET implemented for ythe new BASTCH Upsert
-#   So, for now, Step 02 in REGEXPECT expects the FIRST entity - not the LAST.
-#   Once "Multiple instances of one and the same entity in batch arrays" is implemented, trhis test will start to fail.
-#
 # 01. Upsert+Update the entity E1, with four different instances of E1 in the array
 # 02. GET all entities and see the merged E1
 #
@@ -92,33 +87,20 @@ echo
 --REGEXPECT--
 01. Upsert+Update the entity E1, with four different instances of E1 in the array
 =================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 246
+HTTP/1.1 201 Created
+Content-Length: 27
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "errors": [
-        {
-            "entityId": "urn:ngsi-ld:entities:E1",
-            "error": {
-                "detail": "Created by a previous instance",
-                "status": 409,
-                "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        }
-    ],
-    "success": [
-        "urn:ngsi-ld:entities:E1"
-    ]
-}
+[
+    "urn:ngsi-ld:entities:E1"
+]
 
 
 02. GET all entities and see the merged E1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 209
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -128,6 +110,18 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "P1": {
             "type": "Property",
             "value": "E1/P1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "E1/P2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "E1/P3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "E1/P4"
         },
         "id": "urn:ngsi-ld:entities:E1",
         "type": "T"
