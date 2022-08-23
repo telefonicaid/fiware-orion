@@ -7,7 +7,7 @@
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
 [![Support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
+[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](doc/manuals/orion-api.md)
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
@@ -177,12 +177,8 @@ Reference sections below in order to know more details about the API
 
 ## API
 
--   FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
+-   Orion API FIWARE NGSIv2 Walkthrough FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
     [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
--   FIWARE NGSI v2
-    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook)
-    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook)
-    (Apiary)
 
 [Top](#top)
 
@@ -190,9 +186,9 @@ Reference sections below in order to know more details about the API
 
 API Reference Documentation:
 
--   FIWARE NGSI v2
-    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
-    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
+-   Orion API FIWARE NGSI v2
+    [(en)](doc/manuals/orion-api.md)
+    [(jp)](doc/manuals.jp/orion-api.md) (Markdown)
 
 Orion Reference Documentation:
 

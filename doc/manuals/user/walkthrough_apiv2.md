@@ -23,9 +23,8 @@ This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
 in the process :).
 
-The walkthrough is based on the NGSIv2 Specification, that can be found
-in Apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
-You should also have a look at the [Orion API document](../orion-api.md).
+The walkthrough is based on the Orion API specification (based, in sequence, in the
+NGSIv2 Specification), that can be found [here](../orion-api.md).
 
 The main section is [context management](#context-management). It describes the
 basic context broker functionality for context management (information about entities,
@@ -301,8 +300,8 @@ EOF
 
 Apart from simple values corresponding to JSON datatypes (i.e. numbers, strings, booleans, etc.)
 for attribute values, complex structures or custom metadata can be used. This is an advanced
-topic, described in [this section](structured_attribute_valued.md#structured-attribute-values ) and
-[this other](metadata.md#custom-attribute-metadata), respectively.
+topic, described in [this section](../orion-api.md#json-attribute-representation) and
+[this other](../orion-api.md#context-metadata), respectively.
 
 [Top](#top)
 
@@ -535,8 +534,8 @@ curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: applic
 ```
 
 * You can filter using attribute filters, using the URL parameter `q`. For
-  a complete description, please have a look at the "Simple Query Language" section in
-  the [NGSv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
+  a complete description, please have a look at the [Simple Query Language section](../orion-api.md#simple-query-language) in
+  the Orion API specification.
   For example, to get all entities whose temperature is above 22 (in this case
   retriving Room1). you can use:
 ```
@@ -544,13 +543,13 @@ curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: applicatio
 ```
 
 * You can filter by geographical location. This is an advanced topic, described in
-  [this section](geolocation.md#geolocation-capabilities).
+  [this section](../orion-api.md#geographical-queries).
 
 As a final comment, note that although our example is very simple (only 2 entities), Orion
 can manage millions of entities in a real deployment. However, by default, only 20 entities
 are returned (which is fine for this tutorial, but probably not for a real utilization
 scenario). In order to learn about how to retrieve large sets of entities page by page,
-please refer to [the section on pagination](pagination.md#pagination) in this manual.
+please refer to [the section on pagination](../orion-api.md#pagination) in the Orion API specification.
 
 [Top](#top)
 
@@ -604,11 +603,10 @@ of a given entity, i.e. removing previously existing ones.
 As in the case of entity creation, apart from simple values corresponding to
 JSON datatypes (i.e. numbers, strings, booleans, etc.) for attribute values, you can also
 use complex structures or custom metadata. These are advanced topics, described in
-[this section](structured_attribute_valued.md#structured-attribute-values ) and
-[this other](metadata.md#custom-attribute-metadata ), respectively.
+[this section](../orion-api.md#json-attribute-representation) and
+[this other](../orion-api.md#context-metadata), respectively.
 
-More details on adding/removing attributes can be found in [this section](update_action_types.md)
-of the manual.
+More details on adding/removing attributes can be found in the [Orion API specification](../orion-api.md).
 
 In the examples of this walkthrough we update attributes with particular values,
 such as `26.5`. However, you can also do updates like *"increase tempeture by 2.5 degrees"*.
@@ -708,8 +706,8 @@ Let's examine in detail the different elements included in the payload:
     trigger on any entity attribute change (regardless of the name of the attribute).
 -   Notifications include the attribute values *after* processing the update operation
     triggering the notification. However, you can make Orion include also the
-    *previous* value. This is achieved using metadata. Have a look at
-    [the following piece of documentation](metadata.md#metadata-in-notifications).
+    *previous* value. This is achieved using `previousValue` built-in metadata. Have a look at
+    [the following piece of documentation](../orion-api.md#builtin-metadata).
 -   You can also set "notify all attributes except _some_" subscriptions (a kind of
     "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
     within `notifications`.
@@ -785,12 +783,12 @@ entity](#update-entity): perform the following four updates in sequence:
     consequently no notification is sent.
 -   update Room1 pressure to 765 adding `?options=forcedUpdate` to the request URL: 
     In this case, the broker will send the notification, because of the `forcedUpdate`
-    URI option. Details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
+    URI option. Details about `forcedUpdate` URI option are in the [Orion API specification](../orion-api.md).
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
 
 Subscriptions can be retrieved using `GET /v2/subscriptions` (which
-provides the whole list and [pagination](pagination.md) may be needed if the
+provides the whole list and [pagination](../orion-api.md#pagination) may be needed if the
 list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
 subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
 operation. Finally, subscriptions can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
@@ -812,8 +810,9 @@ EOF
   representation format in notifications, using the `attrsFormat` field within
   `notification`. Secondly, you can use a custom notification HTTP verb (e.g. PUT),
   custom HTTP headers, custom URL query parameters and custom payloads (not necessarily in JSON).
-  Have a look at "Notification Messages" and "Custom Notifications" in the
-  [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+  Have a look at [Notification Messages](../orion-api.md#notification-messages) and
+  [Custom Notifications](../orion-api.md#custom-notifications) sections in the
+  Orion API specification.
 * In addition to the HTTP notifications described in this section, Orion also supports
   MQTT notifications. This topic is described in more detail in [this document](mqtt_notifications.md).
 
@@ -871,7 +870,8 @@ curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Typ
 ```
 
 There are more possibilities apart from range filters (equality filters, geo-filters, etc.). This is
-an advanced topic, see the "Subscriptions" section in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+an advanced topic, see the [Subscriptions conditions section](../orion-api.md#subscriptionsubjectcondition)
+section in the Orion API specification.
 
 [Top](#top)
 
@@ -952,7 +952,7 @@ and get:
 ]
 
 ```
-Note that the [pagination mechanism](pagination.md#pagination) also works in
+Note that the [pagination mechanism](../orion-api.md#pagination) also works in
 the `GET /v2/types` operation described above.
 
 In addition, you can use the following operation to get detailed
@@ -1061,11 +1061,11 @@ EOF
 ```
 
 Apart from `append` and `update`, there are other action types: `delete`, `appendStrict`, etc.
-See [this section](update_action_types.md) for details.
+See [this section in the Orion API specification](../orion-api.md#update-post-v2opupdate) for details.
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
 specified in the payload. It is very similar to `GET /v2/entities` (in fact, the response
-payload is the same and it also supports [pagination](pagination.md) in the same way).
+payload is the same and it also supports [pagination](../orion-api.md#pagination) in the same way).
 However `POST /v2/op/query` can express queries that `GET /v2/entities` cannot (e.g.
 a list of entities of different type).
 

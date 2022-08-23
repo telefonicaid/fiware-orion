@@ -25,7 +25,8 @@
     - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
-    - [Ordering Results](#ordering-results)
+    - [Pagination](#pagination)
+        - [Ordering Results](#ordering-results)
     - [Error Responses](#error-responses)
     - [Update operators for attribute values](#update-operators-for-attribute-values)
         - [Supported operators](#supported-operators)
@@ -654,7 +655,63 @@ section of this documentation.
 * `*`, as it has a special meaning as "all the custom/user metadata" (see section on
   [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
 
-## Ordering Results
+## Pagination
+
+Orion implements a pagination mechanism in order to help clients to retrieve
+large sets of resources. This mechanism works for all listing operations
+in the API (e.g. `GET /v2/entities`, `GET /v2/subscriptions`,
+`POST /v2/op/query`, etc.).
+
+The mechanism is based on three URI parameters:
+
+-   **limit**, in order to specify the maximum number of elements (default
+    is 20, maximum allowed is 1000).
+
+-   **offset**, in order to skip a given number of elements at the
+    beginning (default is 0)
+
+-   **count** (as `option`), if activated then a `Fiware-Total-Count`
+    header is added to the response, with a count of total elements.
+
+By default, results are returned ordered by increasing creation
+time. In the case of entities query, this can be changed with the
+[`orderBy` URL parameter](#ordering-results).
+
+Let's illustrate with an example: a given client cannot process more
+than 100 results in a single response and the query includes a
+total of 322 results. The client could do the following (only the URL is
+included, for the sake of completeness).
+
+```
+GET /v2/entities?limit=100&options=count
+...
+(The first 100 elements are returned, along with the `Fiware-Total-Count: 322`
+header, which makes the client aware of how many entities there are in total and,
+therefore, the number of subsequent queries to be done)
+
+GET /v2/entities?offset=100&limit=100
+...
+(Entities from 101 to 200)
+
+GET /v2/entities?offset=200&limit=100
+...
+(Entities from 201 to 300)
+
+GET /v2/entities?offset=300&limit=100
+...
+(Entities from 301 to 222)
+```
+
+Note that if the request uses an offset beyond the total number of results, an
+empty list is returned, as shown below:
+
+```
+GET /v2/entities?offset=1000&limit=100
+...
+[]
+```
+
+### Ordering Results
 
 Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify the
 attributes or properties to be used as criteria when ordering results.
@@ -667,6 +724,19 @@ The value of `orderBy` can be:
   ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
   field. On ties, the results are ordered by the second field and so on. A "!" before
   the field name means that the order is reversed.
+
+For example:
+
+```
+GET /v2/entities?orderBy=temperature,!humidity
+```
+
+orders first by temperature in ascending order, then by humidity in decreasing order
+in the case of temperature ties.
+
+Note that the [builtin attributes](#builtin-attributes) `dateCreated` and `dateModified` can be used as
+elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
+entity creation time and entity modification time respectively.
 
 With regards of the ordering of attributes which values belong to several JSON types, Orion 
 uses the same criteria as the one used by the underlying implementation (MongoDB). See
@@ -681,7 +751,6 @@ From lowest to highest:
 4. Object
 5. Array
 6. Boolean
-
 
 ## Error Responses
 
@@ -1149,37 +1218,6 @@ Two different syntaxes are supported by Orion:
   complex geospatial shapes, for instance
   [multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
 
-Current implementation (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of `GeoJSON` representations, supporting only the following types:
-
-* Point
-* MultiPoint
-* LineString
-* MultiLineString
-* Polygon
-* MultiPolygon
-
-More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
-
-The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
-use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
-the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
-
-* the `geometry` field, in the case of `Feature`
-* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
-
-Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
-creation/updating time. However, from the point of view of normalization with other `geo:json` types,
-it has been decided to return only the `geometry` part. In the future, maybe a flag to return
-the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
-Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
-[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
-
-With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
-`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
-
-The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
-if you try to use them.
-
 Client applications are responsible for defining which entity attributes convey geospatial
 properties (by providing an appropriate NGSI attribute type). Typically this is an entity attribute
 named `location`, but nothing prevents use another different name for the geospatial attribute. 
@@ -1324,6 +1362,37 @@ might be useful in understanding the format.
   }
 }
 ```
+
+Current implementation (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of GeoJSON representations, supporting only the following types:
+
+* Point
+* MultiPoint
+* LineString
+* MultiLineString
+* Polygon
+* MultiPolygon
+
+More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
+
+The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
+use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
+the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
+
+* the `geometry` field, in the case of `Feature`
+* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
+
+Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
+creation/updating time. However, from the point of view of normalization with other `geo:json` types,
+it has been decided to return only the `geometry` part. In the future, maybe a flag to return
+the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
+Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
+[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
+
+With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
+`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
+
+The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
+if you try to use them.
 
 ## Simple Query Language
 
@@ -2363,14 +2432,14 @@ In order to search for `Tree1` in that scope, the same
 Fiware-ServicePath will be used.
 
 Scopes are hierarchical and hierarchical search can be done. In order to
-do that the `\#` special keyword is used. Thus, a queryContext with
+do that the `\#` special keyword is used. Thus, a query with
 pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
 Finally, you can query for disjoint scopes, using a comma-separated list
 in the `Fiware-ServicePath` header. For example, to get all trees in both
 `ParqueNorte` and `ParqueOeste` (but not `ParqueSur`) the following
-`Fiware-ServicePath` would be used in queryContext request:
+`Fiware-ServicePath` would be used in query request:
 
 ```
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte, /Madrid/Gardens/ParqueOeste
@@ -2399,10 +2468,10 @@ Some additional remarks:
     different Scopes. E.g. we can create entity ID `Tree1` of type
     `Tree` in `/Madrid/Gardens/ParqueNorte/Parterre1` and another entity
     with ID `Tree1` of type `Tree` in `Madrid/Gardens/ParqueOeste` without
-    getting any error. However, queryContext can be weird in this
-    scenario (e.g. a queryContext in `Fiware-ServicePath /Madrid/Gardens`
+    getting any error. However, query can be weird in this
+    scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
     will returns two entities with the same ID and type in the
-    queryContextResponse, making hard to distinguish to which scope
+    query respose, making hard to distinguish to which scope
     belongs each one)
 
 -   Entities belongs to one (and only one) scope.
@@ -2465,14 +2534,14 @@ This requests accepts the following URL parameters to customize the request resp
 |---------------|----------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | `id`          | ✓        | string | A comma-separated list of elements. Retrieve entities whose ID matches one of the elements in the list. Incompatible with `idPattern`.                                                                                 | Boe_Idearium                      |
 | `type`        | ✓        | string | A comma-separated list of elements. Retrieve entities whose type matches one of the elements in the list. Incompatible with `typePattern`.                                                                             | Room                              |
-| `idPattern`   | ✓        | string | A correctly formatted regular expression. Retrieve entities whose ID matches the regular expression. Incompatible with `id`.                                                                                           | Bode_.*                           |
-| `typePattern` | ✓        | string | A correctly formatted regular expression. Retrieve entities whose type matches the regular expression. Incompatible with `type`.                                                                                       | Room_.*                           |
+| `idPattern`   | ✓        | string | A correctly formatted regular expression (see more details in [regex document](user/regex.md)). Retrieve entities whose ID matches the regular expression. Incompatible with `id`.                                     | Bode_.*                           |
+| `typePattern` | ✓        | string | A correctly formatted regular expression (see more details in [regex document](user/regex.md)). Retrieve entities whose type matches the regular expression. Incompatible with `type`.                                 | Room_.*                           |
 | `q`           | ✓        | string | temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`, i.e., q=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language) | temperature>40                    |
 | `mq`          | ✓        | string | A query expression for attribute metadata, composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language)             | temperature.accuracy<0.9          |
 | `georel`      | ✓        | string | Spatial relationship between matching entities and a reference shape. See [Geographical Queries](#geographical-queries).                                                                                               | near                              |
 | `geometry`    | ✓        | string | Geographical area to which the query is restricted.See [Geographical Queries](#geographical-queries).                                                                                                                  | point                             |
-| `limit`       | ✓        | number | Limits the number of entities to be retrieved                                                                                                                                                                          | 20                                |
-| `offset`      | ✓        | number | Establishes the offset from where entities are retrieved                                                                                                                                                               | 20                                |
+| `limit`       | ✓        | number | Limits the number of entities to be retrieved. See [Pagination](#pagination) section for details.                                                                                                                      | 20                                |
+| `offset`      | ✓        | number | Establishes the offset from where entities are retrieved. See [Pagination](#pagination) section for details.                                                                                                           | 100                               |
 | `coords`      | ✓        | string | List of latitude-longitude pairs of coordinates separated by ';'. See [Geographical Queries](#geographical-queries)                                                                                                    | 41.390205,2.154007;48.8566,2.3522 |
 | `attrs`       | ✓        | string | Comma-separated list of attribute names whose data are to be included in the response. The attributes are retrieved in the order specified by this parameter. If this parameter is not included, the attributes are retrieved in arbitrary order. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                                                                                                                                                                                      | seatNumber                        |
 | `metadata`    | ✓        | string | A list of metadata names to include in the response. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.                                                                                              | accuracy                          |
@@ -2483,7 +2552,7 @@ The values that `options` parameter can have for this specific request are:
 
 | Options     | Description                                                                                                                                                                    |
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `count`     | when used, the total number of entities is returned in the response as an HTTP header named `Fiware-Total-Count`.                                                              |
+| `count`     | when used, the total number of entities is returned in the response as an HTTP header named `Fiware-Total-Count`. See [Pagination](#pagination) section for details.                                              |
 | `keyValues` | when used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                             |
 | `values`    | when used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details.                                |
 | `unique`    | when used, the response payload uses the `values` simplified entity representation. Recurring values are left out. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
@@ -3310,17 +3379,17 @@ Retrieves a list of entity types, as described in the response payload section b
 
 _**Request query parameters**_
 
-| Parameter | Optional | Type   | Description                                | Example |
-|-----------|----------|--------|--------------------------------------------|---------|
-| `limit`   | ✓        | number | Limit the number of types to be retrieved. | `10`    |
-| `offset`  | ✓        | number | Skip a number of records.                  | `20`    |
-| `options` | ✓        | string | Options dictionary.                        | `count` |
+| Parameter | Optional | Type   | Description                                                                                   | Example |
+|-----------|----------|--------|-----------------------------------------------------------------------------------------------|---------|
+| `limit`   | ✓        | number | Limit the number of types to be retrieved. See [Pagination](#pagination) section for details. | `10`    |
+| `offset`  | ✓        | number | Skip a number of types. See [Pagination](#pagination) section for details.                    | `20`    |
+| `options` | ✓        | string | Options dictionary.                                                                           | `count` |
 
 The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                              |
 |----------|------------------------------------------------------------------------------------------|
-| `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count` |
+| `count`  | When used, the total number of types is returned in the HTTP header `Fiware-Total-Count`. See [Pagination](#pagination) section for details. |
 | `values` | When used, the response payload is a JSON array with a list of entity types              |
 | `noAttrDetail` | When used, the request does not provide attribute type details, i.e. `types` list associated to each attribute name is set to `[]`. Using this option, Orion solves these queries much faster (in some cases saving from 30 seconds to 0.5 seconds). |
 
@@ -3483,7 +3552,7 @@ A `subject` contains the following subfields:
 
 | Parameter                                    | Optional | Type   | Description                                                                     |
 |----------------------------------------------|----------|--------|---------------------------------------------------------------------------------|
-| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> These fields should follow the [restrictions for IDs and types](#identifiers-syntax-restrictions), be a valid regex (if pattern), and be not empty. |
+| `entities`                                   | ✓        | string | A list of objects, each one composed of the following subfields: <ul><li><code>id</code> or <code>idPattern</code> id or pattern of the affected entities. Both cannot be used at the same time, but one of them must be present.</li> <li><code>type</code> or <code>typePattern</code> Type or type pattern of the affected entities. Both cannot be used at the same time. If omitted, it means "any entity type".</li></ul> These fields should follow the [restrictions for IDs and types](#identifiers-syntax-restrictions), be a valid regex (if pattern, see more details in [regex document](user/regex.md)), and be not empty. |
 | [`condition`](#subscriptionsubjectcondition) | ✓        | object | Condition to trigger notifications. If omitted, it means "any attribute change will trigger condition". If present it must have a content, i.e. `{}` is not allowed. |
 
 #### `subscription.subject.condition`
@@ -3598,17 +3667,17 @@ Returns a list of all the subscriptions present in the system.
 
 _**Request query parameters**_
 
-| Parameter | Optional | Type   | Description                                        | Example |
-|-----------|----------|--------|----------------------------------------------------|---------|
-| `limit`   | ✓        | number | Limit the number of subscriptions to be retrieved. | `10`    |
-| `offset`  | ✓        | number | Skip a number of registrations.                    | `20`    |
-| `options` | ✓        | string | Options dictionary.                                | `count` |
+| Parameter | Optional | Type   | Description                                                                                           | Example |
+|-----------|----------|--------|-------------------------------------------------------------------------------------------------------|---------|
+| `limit`   | ✓        | number | Limit the number of subscriptions to be retrieved. See [Pagination](#pagination) section for details. | `10`    |
+| `offset`  | ✓        | number | Skip a number of subscriptions. See [Pagination](#pagination) section for details.                    | `20`    |
+| `options` | ✓        | string | Options dictionary.                                                                                   | `count` |
 
 The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                                      |
 |----------|--------------------------------------------------------------------------------------------------|
-| `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count` |
+| `count`  | When used, the total number of subscriptions is returned in the HTTP header `Fiware-Total-Count`. See [Pagination](#pagination) section for details. |
 
 _**Request headers**_
 
@@ -3939,17 +4008,17 @@ Lists all the context provider registrations present in the system.
 
 _**Request query parameters**_
 
-| Parameter | Optional | Type   | Description                                        | Example |
-|-----------|----------|--------|----------------------------------------------------|---------|
-| `limit`   | ✓        | number | Limit the number of registrations to be retrieved. | `10`    |
-| `offset`  | ✓        | number | Skip a number of registrations.                    | `20`    |
-| `options` | ✓        | string | Options dictionary.                                | `count` |
+| Parameter | Optional | Type   | Description                                                                                           | Example |
+|-----------|----------|--------|-------------------------------------------------------------------------------------------------------|---------|
+| `limit`   | ✓        | number | Limit the number of registrations to be retrieved. See [Pagination](#pagination) section for details. | `10`    |
+| `offset`  | ✓        | number | Skip a number of registrations. See [Pagination](#pagination) section for details.                    | `20`    |
+| `options` | ✓        | string | Options dictionary.                                                                                   | `count` |
 
 The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                                      |
 |----------|--------------------------------------------------------------------------------------------------|
-| `count`  | When used, the total number of registrations is returned in the HTTP header `Fiware-Total-Count` |
+| `count`  | When used, the total number of registrations is returned in the HTTP header `Fiware-Total-Count`. See [Pagination](#pagination) section for details. |
 
 _**Request headers**_
 
@@ -4254,18 +4323,18 @@ This operation execture a query among the existing entities based on filters pro
 
 _**Request query parameters**_
 
-| Parameter | Optional | Type   | Description                                                               | Example              |
-|-----------|----------|--------|---------------------------------------------------------------------------|----------------------|
-| `limit`   | ✓        | number | Limit the number of entities to be retrieved.                             | `10`                 |
-| `offset`  | ✓        | number | Skip a number of records.                                                 | `20`                 |
-| `orderBy` | ✓        | string | Criteria for ordering results.See [Ordering Results](#ordering-results) section for details. | `temperature,!speed` |
-| `options` | ✓        | string | Options dictionary.                                                       | `count`              |
+| Parameter | Optional | Type   | Description                                                                                       | Example              |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------------|----------------------|
+| `limit`   | ✓        | number | Limit the number of entities to be retrieved. See [Pagination](#pagination) section for details.  | `10`                 |
+| `offset`  | ✓        | number | Skip a number of entities. See [Pagination](#pagination) section for details.                     | `100`                |
+| `orderBy` | ✓        | string | Criteria for ordering results.See [Ordering Results](#ordering-results) section for details.      | `temperature,!speed` |
+| `options` | ✓        | string | Options dictionary.                                                                               | `count`              |
 
 The values that `options` parameter can have for this specific request are:
 
 | Options  | Description                                                                                      |
 |----------|--------------------------------------------------------------------------------------------------|
-| `count`  | When used, the total number of entities returned in the response as an HTTP header named `Fiware-Total-Count` |
+| `count`  | When used, the total number of entities returned in the response as an HTTP header named `Fiware-Total-Count`. See [Pagination](#pagination) section for details. |
 | `keyValues`  | When used, the response payload uses the `keyValues` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `values`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
 | `unique`  | When used, the response payload uses the `values` simplified entity representation. See [Simplified Entity Representation](#simplified-entity-representation) section for details. |
@@ -4285,9 +4354,9 @@ The request payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entities to search for. Each element is represented by a JSON object with the
   following elements:
-    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same
+    + `id` or `idPattern`: Id or pattern (see more details in [regex document](user/regex.md)) of the affected entities. Both cannot be used at the same
       time, but one of them must be present.
-    + `type` or `typePattern`: Type or type pattern of the entities to search for. Both cannot be used at
+    + `type` or `typePattern`: Type or type pattern (see more details in [regex document](user/regex.md)) of the entities to search for. Both cannot be used at
       the same time. If omitted, it means "any entity type".
 + `attrs`: List of attributes to be provided (if not specified, all attributes).
 + `expression`: an expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field).

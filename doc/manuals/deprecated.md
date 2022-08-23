@@ -50,7 +50,7 @@ A list of deprecated features and the version in which they were deprecated foll
   use `/v1` and `/v1/registry` instead.
 * `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
   of specifying entity location is to use `geo:point` type for the attribute (see details in
-  [the corresponding section of the user manual](user/geolocation.md).
+  [the corresponding section of the Orion API specification](../orion-api.md#geospatial-properties-of-entities).
 * Deprecated command line argument in Orion 0.26.1 (removed in Orion 1.0.0).
   * **--silent**. Suppress all log output except errors (Please use *-logLevel ERROR* instead)
 * ONTIMEINTERVAL subscriptions are deprecated since Orion 0.26.0 (removed in Orion 1.0.0).
