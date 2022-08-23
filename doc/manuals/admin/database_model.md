@@ -306,7 +306,7 @@ Fields:
 -   **format**: the format to use to send notification, possible values are **JSON**
     (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
-    `oneshot` (for [oneshot subscriptions](../orion-api.md#oneshot-subscription)). Note that Orion API consider additional states (e.g. `expired`)
+    `oneshot` (for [oneshot subscriptions](../orion-api.md#oneshot-subscriptions)). Note that Orion API consider additional states (e.g. `expired`)
     but they never hit the DB (they are managed by Orion).
 -   **statusLastChange**: last time status was updated (as decimal number, meaning seconds and fractions of seconds).
     This is mainly to be used by the subscription cache update logic (so status in updated in DB from cache only if it is newer).

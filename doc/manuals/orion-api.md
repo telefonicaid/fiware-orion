@@ -15,19 +15,27 @@
     - [JSON Attribute Representation](#json-attribute-representation)
     - [Simplified Entity Representation](#simplified-entity-representation)
     - [Partial Representations](#partial-representations)
+    - [General syntax restrictions](#general-syntax-restrictions)
+    - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
+    - [Error Responses](#error-responses)
+    - [Multi tenancy](#multi-tenancy)
+    - [Service path](#service-path)
+        - [Entity service path](#entity-service-path)
+        - [Service path in subscriptions and registrations](#service-path-in-subscriptions-and-registrations)
     - [Special Attribute Types](#special-attribute-types)
     - [Builtin Attributes](#builtin-attributes)
     - [Special Metadata Types](#special-metadata-types)
     - [Builtin Metadata](#builtin-metadata)
-    - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
-    - [Datetime support](#datetime-support)
-    - [General syntax restrictions](#general-syntax-restrictions)
-    - [Identifiers syntax restrictions](#identifiers-syntax-restrictions)
     - [Attribute names restrictions](#attribute-names-restrictions)
     - [Metadata names restrictions](#metadata-names-restrictions)
-    - [Pagination](#pagination)
-        - [Ordering Results](#ordering-results)
-    - [Error Responses](#error-responses)
+    - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
+    - [Datetime support](#datetime-support)
+    - [Geospatial properties of entities](#geospatial-properties-of-entities)
+        - [Simple Location Format](#simple-location-format)
+        - [GeoJSON](#geojson)
+    - [Simple Query Language](#simple-query-language)
+    - [Geographical Queries](#geographical-queries)
+        - [Query Resolution](#query-resolution)
     - [Update operators for attribute values](#update-operators-for-attribute-values)
         - [Supported operators](#supported-operators)
            - [`$inc`](#inc)
@@ -40,27 +48,13 @@
            - [`$pullAll`](#pullall)
            - [`$set`](#set)
            - [`$unset`](#unset)
-           - [`$unset`](#unset)
            - [Combining `$set` and `$unset`](#combining-set-and-unset)
         - [How Orion deals with operators](#how-orion-deals-with-operators)
         - [Current limitations](#current-limitations)
            - [Create or replace entities](#create-or-replace-entities)
-    - [Geospatial properties of entities](#geospatial-properties-of-entities)
-        - [Simple Location Format](#simple-location-format)
-        - [GeoJSON](#geojson)
-    - [Simple Query Language](#simple-query-language)
-    - [Geographical Queries](#geographical-queries)
-        - [Query Resolution](#query-resolution)
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Metadata update semantics](#metadata-update-semantics)
       - [`overrideMetadata` option](#overridemetadata-option)
-    - [Oneshot Subscription](#oneshot-subscription)
-    - [Covered subscriptions](#covered-subscriptions)
-    - [Notification Messages](#notification-messages)
-    - [Notification triggering](#notification-triggering)
-    - [Custom Notifications](#custom-notifications)
-      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
-    - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
     - [Transient entities](#transient-entities)
       - [The `dateExpires` attribute](#the-dateexpires-attribute)
       - [Valid transitions](#valid-transitions)
@@ -70,10 +64,15 @@
         - [Remove `dateExpires` attribute from entity](#remove-dateexpires-attribute-from-entity)
       - [Deletion of expired entities](#deletion-of-expired-entities)
       - [Backward compatibility considerations](#backward-compatibility-considerations)
-    - [Multi tenancy](#multi-tenancy)
-    - [Service path](#service-path)
-        - [Entity service path](#entity-service-path)
-        - [Service path in subscriptions and registrations](#service-path-in-subscriptions-and-registrations)
+    - [Notification Triggering](#notification-triggering)
+    - [Notification Messages](#notification-messages)
+    - [Custom Notifications](#custom-notifications)
+      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
+    - [Oneshot Subscriptions](#oneshot-subscriptions)
+    - [Covered Subscriptions](#covered-subscriptions)
+    - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
+    - [Pagination](#pagination)
+      - [Ordering Results](#ordering-results)
 - [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
@@ -347,214 +346,6 @@ Some operations use partial representation of entities:
 The metadata update semantics used by Orion (and the related `overrideMetadata`
 option are detailed in [this section of the documentation](#metadata-update-semantics).
 
-## Special Attribute Types
-
-Generally speaking, user-defined attribute types are informative; they are processed by Orion
-in an opaque way. Nonetheless, the types described below are used to convey a special
-meaning:
-
-* `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the query
-  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
-  check the section [Datetime support](#datetime-support) of this documentation.
-
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
-  related with entity location. Attributes with `null` value will not be taken into account in 
-  geo-queries and they doesn't count towards the limit of one geospatial attribute per entity. 
-  See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
-
-* `TextUnrestricted`: this attribute type allows to skip [syntax restrictions](#general-syntax-restrictions) checkings in the attribute 
-   value. However, it could have security implications (possible script injections attacks) so use 
-   it at your own risk!. For instance (only the referred entity attribute is shown):
-
-
-```json
-{
-  "forbiddenAttr": {
-   "type": "TextUnrestricted",
-   "value": "I'"'"'am a unrestricted (and I'"'"'m using forbidden chars)"
-  }
-}
-```
-
-## Builtin Attributes
-
-There are entity properties that are not directly modifiable by clients, but that can be
-rendered by Orion to provide extra information. From a representation point of view, they
-are just like regular attributes, with name, value and type.
-
-Builtin attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
-subscription (`attrs` sub-field within `notification`).
-
-The list of builtin attributes is as follows:
-
-* `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
-
-* `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
-
-* `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How Orion
-  controls entity expiration is described in [Transient entities section](#transient-entities).
-
-* `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with 
-the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
-
-  can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
-   * `entityCreate` if the update that triggers the notification is a entity creation operation 
-   * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
-   * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
-   * `entityDelete` if the update that triggers the notification was a entity delete operation
-
-Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
-However, they cannot be used in resource URLs.
-
-## Special Metadata Types
-
-Generally speaking, user-defined metadata types are informative; they are processed by Orion
-in an opaque way. Nonetheless, the types described below are used to convey a special
-meaning:
-
-* `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
-  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
-  check the section [Datetime support](#datetime-support) of this documentation.
-
-* `ignoreType`: when `ignoreType` with value `true` is added to an attribute, Orion will ignore the
-semantics associated to the attribute type. Note that Orion ignored attribute type in general so
-this metadata is not needed most of the cases, but there are two cases in which attribute
-type has an special semantic for Orion:
-   * `DateTime`
-   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
-
-At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
-mechanism to overcome the limit of only one geo-location per entity (more details
-in [Geospatial properties of entities](#geospatial-properties-of-entities) section). Support
-for `ignoreType` in `DateTime` may come in the future.
-
-## Builtin Metadata
-
-Some attribute properties are not directly modifiable by clients, but they can be
-rendered by Orion to provide extra information. From a representational point of view, they
-are just like regular metadata, with name, value, and type.
-
-Builtin metadata are not rendered by default. In order to render a specific metadata, add its
-name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
-subscription (`metadata` sub-field within `notification`).
-
-The list of builtin metadata is as follows:
-
-* `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
-
-* `dateModified` (type: `DateTime`): attribute modification date as an ISO 8601 string.
-
-* `previousValue` (type: any): only in notifications. The value of this metadata is the previous
-  value (to the request triggering the notification) of the associated attribute. The type of this metadata
-  must be the previous type of the associated attribute. If the type/value of `previousValue` is the same
-  type/value as in the associated attribute, then the attribute has not actually changed its value.
-
-* `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
-  was included in the request that triggered the notification. Its value depends on the request operation
-  type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-* `location`, which is currently [deprecated](#deprecated.md), but still supported.
-
-Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
-
-## User attributes or metadata matching builtin name
-
-(The content of this section applies to all builtins except `dateExpires` attribute. Check
-[Transient entities section](#transient-entities) for specific information about `dateExpires`).
-
-First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an 
-builtin**. In fact, this specification forbids that (check [Attribute names restrictions](#attribute-names-restrictions) and
-[Metadata names restrictions](#metadata-names-restrictions) sections).
-
-However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
-account the following considerations:
-
-* You can create/update attributes and/or metadata which name is the same of a builtin.
-  Orion will let you do so.
-* User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
-  or subscription. For instance, if you created a `dateModified` attribute with value
-  "2050-01-01" in entity E1, then `GET /v2/entities/E1` will retrieve it. You don't need to use
-  `?attrs=dateModified`.
-* When rendered (in response to GET operations or in notifications) the user defined attribute/metadata
-  will take preference over the builtin even when declared explicitly. For instance, if you created
-  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
-  `GET /v2/entities?attrs=dateModified` you will get "2050-01-01".
-* However, filtering (i.e. `q` or `mq`) is based on the value of the builtin. For instance, if you created
-  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
-  `GET /v2/entities?q=dateModified>2049-12-31` you will get no entity. It happens that "2050-01-01" is
-  greater than "2049-12-31" but the date you modified the entity (some date in 2018 or 2019 maybe) will
-  not be greater than "2049-12-31". Note this is somehow inconsistent (i.e. user defined takes preference
-  in rendering but not in filtering) and may change in the future.
-
-For further information about builtin attribute and metadata names you can check the respective sections 
-[Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
-
-## Datetime support
-
-Orion support DateTime in ISO8601 by using attribute or metadata type `Datetime`. These attributes or metadata can be used with the query operators 
-greater-than, less-than, greater-or-equal, less-or-equal and range.  A `DateTime` attribute with `null` value will not be taken into account in filters, 
-i.e. `GET /v2/entities?q=T>2021-04-21`. 
-
-`DateTime` attribute example (only the referred entity attribute is shown):
-
-```
-{
-  "timestamp": {
-    "value": "2017-06-17T07:21:24.238Z",
-    "type: "DateTime"
-  }
-}
-```
-
-`DateTime` metadata example (only the referred attribute metadata is shown):
-
-```
-"metadata": {
-      "dateCreated": {
-        "value": "2019-09-23T03:12:47.213Z",
-        "type": "DateTime"
-      }
-}
-```
-
-The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
-
-* Datetimes are composed of date, time and timezone designator, in one of the following patterns:
-    * `<date>`
-    * `<date>T<time>`
-    * `<date>T<time><timezone>`
-    * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
-      it follows the combined date and time".*
-* Regarding `<date>` it must follow the pattern: `YYYY-MM-DD`
-    * `YYYY`: year (four digits)
-    * `MM`: month (two digits)
-    * `DD`: day (two digits)
-* Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-    * `hh:mm:ss.sss` or `hhmmss.sss`.
-    * `hh:mm:ss` or `hhmmss`. Milliseconds are set to `000` in this case.
-    * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
-    * `hh`. Minutes and seconds are set to `00` in this case.
-    * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
-* Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
-    * `Z`
-    * `±hh:mm`
-    * `±hhmm`
-    * `±hh`
-* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
-  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
-  assume timezone `Z` when timezone designator is omitted.
-
-Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
-Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
-etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
-about this)).
-
-In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
-clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
-
-The string `ISO8601` as type for attributes and metadata is also supported. The effect is the same as when using `DateTime`.
-
 ## General syntax restrictions
 
 In order to avoid script injections attack in some circumstances (e.g.
@@ -626,132 +417,6 @@ In addition, the [General syntax restrictions](#general-syntax-restrictions) als
 
 In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
-## Attribute names restrictions
-
-The following strings must not be used as attribute names:
-
-* `id`, as it would conflict with the field used to represent entity id.
-
-* `type`, as it would conflict with the field used to represent entity type.
-
-* `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
-  center point.
-
-* Builtin attribute names. It is possible to use the same attribute names but it is totally discouraged. 
-Check [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name) 
-section of this documentation.
-
-* `*`, as it has a special meaning as "all the custom/user attributes" (see section on
-  [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
-
-## Metadata names restrictions
-
-The following strings must not be used as metadata names:
-
-* Builtin metadata names. It is possible to use the same metadata names but it is totally discouraged. 
-Check [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name) 
-section of this documentation.
-
-* `*`, as it has a special meaning as "all the custom/user metadata" (see section on
-  [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
-
-## Pagination
-
-Orion implements a pagination mechanism in order to help clients to retrieve
-large sets of resources. This mechanism works for all listing operations
-in the API (e.g. `GET /v2/entities`, `GET /v2/subscriptions`,
-`POST /v2/op/query`, etc.).
-
-The mechanism is based on three URI parameters:
-
--   **limit**, in order to specify the maximum number of elements (default
-    is 20, maximum allowed is 1000).
-
--   **offset**, in order to skip a given number of elements at the
-    beginning (default is 0)
-
--   **count** (as `option`), if activated then a `Fiware-Total-Count`
-    header is added to the response, with a count of total elements.
-
-By default, results are returned ordered by increasing creation
-time. In the case of entities query, this can be changed with the
-[`orderBy` URL parameter](#ordering-results).
-
-Let's illustrate with an example: a given client cannot process more
-than 100 results in a single response and the query includes a
-total of 322 results. The client could do the following (only the URL is
-included, for the sake of completeness).
-
-```
-GET /v2/entities?limit=100&options=count
-...
-(The first 100 elements are returned, along with the `Fiware-Total-Count: 322`
-header, which makes the client aware of how many entities there are in total and,
-therefore, the number of subsequent queries to be done)
-
-GET /v2/entities?offset=100&limit=100
-...
-(Entities from 101 to 200)
-
-GET /v2/entities?offset=200&limit=100
-...
-(Entities from 201 to 300)
-
-GET /v2/entities?offset=300&limit=100
-...
-(Entities from 301 to 222)
-```
-
-Note that if the request uses an offset beyond the total number of results, an
-empty list is returned, as shown below:
-
-```
-GET /v2/entities?offset=1000&limit=100
-...
-[]
-```
-
-### Ordering Results
-
-Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify the
-attributes or properties to be used as criteria when ordering results.
-The value of `orderBy` can be:
-
-* The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
-  (`georel=near`) spatial relationship is used. 
-
-* A comma-separated list of attributes (including builtin attributes), `id` (for entity
-  ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
-  field. On ties, the results are ordered by the second field and so on. A "!" before
-  the field name means that the order is reversed.
-
-For example:
-
-```
-GET /v2/entities?orderBy=temperature,!humidity
-```
-
-orders first by temperature in ascending order, then by humidity in decreasing order
-in the case of temperature ties.
-
-Note that the [builtin attributes](#builtin-attributes) `dateCreated` and `dateModified` can be used as
-elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
-entity creation time and entity modification time respectively.
-
-With regards of the ordering of attributes which values belong to several JSON types, Orion 
-uses the same criteria as the one used by the underlying implementation (MongoDB). See
-[the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort) 
-for details.
-
-From lowest to highest:
-
-1. Null
-2. Number
-3. String
-4. Object
-5. Array
-6. Boolean
-
 ## Error Responses
 
 If present, the error payload is a JSON object including the following fields:
@@ -783,6 +448,793 @@ The `error` reporting is as follows:
   + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
   + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
 
+## Multi tenancy
+
+Orion implements a simple multitenant/multiservice
+model based and logical database separation, to ease service/tenant
+based authorization policies provided by other FIWARE components or
+third party software, e.g. the ones in the FIWARE security framework
+(PEP proxy, IDM and Access Control). This functionality is activated
+when the `-multiservice` [command line option](admin/cli.md) is used. When
+`-multiservice` is used, Orion uses the `Fiware-Service` HTTP header in
+the request to identify the service/tenant. If the header is not present
+in the HTTP request, the default service/tenant is used.
+
+Multitenant/multiservice ensures that the
+entities/attributes/subscriptions of one service/tenant are *"invisible"*
+to other services/tentants. For example, `GET /v2/entities` on tenantA space
+will never return entities from tenantB space. This isolation
+is based on database separation, which [details are described in the
+Installation and Administration
+manual](admin/database_admin.md#multiservicemultitenant-database-separation).
+
+In addition, note that when `-multiservice` is used Orion includes the
+`Fiware-Service` header in the notifyContextRequest request messages associated to subscriptions
+in the given tenant/service (except for the default service/tenant, in
+which case the header is not present), e.g.:
+
+```
+POST http://127.0.0.1:9977/notify
+Content-Length: 725
+User-Agent: orion/0.13.0
+Host: 127.0.0.1:9977
+Accept: application/json
+Fiware-Service: t_02
+Content-Type: application/json
+
+{
+...
+}
+```
+
+Regarding service/tenant name syntax, it must be a string of
+alphanumeric characters (and the `\` symbol). Maximum length is 50
+characters,
+which should be enough for most use cases. Orion Context Broker
+interprets the tenant name in lowercase, thus, although you can use
+tenants such as in update `MyService` it is not advisable, as the
+notifications related with that tenant will be sent with `myservice`
+and, in that sense, it is not coherent the tenant you used in
+update requests compared with the one that Orion sends in
+notifications.
+
+## Service path
+
+### Entity service path
+
+Orion supports hierarchical scopes, so entities can be
+assigned to a scope [at creation time](user/walkthrough_apiv2.md#entity-creation).
+Then, [query](user/walkthrough_apiv2.md#query-entity) and [subscription](user/walkthrough_apiv2.md#subscriptions)
+can be also scoped to locate entities in the corresponding scopes.
+
+For example, consider an Orion-based application using the following
+scopes (shown in the figure):
+
+-   `Madrid`, as first level scope
+-   `Gardens` and `Districts`, as second-level scope (children of Madrid)
+-   `ParqueNorte`, `ParqueOeste` and `ParqueSur` (children of Gardens) and
+    `Fuencarral` and `Latina` (children of Districts)
+-   `Parterre1` and `Parterre2` (children of ParqueNorte)
+
+![](ServicePathExample.png "ServicePathExample.png")
+
+The scope to use is specified using the `Fiware-ServicePath` HTTP header
+in update/query request. For example, to create the entity `Tree1` of type
+`Tree` in `Parterre1` the following Fiware-ServicePath will be used:
+
+```
+    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
+```
+
+In order to search for `Tree1` in that scope, the same
+Fiware-ServicePath will be used.
+
+Scopes are hierarchical and hierarchical search can be done. In order to
+do that the `\#` special keyword is used. Thus, a query with
+pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
+will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
+
+Finally, you can query for disjoint scopes, using a comma-separated list
+in the `Fiware-ServicePath` header. For example, to get all trees in both
+`ParqueNorte` and `ParqueOeste` (but not `ParqueSur`) the following
+`Fiware-ServicePath` would be used in query request:
+
+```
+    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte, /Madrid/Gardens/ParqueOeste
+```
+
+Some additional remarks:
+
+-   Limitations:
+    -   Scope must start with `/` (only "absolute" scopes are allowed)
+    -   10 maximum scope levels in a path
+    -   50 maximum characters in each level (1 char is minimum),
+        only alphanum and underscore allowed
+    -   10 maximum disjoint scope paths in a comma-separated list in
+        query `Fiware-ServicePath` header (no more than 1 scope path in
+        update `Fiware-ServicePath` header)
+    -   Trailing slashes are discarded
+
+-   `Fiware-ServicePath` is an optional header. It is assumed that all the
+    entities created without `Fiware-ServicePath` (or that don't include
+    service path information in the database) belongs to a root scope
+    `/` implicitely. All the queries without using `Fiware-ServicePath`
+    (including subscriptions) are on `\#` implicitly. This behavior
+    ensures backward compatibility to pre-0.14.0 versions.
+
+-   It is possible to have an entity with the same ID and type in
+    different Scopes. E.g. we can create entity ID `Tree1` of type
+    `Tree` in `/Madrid/Gardens/ParqueNorte/Parterre1` and another entity
+    with ID `Tree1` of type `Tree` in `Madrid/Gardens/ParqueOeste` without
+    getting any error. However, query can be weird in this
+    scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
+    will returns two entities with the same ID and type in the
+    query respose, making hard to distinguish to which scope
+    belongs each one)
+
+-   Entities belongs to one (and only one) scope.
+
+-   `Fiware-ServicePath` header is included in notification requests sent by Orion.
+
+-   The scopes entities can be combined orthogonally with the
+    [multi-tenancy functionality](#multi-tenancy). In that case,
+    each `scope tree` lives in a different service/tenant and they can
+    use even the same names with complete database-based isolation. See
+    figure below.
+
+![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
+
+-   Current version doesn’t allow to change the scope to which an entity
+    belongs through the API (a workaround is to modify the
+    `_id.servicePath` field in the [entities collection](admin/database_model.md#entities-collection) directly).
+
+### Service path in subscriptions and registrations
+
+While entities belong to services *and* service paths, subscriptions and registrations
+belong *only* to the service. The servicepath in subscriptions and registrations
+doesn't denote sense of belonging, but is the expression of the query associated
+to the subscription or registration.
+
+Taking this into consideration, the following rules apply:
+
+* `Fiware-ServicePath` header is ignored in `GET /v2/subscriptions/{id}` and
+  `GET /v2/registrations/{id}` operations, as the id fully qualifies the subscription or registration
+  to retrieve.
+* `Fiware-ServicePath` header is taken into account in `GET /v2/subscriptions` and `GET /v2/registrations`
+  in order to narrow down the results to subscriptions/registrations that use *exactly*
+  that service path as query.
+* At the present moment hierarchical service paths (i.e. the ones using ending with `#`) are not allowed
+  in registrations. We have [an issue about it at Github](https://github.com/telefonicaid/fiware-orion/issues/3078) and
+  the limitation could be eventually solved.
+
+## Special Attribute Types
+
+Generally speaking, user-defined attribute types are informative; they are processed by Orion
+in an opaque way. Nonetheless, the types described below are used to convey a special
+meaning:
+
+* `DateTime`:  identifies dates, in ISO8601 format. These attributes can be used with the query
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
+  check the section [Datetime support](#datetime-support) of this documentation.
+
+* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+  related with entity location. Attributes with `null` value will not be taken into account in
+  geo-queries and they doesn't count towards the limit of one geospatial attribute per entity.
+  See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
+
+* `TextUnrestricted`: this attribute type allows to skip [syntax restrictions](#general-syntax-restrictions) checkings in the attribute
+   value. However, it could have security implications (possible script injections attacks) so use
+   it at your own risk!. For instance (only the referred entity attribute is shown):
+
+
+```json
+{
+  "forbiddenAttr": {
+   "type": "TextUnrestricted",
+   "value": "I'm a unrestricted (and I'm using forbidden chars, the apostrophe)"
+  }
+}
+```
+
+## Builtin Attributes
+
+There are entity properties that are not directly modifiable by clients, but that can be
+rendered by Orion to provide extra information. From a representation point of view, they
+are just like regular attributes, with name, value and type.
+
+Builtin attributes are not rendered by default. In order to render a specific attribute, add its
+name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+subscription (`attrs` sub-field within `notification`).
+
+The list of builtin attributes is as follows:
+
+* `dateCreated` (type: `DateTime`): entity creation date as an ISO 8601 string.
+
+* `dateModified` (type: `DateTime`): entity modification date as an ISO 8601 string.
+
+* `dateExpires` (type: `DateTime`): entity expiration date as an ISO 8601 string. How Orion
+  controls entity expiration is described in [Transient entities section](#transient-entities).
+
+* `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
+
+  can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
+   * `entityCreate` if the update that triggers the notification is a entity creation operation
+   * `entityUpdate` if the update that triggers the notification was an update but it wasn't an actual change
+   * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
+   * `entityDelete` if the update that triggers the notification was a entity delete operation
+
+Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
+However, they cannot be used in resource URLs.
+
+## Special Metadata Types
+
+Generally speaking, user-defined metadata types are informative; they are processed by Orion
+in an opaque way. Nonetheless, the types described below are used to convey a special
+meaning:
+
+* `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
+  check the section [Datetime support](#datetime-support) of this documentation.
+
+* `ignoreType`: when `ignoreType` with value `true` is added to an attribute, Orion will ignore the
+semantics associated to the attribute type. Note that Orion ignored attribute type in general so
+this metadata is not needed most of the cases, but there are two cases in which attribute
+type has an special semantic for Orion:
+   * `DateTime`
+   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+
+At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
+mechanism to overcome the limit of only one geo-location per entity (more details
+in [Geospatial properties of entities](#geospatial-properties-of-entities) section). Support
+for `ignoreType` in `DateTime` may come in the future.
+
+## Builtin Metadata
+
+Some attribute properties are not directly modifiable by clients, but they can be
+rendered by Orion to provide extra information. From a representational point of view, they
+are just like regular metadata, with name, value, and type.
+
+Builtin metadata are not rendered by default. In order to render a specific metadata, add its
+name to the `metadata` URL parameter (or payload field in POST /v2/op/query operation) or
+subscription (`metadata` sub-field within `notification`).
+
+The list of builtin metadata is as follows:
+
+* `dateCreated` (type: `DateTime`): attribute creation date as an ISO 8601 string.
+
+* `dateModified` (type: `DateTime`): attribute modification date as an ISO 8601 string.
+
+* `previousValue` (type: any): only in notifications. The value of this metadata is the previous
+  value (to the request triggering the notification) of the associated attribute. The type of this metadata
+  must be the previous type of the associated attribute. If the type/value of `previousValue` is the same
+  type/value as in the associated attribute, then the attribute has not actually changed its value.
+
+* `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
+  was included in the request that triggered the notification. Its value depends on the request operation
+  type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
+
+* `location`, which is currently [deprecated](#deprecated.md), but still supported.
+
+Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
+
+## Attribute names restrictions
+
+The following strings must not be used as attribute names:
+
+* `id`, as it would conflict with the field used to represent entity id.
+
+* `type`, as it would conflict with the field used to represent entity type.
+
+* `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to
+  center point.
+
+* Builtin attribute names. It is possible to use the same attribute names but it is totally discouraged.
+Check [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
+section of this documentation.
+
+* `*`, as it has a special meaning as "all the custom/user attributes" (see section on
+  [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
+
+## Metadata names restrictions
+
+The following strings must not be used as metadata names:
+
+* Builtin metadata names. It is possible to use the same metadata names but it is totally discouraged.
+Check [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
+section of this documentation.
+
+* `*`, as it has a special meaning as "all the custom/user metadata" (see section on
+  [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)).
+
+## User attributes or metadata matching builtin name
+
+(The content of this section applies to all builtins except `dateExpires` attribute. Check
+[Transient entities section](#transient-entities) for specific information about `dateExpires`).
+
+First of all: **you are strongly encouraged to not use attributes or metadata with the same name as an
+builtin**. In fact, this specification forbids that (check [Attribute names restrictions](#attribute-names-restrictions) and
+[Metadata names restrictions](#metadata-names-restrictions) sections).
+
+However, if you are forced to have such attributes or metadata (maybe due to legacy reasons) take into
+account the following considerations:
+
+* You can create/update attributes and/or metadata which name is the same of a builtin.
+  Orion will let you do so.
+* User defined attributes and/or metadata are shown without need to explicit declare it in the GET request
+  or subscription. For instance, if you created a `dateModified` attribute with value
+  "2050-01-01" in entity E1, then `GET /v2/entities/E1` will retrieve it. You don't need to use
+  `?attrs=dateModified`.
+* When rendered (in response to GET operations or in notifications) the user defined attribute/metadata
+  will take preference over the builtin even when declared explicitly. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?attrs=dateModified` you will get "2050-01-01".
+* However, filtering (i.e. `q` or `mq`) is based on the value of the builtin. For instance, if you created
+  a `dateModified` attribute with value "2050-01-01" in entity E1 and you request
+  `GET /v2/entities?q=dateModified>2049-12-31` you will get no entity. It happens that "2050-01-01" is
+  greater than "2049-12-31" but the date you modified the entity (some date in 2018 or 2019 maybe) will
+  not be greater than "2049-12-31". Note this is somehow inconsistent (i.e. user defined takes preference
+  in rendering but not in filtering) and may change in the future.
+
+For further information about builtin attribute and metadata names you can check the respective sections
+[Builtin Attributes](#builtin-attributes) and [Builtin Metadata](#builtin-metadata).
+
+## Datetime support
+
+Orion support DateTime in ISO8601 by using attribute or metadata type `Datetime`. These attributes or metadata can be used with the query operators
+greater-than, less-than, greater-or-equal, less-or-equal and range.  A `DateTime` attribute with `null` value will not be taken into account in filters,
+i.e. `GET /v2/entities?q=T>2021-04-21`.
+
+`DateTime` attribute example (only the referred entity attribute is shown):
+
+```
+{
+  "timestamp": {
+    "value": "2017-06-17T07:21:24.238Z",
+    "type: "DateTime"
+  }
+}
+```
+
+`DateTime` metadata example (only the referred attribute metadata is shown):
+
+```
+"metadata": {
+      "dateCreated": {
+        "value": "2019-09-23T03:12:47.213Z",
+        "type": "DateTime"
+      }
+}
+```
+
+The following considerations have to be taken into account at attribute creation/update time or when used in `q` and `mq` filters:
+
+* Datetimes are composed of date, time and timezone designator, in one of the following patterns:
+    * `<date>`
+    * `<date>T<time>`
+    * `<date>T<time><timezone>`
+    * Note that the format `<date><timezone>` is not allowed. According to ISO8601: *"If a time zone designator is required,
+      it follows the combined date and time".*
+* Regarding `<date>` it must follow the pattern: `YYYY-MM-DD`
+    * `YYYY`: year (four digits)
+    * `MM`: month (two digits)
+    * `DD`: day (two digits)
+* Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
+    * `hh:mm:ss.sss` or `hhmmss.sss`.
+    * `hh:mm:ss` or `hhmmss`. Milliseconds are set to `000` in this case.
+    * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
+    * `hh`. Minutes and seconds are set to `00` in this case.
+    * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
+* Regarding `<timezones>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators):
+    * `Z`
+    * `±hh:mm`
+    * `±hhmm`
+    * `±hh`
+* ISO8601 specifies that *"if no UTC relation information is given with a time representation, the time is assumed to be in local time"*.
+  However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
+  assume timezone `Z` when timezone designator is omitted.
+
+Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
+Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
+etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
+about this)).
+
+In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
+clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
+
+The string `ISO8601` as type for attributes and metadata is also supported. The effect is the same as when using `DateTime`.
+
+## Geospatial properties of entities
+
+The geospatial properties of a context entity can be represented by means of regular
+context attributes.
+The provision of geospatial properties enables the resolution of geographical queries.
+
+Two different syntaxes are supported by Orion:
+
+* *Simple Location Format*. It is meant as a very lightweight format for developers and users to
+  quickly and easily add to their existing entities.
+
+* *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) is a geospatial data
+  interchange format based on the JavaScript Object Notation (JSON).
+  GeoJSON provides greater flexibility allowing the representation of point altitudes or even more
+  complex geospatial shapes, for instance
+  [multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
+
+Client applications are responsible for defining which entity attributes convey geospatial
+properties (by providing an appropriate NGSI attribute type). Typically this is an entity attribute
+named `location`, but nothing prevents use another different name for the geospatial attribute. 
+
+Orion limits the number of geospatial attributes to one (1) attribute due to
+resource constraints imposed by backend databases. If additional use attempts to create additional 
+location attributes, Orion rises an error `413`, *Request entity too large*, and
+the reported error on the response payload is `NoResourcesAvailable`.
+
+However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
+location (more detail in [this section of the documentation](#special-metadata-types)). This disables Orion
+interpretation of that attribute as a location, so it doesn't count towards the limit.
+
+For instance:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType":{
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}
+```
+
+Both attributes are of type `geo:json`, but `serviceArea` uses `ignoreType` metadata to `true` so the limit 
+of one non-informative location is not overpassed.
+
+If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
+is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
+the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
+part in geo-queries.
+
+### Simple Location Format
+
+Simple Location Format supports basic geometries ( *point*, *line*, *box*, *polygon* ) and covers
+the typical use cases when encoding geographical locations. It has been inspired by
+[GeoRSS Simple](http://www.georss.org/simple.html).
+
+It is noteworthy that the Simple Location Format is not intended to represent complex positions on
+Earth surface.
+For instance, applications that require to capture altitude coordinates will have to use GeoJSON as
+representation format for the geospatial properties of their entities. 
+
+A context attribute representing a location encoded with the Simple Location Format
+must conform to the following syntax:
+
+* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or 
+  `geo:polygon`).
+* The attribute value must be a list of coordinates. By default, coordinates are defined
+  using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
+  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
+  with latitude and longitude units of decimal degrees. Such coordinate list allow to encode
+  the geometry specified by the `type` attribute and are encoded according to the specific
+  rules defined below:
+
+  * Type `geo:point`:   the attribute value must contain a string containing a
+    valid latitude-longitude pair, separated by comma.
+  * Type `geo:line`:    the attribute value must contain a string array of
+    valid latitude-longitude pairs. There must be at least two pairs.
+  * Type `geo:polygon`: the attribute value must contain a string array
+    of valid latitude-longitude pairs.
+    There must be at least four pairs, with the last being identical to the first
+    (so a polygon has a minimum of three actual points).
+    Coordinate pairs should be properly ordered so that the line segments
+    that compose the polygon remain on the outer edge of the defined area.
+    For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
+    polygon definition. 
+    Orion should raise an error when none of the former conditions are met by input data.
+  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of
+    a map or a rough area of interest. A box is represented by a two-length string array of
+    latitude-longitude pairs.
+    The first pair is the lower corner, the second is the upper corner.
+
+Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
+describes different shortcomings for implementations. 
+
+The examples below illustrate the referred syntax:
+
+```
+{
+  "location": {
+    "value": "41.3763726, 2.186447514",
+    "type": "geo:point"
+  }
+}
+```
+
+```
+{
+  "location": {
+    "value": [
+      "40.63913831188419, -8.653321266174316",
+      "40.63881265804603, -8.653149604797363"
+    ],
+    "type": "geo:box"
+  }
+}
+```
+
+### GeoJSON
+
+A context attribute representing a location encoded using GeoJSON must conform to the following
+syntax:
+
+* The NGSI type of the attribute must be `geo:json`.
+* The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes before
+  latitude in GeoJSON coordinates.
+
+The example below illustrates the usage of GeoJSON.
+More GeoJSON examples can be found in [GeoJSON IETF Spec](https://tools.ietf.org/html/draft-butler-geojson-06#page-14).
+Additionally, the following
+[GeoJSON Tutorial](http://www.macwright.org/2015/03/23/geojson-second-bite.html)
+might be useful in understanding the format. 
+
+```
+{
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [2.186447514, 41.3763726]
+    },
+    "type": "geo:json"
+  }
+}
+```
+
+Current implementation (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of GeoJSON representations, supporting only the following types:
+
+* Point
+* MultiPoint
+* LineString
+* MultiLineString
+* Polygon
+* MultiPolygon
+
+More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
+
+The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
+use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
+the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
+
+* the `geometry` field, in the case of `Feature`
+* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
+
+Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
+creation/updating time. However, from the point of view of normalization with other `geo:json` types,
+it has been decided to return only the `geometry` part. In the future, maybe a flag to return
+the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
+Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
+[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
+
+With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
+`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
+
+The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
+if you try to use them.
+
+## Simple Query Language
+
+The Simple Query Language provides a simplified syntax to retrieve entities which match a set of
+conditions.
+A query is composed by a list of statements separated by the ';' character.
+Each statement expresses a matching condition.
+The query returns all the entities that match all the matching conditions (AND logical operator). 
+
+There are two kinds of statements: *unary statements* and *binary statements*.
+
+Binary statements are composed by an attribute path (e.g. `temperature` or `brand.name`), an operator
+and a value (whose format depends on the operator), e.g.:
+
+```
+temperature==50
+temperature<=20
+```
+
+The syntax of an attribute path consists of a list of tokens separated by the `.` character. This list of tokens
+addresses a JSON property name, in accordance with the following rules:
+
+* The first token is the name of an NGSI attribute (*target NGSI attribute*) of an entity.
+* If filtering by attribute value (i.e. the expression is used in a `q` query), the rest of tokens (if present)
+  represent the path to a sub-property of the *target NGSI attribute value* (which should be a JSON object).
+  Such sub-property is defined as the *target property*.
+* If filtering by metadata (i.e. the expression is used in a `mq` query), the second token represents a metadata
+  name associated to the target NGSI attribute, *target metadata*, and the rest of tokens
+  (if present) represent the path to a sub-property of the *target metadata value* (which should be a
+  JSON object). Such sub-property is defined as the *target property*.
+
+The *target property value* is defined as the value of the JSON property addressed by the list of tokens described
+above i.e. the value of the *target property*.
+
+In case only one token is provided (two in case of filtering by metadata), then the *target property* will
+be the *target NGSI attribute* itself (or the *target metadata* in case of filtering by metadata) and the
+*target property value* will be the *target NGSI attribute* value (or the *target metadata* value in case
+of filtering by metadata). The value of the *target NGSI attribute* (or the *target metadata*
+in case of filtering by metadata) should not be a JSON object in this case.
+
+In case some of the tokens include `.`, you can use single quote (`'`) as separator. For example, the following
+attribute path `'a.b'.w.'x.y'` is composed by three tokens: the first token is `a.b`, the second token is `w` and
+the third token is `x.y`.
+
+The list of operators (and the format of the values they use) is as follows:
+
++ **Equal**: `==`. This operator accepts the following types of right-hand side:
+    + Single element, e.g. `temperature==40`. For an entity to match, it must contain the *target
+      property* (temperature) and the *target property value* must be the query value (40)
+      (or include the value, in case the *target property value* is an array).
+    + A list of comma-separated values, e.g. `color==black,red`. For an entity to match, it must
+      contain the *target property* and the *target property value* must be **any** of the values
+      in the list (OR clause) (or include **any** of the values in the list in case the *target
+      property value* is an array).
+      E.g. entities with an attribute named `color`, whose value is `black` are a match, while
+      entities with an attribute named `color` but whose value is `white` do not match.
+    + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
+      For an entity to match, it must contain the *target property* (temperature),
+      and the *target property value* must be between the upper and lower limits
+      of the range (both included). Ranges can only be used with *target properties* that represent
+      dates (in ISO8601 format), numbers or strings.
++ **Unequal**: `!=`. This operator accepts the following types of right-hand side:
+    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain the *target
+      property* (temperature) and the *target property value* must **not** be the query value (41).
+    + A list of comma-separated values, e.g. `color!=black,red`. For an entity to match, it must
+      contain the *target property* and the *target property value* must **not** be any of the values
+      in the list (AND clause) (or not include **any** of the values in the list in case the *target
+      property value* is an array).
+      E.g. entities whose attribute `color` is set to `black` will not match, while entities whose
+      attribute `color` is set to `white` will match.
+    + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
+      For an entity to match, it must contain the *target property* (temperature) and the
+      *target property value* must **not** be between the upper and lower limits
+      (both included). Ranges can only be used with elements *target properties* that represent dates
+      (in ISO8601 format), numbers or strings.
++ **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be strictly greater than the query value (42).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
++ **Less than**: `<`. The right-hand side must be a single element, e.g. `temperature<43`.
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be strictly less than the value (43).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
++ **Greater or equal than**: `>=`. The right-hand side must be a single element, e.g. `temperature>=44`.
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be greater than or equal to that value (44).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
++ **Less or equal than**: `<=`. The right-hand side must be a single element, e.g. `temperature<=45`.
+    For an entity to match, it must contain the *target property* (temperature)
+    and the *target property value* must be less than or equal to that value (45).
+    This operation is only valid for *target properties* of type date, number or string (used with
+    *target properties* of other types may lead to unpredictable results).
++ **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
+    `color~=ow`. For an entity to match, it must contain the *target property* (color)
+    and the *target property value* must match the string in the right-hand side,
+    'ow' in this example (`brown` and `yellow` would match, `black` and `white` would not).
+    This operation is only valid for *target properties* of type string.
+
+The symbol `:` can be used instead of `==`.
+
+In case of equal or unequal, if the string to match includes a `,`, you can use single quote
+(`'`) to disable the special meaning of the comma, e.g.: `color=='light,green','deep,blue'`.
+The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
+simple quote syntax can be also used to force string interpretation in filters, e.g.
+`q=title=='20'` will match string "20" but not number 20.
+
+Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
+operator at all.
+The unary statements are used to check for the existence of the *target property*.
+E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
+value), while `!temperature` matches entities that do not have an attribute called 'temperature'.
+ 
+## Geographical Queries
+
+Geographical queries are specified using the following parameters:
+
+``georel`` is intended to specify a spatial relationship (a predicate)
+between matching entities and a reference shape (`geometry`).
+It is composed of a token list separated by ';'.
+The first token is the relationship name, the rest of the tokens (if any) are modifiers which
+provide more information about the relationship. The following values are recognized:
+
++ `georel=near`. The ``near`` relationship means that matching entities must be located at a certain
+  threshold distance to the reference geometry. It supports the following modifiers:
+  + `maxDistance`.  Expresses, in meters, the maximum distance at which matching entities must be
+    located.
+  + `minDistance`.  Expresses, in meters, the minimum distance at which matching entities must be
+    located.
++ `georel=coveredBy`. Denotes that matching entities are those that exist entirely within the
+  reference geometry.
+  When resolving a query of this type, the border of the shape must be considered to be part of the
+  shape. 
++ `georel=intersects`. Denotes that matching entities are those intersecting with the reference
+  geometry.
++ `georel=equals`. The geometry associated to the position of matching entities and the reference
+  geometry must be exactly the same.
++ `georel=disjoint`. Denotes that matching entities are those **not** intersecting with the
+  reference geometry. 
+
+`geometry` allows to define the reference shape to be used when resolving the query.
+ The following geometries (see [Simple Location Format](#simple-location-format)) must be supported:
+
++ `geometry=point`, defines a point on the Earth surface.
++ `geometry=line`, defines a polygonal line.
++ `geometry=polygon`, defines a polygon.
++ `geometry=box`, defines a bounding box.
+
+**coords** must be a string containing a semicolon-separated list of pairs of geographical
+coordinates in accordance with the geometry specified and the rules mandated by the Simple Location
+Format:
+
+* `geometry=point`.   `coords` contains a pair of WGS-84 geo-coordinates.
+* `geometry=line`.    `coords` contains a list of pairs of WGS-84 geo-coordinates.
+* `geometry=polygon`. `coords` is composed by at least four pairs of WGS-84 geo-coordinates.
+* `geometry=box`.     `coords` is composed by two pairs of WGS-84 geo-coordinates.
+
+Examples:
+
+`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`.
+Matching entities must be located (at most) 1000 meters from the reference point.
+
+`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`.
+Matching entities must be (at least) 5000 meters from the reference point. 
+
+`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
+Matching entities are those located within the referred polygon.
+
+### Query Resolution
+
+If Orion is not able to resolve a geographical query, the HTTP Status code of the
+response must be ```422```, *Unprocessable Entity*. The error name, present in the error payload,
+must be ``NotSupportedQuery``. 
+
+When resolving geographical queries, through the Simple Query Language,
+the API implementation is responsible for determining which entity attribute
+contains the geographical location to be used for matching purposes.
+To this aim, the following rules must be followed:
+
+* If an entity has no attribute corresponding to a location (encoded as GeoJSON or the
+  Simple Location Format), then such an entity has not declared any geospatial property and will not
+  match any geographical query.
+
+* If an entity only exposes one attribute corresponding to a location, then such an attribute will
+  be used when resolving geographical queries.
+
+* If an entity exposes more than one location, then the attribute containing a metadata property
+  named ``defaultLocation``, with boolean value ``true`` will be taken as the reference location
+  used for resolving geographical queries. 
+
+* If there is more than one attribute exposing location but none of them is labeled as default
+location, then the query will be declared ambiguous and an HTTP error response with a ``409`` code
+must be sent.
+
+* If there is more than one attribute exposing location labeled as *default location*, then the
+  query is declared ambiguous and an HTTP error response with a ``409`` code must be sent. 
+
 ## Update operators for attribute values
 
 Some attribute value updates has special semantics. In particular we can do requests like this one:
@@ -804,7 +1256,7 @@ context. More detail in [specific documentation](user/update_operators.md).
 ### Supported operators
 
 Orion update operators are based on a subset of the ones implemented by MongoDB
-(described [here](https://docs.mongodb.com/manual/reference/operator/update/)). The 
+(described [here](https://docs.mongodb.com/manual/reference/operator/update/)). The
 complete set of operators supported by Orion are the following:
 
 | Operator                 | Previous attr value     | Operation                          | Final value                     |
@@ -1201,397 +1653,6 @@ POST /v2/entities/E/attrs
 
 then C will be created with value `2`.
 
-## Geospatial properties of entities
-
-The geospatial properties of a context entity can be represented by means of regular
-context attributes.
-The provision of geospatial properties enables the resolution of geographical queries.
-
-Two different syntaxes are supported by Orion:
-
-* *Simple Location Format*. It is meant as a very lightweight format for developers and users to
-  quickly and easily add to their existing entities.
-
-* *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) is a geospatial data
-  interchange format based on the JavaScript Object Notation (JSON).
-  GeoJSON provides greater flexibility allowing the representation of point altitudes or even more
-  complex geospatial shapes, for instance
-  [multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
-
-Client applications are responsible for defining which entity attributes convey geospatial
-properties (by providing an appropriate NGSI attribute type). Typically this is an entity attribute
-named `location`, but nothing prevents use another different name for the geospatial attribute. 
-
-Orion limits the number of geospatial attributes to one (1) attribute due to
-resource constraints imposed by backend databases. If additional use attempts to create additional 
-location attributes, Orion rises an error `413`, *Request entity too large*, and
-the reported error on the response payload is `NoResourcesAvailable`.
-
-However, you can set `ignoreType` metadata to `true` to mean that a given attribute contains an extra informative
-location (more detail in [this section of the documentation](#special-metadata-types)). This disables Orion
-interpretation of that attribute as a location, so it doesn't count towards the limit.
-
-For instance:
-
-```
-{
-  "id": "Hospital1",
-  "type": "Hospital",
-  ...
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [ -3.68666, 40.48108 ]
-    },
-    "type": "geo:json"
-  },
-  "serviceArea": {
-    "value": {
-      "type": "Polygon",
-      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
-    },
-    "type": "geo:json",
-    "metadata": {
-      "ignoreType":{
-        "value": true,
-        "type": "Boolean"
-      }
-    }
-  }
-}
-```
-
-Both attributes are of type `geo:json`, but `serviceArea` uses `ignoreType` metadata to `true` so the limit 
-of one non-informative location is not overpassed.
-
-If extra locations are defined in this way take, into account that the location that is used to solve geo-queries
-is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
-the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
-part in geo-queries.
-
-### Simple Location Format
-
-Simple Location Format supports basic geometries ( *point*, *line*, *box*, *polygon* ) and covers
-the typical use cases when encoding geographical locations. It has been inspired by
-[GeoRSS Simple](http://www.georss.org/simple.html).
-
-It is noteworthy that the Simple Location Format is not intended to represent complex positions on
-Earth surface.
-For instance, applications that require to capture altitude coordinates will have to use GeoJSON as
-representation format for the geospatial properties of their entities. 
-
-A context attribute representing a location encoded with the Simple Location Format
-must conform to the following syntax:
-
-* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or 
-  `geo:polygon`).
-* The attribute value must be a list of coordinates. By default, coordinates are defined
-  using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
-  with latitude and longitude units of decimal degrees. Such coordinate list allow to encode
-  the geometry specified by the `type` attribute and are encoded according to the specific
-  rules defined below:
-
-  * Type `geo:point`:   the attribute value must contain a string containing a
-    valid latitude-longitude pair, separated by comma.
-  * Type `geo:line`:    the attribute value must contain a string array of
-    valid latitude-longitude pairs. There must be at least two pairs.
-  * Type `geo:polygon`: the attribute value must contain a string array
-    of valid latitude-longitude pairs.
-    There must be at least four pairs, with the last being identical to the first
-    (so a polygon has a minimum of three actual points).
-    Coordinate pairs should be properly ordered so that the line segments
-    that compose the polygon remain on the outer edge of the defined area.
-    For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
-    polygon definition. 
-    Orion should raise an error when none of the former conditions are met by input data.
-  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of
-    a map or a rough area of interest. A box is represented by a two-length string array of
-    latitude-longitude pairs.
-    The first pair is the lower corner, the second is the upper corner.
-
-Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
-describes different shortcomings for implementations. 
-
-The examples below illustrate the referred syntax:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
-
-### GeoJSON
-
-A context attribute representing a location encoded using GeoJSON must conform to the following
-syntax:
-
-* The NGSI type of the attribute must be `geo:json`.
-* The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes before
-  latitude in GeoJSON coordinates.
-
-The example below illustrates the usage of GeoJSON.
-More GeoJSON examples can be found in [GeoJSON IETF Spec](https://tools.ietf.org/html/draft-butler-geojson-06#page-14).
-Additionally, the following
-[GeoJSON Tutorial](http://www.macwright.org/2015/03/23/geojson-second-bite.html)
-might be useful in understanding the format. 
-
-```
-{
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [2.186447514, 41.3763726]
-    },
-    "type": "geo:json"
-  }
-}
-```
-
-Current implementation (based in the [MongoDB capabilities](https://www.mongodb.com/docs/manual/reference/geojson/)) introduces some limitations in the usage of GeoJSON representations, supporting only the following types:
-
-* Point
-* MultiPoint
-* LineString
-* MultiLineString
-* Polygon
-* MultiPolygon
-
-More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
-
-The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
-use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
-the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
-
-* the `geometry` field, in the case of `Feature`
-* the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
-
-Note that actually Orion stores the full value used at `Feature` or `FeatureCollection`
-creation/updating time. However, from the point of view of normalization with other `geo:json` types,
-it has been decided to return only the `geometry` part. In the future, maybe a flag to return
-the full content would be implemented (more detail [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4125)).
-Another alternative to disable the special processing of `Feature` or `FeatureCollection` is to use
-[`ignoreType` metadata](#ignoretype-metadata) but in that case also entity location will be ignored.
-
-With regards to `FeatureCollection`, it is only accepted at creation/update time only if it contains a single 
-`Feature` (i.e. the `features` field has only one element). Otherwise , Orion would return an `BadRequest`error.
-
-The only GeoJSON type not supported at all is `GeometryCollection`. You will get a "Database Error"
-if you try to use them.
-
-## Simple Query Language
-
-The Simple Query Language provides a simplified syntax to retrieve entities which match a set of
-conditions.
-A query is composed by a list of statements separated by the ';' character.
-Each statement expresses a matching condition.
-The query returns all the entities that match all the matching conditions (AND logical operator). 
-
-There are two kinds of statements: *unary statements* and *binary statements*.
-
-Binary statements are composed by an attribute path (e.g. `temperature` or `brand.name`), an operator
-and a value (whose format depends on the operator), e.g.:
-
-```
-temperature==50
-temperature<=20
-```
-
-The syntax of an attribute path consists of a list of tokens separated by the `.` character. This list of tokens
-addresses a JSON property name, in accordance with the following rules:
-
-* The first token is the name of an NGSI attribute (*target NGSI attribute*) of an entity.
-* If filtering by attribute value (i.e. the expression is used in a `q` query), the rest of tokens (if present)
-  represent the path to a sub-property of the *target NGSI attribute value* (which should be a JSON object).
-  Such sub-property is defined as the *target property*.
-* If filtering by metadata (i.e. the expression is used in a `mq` query), the second token represents a metadata
-  name associated to the target NGSI attribute, *target metadata*, and the rest of tokens
-  (if present) represent the path to a sub-property of the *target metadata value* (which should be a
-  JSON object). Such sub-property is defined as the *target property*.
-
-The *target property value* is defined as the value of the JSON property addressed by the list of tokens described
-above i.e. the value of the *target property*.
-
-In case only one token is provided (two in case of filtering by metadata), then the *target property* will
-be the *target NGSI attribute* itself (or the *target metadata* in case of filtering by metadata) and the
-*target property value* will be the *target NGSI attribute* value (or the *target metadata* value in case
-of filtering by metadata). The value of the *target NGSI attribute* (or the *target metadata*
-in case of filtering by metadata) should not be a JSON object in this case.
-
-In case some of the tokens include `.`, you can use single quote (`'`) as separator. For example, the following
-attribute path `'a.b'.w.'x.y'` is composed by three tokens: the first token is `a.b`, the second token is `w` and
-the third token is `x.y`.
-
-The list of operators (and the format of the values they use) is as follows:
-
-+ **Equal**: `==`. This operator accepts the following types of right-hand side:
-    + Single element, e.g. `temperature==40`. For an entity to match, it must contain the *target
-      property* (temperature) and the *target property value* must be the query value (40)
-      (or include the value, in case the *target property value* is an array).
-    + A list of comma-separated values, e.g. `color==black,red`. For an entity to match, it must
-      contain the *target property* and the *target property value* must be **any** of the values
-      in the list (OR clause) (or include **any** of the values in the list in case the *target
-      property value* is an array).
-      E.g. entities with an attribute named `color`, whose value is `black` are a match, while
-      entities with an attribute named `color` but whose value is `white` do not match.
-    + A range, specified as a minimum and a maximum, separated by `..`, e.g. `temperature==10..20`.
-      For an entity to match, it must contain the *target property* (temperature),
-      and the *target property value* must be between the upper and lower limits
-      of the range (both included). Ranges can only be used with *target properties* that represent
-      dates (in ISO8601 format), numbers or strings.
-+ **Unequal**: `!=`. This operator accepts the following types of right-hand side:
-    + Single element, e.g. `temperature!=41`. For an entity to match, it must contain the *target
-      property* (temperature) and the *target property value* must **not** be the query value (41).
-    + A list of comma-separated values, e.g. `color!=black,red`. For an entity to match, it must
-      contain the *target property* and the *target property value* must **not** be any of the values
-      in the list (AND clause) (or not include **any** of the values in the list in case the *target
-      property value* is an array).
-      E.g. entities whose attribute `color` is set to `black` will not match, while entities whose
-      attribute `color` is set to `white` will match.
-    + A range, specified as a minimum and maximum separated by `..`, e.g. `temperature!=10..20`.
-      For an entity to match, it must contain the *target property* (temperature) and the
-      *target property value* must **not** be between the upper and lower limits
-      (both included). Ranges can only be used with elements *target properties* that represent dates
-      (in ISO8601 format), numbers or strings.
-+ **Greater than**: `>`. The right-hand side must be a single element, e.g. `temperature>42`.
-    For an entity to match, it must contain the *target property* (temperature)
-    and the *target property value* must be strictly greater than the query value (42).
-    This operation is only valid for *target properties* of type date, number or string (used with
-    *target properties* of other types may lead to unpredictable results).
-+ **Less than**: `<`. The right-hand side must be a single element, e.g. `temperature<43`.
-    For an entity to match, it must contain the *target property* (temperature)
-    and the *target property value* must be strictly less than the value (43).
-    This operation is only valid for *target properties* of type date, number or string (used with
-    *target properties* of other types may lead to unpredictable results).
-+ **Greater or equal than**: `>=`. The right-hand side must be a single element, e.g. `temperature>=44`.
-    For an entity to match, it must contain the *target property* (temperature)
-    and the *target property value* must be greater than or equal to that value (44).
-    This operation is only valid for *target properties* of type date, number or string (used with
-    *target properties* of other types may lead to unpredictable results).
-+ **Less or equal than**: `<=`. The right-hand side must be a single element, e.g. `temperature<=45`.
-    For an entity to match, it must contain the *target property* (temperature)
-    and the *target property value* must be less than or equal to that value (45).
-    This operation is only valid for *target properties* of type date, number or string (used with
-    *target properties* of other types may lead to unpredictable results).
-+ **Match pattern**: `~=`. The value matches a given pattern, expressed as a regular expression, e.g.
-    `color~=ow`. For an entity to match, it must contain the *target property* (color)
-    and the *target property value* must match the string in the right-hand side,
-    'ow' in this example (`brown` and `yellow` would match, `black` and `white` would not).
-    This operation is only valid for *target properties* of type string.
-
-The symbol `:` can be used instead of `==`.
-
-In case of equal or unequal, if the string to match includes a `,`, you can use single quote
-(`'`) to disable the special meaning of the comma, e.g.: `color=='light,green','deep,blue'`.
-The first example would match a color with the exact value 'light,green' OR 'deep,blue'. The
-simple quote syntax can be also used to force string interpretation in filters, e.g.
-`q=title=='20'` will match string "20" but not number 20.
-
-Unary negatory statements use the unary operator `!`, while affirmative unary statements use no
-operator at all.
-The unary statements are used to check for the existence of the *target property*.
-E.g. `temperature` matches entities that have an attribute called 'temperature' (no matter its
-value), while `!temperature` matches entities that do not have an attribute called 'temperature'.
- 
-## Geographical Queries
-
-Geographical queries are specified using the following parameters:
-
-``georel`` is intended to specify a spatial relationship (a predicate)
-between matching entities and a reference shape (`geometry`).
-It is composed of a token list separated by ';'.
-The first token is the relationship name, the rest of the tokens (if any) are modifiers which
-provide more information about the relationship. The following values are recognized:
-
-+ `georel=near`. The ``near`` relationship means that matching entities must be located at a certain
-  threshold distance to the reference geometry. It supports the following modifiers:
-  + `maxDistance`.  Expresses, in meters, the maximum distance at which matching entities must be
-    located.
-  + `minDistance`.  Expresses, in meters, the minimum distance at which matching entities must be
-    located.
-+ `georel=coveredBy`. Denotes that matching entities are those that exist entirely within the
-  reference geometry.
-  When resolving a query of this type, the border of the shape must be considered to be part of the
-  shape. 
-+ `georel=intersects`. Denotes that matching entities are those intersecting with the reference
-  geometry.
-+ `georel=equals`. The geometry associated to the position of matching entities and the reference
-  geometry must be exactly the same.
-+ `georel=disjoint`. Denotes that matching entities are those **not** intersecting with the
-  reference geometry. 
-
-`geometry` allows to define the reference shape to be used when resolving the query.
- The following geometries (see [Simple Location Format](#simple-location-format)) must be supported:
-
-+ `geometry=point`, defines a point on the Earth surface.
-+ `geometry=line`, defines a polygonal line.
-+ `geometry=polygon`, defines a polygon.
-+ `geometry=box`, defines a bounding box.
-
-**coords** must be a string containing a semicolon-separated list of pairs of geographical
-coordinates in accordance with the geometry specified and the rules mandated by the Simple Location
-Format:
-
-* `geometry=point`.   `coords` contains a pair of WGS-84 geo-coordinates.
-* `geometry=line`.    `coords` contains a list of pairs of WGS-84 geo-coordinates.
-* `geometry=polygon`. `coords` is composed by at least four pairs of WGS-84 geo-coordinates.
-* `geometry=box`.     `coords` is composed by two pairs of WGS-84 geo-coordinates.
-
-Examples:
-
-`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`.
-Matching entities must be located (at most) 1000 meters from the reference point.
-
-`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`.
-Matching entities must be (at least) 5000 meters from the reference point. 
-
-`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
-Matching entities are those located within the referred polygon.
-
-### Query Resolution
-
-If Orion is not able to resolve a geographical query, the HTTP Status code of the
-response must be ```422```, *Unprocessable Entity*. The error name, present in the error payload,
-must be ``NotSupportedQuery``. 
-
-When resolving geographical queries, through the Simple Query Language,
-the API implementation is responsible for determining which entity attribute
-contains the geographical location to be used for matching purposes.
-To this aim, the following rules must be followed:
-
-* If an entity has no attribute corresponding to a location (encoded as GeoJSON or the
-  Simple Location Format), then such an entity has not declared any geospatial property and will not
-  match any geographical query.
-
-* If an entity only exposes one attribute corresponding to a location, then such an attribute will
-  be used when resolving geographical queries.
-
-* If an entity exposes more than one location, then the attribute containing a metadata property
-  named ``defaultLocation``, with boolean value ``true`` will be taken as the reference location
-  used for resolving geographical queries. 
-
-* If there is more than one attribute exposing location but none of them is labeled as default
-location, then the query will be declared ambiguous and an HTTP error response with a ``409`` code
-must be sent.
-
-* If there is more than one attribute exposing location labeled as *default location*, then the
-  query is declared ambiguous and an HTTP error response with a ``409`` code must be sent. 
-
 ## Filtering out attributes and metadata
 
 The `attrs` URL parameter (or field in POST /v2/op/query) can be used in retrieve operations
@@ -1718,501 +1779,6 @@ Note `overrideMetadata` option is ignored in the update attribute value operatio
 (e.g. `PUT /v2/entities/E/attrs/temperature/value`) as in that case the operation
 semantics makes explicit that only the value is going to be updated
 (leaving `type` and `metadata` attribute fields untouched).
-
-## Oneshot Subscription
-
-Oneshot subscription provides an option to subscribe an entity only for one time notification. When consumer creates a subscription 
-with status `oneshot`, a subscription is created as similar to the [normal subscription](user/walkthrough_apiv2.md#subscriptions) request with a slight difference.
-
-In the normal case, the consumer gets initial and continuous notifications whenever the entity is updated until subscription is removed or its status passes to inactive after a subscription update.
-
-While, in the case of oneshot subscription, the consumer gets notified only one time whenever the entity is updated after creating 
-the subscription. Once a notification is triggered, the subscription transitions to `status`: `inactive`. Once in this status, 
-the consumer may update it with `oneshot`∫ to repeat the same behavior (i.e. to get the one time notification again). 
-
-![](oneshot_subscription.png "oneshot_subscription.png")
-
-* Assuming an entity with id Room1 and type Room already exists in the database. 
-
-Context Consumer can create a subscription for that entity with status “oneshot” as below:
-
-```
-curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
-{
-  "description": "A subscription to get info about Room1",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room1",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:1028/accumulate"
-    },
-    "attrs": [
-      "temperature"
-    ]
-  },
-  "status" : "oneshot"
-}
-EOF
-```
-
-As the value of pressure attribute is updated, context consumer will get the notification for temperature attribute and status 
-of this subscription will automatically be turned to inactive and no further notification will be triggered until the consumer 
-updates it again to "oneshot" in below manner:
-
-```
-curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
-    -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
-{
-  "status": "oneshot"
-}
-EOF
-```
-Once the status is updated to "oneshot" again, the consumer will again get the notification one time whenever the entity will be updated and the subscription status will again be changed to `inactive` automatically.
-
-## Covered subscriptions
-
-The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
-notification when subscription is triggered. By default Orion only notifies attributes that exist
-in the entity. For instance, if subscription is this way:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ]
-}
-```
-
-but the entity only has `temperature` and `humidity` attributes, then `brightness` attribute is not included
-in notifications.
-
-This default behaviour can be changed using the `covered` field set to `true` this way:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ],
-  "covered": true
-}
-```
-
-in which case all attributes are included in the notification, no matter if they exist or not in the
-entity. For these attributes that don't exist (`brightness` in this example) the `null`
-value (of type `"None"`) is used.
-
-In the case of custom notifications, if `covered` is set to `true` then `null` will be use to replace `${...}`
-for non existing attributes (the default behavior when `covered` is not set to `true` is to replace by the
-empty string the non existing attributes).
-
-We use the term "covered" in the sense the notification "covers" completely all the attributes
-in the `notification.attrs` field. It can be useful for those notification endpoints that are
-not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
-in every received notification.
-
-Note that covered subscriptions need an explicit list of `attrs` in `notification`. Thus, the following
-case is not valid:
-
-```
-"notification": {
-  ...
-  "attrs": [],
-  "covered": true
-}
-```
-
-And if you try to create/update a subscription with that you will get a 400 Bad Request error like this:
-
-```
-{
-    "description": "covered true cannot be used if notification attributes list is empty",
-    "error": "BadRequest"
-}
-```
-
-## Notification Messages
-
-Notifications include two fields:
-
-* `subscriptionId` represents the concerned subscription that originates the notification
-* `data` is an array with the notification data itself which includes the entity and all concerned
-  attributes. Each element in the array corresponds to a different entity. By default, the entities
-  are represented in `normalized` mode. However, using the `attrsFormat` modifier, a simplified
-  representation mode can be requested.
-
-If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation
-is used:
-
-```
-{
-  "subscriptionId": "12345",
-  "data": [
-    {
-      "id": "Room1",
-      "type": "Room",
-      "temperature": {
-        "value": 23,
-        "type": "Number",
-        "metadata": {}
-      },
-      "humidity": {
-        "value": 70,
-        "type": "percentage",
-        "metadata": {}
-      }
-    },
-    {
-      "id": "Room2",
-      "type": "Room",
-      "temperature": {
-        "value": 24,
-        "type": "Number",
-        "metadata": {}
-      }
-    }
-  ]
-}
-```
-
-If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
-
-```json
-{
-  "subscriptionId": "12345",
-  "data": [
-    {
-      "id": "Room1",
-      "type": "Room",
-      "temperature": 23,
-      "humidity": 70
-    },
-    {
-      "id": "Room2",
-      "type": "Room",
-      "temperature": 24
-    }
-  ]
-}
-```
-
-
-If `attrsFormat` is `values` then values partial entity representation mode is used:
-
-```json
-{
-  "subscriptionId": "12345",
-  "data": [ [23, 70], [24] ]
-}
-```
-
-If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users 
-can benefit from the enhancements of Orion subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
-
-Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
-
-```json
-{
-	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
-	"originator": "localhost",
-	"contextResponses": [{
-		"contextElement": {
-			"type": "Car",
-			"isPattern": "false",
-			"id": "Car1",
-			"attributes": [{
-				"name": "temperature",
-				"type": "centigrade",
-				"value": "26.5",
-				"metadatas": [{
-					"name": "TimeInstant",
-					"type": "recvTime",
-					"value": "2015-12-12 11:11:11.123"
-				}]
-			}]
-		},
-		"statusCode": {
-			"code": "200",
-			"reasonPhrase": "OK"
-		}
-	}]
-}
-```
-
-Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`) 
-HTTP header with the value of the format of the associated subscription, so that notification receivers 
-are aware of the format without needing to process the notification payload.
-
-## Notification triggering
-
-Based on the [`condition` subscription field](#subscriptionsubjectcondition), upon
-entity update, the notification triggering rules are as follow:
-
-* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes and at the same time `expression` matches.
-* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
-  attributes in the `attrs` list changes.
-* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
-  attributes of the entity changes and at the same time `expression` matches.
-* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
-  attributes of the entity changes.
-
-Note that changing the metadata of a given attribute is considered a change even though the attribute
-value itself hasn't changed.
-
-## Custom Notifications
-
-Clients can customize notification messages using a simple template mechanism when
-`notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
-depends on the protocol type.
-
-In case of `httpCustom`:
-
-* `url`
-* `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
-  `Ngsiv2-AttrsFormat` headers cannot be overwritten in custom notifications. Any attempt of 
-  doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
-* `qs` (both parameter name and value can be templatized)
-* `payload`
-* `method`, lets the clients select the HTTP method to be used for delivering
-the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
-HEAD, OPTIONS, TRACE, and CONNECT.
-
-In case of `mqttCustom`:
-
-* `payload`
-* `topic`
-
-Macro substitution for templates is based on the syntax `${..}`. In particular:
-
-* `${id}` is replaced by the `id` of the entity
-* `${type}` is replaced by the `type` of the entity 
-* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
-  update request triggering the subscription.
-* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
-  update request triggering the subscription.
-* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
-  update request triggering the subscription.
-* Any other `${token}` is replaced by the value of the attribute whose name is `token` or with
-  an empty string if the attribute is not included in the notification. If the value is a number,
-  a bool or null then its string representation is used. If the value is a JSON array or object
-  then its JSON representation as string is used.
-
-In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or 
-`${authToken}`  (e.g. an attribute which name is `service`) then the attribute value takes precedence.
-
-Example:
-
-Let's consider the following `notification.httpCustom` object in a given subscription.
-
-```
-"httpCustom": {
-  "url": "http://foo.com/entity/${id}",
-  "headers": {
-    "Content-Type": "text/plain"
-  },
-  "method": "PUT",
-  "qs": {
-    "type": "${type}"
-  },
-  "payload": "The temperature is ${temperature} degrees"
-}
-```
-
-Now let's assume that a notification associated to this subscription is triggered, and that the
-notification data is for an entity with id "DC_S1-D41" and type "Room", and including an attribute
-named "temperature" with the value 23.4.
-The resulting notification after applying the template would be:
-
-```
-PUT http://foo.com/entity/DC_S1-D41?type=Room
-Content-Type: text/plain
-Content-Length: 31
-
-The temperature is 23.4 degrees
-```
-
-If `payload` is set to `null`, then the notifications associated to that subscription will not 
-include any payload (i.e. content-length 0 notifications). Note this is not the same than using 
-`payload` set to `""` or omitting the field. In that case, the notification will be sent using 
-the NGSIv2 normalized format.
-
-As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
-used to generate JSON-based payloads. For instance:
-
-```
-"httpCustom": {
-   ...
-   "json": {
-     "t": "${temperature}",
-     "h": [ "${humidityMin}", "${humidityMax}" ],
-     "v": 4
-   }
-}
-```
-
-Some notes to take into account when using `json` instead of `payload`:
-
-* The value of the `json` field must be an array or object. Although a simple string or number is
-  also a valid JSON, these cases are not supported.
-* The macro replacement logic works the same way than in `payload` case, with the following
-  considerations:
-  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
-  * The value of the JSON object or JSON array item in which the macro is used has to match
-    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
-    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
-    will not work
-  * It takes into account the nature of the attribute value to be replaced. For instance,
-    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
-    `"t": "10"` if `temperature` attribute is a string.
-  * If the attribute doesn't exist in the entity, then `null` value is used
-* URL automatic decoding applied to `payload` and `headers` fields (described
-  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)) 
-  is not applied to `json` field.
-* `payload` and `json` cannot be used at the same time
-* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
-
-Some considerations to take into account when using custom notifications:
-
-* It is the client's responsibility to ensure that after substitution, the notification is a
-  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
-  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
-  template is malformed, then no notification is sent.
-* In case the data to notify contains more than one entity, a separate notification (HTTP message)
-  is sent for each of the entities (contrary to default behaviour, which is to send all entities in
-  the same HTTP message).
-* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in 
-  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
-* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
-  [CLI parameter](../admin/cli.md). In this case:
-  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
-  * No `${...}` macro substitution is performed.
-
-Note that if a custom payload is used for the notification (the field `payload` is given in the
-corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
-in the notification.
-
-An empty string value for a header key in the `headers` object will remove that header from 
-notifications. For instance the following configuration:
-
-```
-"httpCustom": { 
-   ...
-   "headers": {"x-auth-token": ""}
-}
-```
-
-will remove the `x-auth-token` header in notifications associated to the subscription.
-
-This can be useful to remove headers that Orion will include automatically in notifications.
-For instance:
-
-* To avoid headers included by default in notifications (e.g. `Accept`)
-* To cut the propagation of headers (from updates to notifications), such the
-  aforementioned `x-auth-token`
-
-### Custom payload and headers special treatment
-
-[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in the API operations, such as
-`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
-in `httpCustom.headers`.
-
-However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
-of `httpCustom.headers` are decoded.
-
-Example:
-
-Let's consider the following `notification.httpCustom` object in a given subscription.
-
-```
-"httpCustom": {
-  "url": "http://foo.com/entity/${id}",
-  "headers": {
-    "Content-Type": "text/plain",
-    "Authorization": "Basic ABC...ABC%3D%3D"
-  },
-  "method": "PUT",
-  "qs": {
-    "type": "${type}"
-  },
-  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
-}
-```
-
-Note that the above payload value is the URL encoded version of this string:
-`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
-`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
-
-Now, let's consider that Orion triggers a notification associated to this subscription.
-Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
-`temperature` with value 23.4. The resulting notification after applying the template would be:
-
-```
-PUT http://foo.com/entity/DC_S1-D41?type=Room
-Authorization: "Basic ABC...ABC=="
-Content-Type: application/json 
-Content-Length: 65
-
-the value of the "temperature" attribute (of type Number) is 23.4
-```
-
-## Subscriptions based in alteration type
-
-By default, a subscription is triggered (i.e. the notification associated to it is sent) when
-the triggered condition (expressed in the `subject` and `conditions` fields of the subscription, e.g.
-covered entities, list of attributes to check, filter expression, etc.) during a create or actual
-update entity operation.
-
-However, this default behavior can be changed so a notification can be sent, for instance,
-only when an entity is created or only when an entity is deleted, but not when the entity is
-updated.
-
-In particular, the `alterationTypes` field is used, as sub-field of `conditions`. The value
-of this field is an array which elements specify a list of alteration types upon which the
-subscription is triggered. At the present moment, the following alteration types are supported:
-
-* `entityUpdate`: notification is sent whenever a entity covered by the subscription is updated
-  (no matter if the entity actually changed or not)
-* `entityChange`: notification is sent whenever a entity covered by the subscription is updated
-  and it actually changes (or if it is not an actual update, but `forcedUpdate` option is used 
-  in the update request)
-* `entityCreate`: notification is sent whenever a entity covered by the subscription is created
-* `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted
-
-For instance:
-
-```
-  "conditions": {
-    "alterationTypes": [ "entityCreate", "entityDelete" ],
-    ...
-  }
-```
-
-will trigger subscription when an entity creation or deletion takes place, but not when an
-update takes place. The elements in the `alterationTypes` array are interpreted in OR sense.
-
-Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
-is `["entityCreate", "entityChange"]`.
-
-The particular alteration type can be got in notifications using the
-[`alterationType` builtin attribute](#builtin-attributes).
 
 ## Transient Entities
 
@@ -2350,164 +1916,597 @@ entity, with the behaviour described in previous section. Please, **take this in
 you were implementing client-side expiration based on the value of that attribute, as your entities could
 be automatically deleted in an unwanted way**.
 
-## Multi tenancy
+## Notification Triggering
 
-Orion implements a simple multitenant/multiservice
-model based and logical database separation, to ease service/tenant
-based authorization policies provided by other FIWARE components or
-third party software, e.g. the ones in the FIWARE security framework
-(PEP proxy, IDM and Access Control). This functionality is activated
-when the `-multiservice` [command line option](admin/cli.md) is used. When
-`-multiservice` is used, Orion uses the `Fiware-Service` HTTP header in
-the request to identify the service/tenant. If the header is not present
-in the HTTP request, the default service/tenant is used.
+Based on the [`condition` subscription field](#subscriptionsubjectcondition), upon
+entity update, the notification triggering rules are as follow:
 
-Multitenant/multiservice ensures that the
-entities/attributes/subscriptions of one service/tenant are *"invisible"*
-to other services/tentants. For example, `GET /v2/entities` on tenantA space
-will never return entities from tenantB space. This isolation
-is based on database separation, which [details are described in the
-Installation and Administration
-manual](admin/database_admin.md#multiservicemultitenant-database-separation).
+* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
+  the `attrs` list changes and at the same time `expression` matches.
+* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
+  attributes in the `attrs` list changes.
+* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
+  attributes of the entity changes and at the same time `expression` matches.
+* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
+  attributes of the entity changes.
 
-In addition, note that when `-multiservice` is used Orion includes the
-`Fiware-Service` header in the notifyContextRequest request messages associated to subscriptions
-in the given tenant/service (except for the default service/tenant, in
-which case the header is not present), e.g.:
+Note that changing the metadata of a given attribute is considered a change even though the attribute
+value itself hasn't changed.
+
+## Notification Messages
+
+Notifications include two fields:
+
+* `subscriptionId` represents the concerned subscription that originates the notification
+* `data` is an array with the notification data itself which includes the entity and all concerned
+  attributes. Each element in the array corresponds to a different entity. By default, the entities
+  are represented in `normalized` mode. However, using the `attrsFormat` modifier, a simplified
+  representation mode can be requested.
+
+If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation
+is used:
 
 ```
-POST http://127.0.0.1:9977/notify
-Content-Length: 725
-User-Agent: orion/0.13.0
-Host: 127.0.0.1:9977
-Accept: application/json
-Fiware-Service: t_02
-Content-Type: application/json
-
 {
-...
+  "subscriptionId": "12345",
+  "data": [
+    {
+      "id": "Room1",
+      "type": "Room",
+      "temperature": {
+        "value": 23,
+        "type": "Number",
+        "metadata": {}
+      },
+      "humidity": {
+        "value": 70,
+        "type": "percentage",
+        "metadata": {}
+      }
+    },
+    {
+      "id": "Room2",
+      "type": "Room",
+      "temperature": {
+        "value": 24,
+        "type": "Number",
+        "metadata": {}
+      }
+    }
+  ]
 }
 ```
 
-Regarding service/tenant name syntax, it must be a string of
-alphanumeric characters (and the `\` symbol). Maximum length is 50
-characters,
-which should be enough for most use cases. Orion Context Broker
-interprets the tenant name in lowercase, thus, although you can use
-tenants such as in update `MyService` it is not advisable, as the
-notifications related with that tenant will be sent with `myservice`
-and, in that sense, it is not coherent the tenant you used in
-update requests compared with the one that Orion sends in
-notifications.
+If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
 
-## Service path
-
-### Entity service path
-
-Orion supports hierarchical scopes, so entities can be
-assigned to a scope [at creation time](user/walkthrough_apiv2.md#entity-creation).
-Then, [query](user/walkthrough_apiv2.md#query-entity) and [subscription](user/walkthrough_apiv2.md#subscriptions)
-can be also scoped to locate entities in the corresponding scopes.
-
-For example, consider an Orion-based application using the following
-scopes (shown in the figure):
-
--   `Madrid`, as first level scope
--   `Gardens` and `Districts`, as second-level scope (children of Madrid)
--   `ParqueNorte`, `ParqueOeste` and `ParqueSur` (children of Gardens) and
-    `Fuencarral` and `Latina` (children of Districts)
--   `Parterre1` and `Parterre2` (children of ParqueNorte)
-
-![](ServicePathExample.png "ServicePathExample.png")
-
-The scope to use is specified using the `Fiware-ServicePath` HTTP header 
-in update/query request. For example, to create the entity `Tree1` of type
-`Tree` in `Parterre1` the following Fiware-ServicePath will be used:
-
-```
-    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
+```json
+{
+  "subscriptionId": "12345",
+  "data": [
+    {
+      "id": "Room1",
+      "type": "Room",
+      "temperature": 23,
+      "humidity": 70
+    },
+    {
+      "id": "Room2",
+      "type": "Room",
+      "temperature": 24
+    }
+  ]
+}
 ```
 
-In order to search for `Tree1` in that scope, the same
-Fiware-ServicePath will be used.
 
-Scopes are hierarchical and hierarchical search can be done. In order to
-do that the `\#` special keyword is used. Thus, a query with
-pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
-will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
+If `attrsFormat` is `values` then values partial entity representation mode is used:
 
-Finally, you can query for disjoint scopes, using a comma-separated list
-in the `Fiware-ServicePath` header. For example, to get all trees in both
-`ParqueNorte` and `ParqueOeste` (but not `ParqueSur`) the following
-`Fiware-ServicePath` would be used in query request:
-
-```
-    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte, /Madrid/Gardens/ParqueOeste
+```json
+{
+  "subscriptionId": "12345",
+  "data": [ [23, 70], [24] ]
+}
 ```
 
-Some additional remarks:
+If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users
+can benefit from the enhancements of Orion subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
 
--   Limitations:
-    -   Scope must start with `/` (only "absolute" scopes are allowed)
-    -   10 maximum scope levels in a path
-    -   50 maximum characters in each level (1 char is minimum),
-        only alphanum and underscore allowed
-    -   10 maximum disjoint scope paths in a comma-separated list in
-        query `Fiware-ServicePath` header (no more than 1 scope path in
-        update `Fiware-ServicePath` header)
-    -   Trailing slashes are discarded
+Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
 
--   `Fiware-ServicePath` is an optional header. It is assumed that all the
-    entities created without `Fiware-ServicePath` (or that don't include
-    service path information in the database) belongs to a root scope
-    `/` implicitely. All the queries without using `Fiware-ServicePath`
-    (including subscriptions) are on `\#` implicitly. This behavior
-    ensures backward compatibility to pre-0.14.0 versions.
+```json
+{
+	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
+	"originator": "localhost",
+	"contextResponses": [{
+		"contextElement": {
+			"type": "Car",
+			"isPattern": "false",
+			"id": "Car1",
+			"attributes": [{
+				"name": "temperature",
+				"type": "centigrade",
+				"value": "26.5",
+				"metadatas": [{
+					"name": "TimeInstant",
+					"type": "recvTime",
+					"value": "2015-12-12 11:11:11.123"
+				}]
+			}]
+		},
+		"statusCode": {
+			"code": "200",
+			"reasonPhrase": "OK"
+		}
+	}]
+}
+```
 
--   It is possible to have an entity with the same ID and type in
-    different Scopes. E.g. we can create entity ID `Tree1` of type
-    `Tree` in `/Madrid/Gardens/ParqueNorte/Parterre1` and another entity
-    with ID `Tree1` of type `Tree` in `Madrid/Gardens/ParqueOeste` without
-    getting any error. However, query can be weird in this
-    scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
-    will returns two entities with the same ID and type in the
-    query respose, making hard to distinguish to which scope
-    belongs each one)
+Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`)
+HTTP header with the value of the format of the associated subscription, so that notification receivers
+are aware of the format without needing to process the notification payload.
 
--   Entities belongs to one (and only one) scope.
+## Custom Notifications
 
--   `Fiware-ServicePath` header is included in notification requests sent by Orion.
+Clients can customize notification messages using a simple template mechanism when
+`notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
+depends on the protocol type.
 
--   The scopes entities can be combined orthogonally with the
-    [multi-tenancy functionality](#multi-tenancy). In that case,
-    each `scope tree` lives in a different service/tenant and they can
-    use even the same names with complete database-based isolation. See
-    figure below.
+In case of `httpCustom`:
 
-![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
+* `url`
+* `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
+  `Ngsiv2-AttrsFormat` headers cannot be overwritten in custom notifications. Any attempt of
+  doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
+* `qs` (both parameter name and value can be templatized)
+* `payload`
+* `method`, lets the clients select the HTTP method to be used for delivering
+the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
+HEAD, OPTIONS, TRACE, and CONNECT.
 
--   Current version doesn’t allow to change the scope to which an entity
-    belongs through the API (a workaround is to modify the
-    `_id.servicePath` field in the [entities collection](admin/database_model.md#entities-collection) directly).
+In case of `mqttCustom`:
 
-### Service path in subscriptions and registrations
+* `payload`
+* `topic`
 
-While entities belong to services *and* service paths, subscriptions and registrations
-belong *only* to the service. The servicepath in subscriptions and registrations
-doesn't denote sense of belonging, but is the expression of the query associated
-to the subscription or registration.
+Macro substitution for templates is based on the syntax `${..}`. In particular:
 
-Taking this into consideration, the following rules apply:
+* `${id}` is replaced by the `id` of the entity
+* `${type}` is replaced by the `type` of the entity
+* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
+  update request triggering the subscription.
+* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
+  update request triggering the subscription.
+* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
+  update request triggering the subscription.
+* Any other `${token}` is replaced by the value of the attribute whose name is `token` or with
+  an empty string if the attribute is not included in the notification. If the value is a number,
+  a bool or null then its string representation is used. If the value is a JSON array or object
+  then its JSON representation as string is used.
 
-* `Fiware-ServicePath` header is ignored in `GET /v2/subscriptions/{id}` and
-  `GET /v2/registrations/{id}` operations, as the id fully qualifies the subscription or registration
-  to retrieve.
-* `Fiware-ServicePath` header is taken into account in `GET /v2/subscriptions` and `GET /v2/registrations`
-  in order to narrow down the results to subscriptions/registrations that use *exactly*
-  that service path as query.
-* At the present moment hierarchical service paths (i.e. the ones using ending with `#`) are not allowed
-  in registrations. We have [an issue about it at Github](https://github.com/telefonicaid/fiware-orion/issues/3078) and 
-  the limitation could be eventually solved.
+In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or
+`${authToken}`  (e.g. an attribute which name is `service`) then the attribute value takes precedence.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "The temperature is ${temperature} degrees"
+}
+```
+
+Now let's assume that a notification associated to this subscription is triggered, and that the
+notification data is for an entity with id "DC_S1-D41" and type "Room", and including an attribute
+named "temperature" with the value 23.4.
+The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Content-Type: text/plain
+Content-Length: 31
+
+The temperature is 23.4 degrees
+```
+
+If `payload` is set to `null`, then the notifications associated to that subscription will not
+include any payload (i.e. content-length 0 notifications). Note this is not the same than using
+`payload` set to `""` or omitting the field. In that case, the notification will be sent using
+the NGSIv2 normalized format.
+
+As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
+used to generate JSON-based payloads. For instance:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+Some notes to take into account when using `json` instead of `payload`:
+
+* The value of the `json` field must be an array or object. Although a simple string or number is
+  also a valid JSON, these cases are not supported.
+* The macro replacement logic works the same way than in `payload` case, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * The value of the JSON object or JSON array item in which the macro is used has to match
+    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
+    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
+    will not work
+  * It takes into account the nature of the attribute value to be replaced. For instance,
+    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
+    `"t": "10"` if `temperature` attribute is a string.
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* URL automatic decoding applied to `payload` and `headers` fields (described
+  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment))
+  is not applied to `json` field.
+* `payload` and `json` cannot be used at the same time
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+Some considerations to take into account when using custom notifications:
+
+* It is the client's responsibility to ensure that after substitution, the notification is a
+  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
+  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
+  template is malformed, then no notification is sent.
+* In case the data to notify contains more than one entity, a separate notification (HTTP message)
+  is sent for each of the entities (contrary to default behaviour, which is to send all entities in
+  the same HTTP message).
+* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
+  custom notifications. This is described in detail in
+  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
+* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
+  [CLI parameter](../admin/cli.md). In this case:
+  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
+  * No `${...}` macro substitution is performed.
+
+Note that if a custom payload is used for the notification (the field `payload` is given in the
+corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
+in the notification.
+
+An empty string value for a header key in the `headers` object will remove that header from
+notifications. For instance the following configuration:
+
+```
+"httpCustom": {
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+will remove the `x-auth-token` header in notifications associated to the subscription.
+
+This can be useful to remove headers that Orion will include automatically in notifications.
+For instance:
+
+* To avoid headers included by default in notifications (e.g. `Accept`)
+* To cut the propagation of headers (from updates to notifications), such the
+  aforementioned `x-auth-token`
+
+### Custom payload and headers special treatment
+
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in the API operations, such as
+`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
+in `httpCustom.headers`.
+
+However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
+of `httpCustom.headers` are decoded.
+
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Content-Type": "text/plain",
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+Note that the above payload value is the URL encoded version of this string:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
+`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+
+Now, let's consider that Orion triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json
+Content-Length: 65
+
+the value of the "temperature" attribute (of type Number) is 23.4
+```
+
+## Oneshot Subscriptions
+
+Oneshot subscription provides an option to subscribe an entity only for one time notification. When consumer creates a subscription
+with status `oneshot`, a subscription is created as similar to the [normal subscription](user/walkthrough_apiv2.md#subscriptions) request with a slight difference.
+
+In the normal case, the consumer gets initial and continuous notifications whenever the entity is updated until subscription is removed or its status passes to inactive after a subscription update.
+
+While, in the case of oneshot subscription, the consumer gets notified only one time whenever the entity is updated after creating
+the subscription. Once a notification is triggered, the subscription transitions to `status`: `inactive`. Once in this status,
+the consumer may update it with `oneshot`∫ to repeat the same behavior (i.e. to get the one time notification again).
+
+![](oneshot_subscription.png "oneshot_subscription.png")
+
+* Assuming an entity with id Room1 and type Room already exists in the database.
+
+Context Consumer can create a subscription for that entity with status “oneshot” as below:
+
+```
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1028/accumulate"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "status" : "oneshot"
+}
+EOF
+```
+
+As the value of pressure attribute is updated, context consumer will get the notification for temperature attribute and status
+of this subscription will automatically be turned to inactive and no further notification will be triggered until the consumer
+updates it again to "oneshot" in below manner:
+
+```
+curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
+    -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "status": "oneshot"
+}
+EOF
+```
+Once the status is updated to "oneshot" again, the consumer will again get the notification one time whenever the entity will be updated and the subscription status will again be changed to `inactive` automatically.
+
+## Covered Subscriptions
+
+The `attrs` field within `notification` specifies the sub-set of entity attributes to be included in the
+notification when subscription is triggered. By default Orion only notifies attributes that exist
+in the entity. For instance, if subscription is this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+but the entity only has `temperature` and `humidity` attributes, then `brightness` attribute is not included
+in notifications.
+
+This default behaviour can be changed using the `covered` field set to `true` this way:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+in which case all attributes are included in the notification, no matter if they exist or not in the
+entity. For these attributes that don't exist (`brightness` in this example) the `null`
+value (of type `"None"`) is used.
+
+In the case of custom notifications, if `covered` is set to `true` then `null` will be use to replace `${...}`
+for non existing attributes (the default behavior when `covered` is not set to `true` is to replace by the
+empty string the non existing attributes).
+
+We use the term "covered" in the sense the notification "covers" completely all the attributes
+in the `notification.attrs` field. It can be useful for those notification endpoints that are
+not flexible enough for a variable set of attributes and needs always the same set of incoming attributes
+in every received notification.
+
+Note that covered subscriptions need an explicit list of `attrs` in `notification`. Thus, the following
+case is not valid:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+And if you try to create/update a subscription with that you will get a 400 Bad Request error like this:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
+
+## Subscriptions based in alteration type
+
+By default, a subscription is triggered (i.e. the notification associated to it is sent) when
+the triggered condition (expressed in the `subject` and `conditions` fields of the subscription, e.g.
+covered entities, list of attributes to check, filter expression, etc.) during a create or actual
+update entity operation.
+
+However, this default behavior can be changed so a notification can be sent, for instance,
+only when an entity is created or only when an entity is deleted, but not when the entity is
+updated.
+
+In particular, the `alterationTypes` field is used, as sub-field of `conditions`. The value
+of this field is an array which elements specify a list of alteration types upon which the
+subscription is triggered. At the present moment, the following alteration types are supported:
+
+* `entityUpdate`: notification is sent whenever a entity covered by the subscription is updated
+  (no matter if the entity actually changed or not)
+* `entityChange`: notification is sent whenever a entity covered by the subscription is updated
+  and it actually changes (or if it is not an actual update, but `forcedUpdate` option is used
+  in the update request)
+* `entityCreate`: notification is sent whenever a entity covered by the subscription is created
+* `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted
+
+For instance:
+
+```
+  "conditions": {
+    "alterationTypes": [ "entityCreate", "entityDelete" ],
+    ...
+  }
+```
+
+will trigger subscription when an entity creation or deletion takes place, but not when an
+update takes place. The elements in the `alterationTypes` array are interpreted in OR sense.
+
+Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
+is `["entityCreate", "entityChange"]`.
+
+The particular alteration type can be got in notifications using the
+[`alterationType` builtin attribute](#builtin-attributes).
+
+## Pagination
+
+Orion implements a pagination mechanism in order to help clients to retrieve
+large sets of resources. This mechanism works for all listing operations
+in the API (e.g. `GET /v2/entities`, `GET /v2/subscriptions`,
+`POST /v2/op/query`, etc.).
+
+The mechanism is based on three URI parameters:
+
+-   **limit**, in order to specify the maximum number of elements (default
+    is 20, maximum allowed is 1000).
+
+-   **offset**, in order to skip a given number of elements at the
+    beginning (default is 0)
+
+-   **count** (as `option`), if activated then a `Fiware-Total-Count`
+    header is added to the response, with a count of total elements.
+
+By default, results are returned ordered by increasing creation
+time. In the case of entities query, this can be changed with the
+[`orderBy` URL parameter](#ordering-results).
+
+Let's illustrate with an example: a given client cannot process more
+than 100 results in a single response and the query includes a
+total of 322 results. The client could do the following (only the URL is
+included, for the sake of completeness).
+
+```
+GET /v2/entities?limit=100&options=count
+...
+(The first 100 elements are returned, along with the `Fiware-Total-Count: 322`
+header, which makes the client aware of how many entities there are in total and,
+therefore, the number of subsequent queries to be done)
+
+GET /v2/entities?offset=100&limit=100
+...
+(Entities from 101 to 200)
+
+GET /v2/entities?offset=200&limit=100
+...
+(Entities from 201 to 300)
+
+GET /v2/entities?offset=300&limit=100
+...
+(Entities from 301 to 222)
+```
+
+Note that if the request uses an offset beyond the total number of results, an
+empty list is returned, as shown below:
+
+```
+GET /v2/entities?offset=1000&limit=100
+...
+[]
+```
+
+### Ordering Results
+
+Operations that retrieve lists of entities permit the `orderBy` URI parameter to specify the
+attributes or properties to be used as criteria when ordering results.
+The value of `orderBy` can be:
+
+* The keyword `geo:distance` to order results by distance to a reference geometry when a "near"
+  (`georel=near`) spatial relationship is used.
+
+* A comma-separated list of attributes (including builtin attributes), `id` (for entity
+  ID), and `type` (for entity type), e.g. `temperature,!humidity`. Results are ordered by the first
+  field. On ties, the results are ordered by the second field and so on. A "!" before
+  the field name means that the order is reversed.
+
+For example:
+
+```
+GET /v2/entities?orderBy=temperature,!humidity
+```
+
+orders first by temperature in ascending order, then by humidity in decreasing order
+in the case of temperature ties.
+
+Note that the [builtin attributes](#builtin-attributes) `dateCreated` and `dateModified` can be used as
+elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
+entity creation time and entity modification time respectively.
+
+With regards of the ordering of attributes which values belong to several JSON types, Orion
+uses the same criteria as the one used by the underlying implementation (MongoDB). See
+[the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)
+for details.
+
+From lowest to highest:
+
+1. Null
+2. Number
+3. String
+4. Object
+5. Array
+6. Boolean
 
 # API Routes
 
@@ -3538,7 +3537,7 @@ A subscription is represented by a JSON object with the following fields:
 | [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". More detail on oneshot subscriptions in the [corresponding section](#oneshot-subscription).|
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". More detail on oneshot subscriptions in the [corresponding section](#oneshot-subscriptions).|
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
