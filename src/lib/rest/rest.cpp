@@ -394,6 +394,32 @@ static void requestCompleted
     orionldState.in.payload = NULL;
   }
 
+  //
+  // CURL Handles And Headers
+  //
+  if (orionldState.multiP != NULL)
+  {
+    for (int ix = 0; ix < orionldState.easyIx; ix++)
+    {
+      curl_multi_remove_handle(orionldState.multiP, orionldState.easyV[ix]);
+      curl_easy_cleanup(orionldState.easyV[ix]);
+    }
+
+    curl_multi_cleanup(orionldState.multiP);
+  }
+
+  if (orionldState.easyV != NULL)
+    free(orionldState.easyV);
+
+  if (orionldState.curlHeadersV != NULL)
+  {
+    for (int ix = 0; ix < orionldState.curlHeadersIx; ix++)
+    {
+      curl_slist_free_all(orionldState.curlHeadersV[ix]);
+    }
+
+    free(orionldState.curlHeadersV);
+  }
 
   lmTransactionEnd();  // Incoming REST request ends
 
