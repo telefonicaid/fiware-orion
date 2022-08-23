@@ -46,15 +46,14 @@ extern "C"
 
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "serviceRoutines/versionTreat.h"                      // versionGet
+#include "serviceRoutines/versionTreat.h"                      // versionGet (Orion version)
 #include "cache/subCache.h"                                    // subCacheItems
-#include "orionld/common/pqHeader.h"                           // Postgres header
-#include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
+
+#include "orionld/common/orionldState.h"                       // orionldState, orionldVersion, postgresServerVersion, mongocServerVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
-#include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
-#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
+#include "orionld/common/pqHeader.h"                           // Postgres header
+#include "orionld/troe/pgVersionGet.h"                         // pgVersionToString
 #include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
@@ -77,27 +76,6 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
   revision = iVersion & 0xFF;
 
   snprintf(buff, buflen, "%x.%x.%x-%x", major, minor, bugfix, revision);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pgVersionToString -
-//
-static void pgVersionToString(int version, char* versionString, int versionStringSize)
-{
-  int major;
-  int minor;
-  int bugfix;
-
-  major    = version / 10000;
-  version -= major * 10000;
-  minor    = version / 100;
-  version -= minor * 100;
-  bugfix   = version;
-
-  snprintf(versionString, versionStringSize - 1, "%d.%d.%d", major, minor, bugfix);
 }
 
 
@@ -172,7 +150,7 @@ bool orionldGetVersion(void)
   //
   // Mongo Server
   //
-  nodeP = kjString(orionldState.kjsonP, "mongodb server version", mongoServerVersion);
+  nodeP = kjString(orionldState.kjsonP, "mongodb server version", mongocServerVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
 
 
@@ -197,24 +175,9 @@ bool orionldGetVersion(void)
     //
     // Postgres Server
     //
-    PgConnection*  connectionP     = pgConnectionGet(NULL);
-    int            pgServerVersion = -1;
-    char           pgServerVersionString[32];
-
-    if ((connectionP != NULL) && (connectionP->connectionP != NULL))
-    {
-      pgServerVersion = PQserverVersion(connectionP->connectionP);
-      pgConnectionRelease(connectionP);
-
-      pgVersionToString(pgServerVersion, pgServerVersionString, sizeof(pgServerVersionString));
-    }
-    else
-      strncpy(pgServerVersionString, "UNKNOWN", sizeof(pgServerVersionString) - 1);
-
-    nodeP = kjString(orionldState.kjsonP, "postgres server version", pgServerVersionString);
+    nodeP = kjString(orionldState.kjsonP, "postgres server version", postgresServerVersion);
     kjChildAdd(orionldState.responseTree, nodeP);
   }
-
 
   // Branch
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);

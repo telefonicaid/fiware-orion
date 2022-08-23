@@ -113,6 +113,8 @@ mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;    // Deprecated
 mongoc_uri_t*          mongocUri;
 mongoc_client_pool_t*  mongocPool;
 sem_t                  mongocContextsSem;
+char                   mongocServerVersion[128];
+char                   postgresServerVersion[128];
 
 
 
