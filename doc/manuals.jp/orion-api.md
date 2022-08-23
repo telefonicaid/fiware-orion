@@ -74,8 +74,6 @@
         - [エンティティのサービス・パス (Entity service path)](#entity-service-path)
         - [サブスクリプションとレジストレーションのサービス・パス (Service path in subscriptions and registrations)](#service-path-in-subscriptions-and-registrations)
 - [API ルート (API Routes)](#api-routes)
-    - [API エントリ・ポイント (API Entry Point)](#api-entry-point)
-        - [API リソースを取得 [GET /v2]](#retrieve-api-resources-get-v2)
     - [エンティティの操作 (Entities Operations)](#entities-operations)
         - [エンティティのリスト (Entities List)](#entities-list)
             - [エンティティをリスト [GET /v2/entities]](#list-entities-get-v2entities)
@@ -138,7 +136,8 @@
        - [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
        - [`keyValues` は`POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
        - [レジストレーションの実装の違い](#registration-implementation-differences)
-- [非推奨の機能 (Deprecated features)](#deprecated-features)
+       - [`GET /v2` 操作](#get-v2-operation)
+       - [非推奨の機能 (Deprecated features)](#deprecated-features)
 <!-- /TOC -->
 
 <a name="preface"></a>
@@ -2411,39 +2410,6 @@ Orion は階層スコープをサポートしているため、エンティテ�
 
 # API ルート (API Routes)
 
-<a name="api-entry-point"></a>
-
-## API エントリ・ポイント (API Entry Point)
-
-<a name="retrieve-api-resources-get-v2"></a>
-
-### API リソースを取得 [GET /v2]
-
-このリソースには、属性はありません。代わりに、JSON 本体のリンクの形で初期 API アフォーダンス (initial API affordance)
-を提供します。
-
-該当する場合は、"url" リンク値、[Link](https://tools.ietf.org/html/rfc5988) または Location ヘッダに従うことを
-お勧めします。独自の URL を構築する代わりに、クライアントと実装の詳細を切り離してください。
-
-_**レスポンス・コード**_
-
--   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、エラー・ペイロード (オプション) を使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
-
-_**レスポンス・ヘッダ**_
-
-成功したオペレーションでは、`application/json` 値を持つ `Content-Type` ヘッダが返されます。
-
-_**レスポンス・ペイロード**_
-
-このリクエストは、次の要素を持つ JSON オブジェクトを返します:
-
--   entities_url: /v2/entities (required, string) - エンティティ・リソースを指す URL
--   types_url: /v2/types (required, string) - 型リソースを指す URL
--   subscriptions_url: /v2/subscriptions (required, string) - サブスクリプション・リソースを指す URL
--   registrations_url: /v2/registrations (required, string) - レジストレーション・リソースを指す URL
-
 <a name="entities-operations"></a>
 
 ## エンティティの操作 (Entities Operations)
@@ -4633,6 +4599,13 @@ Orion は、次の側面を除いて、NGSIv2 仕様で説明されているよ�
     ステータスが `active` と表示されます
 -   従来のコンテキスト・プロバイダの NGSIv1 ベースのクエリ/更新形式での転送をサポートするための `legacyForwarding`
     フィールド (`provider` 内の)
+
+<a name="get-v2-operation"></a>
+
+## `GET /v2` 操作
+
+NGSIv2 仕様には、エンドポイント URL を提供する `GET /v2` が含まれています。 ただし、URL エンドポイントが API
+仕様自体の一部であることを考えると、これはかなり役に立たない操作であるため、Orion はそれをサポートしていません。
 
 <a name="deprecated-features"></a>
 
