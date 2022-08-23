@@ -763,7 +763,7 @@ KjNode* mongocEntitiesQuery
   const char*      geojsonGeometry
 )
 {
-  if (attrList->items > 99)
+  if ((attrList != NULL) && (attrList->items > 99))
   {
     orionldError(OrionldBadRequestData, "Too many attributes", "maximum is 99", 400);
     return NULL;
@@ -802,10 +802,12 @@ KjNode* mongocEntitiesQuery
   //
   bson_t projection;
   bson_init(&projection);
-  bson_append_bool(&projection, "_id.id",    6, true);
-  bson_append_bool(&projection, "_id.type",  8, true);
-  bson_append_bool(&projection, "creDate",   7, true);
-  bson_append_bool(&projection, "modDate",   7, true);
+  bson_append_bool(&projection, "_id.id",          6, true);
+  bson_append_bool(&projection, "_id.type",        8, true);
+  bson_append_bool(&projection, "attrNames",       9, true);
+  bson_append_bool(&projection, "creDate",         7, true);
+  bson_append_bool(&projection, "modDate",         7, true);
+  bson_append_bool(&projection, "lastCorrelator", 14, true);
 
 
   //
@@ -854,7 +856,7 @@ KjNode* mongocEntitiesQuery
   }
 
   // GEO Query
-  if (geoInfoP->geometry != GeoNoGeometry)
+  if ((geoInfoP != NULL) && (geoInfoP->geometry != GeoNoGeometry))
   {
     if (geoFilter(&mongoFilter, geoInfoP) == false)
       return NULL;

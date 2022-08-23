@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -64,14 +65,14 @@ typedef struct NotificationPending
 //
 // notificationResponseTreat -
 //
-static int notificationResponseTreat(NotificationPending* npP, double timestamp)
+static int notificationResponseTreat(NotificationPending* npP, double notificationTime)
 {
   char buf[2048];  // should be enough for the HTTP headers ...
   int  nb = read(npP->fd, buf, sizeof(buf) - 1);
 
   if (nb == -1)
   {
-    notificationFailure(npP->subP, "Unable to read from notification endpoint", timestamp);
+    notificationFailure(npP->subP, "Unable to read from notification endpoint", notificationTime);
     LM_E(("Internal Error (unable to read response for notification)"));
     return -1;
   }
@@ -80,7 +81,7 @@ static int notificationResponseTreat(NotificationPending* npP, double timestamp)
 
   if (endOfFirstLine == NULL)
   {
-    notificationFailure(npP->subP, "Invalid response from notification endpoint", timestamp);
+    notificationFailure(npP->subP, "Invalid response from notification endpoint", notificationTime);
     LM_E(("Internal Error (unable to find end of first line from notification endpoint: %s)", strerror(errno)));
     return -1;
   }
@@ -165,14 +166,16 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-  // ----------------------------  <DEBUG>
+  // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
     LM(("ALT: Alteration %d:", alterations));
-    LM(("ALT:   Entity Id:    %s", aP->entityId));
-    LM(("ALT:   Entity Type:  %s", aP->entityType));
-    LM(("ALT:   Attributes:   %d", aP->alteredAttributes));
+    LM(("ALT:   Entity In:      %p", aP->inEntityP));
+    LM(("ALT:   CompleteEntity: %p", aP->finalApiEntityP));
+    LM(("ALT:   Entity Id:      %s", aP->entityId));
+    LM(("ALT:   Entity Type:    %s", aP->entityType));
+    LM(("ALT:   Attributes:     %d", aP->alteredAttributes));
 
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
@@ -182,7 +185,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     ++alterations;
   }
   LM(("ALT: %d Alterations present", alterations));
-  // ----------------------------  </DEBUG>
+  // </DEBUG>
 
   OrionldAlterationMatch* matchList;
   int                     matches;
@@ -202,13 +205,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
 #ifdef DEBUG
   int ix = 1;
-  LM(("%d Matching subscriptions:", matches));
+  LM(("%d items in matchList:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     if (matchP->altAttrP != NULL)
-      LM(("o %d/%d Subscription '%s' (url: %s), due to '%s'", ix, matches, matchP->subP->subscriptionId, matchP->subP->url, orionldAlterationName(matchP->altAttrP->alterationType)));
+      LM(("o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
     else
-      LM(("o %d/%d Subscription '%s' (url: %s)", ix, matches, matchP->subP->subscriptionId, matchP->subP->url));
+      LM(("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
     ++ix;
   }
 #endif
@@ -217,33 +220,65 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   // Applying the PATCH, if any
   //
+  // FIXME:
+  //   The original db entity is needed only to apply the patch.
+  //   Would be better to apply the patch before so we would not need "altList->dbEntityP"
+  //
+
+#if 1
+  //
+  // Only orionldPatchEntity2 uses this ... Right?
+  // Instead of having this function create finalApiEntityP, it should be done by the service routine
+  // And, after that, altList->dbEntityP is no longer needed
+  //
   if (altList->dbEntityP != NULL)
   {
-    altList->patchedEntity = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
+    LM(("Applying PATCH"));
+    altList->finalApiEntityP = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
 
-    for (KjNode* patchP = altList->patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
+    for (KjNode* patchP = altList->inEntityP->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
-      orionldPatchApply(altList->patchedEntity, patchP);
+      orionldPatchApply(altList->finalApiEntityP, patchP);
     }
   }
+#endif
 
   //
   // Timestamp for sending of notification - for stats in subscriptions
+  // The request time is used instead of calling the system to ask for a new time
   //
-  struct timespec  notificationTime;
-  double           notificationTimeAsFloat;
-  kTimeGet(&notificationTime);
-  notificationTimeAsFloat = notificationTime.tv_sec + ((double) notificationTime.tv_nsec) / 1000000000;
+  double notificationTime = orionldState.requestTime;
 
-  for (OrionldAlterationMatch* mAltP = matchList; mAltP != NULL; mAltP = mAltP->next)
+  while (matchList != NULL)
   {
+    //
+    // 1. Extract first match from matchList, call it matchHead
+    // 2. Extract all subsequent matches from matchList - add them to matchHead
+    // 3. Call notificationSend, which will combine all of them into one single notification
+    //
+    // The matches come in subscription order, so, we just need to break after the first non-same subscription
+    //
+    OrionldAlterationMatch* matchHead = matchList;
+
+    matchList = matchList->next;
+    matchHead->next = NULL;  // The matchHead-list is now NULL-terminated and separated from matchList
+
+    while ((matchList != NULL) && (matchList->subP == matchHead->subP))
+    {
+      OrionldAlterationMatch* current = matchList;
+
+      matchList     = matchList->next;
+      current->next = matchHead;
+      matchHead     = current;
+    }
+
     CURL* curlHandleP;
-    int fd = notificationSend(mAltP, notificationTimeAsFloat, &curlHandleP);  // curl handle as output param?
+    int   fd = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
     if (fd != -1)
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
-      npP->subP        = mAltP->subP;
+      npP->subP        = matchHead->subP;
       npP->fd          = fd;
       npP->curlHandleP = curlHandleP;
 
@@ -314,8 +349,8 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       {
         if ((npP->fd >= 0) && (FD_ISSET(npP->fd, &rFds)))
         {
-          if (notificationResponseTreat(npP, notificationTimeAsFloat) == 0)
-            notificationSuccess(npP->subP, notificationTimeAsFloat);
+          if (notificationResponseTreat(npP, notificationTime) == 0)
+            notificationSuccess(npP->subP, notificationTime);
 
           close(npP->fd);  // OR: close socket inside responseTreat?
           npP->fd = -1;
@@ -342,7 +377,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       // No response
       if (strncmp(npP->subP->protocolString, "mqtt", 4) != 0)
       {
-        notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTimeAsFloat);
+        notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTime);
         close(npP->fd);
         npP->fd = -1;
       }
@@ -406,13 +441,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM(("Update Counters for subscription '%s'", npP->subP->subscriptionId));
 
       if (msgP->data.result == 0)
-        notificationSuccess(npP->subP, notificationTimeAsFloat);
+        notificationSuccess(npP->subP, notificationTime);
       else
       {
         char errorString[512];
 
         snprintf(errorString, sizeof(errorString), "CURL Error %d: %s", msgP->data.result, curl_easy_strerror(msgP->data.result));
-        notificationFailure(npP->subP, errorString, notificationTimeAsFloat);
+        notificationFailure(npP->subP, errorString, notificationTime);
       }
     }
   }

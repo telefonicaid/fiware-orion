@@ -49,6 +49,7 @@ SET (SOURCES
     mongocSubscriptionReplace.cpp
     mongocEntitiesQuery.cpp
     mongocEntityDelete.cpp
+    mongocEntitiesUpsert.cpp
 )
 
 # Include directories

@@ -25,12 +25,9 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
-#include "kjson/kjRender.h"                                      // kjFastRender
-#include "kjson/kjRenderSize.h"                                  // kjFastRenderSize
 #include "kjson/kjClone.h"                                       // kjClone
 }
 
@@ -43,14 +40,17 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
-#include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
+#include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
+#include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
 
@@ -289,146 +289,13 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
       newPath = newPathV;
     }
 
-    orionldEntityPatchTree(oldItemP, newItemP, newPath, patchTree);
+    orionldEntityPatchTree(oldItemP, newItemP, newPath, patchTree);  // Recursive call
 
     newItemP = next;
   }
 
   if (namesP != NULL)
     namesToPatchTree(patchTree, path, namesP, addedP, removedP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjValuesDiffer -
-//
-bool kjValuesDiffer(KjNode* leftAttr, KjNode* rightAttr)
-{
-  KjNode* left  = kjLookup(leftAttr,  "value");  // "object", "languageMap" ... First lookup "type" ...
-  KjNode* right = kjLookup(rightAttr, "value");
-
-  if (left == NULL)
-    LM_RE(true, ("Internal Error (left KjNode has no value member)"));
-  if (right == NULL)
-    LM_RE(true, ("Database Error (DB KjNode has no value member)"));
-
-  if (left->type != right->type)
-    return true;
-
-  KjValueType type = left->type;
-
-  if (type == KjString)   return (strcmp(left->value.s, right->value.s) == 0)? false : true;
-  if (type == KjInt)      return (left->value.i == right->value.i)?            false : true;
-  if (type == KjFloat)    return (left->value.f == right->value.f)?            false : true;
-  if (type == KjBoolean)  return (left->value.b == right->value.b)?            false : true;
-
-  // Compound values ... let's just render the values and do a strcmp on the rendered buffers
-  int   leftBufSize     = kjFastRenderSize(left->value.firstChildP);
-  int   rightBufSize    = kjFastRenderSize(right->value.firstChildP);
-  char* leftBuf         = kaAlloc(&orionldState.kalloc, leftBufSize);
-  char* rightBuf        = kaAlloc(&orionldState.kalloc, rightBufSize);
-
-  kjFastRender(left->value.firstChildP,  leftBuf);
-  kjFastRender(right->value.firstChildP, rightBuf);
-
-  if (strcmp(leftBuf, rightBuf) == 0)
-    return false;
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// ALTERATION -
-//
-#define ALTERATION(altType)                                 \
-do                                                          \
-{                                                           \
-  aeP->alteredAttributeV[ix].alterationType = altType;      \
-  aeP->alteredAttributeV[ix].attrName       = attrP->name;  \
-  aeP->alteredAttributeV[ix].attrNameEq     = attrNameEq;   \
-  ++ix;                                                     \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldAlterationType -
-//
-const char* orionldAlterationType(OrionldAlterationType altType)
-{
-  switch (altType)
-  {
-  case EntityCreated:               return "EntityCreated";
-  case EntityDeleted:               return "EntityDeleted";
-  case EntityModified:              return "EntityModified";
-  case AttributeAdded:              return "AttributeAdded";
-  case AttributeDeleted:            return "AttributeDeleted";
-  case AttributeValueChanged:       return "AttributeValueChanged";
-  case AttributeMetadataChanged:    return "AttributeMetadataChanged";
-  case AttributeModifiedAtChanged:  return "AttributeModifiedAtChanged";
-  }
-
-  return "Unknown";
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldAlterations - important to not alter the request tree in any way
-//
-OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* attrsP, KjNode* dbAttrsP)
-{
-  OrionldAlteration* aeP   = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
-  int                attrs = 0;
-
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    ++attrs;
-  }
-
-  aeP->entityId          = entityId;
-  aeP->entityType        = entityType;
-  aeP->alteredAttributes = attrs;
-  aeP->alteredAttributeV = (OrionldAttributeAlteration*) kaAlloc(&orionldState.kalloc, attrs * sizeof(OrionldAttributeAlteration));
-
-  int ix = 0;
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    char* attrNameEq = kaStrdup(&orionldState.kalloc, attrP->name);  // Must copy to change dot for eq for ...
-    dotForEq(attrNameEq);
-
-    if (attrP->type == KjNull)
-    {
-      ALTERATION(AttributeDeleted);
-      continue;
-    }
-
-    KjNode* dbAttrP = kjLookup(dbAttrsP, attrNameEq);
-
-    if (dbAttrP == NULL)
-    {
-      ALTERATION(AttributeAdded);
-      continue;
-    }
-
-    bool valuesDiffer = kjValuesDiffer(attrP, dbAttrP);
-
-    if (valuesDiffer)
-      ALTERATION(AttributeValueChanged);
-    else
-      ALTERATION(AttributeModifiedAtChanged);  // Need to check all metadata - could also be AttributeMetadataChanged
-  }
-
-  aeP->next = NULL;
-
-  return aeP;
 }
 
 
@@ -546,17 +413,19 @@ bool orionldPatchEntity2(void)
     return false;
   }
 
-  orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP);
+  orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
   orionldAlterationsPresent(orionldState.alterations);
   orionldState.alterations->dbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
 
   //
   // For TRoE we need a tree with all those attributes that have been patched (part of incoming tree)
-  // but, with their current value in the database.
-  // That tree needs to be trimmed
+  // but, with their current value in the database PATCHED with their new values
   //
   if (troe)
   {
+    // 1. Get from DB (dbAttrsP) all attributes that have been touched by the PATCH
+    // 2. Convert the attributes to API Model
+    // 3. Perform the PATCH on the attributes
     KjNode* troeTree = kjObject(orionldState.kjsonP, NULL);
 
     for (KjNode* patchedAttrP = orionldState.requestTree->value.firstChildP; patchedAttrP != NULL; patchedAttrP = patchedAttrP->next)
@@ -582,8 +451,7 @@ bool orionldPatchEntity2(void)
   //        I extract the part that is to be forwarded from the tree before I destroy
   //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
   //
-  KjNode* dbAttrNamesP = kjLookup(dbEntityP, "attrNames");
-  if (dbModelFromApiEntity(orionldState.requestTree, dbAttrsP, dbAttrNamesP, false) == false)
+  if (dbModelFromApiEntity(orionldState.requestTree, dbEntityP, false, NULL, NULL) == false)
   {
     LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
     return false;
@@ -612,8 +480,8 @@ bool orionldPatchEntity2(void)
   orionldState.requestTree->name = NULL;
   orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
 
-  orionldState.alterations->patchTree     = patchTree;
-  orionldState.alterations->patchedEntity = NULL;
+  orionldState.alterations->inEntityP       = patchTree;  // Not sure this is needed - alteredAttributeV should be used instead ... Right?
+  orionldState.alterations->finalApiEntityP = NULL;
 
   bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
   if (b == false)

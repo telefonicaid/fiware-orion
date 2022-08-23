@@ -3,3 +3,4 @@
 * Issue #280  New CLI option: -cSubCounters - number of subscription counter updates before flushing from sub-cache to DB (0: never, 1: always)
 * Issue #280  Bug fix: getting lastNotification, lastSuccess, lastFailure from DB in when refreshing the subscription cache
 * Issue #280  TRoE for PUT /entities/{entityId}
+* Issue #280  Reimplementation of BATCH Upsert, using the new mongo driver (mongoc) - only used if -experimental is set

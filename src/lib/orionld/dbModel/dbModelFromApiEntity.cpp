@@ -33,8 +33,10 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
+#include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
 #include "orionld/dbModel/dbModelFromApiAttribute.h"             // dbModelFromApiAttribute
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // Own interface
 
@@ -47,15 +49,18 @@ extern "C"
 // Modifications:
 //
 //   * Entity Level (dbModelEntity)
+//     * if != Object - error (as pCheckAttribute makes sure the request tree is normalized)
+//     * For PATCH, the Entity _id.id should not be there, as it is never altered
+//       But, for CREATE, REPLACE, it is needed.
+//        So, the function parameter 'creation' decides whether to add the _id (with id, type, servicePath) or not
+//        Not only '_id', but also 'attrNames' and 'creDate'
 //     * "id" can't be modified    (make sure it's removed and partial error reported by pCheckEntity)
 //     * "type" can't be modified  (make sure it's removed and partial error reported by pCheckEntity)
 //     * "scope" doesn't exist yet (make sure it's removed and partial error reported by pCheckEntity)
 //     * "modDate" is set with orionldState.requestTime
 //     * "attrs" member is created and added
-//     * It's an attribute - move to "attrs" and call "attributeToDbModel" on it.
+//     * if attribute - move to "attrs" and call "attributeToDbModel" on it.
 //     * if Array - datasetId - error for now (partial 501)
-//     * if != Object - error (as pCheckAttribute makes sure the request tree is normalized)
-//     * move the attribute there + call "Level 1 Function" (orionldDbModelAttribute)
 //
 //   * Attribute Level (dbModelAttribute)
 //     * If Array, recursive call for each member (set the name to the sttribute name)
@@ -78,10 +83,14 @@ extern "C"
 //   * modDate
 //   * lastCorrelator
 //
-bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP, bool creation)
+bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbEntityP, bool creation, const char* entityId, const char* entityType)
 {
   KjNode*      nodeP;
-  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "creDate", "modDate" };
+  const char*  mustGo[]     = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "modDate", "creDate", "servicePath" };
+  KjNode*      idP          = NULL;
+  KjNode*      typeP        = NULL;
+  KjNode*      dbAttrsP     = NULL;
+  KjNode*      dbAttrNamesP = NULL;
 
   //
   // Remove any non-attribute nodes from the incoming tree (entityP)
@@ -90,10 +99,18 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   for (unsigned int ix = 0; ix < sizeof(mustGo) / sizeof(mustGo[0]); ix++)
   {
     nodeP = kjLookup(entityP, mustGo[ix]);
-    if (nodeP != NULL)
-      kjChildRemove(entityP, nodeP);
-  }
+    if (nodeP == NULL)
+      continue;
 
+    kjChildRemove(entityP, nodeP);
+    if (creation == true)  // Keep id and type, put them inside _id object
+    {
+      if ((ix == 1) || (ix == 2))
+        idP = nodeP;
+      else if ((ix == 3) || (ix == 4))
+        typeP = nodeP;
+    }
+  }
 
   //
   // Create the "attrs" field and move all attributes from entityP to there ("attrs")
@@ -107,11 +124,30 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   entityP->value.firstChildP = NULL;
   entityP->lastChild         = NULL;
 
+  //
+  // If the entity already existed, the creDate needs to be copied from the previous entity
+  //
+  bool creDateAdded = false;
+  if (dbEntityP != NULL)
+  {
+    dbAttrsP     = kjLookup(dbEntityP, "attrs");      // Not present if the entity has no attributes
+    dbAttrNamesP = kjLookup(dbEntityP, "attrNames");  // Must be there
+    LM(("dbAttrNamesP at %p", dbAttrNamesP));
+    KjNode* creDateNodeP = kjLookup(dbEntityP, "creDate");
+    if (creDateNodeP != NULL)
+    {
+      kjChildRemove(dbEntityP, creDateNodeP);
+      kjChildAdd(entityP, creDateNodeP);
+      creDateAdded = true;
+    }
+  }
+
 
   //
   // Add to entityP:
   // - First "attrNames" (.added)
   // - Then "attrs"
+  // - Then the timestamps
   //
   KjNode* attrAddedV = kjArrayAdd(entityP, ".added");
   kjChildAdd(entityP, attrsP);
@@ -119,8 +155,9 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
   // Not really necessary?   - RHS == null already tells the next layer ... ?
   KjNode* attrRemovedV = kjArrayAdd(entityP, ".removed");
 
-  if (creation == true)
+  if (creDateAdded == false)
     kjTimestampAdd(entityP, "creDate");
+
   kjTimestampAdd(entityP, "modDate");
 
 
@@ -179,7 +216,23 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     KjNode* lastCorrelatorP = kjString(orionldState.kjsonP,  "lastCorrelator", "");
     kjChildAdd(entityP, lastCorrelatorP);
 
-    // _id ...
+    //
+    // Create the _id object with 'id', 'type', and 'servicePath'
+    //
+    KjNode* _idP = kjObject(orionldState.kjsonP, "_id");
+    KjNode*  spP = kjString(orionldState.kjsonP, "servicePath", "/");
+
+    // POST /entities has entity id and type already extracted and in orionldState
+    if (idP   == NULL) idP   = kjString(orionldState.kjsonP, "id",   entityId);
+    if (typeP == NULL) typeP = kjString(orionldState.kjsonP, "type", entityType);
+
+    kjChildAdd(_idP, idP);
+    kjChildAdd(_idP, typeP);
+    kjChildAdd(_idP, spP);
+
+    // Add "_id" to the beginning of the Entity
+    _idP->next = entityP->value.firstChildP;
+    entityP->value.firstChildP = _idP;
   }
 
   return true;

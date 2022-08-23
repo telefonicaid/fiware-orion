@@ -71,7 +71,7 @@ payload='[
         "type": "T"
     }
 ]'
-orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -102,7 +102,7 @@ payload='[
         }
     }
 ]'
-orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -123,7 +123,7 @@ payload='[
         }
     }
 ]'
-orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 
@@ -156,7 +156,7 @@ payload='[
         "type": "T"
     }
 ]'
-orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Orionld-Legacy: yes"
 echo
 echo
 

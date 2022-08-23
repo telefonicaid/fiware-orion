@@ -51,6 +51,8 @@ extern "C"
 //
 bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP)
 {
+  LM(("CA: Treating sub-attribute '%s'", saP->name));
+
   char* saEqName  = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
   char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
 
@@ -64,15 +66,8 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if (dbSubAttributeP == NULL)
     {
       // Apparently it's OK to try to delete an attribute that does not exist (RFC 7396))
-#if 1
       *ignoreP = true;
       return true;  // Just ignore it
-#else
-      LM_W(("Attempt to DELETE a sub-attribute that doesn't exist (%s)", saDotName));
-      orionldError(OrionldResourceNotFound, "Cannot delete a sub-attribute that does not exist", saDotName, 404);
-      // Add to 207
-      return false;
-#endif
     }
 
     kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));
@@ -131,8 +126,27 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
       kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
   }
+  else if (strcmp(saDotName, "creDate") == 0) {}
+  else if (strcmp(saDotName, "modDate") == 0) {}
+  else if (strcmp(saDotName, "createdAt") == 0)
+  {
+    // This is not a sub-attribute, it's the timestamp of the attribute, and it must be called "creDate"
+    saP->name = (char*) "creDate";
+  }
+  else if (strcmp(saDotName, "modifiedAt") == 0)
+  {
+    // This is not a sub-attribute, it's the timestamp of the attribute, and it must be called "modDate"
+    saP->name = (char*) "modDate";
+  }
   else
   {
+    if (saP->type != KjObject)
+    {
+      // Not an object ... weird, but let's leave it as it is
+      LM_W(("The sub-attribute '%s' is not a JSON Object", saP->name));
+      return true;
+    }
+
     // If object or languageMap exist, change name to value
     KjNode* valueP = kjLookup(saP, "object");
 

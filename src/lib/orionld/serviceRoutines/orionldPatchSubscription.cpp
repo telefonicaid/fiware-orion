@@ -806,7 +806,7 @@ bool orionldPatchSubscription(void)
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
 
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
-    LM_RE(false, ("KZ: ngsildSubscriptionPatch failed!"));
+    LM_RE(false, ("ngsildSubscriptionPatch failed!"));
 
   //
   // Update modifiedAt

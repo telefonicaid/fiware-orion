@@ -46,6 +46,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityInsert.h"                   // mongocEntityInsert
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
@@ -107,10 +108,9 @@ bool orionldPostEntities(void)
   //
   KjNode* cloneForTroeP = NULL;
   if (troe)
-    cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // Must I clone this one?
+    cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // apiEntityP contains entity ID and TYPE
 
-
-  if (dbModelFromApiEntity(orionldState.requestTree, NULL, NULL, true) == false)
+  if (dbModelFromApiEntity(orionldState.requestTree, NULL, true, orionldState.payloadIdNode->value.s, orionldState.payloadTypeNode->value.s) == false)
   {
     //
     // Not calling orionldError as a better error message is overwritten if I do.
@@ -120,30 +120,12 @@ bool orionldPostEntities(void)
 
     return false;
   }
+
   KjNode* dbEntityP = orionldState.requestTree;  // More adecuate to talk about DB-Entity from here on
 
   // datasets?
   if (orionldState.datasets != NULL)
     kjChildAdd(dbEntityP, orionldState.datasets);
-
-  //
-  // Put Entity ID and TYPE back - inside _id as first members of the tree
-  //
-  KjNode* _idNodeP         = kjObject(orionldState.kjsonP, "_id");
-  KjNode* entityIdNodeP    = kjString(orionldState.kjsonP, "id",          entityId);
-  KjNode* entityTypeNodeP  = kjString(orionldState.kjsonP, "type",        entityType);
-  KjNode* servicePathNodeP = kjString(orionldState.kjsonP, "servicePath", "/");  // NGSIv2 backwards compatibility
-
-  // Insert the three in _idNodeP
-  entityIdNodeP->next          = entityTypeNodeP;
-  entityTypeNodeP->next        = servicePathNodeP;
-  servicePathNodeP->next       = NULL;
-  _idNodeP->value.firstChildP  = entityIdNodeP;
-  _idNodeP->lastChild          = servicePathNodeP;
-
-  // "Chain-in" _idNodeP as 1st member of dbEntityP
-  _idNodeP->next               = dbEntityP->value.firstChildP;
-  dbEntityP->value.firstChildP = _idNodeP;
 
   // Ready to send it to the database
   if (mongocEntityInsert(dbEntityP, entityId) == false)
@@ -158,9 +140,9 @@ bool orionldPostEntities(void)
   orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
   orionldState.alterations->entityId          = entityId;
   orionldState.alterations->entityType        = entityType;
-  orionldState.alterations->patchTree         = NULL;
+  orionldState.alterations->inEntityP         = apiEntityP;
   orionldState.alterations->dbEntityP         = NULL;
-  orionldState.alterations->patchedEntity     = apiEntityP;  // entity id, createdAt, modifiedAt ...
+  orionldState.alterations->finalApiEntityP   = apiEntityP;  // entity id, createdAt, modifiedAt ...
   orionldState.alterations->alteredAttributes = 0;
   orionldState.alterations->alteredAttributeV = NULL;
   orionldState.alterations->next              = NULL;

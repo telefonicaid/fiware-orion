@@ -1,0 +1,442 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New Batch Upsert
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Upsert 3 entities (Create) with plenty of errors
+# 02. See the three entities in mongo
+# 03. QUERY for all three
+# 04. GET urn:ngsi-ld:T:E3
+#
+
+echo "01. Upsert 3 entities (Create) with plenty of errors"
+echo "===================================================="
+payload='[
+  "123",
+  12,
+  {},
+  { "name": 14 },
+  [1,2,3],
+  [],
+  { "id": 12 },
+  { "id":  "urn:ngsi-ld:T:Eh1", "id":  "urn:ngsi-ld:T:Eh2", "type": "T", "P1": 5 },
+  { "id":  "urn:ngsi-ld:T:Eh1", "@id": "urn:ngsi-ld:T:Eh2", "type": "T", "P1": 5 },
+  { "@id": "urn:ngsi-ld:T:Eh1", "@id": "urn:ngsi-ld:T:Eh2", "type": "T", "P1": 5 },
+  { "id":  "urn:ngsi-ld:T:Eh1", "type":  "T", "type":  "T", "P1": 5 },
+  { "id":  "urn:ngsi-ld:T:Eh1", "type":  "T", "@type": "T", "P1": 5 },
+  { "id":  "urn:ngsi-ld:T:Eh1", "@type": "T", "@type": "T", "P1": 5 },
+  { "id":  "urn:ngsi-ld:T:Eh1", "type":  "T", "P1": 5, "P1": "5" },
+  { "id": "urn:ngsi-ld:T:E1", "type": "T", "P1": { "value": 1, "unitCode": "CEL" } },
+  { "id": "urn:ngsi-ld:T:E2", "type": "T", "P1": { "value": 2, "unitCode": "CEL" } },
+  { "id": "urn:ngsi-ld:T:E3", "type": "T", "P1": { "value": 3, "unitCode": "CEL", "P1_P1": 25, "P1_R1": {"object": "urn:ngsi-ld:T:E1"} } }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json # -H 'Performance: on' -H "Orionld-Legacy: yes"
+echo
+echo
+
+
+echo "02. See the three entities in mongo"
+echo "==================================="
+mongoCmd2 ftest "db.entities.find().pretty()"
+echo
+echo
+
+
+echo "03. QUERY for all three"
+echo "======================="
+orionCurl --url '/ngsi-ld/v1/entities?local=true&options=sysAttrs'
+echo
+echo
+
+
+echo "04. GET urn:ngsi-ld:T:E3"
+echo "========================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:E3?options=sysAttrs'
+echo
+echo
+
+
+--REGEXPECT--
+01. Upsert 3 entities (Create) with plenty of errors
+====================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 2540
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "must be a JSON Object",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "must be a JSON Object",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "must be a non-empty JSON Object",
+                "status": 400,
+                "title": "Empty Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "must be a JSON Object",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "must be a JSON Object",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "Entity::id",
+                "status": 400,
+                "title": "Mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "No Entity::id",
+            "error": {
+                "detail": "Entity::id",
+                "status": 400,
+                "title": "Invalid JSON type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "id",
+                "status": 400,
+                "title": "Duplicated field in an entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "urn:ngsi-ld:T:Eh1",
+                "status": 400,
+                "title": "Duplicated field in an entity (id+@id)",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "urn:ngsi-ld:T:Eh1",
+                "status": 400,
+                "title": "Duplicated field in an entity (id+@id)",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "type",
+                "status": 400,
+                "title": "Duplicated field in an entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "urn:ngsi-ld:T:Eh1",
+                "status": 400,
+                "title": "Duplicated field in an entity (type+@type)",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "@type",
+                "status": 400,
+                "title": "Duplicated field in an entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:T:Eh1",
+            "error": {
+                "detail": "P1",
+                "status": 400,
+                "title": "Duplicated field in an entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:T:E1",
+        "urn:ngsi-ld:T:E2",
+        "urn:ngsi-ld:T:E3"
+    ]
+}
+
+
+02. See the three entities in mongo
+===================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [
+				"unitCode"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "CEL"
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 2,
+			"mdNames" : [
+				"unitCode"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "CEL"
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E3",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3,
+			"mdNames" : [
+				"unitCode",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "CEL"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"type" : "Property",
+					"value" : 25,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
+					"value" : "urn:ngsi-ld:T:E1",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. QUERY for all three
+=======================
+HTTP/1.1 200 OK
+Content-Length: 999
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E1",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 2
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E2",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P1_P1": {
+                "createdAt": "202REGEX(.*)",
+                "modifiedAt": "202REGEX(.*)",
+                "type": "Property",
+                "value": 25
+            },
+            "P1_R1": {
+                "createdAt": "202REGEX(.*)",
+                "modifiedAt": "202REGEX(.*)",
+                "object": "urn:ngsi-ld:T:E1",
+                "type": "Relationship"
+            },
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 3
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E3",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    }
+]
+
+
+04. GET urn:ngsi-ld:T:E3
+========================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "P1_P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "value": 25
+        },
+        "P1_R1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "object": "urn:ngsi-ld:T:E1",
+            "type": "Relationship"
+        },
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 3
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:ngsi-ld:T:E3",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

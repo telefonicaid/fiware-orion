@@ -284,7 +284,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
             aTop = kjString(orionldState.kjsonP, attrName, langValueNodeP->value.s);
           else  // langValueP->type == KjArray
             aTop = langValueNodeP;
-          kjTreeLog(aTop, "KZ: aTop");
         }
         else
         {
@@ -333,7 +332,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
         }
 
         kjChildAdd(top, aTop);    // Adding the attribute to the tree
-        kjTreeLog(top, "KZ: top with aTop inside");
       }
       else  // Normalized   AND    Concise  - concise is dealt with later!
       {
@@ -584,6 +582,5 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
     }
   }
 
-  kjTreeLog(root, "KZ: root with top and aTop inside");
   return root;
 }

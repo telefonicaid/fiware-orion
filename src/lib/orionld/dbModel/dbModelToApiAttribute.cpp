@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjAttributeNormalizedToSimplified.h"    // kjAttributeNormalizedToSimplified
 #include "orionld/kjTree/kjAttributeNormalizedToConcise.h"       // kjAttributeNormalizedToConcise
 #include "orionld/dbModel/dbModelToApiSubAttribute.h"            // dbModelToApiSubAttribute
@@ -58,8 +59,8 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
   //
   // Remove unwanted parts of the attribute from DB
   //
-  const char* unwanted[]   = { "mdNames", "creDate",   "modDate" };
-  const char* ngsildName[] = { NULL,      "createdAt", "modifiedAt" };
+  const char* unwanted[]   = { "mdNames", ".added", ".removed", "creDate",   "modDate"    };
+  const char* ngsildName[] = { NULL,      NULL,     NULL,       "createdAt", "modifiedAt" };
 
   for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {
@@ -67,7 +68,7 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
 
     if (nodeP != NULL)
     {
-      if ((sysAttrs == true) && (ix > 0))
+      if ((sysAttrs == true) && (ix > 2))
       {
         char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
         numberToDate(dbAttrP->value.f, dateTimeBuf, 32);
@@ -78,24 +79,6 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
       else
         kjChildRemove(dbAttrP, nodeP);
     }
-  }
-
-  KjNode* observedAtP = kjLookup(dbAttrP, "observedAt");
-  KjNode* unitCodeP   = kjLookup(dbAttrP, "unitCode");
-
-  if (observedAtP != NULL)
-  {
-    char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
-    numberToDate(observedAtP->value.firstChildP->value.f, dateTimeBuf, 32);
-    observedAtP->type      = KjString;
-    observedAtP->value.s   = dateTimeBuf;
-  }
-
-  if (unitCodeP != NULL)
-  {
-    unitCodeP->type      = KjString;
-    unitCodeP->value.s   = unitCodeP->value.firstChildP->value.s;
-    unitCodeP->lastChild = NULL;
   }
 
   KjNode* typeP  = kjLookup(dbAttrP, "type");
@@ -128,7 +111,11 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
   {
     kjChildRemove(dbAttrP, mdP);  // The content of mdP is added to dbAttrP at the end of the if
 
-    // Special Sub-Attrs: unitCode + observedAt
+    //
+    // Treating sub-attributes
+    //
+    // Special attention to: unitCode + observedAt
+    //
     for (KjNode* subP = mdP->value.firstChildP; subP != NULL; subP = subP->next)
     {
       if (strcmp(subP->name, "unitCode") == 0)
@@ -138,8 +125,10 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
       }
       else if (strcmp(subP->name, "observedAt") == 0)  // Part of Sub-Attribute
       {
-        subP->type  = subP->value.firstChildP->type;
-        subP->value = subP->value.firstChildP->value;  // + convert to iso8601 string
+        char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+        numberToDate(subP->value.firstChildP->value.f, dateTimeBuf, 32);
+        subP->type     = KjString;
+        subP->value.s  = dateTimeBuf;
       }
       else
         dbModelToApiSubAttribute(subP);

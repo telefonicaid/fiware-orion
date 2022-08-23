@@ -125,7 +125,7 @@ static KjNode* headersParse(struct iovec* ioVec, int ioVecSize, CachedSubscripti
 //
 // mqttNotify -
 //
-int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, double timestamp)
+int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, double notificationTime)
 {
   //
   // The headers and the body comes already rendered inside ioVec
@@ -139,7 +139,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
   if (metadata == NULL)
   {
     orionldError(OrionldInternalError, "Internal Error", "headersParse failed", 500);
-    notificationFailure(cSubP, "Error parsing headers", timestamp);
+    notificationFailure(cSubP, "Error parsing headers", notificationTime);
     return 1;
   }
 
@@ -150,7 +150,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
   if (buf == NULL)
   {
     orionldError(OrionldInternalError, "kaAlloc failed", "out of memory?", 500);
-    notificationFailure(cSubP, "Out of memory", timestamp);
+    notificationFailure(cSubP, "Out of memory", notificationTime);
     return 2;
   }
 
@@ -174,7 +174,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
     if (mqttConnectionP == NULL)
     {
       orionldError(OrionldInternalError, "MQTT Broker Problem", "unable to connect to the MQTT broker", 500);
-      notificationFailure(cSubP, "Unable to connect to the MQTT broker", timestamp);
+      notificationFailure(cSubP, "Unable to connect to the MQTT broker", notificationTime);
       return 3;
     }
   }
@@ -192,11 +192,11 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
   {
     LM_E(("Internal Error (MQTT waitForCompletion error %d)", rc));
     orionldError(OrionldInternalError, "MQTT Broker Problem", "MQTT waitForCompletion error", 500);
-    notificationFailure(cSubP, "MQTT waitForCompletion error", timestamp);
+    notificationFailure(cSubP, "MQTT waitForCompletion error", notificationTime);
     return 4;
   }
 
-  notificationSuccess(cSubP, timestamp);
+  notificationSuccess(cSubP, notificationTime);
 
   return 0;
 }

@@ -24,13 +24,13 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
-#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/types/OrionldResponseErrorType.h"            // OrionldResponseErrorType
 
 
 
@@ -49,6 +49,42 @@ KjNode* entityLookupById(KjNode* entityArray, char* entityId)
 
     if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
       return entityP;
+  }
+
+  return NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityLookupBy_id_Id - lookup an entity in an array of DB entities, by its entity-id
+//
+KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entityTypeNodeP)
+{
+  for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    KjNode* _idNodeP = kjLookup(entityP, "_id");
+
+    if (_idNodeP != NULL)
+    {
+      KjNode* idNodeP = kjLookup(_idNodeP, "id");
+
+      if (idNodeP == NULL)
+        idNodeP = kjLookup(_idNodeP, "@id");
+
+      if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
+      {
+        if (entityTypeNodeP != NULL)
+        {
+          *entityTypeNodeP = kjLookup(_idNodeP, "type");
+          if (*entityTypeNodeP == NULL)
+            *entityTypeNodeP = kjLookup(_idNodeP, "@type");
+        }
+
+        return entityP;
+      }
+    }
   }
 
   return NULL;

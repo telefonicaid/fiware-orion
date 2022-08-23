@@ -1,0 +1,586 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New Batch Upsert - Update-REPLACE with notifications
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbDrop orionld
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER2_PORT
+
+--SHELL--
+
+#
+# 01. Create a subscription for everything (i.e. all entities with type T)
+# 02. Create another subscription for everything (to accumulator2)
+# 03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1 + notification for E1
+# 04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error + notification for E2
+# 05. Upsert/REPLACE urn:ngsi-ld:T:E1 + notification for E1 and E3
+# 06. See the three entities in mongo
+# 07. QUERY for all entites
+# 08. GET urn:ngsi-ld:T:E1
+# 09. Dump Accumulator - see four notifications (one double)
+# 10. Dump Accumulator2 - see four notifications (one double)
+#
+
+echo "01. Create a subscription for everything (i.e. all entities with type T)"
+echo "========================================================================"
+payload='{
+  "type": "Subscription",
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create another subscription for everything (to accumulator2)"
+echo "================================================================"
+payload='{
+  "type": "Subscription",
+  "id": "urn:ngsi-ld:subscriptions:S2",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER2_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P0": {
+    "value": 1,
+    "unitCode": "CEL"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error"
+echo "===================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T2",
+    "P1": {
+      "value": 2,
+      "unitCode": "CEL"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E2",
+    "type": "T",
+    "P1": 2
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
+echo
+echo
+
+
+echo "05. Upsert/REPLACE urn:ngsi-ld:T:E1"
+echo "==================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:T:E1",
+    "type": "T",
+    "P1": {
+      "value": 3,
+      "unitCode": "CEL"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:T:E3",
+    "type": "T",
+    "P1": 3
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --out application/ld+json
+echo
+echo
+
+
+echo "06. See the three entities in mongo"
+echo "==================================="
+mongoCmd2 ftest "db.entities.find().pretty()"
+echo
+echo
+
+
+echo "07. QUERY for all entites"
+echo "========================="
+orionCurl --url '/ngsi-ld/v1/entities?local=true&options=sysAttrs'
+echo
+echo
+
+
+echo "08. GET urn:ngsi-ld:T:E1"
+echo "========================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:E1?options=sysAttrs'
+echo
+echo
+
+
+echo "09. Dump Accumulator - see four notifications (one double)"
+echo "=========================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "10. Dump Accumulator2 - see four notifications (one double)"
+echo "==========================================================="
+accumulator2Dump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription for everything (i.e. all entities with type T)
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. Create another subscription for everything (to accumulator2)
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2
+
+
+
+03. Create entity urn:ngsi-ld:T:E1, so that the UPSERT in Step 02 Overwrites urn:ngsi-ld:T:E1
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+
+
+
+04. Attempt to Upsert/REPLACE urn:ngsi-ld:T:E1 modifying the Entity Type - see error
+====================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 228
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:T:E1",
+            "error": {
+                "detail": "the Entity Type cannot be altered",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:T:E2"
+    ]
+}
+
+
+05. Upsert/REPLACE urn:ngsi-ld:T:E1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 20
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:T:E3"
+]
+
+
+06. See the three entities in mongo
+===================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3,
+			"mdNames" : [
+				"unitCode"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "CEL"
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 2,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E3",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+07. QUERY for all entites
+=========================
+HTTP/1.1 200 OK
+Content-Length: 708
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 3
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E1",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "Property",
+            "value": 2
+        },
+        "createdAt": "202REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E2",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": 3
+        },
+        "createdAt": "REGEX(.*)",
+        "id": "urn:ngsi-ld:T:E3",
+        "modifiedAt": "REGEX(.*)",
+        "type": "T"
+    }
+]
+
+
+08. GET urn:ngsi-ld:T:E1
+========================
+HTTP/1.1 200 OK
+Content-Length: 246
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 3
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:ngsi-ld:T:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+09. Dump Accumulator - see four notifications (one double)
+==========================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 278
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 261
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 2
+            },
+            "id": "urn:ngsi-ld:T:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 350
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+10. Dump Accumulator2 - see four notifications (one double)
+===========================================================
+POST http://127.0.0.1:9977/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 278
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9977/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 261
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 2
+            },
+            "id": "urn:ngsi-ld:T:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://127.0.0.1:9977/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 350
+User-Agent: orionld/post-v1.1.0
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E1",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "value": 3
+            },
+            "id": "urn:ngsi-ld:T:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
+accumulatorStop $LISTENER2_PORT

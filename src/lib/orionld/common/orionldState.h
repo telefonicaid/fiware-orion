@@ -237,6 +237,7 @@ typedef struct OrionldStateIn
   char*     authorization;
   char*     tenant;
   char*     legacy;          // Use legacy mongodb driver / mongoBackend
+  bool      performance;
 
   // Incoming payload
   char*     payload;
@@ -369,10 +370,8 @@ typedef struct OrionldConnectionState
   //
   // Notifications
   //
-  int                     notificationRecords;   // Old
-  OrionldNotificationInfo notificationInfo[16];  // Old
-  bool                    notify;                // Old
   OrionldAlteration*      alterations;
+  OrionldAlteration*      alterationsTail;
   CURLM*                  multiP;                // curl multi api
 
   OrionldPrefixCache      prefixCache;

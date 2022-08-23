@@ -948,6 +948,23 @@ function accumulator3Dump()
 
 # ------------------------------------------------------------------------------
 #
+# accumulator4Dump
+#
+function accumulator4Dump()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER4_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER4_PORT}/dump -s -S 2> /dev/null
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
 # accumulatorCount
 #
 function accumulatorCount()
@@ -1714,6 +1731,7 @@ export -f accumulatorStop
 export -f accumulatorDump
 export -f accumulator2Dump
 export -f accumulator3Dump
+export -f accumulator4Dump
 export -f accumulatorCount
 export -f accumulator2Count
 export -f accumulator3Count

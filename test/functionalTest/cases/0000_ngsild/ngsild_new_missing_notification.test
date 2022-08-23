@@ -1,0 +1,261 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification test for https://stackoverflow.com/questions/70588960/orion-ld-issues-no-notification-send-to-subscription
+
+--SHELL-INIT--
+# Copied from ngsild_missing_notification.test
+export BROKER=orionld
+dbInit CB
+dbInit CB openiot
+brokerStart CB 0 IPv4 -multiservice -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 00. Adding an @context in the context server
+# 01. Creating subscription on tenant openiot
+# 02. Creating an entity on tenant openiot
+# 03. Dumping/Reseting accumulator to see one notification
+# 04. Updating the entity
+# 05. Dumping accumulator to see one notification
+#
+
+echo "00. Adding an @context in the context server"
+echo "============================================"
+#
+# First we remove the context, if present, as if already present, the creation request gives an 409 Conflict.
+# We don't want to see the output of the DELETE request (either it works or it gives a 404 Not Found), so the output is send to / dev/null
+#
+cServerCurl --url /jsonldContexts/testContext --verb DELETE > /dev/null  2>&1
+
+payload='{
+  "@context": {
+    "type": "@type",
+    "id": "@id",
+    "ngsi-ld": "https://uri.etsi.org/ngsi-ld/",
+    "example": "https://ngsi-ld-tutorials.readthedocs.io/en/latest/datamodels.html#",        
+    "LoraDevice": "example:LoraDevice",
+    "temperatureCh3": "example:ch3",
+    "temperatureCh5": "example:ch5",
+    "TemperatureSensor": "example:TemperatureSensor",
+    "temperature": "https://w3id.org/saref#temperature"
+  }
+}'
+cServerCurl --url /jsonldContexts/testContext --payload "$payload" --verb POST
+echo
+echo
+
+
+echo "01. Creating subscription on tenant openiot"
+echo "==========================================="
+payload='{
+  "description": "Notify me of all changes",
+  "type": "Subscription",
+  "entities" : [{"type": "TemperatureSensor"}],
+  "watchedAttributes": ["temperature"],
+  "notification": {
+    "attributes": ["temperature"],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  },
+  "@context": "http://localhost:7080/jsonldContexts/testContext"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json" -H "NGSILD-Tenant: openiot"
+echo
+echo
+
+
+echo "02. Creating an entity on tenant openiot"
+echo "========================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:Device:temperature002",
+    "type": "TemperatureSensor",
+    "temperature": {
+      "type": "Property",
+      "value": {
+        "@type": "Intangible",
+        "@value": null
+      },
+      "unitCode": "CEL"
+    },
+    "@context": "http://localhost:7080/jsonldContexts/testContext"
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert  -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "NGSILD-Tenant: openiot"
+echo
+echo
+
+
+echo "03. Dumping/Reseting accumulator to see one notification"
+echo "========================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Updating the entity"
+echo "======================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:Device:temperature002",
+    "type": "TemperatureSensor",
+    "temperature": {
+      "type": "Property",
+      "value": 10,
+      "unitCode": "CEL",
+      "observedAt": "2022-01-17T11:18:02.585Z"
+    },
+    "@context": "http://localhost:7080/jsonldContexts/testContext"
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update  -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "NGSILD-Tenant: openiot"
+echo
+echo
+
+
+echo "05. Dumping accumulator to see one notification"
+echo "==============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+00. Adding an @context in the context server
+============================================
+HTTP/1.1 201 Created
+Location: http://localhost:8080/jsonldContexts/testContext
+Date: REGEX(.*)
+connection: keep-alive
+transfer-encoding: chunked
+
+
+
+01. Creating subscription on tenant openiot
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+NGSILD-Tenant: openiot
+
+
+
+02. Creating an entity on tenant openiot
+========================================
+HTTP/1.1 201 Created
+Content-Length: 37
+Content-Type: application/json
+Date: REGEX(.*)
+NGSILD-Tenant: openiot
+
+[
+    "urn:ngsi-ld:Device:temperature002"
+]
+
+
+03. Dumping/Reseting accumulator to see one notification
+========================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
+Content-Length: 388
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Ngsild-Tenant: openiot
+Content-Type: application/json
+Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:Device:temperature002",
+            "temperature": {
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": {
+                    "@type": "Intangible",
+                    "@value": null
+                }
+            },
+            "type": "TemperatureSensor"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+04. Updating the entity
+=======================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Dumping accumulator to see one notification
+===============================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
+Content-Length: 394
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Ngsild-Tenant: openiot
+Content-Type: application/json
+Link: <http://localhost:7080/jsonldContexts/testContext>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:Device:temperature002",
+            "temperature": {
+                "observedAt": "2022-01-17T11:18:02.585Z",
+                "type": "Property",
+                "unitCode": "CEL",
+                "value": 10
+            },
+            "type": "TemperatureSensor"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
+dbDrop CB openiot

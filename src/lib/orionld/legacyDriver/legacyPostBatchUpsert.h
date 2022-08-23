@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H_
-#define SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPSERT_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPSERT_H_
 
 /*
 *
@@ -23,21 +23,15 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Larysse Savanna
+* Author: Gabriel Quaresma
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/db/dbConfiguration.h"                          // dbEntityListLookupWithIdTypeCreDate
 
 
 
 // ----------------------------------------------------------------------------
 //
-// dbEntityListLookupWithIdTypeCreDate -
+// legacyPostBatchUpsert -
 //
-extern dbEntityListLookupWithIdTypeCreDate dbEntityListLookupWithIdTypeCreDate;
+extern bool legacyPostBatchUpsert(void);
 
-#endif  // SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPSERT_H_

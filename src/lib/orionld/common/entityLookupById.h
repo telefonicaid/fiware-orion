@@ -38,4 +38,12 @@ extern "C"
 //
 extern KjNode* entityLookupById(KjNode* entityArray, char* entityId);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// entityLookupBy_id_Id - lookup an entity in an array of DB entities, by its entity-id
+//
+extern KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entityTypeNodeP);
+
 #endif  // SRC_LIB_ORIONLD_COMMON_ENTITYLOOKUPBYID_H_

@@ -70,6 +70,7 @@ extern "C"
 //
 bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP)
 {
+  LM(("CA: Treating attribute '%s'", attrP->name));
   KjNode* mdP         = NULL;
   char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
   char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);
@@ -158,7 +159,10 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       if (ix == 0)
       {
         if (dbAttrP == NULL)  // Attribute does not already exist
+        {
+          LM(("CA: Adding creDate to attribute '%s'", attrP->name));
           kjTimestampAdd(attrP, "creDate");
+        }
 
         // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
         kjTimestampAdd(attrP, "modDate");
@@ -246,6 +250,15 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
     next = subP->next;
 
+    if (strcmp(subP->name, "creDate") == 0)
+    {
+      LM(("CA: Got a 'creDate' as 'sub-attr' of attribute '%s'", attrP->name));
+      kjChildRemove(mdP, subP);
+      kjChildAdd(attrP, subP);
+      subP = next;
+      continue;
+    }
+    LM(("CA: Expanding sub-attr '%s'", subP->name));
     subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
 
     // Add the name of the sub-attribute to the "mdNames" array

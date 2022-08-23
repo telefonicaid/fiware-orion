@@ -71,7 +71,7 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
 
   if (typeP == NULL)
   {
-    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbSubAttrP->name, 500);
+    orionldError(OrionldInternalError, "Database Error (sub-attribute without type in database)", dbSubAttrP->name, 500);
     return;
   }
 
@@ -110,7 +110,7 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Render
 
   if (typeP == NULL)
   {
-    orionldError(OrionldInternalError, "Database Error (attribute without type in database)", dbSubAttributeP->name, 500);
+    orionldError(OrionldInternalError, "Database Error (sub-attribute without type in database)", dbSubAttributeP->name, 500);
     return NULL;
   }
 

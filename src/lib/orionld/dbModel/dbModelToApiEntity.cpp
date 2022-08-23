@@ -49,11 +49,13 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiEntity -
+// dbModelToApiEntity - transform a DB-Model Entity to an API Entity
+//
+// The incoming DB-Model Entity is DESTROYED by this function
 //
 // USED BY
-//   orionldAlterationsTreat
-//
+//   orionldAlterationsTreat() ?
+//   orionldPostBatchUpsert()
 //
 KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityId)
 {
@@ -203,10 +205,8 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
 
   if (attrsP == NULL)
   {
-    LM_E(("Database Error (the field 'attrs' is missing)"));
-    pdP->title  = (char*) "Database Error";
-    pdP->detail = (char*) "the field 'attrs' is missing";
-    return NULL;
+    KjNode* attrsP = kjObject(orionldState.kjsonP, "attrs");
+    kjChildAdd(dbEntityP, attrsP);
   }
 
   KjNode* idP   = NULL;
@@ -291,6 +291,9 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   //
   for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
+    if (strcmp(attrP->name, ".added")   == 0) continue;
+    if (strcmp(attrP->name, ".removed") == 0) continue;
+
     KjNode* attributeP;
     KjNode* datasetP = datasetExtract(datasetsP, attrP->name);  // datasetExtract removes the dataset from @datasets
 
