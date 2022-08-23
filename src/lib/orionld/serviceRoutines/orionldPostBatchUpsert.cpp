@@ -416,60 +416,6 @@ extern bool dbEntityFields(KjNode* dbEntityP, const char* entityId, char** entit
 
 // ----------------------------------------------------------------------------
 //
-// entityListWithIdAndType -
-//
-//   HERE dbEntityArray is "cloned" into the format dbEntityListLookupWithIdTypeCreDate() gives back
-//   [
-//     {
-//       "id": "urn:E1",
-//       "type": "T"
-//     },
-//     ...
-//   ]
-//   orionldState.batchEntities is set to point to the array (used in troePostBatchUpsert)
-//
-static KjNode* entityListWithIdAndType(KjNode* dbEntityArray)
-{
-  KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
-
-  for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
-  {
-    KjNode* _idP = kjLookup(dbEntityP, "_id");
-
-    if (_idP == NULL)
-    {
-      LM_E(("Database Error (unable to extract _id field from entity in database)"));
-      continue;
-    }
-
-    KjNode* dbIdNodeP   = kjLookup(_idP, "id");
-    KjNode* dbTypeNodeP = kjLookup(_idP, "type");
-
-    if ((dbIdNodeP == NULL) || (dbTypeNodeP == NULL))
-    {
-      LM_E(("Database Error (unable to extract id/type fields from entity::_id in database)"));
-      continue;
-    }
-
-    KjNode* entityP    = kjObject(orionldState.kjsonP, NULL);
-    KjNode* idNodeP    = kjString(orionldState.kjsonP, "id",   dbIdNodeP->value.s);
-    KjNode* typeNodeP  = kjString(orionldState.kjsonP, "type", dbTypeNodeP->value.s);
-
-    kjChildAdd(entityP, idNodeP);
-    kjChildAdd(entityP, typeNodeP);
-
-    kjChildAdd(entityArray, entityP);
-    LM(("X2: Inserted entity '%s' in the entityIdAndTypeArray", dbIdNodeP->value.s));
-  }
-
-  kjTreeLog(entityArray, "X2: entityIdAndTypeArray");
-  return entityArray;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
 // kjConcatenate - move all children from srcP to the end of destP)
 //
 static KjNode* kjConcatenate(KjNode* destP, KjNode* srcP)
@@ -524,17 +470,39 @@ static bool multipleInstances(const char* entityId, KjNode* updatedArrayP, KjNod
 
 // -----------------------------------------------------------------------------
 //
+// troeInfo -
+//
+// Add the field for TRoE inside the original entity: ".troe": "Create"/"Replace"/"Update"/"Ignore"
+// This field tells TRoE processing how to treat the entity
+// It needs to be inside the tree (TRoE processing will remove it) as this merchanism
+// cannot be based on solely the Entity ID - there may be more that one Entity-instance with the same Entity ID
+//
+static void troeInfo(KjNode* inEntityP, const char* troeValue)
+{
+  KjNode* troeNodeP = kjString(orionldState.kjsonP, ".troe", troeValue);
+
+  kjChildAdd(inEntityP, troeNodeP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // batchCreateEntity -
 //
 // * An entity in DB-Model format is returned
 // * 'inEntityP' is left untouched
 //
-static KjNode* batchCreateEntity(KjNode* inEntityP, char* entityId, char* entityType)
+static KjNode* batchCreateEntity(KjNode* inEntityP, char* entityId, char* entityType, bool replaced)
 {
   KjNode* dbFinalEntityP = kjClone(orionldState.kjsonP, inEntityP);  // Starts out as API-Entity but dbModelFromApiEntity makes it a DB-Entity
 
   if (dbModelFromApiEntity(dbFinalEntityP, NULL, true, entityId, entityType) == false)
     return NULL;
+
+  // Inserting the ".troe" field AFTER the DB Entity has been created
+  if (troe)
+    troeInfo(inEntityP, (replaced == false)? "Create" : "Replace");
 
   return dbFinalEntityP;
 }
@@ -572,6 +540,10 @@ static KjNode* batchReplaceEntity(KjNode* inEntityP, char* entityId, char* entit
     creDateNodeP = kjFloat(orionldState.kjsonP, "creDate", entityCreDate);
     kjChildAdd(dbFinalEntityP, creDateNodeP);
   }
+
+  // Inserting the ".troe" field AFTER the DB Entity has been created
+  if (troe)
+    troeInfo(inEntityP, "Replace");
 
   return dbFinalEntityP;
 }
@@ -661,6 +633,10 @@ static KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, c
     modDateNodeP = kjFloat(orionldState.kjsonP, "modDate", orionldState.requestTime);
     kjChildAdd(dbFinalEntityP, modDateNodeP);
   }
+
+  // Inserting the ".troe" field AFTER the DB Entity has been created
+  if (troe)
+    troeInfo(inEntityP, "Update");
 
   return dbFinalEntityP;
 }
@@ -788,9 +764,6 @@ bool orionldPostBatchUpsert(void)
   noOfEntities = entitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update);
   LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
-  if (troe)
-    orionldState.batchEntities = entityListWithIdAndType(dbEntityArray);  // For TRoE - but, a new method should be found
-
   KjNode* outArrayCreatedP  = kjArray(orionldState.kjsonP, "created");
   KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");
 
@@ -859,7 +832,7 @@ bool orionldPostBatchUpsert(void)
 
     if (originalDbEntityP == NULL)  // The entity did not exist before - CREATION
     {
-      finalDbEntityP = batchCreateEntity(inEntityP, entityId, entityType);
+      finalDbEntityP = batchCreateEntity(inEntityP, entityId, entityType, multipleEntities);
 
       if (finalDbEntityP != NULL)
       {

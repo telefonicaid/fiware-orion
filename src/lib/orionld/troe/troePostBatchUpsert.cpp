@@ -105,20 +105,27 @@ bool troePostBatchUpsert(void)
     if (troeIgnored(entityP) == true)
       continue;
 
-    kjTreeLog(entityP, "XX: entityP");
     KjNode* entityIdP    = kjLookup(entityP, "id");
     bool    entityUpdate = false;  // Updated of entities aren't recorded in the "entities" table
 
-    LM(("XX: entityIdP at %p", entityIdP));
     if (entityIdP != NULL)  // Can't be NULL, really ...
     {
-      LM(("XX: orionldState.batchEntities at %p", orionldState.batchEntities));
-      if (orionldState.batchEntities != NULL)
+      KjNode* troeModeNodeP = kjLookup(entityP, ".troe");
+
+      //
+      // ".troe" field inside entity is the new mechanism to pass the OpMode to TRoE.
+      // orionldState.batchEntities is the old mechanism.
+      //
+      if (troeModeNodeP != NULL)
       {
-        LM(("XX: Still here"));
+        troeEntityMode = troeModeNodeP->value.s;
+        if (strcmp(troeEntityMode, "Update") == 0)
+          entityUpdate = true;
+      }
+      else if (orionldState.batchEntities != NULL)
+      {
         kjTreeLog(orionldState.batchEntities, "orionldState.batchEntities");
-        LM(("XX: Still here"));
-        LM(("XX: Entity ID: '%s'", entityIdP->value.s));
+
         // If the entity already existed, the entity op mode must be "REPLACE"
         if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
           troeEntityMode = (char*) "Create";
@@ -138,7 +145,6 @@ bool troePostBatchUpsert(void)
       pgAttributesBuild(&attributes, entityP, NULL, "Replace", &subAttributes);
     else
       pgEntityBuild(&entities, troeEntityMode, entityP, NULL, NULL, &attributes, &subAttributes);
-    LM(("XX: Here"));
   }
 
 
