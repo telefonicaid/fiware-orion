@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
-#define SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPDATE_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPDATE_H_
 
 /*
 *
@@ -23,29 +23,15 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma and Ken Zangelin
+* Author: Gabriel Quaresma
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// entityErrorPush -
+// legacyPostBatchUpdate -
 //
-extern void entityErrorPush
-(
-  KjNode*                   errorsArrayP,
-  const char*               entityId,
-  OrionldResponseErrorType  type,
-  const char*               title,
-  const char*               detail,
-  int                       status
-);
+extern bool legacyPostBatchUpdate(void);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHUPDATE_H_

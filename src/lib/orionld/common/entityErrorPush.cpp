@@ -65,20 +65,16 @@ void entityErrorPush
   OrionldResponseErrorType  type,
   const char*               title,
   const char*               detail,
-  int                       status,
-  bool                      avoidDuplicate
+  int                       status
 )
 {
-  if (avoidDuplicate == true)
+  // If the entity 'entityId' is present already, then we don't add another error
+  for (KjNode* nodeP = errorsArrayP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    // If the entity 'entityId' is present already, then don't add another one
-    for (KjNode* nodeP = errorsArrayP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-    {
-      KjNode* entityIdP = kjLookup(nodeP, "entityId");
+    KjNode* entityIdP = kjLookup(nodeP, "entityId");
 
-      if ((entityIdP != NULL) && (strcmp(entityIdP->value.s, entityId) == 0))
-        return;
-    }
+    if ((entityIdP != NULL) && (strcmp(entityIdP->value.s, entityId) == 0))
+      return;
   }
 
   KjNode* objP            = kjObject(orionldState.kjsonP, NULL);

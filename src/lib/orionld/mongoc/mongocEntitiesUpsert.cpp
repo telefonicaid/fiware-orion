@@ -58,19 +58,22 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 
   bulkP = mongoc_collection_create_bulk_operation_with_opts(orionldState.mongoc.entitiesP, NULL);
 
-  LM(("KZ: First the ones to be created:"));
-  for (KjNode* entityP = createArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  if (createArrayP != NULL)
   {
-    LM(("KZ:  o %p", entityP));
-    bson_t doc;
+    LM(("KZ: The entities to be created:"));
+    for (KjNode* entityP = createArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      LM(("KZ:  o %p", entityP));
+      bson_t doc;
 
-    bson_init(&doc);
-    mongocKjTreeToBson(entityP, &doc);  // The entity needs to be DB-Prepared !
-    mongoc_bulk_operation_insert(bulkP, &doc);
-    bson_destroy(&doc);
+      bson_init(&doc);
+      mongocKjTreeToBson(entityP, &doc);  // The entity needs to be DB-Prepared !
+      mongoc_bulk_operation_insert(bulkP, &doc);
+      bson_destroy(&doc);
+    }
   }
 
-  LM(("KZ: Then the ones to be updated (replaced):"));
+  LM(("KZ: The entities to be updated (replaced):"));
   for (KjNode* entityP = updateArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     bson_t doc;

@@ -89,7 +89,7 @@ echo
 01. Upsert 3 entities (Create) with plenty of errors
 ====================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 2540
+Content-Length: 581
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -105,54 +105,9 @@ Date: REGEX(.*)
             }
         },
         {
-            "entityId": "No Entity::id",
+            "entityId": "Invalid Entity::id",
             "error": {
-                "detail": "must be a JSON Object",
-                "status": 400,
-                "title": "Invalid Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "must be a non-empty JSON Object",
-                "status": 400,
-                "title": "Empty Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "must be a JSON Object",
-                "status": 400,
-                "title": "Invalid Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "must be a JSON Object",
-                "status": 400,
-                "title": "Invalid Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "Entity::id",
+                "detail": "Int",
                 "status": 400,
                 "title": "Invalid JSON type",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
@@ -162,60 +117,6 @@ Date: REGEX(.*)
             "entityId": "urn:ngsi-ld:T:Eh1",
             "error": {
                 "detail": "id",
-                "status": 400,
-                "title": "Duplicated field in an entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:T:Eh1",
-            "error": {
-                "detail": "urn:ngsi-ld:T:Eh1",
-                "status": 400,
-                "title": "Duplicated field in an entity (id+@id)",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:T:Eh1",
-            "error": {
-                "detail": "urn:ngsi-ld:T:Eh1",
-                "status": 400,
-                "title": "Duplicated field in an entity (id+@id)",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:T:Eh1",
-            "error": {
-                "detail": "type",
-                "status": 400,
-                "title": "Duplicated field in an entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:T:Eh1",
-            "error": {
-                "detail": "urn:ngsi-ld:T:Eh1",
-                "status": 400,
-                "title": "Duplicated field in an entity (type+@type)",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:T:Eh1",
-            "error": {
-                "detail": "@type",
-                "status": 400,
-                "title": "Duplicated field in an entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:T:Eh1",
-            "error": {
-                "detail": "P1",
                 "status": 400,
                 "title": "Duplicated field in an entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

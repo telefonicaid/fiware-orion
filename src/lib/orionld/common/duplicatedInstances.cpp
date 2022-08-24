@@ -249,7 +249,7 @@ void duplicatedInstances(KjNode* incomingTree, KjNode* dbEntityV, bool entityRep
     if (orionldState.duplicateArray == NULL)
       orionldState.duplicateArray = kjArray(orionldState.kjsonP, NULL);
 
-    entityErrorPush(errorsArray, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instances merged into one", 400, true);
+    entityErrorPush(errorsArray, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instances merged into one", 400);
     kjChildRemove(incomingTree, entityP);
     kjChildAdd(orionldState.duplicateArray, entityP);
     entityP = next;
