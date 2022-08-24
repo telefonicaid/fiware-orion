@@ -91,7 +91,7 @@
             - [Replace all entity attributes `PUT /v2/entities/{entityId}/attrs`](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
             - [Remove Entity `DELETE /v2/entities/{entityId}`](#remove-entity-delete-v2entitiesentityid)
         - [Attributes](#attributes)
-            - ` attribute data `GET /v2/entities/{entityId}/attrs/{attrName}`](#get-attribute-data-get-v2entitiesentityidattrsattrname)
+            - [Get attribute data `GET /v2/entities/{entityId}/attrs/{attrName}`](#get-attribute-data-get-v2entitiesentityidattrsattrname)
             - [Update Attribute Data `PUT /v2/entities/{entityId}/attrs/{attrName}`](#update-attribute-data-put-v2entitiesentityidattrsattrname)
             - [Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}`](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
         - [Attribute Value](#attribute-value)
