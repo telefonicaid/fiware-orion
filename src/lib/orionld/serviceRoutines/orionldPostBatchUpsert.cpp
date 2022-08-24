@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
-#include "orionld/common/entityLookupById.h"                   // entityLookupById
+#include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration
@@ -104,7 +104,7 @@ int batchEntityCountAndFirstCheck(KjNode* requestTree, KjNode* errorsArrayP)
 //
 // batchEntityStringArrayPopulate -
 //
-int batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, KjNode* errorsArrayP)
+int batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, KjNode* errorsArrayP, bool entityTypeMandatory)
 {
   int     idIndex = 0;
   KjNode* eP      = requestTree->value.firstChildP;
@@ -145,6 +145,38 @@ int batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, 
       kjChildRemove(orionldState.requestTree, eP);
       eP = next;
       continue;
+    }
+
+
+    //
+    // Entity Type check, only if the type is mandatory
+    //
+    if (entityTypeMandatory == true)
+    {
+      KjNode* typeNodeP = kjLookup(eP, "type");
+
+      if (typeNodeP == NULL)
+      {
+        typeNodeP = kjLookup(eP, "@type");
+
+        if (typeNodeP == NULL)
+        {
+          entityErrorPush(errorsArrayP, "No Entity::type", OrionldBadRequestData, "Mandatory field missing", "Entity::type", 400);
+          kjChildRemove(orionldState.requestTree, eP);
+          eP = next;
+          continue;
+        }
+
+        typeNodeP->name = (char*) "type";  // From this point, there are no @type, only type
+      }
+
+      if (typeNodeP->type != KjString)
+      {
+        entityErrorPush(errorsArrayP, "Invalid Entity::type", OrionldBadRequestData, "Invalid JSON type", kjValueType(typeNodeP->type), 400);
+        kjChildRemove(orionldState.requestTree, eP);
+        eP = next;
+        continue;
+      }
     }
 
     eIdArrayP->array[idIndex++] = idNodeP->value.s;
@@ -237,7 +269,7 @@ static bool creationByPreviousInstance(KjNode* creationArrayP, KjNode* entityP, 
 //
 // batchEntitiesFinalCheck -
 //
-int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update, bool mustExist)
+int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update, bool mustExist, bool cannotExist)
 {
   int      noOfEntities   = 0;
   KjNode*  eP             = requestTree->value.firstChildP;
@@ -320,6 +352,15 @@ int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* d
     {
       LM_E(("The entity '%s' does not exist", entityId));
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Entity not found", "Cannot update a non-existing entity", 404);
+      kjChildRemove(orionldState.requestTree, eP);
+      eP = next;
+      continue;
+    }
+
+    if ((cannotExist == true) && (dbEntityP != NULL))  // FIXME: Only interesting for BATCH CREATE
+    {
+      LM_E(("The entity '%s' already exists", entityId));
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Entity already exists", "Cannot create an existing entity", 409);
       kjChildRemove(orionldState.requestTree, eP);
       eP = next;
       continue;
@@ -512,7 +553,7 @@ static void troeInfo(KjNode* inEntityP, const char* troeValue)
 // * An entity in DB-Model format is returned
 // * 'inEntityP' is left untouched
 //
-static KjNode* batchCreateEntity(KjNode* inEntityP, char* entityId, char* entityType, bool replaced)
+KjNode* batchCreateEntity(KjNode* inEntityP, char* entityId, char* entityType, bool replaced)
 {
   KjNode* dbFinalEntityP = kjClone(orionldState.kjsonP, inEntityP);  // Starts out as API-Entity but dbModelFromApiEntity makes it a DB-Entity
 
@@ -779,7 +820,7 @@ bool orionldPostBatchUpsert(void)
   // We have the StringArray (eIdArray), so, now we can loop through the incoming array of entities and populate eIdArray
   // (extract the entity ids) later to be used by mongocEntitiesQuery().
   //
-  noOfEntities = batchEntityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP);
+  noOfEntities = batchEntityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP, false);
   LM(("Number of valid Entities after 2nd check-round: %d", noOfEntities));
 
 
@@ -796,7 +837,7 @@ bool orionldPostBatchUpsert(void)
   //
   // Finally we have everything we need to 100% CHECK the incoming entities
   //
-  noOfEntities = batchEntitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update, false);
+  noOfEntities = batchEntitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update, false, false);
   LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
   KjNode* outArrayCreatedP  = kjArray(orionldState.kjsonP, "created");  // For the HTTP response payload body
@@ -934,7 +975,6 @@ bool orionldPostBatchUpsert(void)
   // Returning the three arrays, or not ...
   //
   // 1. The broker returns 201 if there are no errors
-  //
   //    - updatedArrayP EMPTY
   //    - createdArrayP NOT EMPTY
   //

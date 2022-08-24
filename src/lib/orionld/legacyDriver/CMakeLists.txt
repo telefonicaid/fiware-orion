@@ -29,6 +29,7 @@ SET (SOURCES
     legacyGetEntities.cpp
     legacyPostBatchUpsert.cpp
     legacyPostBatchUpdate.cpp
+    legacyPostBatchCreate.cpp
 )
 
 # Include directories

@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 #
 # 01. Create a subscription for all entities of type T
 # 02. Create entities E1, E2 and E3 with attributes P1 and R1
-# 03. Dump and reset accumulator - see 3 notifications - should be one with 3 entities ... (when experimental BATCH Create)
+# 03. Dump and reset accumulator - see one notification with 3 entities
 # 04. GET the entities
 # 05. Batch-update E1 and E3, with attrs P1 and R2 (attribute overwrite is default)
 # 06. Dump and reset accumulator - see one notification with two entities
@@ -136,8 +136,8 @@ echo
 echo
 
 
-echo "03. Dump and reset accumulator - see 3 notifications - should be one with 3 entities ... (when experimental BATCH Create)"
-echo "========================================================================================================================="
+echo "03. Dump and reset accumulator - see one notification with 3 entities"
+echo "====================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -299,17 +299,15 @@ Date: REGEX(.*)
 ]
 
 
-03. Dump and reset accumulator - see 3 notifications - should be one with 3 entities ... (when experimental BATCH Create)
-=========================================================================================================================
+03. Dump and reset accumulator - see one notification with 3 entities
+=====================================================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
-Fiware-Servicepath: /
-Content-Length: 282
-User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: keyValues
-Host: 127.0.0.1:9997
+Content-Length: 436
+User-Agent: orionld/REGEX(.*)
 Accept: application/json
-Content-Type: application/json; charset=utf-8
+Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Simplified
 
 {
     "data": [
@@ -318,51 +316,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "R1": "urn:E1:R1:step2",
             "id": "urn:ngsi-ld:entity:E1",
             "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
-    "notifiedAt": "202REGEX(.*)Z",
-    "subscriptionId": "urn:ngsi-ld:Subscription:testsubscription",
-    "type": "Notification"
-}
-=======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
-Fiware-Servicepath: /
-Content-Length: 282
-User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: keyValues
-Host: 127.0.0.1:9997
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-
-{
-    "data": [
+        },
         {
             "P1": "STEP 02",
             "R1": "urn:E2:R1:step2",
             "id": "urn:ngsi-ld:entity:E2",
             "type": "T"
-        }
-    ],
-    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
-    "notifiedAt": "202REGEX(.*)Z",
-    "subscriptionId": "urn:ngsi-ld:Subscription:testsubscription",
-    "type": "Notification"
-}
-=======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
-Fiware-Servicepath: /
-Content-Length: 276
-User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: keyValues
-Host: 127.0.0.1:9997
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-
-{
-    "data": [
+        },
         {
             "P1": "STEP 02",
             "R1": "urn:E3:R1",

@@ -1,0 +1,811 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+BATCH Create with MANU geo-properties, issue #922
+
+--SHELL-INIT--
+# Copied from ngsild_issue_0922-many-geoprops.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. BATCH Create 50 entities with location attribute
+#
+
+echo "01. BATCH Create 50 entities with location attribute"
+echo "===================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-001",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-002",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-003",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-004",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-005",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-006",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-007",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-008",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-009",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-010",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-011",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-012",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-013",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-014",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-015",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-016",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-017",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-018",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-019",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-020",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-021",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-022",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-023",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-024",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-025",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-026",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-027",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-028",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-029",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-030",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-031",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-032",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-033",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-034",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-035",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-036",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-037",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-038",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-039",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-040",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-041",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-042",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-043",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-044",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-045",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-046",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-047",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-048",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-049",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Camera:test-camera-050",
+    "type": "Camera",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          1,
+          2
+        ]
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" -H 'Link: <https://github.com/FIWARE/context.Orion-LD/files/7334895/test-context-ngsi.txt>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. BATCH Create 50 entities with location attribute
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 1851
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:Camera:test-camera-001",
+    "urn:ngsi-ld:Camera:test-camera-002",
+    "urn:ngsi-ld:Camera:test-camera-003",
+    "urn:ngsi-ld:Camera:test-camera-004",
+    "urn:ngsi-ld:Camera:test-camera-005",
+    "urn:ngsi-ld:Camera:test-camera-006",
+    "urn:ngsi-ld:Camera:test-camera-007",
+    "urn:ngsi-ld:Camera:test-camera-008",
+    "urn:ngsi-ld:Camera:test-camera-009",
+    "urn:ngsi-ld:Camera:test-camera-010",
+    "urn:ngsi-ld:Camera:test-camera-011",
+    "urn:ngsi-ld:Camera:test-camera-012",
+    "urn:ngsi-ld:Camera:test-camera-013",
+    "urn:ngsi-ld:Camera:test-camera-014",
+    "urn:ngsi-ld:Camera:test-camera-015",
+    "urn:ngsi-ld:Camera:test-camera-016",
+    "urn:ngsi-ld:Camera:test-camera-017",
+    "urn:ngsi-ld:Camera:test-camera-018",
+    "urn:ngsi-ld:Camera:test-camera-019",
+    "urn:ngsi-ld:Camera:test-camera-020",
+    "urn:ngsi-ld:Camera:test-camera-021",
+    "urn:ngsi-ld:Camera:test-camera-022",
+    "urn:ngsi-ld:Camera:test-camera-023",
+    "urn:ngsi-ld:Camera:test-camera-024",
+    "urn:ngsi-ld:Camera:test-camera-025",
+    "urn:ngsi-ld:Camera:test-camera-026",
+    "urn:ngsi-ld:Camera:test-camera-027",
+    "urn:ngsi-ld:Camera:test-camera-028",
+    "urn:ngsi-ld:Camera:test-camera-029",
+    "urn:ngsi-ld:Camera:test-camera-030",
+    "urn:ngsi-ld:Camera:test-camera-031",
+    "urn:ngsi-ld:Camera:test-camera-032",
+    "urn:ngsi-ld:Camera:test-camera-033",
+    "urn:ngsi-ld:Camera:test-camera-034",
+    "urn:ngsi-ld:Camera:test-camera-035",
+    "urn:ngsi-ld:Camera:test-camera-036",
+    "urn:ngsi-ld:Camera:test-camera-037",
+    "urn:ngsi-ld:Camera:test-camera-038",
+    "urn:ngsi-ld:Camera:test-camera-039",
+    "urn:ngsi-ld:Camera:test-camera-040",
+    "urn:ngsi-ld:Camera:test-camera-041",
+    "urn:ngsi-ld:Camera:test-camera-042",
+    "urn:ngsi-ld:Camera:test-camera-043",
+    "urn:ngsi-ld:Camera:test-camera-044",
+    "urn:ngsi-ld:Camera:test-camera-045",
+    "urn:ngsi-ld:Camera:test-camera-046",
+    "urn:ngsi-ld:Camera:test-camera-047",
+    "urn:ngsi-ld:Camera:test-camera-048",
+    "urn:ngsi-ld:Camera:test-camera-049",
+    "urn:ngsi-ld:Camera:test-camera-050"
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

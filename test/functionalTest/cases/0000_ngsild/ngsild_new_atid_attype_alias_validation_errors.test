@@ -1734,7 +1734,7 @@ Date: REGEX(*.)
 15. Attempt to create entities with entityOperations using @id invalid - see error
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 248
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1745,8 +1745,8 @@ Date: REGEX(*.)
       "entityId": "123",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1758,7 +1758,7 @@ Date: REGEX(*.)
 16. Attempt to create entities with entityOperations using @type invalid - see error
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 540
+Content-Length: 550
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1769,8 +1769,8 @@ Date: REGEX(*.)
       "entityId": "urn:ngsi-ld:entity:E1",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "field with invalid type",
-        "detail": "entity::type",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
         "status": 400
       }
     },
@@ -1778,8 +1778,8 @@ Date: REGEX(*.)
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "field with invalid type",
-        "detail": "entity::type",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
         "status": 400
       }
     }
@@ -1791,7 +1791,7 @@ Date: REGEX(*.)
 17. Attempt to create entities with entityOperations using @id and @type invalid - see error
 ============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 248
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1802,8 +1802,8 @@ Date: REGEX(*.)
       "entityId": "123",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1823,11 +1823,11 @@ Date: REGEX(*.)
   "success": [],
   "errors": [
     {
-      "entityId": "no entity::id",
+      "entityId": "No Entity::id",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "mandatory field missing",
-        "detail": "entity::id",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1839,7 +1839,7 @@ Date: REGEX(*.)
 19. Attempt to create entities with entityOperations w/o @type - see error
 ==========================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 576
+Content-Length: 598
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1851,7 +1851,7 @@ Date: REGEX(*.)
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
         "title": "Invalid Entity",
-        "detail": "Mandatory field entity::type is missing",
+        "detail": "no type in incoming payload for CREATION of Entity",
         "status": 400
       }
     },
@@ -1860,7 +1860,7 @@ Date: REGEX(*.)
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
         "title": "Invalid Entity",
-        "detail": "Mandatory field entity::type is missing",
+        "detail": "no type in incoming payload for CREATION of Entity",
         "status": 400
       }
     }
@@ -1880,11 +1880,11 @@ Date: REGEX(*.)
   "success": [],
   "errors": [
     {
-      "entityId": "no entity::id",
+      "entityId": "No Entity::id",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "mandatory field missing",
-        "detail": "entity::id",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
         "status": 400
       }
     }
