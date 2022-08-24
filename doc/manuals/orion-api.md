@@ -2929,7 +2929,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Update Existing Entity Attributes `PATCH /v2/entities/{entityId}/attrs
+#### Update Existing Entity Attributes `PATCH /v2/entities/{entityId}/attrs`
 
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
 attributes in the payload doesn't exist in the entity, an error is returned.
@@ -3054,7 +3054,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Remove Entity `DELETE /v2/entities/{entityId}
+#### Remove Entity `DELETE /v2/entities/{entityId}`
 
 Delete the entity.
 
@@ -3313,7 +3313,7 @@ Example:
 }
 ```
 
-#### Update Attribute Value ` /v2/entities/{entityId}/attrs/{attrName}/value
+#### Update Attribute Value `PUT /v2/entities/{entityId}/attrs/{attrName}/value`
 
 The request payload is the new attribute value.
 
@@ -4212,7 +4212,7 @@ Example:
 }      
 ```
 
-#### Delete Registration ` /v2/registrations/{registrationId}
+#### Delete Registration `DELETE /v2/registrations/{registrationId}`
 
 Cancels a context provider registration.
 
