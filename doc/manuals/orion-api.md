@@ -2526,7 +2526,7 @@ From lowest to highest:
 
 ### Entities List
 
-#### List Entities `GET /v2/entities
+#### List Entities `GET /v2/entities`
 
 Retrieves an array of entities objects following the [JSON Entity Representation](#json-entity-representation), 
 that match different criteria by id, type, pattern matching (either id or type)
@@ -2635,7 +2635,7 @@ Example:
 ]
 ```
 
-#### Create Entity `POST /v2/entities
+#### Create Entity `POST /v2/entities`
 
 _**Request query parameters**_
 
@@ -2704,7 +2704,7 @@ Response includes a `Location` header with the URL of the created entity.
 
 ### Entity by ID
 
-#### Retrieve Entity `GET /v2/entities/{entityId}
+#### Retrieve Entity `GET /v2/entities/{entityId}`
 
 _**Request URL parameters**_
 
@@ -2782,7 +2782,7 @@ Example:
 }
 ```
 
-#### Retrieve Entity Attributes `GET /v2/entities/{entityId}/attrs
+#### Retrieve Entity Attributes `GET /v2/entities/{entityId}/attrs`
 
 This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -3087,7 +3087,7 @@ _**Response code**_
 
 ### Attributes
 
-#### Get attribute data `GET /v2/entities/{entityId}/attrs/{attrName}
+#### Get attribute data `GET /v2/entities/{entityId}/attrs/{attrName}`
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in [JSON Attribute Representation](#json-attribute-representation) section).
@@ -3148,7 +3148,7 @@ Example:
 }
 ```
 
-#### Update Attribute Data `PUT /v2/entities/{entityId}/attrs/{attrName}
+#### Update Attribute Data `PUT /v2/entities/{entityId}/attrs/{attrName}`
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -3211,7 +3211,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}
+#### Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}`
 
 Removes an entity attribute from a given entity.
 
@@ -3245,7 +3245,7 @@ _**Response code**_
 
 ### Attribute Value
 
-#### Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value
+#### Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value`
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -3384,7 +3384,7 @@ _**Response code**_
 
 ### Types
 
-#### List Entity Types `GET /v2/type
+#### List Entity Types `GET /v2/type`
 
 Retrieves a list of entity types, as described in the response payload section below.
 
@@ -3817,7 +3817,7 @@ when the creation succeeds (Response code 201).
 
 ### Subscription By ID
 
-#### Retrieve Subscription `GET /v2/subscriptions/{subscriptionId}
+#### Retrieve Subscription `GET /v2/subscriptions/{subscriptionId}`
 
 Returns the subscription requested.
 
@@ -3886,7 +3886,7 @@ Example:
 }
 ```
 
-#### Update Subscription `PATCH /v2/subscriptions/{subscriptionId}
+#### Update Subscription `PATCH /v2/subscriptions/{subscriptionId}`
 
 Only the fields included in the request are updated in the subscription.
 
@@ -4013,7 +4013,7 @@ The `forwardingInformation` field contains the following subfields:
 
 ### Registration list
 
-#### List Registrations `GET /v2/registrations
+#### List Registrations `GET /v2/registrations`
 
 Lists all the context provider registrations present in the system.
 
@@ -4089,7 +4089,7 @@ Example:
 ]
 ```
 
-#### Create Registration `POST /v2/registrations
+#### Create Registration `POST /v2/registrations`
 
 Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
@@ -4144,7 +4144,7 @@ when the operation succeeds (Return code 201).
 
 ### Registration By ID
 
-#### Retrieve Registration `GET /v2/registrations/{registrationId}
+#### Retrieve Registration `GET /v2/registrations/{registrationId}`
 
 Returns the registration requested.
 
@@ -4241,7 +4241,7 @@ _**Response code**_
 
 ### Update operation
 
-#### Update `POST /v2/op/update
+#### Update `POST /v2/op/update`
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
 
@@ -4328,7 +4328,7 @@ _**Response code**_
 
 ### Query operation
 
-#### Query `POST /v2/op/query
+#### Query `POST /v2/op/query`
 
 This operation execture a query among the existing entities based on filters provided in the request payload. 
 
