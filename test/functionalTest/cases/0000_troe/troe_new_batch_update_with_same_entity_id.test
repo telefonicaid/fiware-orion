@@ -1,4 +1,4 @@
-# Copyright 2020 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -24,10 +24,11 @@
 Entity Batch Update with instances of the same entity
 
 --SHELL-INIT--
+# Copied from troe_batch_update_noOverwrite_ignore_one_property.test
 export BROKER=orionld
 dbInit CB
 pgInit $CB_DB_NAME
-brokerStart CB 100 IPv4 -troe
+brokerStart CB 100 IPv4 -troe -experimental
 
 --SHELL--
 
@@ -38,7 +39,82 @@ brokerStart CB 100 IPv4 -troe
 # 04. See TRoE content - 3 entities, 12 attributes
 # 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
 # 06. See TRoE content - 3 entities, 18 attributes
+# 07. GET all entities
 #
+
+# Detail about what must go into TRoE - this is ... tricky !!!
+#
+# [ There's a bug in the old implementation (legacy, non-experimental) -
+#   Step six adds to TRoE the two ignored attributes from the second instance of E1 ]
+#
+# 01: BATCH Create - 3+6 for TRoE
+#   urn:ngsi-ld:entities:E1
+#     P1 - created  (Step 01, Instance 1: E1/P1)
+#     R1 - created  (urn:ngsi-ld:entities:step1:instance1:R1:E1)
+#   urn:ngsi-ld:entities:E2
+#     P1 - created  (Step 01, Instance 1: E2/P1)
+#     R1 - created  (urn:ngsi-ld:entities:step1:instance1:R1:E2)
+#   urn:ngsi-ld:entities:E3
+#     P1 - created  (Step 01, Instance 1: E3/P1)
+#     R1 - created  (urn:ngsi-ld:entities:step1:instance1:R1:E3)
+# 
+# 
+# 03: BATCH Update - overwrite attributes - Adds 6 attributes to TRoE: 3+12
+#   urn:ngsi-ld:entities:E1
+#     P2 - appended  (Step 03, Instance 1: E1/P2)
+#     R2 - appended  (urn:ngsi-ld:entities:step3:instance1:R2:E1)
+#   urn:ngsi-ld:entities:E1
+#     P2 - replaces  (Step 03, Instance 2: E1/P2)
+#     R2 - replaces  (urn:ngsi-ld:entities:step3:instance2:R2:E1)
+#   urn:ngsi-ld:entities:E2
+#     P2 - appended  (Step 03, Instance 1: E2/P2)
+#     R2 - appended  (urn:ngsi-ld:entities:step3:instance1:R2:E2)
+#   urn:ngsi-ld:entities:E4 - 404
+# 
+# 
+# 05. BATCH Update - ignore existing attribute - Adds 6 attributes to TRoE: 3+18
+#   urn:ngsi-ld:entities:E1
+#     P2 - ignored
+#     R2 - ignored
+#     P3 - appended  (Step 05, Instance 1: E1/P3)
+#     R3 - appended  (urn:ngsi-ld:entities:step5:instance1:R3:E1)
+#   urn:ngsi-ld:entities:E1
+#     P2 - ignored
+#     R2 - ignored
+#     P3 - ignored*                BUG in old implementation - not ignored
+#     R3 - ignored*                BUG in old implementation - not ignored
+#   urn:ngsi-ld:entities:E3
+#     P2 - appended  (Step 05, Instance 1: E3/P2)
+#     R2 - appended  (urn:ngsi-ld:entities:step5:instance1:R2:E3)
+#     P3 - appended  (Step 05, Instance 1: E3/P3)
+#     R3 - appended  (urn:ngsi-ld:entities:step5:instance1:R3:E3)
+#   urn:ngsi-ld:entities:E5 - 404    
+#
+#
+# Final Entities in mongo:
+#
+# urn:ngsi-ld:entities:E1
+#   P1: Step 01, Instance 1: E1/P1
+#   P2: Step 03, Instance 2: E1/P2
+#   P3: Step 05, Instance 1: E1/P3
+#   R1: urn:ngsi-ld:entities:step1:instance1:R1:E1
+#   R2: urn:ngsi-ld:entities:step3:instance2:R2:E1
+#   R3: urn:ngsi-ld:entities:step5:instance1:R3:E1
+#   
+# urn:ngsi-ld:entities:E2
+#   P1: Step 01, Instance 1: E2/P1
+#   P2: Step 03, Instance 1: E2/P2
+#   R1: urn:ngsi-ld:entities:step1:instance1:R1:E2
+#   R2: urn:ngsi-ld:entities:step3:instance1:R2:E2
+#   
+# urn:ngsi-ld:entities:E3
+#   P1: Step 01, Instance 1: E3/P1
+#   P2: Step 05, Instance 1: E3/P2
+#   P3: Step 05, Instance 1: E3/P3
+#   R1: urn:ngsi-ld:entities:step1:instance1:R1:E3
+#   R2: urn:ngsi-ld:entities:step5:instance1:R2:E3
+#   R3: urn:ngsi-ld:entities:step5:instance1:R3:E3
+#   
 
 echo "01. Create entities E1, E2, and E3 - all three with P1 and R1"
 echo "============================================================="
@@ -273,6 +349,13 @@ echo
 echo
 
 
+echo "07. GET all entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?local=true&options=simplified'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entities E1, E2, and E3 - all three with P1 and R1
 =============================================================
@@ -312,7 +395,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
 ===================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 426
+Content-Length: 272
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -321,24 +404,16 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E4",
             "error": {
-                "status": 400,
-                "title": "entity does not exist",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:entities:E1",
-            "error": {
-                "detail": "previous instances merged into one",
-                "status": 400,
-                "title": "Duplicated Entity",
+                "detail": "Cannot update a non-existing entity",
+                "status": 404,
+                "title": "Entity not found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
     ],
     "success": [
-        "urn:ngsi-ld:entities:E2",
-        "urn:ngsi-ld:entities:E1"
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E2"
     ]
 }
 
@@ -373,7 +448,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
 ==========================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 426
+Content-Length: 272
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -382,24 +457,16 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E5",
             "error": {
-                "status": 400,
-                "title": "entity does not exist",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:entities:E1",
-            "error": {
-                "detail": "previous instances merged into one",
-                "status": 400,
-                "title": "Duplicated Entity",
+                "detail": "Cannot update a non-existing entity",
+                "status": 404,
+                "title": "Entity not found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
     ],
     "success": [
-        "urn:ngsi-ld:entities:E3",
-        "urn:ngsi-ld:entities:E1"
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E3"
     ]
 }
 
@@ -428,8 +495,6 @@ Replace,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/P2,
 Replace,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,f,,None,urn:ngsi-ld:entities:step3:instance1:R2:E2,,,REGEX(202.*)
 Append,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P3,String,f,,None,"Step 05, Instance 1: E1/P3",,,REGEX(202.*)
 Append,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,f,,None,urn:ngsi-ld:entities:step5:instance1:R3:E1,,,REGEX(202.*)
-Append,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P3,String,f,,None,"Step 05, Instance 2: E1/P3",,,REGEX(202.*)
-Append,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,f,,None,urn:ngsi-ld:entities:step5:instance2:R3:E1,,,REGEX(202.*)
 Append,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/P2,String,f,,None,"Step 05, Instance 1: E3/P2",,,REGEX(202.*)
 Append,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,f,,None,urn:ngsi-ld:entities:step5:instance1:R2:E3,,,REGEX(202.*)
 Append,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/P3,String,f,,None,"Step 05, Instance 1: E3/P3",,,REGEX(202.*)
@@ -437,6 +502,46 @@ Append,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/R3,R
 
 SUB-ATTRIBUTES:
 id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
+
+
+07. GET all entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P1": "Step 01, Instance 1: E1/P1",
+        "P2": "Step 03, Instance 2: E1/P2",
+        "P3": "Step 05, Instance 1: E1/P3",
+        "R1": "urn:ngsi-ld:entities:step1:instance1:R1:E1",
+        "R2": "urn:ngsi-ld:entities:step3:instance2:R2:E1",
+        "R3": "urn:ngsi-ld:entities:step5:instance1:R3:E1",
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T"
+    },
+    {
+        "P1": "Step 01, Instance 1: E2/P1",
+        "P2": "Step 03, Instance 1: E2/P2",
+        "R1": "urn:ngsi-ld:entities:step1:instance1:R1:E2",
+        "R2": "urn:ngsi-ld:entities:step3:instance1:R2:E2",
+        "id": "urn:ngsi-ld:entities:E2",
+        "type": "T"
+    },
+    {
+        "P1": "Step 01, Instance 1: E3/P1",
+        "P2": "Step 05, Instance 1: E3/P2",
+        "P3": "Step 05, Instance 1: E3/P3",
+        "R1": "urn:ngsi-ld:entities:step1:instance1:R1:E3",
+        "R2": "urn:ngsi-ld:entities:step5:instance1:R2:E3",
+        "R3": "urn:ngsi-ld:entities:step5:instance1:R3:E3",
+        "id": "urn:ngsi-ld:entities:E3",
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN--

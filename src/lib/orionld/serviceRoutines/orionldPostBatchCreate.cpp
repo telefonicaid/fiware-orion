@@ -199,7 +199,7 @@ bool orionldPostBatchCreate(void)
 
       // Get entity id, type and creDate from the DB
       entityIdGet(dbEntityP, &idInDb);
-      entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "entity already exists", NULL, 400, true);
+      entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "entity already exists", NULL, 400);
 
       entityP = entityLookupById(incomingTree, idInDb);
 
@@ -263,7 +263,7 @@ bool orionldPostBatchCreate(void)
 
       if (strcmp(entityId, copyIdP->value.s) == 0)
       {
-        entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400, true);
+        entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400);
         kjChildRemove(orionldState.requestTree, copyP);
       }
       copyP = copyNext;
@@ -281,7 +281,7 @@ bool orionldPostBatchCreate(void)
     // Entity ok, from a "repetition point of view", now, let's MAKE SURE it's correct!
     if (pCheckEntity(entityP, true, NULL) == false)
     {
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, true);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400);
       kjChildRemove(orionldState.requestTree, entityP);
     }
 
@@ -341,8 +341,7 @@ bool orionldPostBatchCreate(void)
                           OrionldBadRequestData,
                           "",
                           mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                          400,
-                          false);
+                          400);
       }
 
       for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)

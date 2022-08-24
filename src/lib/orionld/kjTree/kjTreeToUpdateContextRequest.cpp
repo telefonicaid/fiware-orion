@@ -174,7 +174,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     {
       // Is this even possible???
       LM_E(("Entity not a JSON object!"));
-      entityErrorPush(errorsArrayP, "No Entity ID", OrionldBadRequestData, "Entity must be a JSON Object", kjValueType(entityP->type), 400, false);
+      entityErrorPush(errorsArrayP, "No Entity ID", OrionldBadRequestData, "Entity must be a JSON Object", kjValueType(entityP->type), 400);
       entityP = next;
       continue;
     }
@@ -193,7 +193,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       if (contextNodeP == NULL)
       {
         LM_E(("Content-Type is 'application/ld+json', but no @context found for entity '%s'", entityId));
-        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Content-Type is 'application/ld+json', but no @context in payload data array item", NULL, 400, false);
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Content-Type is 'application/ld+json', but no @context in payload data array item", NULL, 400);
         entityP = next;
         continue;
       }
@@ -202,7 +202,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       if (contextP == NULL)
       {
         LM_E(("orionldContextFromTree reports error: %s: %s", orionldState.pd.title, orionldState.pd.detail));
-        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status, false);
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, orionldState.pd.status);
         entityP = next;
         continue;
       }
@@ -212,7 +212,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       if (contextNodeP != NULL)
       {
         LM_E(("Content-Type is 'application/json', and an @context is present in the payload data array item of entity '%s'", entityId));
-        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Content-Type is 'application/json', and an @context is present in the payload data array item", NULL, 400, false);
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Content-Type is 'application/json', and an @context is present in the payload data array item", NULL, 400);
         entityP = next;
         continue;
       }
@@ -230,7 +230,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       if (idTypeAndCreDateFromDb == NULL)
       {
         LM_E(("No entity type given and no way to find it in the DB - we should never get here"));
-        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "No entity type given and no way to find it in the DB", "we should never get here", 500, false);
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "No entity type given and no way to find it in the DB", "we should never get here", 500);
         entityP = next;
         continue;
       }
@@ -262,7 +262,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       if (dbEntityP == NULL)
       {
         LM_E(("Internal Error (no entity type in payload and entity not found in DB - this should have been reported as an error in an earlier stage ...)"));
-        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in payload and entity not found in DB", NULL, 500, false);
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in payload and entity not found in DB", NULL, 500);
         entityP = next;
         continue;
       }
@@ -271,7 +271,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       if (dbEntityTypeP == NULL)
       {
         LM_E(("Internal Error (no entity type in object extracted from the DB)"));
-        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in object extracted from the DB", NULL, 500, false);
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in object extracted from the DB", NULL, 500);
         entityP = next;
         continue;
       }
@@ -281,7 +281,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
 
     if (entityType == NULL)
     {
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to find entity::type", "not in payload nor in database", 400, false);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to find entity::type", "not in payload nor in database", 400);
       entityP = next;
       continue;
     }
@@ -296,7 +296,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     if (kjTreeToContextElementAttributes(contextP, entityP, NULL, NULL, ceP, &title, &detail) == false)
     {
       LM_W(("kjTreeToContextElementAttributes flags error '%s: %s' for entity '%s'", title, detail, entityId));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, title, detail, 400, false);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, title, detail, 400);
       delete ceP;
       entityP = next;
       continue;

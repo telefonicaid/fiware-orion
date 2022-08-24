@@ -449,16 +449,16 @@ echo
 01. Attempt to upsert with an entity having an id that is not a string - see error
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 212
+Content-Length: 210
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errors": [
         {
-            "entityId": "No Entity::id",
+            "entityId": "Invalid Entity::id",
             "error": {
-                "detail": "Entity::id",
+                "detail": "Int",
                 "status": 400,
                 "title": "Invalid JSON type",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

@@ -107,7 +107,7 @@ bool orionldPostBatchDelete(void)
 
     if (idExists == false)
     {
-      entityErrorPush(errors, reqEntityId->value.s, OrionldResourceNotFound, "Entity not found", NULL, 404, true);
+      entityErrorPush(errors, reqEntityId->value.s, OrionldResourceNotFound, "Entity not found", NULL, 404);
 
       // Remove the not found entity from the incoming payload
       kjChildRemove(orionldState.requestTree, reqEntityId);

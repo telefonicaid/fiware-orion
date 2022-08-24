@@ -1,0 +1,686 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Update and Retrieval
+
+--SHELL-INIT--
+# Copied from ngsild_entity_post_operations_update_error_handling.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Attempt to update with an entity having an ID that is not a string - see error
+# 02. Attempt to update with an entity without ID field - see error
+# 03. Attempt to update with an entity having an ID with URI invalid - see error
+# 04. Attempt to update with an entity having a TYPE that is not a string - see error
+# 05. Attempt to update with an entity without TYPE field - see error
+# 06. Attempt to update with an entity with 2 ID fields - see error
+# 07. Attempt to update with an entity with 2 TYPE fields - see error
+# 08. Attempt to update with an empty array - see error
+# 09. Attempt to update with an entity without @context field - see error
+# 10. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/create
+# 11. Attempt to BATCH Update a non-existing Entity
+#
+
+
+echo "01. Attempt to update with an entity having an ID that is not a string - see error"
+echo "=================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": 1,
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "02. Attempt to update with an entity without ID field - see error"
+echo "================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "03. Attempt to update with an entity having an ID with URI invalid - see error"
+echo "=============================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "04. Attempt to update with an entity having a TYPE that is not a string - see error"
+echo "==================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": 1,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "05. Attempt to update with an entity without TYPE field - see error"
+echo "==================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "06. Attempt to update with an entity with 2 ID fields - see error"
+echo "================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "07. Attempt to update with an entity with 2 TYPE fields - see error"
+echo "==================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "08. Attempt to update with an empty array - see error"
+echo "====================================================="
+payload='[]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "09. Attempt to update with an entity without @context field - see error"
+echo "======================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "10. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/create"
+echo "============================================================================"
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "11. Attempt to BATCH Update a non-existing Entity"
+echo "================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to update with an entity having an ID that is not a string - see error
+==================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 538
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "Invalid Entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Invalid JSON type",
+        "detail": "Int",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+02. Attempt to update with an entity without ID field - see error
+=================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 546
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "No Entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+03. Attempt to update with an entity having an ID with URI invalid - see error
+==============================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 523
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+04. Attempt to update with an entity having a TYPE that is not a string - see error
+===================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 561
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+05. Attempt to update with an entity without TYPE field - see error
+===================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+06. Attempt to update with an entity with 2 ID fields - see error
+=================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 552
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Duplicated field in an entity",
+        "detail": "id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E3",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+07. Attempt to update with an entity with 2 TYPE fields - see error
+===================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 554
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Duplicated field in an entity",
+        "detail": "type",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+08. Attempt to update with an empty array - see error
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
+  "title": "Invalid Payload Body",
+  "detail": "Empty Array"
+}
+
+
+
+09. Attempt to update with an entity without @context field - see error
+=======================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 617
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E3",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Invalid payload",
+        "detail": "Content-Type is 'application/ld+json', but no @context in payload data array item",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E4",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+10. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/create
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 57
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+  "urn:ngsi-ld:entity:E1",
+  "urn:ngsi-ld:entity:E2"
+]
+
+
+
+11. Attempt to BATCH Update a non-existing Entity
+=================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 336
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "success": [
+    "urn:ngsi-ld:entity:E1"
+  ],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E3",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Entity not found",
+        "detail": "Cannot update a non-existing entity",
+        "status": 404
+      }
+    }
+  ]
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
