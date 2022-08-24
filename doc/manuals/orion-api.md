@@ -174,11 +174,11 @@ as shown in the figure below.
 
 #### Context Entities
 
-Context entities, or simply entities, are the center of gravity in the FIWARE NGSI information 
+Context entities, or simply entities, are the center of gravity in Orion NGSIv2 based information
 model. An entity represents a thing, i.e., any physical or logical object (e.g., a sensor, a person,
 a room, an issue in a ticketing system, etc.). Each entity has an **entity id**.
 
-Furthermore, the type system of FIWARE NGSI enables entities to have 
+Furthermore, the type system of Orion NGSIv2 based information model enables entities to have
 an **entity type**. Entity types are semantic types; they are intended
 to describe the type of thing represented by the entity.
 For example, a context entity with id *sensor-365* could have the
@@ -290,8 +290,9 @@ An example of this syntax in shown below:
 
 ## Simplified Entity Representation
 
-There are two representation modes that must be supported by implementations. These representation
-modes allow to generate simplified representations of entities.
+Apart from the regular representation model (also name *normalized*), tere are three representation
+modes that are supported by Orion. These representation modes allow to generate simplified
+representations of entities.
 
 * *keyValues* mode. This mode represents the entity attributes by their values only, leaving out the
   information about type and metadata.
