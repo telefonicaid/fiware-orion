@@ -4586,7 +4586,7 @@ in stable RC-2016.05 and removed in RC-2016.10) is still supported, e.g. `option
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 
 * `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
-`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, always  the following counterparts:
+`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, always preferring the following counterparts:
 `append`, `appendStrict`, `update`, `delete` and `replace`.
 
 * `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
