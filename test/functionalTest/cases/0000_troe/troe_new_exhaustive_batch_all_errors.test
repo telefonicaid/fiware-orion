@@ -119,7 +119,7 @@ echo
 01. Attempt to Batch Create entity E1 with user context in payload body but Content-Type as application/json
 ============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 249
+Content-Length: 276
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -128,8 +128,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entity:E1",
             "error": {
+                "detail": "Content-Type is 'application/json', and an @context is present in the payload data array item",
                 "status": 400,
-                "title": "Content-Type is 'application/json', and an @context is present in the payload data array item",
+                "title": "Invalid payload",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }

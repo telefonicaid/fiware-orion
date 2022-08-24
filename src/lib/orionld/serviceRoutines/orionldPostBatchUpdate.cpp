@@ -35,7 +35,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/common/entityLookupById.h"                   // entityLookupById
+#include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
@@ -55,8 +55,8 @@ extern "C"
 //   If not, in "orionld/common"
 //
 extern int      batchEntityCountAndFirstCheck(KjNode* requestTree, KjNode* errorsArrayP);
-extern int      batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, KjNode* errorsArrayP);
-extern int      batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update, bool mustExist);
+extern int      batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, KjNode* errorsArrayP, bool entityTypeMandatory);
+extern int      batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update, bool mustExist, bool cannotExist);
 extern KjNode*  batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* entityId, char* entityType, bool ignore);
 extern bool     batchMultipleInstances(const char* entityId, KjNode* updatedArrayP, KjNode* createdArrayP);
 extern KjNode*  batchEntityLookupinDbArray(KjNode* dbEntityArray, const char* entityId);
@@ -115,7 +115,7 @@ bool orionldPostBatchUpdate(void)
   // We have the StringArray (eIdArray), so, now we can loop through the incoming array of entities and populate eIdArray
   // (extract the entity ids) later to be used by mongocEntitiesQuery().
   //
-  noOfEntities = batchEntityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP);
+  noOfEntities = batchEntityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP, false);
   LM(("Number of valid Entities after 2nd check-round: %d", noOfEntities));
 
   //
@@ -131,7 +131,7 @@ bool orionldPostBatchUpdate(void)
   //
   // Finally we have everything we need to 100% CHECK the incoming entities
   //
-  noOfEntities = batchEntitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update, true);
+  noOfEntities = batchEntitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update, true, false);
   LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
 
@@ -158,7 +158,6 @@ bool orionldPostBatchUpdate(void)
   bool    ignore            = orionldState.uriParamOptions.noOverwrite == true;
   KjNode* next;
 
-  kjTreeLog(orionldState.requestTree, "Possible TROE Input");
   while (inEntityP != NULL)
   {
     next = inEntityP->next;

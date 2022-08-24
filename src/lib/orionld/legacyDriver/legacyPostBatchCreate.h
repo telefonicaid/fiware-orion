@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHCREATE_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHCREATE_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,15 +23,15 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin
+* Author: Gabriel Quaresma
 */
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostBatchCreate -
+// legacyPostBatchCreate -
 //
-extern bool orionldPostBatchCreate(void);
+extern bool legacyPostBatchCreate(void);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPOSTBATCHCREATE_H_

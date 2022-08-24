@@ -48,7 +48,6 @@ extern "C"
 //
 bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 {
-  LM(("KZ: Upserting Entities"));
   mongocConnectionGet();  // mongocConnectionGet(MONGO_ENTITIES) - do the mongoc_client_get_collection also
 
   if (orionldState.mongoc.entitiesP == NULL)
@@ -60,10 +59,8 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 
   if (createArrayP != NULL)
   {
-    LM(("KZ: The entities to be created:"));
     for (KjNode* entityP = createArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      LM(("KZ:  o %p", entityP));
       bson_t doc;
 
       bson_init(&doc);
@@ -73,43 +70,40 @@ bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
     }
   }
 
-  LM(("KZ: The entities to be updated (replaced):"));
-  for (KjNode* entityP = updateArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  if (updateArrayP != NULL)
   {
-    bson_t doc;
-    bson_t match;
-
-    bson_init(&doc);
-    bson_init(&match);
-
-
-    kjTreeLog(entityP, "KZ: Entity to be updated");
-    KjNode* _idP = kjLookup(entityP, "_id");
-
-    if (_idP == NULL)
+    for (KjNode* entityP = updateArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      LM_E(("KZ: Can't update an entity without entity id"));
-      continue;
+      bson_t doc;
+      bson_t match;
+
+      bson_init(&doc);
+      bson_init(&match);
+
+      KjNode* _idP = kjLookup(entityP, "_id");
+      if (_idP == NULL)
+      {
+        LM_E(("Can't update an entity without entity id"));
+        continue;
+      }
+
+      KjNode* idP  = kjLookup(_idP, "id");
+      if (idP == NULL)
+      {
+        LM_E(("Can't update an entity without an entity id"));
+        continue;
+      }
+
+      bson_append_utf8(&match, "_id.id", 6, idP->value.s, -1);
+
+      // Now that the entity id is known, the entire _id must be removed - can't update with _id present
+      kjChildRemove(entityP, _idP);
+
+      mongocKjTreeToBson(entityP, &doc);  // The entity needs to be DB-Prepared !
+      mongoc_bulk_operation_replace_one(bulkP, &match, &doc, false);
+      bson_destroy(&doc);
+      bson_destroy(&match);
     }
-
-    KjNode* idP  = kjLookup(_idP, "id");
-
-    if (idP == NULL)
-    {
-      LM_E(("KZ: Can't update an entity without an entity id"));
-      continue;
-    }
-
-    bson_append_utf8(&match, "_id.id", 6, idP->value.s, -1);
-
-    // Now that the entity id is known, the entire _id must be removed - can't update with _id present
-    kjChildRemove(entityP, _idP);
-
-    LM(("KZ:  o %s", idP->value.s));
-    mongocKjTreeToBson(entityP, &doc);  // The entity needs to be DB-Prepared !
-    mongoc_bulk_operation_replace_one(bulkP, &match, &doc, false);
-    bson_destroy(&doc);
-    bson_destroy(&match);
   }
 
   bson_error_t error;
