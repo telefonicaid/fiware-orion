@@ -76,25 +76,25 @@
 - [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
-            - [List Entities [GET /v2/entities]](#list-entities-get-v2entities)
-            - [Create Entity [POST /v2/entities]](#create-entity-post-v2entities)
+            - [List Entities `GET /v2/entities`](#list-entities-get-v2entities)
+            - [Create Entity `POST /v2/entities`](#create-entity-post-v2entities)
         - [Entity by ID](#entity-by-id)
-            - [Retrieve Entity [GET /v2/entities/{entityId}]](#retrieve-entity-get-v2entitiesentityid)
-            - [Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
-            - [Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
-            - [Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
-            - [Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
-            - [Remove Entity [DELETE /v2/entities/{entityId}]](#remove-entity-delete-v2entitiesentityid)
+            - [Retrieve Entity `GET /v2/entities/{entityId}`](#retrieve-entity-get-v2entitiesentityid)
+            - [Retrieve Entity Attributes `GET /v2/entities/{entityId}/attrs`](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
+            - [Update or Append Entity Attributes `POST /v2/entities/{entityId}/attrs`](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
+            - [Update Existing Entity Attributes `PATCH /v2/entities/{entityId}/attrs`](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
+            - [Replace all entity attributes `PUT /v2/entities/{entityId}/attrs`](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
+            - [Remove Entity `DELETE /v2/entities/{entityId}`](#remove-entity-delete-v2entitiesentityid)
         - [Attributes](#attributes)
-            - [Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]](#get-attribute-data-get-v2entitiesentityidattrsattrname)
-            - [Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]](#update-attribute-data-put-v2entitiesentityidattrsattrname)
-            - [Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
+            - ` attribute data `GET /v2/entities/{entityId}/attrs/{attrName}`](#get-attribute-data-get-v2entitiesentityidattrsattrname)
+            - [Update Attribute Data `PUT /v2/entities/{entityId}/attrs/{attrName}`](#update-attribute-data-put-v2entitiesentityidattrsattrname)
+            - [Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}`](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
         - [Attribute Value](#attribute-value)
-            - [Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
-            - [Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
+            - [Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
+            - [Update Attribute Value `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
-            - [List Entity Types [GET /v2/type]](#list-entity-types-get-v2type)
-            - [Retrieve entity information for a given type [GET /v2/types/{type}]](#retrieve-entity-information-for-a-given-type-get-v2typestype)
+            - [List Entity Types `GET /v2/type`](#list-entity-types-get-v2type)
+            - [Retrieve entity information for a given type `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
             - [`subscription.subject`](#subscriptionsubject)
@@ -105,12 +105,12 @@
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
             - [`subscription.notification.mqttCustom`](#subscriptionnotificationmqttcustom)
         - [Subscription List](#subscription-list)
-            - [List Subscriptions [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
-            - [Create Subscription [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
+            - [List Subscriptions `GET /v2/subscriptions`](#list-subscriptions-get-v2subscriptions)
+            - [Create Subscription `POST /v2/subscriptions`](#create-subscription-post-v2subscriptions)
         - [Subscription By ID](#subscription-by-id)
-            - [Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
-            - [Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
-            - [Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
+            - [Retrieve Subscription `GET /v2/subscriptions/{subscriptionId}`](#retrieve-subscription-get-v2subscriptionssubscriptionid)
+            - [Update Subscription `PATCH /v2/subscriptions/{subscriptionId}`](#update-subscription-patch-v2subscriptionssubscriptionid)
+            - [Delete subscription `DELETE /v2/subscriptions/{subscriptionId}`](#delete-subscription-delete-v2subscriptionssubscriptionid)
     - [Registration Operations](#registration-operations)
         - [Registration payload datamodel](#registration-payload-datamodel)
             - [`registration`](#registration)
@@ -118,18 +118,18 @@
             - [`registration.dataProvided`](#registrationdataprovided)
             - [`registration.forwardingInformation`](#registrationforwardinginformation)
         - [Registration list](#registration-list)
-            - [List Registrations [GET /v2/registrations]](#list-registrations-get-v2registrations)
-            - [Create Registration [POST /v2/registrations]](#create-registration-post-v2registrations)
+            - [List Registrations `GET /v2/registrations`](#list-registrations-get-v2registrations)
+            - [Create Registration `POST /v2/registrations`](#create-registration-post-v2registrations)
         - [Registration By ID](#registration-by-id)
-            - [Retrieve Registration [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
-            - [Delete Registration [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
+            - [Retrieve Registration `GET /v2/registrations/{registrationId}`](#retrieve-registration-get-v2registrationsregistrationid)
+            - [Delete Registration `DELETE /v2/registrations/{registrationId}`](#delete-registration-delete-v2registrationsregistrationid)
     - [Batch Operations](#batch-operations)
         - [Update operation](#update-operation)
-            - [Update [POST /v2/op/update]](#update-post-v2opupdate)
+            - [Update `POST /v2/op/update`](#update-post-v2opupdate)
         - [Query operation](#query-operation)
-            - [Query [POST /v2/op/query]](#query-post-v2opquery)
+            - [Query `POST /v2/op/query`](#query-post-v2opquery)
         - [Notify operation](#notify-operation)
-            - [Notify [POST /v2/op/notify]](#notify-post-v2opnotify)
+            - [Notify `POST /v2/op/notify`](#notify-post-v2opnotify)
 - [Differences regarding the original NGSIv2 spec](#differences-regarding-the-original-ngsiv2-spec)
     - [`actionType` metadata](#actiontype-metadata)
     - [Ambiguous subscription status `failed` not used](#ambiguous-subscription-status-failed-not-used)
@@ -2514,7 +2514,7 @@ From lowest to highest:
 
 ### Entities List
 
-#### List Entities [GET /v2/entities]
+#### List Entities `GET /v2/entities
 
 Retrieves an array of entities objects following the [JSON Entity Representation](#json-entity-representation), 
 that match different criteria by id, type, pattern matching (either id or type)
@@ -2623,7 +2623,7 @@ Example:
 ]
 ```
 
-#### Create Entity [POST /v2/entities]
+#### Create Entity `POST /v2/entities
 
 _**Request query parameters**_
 
@@ -2692,7 +2692,7 @@ Response includes a `Location` header with the URL of the created entity.
 
 ### Entity by ID
 
-#### Retrieve Entity [GET /v2/entities/{entityId}]
+#### Retrieve Entity `GET /v2/entities/{entityId}
 
 _**Request URL parameters**_
 
@@ -2770,7 +2770,7 @@ Example:
 }
 ```
 
-#### Retrieve Entity Attributes [GET /v2/entities/{entityId}/attrs]
+#### Retrieve Entity Attributes `GET /v2/entities/{entityId}/attrs
 
 This request is similar to retrieving the whole entity, however this one omits the `id` and `type`
 fields.
@@ -2850,7 +2850,7 @@ Example:
 }
 ```
 
-#### Update or Append Entity Attributes [POST /v2/entities/{entityId}/attrs]
+#### Update or Append Entity Attributes ` /v2/entities/{entityId}/attrs
 
 The entity attributes are updated with the ones in the payload, depending on
 whether the `append` operation option is used or not.
@@ -2917,7 +2917,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Update Existing Entity Attributes [PATCH /v2/entities/{entityId}/attrs]
+#### Update Existing Entity Attributes ` /v2/entities/{entityId}/attrs
 
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
 attributes in the payload doesn't exist in the entity, an error is returned.
@@ -2980,7 +2980,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Replace all entity attributes [PUT /v2/entities/{entityId}/attrs]
+#### Replace all entity attributes `PUT /v2/entities/{entityId}/attrs`
 
 New entity attributes in the payload are added to the entity.The attributes previously existing in the entity are removed and replaced by the ones in the
 request.
@@ -3042,7 +3042,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Remove Entity [DELETE /v2/entities/{entityId}]
+#### Remove Entity `DELETE /v2/entities/{entityId}
 
 Delete the entity.
 
@@ -3075,7 +3075,7 @@ _**Response code**_
 
 ### Attributes
 
-#### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
+#### Get attribute data `GET /v2/entities/{entityId}/attrs/{attrName}
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON
 representation for attributes (described in [JSON Attribute Representation](#json-attribute-representation) section).
@@ -3136,7 +3136,7 @@ Example:
 }
 ```
 
-#### Update Attribute Data [PUT /v2/entities/{entityId}/attrs/{attrName}]
+#### Update Attribute Data `PUT /v2/entities/{entityId}/attrs/{attrName}
 
 The request payload is an object representing the new attribute data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -3199,7 +3199,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Remove a Single Attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+#### Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}
 
 Removes an entity attribute from a given entity.
 
@@ -3233,7 +3233,7 @@ _**Response code**_
 
 ### Attribute Value
 
-#### Get Attribute Value [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+#### Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value
 
 This operation returns the `value` property with the value of the attribute.
 
@@ -3301,7 +3301,7 @@ Example:
 }
 ```
 
-#### Update Attribute Value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+#### Update Attribute Value ` /v2/entities/{entityId}/attrs/{attrName}/value
 
 The request payload is the new attribute value.
 
@@ -3372,7 +3372,7 @@ _**Response code**_
 
 ### Types
 
-#### List Entity Types [GET /v2/type]
+#### List Entity Types `GET /v2/type
 
 Retrieves a list of entity types, as described in the response payload section below.
 
@@ -3462,7 +3462,7 @@ Example:
 ]
 ```
 
-#### Retrieve entity information for a given type [GET /v2/types/{type}]
+#### Retrieve entity information for a given type `GET /v2/types/{type}`
 
 This operation returns a JSON object with information about the type, as described in the response payload section below.
 
@@ -3660,7 +3660,7 @@ see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
 ### Subscription List
 
-#### List Subscriptions [GET /v2/subscriptions]
+#### List Subscriptions `GET /v2/subscriptions`
 
 Returns a list of all the subscriptions present in the system.
 
@@ -3744,7 +3744,7 @@ Example:
 ]
 ```
 
-#### Create Subscription [POST /v2/subscriptions]
+#### Create Subscription `POST /v2/subscriptions`
 
 Creates a new subscription.
 
@@ -3805,7 +3805,7 @@ when the creation succeeds (Response code 201).
 
 ### Subscription By ID
 
-#### Retrieve Subscription [GET /v2/subscriptions/{subscriptionId}]
+#### Retrieve Subscription `GET /v2/subscriptions/{subscriptionId}
 
 Returns the subscription requested.
 
@@ -3874,7 +3874,7 @@ Example:
 }
 ```
 
-#### Update Subscription [PATCH /v2/subscriptions/{subscriptionId}]
+#### Update Subscription `PATCH /v2/subscriptions/{subscriptionId}
 
 Only the fields included in the request are updated in the subscription.
 
@@ -3913,7 +3913,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
+#### Delete subscription `DELETE /v2/subscriptions/{subscriptionId}`
 
 Cancels subscription.
 
@@ -4001,7 +4001,7 @@ The `forwardingInformation` field contains the following subfields:
 
 ### Registration list
 
-#### List Registrations [GET /v2/registrations]
+#### List Registrations `GET /v2/registrations
 
 Lists all the context provider registrations present in the system.
 
@@ -4077,7 +4077,7 @@ Example:
 ]
 ```
 
-#### Create Registration [POST /v2/registrations]
+#### Create Registration `POST /v2/registrations
 
 Creates a new context provider registration. This is typically used for binding context sources
 as providers of certain data.
@@ -4132,7 +4132,7 @@ when the operation succeeds (Return code 201).
 
 ### Registration By ID
 
-#### Retrieve Registration [GET /v2/registrations/{registrationId}]
+#### Retrieve Registration `GET /v2/registrations/{registrationId}
 
 Returns the registration requested.
 
@@ -4200,7 +4200,7 @@ Example:
 }      
 ```
 
-#### Delete Registration [DELETE /v2/registrations/{registrationId}]
+#### Delete Registration ` /v2/registrations/{registrationId}
 
 Cancels a context provider registration.
 
@@ -4229,7 +4229,7 @@ _**Response code**_
 
 ### Update operation
 
-#### Update [POST /v2/op/update]
+#### Update `POST /v2/op/update
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
 
@@ -4316,7 +4316,7 @@ _**Response code**_
 
 ### Query operation
 
-#### Query [POST /v2/op/query]
+#### Query `POST /v2/op/query
 
 This operation execture a query among the existing entities based on filters provided in the request payload. 
 
@@ -4444,7 +4444,7 @@ Example:
 
 ### Notify operation
 
-#### Notify [POST /v2/op/notify]
+#### Notify `POST /v2/op/notify`
 
 This operation is intended to consume a notification payload so that all the entity data included by such notification is persisted, overwriting if necessary.
 It is useful when one Orion endpoint is subscribed to another Orion endpoint (federation scenarios).
