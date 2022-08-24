@@ -2862,7 +2862,7 @@ Example:
 }
 ```
 
-#### Update or Append Entity Attributes ` /v2/entities/{entityId}/attrs
+#### Update or Append Entity Attributes `POST /v2/entities/{entityId}/attrs`
 
 The entity attributes are updated with the ones in the payload, depending on
 whether the `append` operation option is used or not.
@@ -2929,7 +2929,7 @@ _**Response code**_
 * Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
   more details.
 
-#### Update Existing Entity Attributes ` /v2/entities/{entityId}/attrs
+#### Update Existing Entity Attributes `PATCH /v2/entities/{entityId}/attrs
 
 The entity attributes are updated with the ones in the payload. In addition to that, if one or more
 attributes in the payload doesn't exist in the entity, an error is returned.
