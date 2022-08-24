@@ -30,7 +30,7 @@
     * `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
 * Orion 1.5.0 では、NGSIv2 で `dateCreated` および/または `dateModified` 属性を含めるために `optionsURL` パラメータ使用することは推奨されていません。代わりに `attrs`URI パラメータを使用してください
 * パス・プレフィックスとして /ngsi10 そして /ngsi9URL は、orion 1.2.0 で廃止されました。代わりに `/v1` と `/v1/registry` を使用してください
-* エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です。エンティティの場所を指定する新しい方法は、属性の `geo:point` 型を使用することです。[ユーザ・マニュアルの対応するセクション](user/geolocation.md)を参照してください) 
+* エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です。エンティティの場所を指定する新しい方法は、属性の `geo:point` 型を使用することです。[Orion API の対応するセクション](../orion-api.md#geospatial-properties-of-entities)を参照してください)
 * Orion 0.26.1 のコマンドライン引数は廃止されました。Orion 1.0.0 で削除されました
     * **--silent** : エラー以外のすべてのログ出力を抑止します。代わりに `-logLevel ERROR` を使用してください
 * ONTIMEINTERVAL サブスクリプションは Orion 0.26.0 以降で廃止されました。Orion 1.0.0 では削除されました。ONTIMEINTERVAL サブスクリプションにはいくつかの問題があります。CB に状態 (state) を導入するため、水平スケーリングの設定をより困難にし、ページネーション/フィルタリングの導入を困難にします。実際には、ONTIMEINTERVAL 通知に基づくユース・ケースは、レセプタが queryContext を同じ頻度で実行する等価なユース・ケースに変換できるため、実際には必要ありません。ページ区切りやフィルタリングなどの queryContext の機能を利用してください

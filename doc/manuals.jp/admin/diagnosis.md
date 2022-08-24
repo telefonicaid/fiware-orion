@@ -190,7 +190,7 @@ Orion Context Broker は、次のフローを使用します :
   モードで実行されていない場合 (つまり、`-insecureNotif`
   [CLI パラメータ](cli.md)) に自己署名証明書が発行された場合に発生します。
 
-[Orion API ドキュメント](../orion-api.md#subscription.notification)に `status`, `lastFailureReason`, `lastSuccessCode`
+[Orion API 仕様](../orion-api.md#subscription.notification)に `status`, `lastFailureReason`, `lastSuccessCode`
 の詳細があります。
 
 さらに、

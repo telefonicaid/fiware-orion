@@ -5,7 +5,7 @@ HTTP 通知とは別に、Orion は MQTT を使用して通知できます。こ
 
 ![](mqtt-notifications.png "mqtt-notifications.png")
 
-[ドキュメントのこのセクション](walkthrough_apiv2.md#subscriptions) および[NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
+[ドキュメントのこのセクション](walkthrough_apiv2.md#subscriptions) および[Orion API 仕様](../orion-api.md)
 で説明されているように、運用の観点からは、MQTT サブスクリプションは HTTP サブスクリプションに似ています (たとえば、通知ペイロードは同じです。
 有効期限やフィルタリング式などを設定できます) が、`notification` オブジェクトで `http` の代わりに `mqtt` を使用します。
 
@@ -42,7 +42,7 @@ HTTP サブスクリプションと同じ方法で MQTT サブスクリプショ
 
 ## カスタム通知
 
-MQTT サブスクリプションのカスタム通知 ([NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable) で説明) は、
+MQTT サブスクリプションのカスタム通知 ([Orion API 仕様のカスタム通知のセクション](../orion-api.md#custom-notifications) で説明) は、
 次の点を考慮して、HTTP サブスクリプションと同じように機能します
 
 * `httpCustom` の代わりに `mqttCustom` が使用されます

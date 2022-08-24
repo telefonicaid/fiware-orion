@@ -7,7 +7,7 @@
 
         yum remove contextBroker
 
--   [DB のバックアップをとってください](database_admin.md#metadata-id-for-attributes)。これは、問題が発生した場合の安全対策です。たとえば、終了する前に一部のスクリプトが中断され、データベースデータが非整合状態で終了するなどです。
+-   [DB のバックアップをとってください](https://github.com/telefonicaid/fiware-orion/blob/1.5.0/doc/manuals/user/metadata.md#metadata-id-for-attributes)。これは、問題が発生した場合の安全対策です。たとえば、終了する前に一部のスクリプトが中断され、データベースデータが非整合状態で終了するなどです。
 -   次のスクリプトをダウンロードします :
     -   [change_attr_id_separator.py](https://github.com/telefonicaid/fiware-orion/blob/1.5.0/scripts/managedb/change_attr_id_separator.py)
 -   pymongo を以前にインストールしたことがない場合はインストールしてください。スクリプトの依存関係のためです
