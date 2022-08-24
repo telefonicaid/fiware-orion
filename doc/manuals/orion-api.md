@@ -67,6 +67,11 @@
     - [Notification Triggering](#notification-triggering)
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
+      - [Macro substitution](#macro-substitution)
+      - [JSON payloads](#json-payloads)
+      - [Omitting payload](#omitting-payload)
+      - [Remove headers](#remove-headers)
+      - [Additional considerations](#additional-considerations)
       - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
     - [Covered Subscriptions](#covered-subscriptions)
@@ -2047,6 +2052,8 @@ are aware of the format without needing to process the notification payload.
 
 ## Custom Notifications
 
+### Macro substitution
+
 Clients can customize notification messages using a simple template mechanism when
 `notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
 depends on the protocol type.
@@ -2117,10 +2124,7 @@ Content-Length: 31
 The temperature is 23.4 degrees
 ```
 
-If `payload` is set to `null`, then the notifications associated to that subscription will not
-include any payload (i.e. content-length 0 notifications). Note this is not the same than using
-`payload` set to `""` or omitting the field. In that case, the notification will be sent using
-the NGSIv2 normalized format.
+### JSON payloads
 
 As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
 used to generate JSON-based payloads. For instance:
@@ -2157,26 +2161,14 @@ Some notes to take into account when using `json` instead of `payload`:
 * `payload` and `json` cannot be used at the same time
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
 
-Some considerations to take into account when using custom notifications:
+### Omitting payload
 
-* It is the client's responsibility to ensure that after substitution, the notification is a
-  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
-  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
-  template is malformed, then no notification is sent.
-* In case the data to notify contains more than one entity, a separate notification (HTTP message)
-  is sent for each of the entities (contrary to default behaviour, which is to send all entities in
-  the same HTTP message).
-* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in
-  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
-* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
-  [CLI parameter](../admin/cli.md). In this case:
-  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
-  * No `${...}` macro substitution is performed.
+If `payload` is set to `null`, then the notifications associated to that subscription will not
+include any payload (i.e. content-length 0 notifications). Note this is not the same than using
+`payload` set to `""` or omitting the field. In that case, the notification will be sent using
+the NGSIv2 normalized format.
 
-Note that if a custom payload is used for the notification (the field `payload` is given in the
-corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
-in the notification.
+### Remove headers
 
 An empty string value for a header key in the `headers` object will remove that header from
 notifications. For instance the following configuration:
@@ -2196,6 +2188,26 @@ For instance:
 * To avoid headers included by default in notifications (e.g. `Accept`)
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
+
+### Additional considerations
+
+Some considerations to take into account when using custom notifications:
+
+* It is the client's responsibility to ensure that after substitution, the notification is a
+  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
+  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
+  template is malformed, then no notification is sent.
+* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
+  custom notifications. This is described in detail in
+  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
+* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
+  [CLI parameter](../admin/cli.md). In this case:
+  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
+  * No `${...}` macro substitution is performed.
+
+Note that if a custom payload is used for the notification (the field `payload` is given in the
+corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
+in the notification.
 
 ### Custom payload and headers special treatment
 
