@@ -344,7 +344,7 @@ Some operations use partial representation of entities:
   associated to the attribute. What "associated" means depends on `overrideMetadata`:
   * If `overrideMetadata` is not used (default behaviour), it means there are no metadata elements associated to the attribute, *which need to be updated*
   * If `overrideMetadata` is used, it means there are no metadata elements associated to the attribute,
-  *as a result of the the attribute update*"
+  *as a result of the attribute update*"
 
 * In responses, `metadata` is set to `{}` if the attribute doesn't have any metadata. 
 
@@ -554,7 +554,7 @@ Some additional remarks:
     -   Scope must start with `/` (only "absolute" scopes are allowed)
     -   10 maximum scope levels in a path
     -   50 maximum characters in each level (1 char is minimum),
-        only alphanum and underscore allowed
+        only alphanumeric and underscore allowed
     -   10 maximum disjoint scope paths in a comma-separated list in
         query `Fiware-ServicePath` header (no more than 1 scope path in
         update `Fiware-ServicePath` header)
@@ -563,7 +563,7 @@ Some additional remarks:
 -   `Fiware-ServicePath` is an optional header. It is assumed that all the
     entities created without `Fiware-ServicePath` (or that don't include
     service path information in the database) belongs to a root scope
-    `/` implicitely. All the queries without using `Fiware-ServicePath`
+    `/` implicitly. All the queries without using `Fiware-ServicePath`
     (including subscriptions) are on `\#` implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
@@ -574,7 +574,7 @@ Some additional remarks:
     getting any error. However, query can be weird in this
     scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
     will returns two entities with the same ID and type in the
-    query respose, making hard to distinguish to which scope
+    query response, making hard to distinguish to which scope
     belongs each one)
 
 -   Entities belongs to one (and only one) scope.
@@ -840,11 +840,11 @@ The following considerations have to be taken into account at attribute creation
   assume timezone `Z` when timezone designator is omitted.
 
 Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
-Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
+Orion provides other timestamps (registration/subscription expiration date, last notification/failure/success in notifications,
 etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
 about this)).
 
-In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
+In addition, note Orion always uses UTC/Zulu timezone when provides datetime (which is the best default option, as
 clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
 
 The string `ISO8601` as type for attributes and metadata is also supported. The effect is the same as when using `DateTime`.
@@ -1090,7 +1090,7 @@ The list of operators (and the format of the values they use) is as follows:
 + **Equal**: `==`. This operator accepts the following types of right-hand side:
     + Single element, e.g. `temperature==40`. For an entity to match, it must contain the *target
       property* (temperature) and the *target property value* must be the query value (40)
-      (or include the value, in case the *target property value* is an array).
+      (or include the value in case the *target property value* is an array).
     + A list of comma-separated values, e.g. `color==black,red`. For an entity to match, it must
       contain the *target property* and the *target property value* must be **any** of the values
       in the list (OR clause) (or include **any** of the values in the list in case the *target
@@ -1513,7 +1513,7 @@ PUT /v2/entities/E/attrs/A
 
 would change the value of attribute A to `{"Y": 2}`.
 
-The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommented
+The actual value of the sub-key used with `$unset` is not relevant. A value of 1 is recommended
 for simplicity but the following request would also work and would be equivalent to the one above:
 
 ```
@@ -1730,7 +1730,7 @@ After processing the update, the metadata at the attribute `temperature` would b
 * `avg`: `25.6` (existing but touched by the request)
 * `accuracy`: `98.7` (metadata added by the request)
 
-The rationale behind the "stikyness" of metadata in this default behaviour is described in
+The rationale behind the "stickiness" of metadata in this default behaviour is described in
 more detail in [this issue at Orion repository](https://github.com/telefonicaid/fiware-orion/issues/4033)
 
 At the moment, Orion doesn't allow to delete individual metadata elements once introduced.
@@ -2550,7 +2550,7 @@ This requests accepts the following URL parameters to customize the request resp
 | `q`           | ✓        | string | temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`, i.e., q=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language) | temperature>40                    |
 | `mq`          | ✓        | string | A query expression for attribute metadata, composed of a list of statements separated by `;`, i.e., mq=statement1;statement2;statement3. See [Simple Query Language specification](#simple-query-language)             | temperature.accuracy<0.9          |
 | `georel`      | ✓        | string | Spatial relationship between matching entities and a reference shape. See [Geographical Queries](#geographical-queries).                                                                                               | near                              |
-| `geometry`    | ✓        | string | Geographical area to which the query is restricted.See [Geographical Queries](#geographical-queries).                                                                                                                  | point                             |
+| `geometry`    | ✓        | string | Geographical area to which the query is restricted. See [Geographical Queries](#geographical-queries).                                                                                                                  | point                             |
 | `limit`       | ✓        | number | Limits the number of entities to be retrieved. See [Pagination](#pagination) section for details.                                                                                                                      | 20                                |
 | `offset`      | ✓        | number | Establishes the offset from where entities are retrieved. See [Pagination](#pagination) section for details.                                                                                                           | 100                               |
 | `coords`      | ✓        | string | List of latitude-longitude pairs of coordinates separated by ';'. See [Geographical Queries](#geographical-queries)                                                                                                    | 41.390205,2.154007;48.8566,2.3522 |
@@ -2994,7 +2994,7 @@ _**Response code**_
 
 #### Replace all entity attributes `PUT /v2/entities/{entityId}/attrs`
 
-New entity attributes in the payload are added to the entity.The attributes previously existing in the entity are removed and replaced by the ones in the
+New entity attributes in the payload are added to the entity. The attributes previously existing in the entity are removed and replaced by the ones in the
 request.
 
 _**Request URL parameters**_
@@ -3188,7 +3188,7 @@ _**Request headers**_
 
 _**Request payload**_
 
-The reques payload is an object representing the attribute identified by the attribute name given in the URL 
+The request payload is an object representing the attribute identified by the attribute name given in the URL 
 contained in the entity identified by the ID. The object follow structure described in the 
 [JSON Attribute Representation](#json-attribute-representation) (and side [Partial Representations](#partial-representations) section).
 
@@ -3545,11 +3545,11 @@ A subscription is represented by a JSON object with the following fields:
 | Parameter      | Optional | Type    | Description                                                                                   |
 |----------------|----------|---------|-----------------------------------------------------------------------------------------------|
 | `id`           |          | string  | Subscription unique identifier. Automatically created at creation time.                       |
-| `description`  | ✓        | string  | A free text used by the client to describe the subscription. Maximum leght is 1024 character. |
+| `description`  | ✓        | string  | A free text used by the client to describe the subscription. Maximum lenght is 1024 character. |
 | [`subject`](#subscriptionsubject)   |          | object | An object that describes the subject of the subscription.                 |
 | [`notification`](#subscriptionnotification) |          | object | An object that describes the notification to send when the subscription is triggered.         |
 | `expires`      | ✓        | ISO8601 | Subscription expiration date in ISO8601 format. Permanent subscriptions must omit this field. |
-| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionaly, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". More detail on oneshot subscriptions in the [corresponding section](#oneshot-subscriptions).|
+| `status`       |          | string | Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions). If this field is not provided at subscription creation time, new subscriptions are created with the `active` status, which can be changed by clients afterwards. For expired subscriptions, this attribute is set to `expired` (no matter if the client updates it to `active`/`inactive`). Additionally, `oneshot` value is available, firing the notification only once whenever the entity is updated after creating the subscription. Once a notification is triggered, the subscription transitions to "status": "inactive". More detail on oneshot subscriptions in the [corresponding section](#oneshot-subscriptions).|
 | `throttling`   | ✓        | number | Minimal period of time in seconds which must elapse between two consecutive notifications. Orion implements this discarding notifications during the throttling guard period. Thus, notifications may be lost if they arrive too close in time. |
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
@@ -3573,7 +3573,7 @@ A `condition` contains the following subfields:
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
-| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and subelements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 
 Notification triggering (i.e. when a notification is triggered based on entity updates)
@@ -3589,7 +3589,7 @@ A `notification` object contains the following subfields:
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
 | `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
-| `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is ommitted)) |
+| `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
 | `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
 | `timesSent`        | Only on retrieval | number  | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                              |
 | `lastNotification` | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                      |
@@ -3598,7 +3598,7 @@ A `notification` object contains the following subfields:
 | `lastFailureReason`| Only on retrieval | string  | Not editable, only present in GET operations. Describes the cause of the last failure (i.e. the failure occurred at `lastFailure` time). Not included in MQTT subscriptions.|
 | `lastSuccessCode`  | Only on retrieval | number  | Not editable, only present in GET operations. the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last time a successful notification was sent (i.e. the success occurred at `lastSuccess` time). Not included in MQTT subscriptions.|
 | `failsCounter`     | Only on retrieval | number  | Not editable, only present in GET operations. The number of consecutive failing notifications associated to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).|
-| `maxFailsLimit`    | ✓                 | number  | Establishes a maximum allowed number of consecutive fails. If the number of fails overpasses the value of `maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then Orion automatically passes the subscription to `inactive` state. A subscripiton update operation (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state `active` again). |
+| `maxFailsLimit`    | ✓                 | number  | Establishes a maximum allowed number of consecutive fails. If the number of fails overpasses the value of `maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then Orion automatically passes the subscription to `inactive` state. A subscription update operation (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state `active` again). |
 
 Regarding `onlyChangedAttrs` field, as an example, if `attrs` is `[A, B, C]` for a given subscription, the default behavior 
 (when `onlyChangedAttrs` is `false`) and the triggering update modified only A, then A, B and C are notified (in other 
@@ -3635,7 +3635,7 @@ A `mqtt` object contains the following subfields:
 | `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
-| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscate when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 
 For further information about MQTT notifications, see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
@@ -3664,7 +3664,7 @@ A `mqttCustom` object contains the following subfields.
 | `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
-| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscate when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
 
 If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
@@ -3908,7 +3908,7 @@ _**Request headers**_
 
 _**Request payload**_
 
-The payload is a JSON object containing the fields to be modified of the subscrition following the JSON subscription 
+The payload is a JSON object containing the fields to be modified of the subscription following the JSON subscription 
 representation format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
 Example: 
@@ -4051,7 +4051,7 @@ Successful operations return `Content-Type` header with `application/json` value
 _**Response payload**_
 
 A JSON array containing all the registrations represented by an object for each registration following 
-[Registratin Payload Datamodel](#registration-payload-datamodel)
+[Registration Payload Datamodel](#registration-payload-datamodel)
 
 Example:
 
@@ -4330,7 +4330,7 @@ _**Response code**_
 
 #### Query `POST /v2/op/query`
 
-This operation execture a query among the existing entities based on filters provided in the request payload. 
+This operation executes a query among the existing entities based on filters provided in the request payload. 
 
 _**Request query parameters**_
 
@@ -4338,7 +4338,7 @@ _**Request query parameters**_
 |-----------|----------|--------|---------------------------------------------------------------------------------------------------|----------------------|
 | `limit`   | ✓        | number | Limit the number of entities to be retrieved. See [Pagination](#pagination) section for details.  | `10`                 |
 | `offset`  | ✓        | number | Skip a number of entities. See [Pagination](#pagination) section for details.                     | `100`                |
-| `orderBy` | ✓        | string | Criteria for ordering results.See [Ordering Results](#ordering-results) section for details.      | `temperature,!speed` |
+| `orderBy` | ✓        | string | Criteria for ordering results. See [Ordering Results](#ordering-results) section for details.     | `temperature,!speed` |
 | `options` | ✓        | string | Options dictionary.                                                                               | `count`              |
 
 The values that `options` parameter can have for this specific request are:
@@ -4586,7 +4586,7 @@ in stable RC-2016.05 and removed in RC-2016.10) is still supported, e.g. `option
 you are highly encouraged to use `attrs` instead (i.e. `attrs=dateModified,*`).
 
 * `POST /v2/op/update` accepts the same action types as NGSIv1, that is `APPEND`, `APPEND_STRICT`,
-`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, preferring always the following counterparts:
+`UPDATE`, `DELETE` and `REPLACE`. However, they shouldn't be used, always  the following counterparts:
 `append`, `appendStrict`, `update`, `delete` and `replace`.
 
 * `attributes` field in `POST /v2/op/query` is deprecated. It is a combination of `attrs` (to select
