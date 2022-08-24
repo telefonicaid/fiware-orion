@@ -3635,7 +3635,7 @@ A `mqtt` object contains the following subfields:
 | `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
-| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscate when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 
 For further information about MQTT notifications, see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
@@ -3664,7 +3664,7 @@ A `mqttCustom` object contains the following subfields.
 | `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
-| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscate when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
+| `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 | `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
 
 If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
