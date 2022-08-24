@@ -15,19 +15,27 @@
     - [JSON 属性表現 (JSON Attribute Representation)](#json-attribute-representation)
     - [簡略化されたエンティティ表現 (Simplified Entity Representation)](#simplified-entity-representation)
     - [部分表現 (Partial Representations)](#partial-representations)
-    - [特殊な属性型 (Special Attribute Types)](#special-attribute-types)
-    - [組み込み属性 (Builtin Attributes)](#builtin-attributes)
-    - [組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
-    - [Datetime サポート](#datetime-support)
-    - [特殊なメタデータ型 (Special Metadata Types)](#special-metadata-types)
-    - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
     - [一般的な構文制限 (General syntax restrictions)](#general-syntax-restrictions)
     - [識別子の構文制限 (Identifiers syntax restrictions)](#identifiers-syntax-restrictions)
+    - [エラー・レスポンス (Error Responses)](#error-responses)
+    - [マルチ・テナンシー (Multi tenancy)](#multi-tenancy)
+    - [サービス・パス (Service path)](#service-path)
+        - [エンティティのサービス・パス (Entity service path)](#entity-service-path)
+        - [サブスクリプションとレジストレーションのサービス・パス (Service path in subscriptions and registrations)](#service-path-in-subscriptions-and-registrations)
+    - [特殊な属性型 (Special Attribute Types)](#special-attribute-types)
+    - [組み込み属性 (Builtin Attributes)](#builtin-attributes)
+    - [特殊なメタデータ型 (Special Metadata Types)](#special-metadata-types)
+    - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
     - [属性名の制限 (Attribute names restrictions)](#attribute-names-restrictions)
     - [メタデータ名の制限 (Metadata names restrictions)](#metadata-names-restrictions)
-    - [ページネーション (Pagination)](#pagination)
-        - [結果の順序付け (Ordering Results)](#ordering-results)
-    - [エラー・レスポンス (Error Responses)](#error-responses)
+    - [組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
+    - [Datetime サポート](#datetime-support)
+    - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
+        - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
+        - [GeoJSON](#geojson)
+    - [シンプル・クエリ言語 (Simple Query Language)](#simple-query-language)
+    - [地理的クエリ (Geographical Queries)](#geographical-queries)
+        - [クエリの解決 (Query Resolution)](#query-resolution)
     - [属性値の更新演算子 (Update operators for attribute values)](#update-operators-for-attribute-values)
         - [サポートされている演算子 (Supported operators)](#supported-operators)
             - [`$inc`](#inc)
@@ -40,27 +48,13 @@
             - [`$pullAll`](#pullall)
             - [`$set`](#set)
             - [`$unset`](#unset)
-            - [`$unset`](#unset)
             - [`$set` と `$unset` の組み合わせ](#combining-set-and-unset)
         - [Orion が演算子を処理する方法](#how-orion-deals-with-operators)
         - [現在の制限](#current-limitations)
             - [エンティティの作成または置換](#create-or-replace-entities)
-    - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
-        - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
-        - [GeoJSON](#geojson)
-    - [シンプル・クエリ言語 (Simple Query Language)](#simple-query-language)
-    - [地理的クエリ (Geographical Queries)](#geographical-queries)
-        - [クエリの解決 (Query Resolution)](#query-resolution)
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [メタデータ更新のセマンティクス (Metadata update semantics)](#metadata-update-semantics)
       - [`overrideMetadata` オプション](#overridemetadata-option)
-    - [ワンショット・サブスクリプション](#oneshot-subscription)
-    - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
-    - [通知メッセージ (Notification Messages)](#notification-messages)
-    - [通知トリガー (Notification triggering)](#notification-triggering)
-    - [カスタム通知 (Custom Notifications)](#custom-notifications)
-      - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
-    - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
     - [一時的なエンティティ (Transient entities)](#transient-entities)
       - [`dateExpires` 属性 (The `dateExpires` attribute)](#the-dateexpires-attribute)
       - [有効なトランジション (Valid transitions)](#valid-transitions)
@@ -70,10 +64,15 @@
         - [エンティティから `dateExpires` 属性を削除 (Remove `dateExpires` attribute from entity)](#remove-dateexpires-attribute-from-entity)
       - [期限切れエンティティを削除 (Deletion of expired entities)](#deletion-of-expired-entities)
       - [下位互換性に関する考慮事項 (Backward compatibility considerations)](#backward-compatibility-considerations)
-    - [マルチ・テナンシー (Multi tenancy)](#multi-tenancy)
-    - [サービス・パス (Service path)](#service-path)
-        - [エンティティのサービス・パス (Entity service path)](#entity-service-path)
-        - [サブスクリプションとレジストレーションのサービス・パス (Service path in subscriptions and registrations)](#service-path-in-subscriptions-and-registrations)
+    - [通知トリガー (Notification triggering)](#notification-triggering)
+    - [通知メッセージ (Notification Messages)](#notification-messages)
+    - [カスタム通知 (Custom Notifications)](#custom-notifications)
+      - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
+    - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
+    - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
+    - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
+    - [ページネーション (Pagination)](#pagination)
+        - [結果の順序付け (Ordering Results)](#ordering-results)
 - [API ルート (API Routes)](#api-routes)
     - [エンティティの操作 (Entities Operations)](#entities-operations)
         - [エンティティのリスト (Entities List)](#entities-list)
@@ -343,6 +342,243 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 Orion で使用されるメタデータ更新セマンティクス (および関連する `overrideMetadata` オプションについては、
 [ドキュメントのこのセクション](#metadata-update-semantics)で詳しく説明します)。
 
+<a name="general-syntax-restrictions"></a>
+
+## 一般的な構文制限 (General syntax restrictions)
+
+一部の状況でスクリプト・インジェクション攻撃を回避するために (たとえば、CB と同じ場所にある Web サーバへの
+クロス・ドメイン)、次の文字はすべてのリクエストで禁止されています:
+
+-   &lt;
+-   &gt;
+-   "
+-   '
+-   =
+-   ;
+-   (
+-   )
+
+それらを使用しようとすると、次のような 400 Bad Request のレスポンスが返されます:
+
+    {
+        "error": "BadRequest",
+        "description": "Invalid characters in attribute type"
+    }
+
+アプリケーションでこれらの文字を使用する必要がある場合は、Orion にリクエストを送信する前に、禁止文字を含まないスキームを
+使用してエンコードする必要があります。
+
+[URL エンコード](http://www.degraeve.com/reference/urlencoding.php) は有効なエンコード方法です。ただし、"%" 文字自体を
+エンコードする必要があるため、API URL (エンティティ ID や属性名など) に表示される可能性のあるフィールドでの使用は
+お勧めしません。 たとえば、"E<01>" をエンティティ ID として使用する場合、その URL エンコードは "E%3C01%3E" になります。
+
+このエンティティ ID を URL で使用するには (エンティティ情報の取得操作など)、次のようにします ("%25" は "%"
+のエンコーディングであることに注意してください)。
+
+```
+GET /v2/entities/E%253C01%253E
+```
+
+上記の制限が適用されない例外的なケースがいくつかあります。 特に、次のフィールドで:
+
+-   URL パラメータ `q` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
+-   URL パラメータ `mq` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
+-   URL パラメータ `georel` と `coords` は `;` を許可します
+-   属性タイプとして `TextUnrestricted` を使用する属性値 ([特別な属性タイプ](#special-attribute-types)のセクションを参照)
+
+<a name="identifiers-syntax-restrictions"></a>
+
+## 識別子の構文制限 (Identifiers syntax restrictions)
+
+この API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
+
+-   エンティティ id (Entity id)
+-   エンティティ型 (Entity type)
+-   属性名 (Attribute name)
+-   属性型 (Attribute type)
+-   メタデータ名 (Metadata name)
+-   メタデータ型 (Metadata type)
+
+ルールは次のとおりです:
+
+-   使用できる文字は、制御文字, 空白, `&`, `?`, `/`, `#` の文字を除き、プレーンな ASCII セットの文字です
+-   最大フィールド長は 256文字です
+-   最小フィールド長は 1文字です
+
+さらに、[一般的な構文制限](#general-syntax-restrictions) も これらの識別子に適用されます。
+
+クライアントが構文の観点から無効なフィールドを使用しようとすると、クライアントは、原因を説明する "Bad Request" エラーの
+レスポンスを受け取ります。
+
+<a name="error-responses"></a>
+
+## エラー・レスポンス (Error Responses)
+
+エラー・ペイロードが存在する場合は、次のフィールドを含む JSON オブジェクトです:
+
+-   `error` (必須, 文字列): エラーのテキスト記述
+-   `description` (オプション, 文字列): エラーに関する追加情報
+
+Oron の実装では、この節で説明する HTTP ステータス・コードと `error` テキストを使用する必要があります。
+しかしながら、`description` フィールドのために使用される特定のテキストは実装の固有側面です。
+
+`error` レポートは次のとおりです:
+
+-   着信 JSON ペイロードがパースできない場合、`ParseError` (`400`) が返されます
+-   URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生するエラー (つまり、Orion の
+    ステータスに依存しないエラー) は、`BadRequest` (`400`) となります
+    -   例外: 受信した JSON ペイロード・エラー。これには別の `error` メッセージがあります (前の箇条書きを参照)
+-   空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) になります。詳細は、"エンティティの
+    地理空間プロパティ"を参照してください
+-   リクエストに起因する曖昧さは、いくつかのリソースを参照する可能性があります。その id だけを提供するエンティティを更新
+    しようとすると、その id を持つ複数のエンティティが存在すると、`TooManyResults` (`409`) になります
+-   リクエストによって識別されるリソースが見つからない場合、`NotFound` (`404`) が返されます
+-   リクエストと状態の組み合わせに起因するものの、排他的ではないリクエスト (たとえば、既存の属性に対して
+    `options=append` を指定した POST) は、`Unprocessable` (`422`) になります
+    -   例外: 前の箇条書きで説明した 404, 409 または 413 のエラーにつながるリクエストと状態の条件
+-   HTTP 層のエラーは次のように使用されます:
+    -   HTTP 405 Method Not Allowed は、`MethodNotAlowed` (`405`) に対応しています
+    -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
+    -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
+    -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
+
+<a name="multi-tenancy"></a>
+
+## マルチ・テナンシー (Multi tenancy)
+
+Orion は、単純なマルチ・テナント/マルチ・サービス・モデル・ベースの論理データベース分離を実装し、他の FIWARE
+コンポーネントまたはサード・パーティ・ソフトウェアによって提供されるサービス/テナント・ベースの認可ポリシー
+(authorization policies) を容易にします。たとえば、FIWARE セキュリティ・フレームワーク (PEP Proxy, IDM,
+およびアクセス制御)の認可ポリシー。この機能は、`-multiservice` [コマンド・ライン オプション](admin/cli.md)
+を使用するとアクティブになります。 `-multiservice` を使用すると、Orion はリクエストで `Fiware-Service` HTTP
+ヘッダを使用してサービス/テナントを識別します。HTTP リクエストにヘッダが存在しない場合、デフォルトの
+サービス/テナントが使用されます。
+
+マルチ・テナント/マルチ・サービスは、1つのサービス/テナントのエンティティ/属性/サブスクリプションが、
+他のサービス/テナントから*"見えない"* (invisible) ことを保証します。たとえば、tenantA スペースで
+`GET /v2/entities` を実行しても、tenantB スペースからエンティティが返されることはありません。
+この分離はデータベースの分離に基づいており、
+[詳細はインストールおよび管理マニュアル](admin/database_admin.md#multiservicemultitenant-database-separation)
+に記載されています。
+
+さらに、`-multiservice` が使用される場合、Orion は、指定されたテナント/サービスのサブスクリプションに
+関連付けられた notifyContextRequest リクエスト・メッセージに `Fiware-Service` ヘッダを含めることに注意して
+ください (デフォルトのサービス/テナントを除きます。この場合、ヘッダは存在しません)、例:
+
+```
+POST http://127.0.0.1:9977/notify
+Content-Length: 725
+User-Agent: orion/0.13.0
+Host: 127.0.0.1:9977
+Accept: application/json
+Fiware-Service: t_02
+Content-Type: application/json
+{
+...
+}
+```
+
+サービス/テナント名の構文に関しては、英数字の文字列 (および `\` 記号) である必要があります。最大長は
+50文字で、ほとんどのユースケースでは十分です。 Orion はテナント名を小文字で解釈するため、`MyService`
+の更新などでテナントを使用することはできますが、そのテナントに関連する通知は `myservice` で送信され、その意味では、
+お勧めできません。Orion が通知で送信するテナントと比較して、更新リクエストで使用したテナントと一貫性がありません。
+
+<a name="service-path"></a>
+
+## サービス・パス (Service path)
+
+<a name="entity-service-path"></a>
+
+### エンティティのサービス・パス (Entity service path)
+
+Orion は階層スコープをサポートしているため、エンティティの[作成時に](user/walkthrough_apiv2.md#entity-creation)、
+スコープに割り当てることができます。次に、[クエリ](user/walkthrough_apiv2.md#query-entity)と
+[サブスクリプション](user/walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するスコープ内のエンティティを
+見つけることもできます。
+
+たとえば、次のスコープを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
+
+-   第1レベルのスコープとして、`マドリッド`
+-   第2レベルのスコープ (マドリッドの子供たち) としての `Gardens` と `Districts`
+-   `ParqueNorte`, `ParqueOeste`, `ParqueSur` (Gardens の子) および `Fuencarral` と `Latina` (Districts の子)
+-   `Parterre1` と `Parterre2` (ParqueNorte の子)
+
+![](ServicePathExample.png "ServicePathExample.png")
+
+使用するスコープは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
+`Parterre1` に `Tree` 型のエンティティ `Tree1` を作成するには、次の Fiware-ServicePath が使用されます:
+
+```
+    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
+```
+
+そのスコープで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
+
+スコープは階層的で、階層的な検索が可能です。これを行うために、`\#` 特別なキーワードが使用されます。 したがって、
+`/Madrid/Gardens/ParqueNorte/#` の `Tree` 型のエンティティ ID `.\*` のパターンを持つ query は、`ParqueNorte`,
+`Parterre1`, `Parterre2` のすべてのツリー (trees) を返します。
+
+最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなスコープをクエリできます。たとえば、
+`ParqueNorte` と `ParqueOeste` の両方ですべてのツリーを取得するには (`ParqueSur` ではなく)、次の `Fiware-ServicePath`
+を query リクエストで使用します:
+
+```
+    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte, /Madrid/Gardens/ParqueOeste
+```
+
+いくつかの追加のコメント:
+
+-   制限:
+    -   スコープは `/` で始まる必要があります ("絶対" (absolute) スコープのみが許可されます)
+    -   1つのパスで最大10のスコープ・レベル
+    -   各レベルで最大50文字 (最低1文字)、英数字とアンダー・スコアのみ使用可能
+    -   クエリ `Fiware-ServicePath` ヘッダのコンマ区切りリスト内の最大10個のばらばらなスコープ・パス (アップデート
+        `Fiware-ServicePath` ヘッダのスコープ・パスは1つ以下)
+    -   末尾のスラッシュは破棄されます
+
+-   `Fiware-ServicePath` はオプションのヘッダです。`Fiware-ServicePath` なしで作成された (またはデータベースにサービス
+   ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・スコープ `/` に属していると想定されます。
+    `Fiware-ServicePath` を使用しないすべてのクエリ (サブスクリプションを含む) は、暗黙的に `\#` にあります。
+    この動作により、0.14.0より前のバージョンとの下位互換性が保証されます
+
+-   異なるスコープで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
+    に `Tree` 型のエンティティ ID `Tree1` を作成し、`Madrid/Gardens/ParqueOeste` に `Tree` 型の ID `Tree1`
+    の別のエンティティをエラーなしで作成できます。ただし、このシナリオでは query が奇妙になる可能性があります
+    (たとえば、`Fiware-ServicePath /Madrid/Gardens` の query は、query response で同じ ID と型を持つ2つの
+    エンティティを返すため、それぞれがどのスコープに属しているかを区別するのが難しくなります)
+
+-   エンティティは1つの (そして、1つだけの) スコープに属します
+
+-   `Fiware-ServicePath` ヘッダは、Orion から送信される通知リクエストに含まれています
+
+-   スコープ・エンティティは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
+    その場合、各 `scope tree` (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
+    同じ名前を使用することもできます。下の図を参照してください。
+
+![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
+
+-   現在のバージョンでは、API を介してエンティティが属するスコープを変更することはできません (回避策は、
+    [エンティティ・コレクション](admin/database_model.md#entities-collection) の `_id.servicePath`
+    フィールドを直接変更することです)
+
+<a name="service-path-in-subscriptions-and-registrations"></a>
+
+### サブスクリプションとレジストレーションのサービス・パス (Service path in subscriptions and registrations)
+
+エンティティはサービス *および* サービス・パスに属しますが、サブスクリプションとレジストレーションはサービス *のみ*
+に属します。サブスクリプションとレジストレーションの servicepath は所属の意味を示すものではなく、サブスクリプション
+またはレジストレーションに関連付けられたクエリの表現です。
+
+これを考慮すると、次の規則が適用されます:
+
+-   ID は取得するサブスクリプションまたはレジストレーションを完全に修飾するため、`GET /v2/subscriptions/{id}` および
+    `GET /v2/registrations/{id}` 操作では `Fiware-ServicePath` ヘッダは無視されます
+-   `Fiware-ServicePath` ヘッダは、`GET /v2/subscriptions` および `GET /v2/registrations` で考慮され、*正確に*
+    そのサービス・パスをクエリとして使用するサブスクリプション/レジストレーションに結果を絞り込みます
+-   現時点では、階層的なサービス・パス (つまり、`#` で終わるもの) はレジストレーションで許可されていません。
+    [Github での Issue](https://github.com/telefonicaid/fiware-orion/issues/3078) があり、この制限は最終的に
+    解決される可能性があります
+
 <a name="special-attribute-types"></a>
 
 ## 特殊な属性型 (Special Attribute Types)
@@ -447,7 +683,34 @@ Orion で使用されるメタデータ更新セマンティクス (および関
 
 通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs では使用できません。
 
-<a name="user-attributes-or-metadata-matching-builtin-nam"></a>
+<a name="attribute-names-restrictions"></a>
+
+## 属性名の制限 (Attribute names restrictions)
+
+次の文字列を属性名として使用しないでください:
+
+-   `id` は、エンティティ id を表すために使用されるフィールドと競合するためです
+-   `type` は、エンティティ型を表すために使用されるフィールドと競合するためです
+-   `geo:distance` は、中心点に近接するために `orderBy` で使用される文字列と競合するためです
+-   組み込みの属性名。同じ属性名を使用することは可能ですが、まったく推奨されません。このドキュメントの
+    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
+    セクションを確認してください
+-   `*` は、"すべてのカスタム/ユーザ属性" ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を
+    参照) という特別な意味を持っています
+
+<a name="metadata-names-restrictions"></a>
+
+## メタデータ名の制限 (Metadata names restrictions)
+
+次の文字列をメタデータ名として使用しないでください:
+
+-   組み込みのメタデータ名。同じメタデータ名を使用することは可能ですが、まったく推奨されません。このドキュメントの
+    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
+    セクションを確認してください
+-   `*` は、"すべてのカスタム/ユーザ・メタデータ"
+    ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を参照) という特別な意味を持っています
+
+<a name="user-attributes-or-metadata-matching-builtin-name"></a>
 
 ## 組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)
 
@@ -548,215 +811,361 @@ Orion は常に `YYYY-MM-DDThh:mm:ss.sssZ` の形式を使用して日時属性/
 を参照)。属性とメタデータのタイプとして文字列 `ISO8601` もサポートされています。効果は `DateTime`
 を使用した場合と同じです。
 
-<a name="general-syntax-restrictions"></a>
+<a name="geospatial-properties-of-entities"></a>
 
-## 一般的な構文制限 (General syntax restrictions)
+## エンティティの地理空間プロパティ (Geospatial properties of entities)
 
-一部の状況でスクリプト・インジェクション攻撃を回避するために (たとえば、CB と同じ場所にある Web サーバへの
-クロス・ドメイン)、次の文字はすべてのリクエストで禁止されています:
+コンテキストのエンティティの地理空間プロパティは、通常のコンテキスト属性を用いて表すことができます。地理空間的
+プロパティの提供は、地理的クエリの解決を可能にします。
 
--   &lt;
--   &gt;
--   "
--   '
--   =
--   ;
--   (
--   )
+Orion では 2 つの異なる構文がサポートされています:
 
-それらを使用しようとすると、次のような 400 Bad Request のレスポンスが返されます:
+-   *Simple Location Format*。これは、開発者とユーザが既存のエンティティに素早く簡単に追加できる、非常に軽量な形式です
+-   *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、JSON (JavaScript Object Notation) に
+    基づく地理空間データ交換フォーマットです。GeoJSON は、より高度な柔軟性を提供し、ポイント高度またはより複雑な
+    地理空間形状、たとえば、
+    [マルチ・ジオメトリ](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries)
+    の表現を可能にします
 
-    {
-        "error": "BadRequest",
-        "description": "Invalid characters in attribute type"
+クライアント・アプリケーションは、(適切な NGSI 属性タイプを提供することによって) 地理空間プロパティを伝達する
+エンティティ属性を定義する責任があります。通常、これは `location` という名前のエンティティ属性ですが、地理空間属性に
+別の名前を使用することを妨げるものは何もありません。
+
+Orion は、バックエンド・データベースによって課されるリソースの制約により、地理空間属性の数を1つの属性に制限します。
+追加の使用で追加のロケーション属性を作成しようとすると、Orion はエラー `413`、*Request entity too large* を発生させ、
+レスポンス・ペイロードで報告されるエラーは `NoResourcesAvailable` です。
+
+ただし、`ignoreType` メタデータを `true` に設定して、特定の属性に追加の情報ロケーションが含まれていることを意味できます
+(詳細は [ドキュメントのこのセクション](#special-metadata-types) を参照)。これにより、Orion によるその属性の location
+としての解釈が無効になるため、制限にはカウントされません。
+
+例えば:
+
+```
+{
+  "id": "Hospital1",
+  "type": "Hospital",
+  ...
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ -3.68666, 40.48108 ]
+    },
+    "type": "geo:json"
+  },
+  "serviceArea": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
+    },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType":{
+        "value": true,
+        "type": "Boolean"
+      }
     }
-
-アプリケーションでこれらの文字を使用する必要がある場合は、Orion にリクエストを送信する前に、禁止文字を含まないスキームを
-使用してエンコードする必要があります。
-
-[URL エンコード](http://www.degraeve.com/reference/urlencoding.php) は有効なエンコード方法です。ただし、"%" 文字自体を
-エンコードする必要があるため、API URL (エンティティ ID や属性名など) に表示される可能性のあるフィールドでの使用は
-お勧めしません。 たとえば、"E<01>" をエンティティ ID として使用する場合、その URL エンコードは "E%3C01%3E" になります。
-
-このエンティティ ID を URL で使用するには (エンティティ情報の取得操作など)、次のようにします ("%25" は "%"
-のエンコーディングであることに注意してください)。
-
-```
-GET /v2/entities/E%253C01%253E
+  }
+}
 ```
 
-上記の制限が適用されない例外的なケースがいくつかあります。 特に、次のフィールドで:
+どちらの属性も `geo:json` タイプですが、`serviceArea` は `ignoreType` メタデータを `true` に使用するため、
+情報を提供しない1つの場所の制限を超えることはありません。
 
--   URL パラメータ `q` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
--   URL パラメータ `mq` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
--   URL パラメータ `georel` と `coords` は `;` を許可します
--   属性タイプとして `TextUnrestricted` を使用する属性値 ([特別な属性タイプ](#special-attribute-types)のセクションを参照)
+追加の場所 (locations) がこのように定義されている場合、地理クエリの解決に使用される場所は、`ignoreType` が `true`
+メタデータに設定されていない場所であることを考慮してください (上記の例では `location` 属性)。`ignoreType` を `true`
+に設定して定義されたすべての場所は Orion によって無視され、この意味で地理クエリには影響しません。
 
-<a name="identifiers-syntax-restrictions"></a>
+<a name="simple-location-format"></a>
 
-## 識別子の構文制限 (Identifiers syntax restrictions)
+### シンプル・ロケーション・フォーマット (Simple Location Format)
 
-この API の識別子として使用されるフィールドは、許可される構文に関する特別な規則に従います。これらの規則は:
+シンプル・ロケーション・フォーマットは、基本的なジオメトリ (*point*, *line*, *box*, *polygon*) をサポートし、
+地理的位置をエンコードする際の典型的な使用例をカバーしています。[GeoRSS Simple](http://www.georss.org/simple.html)
+に触発されています。
 
--   エンティティ id (Entity id)
--   エンティティ型 (Entity type)
--   属性名 (Attribute name)
--   属性型 (Attribute type)
--   メタデータ名 (Metadata name)
--   メタデータ型 (Metadata type)
+シンプル・ロケーション・フォーマットは、地球表面上の複雑な位置を表すことを意図していないことに注目してください。
+たとえば、高度座標を取得する必要のあるアプリケーションでは、GeoJSON をそのエンティティの地理空間プロパティの表現形式
+として使用する必要があります。
 
-ルールは次のとおりです:
+シンプル・ロケーション・フォーマットでエンコードされたロケーションを表すコンテキスト属性は、次の構文に準拠している必要が
+あります:
 
--   使用できる文字は、制御文字, 空白, `&`, `?`, `/`, `#` の文字を除き、プレーンな ASCII セットの文字です
--   最大フィールド長は 256文字です
--   最小フィールド長は 1文字です
+-   属性型は、(`geo:point`, `geo:line`, `geo:box`, `geo:polygon`) のいずれかの値でなければなりません
+-   属性値は座標のリストでなければなりません。既定では、座標は、
+    [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
+    [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) 座標リファレンス・システム (CRS) を使用して定義され、
+    緯度と経度の単位は小数です。このような座標リストは、`type` 属性で指定されたジオメトリをエンコードすることを可能に
+    し、以下で定義される特定の規則に従ってエンコードされます:
+    -   `geo:point` 型: 属性値には有効な緯度経度のペアをカンマで区切った文字列を含める必要があります
+    -   `geo:line` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも2つのペアが必要です
+    -   `geo:polygon` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも4つのペアが存在
+        しなければならず、最後のペアは最初のものと同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
+        ポリゴンを構成する線分が定義された領域の外縁に残るように、座標ペアを適切に順序付けする必要があります。たとえば、
+        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。Orion は、入力データが前者の条件を
+        満たさない場合にエラーを発生させる必要があります
+    -   `geo:box` 型: バウンディング・ボックスは矩形領域であり、地図の範囲や関心のある大まかな領域を定義するためによく
+        使用されます。ボックスは、緯度経度ペアの2つの長さの文字列配列によって表現されます。最初のペアは下のコーナー、
+        2番目のペアは上のコーナーです
 
-さらに、[一般的な構文制限](#general-syntax-restrictions) も これらの識別子に適用されます。
+注: [この文献](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)で、
+実装のさまざまな欠点を説明しているように、サークル・ジオメトリはサポートされていません。
 
-クライアントが構文の観点から無効なフィールドを使用しようとすると、クライアントは、原因を説明する "Bad Request" エラーの
-レスポンスを受け取ります。
-
-<a name="attribute-names-restrictions"></a>
-
-## 属性名の制限 (Attribute names restrictions)
-
-次の文字列を属性名として使用しないでください:
-
--   `id` は、エンティティ id を表すために使用されるフィールドと競合するためです
--   `type` は、エンティティ型を表すために使用されるフィールドと競合するためです
--   `geo:distance` は、中心点に近接するために `orderBy` で使用される文字列と競合するためです
--   組み込みの属性名。同じ属性名を使用することは可能ですが、まったく推奨されません。このドキュメントの
-    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
-    セクションを確認してください
--   `*` は、"すべてのカスタム/ユーザ属性" ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を
-    参照) という特別な意味を持っています
-
-<a name="metadata-names-restrictions"></a>
-
-## メタデータ名の制限 (Metadata names restrictions)
-
-次の文字列をメタデータ名として使用しないでください:
-
--   組み込みのメタデータ名。同じメタデータ名を使用することは可能ですが、まったく推奨されません。このドキュメントの
-    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
-    セクションを確認してください
--   `*` は、"すべてのカスタム/ユーザ・メタデータ"
-    ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を参照) という特別な意味を持っています
-
-<a name="pagination"></a>
-
-## ページネーション (Pagination)
-
-Orion は、クライアントが大量のリソース セットを取得できるように、ページネーション・メカニズムを実装しています。
-このメカニズムは、API のすべてのリスト操作で機能します (例: `GET /v2/entities`, `GET /v2/subscriptions`,
-`POST /v2/op/query` など)。
-
-このメカニズムは、次の 3 つの URI パラメータに基づいています。
-
--   **limit**: 要素の最大数を指定するため (デフォルトは20、最大許容数は1000)
--   **offset**: 最初に指定された数の要素をスキップするため (デフォルトは0)
--   **count** (`option` として): アクティブ化されている場合、`Fiware-Total-Count` ヘッダがレスポンスに追加され、
-    要素の総数が示されます
-
-デフォルトでは、結果は作成時間の昇順で返されます。エンティティ・クエリの場合、これは
-[`orderBy` URL パラメータ](#ordering-results)で変更できます。
-
-例を挙げて説明しましょう。特定のクライアントが1回のレスポンスで100を超える結果を処理することはできず、クエリには合計
-322の結果が含まれます。クライアントは次のことを実行できます (完全を期すために、URL のみが含まれています)。
+以下の例は、参照される構文を示しています:
 
 ```
-GET /v2/entities?limit=100&options=count
-...
-(最初の100個の要素が、'Fiware-Total-Count: 322' ヘッダと共に返されます。これにより、クライアントはエンティティの総数を
-認識し、その後実行するクエリの数を知ることができます)
-GET /v2/entities?offset=100&limit=100
-...
-(101から200までのエンティティ)
-GET /v2/entities?offset=200&limit=100
-...
-(201から300までのエンティティ)
-GET /v2/entities?offset=300&limit=100
-...
-(301から322までのエンティティ)
+{
+  "location": {
+    "value": "41.3763726, 2.186447514",
+    "type": "geo:point"
+  }
+}
 ```
 
-リクエストが結果の総数を超えるオフセットを使用する場合、以下に示すように空のリストが返されることに注意してください:
-
 ```
-GET /v2/entities?offset=1000&limit=100
-...
-[]
-```
-
-<a name="ordering-results"></a>
-
-## 結果の順序付け (Ordering Results)
-
-エンティティのリストを検索するオペレーションは、`orderBy` URI パラメータが、結果を順序付けする際の基準として使用される
-属性またはプロパティを指定することを可能にする。`orderBy` の値は次のようになります:
-
-例えば：
-
-```
-GET /v2/entities?orderBy=temperature,!humidity
+{
+  "location": {
+    "value": [
+      "40.63913831188419, -8.653321266174316",
+      "40.63881265804603, -8.653149604797363"
+    ],
+    "type": "geo:box"
+  }
+}
 ```
 
-最初に温度の昇順で並べ替え、次に湿度の降順で並べます (温度が同値の場合)。
+<a name="geojson"></a>
 
-[組み込み属性](#builtin-attributes)の `dateCreated` と `dateModified` は、エンティティの作成時刻とエンティティの
-更新時刻を意味するために、`orderBy` コンマ区切りリスト (`!` 構文を含む) の要素として使用できることに注意してください。
+### GeoJSON
 
--   キーワード `geo:distance` は、"near" (`georel=near`) の空間関係 (spatial relationship) が使用されているときに
-    リファレンス・ジオメトリまでの距離によって結果を並べます
--   カンマで区切られた属性のリストです。組み込み属性、エンティティ id の `id`、エンティティ型の `type` などがあります。
-    たとえば、`temperature,!humidity`。結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなどの順序で
-    並べられます。フィールド名の前の "!" は、順序が逆になっていることを示します
+GeoJSON を使用してエンコードされた位置を表すコンテキスト属性は、次の構文に準拠している必要があります:
 
-値が複数の JSON タイプに属する属性の順序に関して、Orion は、基礎となる実装 (MongoDB) で使用される基準と同じ基準を
-使用します。詳細については、
-[次のリンク](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)を
+-   属性の NGSI 型は `geo:json` でなければなりません
+-   属性値は有効な GeoJSON オブジェクトである必要があります。GeoJSON の座標で経度が緯度の前に来ることに注目してください
+
+以下の例は、GeoJSON の使い方を示しています。その他の GeoJSON の例は、
+[GeoJSON IETF 仕様書](https://tools.ietf.org/html/draft-butler-geojson-06#page-14) にあります。さらに、
+[この GeoJSON チュートリアル](http://www.macwright.org/2015/03/23/geojson-second-bite.html)は、
+フォーマットの理解に役立ちます。
+
+```
+{
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [2.186447514, 41.3763726]
+    },
+    "type": "geo:json"
+  }
+}
+```
+
+現在の実装 ([MongoDB 機能](https://www.mongodb.com/docs/manual/reference/geojson/)に基づく) では、`GeoJSON`
+表現の使用にいくつかの制限が導入されており、次のタイプのみがサポートされています:
+
+-   Point
+-   MultiPoint
+-   LineString
+-   MultiLineString
+-   Polygon
+-   MultiPolygon
+
+実施されたテストの詳細については、[こちら] (https://github.com/telefonicaid/fiware-orion/issues/3586) を
 参照してください。
 
-最低から最高へ:
+タイプ `Feature` および `FeatureCollection` もサポートされていますが、特別な方法でサポートされています。`Feature`
+または `FeatureCollection` を使用して、`geo:json` 属性を作成/更新できます。ただし、属性値が取得されると
+(GET レスポンスまたは通知)、次のコンテンツのみが取得されます:
 
-1. Null
-2. Number
-3. String
-4. Object
-5. Array
-6. Boolean
+-   `Feature` の場合は `geometry` フィールド
+-   `FeatureCollection` の場合、`features` 配列の最初の項目の `geometry` フィールド
 
-<a name="error-responses"></a>
+実際には、Orion は `Feature` または `FeatureCollection` の作成/更新時に使用される完全な値を保存することに注意して
+ください。ただし、他の `geo:json` 型との正規化の観点から、`geometry` 部分のみを返すことにしました。将来的には、完全な
+コンテンツを返すフラグが実装される可能性があります
+(詳細は [この Issue](https://github.com/telefonicaid/fiware-orion/issues/4125) を参照)。`Feature` または
+`FeatureCollection` の特別な処理を無効にするもう1つの方法は、[`ignoreType` メタデータ](#ignoretype-metadata)
+を使用することですが、その場合もエンティティの場所は無視されます。
 
-## エラー・レスポンス (Error Responses)
+`FeatureCollection` に関しては、単一の `Feature` が含まれている場合 (つまり、`features` フィールドに要素が1つしかない
+場合) のみ、作成/更新時にのみ受け入れられます。そうしないと、Orion は "Bad Request" エラーを返します。
 
-エラー・ペイロードが存在する場合は、次のフィールドを含む JSON オブジェクトです:
+全くサポートされていない唯一の GeoJSON タイプは `GeometryCollection` です。それらを使用しようとすると、
+"Database Error" が発生します。
 
--   `error` (必須, 文字列): エラーのテキスト記述
--   `description` (オプション, 文字列): エラーに関する追加情報
+<a name="simple-query-language"></a>
 
-Oron の実装では、この節で説明する HTTP ステータス・コードと `error` テキストを使用する必要があります。
-しかしながら、`description` フィールドのために使用される特定のテキストは実装の固有側面です。
+## シンプル・クエリ言語 (Simple Query Language)
 
-`error` レポートは次のとおりです:
+シンプル・クエリ言語は、一連の条件に一致するエンティティを取得するための簡単な構文を提供します。クエリは、';' キャラクタ
+で区切られたステートメントのリストで構成されます。各ステートメントは一致条件を表します。クエリは、一致するすべての条件
+(AND 論理演算子) に一致するすべてのエンティティを返します。
 
--   着信 JSON ペイロードがパースできない場合、`ParseError` (`400`) が返されます
--   URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生するエラー (つまり、Orion の
-    ステータスに依存しないエラー) は、`BadRequest` (`400`) となります
-    -   例外: 受信した JSON ペイロード・エラー。これには別の `error` メッセージがあります (前の箇条書きを参照)
--   空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) になります。詳細は、"エンティティの
-    地理空間プロパティ"を参照してください
--   リクエストに起因する曖昧さは、いくつかのリソースを参照する可能性があります。その id だけを提供するエンティティを更新
-    しようとすると、その id を持つ複数のエンティティが存在すると、`TooManyResults` (`409`) になります
--   リクエストによって識別されるリソースが見つからない場合、`NotFound` (`404`) が返されます
--   リクエストと状態の組み合わせに起因するものの、排他的ではないリクエスト (たとえば、既存の属性に対して
-    `options=append` を指定した POST) は、`Unprocessable` (`422`) になります
-    -   例外: 前の箇条書きで説明した 404, 409 または 413 のエラーにつながるリクエストと状態の条件
--   HTTP 層のエラーは次のように使用されます:
-    -   HTTP 405 Method Not Allowed は、`MethodNotAlowed` (`405`) に対応しています
-    -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
-    -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
-    -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
+ステートメントには、2種類あります: *単項ステートメント* と *バイナリ・ステートメント*
+
+バイナリ・ステートメントは、属性パス (たとえば、`temperature` や `brand.name`)、演算子と値
+(値の形式は演算子に依存します)、たとえば:
+
+```
+temperature==50
+temperature<=20
+```
+
+属性パスの構文は、`.` 文字で区切られたトークンのリストで構成されます。このトークンのリストは、次の規則に従って JSON
+プロパティ名を指定します。
+
+-   最初のトークンは、エンティティの NGSI 属性 (*ターゲット NGSI 属性*) の名前です
+-   属性値によるフィルタリング (つまり、式が `q` クエリで使用されている) の場合、残りのトークン (存在する場合) は、JSON
+    オブジェクトでなければならない、*ターゲット NGSI 属性*のサブ・プロパティへのパスを表します。そのようなサブプロパティ
+    は、*ターゲット・プロパティ*として定義されます
+-   メタデータによるフィルタリング (つまり、式が `mq` クエリで使用されている) の場合、2番目のトークンはターゲット NGSI
+    属性, *ターゲット・メタデータ*に関連付けられたメタデータ名を表し、残りのトークン (存在する場合) は JSON
+    オブジェクトでなければならない *ターゲット・メタデータ値*のサブ・プロパティへのパスを表します。そのようなサブ・
+    プロパティは、*ターゲット・プロパティ*として定義されます
+
+*ターゲット・プロパティ値*は、上記のトークンのリストによって指定される、JSON プロパティの値、つまり、*ターゲット・
+プロパティ*の値として定義されます。
+
+トークンが 1つだけ提供されている場合 (メタデータによるフィルタリングの場合は2つ)、*ターゲット・プロパティ* は
+*ターゲット NGSI 属性* (またはメタデータでフィルタリングする場合の *ターゲット・メタデータ*) と
+*ターゲット・プロパティ値* は、*ターゲット NGSI 属性*値 (または、メタデータによるフィルタリングの場合の
+*ターゲット・メタデータ*値) になります。この場合、*ターゲット NGSI 属性* (または、メタデータによるフィルタリングの場合の
+*ターゲット・メタデータ*) の値は JSON オブジェクトであってはなりません。
+
+トークンの一部に `.` が含まれている場合、セパレータとして一重引用符 (`'`) を使用できます。たとえば、次の属性パス
+`'a.b'.w.'x.y'` は3つのトークンで構成されます: 最初のトークンは `ab`、2番目のトークンは `w`、3番目のトークンは `xy`
+です。
+
+演算子のリスト、および、使用する値の形式は次のとおりです:
+
+-   **等号**: `==`。この演算子は、次の型の右辺を受け入れます:
+    -   単一要素、たとえば `temperature==40` です。エンティティがマッチするためには、*ターゲット・プロパティ*
+        (temperature) が含まれていなければならず、*ターゲット・プロパティ値*は、クエリ値 (40) でなければなりません。
+        または、*ターゲット・プロパティ値*が配列の場合はその値を含んでいなければなりません
+    -   カンマで区切られた値のリストです。たとえば、`color==black,red`。エンティティがマッチするためには、*ターゲット・
+        プロパティ* が含まれていなければならず、*ターゲット・プロパティ値*が、リスト内の値のうちの**いずれか**でなければ
+        なりません (OR 句) 。または、*ターゲット・プロパティ値*が配列の場合は、リスト内の値の**いずれか**を含んで
+        いなければなりません。たとえば、`color` という名前の属性を持つエンティティは、その値が ` black` であるとマッチ
+        しますが、`color` という名前の属性を持つエンティティは、その値が `white` であるとはマッチしません
+    -   範囲 (range)。最小値と最大値として指定され、`..` で区切られています。たとえば、`temperature==10..20` です。
+        エンティティがマッチするためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、
+        *ターゲット・プロパティ値*は、範囲の上限と下限の間 (どちらも含まれています) にある必要があります。範囲は、
+        ISO8601 形式の日付、数字または文字列を表す*ターゲット・プロパティ*でのみ使用できます
+-   **不等号**: `!=`。この演算子は、次の型の右辺を受け入れます:
+    -   単一の要素、たとえば `temperature!=41` です。エンティティが一致するには、*ターゲット・プロパティ* (temperature)
+        が含まれていなければならず、*ターゲット・プロパティー値*は、クエリ値 (41) で**あってはなりません**
+    -   カンマで区切られた値のリスト、たとえば `color!=black,red`。エンティティがマッチするには、
+        *ターゲット・プロパティ*が含まれていなければならず、*ターゲット・プロパティ値*が、リスト内のいずれかの値で
+        *あってはなりません* (AND 句)。または、*ターゲット・プロパティ値*が配列の場合、リスト内の値の**いずれか**を
+        含んでいてはなりません。例えば。属性 `color` が `black` に設定されたエンティティはマッチせず、属性 `color` が
+        `white` に設定されたエンティティはマッチします
+    -   範囲 (range)、最小値と最大値として指定され、`..` で区切られています。たとえば `temperature!=10..20`。
+        エンティティがマッチするためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、
+        *ターゲット・プロパティ値* は上限と下限の間 (どちらも含まれています) にある**必要はありません**。範囲は、
+        ISO8601 形式の日付、数字または文字列の日付を表す要素 *ターゲット・プロパティ*でのみ使用できます
+-   **より大きい**: `>`。右側は単一の要素でなければなりません。たとえば `temperature>42` です。エンティティがマッチ
+    するためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、*ターゲット・プロパティ値*が
+    クエリ値 (42) より厳密に大きくなければなりません。このオペレーションは、date 型、number 型または string 型の
+    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果に
+    なる可能性があります)
+-   **未満**: `<`。右側は単一の要素でなければなりません。たとえば、`temperature<43` です。エンティティがマッチするため
+    には、*ターゲット・プロパティ* (temperature) が含まれていなければならず、*ターゲット・プロパティ値*は 値 (43)
+    より厳密に小さくなければなりません。このオペレーションは、date 型、number 型または string 型の
+    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果に
+    なる可能性があります)
+-   **以上**: `>=`。右側は単一の要素でなければなりません。たとえば、`temperature>=44` です。エンティティがマッチするため
+    には、*ターゲット・プロパティ* (temperature)が含まれていなければならず、*ターゲット・プロパティ値*は 値 (44) 以上で
+    なければなりません。このオペレーションは、date 型、number 型または string 型の*ターゲット・プロパティ*に対してのみ
+    有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果になる可能性があります)
+-   **以下**: `<=`。右側は単一の要素でなければなりません。たとえば、`temperature<=45` です。エンティティがマッチするため
+    には、*ターゲット・プロパティ* (temperature)が含まれていなければならず、*ターゲットプロパティ値*は、値 (45) 以下で
+    なければなりません。このオペレーションは、date 型、number 型または string 型の*ターゲット・プロパティ*に対してのみ
+    有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果になる可能性があります)
+-   **マッチ・パターン**: `~=`。値は正規表現として表現された、与えられたパターンと一致します。`color~=ow`。
+    エンティティがマッチするためには、*targetプロパティ* (color) が含まれていなければならず、*ターゲット・プロパティの
+    値*が、右側の文字列と一致する必要があります。この例では `ow` (`brown` と `yellow` はマッチし、`black` と `white`
+    はマッチしません) です。このオペレーションは、string 型の *ターゲット・プロパティ*に対してのみ有効です
+
+シンボル `:` は `==` の代わりに使用できます。
+
+等号または不等号の場合、一致する文字列に `,` が含まれている場合は、カンマの特殊な意味を無効にするために一重引用符 (`'`)
+を使用できます。たとえば、`color=='light,green','deep,blue'`。最初の例は、正確な値  'light,green' または 'deep,blue' と
+color を一致させます。また、`q=title=='20'` は文字列 "20" にマッチしますが、数値 20 ではマッチしません。
+
+単項否定ステートメントは単項演算子 `!` を使用しますが、肯定単項ステートメントは演算子をまったく使用しません。単項
+ステートメントは、*ターゲット・プロパティ*の存在をチェックするために使用されます。たとえば、`temperature` は、
+'temperature' という属性を持つエンティティにマッチします (値に関係なく)。`!temperature` は、'temperature' という属性を
+持たないエンティティと一致します。
+
+<a name="geographical-queries"></a>
+
+## 地理的クエリ (Geographical Queries)
+
+地理的クエリは、以下のパラメータを使用して指定されます。
+
+``georel`` は、一致するエンティティとリファレンス・シェイプ (`geometry`) の間の空間的関係 (述語) を指定することを意図
+しています。';' で区切られたトークンリストで構成されています。最初のトークンはリレーションシップ名であり、残りのトークン
+(あれば) はリレーションシップに関する詳細情報を提供する修飾語です。次の値が認識されます:
+
+-   `georel=near`。``near`` リレーションシップは、一致するエンティティが、リファレンス・ジオメトリにある閾値距離に配置
+    しなければならないことを意味します。これは次の修飾子をサポートしています:
+    -   `maxDistance`。一致するエンティティを配置する必要がある最大距離をメートルで表します
+    -   `minDistance`。一致するエンティティを配置する必要がある最小距離をメートルで表します
+-   `georel=coveredBy`。一致するエンティティは、リファレンス・ジオメトリ内に完全に存在するエンティティであることを
+    示します。このタイプのクエリを解決するときは、シェイプの境界線をシェイプの一部とみなす必要があります
+-   `georel=intersects`。一致するエンティティはリファレンス・ジオメトリと交差するエンティティであることを示します。
+-   `georel=equals`。一致するエンティティとリファレンス・ジオメトリの位置に関連付けられたジオメトリは、まったく同じで
+    なければなりません
+-   `georel=disjoint`。一致するエンティティは、リファレンス・参照ジオメトリと**交差しない**エンティティであることを
+    示します
+
+`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ (シンプル・
+ロケーション・フォーマットを参照) をサポートする必要があります。
+
+-   `geometry=point` は、地球表面上の点を定義します
+-   `geometry=line` は、折れ線を定義します
+-   `geometry=polygon` はポリゴンを定義します
+-   `geometry=box` は、バウンディング・ボックス (bounding box) を定義します
+
+**coords** は、指定されたジオメトリとシンプル・ロケーション・フォーマットで規定されている規則に従って、セミコロンで
+区切られた地理座標のペアのリストを含む文字列でなければなりません:
+
+-   `geometry=point`。`coords` は、WGS-84 地理座標のペアを含んでいます
+-   `geometry=line`。`coords` は、WGS-84 地理座標のペアのリストを含んでいます
+-   `geometry=polygon`。`coords` は、少なくとも 4組の WGS-84 地理座標で構成されています
+-   `geometry=box`。`coords` は、2組の WGS-84 地理座標で構成されています
+
+例:
+
+`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`。マッチング・エンティティは、基準点から 1,000メートル
+以内に配置する必要があります。
+
+`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`。マッチング・エンティティは、基準点から (少なくとも)
+5,000メートル離れていなければなりません。
+
+`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`。
+マッチング・エンティティは、参照されたポリゴン内にあるものです。
+
+<a name="query-resolution"></a>
+
+### クエリの解決 (Query Resolution)
+
+Orion が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは ```422```, *Unprocessable Entity* で
+なければなりません。エラー・ペイロードに存在するエラー名は、``NotSupportedQuery`` でなければなりません。
+
+地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、マッチング目的で使用される地理的位置を含む
+エンティティ属性を決定する責任があります。この目的のために、以下の規則を遵守しなければなりません。
+
+-   エンティティに、GeoJSON または、シンプル・ロケーション・フォーマットとしてエンコードされた場所に対応する属性がない
+    場合、そのようなエンティティは地理空間プロパティを宣言せず、地理的なクエリに一致しません
+-   エンティティがロケーションに対応する1つの属性のみを公開する場合、そのような属性は地理的クエリを解決する際に使用
+    されます
+-   エンティティが複数のロケーションを公開している場合、ブーリン値が ``true`` の ``defaultLocation`` という名前の
+    メタデータ・プロパティを含む属性は、地理的クエリを解決するためのリファレンス・ロケーションとして扱われます
+-   複数の属性が公開されているが、いずれもデフォルトのロケーションとしてラベル付けされていない場合、クエリはあいまいで
+    あると宣言され、``409`` コードの HTTP エラー・レスポンスが送られなければなりません
+-   *default location* とラベル付けされた複数の属性公開ロケーションがある場合、クエリはあいまいであると宣言され、``409``
+    コードの  HTTP エラー・レスポンスが送られなければなりません
 
 <a name="update-operators-for-attribute-values"></a>
 
@@ -1205,362 +1614,6 @@ POST /v2/entities/E/attrs
 
 Cは値 `2` で作成されます。
 
-<a name="geospatial-properties-of-entities"></a>
-
-## エンティティの地理空間プロパティ (Geospatial properties of entities)
-
-コンテキストのエンティティの地理空間プロパティは、通常のコンテキスト属性を用いて表すことができます。地理空間的
-プロパティの提供は、地理的クエリの解決を可能にします。
-
-Orion では 2 つの異なる構文がサポートされています:
-
--   *Simple Location Format*。これは、開発者とユーザが既存のエンティティに素早く簡単に追加できる、非常に軽量な形式です
--   *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、JSON (JavaScript Object Notation) に
-    基づく地理空間データ交換フォーマットです。GeoJSON は、より高度な柔軟性を提供し、ポイント高度またはより複雑な
-    地理空間形状、たとえば、
-    [マルチ・ジオメトリ](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries)
-    の表現を可能にします
-
-クライアント・アプリケーションは、(適切な NGSI 属性タイプを提供することによって) 地理空間プロパティを伝達する
-エンティティ属性を定義する責任があります。通常、これは `location` という名前のエンティティ属性ですが、地理空間属性に
-別の名前を使用することを妨げるものは何もありません。
-
-Orion は、バックエンド・データベースによって課されるリソースの制約により、地理空間属性の数を1つの属性に制限します。
-追加の使用で追加のロケーション属性を作成しようとすると、Orion はエラー `413`、*Request entity too large* を発生させ、
-レスポンス・ペイロードで報告されるエラーは `NoResourcesAvailable` です。
-
-ただし、`ignoreType` メタデータを `true` に設定して、特定の属性に追加の情報ロケーションが含まれていることを意味できます
-(詳細は [ドキュメントのこのセクション](#special-metadata-types) を参照)。これにより、Orion によるその属性の location
-としての解釈が無効になるため、制限にはカウントされません。
-
-例えば:
-
-```
-{
-  "id": "Hospital1",
-  "type": "Hospital",
-  ...
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [ -3.68666, 40.48108 ]
-    },
-    "type": "geo:json"
-  },
-  "serviceArea": {
-    "value": {
-      "type": "Polygon",
-      "coordinates": [ [ [-3.69807, 40.49029 ], [ -3.68640, 40.49100], [-3.68602, 40.50456], [-3.71192, 40.50420], [-3.69807, 40.49029 ] ] ]
-    },
-    "type": "geo:json",
-    "metadata": {
-      "ignoreType":{
-        "value": true,
-        "type": "Boolean"
-      }
-    }
-  }
-}
-```
-
-どちらの属性も `geo:json` タイプですが、`serviceArea` は `ignoreType` メタデータを `true` に使用するため、
-情報を提供しない1つの場所の制限を超えることはありません。
-
-追加の場所 (locations) がこのように定義されている場合、地理クエリの解決に使用される場所は、`ignoreType` が `true`
-メタデータに設定されていない場所であることを考慮してください (上記の例では `location` 属性)。`ignoreType` を `true`
-に設定して定義されたすべての場所は Orion によって無視され、この意味で地理クエリには影響しません。
-
-<a name="simple-location-format"></a>
-
-### シンプル・ロケーション・フォーマット (Simple Location Format)
-
-シンプル・ロケーション・フォーマットは、基本的なジオメトリ (*point*, *line*, *box*, *polygon*) をサポートし、
-地理的位置をエンコードする際の典型的な使用例をカバーしています。[GeoRSS Simple](http://www.georss.org/simple.html)
-に触発されています。
-
-シンプル・ロケーション・フォーマットは、地球表面上の複雑な位置を表すことを意図していないことに注目してください。
-たとえば、高度座標を取得する必要のあるアプリケーションでは、GeoJSON をそのエンティティの地理空間プロパティの表現形式
-として使用する必要があります。
-
-シンプル・ロケーション・フォーマットでエンコードされたロケーションを表すコンテキスト属性は、次の構文に準拠している必要が
-あります:
-
--   属性型は、(`geo:point`, `geo:line`, `geo:box`, `geo:polygon`) のいずれかの値でなければなりません
--   属性値は座標のリストでなければなりません。既定では、座標は、
-    [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-    [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) 座標リファレンス・システム (CRS) を使用して定義され、
-    緯度と経度の単位は小数です。このような座標リストは、`type` 属性で指定されたジオメトリをエンコードすることを可能に
-    し、以下で定義される特定の規則に従ってエンコードされます:
-    -   `geo:point` 型: 属性値には有効な緯度経度のペアをカンマで区切った文字列を含める必要があります
-    -   `geo:line` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも2つのペアが必要です
-    -   `geo:polygon` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも4つのペアが存在
-        しなければならず、最後のペアは最初のものと同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
-        ポリゴンを構成する線分が定義された領域の外縁に残るように、座標ペアを適切に順序付けする必要があります。たとえば、
-        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。Orion は、入力データが前者の条件を
-        満たさない場合にエラーを発生させる必要があります
-    -   `geo:box` 型: バウンディング・ボックスは矩形領域であり、地図の範囲や関心のある大まかな領域を定義するためによく
-        使用されます。ボックスは、緯度経度ペアの2つの長さの文字列配列によって表現されます。最初のペアは下のコーナー、
-        2番目のペアは上のコーナーです
-
-注: [この文献](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)で、
-実装のさまざまな欠点を説明しているように、サークル・ジオメトリはサポートされていません。
-
-以下の例は、参照される構文を示しています:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
-
-<a name="geojson"></a>
-
-### GeoJSON
-
-GeoJSON を使用してエンコードされた位置を表すコンテキスト属性は、次の構文に準拠している必要があります:
-
--   属性の NGSI 型は `geo:json` でなければなりません
--   属性値は有効な GeoJSON オブジェクトである必要があります。GeoJSON の座標で経度が緯度の前に来ることに注目してください
-
-以下の例は、GeoJSON の使い方を示しています。その他の GeoJSON の例は、
-[GeoJSON IETF 仕様書](https://tools.ietf.org/html/draft-butler-geojson-06#page-14) にあります。さらに、
-[この GeoJSON チュートリアル](http://www.macwright.org/2015/03/23/geojson-second-bite.html)は、
-フォーマットの理解に役立ちます。
-
-```
-{
-  "location": {
-    "value": {
-      "type": "Point",
-      "coordinates": [2.186447514, 41.3763726]
-    },
-    "type": "geo:json"
-  }
-}
-```
-
-現在の実装 ([MongoDB 機能](https://www.mongodb.com/docs/manual/reference/geojson/)に基づく) では、`GeoJSON`
-表現の使用にいくつかの制限が導入されており、次のタイプのみがサポートされています:
-
--   Point
--   MultiPoint
--   LineString
--   MultiLineString
--   Polygon
--   MultiPolygon
-
-実施されたテストの詳細については、[こちら] (https://github.com/telefonicaid/fiware-orion/issues/3586) を
-参照してください。
-
-タイプ `Feature` および `FeatureCollection` もサポートされていますが、特別な方法でサポートされています。`Feature`
-または `FeatureCollection` を使用して、`geo:json` 属性を作成/更新できます。ただし、属性値が取得されると
-(GET レスポンスまたは通知)、次のコンテンツのみが取得されます:
-
--   `Feature` の場合は `geometry` フィールド
--   `FeatureCollection` の場合、`features` 配列の最初の項目の `geometry` フィールド
-
-実際には、Orion は `Feature` または `FeatureCollection` の作成/更新時に使用される完全な値を保存することに注意して
-ください。ただし、他の `geo:json` 型との正規化の観点から、`geometry` 部分のみを返すことにしました。将来的には、完全な
-コンテンツを返すフラグが実装される可能性があります
-(詳細は [この Issue](https://github.com/telefonicaid/fiware-orion/issues/4125) を参照)。`Feature` または
-`FeatureCollection` の特別な処理を無効にするもう1つの方法は、[`ignoreType` メタデータ](#ignoretype-metadata)
-を使用することですが、その場合もエンティティの場所は無視されます。
-
-`FeatureCollection` に関しては、単一の `Feature` が含まれている場合 (つまり、`features` フィールドに要素が1つしかない
-場合) のみ、作成/更新時にのみ受け入れられます。そうしないと、Orion は "Bad Request" エラーを返します。
-
-全くサポートされていない唯一の GeoJSON タイプは `GeometryCollection` です。それらを使用しようとすると、
-"Database Error" が発生します。
-
-<a name="simple-query-language"></a>
-
-## シンプル・クエリ言語 (Simple Query Language)
-
-シンプル・クエリ言語は、一連の条件に一致するエンティティを取得するための簡単な構文を提供します。クエリは、';' キャラクタ
-で区切られたステートメントのリストで構成されます。各ステートメントは一致条件を表します。クエリは、一致するすべての条件
-(AND 論理演算子) に一致するすべてのエンティティを返します。
-
-ステートメントには、2種類あります: *単項ステートメント* と *バイナリ・ステートメント*
-
-バイナリ・ステートメントは、属性パス (たとえば、`temperature` や `brand.name`)、演算子と値
-(値の形式は演算子に依存します)、たとえば:
-
-```
-temperature==50
-temperature<=20
-```
-
-属性パスの構文は、`.` 文字で区切られたトークンのリストで構成されます。このトークンのリストは、次の規則に従って JSON
-プロパティ名を指定します。
-
--   最初のトークンは、エンティティの NGSI 属性 (*ターゲット NGSI 属性*) の名前です
--   属性値によるフィルタリング (つまり、式が `q` クエリで使用されている) の場合、残りのトークン (存在する場合) は、JSON
-    オブジェクトでなければならない、*ターゲット NGSI 属性*のサブ・プロパティへのパスを表します。そのようなサブプロパティ
-    は、*ターゲット・プロパティ*として定義されます
--   メタデータによるフィルタリング (つまり、式が `mq` クエリで使用されている) の場合、2番目のトークンはターゲット NGSI
-    属性, *ターゲット・メタデータ*に関連付けられたメタデータ名を表し、残りのトークン (存在する場合) は JSON
-    オブジェクトでなければならない *ターゲット・メタデータ値*のサブ・プロパティへのパスを表します。そのようなサブ・
-    プロパティは、*ターゲット・プロパティ*として定義されます
-
-*ターゲット・プロパティ値*は、上記のトークンのリストによって指定される、JSON プロパティの値、つまり、*ターゲット・
-プロパティ*の値として定義されます。
-
-トークンが 1つだけ提供されている場合 (メタデータによるフィルタリングの場合は2つ)、*ターゲット・プロパティ* は
-*ターゲット NGSI 属性* (またはメタデータでフィルタリングする場合の *ターゲット・メタデータ*) と
-*ターゲット・プロパティ値* は、*ターゲット NGSI 属性*値 (または、メタデータによるフィルタリングの場合の
-*ターゲット・メタデータ*値) になります。この場合、*ターゲット NGSI 属性* (または、メタデータによるフィルタリングの場合の
-*ターゲット・メタデータ*) の値は JSON オブジェクトであってはなりません。
-
-トークンの一部に `.` が含まれている場合、セパレータとして一重引用符 (`'`) を使用できます。たとえば、次の属性パス
-`'a.b'.w.'x.y'` は3つのトークンで構成されます: 最初のトークンは `ab`、2番目のトークンは `w`、3番目のトークンは `xy`
-です。
-
-演算子のリスト、および、使用する値の形式は次のとおりです:
-
--   **等号**: `==`。この演算子は、次の型の右辺を受け入れます:
-    -   単一要素、たとえば `temperature==40` です。エンティティがマッチするためには、*ターゲット・プロパティ*
-        (temperature) が含まれていなければならず、*ターゲット・プロパティ値*は、クエリ値 (40) でなければなりません。
-        または、*ターゲット・プロパティ値*が配列の場合はその値を含んでいなければなりません
-    -   カンマで区切られた値のリストです。たとえば、`color==black,red`。エンティティがマッチするためには、*ターゲット・
-        プロパティ* が含まれていなければならず、*ターゲット・プロパティ値*が、リスト内の値のうちの**いずれか**でなければ
-        なりません (OR 句) 。または、*ターゲット・プロパティ値*が配列の場合は、リスト内の値の**いずれか**を含んで
-        いなければなりません。たとえば、`color` という名前の属性を持つエンティティは、その値が ` black` であるとマッチ
-        しますが、`color` という名前の属性を持つエンティティは、その値が `white` であるとはマッチしません
-    -   範囲 (range)。最小値と最大値として指定され、`..` で区切られています。たとえば、`temperature==10..20` です。
-        エンティティがマッチするためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、
-        *ターゲット・プロパティ値*は、範囲の上限と下限の間 (どちらも含まれています) にある必要があります。範囲は、
-        ISO8601 形式の日付、数字または文字列を表す*ターゲット・プロパティ*でのみ使用できます
--   **不等号**: `!=`。この演算子は、次の型の右辺を受け入れます:
-    -   単一の要素、たとえば `temperature!=41` です。エンティティが一致するには、*ターゲット・プロパティ* (temperature)
-        が含まれていなければならず、*ターゲット・プロパティー値*は、クエリ値 (41) で**あってはなりません**
-    -   カンマで区切られた値のリスト、たとえば `color!=black,red`。エンティティがマッチするには、
-        *ターゲット・プロパティ*が含まれていなければならず、*ターゲット・プロパティ値*が、リスト内のいずれかの値で
-        *あってはなりません* (AND 句)。または、*ターゲット・プロパティ値*が配列の場合、リスト内の値の**いずれか**を
-        含んでいてはなりません。例えば。属性 `color` が `black` に設定されたエンティティはマッチせず、属性 `color` が
-        `white` に設定されたエンティティはマッチします
-    -   範囲 (range)、最小値と最大値として指定され、`..` で区切られています。たとえば `temperature!=10..20`。
-        エンティティがマッチするためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、
-        *ターゲット・プロパティ値* は上限と下限の間 (どちらも含まれています) にある**必要はありません**。範囲は、
-        ISO8601 形式の日付、数字または文字列の日付を表す要素 *ターゲット・プロパティ*でのみ使用できます
--   **より大きい**: `>`。右側は単一の要素でなければなりません。たとえば `temperature>42` です。エンティティがマッチ
-    するためには、*ターゲット・プロパティ* (temperature) が含まれていなければならず、*ターゲット・プロパティ値*が
-    クエリ値 (42) より厳密に大きくなければなりません。このオペレーションは、date 型、number 型または string 型の
-    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果に
-    なる可能性があります)
--   **未満**: `<`。右側は単一の要素でなければなりません。たとえば、`temperature<43` です。エンティティがマッチするため
-    には、*ターゲット・プロパティ* (temperature) が含まれていなければならず、*ターゲット・プロパティ値*は 値 (43)
-    より厳密に小さくなければなりません。このオペレーションは、date 型、number 型または string 型の
-    *ターゲット・プロパティ*に対してのみ有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果に
-    なる可能性があります)
--   **以上**: `>=`。右側は単一の要素でなければなりません。たとえば、`temperature>=44` です。エンティティがマッチするため
-    には、*ターゲット・プロパティ* (temperature)が含まれていなければならず、*ターゲット・プロパティ値*は 値 (44) 以上で
-    なければなりません。このオペレーションは、date 型、number 型または string 型の*ターゲット・プロパティ*に対してのみ
-    有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果になる可能性があります)
--   **以下**: `<=`。右側は単一の要素でなければなりません。たとえば、`temperature<=45` です。エンティティがマッチするため
-    には、*ターゲット・プロパティ* (temperature)が含まれていなければならず、*ターゲットプロパティ値*は、値 (45) 以下で
-    なければなりません。このオペレーションは、date 型、number 型または string 型の*ターゲット・プロパティ*に対してのみ
-    有効です (他の型の *ターゲット・プロパティ*で使用されると、予測できない結果になる可能性があります)
--   **マッチ・パターン**: `~=`。値は正規表現として表現された、与えられたパターンと一致します。`color~=ow`。
-    エンティティがマッチするためには、*targetプロパティ* (color) が含まれていなければならず、*ターゲット・プロパティの
-    値*が、右側の文字列と一致する必要があります。この例では `ow` (`brown` と `yellow` はマッチし、`black` と `white`
-    はマッチしません) です。このオペレーションは、string 型の *ターゲット・プロパティ*に対してのみ有効です
-
-シンボル `:` は `==` の代わりに使用できます。
-
-等号または不等号の場合、一致する文字列に `,` が含まれている場合は、カンマの特殊な意味を無効にするために一重引用符 (`'`)
-を使用できます。たとえば、`color=='light,green','deep,blue'`。最初の例は、正確な値  'light,green' または 'deep,blue' と
-color を一致させます。また、`q=title=='20'` は文字列 "20" にマッチしますが、数値 20 ではマッチしません。
-
-単項否定ステートメントは単項演算子 `!` を使用しますが、肯定単項ステートメントは演算子をまったく使用しません。単項
-ステートメントは、*ターゲット・プロパティ*の存在をチェックするために使用されます。たとえば、`temperature` は、
-'temperature' という属性を持つエンティティにマッチします (値に関係なく)。`!temperature` は、'temperature' という属性を
-持たないエンティティと一致します。
-
-<a name="geographical-queries"></a>
-
-## 地理的クエリ (Geographical Queries)
-
-地理的クエリは、以下のパラメータを使用して指定されます。
-
-``georel`` は、一致するエンティティとリファレンス・シェイプ (`geometry`) の間の空間的関係 (述語) を指定することを意図
-しています。';' で区切られたトークンリストで構成されています。最初のトークンはリレーションシップ名であり、残りのトークン
-(あれば) はリレーションシップに関する詳細情報を提供する修飾語です。次の値が認識されます:
-
--   `georel=near`。``near`` リレーションシップは、一致するエンティティが、リファレンス・ジオメトリにある閾値距離に配置
-    しなければならないことを意味します。これは次の修飾子をサポートしています:
-    -   `maxDistance`。一致するエンティティを配置する必要がある最大距離をメートルで表します
-    -   `minDistance`。一致するエンティティを配置する必要がある最小距離をメートルで表します
--   `georel=coveredBy`。一致するエンティティは、リファレンス・ジオメトリ内に完全に存在するエンティティであることを
-    示します。このタイプのクエリを解決するときは、シェイプの境界線をシェイプの一部とみなす必要があります
--   `georel=intersects`。一致するエンティティはリファレンス・ジオメトリと交差するエンティティであることを示します。
--   `georel=equals`。一致するエンティティとリファレンス・ジオメトリの位置に関連付けられたジオメトリは、まったく同じで
-    なければなりません
--   `georel=disjoint`。一致するエンティティは、リファレンス・参照ジオメトリと**交差しない**エンティティであることを
-    示します
-
-`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ (シンプル・
-ロケーション・フォーマットを参照) をサポートする必要があります。
-
--   `geometry=point` は、地球表面上の点を定義します
--   `geometry=line` は、折れ線を定義します
--   `geometry=polygon` はポリゴンを定義します
--   `geometry=box` は、バウンディング・ボックス (bounding box) を定義します
-
-**coords** は、指定されたジオメトリとシンプル・ロケーション・フォーマットで規定されている規則に従って、セミコロンで
-区切られた地理座標のペアのリストを含む文字列でなければなりません:
-
--   `geometry=point`。`coords` は、WGS-84 地理座標のペアを含んでいます
--   `geometry=line`。`coords` は、WGS-84 地理座標のペアのリストを含んでいます
--   `geometry=polygon`。`coords` は、少なくとも 4組の WGS-84 地理座標で構成されています
--   `geometry=box`。`coords` は、2組の WGS-84 地理座標で構成されています
-
-例:
-
-`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`。マッチング・エンティティは、基準点から 1,000メートル
-以内に配置する必要があります。
-
-`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`。マッチング・エンティティは、基準点から (少なくとも)
-5,000メートル離れていなければなりません。
-
-`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`。
-マッチング・エンティティは、参照されたポリゴン内にあるものです。
-
-<a name="query-resolution"></a>
-
-### クエリの解決 (Query Resolution)
-
-Orion が地理的なクエリを解決できない場合、レスポンスの HTTP ステータス・コードは ```422```, *Unprocessable Entity* で
-なければなりません。エラー・ペイロードに存在するエラー名は、``NotSupportedQuery`` でなければなりません。
-
-地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、マッチング目的で使用される地理的位置を含む
-エンティティ属性を決定する責任があります。この目的のために、以下の規則を遵守しなければなりません。
-
--   エンティティに、GeoJSON または、シンプル・ロケーション・フォーマットとしてエンコードされた場所に対応する属性がない
-    場合、そのようなエンティティは地理空間プロパティを宣言せず、地理的なクエリに一致しません
--   エンティティがロケーションに対応する1つの属性のみを公開する場合、そのような属性は地理的クエリを解決する際に使用
-    されます
--   エンティティが複数のロケーションを公開している場合、ブーリン値が ``true`` の ``defaultLocation`` という名前の
-    メタデータ・プロパティを含む属性は、地理的クエリを解決するためのリファレンス・ロケーションとして扱われます
--   複数の属性が公開されているが、いずれもデフォルトのロケーションとしてラベル付けされていない場合、クエリはあいまいで
-    あると宣言され、``409`` コードの HTTP エラー・レスポンスが送られなければなりません
--   *default location* とラベル付けされた複数の属性公開ロケーションがある場合、クエリはあいまいであると宣言され、``409``
-    コードの  HTTP エラー・レスポンスが送られなければなりません
-
 <a name="filtering-out-attributes-and-metadata"></a>
 
 ## 属性とメタデータのフィルタリング (Filtering out attributes and metadata)
@@ -1684,138 +1737,177 @@ PUT /v2/entities/E/attrs/temperature?options=overrideMetadata
 では無視されることに注意してください。その場合、操作のセマンティクスは、値のみが更新されることを明示します
 (`type` および `metadata` 属性フィールドは変更されません)。
 
-<a name="oneshot-subscription"></a>
+<a name="transient-entities"></a>
 
-## Oneshot Subscription
+## 一時的なエンティティ (Transient entities)
 
-Oneshot サブスクリプションは、一度の通知のためだけにエンティティをサブスクライブするオプションを提供します。コンシューマ
-がステータス `oneshot` のサブスクリプションを作成すると、[通常のサブスクリプション](walkthrough_apiv2.md#subscriptions)
-・リクエストと同じようにわずかな差異でサブスクリプションが作成されます。
+一時的なエンティティは、通常のエンティティです。つまり、id/type、属性のセットなどありますが、有効期限のタイムスタンプを
+持ちます。その時点に達すると、エンティティは Orion によって管理されるコンテキストから自動的に削除されます。
 
-通常のケースでは、サブスクリプションが削除されるか、サブスクリプションの更新後にそのステータスが非アクティブになるまで、
-エンティティが更新されると、コンシューマは初期通知および継続的な通知を受け取ります。
+したがって、最初の非常に重要なアドバイスです: **一時的なエンティティを使用して、期限切れになるとエンティティが自動的に
+データベースから削除され、回復する方法がないため注意が必要です**。エンティティの有効期限が切れた、つまり、
+削除された場合、一時的なエンティティで設定した情報が関係ないことを確認します。
 
-ワンショット・サブスクリプションの場合、サブスクリプションの作成後にエンティティが更新されたときに、コンシューマに
-通知されるのは1回だけです。通知がトリガーされると、サブスクリプションは `status`: `inactive` に移行します。この状態に
-なると、コンシューマは `oneshot` でステータスを更新して、同じ動作を繰り返すことができます。すなわち、1回限りの通知を
-再度得ることができます。
+さらに、**すでに正確な名前 `dateExpires` の属性を使用している場合は、
+[下位互換性の考慮事項のセクション](#backward-compatibility-considerations)を参照してください**。
 
-![](../manuals/user/oneshot_subscription.png "oneshot_subscription.png")
+<a name="the-dateexpires-attribute"></a>
 
--   Room1 という ID で Room 型のエンティティがすでにデータベースに存在していると仮定します。
+### `dateExpires` 属性 (The `dateExpires` attribute)
 
-コンテキスト・コンシューマは、以下のように status "oneshot" を持つそのエンティティのサブスクリプションを作成できます:
+エンティティの有効期限のタイムスタンプは、`dateExpires` [組み込み属性](#builtin-attributes)によって定義されます。 これは
+`DateTime` 型の属性で、値はエンティティの有効期限が切れる日時です。
+
+他の組み込み属性として、`dateExpires` はデフォルトでは表示されません。それを取得するには、`attrs` URI パラメータ (GET
+ベースのクエリの場合) または `"attrs"` フィールド (`POST /v2/op/query` の場合) を使用する必要があります。
+[属性とメタデータの除外セクション](#filtering-out-attributes-and-metadata)をご覧ください。
+
+<a name="valid-transitions"></a>
+
+### 有効なトランジション (Valid transitions)
+
+<a name="create-entity-with-dateexpires-attribute"></a>
+
+#### `dateExpires` 属性を持つエンティティを作成 (Create entity with `dateExpires` attribute)
+
+`dateExpires` 属性が含まれている場合、エンティティは一時的な性質 (transient nature) で作成されます。 例えば:
 
 ```
-curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
+POST /v2/entities
 {
-  "description": "A subscription to get info about Room1",
-  "subject": {
-    "entities": [
-      {
-        "id": "Room1",
-        "type": "Room"
-      }
-    ],
-    "condition": {
-      "attrs": [
-        "pressure"
-      ]
-    }
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:1028/accumulate"
-    },
-    "attrs": [
-      "temperature"
-    ]
-  },
-  "status" : "oneshot"
+  "id": "t1",
+  "type": "Ticket",
+  ...
+  "dateExpires": {
+    "value": "2028-07-07T21:35:00Z",
+    "type": "DateTime"
+  }
 }
-EOF
 ```
 
-気圧の属性の値が更新されると、コンテキスト・コンシューマは温度属性の通知を受け取り、このサブスクリプションのステータスは
-自動的に非アクティブになり、コンシューマが次のようにして再び `oneshot` に更新するまで、それ以上の通知はトリガされません:
+2028年7月7日 21:35 UTC に有効期限が切れるエンティティを作成します。
+
+その他の考慮事項:
+
+-   `dateExpires` には有効な `DateTime` 値が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
+   を確認してください)。そうしないと、400 Bad Request が返されます
+
+-   `dateExpires` が過去に設定されている場合、エンティティは期限切れで作成されます
+    (少し奇妙ですが、機能的には正しいです)
+
+<a name="add-dateexpires-attribute-to-entity-that-previously-doesnt-have-it"></a>
+
+#### `dateExpires` 属性をエンティティに追加 (Add `dateExpires` attribute to entity that previously doesn't have it)
+
+`dateExpires` 属性を通常のエンティティ (例: "t2") に追加できます。例えば:
 
 ```
-curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
-    -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
+POST /v2/entities/t2/attrs
 {
-  "status": "oneshot"
-}
-EOF
-```
-ステータスが再び "oneshot" に更新されると、エンティティが更新されたときに、コンシューマは再度通知を受け取り、
-サブスクリプション・ステータスは自動的に `inactive` に変更されます。
-
-<a name="covered-subscriptions"></a>
-
-## Covered subscriptions
-
-`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれるエンティティ属性の
-サブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを通知します。
-たとえば、サブスクリプションが次のようになっている場合:
-
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ]
+  "dateExpires": {
+    "value": "2028-10-12T14:23:00Z",
+    "type": "DateTime"
+  }
 }
 ```
 
-ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness` 属性は通知に含まれません。
+そのエンティティは、2028年10月1日 14:23 UTC に期限切れになります。
 
-このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
+その他の考慮事項:
 
-```
-"notification": {
-  ...
-  "attrs": [
-    "temperature",
-    "humidity",
-    "brightness"
-  ],
-  "covered": true
-}
-```
+-   `dateExpires` には有効な `DateTime` 構文が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
+    を確認してください)。そうしないと、400 Bad Request が返されます
 
-この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの属性
-(この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
+-   `dateExpires` が過去に設定されている場合、エンティティは自動的に期限切れになります
 
-カスタム通知の場合、`covered` が `true` に設定されていると、`null` は、存在しない属性の `${...}` を置き換えるために
-使用されます (`covered` が `true` に設定されていない場合のデフォルトの動作は、存在しない属性を空の文字列に
-置き換えることです)。
+<a name="update-dateexpires-attribute-in-entity-that-previously-has-it"></a>
 
-通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で "カバーされる" (covered)
-という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、受信したすべての通知で常に同じ着信属性の
-セットを必要とする通知エンドポイントに役立ちます。
+#### エンティティの `dateExpires` 属性を更新 (Update `dateExpires` attribute in entity that previously has it)
 
-対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに注意してください。
-したがって、次の場合は無効です:
+Orion では、属性値を更新する方法がいくつかあります。たとえば、属性リソース URL で PUT を使用すると、次のようになります:
 
 ```
-"notification": {
-  ...
-  "attrs": [],
-  "covered": true
-}
-```
-
-そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
-発生します:
-
-```
+PUT /v2/entities/t2/attrs/dateExpires
 {
-    "description": "covered true cannot be used if notification attributes list is empty",
-    "error": "BadRequest"
+  "value": "2028-12-31T23:59:00Z",
+  "type": "DateTime"
 }
 ```
+
+有効期限が 2028年12月31日 23:59 UTC に変更されます。
+
+その他の考慮事項:
+
+-   `dateExpires` には有効な `DateTime` 構文が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
+    を確認してください)。そうしないと、400 Bad Request が返されます
+
+-   `dateExpires` が過去に設定されている場合、エンティティは自動的に期限切れになります
+
+<a name="remove-dateexpires-attribute-from-entity"></a>
+
+#### エンティティから `dateExpires` 属性を削除 (Remove `dateExpires` attribute from entity)
+
+最後に、一時的なエンティティから `dateExpires` 属性を削除できます:
+
+```
+DELETE /v2/entities/t2/attrs/dateExpires
+```
+
+これにより、エンティティは通常の (つまり、一時的ではない) エンティティになり、有効期限が切れても削除されません。
+
+<a name="deletion-of-expired-entities"></a>
+
+### 期限切れエンティティを削除 (Deletion of expired entities)
+
+有効期限は、MongoDB 機能に依存して、
+[特定のクロック時にドキュメントを期限切れ](https://docs.mongodb.com/manual/tutorial/expire-data/#expire-documents-at-a-specific-clock-time)
+にします。これは、60秒ごとに起動するバックグラウンド・スレッドに基づいているため、有効期限が過ぎると、
+一時的なエンティティがデータベースに60秒間、または MongoDB の負荷が高い場合はさらに多少、データベースに残る可能性が
+あります。詳細は、[MongoDB のドキュメント](https://docs.mongodb.com/manual/core/index-ttl/#timing-of-the-delete-operation)
+を参照してください。
+
+TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で変更できますが、そのトピックはこのドキュメントの範囲外です。
+詳細については、[このリンク](http://hassansin.github.io/working-with-mongodb-ttl-index#ttlmonitor-sleep-interval)
+をご覧ください。
+
+**一時的なエンティティが削除されると、それを回復することはできません**。
+
+<a name="backward-compatibility-considerations"></a>
+
+### 下位互換性に関する考慮事項 (Backward compatibility considerations)
+
+一時的なエンティティは Orion 1.15.0 に導入されました。Orion 1.14.0 まで `dateExpires` は特別な意味を持たない通常の属性
+として解釈されます。Orion 1.15.0 にアップグレードする前に、アプリケーションで `dateExpires` という名前の付いた属性を
+すでに使用している場合はどうなりますか？
+
+`dateExpires` を使用している既存のエンティティは、属性が更新されるまで同じ方法で使用し続けます。つまり、`dateExpires`
+が `DateTime` でない場合、例えば、GET オペレーションなどで、数値、通常の文字列など、同じ値を保持します。`dateExpires`
+が `DateTime` である場合、その日時は有効期限と解釈されません。つまり、エンティティは日時が経過しても削除されません。
+
+しかし、属性が特別な意味を持たずに前の値を保持する場合でも、`dataExpires` は組み込み属性になりますので、GET
+ベースのクエリでは `attrs` URI パラメータ または、`POST /v2/op/query` とサブスクリプションでは `"attrs"`
+フィールドで明示的にリクエストされている場合を除いては表示されません。
+
+`dateExpires` 属性が初めて更新されると、それは前のセクションで説明した振る舞いで、指定されたエンティティの有効期限を
+意味するようになります。 **エンティティが望ましくない方法で自動的に削除される可能性があるので、その属性の値に基づいて
+クライアント側の有効期限を実装している場合は、これを考慮してください**。
+
+<a name="notification-triggering"></a>
+
+## 通知トリガー (Notification triggering)
+
+[`condition` サブスクリプション・フィールド](#subscriptionsubjectcondition)に基づいて、エンティティの更新時に通知を
+トリガーするルールは次のとおりです。
+
+-   `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性のいずれかが変更され、同時に `expression`
+    が一致するたびに通知が送信されます
+-   `attrs` が使用され、`expression` が使用されていない場合、`attrs` リスト内のいずれかの属性が変更されるたびに通知が
+    送信されます
+-   `attrs` を使用せず、`expression` を使用すると、エンティティのいずれかの属性が変更され、同時に `expression`
+    が一致するたびに通知が送信されます
+-   `attrs` も `expression` も使用されていない場合、エンティティのいずれかの属性が変更されるたびに通知が送信されます
+
+特定の属性のメタデータを変更すると、属性値自体が変更されていなくても、変更と見なされることに注意してください。
 
 <a name="notification-messages"></a>
 
@@ -1927,23 +2019,6 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 
 通知には、関連するサブスクリプションの形式の値を含む `Ngsiv2-AttrsFormat` (`attrsFormat` が `legacy` の場合を想定) HTTP
 ヘッダを含める必要があります。これにより、通知受信者は通知ペイロードを処理しなくても形式を認識できます。
-
-<a name="notification-triggering"></a>
-
-## 通知トリガー (Notification triggering)
-
-[`condition` サブスクリプション・フィールド](#subscriptionsubjectcondition)に基づいて、エンティティの更新時に通知を
-トリガーするルールは次のとおりです。
-
--   `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性のいずれかが変更され、同時に `expression`
-    が一致するたびに通知が送信されます
--   `attrs` が使用され、`expression` が使用されていない場合、`attrs` リスト内のいずれかの属性が変更されるたびに通知が
-    送信されます
--   `attrs` を使用せず、`expression` を使用すると、エンティティのいずれかの属性が変更され、同時に `expression`
-    が一致するたびに通知が送信されます
--   `attrs` も `expression` も使用されていない場合、エンティティのいずれかの属性が変更されるたびに通知が送信されます
-
-特定の属性のメタデータを変更すると、属性値自体が変更されていなくても、変更と見なされることに注意してください。
 
 <a name="custom-notifications"></a>
 
@@ -2134,6 +2209,139 @@ Content-Length: 65
 the value of the "temperature" attribute (of type Number) is 23.4
 ```
 
+<a name="oneshot-subscriptions"></a>
+
+## Oneshot サブスクリプション (Oneshot Subscriptions)
+
+Oneshot サブスクリプションは、一度の通知のためだけにエンティティをサブスクライブするオプションを提供します。コンシューマ
+がステータス `oneshot` のサブスクリプションを作成すると、[通常のサブスクリプション](walkthrough_apiv2.md#subscriptions)
+・リクエストと同じようにわずかな差異でサブスクリプションが作成されます。
+
+通常のケースでは、サブスクリプションが削除されるか、サブスクリプションの更新後にそのステータスが非アクティブになるまで、
+エンティティが更新されると、コンシューマは初期通知および継続的な通知を受け取ります。
+
+ワンショット・サブスクリプションの場合、サブスクリプションの作成後にエンティティが更新されたときに、コンシューマに
+通知されるのは1回だけです。通知がトリガーされると、サブスクリプションは `status`: `inactive` に移行します。この状態に
+なると、コンシューマは `oneshot` でステータスを更新して、同じ動作を繰り返すことができます。すなわち、1回限りの通知を
+再度得ることができます。
+
+![](../manuals/user/oneshot_subscription.png "oneshot_subscription.png")
+
+-   Room1 という ID で Room 型のエンティティがすでにデータベースに存在していると仮定します。
+
+コンテキスト・コンシューマは、以下のように status "oneshot" を持つそのエンティティのサブスクリプションを作成できます:
+
+```
+curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "description": "A subscription to get info about Room1",
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1028/accumulate"
+    },
+    "attrs": [
+      "temperature"
+    ]
+  },
+  "status" : "oneshot"
+}
+EOF
+```
+
+気圧の属性の値が更新されると、コンテキスト・コンシューマは温度属性の通知を受け取り、このサブスクリプションのステータスは
+自動的に非アクティブになり、コンシューマが次のようにして再び `oneshot` に更新するまで、それ以上の通知はトリガされません:
+
+```
+curl localhost:1026/v2/subscriptions/<subscription_id> -s -S \
+    -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
+{
+  "status": "oneshot"
+}
+EOF
+```
+ステータスが再び "oneshot" に更新されると、エンティティが更新されたときに、コンシューマは再度通知を受け取り、
+サブスクリプション・ステータスは自動的に `inactive` に変更されます。
+
+<a name="covered-subscriptions"></a>
+
+## Covered subscriptions
+
+`notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれるエンティティ属性の
+サブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを通知します。
+たとえば、サブスクリプションが次のようになっている場合:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ]
+}
+```
+
+ただし、エンティティには `temperature` 属性と `humidity` 属性しかないため、`brightness` 属性は通知に含まれません。
+
+このデフォルトの動作は、次のように `true` に設定された `covered` フィールドを使用して変更できます:
+
+```
+"notification": {
+  ...
+  "attrs": [
+    "temperature",
+    "humidity",
+    "brightness"
+  ],
+  "covered": true
+}
+```
+
+この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの属性
+(この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
+
+カスタム通知の場合、`covered` が `true` に設定されていると、`null` は、存在しない属性の `${...}` を置き換えるために
+使用されます (`covered` が `true` に設定されていない場合のデフォルトの動作は、存在しない属性を空の文字列に
+置き換えることです)。
+
+通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で "カバーされる" (covered)
+という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、受信したすべての通知で常に同じ着信属性の
+セットを必要とする通知エンドポイントに役立ちます。
+
+対象となるサブスクリプションには、`notification` に `attrs` の明示的なリストが必要であることに注意してください。
+したがって、次の場合は無効です:
+
+```
+"notification": {
+  ...
+  "attrs": [],
+  "covered": true
+}
+```
+
+そして、それを使用してサブスクリプションを作成/更新しようとすると、次のような 400 Bad Request エラーが
+発生します:
+
+```
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+```
+
 <a name="subscriptions-based-in-alteration-type"></a>
 
 ## 変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)
@@ -2172,297 +2380,88 @@ the value of the "temperature" attribute (of type Number) is 23.4
 
 特定の変更タイプは、[`alterationType` 組み込み属性](#builtin-attributes)を使用して通知で取得できます。
 
-<a name="transient-entities"></a>
+<a name="pagination"></a>
 
-## 一時的なエンティティ (Transient entities)
+## ページネーション (Pagination)
 
-一時的なエンティティは、通常のエンティティです。つまり、id/type、属性のセットなどありますが、有効期限のタイムスタンプを
-持ちます。その時点に達すると、エンティティは Orion によって管理されるコンテキストから自動的に削除されます。
+Orion は、クライアントが大量のリソース セットを取得できるように、ページネーション・メカニズムを実装しています。
+このメカニズムは、API のすべてのリスト操作で機能します (例: `GET /v2/entities`, `GET /v2/subscriptions`,
+`POST /v2/op/query` など)。
 
-したがって、最初の非常に重要なアドバイスです: **一時的なエンティティを使用して、期限切れになるとエンティティが自動的に
-データベースから削除され、回復する方法がないため注意が必要です**。エンティティの有効期限が切れた、つまり、
-削除された場合、一時的なエンティティで設定した情報が関係ないことを確認します。
+このメカニズムは、次の 3 つの URI パラメータに基づいています。
 
-さらに、**すでに正確な名前 `dateExpires` の属性を使用している場合は、
-[下位互換性の考慮事項のセクション](#backward-compatibility-considerations)を参照してください**。
+-   **limit**: 要素の最大数を指定するため (デフォルトは20、最大許容数は1000)
+-   **offset**: 最初に指定された数の要素をスキップするため (デフォルトは0)
+-   **count** (`option` として): アクティブ化されている場合、`Fiware-Total-Count` ヘッダがレスポンスに追加され、
+    要素の総数が示されます
 
-<a name="the-dateexpires-attribute"></a>
+デフォルトでは、結果は作成時間の昇順で返されます。エンティティ・クエリの場合、これは
+[`orderBy` URL パラメータ](#ordering-results)で変更できます。
 
-### `dateExpires` 属性 (The `dateExpires` attribute)
-
-エンティティの有効期限のタイムスタンプは、`dateExpires` [組み込み属性](#builtin-attributes)によって定義されます。 これは
-`DateTime` 型の属性で、値はエンティティの有効期限が切れる日時です。
-
-他の組み込み属性として、`dateExpires` はデフォルトでは表示されません。それを取得するには、`attrs` URI パラメータ (GET
-ベースのクエリの場合) または `"attrs"` フィールド (`POST /v2/op/query` の場合) を使用する必要があります。
-[属性とメタデータの除外セクション](#filtering-out-attributes-and-metadata)をご覧ください。
-
-<a name="valid-transitions"></a>
-
-### 有効なトランジション (Valid transitions)
-
-<a name="create-entity-with-dateexpires-attribute"></a>
-
-#### `dateExpires` 属性を持つエンティティを作成 (Create entity with `dateExpires` attribute)
-
-`dateExpires` 属性が含まれている場合、エンティティは一時的な性質 (transient nature) で作成されます。 例えば:
+例を挙げて説明しましょう。特定のクライアントが1回のレスポンスで100を超える結果を処理することはできず、クエリには合計
+322の結果が含まれます。クライアントは次のことを実行できます (完全を期すために、URL のみが含まれています)。
 
 ```
-POST /v2/entities
-{
-  "id": "t1",
-  "type": "Ticket",
-  ...
-  "dateExpires": {
-    "value": "2028-07-07T21:35:00Z",
-    "type": "DateTime"
-  }
-}
-```
-
-2028年7月7日 21:35 UTC に有効期限が切れるエンティティを作成します。
-
-その他の考慮事項:
-
--   `dateExpires` には有効な `DateTime` 値が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
-   を確認してください)。そうしないと、400 Bad Request が返されます
-
--   `dateExpires` が過去に設定されている場合、エンティティは期限切れで作成されます
-    (少し奇妙ですが、機能的には正しいです)
-
-<a name="add-dateexpires-attribute-to-entity-that-previously-doesnt-have-it"></a>
-
-#### `dateExpires` 属性をエンティティに追加 (Add `dateExpires` attribute to entity that previously doesn't have it)
-
-`dateExpires` 属性を通常のエンティティ (例: "t2") に追加できます。例えば:
-
-```
-POST /v2/entities/t2/attrs
-{
-  "dateExpires": {
-    "value": "2028-10-12T14:23:00Z",
-    "type": "DateTime"
-  }
-}
-```
-
-そのエンティティは、2028年10月1日 14:23 UTC に期限切れになります。
-
-その他の考慮事項:
-
--   `dateExpires` には有効な `DateTime` 構文が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
-    を確認してください)。そうしないと、400 Bad Request が返されます
-
--   `dateExpires` が過去に設定されている場合、エンティティは自動的に期限切れになります
-
-<a name="update-dateexpires-attribute-in-entity-that-previously-has-it"></a>
-
-#### エンティティの `dateExpires` 属性を更新 (Update `dateExpires` attribute in entity that previously has it)
-
-Orion では、属性値を更新する方法がいくつかあります。たとえば、属性リソース URL で PUT を使用すると、次のようになります:
-
-```
-PUT /v2/entities/t2/attrs/dateExpires
-{
-  "value": "2028-12-31T23:59:00Z",
-  "type": "DateTime"
-}
-```
-
-有効期限が 2028年12月31日 23:59 UTC に変更されます。
-
-その他の考慮事項:
-
--   `dateExpires` には有効な `DateTime` 構文が必要です (詳細については、[特別な属性タイプ](#special-attribute-types)
-    を確認してください)。そうしないと、400 Bad Request が返されます
-
--   `dateExpires` が過去に設定されている場合、エンティティは自動的に期限切れになります
-
-<a name="remove-dateexpires-attribute-from-entity"></a>
-
-#### エンティティから `dateExpires` 属性を削除 (Remove `dateExpires` attribute from entity)
-
-最後に、一時的なエンティティから `dateExpires` 属性を削除できます:
-
-```
-DELETE /v2/entities/t2/attrs/dateExpires
-```
-
-これにより、エンティティは通常の (つまり、一時的ではない) エンティティになり、有効期限が切れても削除されません。
-
-<a name="deletion-of-expired-entities"></a>
-
-### 期限切れエンティティを削除 (Deletion of expired entities)
-
-有効期限は、MongoDB 機能に依存して、
-[特定のクロック時にドキュメントを期限切れ](https://docs.mongodb.com/manual/tutorial/expire-data/#expire-documents-at-a-specific-clock-time)
-にします。これは、60秒ごとに起動するバックグラウンド・スレッドに基づいているため、有効期限が過ぎると、
-一時的なエンティティがデータベースに60秒間、または MongoDB の負荷が高い場合はさらに多少、データベースに残る可能性が
-あります。詳細は、[MongoDB のドキュメント](https://docs.mongodb.com/manual/core/index-ttl/#timing-of-the-delete-operation)
-を参照してください。
-
-TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で変更できますが、そのトピックはこのドキュメントの範囲外です。
-詳細については、[このリンク](http://hassansin.github.io/working-with-mongodb-ttl-index#ttlmonitor-sleep-interval)
-をご覧ください。
-
-**一時的なエンティティが削除されると、それを回復することはできません**。
-
-<a name="backward-compatibility-considerations"></a>
-
-### 下位互換性に関する考慮事項 (Backward compatibility considerations)
-
-一時的なエンティティは Orion 1.15.0 に導入されました。Orion 1.14.0 まで `dateExpires` は特別な意味を持たない通常の属性
-として解釈されます。Orion 1.15.0 にアップグレードする前に、アプリケーションで `dateExpires` という名前の付いた属性を
-すでに使用している場合はどうなりますか？
-
-`dateExpires` を使用している既存のエンティティは、属性が更新されるまで同じ方法で使用し続けます。つまり、`dateExpires`
-が `DateTime` でない場合、例えば、GET オペレーションなどで、数値、通常の文字列など、同じ値を保持します。`dateExpires`
-が `DateTime` である場合、その日時は有効期限と解釈されません。つまり、エンティティは日時が経過しても削除されません。
-
-しかし、属性が特別な意味を持たずに前の値を保持する場合でも、`dataExpires` は組み込み属性になりますので、GET
-ベースのクエリでは `attrs` URI パラメータ または、`POST /v2/op/query` とサブスクリプションでは `"attrs"`
-フィールドで明示的にリクエストされている場合を除いては表示されません。
-
-`dateExpires` 属性が初めて更新されると、それは前のセクションで説明した振る舞いで、指定されたエンティティの有効期限を
-意味するようになります。 **エンティティが望ましくない方法で自動的に削除される可能性があるので、その属性の値に基づいて
-クライアント側の有効期限を実装している場合は、これを考慮してください**。
-
-<a name=""></a>
-
-## マルチ・テナンシー (Multi tenancy)
-
-Orion は、単純なマルチ・テナント/マルチ・サービス・モデル・ベースの論理データベース分離を実装し、他の FIWARE
-コンポーネントまたはサード・パーティ・ソフトウェアによって提供されるサービス/テナント・ベースの認可ポリシー
-(authorization policies) を容易にします。たとえば、FIWARE セキュリティ・フレームワーク (PEP Proxy, IDM,
-およびアクセス制御)の認可ポリシー。この機能は、`-multiservice` [コマンド・ライン オプション](admin/cli.md)
-を使用するとアクティブになります。 `-multiservice` を使用すると、Orion はリクエストで `Fiware-Service` HTTP
-ヘッダを使用してサービス/テナントを識別します。HTTP リクエストにヘッダが存在しない場合、デフォルトの
-サービス/テナントが使用されます。
-
-マルチ・テナント/マルチ・サービスは、1つのサービス/テナントのエンティティ/属性/サブスクリプションが、
-他のサービス/テナントから*"見えない"* (invisible) ことを保証します。たとえば、tenantA スペースで
-`GET /v2/entities` を実行しても、tenantB スペースからエンティティが返されることはありません。
-この分離はデータベースの分離に基づいており、
-[詳細はインストールおよび管理マニュアル](admin/database_admin.md#multiservicemultitenant-database-separation)
-に記載されています。
-
-さらに、`-multiservice` が使用される場合、Orion は、指定されたテナント/サービスのサブスクリプションに
-関連付けられた notifyContextRequest リクエスト・メッセージに `Fiware-Service` ヘッダを含めることに注意して
-ください (デフォルトのサービス/テナントを除きます。この場合、ヘッダは存在しません)、例:
-
-```
-POST http://127.0.0.1:9977/notify
-Content-Length: 725
-User-Agent: orion/0.13.0
-Host: 127.0.0.1:9977
-Accept: application/json
-Fiware-Service: t_02
-Content-Type: application/json
-{
+GET /v2/entities?limit=100&options=count
 ...
-}
+(最初の100個の要素が、'Fiware-Total-Count: 322' ヘッダと共に返されます。これにより、クライアントはエンティティの総数を
+認識し、その後実行するクエリの数を知ることができます)
+GET /v2/entities?offset=100&limit=100
+...
+(101から200までのエンティティ)
+GET /v2/entities?offset=200&limit=100
+...
+(201から300までのエンティティ)
+GET /v2/entities?offset=300&limit=100
+...
+(301から322までのエンティティ)
 ```
 
-サービス/テナント名の構文に関しては、英数字の文字列 (および `\` 記号) である必要があります。最大長は
-50文字で、ほとんどのユースケースでは十分です。 Orion はテナント名を小文字で解釈するため、`MyService`
-の更新などでテナントを使用することはできますが、そのテナントに関連する通知は `myservice` で送信され、その意味では、
-お勧めできません。Orion が通知で送信するテナントと比較して、更新リクエストで使用したテナントと一貫性がありません。
-
-<a name="service-path"></a>
-
-## サービス・パス (Service path)
-
-<a name="entity-service-path"></a>
-
-### エンティティのサービス・パス (Entity service path)
-
-Orion は階層スコープをサポートしているため、エンティティの[作成時に](user/walkthrough_apiv2.md#entity-creation)、
-スコープに割り当てることができます。次に、[クエリ](user/walkthrough_apiv2.md#query-entity)と
-[サブスクリプション](user/walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するスコープ内のエンティティを
-見つけることもできます。
-
-たとえば、次のスコープを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
-
--   第1レベルのスコープとして、`マドリッド`
--   第2レベルのスコープ (マドリッドの子供たち) としての `Gardens` と `Districts`
--   `ParqueNorte`, `ParqueOeste`, `ParqueSur` (Gardens の子) および `Fuencarral` と `Latina` (Districts の子)
--   `Parterre1` と `Parterre2` (ParqueNorte の子)
-
-![](ServicePathExample.png "ServicePathExample.png")
-
-使用するスコープは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
-`Parterre1` に `Tree` 型のエンティティ `Tree1` を作成するには、次の Fiware-ServicePath が使用されます:
+リクエストが結果の総数を超えるオフセットを使用する場合、以下に示すように空のリストが返されることに注意してください:
 
 ```
-    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
+GET /v2/entities?offset=1000&limit=100
+...
+[]
 ```
 
-そのスコープで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
+<a name="ordering-results"></a>
 
-スコープは階層的で、階層的な検索が可能です。これを行うために、`\#` 特別なキーワードが使用されます。 したがって、
-`/Madrid/Gardens/ParqueNorte/#` の `Tree` 型のエンティティ ID `.\*` のパターンを持つ query は、`ParqueNorte`,
-`Parterre1`, `Parterre2` のすべてのツリー (trees) を返します。
+## 結果の順序付け (Ordering Results)
 
-最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなスコープをクエリできます。たとえば、
-`ParqueNorte` と `ParqueOeste` の両方ですべてのツリーを取得するには (`ParqueSur` ではなく)、次の `Fiware-ServicePath`
-を query リクエストで使用します:
+エンティティのリストを検索するオペレーションは、`orderBy` URI パラメータが、結果を順序付けする際の基準として使用される
+属性またはプロパティを指定することを可能にする。`orderBy` の値は次のようになります:
+
+例えば：
 
 ```
-    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte, /Madrid/Gardens/ParqueOeste
+GET /v2/entities?orderBy=temperature,!humidity
 ```
 
-いくつかの追加のコメント:
+最初に温度の昇順で並べ替え、次に湿度の降順で並べます (温度が同値の場合)。
 
--   制限:
-    -   スコープは `/` で始まる必要があります ("絶対" (absolute) スコープのみが許可されます)
-    -   1つのパスで最大10のスコープ・レベル
-    -   各レベルで最大50文字 (最低1文字)、英数字とアンダー・スコアのみ使用可能
-    -   クエリ `Fiware-ServicePath` ヘッダのコンマ区切りリスト内の最大10個のばらばらなスコープ・パス (アップデート
-        `Fiware-ServicePath` ヘッダのスコープ・パスは1つ以下)
-    -   末尾のスラッシュは破棄されます
+[組み込み属性](#builtin-attributes)の `dateCreated` と `dateModified` は、エンティティの作成時刻とエンティティの
+更新時刻を意味するために、`orderBy` コンマ区切りリスト (`!` 構文を含む) の要素として使用できることに注意してください。
 
--   `Fiware-ServicePath` はオプションのヘッダです。`Fiware-ServicePath` なしで作成された (またはデータベースにサービス
-   ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・スコープ `/` に属していると想定されます。
-    `Fiware-ServicePath` を使用しないすべてのクエリ (サブスクリプションを含む) は、暗黙的に `\#` にあります。
-    この動作により、0.14.0より前のバージョンとの下位互換性が保証されます
+-   キーワード `geo:distance` は、"near" (`georel=near`) の空間関係 (spatial relationship) が使用されているときに
+    リファレンス・ジオメトリまでの距離によって結果を並べます
+-   カンマで区切られた属性のリストです。組み込み属性、エンティティ id の `id`、エンティティ型の `type` などがあります。
+    たとえば、`temperature,!humidity`。結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなどの順序で
+    並べられます。フィールド名の前の "!" は、順序が逆になっていることを示します
 
--   異なるスコープで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
-    に `Tree` 型のエンティティ ID `Tree1` を作成し、`Madrid/Gardens/ParqueOeste` に `Tree` 型の ID `Tree1`
-    の別のエンティティをエラーなしで作成できます。ただし、このシナリオでは query が奇妙になる可能性があります
-    (たとえば、`Fiware-ServicePath /Madrid/Gardens` の query は、query response で同じ ID と型を持つ2つの
-    エンティティを返すため、それぞれがどのスコープに属しているかを区別するのが難しくなります)
+値が複数の JSON タイプに属する属性の順序に関して、Orion は、基礎となる実装 (MongoDB) で使用される基準と同じ基準を
+使用します。詳細については、
+[次のリンク](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)を
+参照してください。
 
--   エンティティは1つの (そして、1つだけの) スコープに属します
+最低から最高へ:
 
--   `Fiware-ServicePath` ヘッダは、Orion から送信される通知リクエストに含まれています
-
--   スコープ・エンティティは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
-    その場合、各 `scope tree` (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
-    同じ名前を使用することもできます。下の図を参照してください。
-
-![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
-
--   現在のバージョンでは、API を介してエンティティが属するスコープを変更することはできません (回避策は、
-    [エンティティ・コレクション](admin/database_model.md#entities-collection) の `_id.servicePath`
-    フィールドを直接変更することです)
-
-<a name="service-path-in-subscriptions-and-registrations"></a>
-
-### サブスクリプションとレジストレーションのサービス・パス (Service path in subscriptions and registrations)
-
-エンティティはサービス *および* サービス・パスに属しますが、サブスクリプションとレジストレーションはサービス *のみ*
-に属します。サブスクリプションとレジストレーションの servicepath は所属の意味を示すものではなく、サブスクリプション
-またはレジストレーションに関連付けられたクエリの表現です。
-
-これを考慮すると、次の規則が適用されます:
-
--   ID は取得するサブスクリプションまたはレジストレーションを完全に修飾するため、`GET /v2/subscriptions/{id}` および
-    `GET /v2/registrations/{id}` 操作では `Fiware-ServicePath` ヘッダは無視されます
--   `Fiware-ServicePath` ヘッダは、`GET /v2/subscriptions` および `GET /v2/registrations` で考慮され、*正確に*
-    そのサービス・パスをクエリとして使用するサブスクリプション/レジストレーションに結果を絞り込みます
--   現時点では、階層的なサービス・パス (つまり、`#` で終わるもの) はレジストレーションで許可されていません。
-    [Github での Issue](https://github.com/telefonicaid/fiware-orion/issues/3078) があり、この制限は最終的に
-    解決される可能性があります
+1. Null
+2. Number
+3. String
+4. Object
+5. Array
+6. Boolean
 
 <a name="api-routes"></a>
 

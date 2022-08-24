@@ -226,7 +226,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **count** : サブスクリプションに関連付けられて送信された通知の数です
 -   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **values** (最後の3つは NGSIv2 形式で使用されます) です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
-    または `oneshot` ([oneshot サブスクリプション](../orion-api.md#oneshot-subscription) の場合) のいずれか。Orion API
+    または `oneshot` ([oneshot サブスクリプション](../orion-api.md#oneshot-subscriptions) の場合) のいずれか。Orion API
     は追加の状態 (`expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
 -   **description** (オプションフィールド) : サブスクリプションを説明するフリーテキスト文字列。最大長は1024です
 -   **custom** : このサブスクリプションがカスタマイズされた通知 (Orion API の機能) を使用するかどうかを指定するブール値フィールドです。このフィールドが存在し、その値が "true" であれば、カスタマイズされた通知が使用されていて、`headers`, `qs`, `method` および `payload` フィールドは考慮されています
