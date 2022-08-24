@@ -290,7 +290,7 @@ An example of this syntax in shown below:
 
 ## Simplified Entity Representation
 
-Apart from the *normalizeed* representation model, there are three representation
+Apart from the *normalizeed* representation mode, there are three representation
 modes that are supported by Orion. These representation modes allow to generate simplified
 representations of entities.
 
