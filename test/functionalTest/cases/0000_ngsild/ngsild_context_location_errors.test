@@ -112,14 +112,14 @@ Date: REGEX(.*)
 04. Attempt to GET a cached context that doesn't exist
 ======================================================
 HTTP/1.1 404 Not Found
-Content-Length: 168
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/nothing.jsonld",
     "title": "Context Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

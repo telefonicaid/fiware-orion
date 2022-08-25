@@ -785,7 +785,7 @@ NGSILD-Tenant: t1
 03. Batch Update entity E1+E3 on default tenant and without context - E1 is updated, E3 is ignored (with error)
 ===============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 242
+Content-Length: 244
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -797,7 +797,7 @@ Date: REGEX(.*)
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],
@@ -810,7 +810,7 @@ Date: REGEX(.*)
 04. Batch Update entity E2+E4 on T1 tenant and without context - E2 is updated, E4 is ignored (with error)
 ==========================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 242
+Content-Length: 244
 Content-Type: application/json
 Date: REGEX(.*)
 NGSILD-Tenant: t1
@@ -823,7 +823,7 @@ NGSILD-Tenant: t1
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],
@@ -850,7 +850,7 @@ Date: REGEX(.*)
 07. Batch Update entity E1+E3 on default tenant and with user contexts 1+2 in payload body
 ==========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 242
+Content-Length: 244
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -862,7 +862,7 @@ Date: REGEX(.*)
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],

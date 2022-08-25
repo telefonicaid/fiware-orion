@@ -86,14 +86,14 @@ Date: REGEX(.*)
 03. Attempt to GET the context - see 404 Not Found
 ==================================================
 HTTP/1.1 404 Not Found
-Content-Length: 176
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "title": "Context Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

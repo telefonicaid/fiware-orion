@@ -159,7 +159,7 @@ bool orionldPostBatchCreate(void)
     if (batchMultipleInstances(entityId, outArrayCreatedP, NULL) == true)
     {
       LM_W(("Got another instance of entity '%s' - that's an error", entityId));
-      entityErrorPush(outArrayErroredP, entityId, OrionldBadRequestData, "Entity already exists", "Created as part of the same reqeust", 409);
+      entityErrorPush(outArrayErroredP, entityId, OrionldBadRequestData, "Entity already exists", "Created as part of the same request", 409);
       kjChildRemove(orionldState.requestTree, inEntityP);
       inEntityP = next;
       continue;

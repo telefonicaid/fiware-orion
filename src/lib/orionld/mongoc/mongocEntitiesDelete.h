@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESDELETE_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESDELETE_H_
 
 /*
 *
@@ -26,12 +26,17 @@
 * Author: Ken Zangelin
 */
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
-// ----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 //
-// orionldPostBatchDelete -
+// mongocEntitiesDelete -
 //
-extern bool orionldPostBatchDelete(void);
+extern bool mongocEntitiesDelete(KjNode* entityIdArray);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESDELETE_H_

@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -20,25 +20,47 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Larysse Savanna
+* Author: Ken Zangelin
 */
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjArray, ...
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
-#include "orionld/db/dbConfiguration.h"                        // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
-#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_STRING, PCHECK_URI
+#include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
+#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
+#include "orionld/legacyDriver/legacyPostBatchDelete.h"        // legacyPostBatchDelete
+#include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
+#include "orionld/mongoc/mongocEntitiesExist.h"                // mongocEntitiesExist
+#include "orionld/mongoc/mongocEntitiesDelete.h"               // mongocEntitiesDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// eidLookup - lookup an Entity Id in "the rest of the array"
+//
+static KjNode* eidLookup(KjNode* eidP, const char* entityId)
+{
+  while (eidP != NULL)
+  {
+    if ((eidP->type == KjString) && (strcmp(eidP->value.s, entityId) == 0))
+      return eidP;
+    eidP = eidP->next;
+  }
+
+  return NULL;
+}
 
 
 
@@ -46,135 +68,92 @@ extern "C"
 //
 // orionldPostBatchDelete -
 //
-// This function receives an array of entity ids as parameter and performs the batch delete operation.
-// It will remove a set of entities from the database.
-//
 bool orionldPostBatchDelete(void)
 {
-  KjNode* success  = kjArray(orionldState.kjsonP, "success");
-  KjNode* errors   = kjArray(orionldState.kjsonP, "errors");
-
-  // Error or not, the Link header should never be present in the reponse
-  orionldState.noLinkHeader = true;
-
-  // The response is never JSON-LD
-  orionldState.out.contentType = JSON;
-
-  if (orionldState.requestTree->type != KjArray)
-  {
-    LM_W(("Bad Input (Payload must be a JSON Array)"));
-    orionldError(OrionldBadRequestData, "Invalid payload", "Must be a JSON Array", 400);
-    return false;
-  }
+  if ((experimental == false) || (orionldState.in.legacy != NULL))  // If Legacy header - use old implementation
+    return legacyPostBatchDelete();
 
   //
-  // Make sure all array items are strings and valid URIs
+  // Incoming payload body is an array of Strings - Entity IDs
+  // The Strings can't be empty and must be valis URIs
   //
-  for (KjNode* idNodeP = orionldState.requestTree->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
-  {
-    PCHECK_STRING(idNodeP, 0, "Invalid payload", "Array items must be JSON Strings", 400);
-    PCHECK_URI(idNodeP->value.s, true, 0, "Invalid payload", "Array items must be valid URIs", 400);
-  }
+  PCHECK_ARRAY(orionldState.requestTree,       0, NULL, "payload body must be a JSON Array",           400);
+  PCHECK_ARRAY_EMPTY(orionldState.requestTree, 0, NULL, "payload body must be a non-empty JSON Array", 400);
 
+  KjNode* outArrayErroredP = kjArray(orionldState.kjsonP, "errors");
+  // KjNode* outArrayDeletedP = kjArray(orionldState.kjsonP, "success");
 
-  //
-  // First get the entities from database to check which exist
-  //
-  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree, false);
-
-  //
-  // Now loop in the array of entities from database and compare each id with the id from requestTree
-  //
-  KjNode* reqEntityId = orionldState.requestTree->value.firstChildP;
-  while (reqEntityId != NULL)
-  {
-    KjNode*  next     = reqEntityId->next;
-    bool     idExists = false;
-
-    if (dbEntities != NULL)
-    {
-      for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
-      {
-        KjNode* dbEntityId  = kjLookup(dbEntity, "id");  // Coming from DB - '@id' not necessary
-
-        if ((dbEntityId != NULL) && (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0))
-        {
-          idExists = true;
-          break;  // Found - no need to keep searching.
-        }
-      }
-    }
-
-    if (idExists == false)
-    {
-      entityErrorPush(errors, reqEntityId->value.s, OrionldResourceNotFound, "Entity not found", NULL, 404);
-
-      // Remove the not found entity from the incoming payload
-      kjChildRemove(orionldState.requestTree, reqEntityId);
-    }
-    else
-      entitySuccessPush(success, reqEntityId->value.s);
-
-    reqEntityId = next;
-  }
-
-
-  //
-  // Eliminate possibly duplicated entity ids
-  //
-  KjNode* eidP = orionldState.requestTree->value.firstChildP;
+  // Check children for String and valid URI
+  KjNode* eidNodeP = orionldState.requestTree->value.firstChildP;
   KjNode* next;
-
-  while (eidP != NULL)
+  while (eidNodeP != NULL)
   {
-    next = eidP->next;
-
-    //
-    // Compare current (eidP) string value with all nextcoming EIDs is the array
-    // If match, remove the latter
-    //
-    KjNode* copyP = eidP->next;
-    KjNode* copyNext;
-
-    while (copyP != NULL)
+    next = eidNodeP->next;
+    if (eidNodeP->type != KjString)
     {
-      copyNext = copyP->next;
-      if (strcmp(eidP->value.s, copyP->value.s) == 0)
-        kjChildRemove(orionldState.requestTree, copyP);
-      copyP = copyNext;
+      orionldError(OrionldBadRequestData, "Invalid JSON type", "Entity::id must be a JSON String", 400);
+      return false;
+    }
+    else if (pCheckUri(eidNodeP->value.s, "Entity::id", true) == false)
+    {
+      orionldError(OrionldBadRequestData, "Invalid URI", "Entity::id must be a valid URI", 400);
+      return false;
     }
 
-    eidP = next;
+    KjNode* duplicatedP = eidLookup(next, eidNodeP->value.s);
+    if (duplicatedP != NULL)  // Duplicated entity id?
+    {
+      if (duplicatedP == next)
+        next = duplicatedP->next;
+      kjChildRemove(orionldState.requestTree, duplicatedP);
+    }
+
+    eidNodeP = next;
   }
 
+  // Now we have an Array with valid Entity IDs - time to ask mongo if they actually exist
+  kjTreeLog(orionldState.requestTree, "Entities to DELETE");
+  KjNode* dbEntityIdArray = mongocEntitiesExist(orionldState.requestTree);
+  kjTreeLog(dbEntityIdArray, "Existing Entities from DB");
 
-  //
-  // Call batch delete function
-  //
-  if ((orionldState.requestTree->value.firstChildP != NULL) && (dbEntitiesDelete(orionldState.requestTree) == false))
+  // Give error for the Entities that don't exist
+  KjNode* inEntityIdNodeP = orionldState.requestTree->value.firstChildP;
+
+  while (inEntityIdNodeP != NULL)
   {
-    LM_E(("Database Error (dbEntitiesDelete returned error)"));
-    orionldState.httpStatusCode = 500;
-    orionldError(OrionldBadRequestData, "Database Error", "dbEntitiesDelete", 400);
+    next = inEntityIdNodeP->next;
 
-    return false;
+    char*   entityId = inEntityIdNodeP->value.s;
+    KjNode* foundP   = entityLookupBy_id_Id(dbEntityIdArray, entityId, NULL);
+
+    if (foundP == NULL)
+    {
+      kjChildRemove(orionldState.requestTree, inEntityIdNodeP);
+      entityErrorPush(outArrayErroredP, entityId, OrionldResourceNotFound, "Entity Not Found", "Cannot delete entities that do not exist", 404);
+    }
+
+    inEntityIdNodeP = next;
   }
 
-  if (errors->value.firstChildP == NULL)
-  {
-    orionldState.responseTree   = NULL;
-    orionldState.httpStatusCode = 204;
-  }
+  // And those that existed (still present in orionldState.requestTree), delete them!
+  mongocEntitiesDelete(orionldState.requestTree);
+
+  if (outArrayErroredP->value.firstChildP == NULL)
+    orionldState.httpStatusCode  = 204;
   else
   {
-    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+    KjNode* response = kjObject(orionldState.kjsonP, NULL);
 
-    kjChildAdd(orionldState.responseTree, success);
-    kjChildAdd(orionldState.responseTree, errors);
+    kjChildAdd(response, outArrayErroredP);
+    kjChildAdd(response, orionldState.requestTree);
+    orionldState.requestTree->name = (char*) "success";
 
-    orionldState.httpStatusCode  = 207;   // Multi-Status
-    orionldState.out.contentType = JSON;  // restReply already sets it to JSON is 207 ...
+    orionldState.responseTree    = response;
+    orionldState.httpStatusCode  = 207;
   }
+
+  orionldState.out.contentType = JSON;
+  orionldState.noLinkHeader    = true;
 
   return true;
 }
