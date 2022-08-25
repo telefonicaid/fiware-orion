@@ -129,6 +129,7 @@ extern "C"
 #include "orionld/orionldRestServices.h"
 
 #include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
+#include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
@@ -136,10 +137,6 @@ extern "C"
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
 
 using namespace orion;
-
-
-extern void contextDownloadListInit(void);     // FIXME PR: include header ...
-extern void contextDownloadListRelease(void);  // FIXME PR: include header ...
 
 
 
@@ -1176,7 +1173,6 @@ int main(int argC, char* argV[])
 
   if (troe)
   {
-    extern bool pgVersionGet(char* versionString, int versionStringSize);
     if (pgVersionGet(postgresServerVersion, sizeof(postgresServerVersion)) == false)
       LM_X(1, ("Unable to contact the Postgres Server"));
   }

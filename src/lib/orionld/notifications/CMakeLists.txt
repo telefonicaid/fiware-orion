@@ -30,6 +30,7 @@ SET (SOURCES
     notificationFailure.cpp
     httpNotify.cpp
     httpsNotify.cpp
+    alteration.cpp
 )
 
 # Include directories

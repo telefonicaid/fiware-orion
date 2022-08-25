@@ -42,6 +42,7 @@ SET (SOURCES
     orionldContextItemAlreadyExpanded.cpp
     orionldAttributeExpand.cpp
     orionldSubAttributeExpand.cpp
+    orionldContextOriginName.cpp
 )
 
 # Include directories

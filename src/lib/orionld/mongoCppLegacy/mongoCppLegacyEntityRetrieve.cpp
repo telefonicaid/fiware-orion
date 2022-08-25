@@ -45,6 +45,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                            // numberToDate
 #include "orionld/common/eqForDot.h"                                // eqForDot
 #include "orionld/common/performance.h"                             // PERFORMANCE
+#include "orionld/common/langStringExtract.h"                       // langValueFix
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"             // kjEntityNormalizedToConcise
@@ -86,7 +87,6 @@ static bool timestampToString(KjNode* nodeP)
 
 
 
-extern void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang);  // FIXME: Move to its own module
 // -----------------------------------------------------------------------------
 //
 // presentationAttributeFix -

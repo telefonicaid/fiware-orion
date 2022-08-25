@@ -59,14 +59,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// clientIp - move to orionldState
-//
-extern __thread char  clientIp[IP_LENGTH_MAX + 1];
-
-
-
-// -----------------------------------------------------------------------------
-//
 // connectionInfo - as a thread variable
 //
 // This to avoid thousands of mallocs/constructor calls every second in a busy broker.

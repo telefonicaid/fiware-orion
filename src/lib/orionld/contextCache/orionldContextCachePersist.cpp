@@ -35,12 +35,12 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldContextOriginName.h"            // orionldContextOriginName
 #include "orionld/mongoc/mongocContextCachePersist.h"            // mongocContextCachePersist - FIXME: Use dbContextCachePersist
 #include "orionld/contextCache/orionldContextCachePersist.h"     // Own interface
 
 
 
-extern const char* originName(OrionldContextOrigin origin);  // FIXME: own module!
 // -----------------------------------------------------------------------------
 //
 // orionldContextCachePersist -
@@ -61,7 +61,7 @@ void orionldContextCachePersist(OrionldContext* contextP)
   KjNode*  idP;
   KjNode*  urlP         = kjString(orionldState.kjsonP, "url",       contextP->url);
   KjNode*  parentP;
-  KjNode*  originP      = kjString(orionldState.kjsonP, "origin",    originName(contextP->origin));
+  KjNode*  originP      = kjString(orionldState.kjsonP, "origin",    orionldContextOriginName(contextP->origin));
   KjNode*  createdAtP   = kjFloat(orionldState.kjsonP,  "createdAt", orionldState.requestTime);  // FIXME: make sure it's not overwritten if already exists
   KjNode*  valueP       = contextP->tree;
 

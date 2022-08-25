@@ -41,28 +41,6 @@
 
 // -----------------------------------------------------------------------------
 //
-// originName -
-//
-const char* originName(OrionldContextOrigin origin)
-{
-  switch (origin)
-  {
-  case OrionldContextUnknownOrigin:        return "Unknown";
-  case OrionldContextFromInline:           return "Inline";
-  case OrionldContextDownloaded:           return "Downloaded";
-  case OrionldContextFileCached:           return "FileCached";
-  case OrionldContextForNotifications:     return "Notifications";
-  case OrionldContextForForwarding:        return "Forwarding";
-  case OrionldContextUserCreated:          return "UserCreated";
-  }
-
-  return "InvalidOrigin";
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldContextCacheInsert -
 //
 void orionldContextCacheInsert(OrionldContext* contextP)

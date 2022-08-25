@@ -85,14 +85,6 @@ typedef enum OrionldContextOrigin
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextOriginName -
-//
-extern const char* orionldContextOriginName(OrionldContextOrigin origin);
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldOriginFromString -
 //
 extern OrionldContextOrigin orionldOriginFromString(const char* s);

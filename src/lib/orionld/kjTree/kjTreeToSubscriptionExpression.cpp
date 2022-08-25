@@ -35,17 +35,9 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/dbModel/dbModelFromGeometry.h"               // dbModelFromGeometry
+#include "orionld/dbModel/dbModelFromGeorel.h"                 // dbModelFromGeorel
 #include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// dbModelFromGeorel   - from dbModelFromApiSubscription.cpp - own module!
-// dbModelFromGeometry - from dbModelFromApiSubscription.cpp - own module!
-//
-extern const char* dbModelFromGeorel(char* georel);
-extern const char* dbModelFromGeometry(char* geometry);
 
 
 

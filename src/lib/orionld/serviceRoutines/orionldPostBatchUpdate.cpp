@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
@@ -33,36 +31,26 @@ extern "C"
 #include "kjson/kjClone.h"                                     // kjClone
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/tenantList.h"                         // tenant0
+#include "orionld/common/batchEntityCountAndFirstCheck.h"      // batchEntityCountAndFirstCheck
+#include "orionld/common/batchEntityStringArrayPopulate.h"     // batchEntityStringArrayPopulate
+#include "orionld/common/batchEntitiesFinalCheck.h"            // batchEntitiesFinalCheck
+#include "orionld/common/batchMultipleInstances.h"             // batchMultipleInstances
+#include "orionld/common/batchUpdateEntity.h"                  // batchUpdateEntity
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity
 #include "orionld/legacyDriver/legacyPostBatchUpdate.h"        // legacyPostBatchUpdate
 #include "orionld/mongoc/mongocEntitiesQuery.h"                // mongocEntitiesQuery
 #include "orionld/mongoc/mongocEntitiesUpsert.h"               // mongocEntitiesUpsert
+#include "orionld/notifications/alteration.h"                  // alteration
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// BATCH helper functions -
-//   Need to have their own modules - perhaps even in a separate library "orionld/batch"?
-//   If not, in "orionld/common"
-//
-extern int      batchEntityCountAndFirstCheck(KjNode* requestTree, KjNode* errorsArrayP);
-extern int      batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, KjNode* errorsArrayP, bool entityTypeMandatory);
-extern int      batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update, bool mustExist, bool cannotExist);
-extern KjNode*  batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* entityId, char* entityType, bool ignore);
-extern bool     batchMultipleInstances(const char* entityId, KjNode* updatedArrayP, KjNode* createdArrayP);
-extern KjNode*  batchEntityLookupinDbArray(KjNode* dbEntityArray, const char* entityId);
-
-// This one ... to orionld/notifications?
-extern void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* incomingP);
 
 
 
@@ -174,7 +162,7 @@ bool orionldPostBatchUpdate(void)
     {
       multipleEntities = true;
 
-      KjNode* dbArrayItemP = batchEntityLookupinDbArray(dbUpdateArray, entityId);
+      KjNode* dbArrayItemP = entityLookupBy_id_Id(dbUpdateArray, entityId, NULL);
       if (dbArrayItemP == NULL)
         LM_E(("MI: Internal Error (multiple instance entity '%s' not found in DB Array)", entityId));
       else

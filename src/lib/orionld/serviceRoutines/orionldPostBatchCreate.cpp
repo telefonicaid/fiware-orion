@@ -36,29 +36,18 @@ extern "C"
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
+#include "orionld/common/batchEntityCountAndFirstCheck.h"      // batchEntityCountAndFirstCheck
+#include "orionld/common/batchEntityStringArrayPopulate.h"     // batchEntityStringArrayPopulate
+#include "orionld/common/batchEntitiesFinalCheck.h"            // batchEntitiesFinalCheck
+#include "orionld/common/batchCreateEntity.h"                  // batchCreateEntity
+#include "orionld/common/batchMultipleInstances.h"             // batchMultipleInstances
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
 #include "orionld/legacyDriver/legacyPostBatchCreate.h"        // legacyPostBatchCreate
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity
 #include "orionld/mongoc/mongocEntitiesQuery.h"                // mongocEntitiesQuery
 #include "orionld/mongoc/mongocEntitiesUpsert.h"               // mongocEntitiesUpsert
+#include "orionld/notifications/alteration.h"                  // alteration
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"    // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// BATCH helper functions -
-//   Need to have their own modules - perhaps even in a separate library "orionld/batch"?
-//   If not, in "orionld/common"
-//
-extern int      batchEntityCountAndFirstCheck(KjNode* requestTree, KjNode* errorsArrayP);
-extern int      batchEntityStringArrayPopulate(KjNode* requestTree, StringArray* eIdArrayP, KjNode* errorsArrayP, bool entityTypeMandatory);
-extern int      batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* dbEntityArray, bool update, bool mustExist, bool cannotExist);
-extern KjNode*  batchCreateEntity(KjNode* inEntityP, char* entityId, char* entityType, bool replaced);
-extern bool     batchMultipleInstances(const char* entityId, KjNode* updatedArrayP, KjNode* createdArrayP);
-
-// This one ... to orionld/notifications?
-extern void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* incomingP);
 
 
 

@@ -37,12 +37,12 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+#include "orionld/context/orionldContextOriginName.h"            // orionldContextOriginName
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheGet.h"         // Own interface
 
 
 
-extern const char* originName(OrionldContextOrigin origin);  // FIXME: move to own module
 // -----------------------------------------------------------------------------
 //
 // orionldContextCacheGet -
@@ -68,7 +68,7 @@ KjNode* orionldContextCacheGet(KjNode* arrayP, bool details)
       KjNode*          urlStringP       = kjString(orionldState.kjsonP, "url",       contextP->url);
       KjNode*          idStringP        = kjString(orionldState.kjsonP, "id",        (contextP->id == NULL)? "None" : contextP->id);
       KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type",      contextP->keyValues? "hash-table" : "array");
-      KjNode*          originP          = kjString(orionldState.kjsonP, "origin",    originName(contextP->origin));
+      KjNode*          originP          = kjString(orionldState.kjsonP, "origin",    orionldContextOriginName(contextP->origin));
       KjNode*          createdAtP       = kjString(orionldState.kjsonP, "createdAt", createdAtString);
 
       kjChildAdd(contextObjP, urlStringP);

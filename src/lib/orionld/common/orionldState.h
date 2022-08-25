@@ -43,6 +43,7 @@ extern "C"
 }
 
 #include "common/globals.h"                                      // ApiVersion
+#include "common/limits.h"                                       // IP_LENGTH_MAX, STATIC_BUFFER_SIZE
 #include "common/MimeType.h"                                     // MimeType
 #include "common/RenderFormat.h"                                 // RenderFormat
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
@@ -517,6 +518,15 @@ extern __thread Timestamps performanceTimestamps;
 // orionldState -
 //
 extern __thread OrionldConnectionState orionldState;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// Thread variables from rest/rest.cpp
+//
+extern __thread char  clientIp[IP_LENGTH_MAX + 1];
+extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 
 
 
