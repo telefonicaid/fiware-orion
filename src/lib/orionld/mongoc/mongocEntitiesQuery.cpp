@@ -520,7 +520,7 @@ static bool geoIntersectsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 //     geoqFilter : EQ: { attrs.https://uri=etsi=org/ngsi-ld/default-context/geo.value: { type: "Polygon", coordinates: [ [ [ 0, 0 ], [ 0, 1 ], [ 1, 1 ], [ 0, 0 ] ] ] } }
 //
 //   The same trace line for mongocEntitiesQuery (mongocEntitiesQuery.cpp[709]):
-//     mongocEntitiesQuery : GEO: Running the query with filter '{ "_id.type" : "https://uri.etsi.org/ngsi-ld/default-context/T", "attrs.geo.value" : { "type" : "Polygon", "coordinates" : [ [ [ 1, 1 ], [ 1, 2 ], [ 2, 2 ], [ 2, 1 ], [ 1, 1 ] ] ] } }'
+//     mongocEntitiesQuery : Running the query with filter '{ "_id.type" : "https://uri.etsi.org/ngsi-ld/default-context/T", "attrs.geo.value" : { "type" : "Polygon", "coordinates" : [ [ [ 1, 1 ], [ 1, 2 ], [ 2, 2 ], [ 2, 1 ], [ 1, 1 ] ] ] } }'
 //
 //   Seems to be exactly the same, but works in mongoCppLegacy but not in mongoc ;(
 //   So, I give up for now, setting the all geo-equals functests as DISABLED - will try to fix this some other day :(
@@ -892,7 +892,7 @@ KjNode* mongocEntitiesQuery
 
   if (limit != 0)
   {
-#if 1
+#if 0
     char* filterString  = bson_as_json(&mongoFilter, NULL);
     char* optionsString = bson_as_json(&options, NULL);
 
@@ -905,7 +905,7 @@ KjNode* mongocEntitiesQuery
 
     if (mongoCursorP == NULL)
     {
-      LM_E(("GEO: Database Error (mongoc_collection_find_with_opts ERROR)"));
+      LM_E(("Database Error (mongoc_collection_find_with_opts ERROR)"));
       bson_destroy(&mongoFilter);
       mongoc_read_prefs_destroy(readPrefs);
       orionldError(OrionldInternalError, "Database Error", "mongoc_collection_find_with_opts failed", 500);
@@ -916,7 +916,7 @@ KjNode* mongocEntitiesQuery
     // <DEBUG>
     const bson_t* lastError = mongoc_collection_get_last_error(orionldState.mongoc.entitiesP);
     if (lastError != NULL)
-      LM_E(("GEO: MongoC Error: %s", bson_as_canonical_extended_json(lastError, NULL)));
+      LM_E(("MongoC Error: %s", bson_as_canonical_extended_json(lastError, NULL)));
     // </DEBUG>
 #endif
 
@@ -932,12 +932,12 @@ KjNode* mongocEntitiesQuery
         ++hits;
       }
       else
-        LM_E(("GEO: Database Error (%s: %s)", title, detail));
+        LM_E(("Database Error (%s: %s)", title, detail));
     }
 
     bson_error_t error;
     if (mongoc_cursor_error(mongoCursorP, &error) == true)
-      LM_E(("GEO: mongoc_cursor_error: %d.%d: '%s'", error.domain, error.code, error.message));
+      LM_E(("mongoc_cursor_error: %d.%d: '%s'", error.domain, error.code, error.message));
 
     mongoc_cursor_destroy(mongoCursorP);
   }

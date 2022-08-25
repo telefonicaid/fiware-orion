@@ -51,6 +51,8 @@ SET (SOURCES
     mongocEntityDelete.cpp
     mongocEntitiesUpsert.cpp
     mongocServerVersionGet.cpp
+    mongocEntitiesExist.cpp
+    mongocEntitiesDelete.cpp
 )
 
 # Include directories

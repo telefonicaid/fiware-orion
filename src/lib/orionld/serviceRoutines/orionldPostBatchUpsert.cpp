@@ -351,7 +351,7 @@ int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* d
     if ((mustExist == true) && (dbEntityP == NULL))  // FIXME: Only interesting for BATCH UPSERT
     {
       LM_E(("The entity '%s' does not exist", entityId));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Entity not found", "Cannot update a non-existing entity", 404);
+      entityErrorPush(errorsArrayP, entityId, OrionldResourceNotFound, "Entity not found", "Cannot update a non-existing entity", 404);
       kjChildRemove(orionldState.requestTree, eP);
       eP = next;
       continue;

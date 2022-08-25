@@ -68,7 +68,7 @@ bool orionldGetContexts(void)
 
     if (contextP == NULL)
     {
-      orionldError(OrionldBadRequestData, "Context Not Found", orionldState.uriParams.url, 404);
+      orionldError(OrionldResourceNotFound, "Context Not Found", orionldState.uriParams.url, 404);
       return false;
     }
 

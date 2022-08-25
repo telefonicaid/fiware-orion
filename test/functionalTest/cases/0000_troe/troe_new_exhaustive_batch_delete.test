@@ -414,7 +414,7 @@ NGSILD-Tenant: t1
 03. Batch Delete E2 on default tenant - see error, and nothing reported in TRoE DB
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 174
+Content-Length: 226
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -423,8 +423,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entity:E2",
             "error": {
+                "detail": "Cannot delete entities that do not exist",
                 "status": 404,
-                "title": "Entity not found",
+                "title": "Entity Not Found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
@@ -436,7 +437,7 @@ Date: REGEX(.*)
 04. Batch Delete E1 on T1 tenant - see error, and nothing reported in TRoE DB
 =============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 174
+Content-Length: 226
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -445,8 +446,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entity:E1",
             "error": {
+                "detail": "Cannot delete entities that do not exist",
                 "status": 404,
-                "title": "Entity not found",
+                "title": "Entity Not Found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
@@ -458,7 +460,7 @@ Date: REGEX(.*)
 05. Batch Delete E1, E2, and E3 on default tenant - see error for E2, and E1 and E3 only reported deleted in TRoE DB
 ====================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 221
+Content-Length: 273
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -467,8 +469,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entity:E2",
             "error": {
+                "detail": "Cannot delete entities that do not exist",
                 "status": 404,
-                "title": "Entity not found",
+                "title": "Entity Not Found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
@@ -483,7 +486,7 @@ Date: REGEX(.*)
 06. Batch Delete E2, E3, and E4 on T1 tenant - see error for E3, and E2 and E4 only reported deleted in TRoE DB
 ===============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 221
+Content-Length: 273
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -492,8 +495,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entity:E3",
             "error": {
+                "detail": "Cannot delete entities that do not exist",
                 "status": 404,
-                "title": "Entity not found",
+                "title": "Entity Not Found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }

@@ -188,7 +188,7 @@ Date: REGEX(.*)
 04. Attempt to Batch Delete one entity with non-existing entities
 =================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 320
+Content-Length: 424
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -197,16 +197,18 @@ Date: REGEX(.*)
         {
             "entityId": "urn:not:an:entity",
             "error": {
+                "detail": "Cannot delete entities that do not exist",
                 "status": 404,
-                "title": "Entity not found",
+                "title": "Entity Not Found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         },
         {
             "entityId": "urn:also:not:an:entity",
             "error": {
+                "detail": "Cannot delete entities that do not exist",
                 "status": 404,
-                "title": "Entity not found",
+                "title": "Entity Not Found",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }

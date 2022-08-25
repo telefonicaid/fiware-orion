@@ -225,7 +225,7 @@ Date: REGEX(.*)
 02. BATCH Update on all three entities and a fourth that doesn't exist
 ======================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 298
+Content-Length: 300
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -237,7 +237,7 @@ Date: REGEX(.*)
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],

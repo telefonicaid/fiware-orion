@@ -365,7 +365,7 @@ echo
 01. Attempt to update with an entity having an ID that is not a string - see error
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 538
+Content-Length: 540
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -384,7 +384,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -398,7 +398,7 @@ Date: REGEX(.*)
 02. Attempt to update with an entity without ID field - see error
 =================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 546
+Content-Length: 548
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -417,7 +417,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -431,7 +431,7 @@ Date: REGEX(.*)
 03. Attempt to update with an entity having an ID with URI invalid - see error
 ==============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 523
+Content-Length: 525
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -450,7 +450,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -464,7 +464,7 @@ Date: REGEX(.*)
 04. Attempt to update with an entity having a TYPE that is not a string - see error
 ===================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 561
+Content-Length: 563
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -483,7 +483,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -497,7 +497,7 @@ Date: REGEX(.*)
 05. Attempt to update with an entity without TYPE field - see error
 ===================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 572
+Content-Length: 576
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -507,7 +507,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E1",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -516,7 +516,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -530,7 +530,7 @@ Date: REGEX(.*)
 06. Attempt to update with an entity with 2 ID fields - see error
 =================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 552
+Content-Length: 554
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -549,7 +549,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E3",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -563,7 +563,7 @@ Date: REGEX(.*)
 07. Attempt to update with an entity with 2 TYPE fields - see error
 ===================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 554
+Content-Length: 556
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -582,7 +582,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -611,7 +611,7 @@ Date: REGEX(.*)
 09. Attempt to update with an entity without @context field - see error
 =======================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 617
+Content-Length: 619
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -630,7 +630,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E4",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404
@@ -658,7 +658,7 @@ Date: REGEX(.*)
 11. Attempt to BATCH Update a non-existing Entity
 =================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 336
+Content-Length: 338
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -670,7 +670,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E3",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
         "title": "Entity not found",
         "detail": "Cannot update a non-existing entity",
         "status": 404

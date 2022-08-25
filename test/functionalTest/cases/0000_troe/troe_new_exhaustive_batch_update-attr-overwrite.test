@@ -1138,7 +1138,7 @@ NGSILD-Tenant: t1
 03. Update E1,E3,E7 on default tenant and without context - E7 fails, E1+E3 are updated
 =======================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 266
+Content-Length: 268
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -1150,7 +1150,7 @@ Date: REGEX(.*)
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],
@@ -1164,7 +1164,7 @@ Date: REGEX(.*)
 04. Update E2,E4,E8 on T1 tenant and without context - E8 fails, E2+E4 are updated
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 266
+Content-Length: 268
 Content-Type: application/json
 Date: REGEX(.*)
 NGSILD-Tenant: t1
@@ -1177,7 +1177,7 @@ NGSILD-Tenant: t1
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],

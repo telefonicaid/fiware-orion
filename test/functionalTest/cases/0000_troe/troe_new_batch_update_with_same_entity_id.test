@@ -395,7 +395,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
 ===================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 272
+Content-Length: 274
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -407,7 +407,7 @@ Date: REGEX(.*)
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],
@@ -448,7 +448,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
 ==========================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 272
+Content-Length: 274
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -460,7 +460,7 @@ Date: REGEX(.*)
                 "detail": "Cannot update a non-existing entity",
                 "status": 404,
                 "title": "Entity not found",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
             }
         }
     ],

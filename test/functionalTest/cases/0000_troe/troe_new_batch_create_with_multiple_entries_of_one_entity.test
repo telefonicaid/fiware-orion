@@ -106,7 +106,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E1",
             "error": {
-                "detail": "Created as part of the same reqeust",
+                "detail": "Created as part of the same request",
                 "status": 409,
                 "title": "Entity already exists",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
