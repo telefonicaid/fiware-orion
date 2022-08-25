@@ -35,14 +35,6 @@ extern "C"
 
 
 
-// -----------------------------------------------------------------------------
-//
-// static_buffer - from src/lib/rest.cpp
-//
-extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
-
-
-
 /* ****************************************************************************
 *
 * orionldMhdConnectionPayloadRead - 

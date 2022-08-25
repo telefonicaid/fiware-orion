@@ -57,6 +57,14 @@ SET (SOURCES
     pathComponentsSplit.cpp
     urlDecode.cpp
     subCacheApiSubscriptionInsert.cpp
+    batchEntityCountAndFirstCheck.cpp
+    batchEntityStringArrayPopulate.cpp
+    batchEntitiesFinalCheck.cpp
+    batchMultipleInstances.cpp
+    batchCreateEntity.cpp
+    batchUpdateEntity.cpp
+    batchReplaceEntity.cpp
+    metadataAdd.cpp
 )
 
 # Include directories

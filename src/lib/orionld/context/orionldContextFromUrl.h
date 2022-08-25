@@ -31,6 +31,27 @@
 
 // -----------------------------------------------------------------------------
 //
+// contextDownloadListInit - initialize the 'context download list'
+//
+extern void contextDownloadListInit(void);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// contextDownloadListRelease - release all items in the 'context download cache'
+//
+// The cache is self-cleaning and this function isn't really necessary - except perhaps
+// if the broker is killed while serving requests, e.g. while running tests.
+//
+// This function is ONLY called from the main exit-function, to avoid leaks for valgrind tests.
+//
+extern void contextDownloadListRelease(void);
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextFromUrl -
 //
 extern OrionldContext* orionldContextFromUrl(char* url, char* id);

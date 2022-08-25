@@ -37,19 +37,10 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/metadataAdd.h"                          // metadataAdd
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// metadataAdd - from kjTreeToContextAttribute.cpp
-//
-// FIXME: needs its own module under orionld/common
-//
-extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* attributeName);
 
 
 

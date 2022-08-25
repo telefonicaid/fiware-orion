@@ -26,21 +26,11 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/pqHeader.h"                           // Postgres header
+#include "orionld/troe/dbCreationCommand.h"                    // dbCreationCommand
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
 #include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
 #include "orionld/troe/pgDatabaseTableCreateAll.h"             // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// The variable 'dbCreationCommand' comes from an auto-generated file:
-//  src/lib/orionld/troe/dbCreationCommand.cpp
-//
-// No need to auto-generate also a header file - the variable is only used in this file.
-//
-extern const char* dbCreationCommand;
 
 
 

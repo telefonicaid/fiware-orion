@@ -32,10 +32,11 @@
 #include "orionld/common/orionldState.h"                       // troePort
 #include "orionld/troe/pgConnectionPoolInit.h"                 // pgConnectionPoolInit
 #include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
+#include "orionld/troe/pgConnectionPoolsPresent.h"              // pgConnectionPoolsPresent
 #include "orionld/troe/pgInit.h"                               // Own interface
 
 
-extern void pgConnectionPoolsPresent(void);
+
 // -----------------------------------------------------------------------------
 //
 // pgInit -

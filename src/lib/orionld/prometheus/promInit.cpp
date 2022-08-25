@@ -66,7 +66,6 @@ int promInit(unsigned short promPort)
   // Set the active registry for the HTTP handler
   promhttp_set_active_collector_registry(NULL);
 
-
   struct MHD_Daemon* daemon = promhttp_start_daemon(MHD_USE_SELECT_INTERNALLY, promPort, NULL, NULL);
 
   return (daemon != NULL)? 0 : 1;

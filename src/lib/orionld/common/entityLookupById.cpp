@@ -73,7 +73,7 @@ KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entit
       if (idNodeP == NULL)
         idNodeP = kjLookup(_idNodeP, "@id");
 
-      if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
+      if ((idNodeP != NULL) && (idNodeP->type == KjString) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
       {
         if (entityTypeNodeP != NULL)
         {

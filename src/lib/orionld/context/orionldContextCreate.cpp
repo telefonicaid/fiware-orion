@@ -39,28 +39,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextOriginName - FIXME: move to its own module
-//
-const char* orionldContextOriginName(OrionldContextOrigin origin)
-{
-  switch (origin)
-  {
-  case OrionldContextUnknownOrigin:     return "UnknownOrigin";
-  case OrionldContextFromInline:        return "Inline";
-  case OrionldContextDownloaded:        return "Downloaded";
-  case OrionldContextFileCached:        return "FileCached";
-  case OrionldContextForNotifications:  return "ForNotifications";
-  case OrionldContextForForwarding:     return "ForForwarding";
-  case OrionldContextUserCreated:       return "UserCreated";
-  }
-
-  return "Unknown Origin II";
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldOriginFromString - FIXME: move to its own module
 //
 OrionldContextOrigin orionldOriginFromString(const char* s)
