@@ -22,15 +22,17 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                          // read, write
+#include <unistd.h>                                          // read, write, usleep
 #include <errno.h>                                           // errno
 #include <string.h>                                          // strerror
 #include <poll.h>                                            // poll
 #include <netinet/in.h>                                      // sockaddr_in
 
 #include "logMsg/logMsg.h"                                   // LM_*
-#include "logMsg/traceLevels.h"                              // Lmt*
 
+#include "orionld/common/orionldState.h"                     // troe
+#include "orionld/mongoc/mongocServerVersionGet.h"           // mongocServerVersionGet
+#include "orionld/troe/pgVersionGet.h"                       // pgVersionGet
 #include "orionld/socketService/socketService.h"             // SsHeader, SsMsgCode
 #include "orionld/socketService/socketServiceRun.h"          // Own interface
 
@@ -50,6 +52,28 @@ int ssAccept(int listenFd)
     LM_RE(-1, ("accept socket service connection: %s", strerror(errno)));
 
   return fd;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// healthCheck -
+//
+static bool healthCheck(void)
+{
+  char version[64];
+
+  if (mongocServerVersionGet(version) == false)
+    return false;
+
+  if (troe)
+  {
+    if (pgVersionGet(version, sizeof(version)) == false)
+      return false;
+  }
+
+  return true;
 }
 
 
@@ -87,6 +111,12 @@ void socketServiceRun(int listenFd)
     {
       if (fd == listenFd)
       {
+        if (healthCheck() == false)
+        {
+          usleep(500000);
+          continue;
+        }
+
         connectionFd = ssAccept(listenFd);
         if (fd == -1)
           LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
