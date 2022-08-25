@@ -368,7 +368,7 @@ Date: REGEX(.*)
 02. Attempt to create with an entity without ID field - see error
 =================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 548
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -387,7 +387,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
         "title": "Entity already exists",
         "detail": "Cannot create an existing entity",
         "status": 409
@@ -401,7 +401,7 @@ Date: REGEX(.*)
 03. Attempt to create with an entity having an ID with URI invalid - see error
 ==============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 525
+Content-Length: 524
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -420,7 +420,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
         "title": "Entity already exists",
         "detail": "Cannot create an existing entity",
         "status": 409
@@ -434,7 +434,7 @@ Date: REGEX(.*)
 04. Attempt to create with an entity having a TYPE that is not a string - see error
 ===================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 563
+Content-Length: 562
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -453,7 +453,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
         "title": "Entity already exists",
         "detail": "Cannot create an existing entity",
         "status": 409
@@ -467,7 +467,7 @@ Date: REGEX(.*)
 05. Attempt to create with an entity without TYPE field - see error
 ===================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 587
+Content-Length: 586
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -486,7 +486,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
         "title": "Entity already exists",
         "detail": "Cannot create an existing entity",
         "status": 409
@@ -526,7 +526,7 @@ Date: REGEX(.*)
 07. Attempt to create with an entity with 2 TYPE fields - see error
 ===================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 556
+Content-Length: 555
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -545,7 +545,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
         "title": "Entity already exists",
         "detail": "Cannot create an existing entity",
         "status": 409
@@ -609,7 +609,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E10
 11. Attempt to create entities E10 and E11 - see error for E10, ok for E11
 ==========================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 340
+Content-Length: 339
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -621,7 +621,7 @@ Date: REGEX(.*)
     {
       "entityId": "urn:ngsi-ld:entity:E10",
       "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
         "title": "Entity already exists",
         "detail": "Cannot create an existing entity",
         "status": 409

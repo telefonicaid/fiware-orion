@@ -982,7 +982,7 @@ NGSILD-Tenant: t1
 03. Attempt to create E1,E3,E5 on default tenant and without context - E1 must not be recreated
 ===============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 268
+Content-Length: 267
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -994,7 +994,7 @@ Date: REGEX(.*)
                 "detail": "Cannot create an existing entity",
                 "status": 409,
                 "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
             }
         }
     ],
@@ -1008,7 +1008,7 @@ Date: REGEX(.*)
 04. Attempt to create E2,E4,E6 on T1 tenant and without context - E2 must not be recreated
 ==========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 268
+Content-Length: 267
 Content-Type: application/json
 Date: REGEX(.*)
 NGSILD-Tenant: t1
@@ -1021,7 +1021,7 @@ NGSILD-Tenant: t1
                 "detail": "Cannot create an existing entity",
                 "status": 409,
                 "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
             }
         }
     ],

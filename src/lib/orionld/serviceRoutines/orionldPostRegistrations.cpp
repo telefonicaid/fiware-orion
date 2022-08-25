@@ -65,7 +65,7 @@ bool orionldPostRegistrations(void)
     // mongoLdRegistrationGet takes the req semaphore
     if (mongoLdRegistrationGet(NULL, regId, orionldState.tenantP, &statusCode, &details) == true)
     {
-      orionldError(OrionldBadRequestData, "Registration already exists", regId, 409);
+      orionldError(OrionldAlreadyExists, "Registration already exists", regId, 409);
       return false;
     }
   }

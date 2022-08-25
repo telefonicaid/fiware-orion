@@ -193,7 +193,7 @@ id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 05. Issue a Batch Create attempting to create an entity that already exists, plus one new entity
 ================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 248
+Content-Length: 247
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -205,7 +205,7 @@ Date: REGEX(.*)
                 "detail": "Cannot create an existing entity",
                 "status": 409,
                 "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
             }
         }
     ],
