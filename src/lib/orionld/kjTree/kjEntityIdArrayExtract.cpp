@@ -100,8 +100,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
                       OrionldBadRequestData,
                       "Invalid payload",
                       "Content-Type is 'application/ld+json', but no @context in payload data array item",
-                      400,
-                      false);
+                      400);
       kjChildRemove(entityArray, entityP);
       entityP = next;
       continue;
@@ -116,8 +115,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
                       OrionldBadRequestData,
                       "Invalid payload",
                       "Content-Type is 'application/json', and an @context is present in the payload data array item",
-                      400,
-                      false);
+                      400);
       kjChildRemove(entityArray, entityP);
       entityP = next;
       continue;
@@ -131,8 +129,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
                       OrionldBadRequestData,
                       "Inconsistency between HTTP headers and payload data",
                       "@context present both in Link header and in payload data",
-                      400,
-                      false);
+                      400);
       kjChildRemove(entityArray, entityP);
       entityP = next;
       continue;
@@ -149,8 +146,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
                       OrionldBadRequestData,
                       "invalid payload body",
                       "no details",
-                      400,
-                      false);
+                      400);
       kjChildRemove(entityArray, entityP);
       entityP = next;
       continue;

@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma
+* Author: Ken Zangelin
 */
 
 

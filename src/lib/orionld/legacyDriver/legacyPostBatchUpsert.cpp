@@ -228,7 +228,7 @@ bool legacyPostBatchUpsert(void)
 
     if (entityP->type != KjObject)
     {
-      entityErrorPush(errorsArrayP, "No Entity::id", OrionldBadRequestData, "Invalid Entity", "must be a JSON Object", 400, false);
+      entityErrorPush(errorsArrayP, "No Entity::id", OrionldBadRequestData, "Invalid Entity", "must be a JSON Object", 400);
       kjChildRemove(orionldState.requestTree, entityP);
       entityP = next;
       continue;
@@ -236,7 +236,7 @@ bool legacyPostBatchUpsert(void)
 
     if (entityP->value.firstChildP == NULL)
     {
-      entityErrorPush(errorsArrayP, "No Entity::id", OrionldBadRequestData, "Empty Entity", "must be a non-empty JSON Object", 400, false);
+      entityErrorPush(errorsArrayP, "No Entity::id", OrionldBadRequestData, "Empty Entity", "must be a non-empty JSON Object", 400);
       kjChildRemove(orionldState.requestTree, entityP);
       entityP = next;
       continue;
@@ -262,7 +262,7 @@ bool legacyPostBatchUpsert(void)
     {
       const char* entityId = (idNodeP == NULL)? "No entity::id" : (idNodeP->type == KjString)? idNodeP->value.s : "Invalid entity::id";
 
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400, false);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400);
       kjChildRemove(orionldState.requestTree, entityP);
     }
 
@@ -350,7 +350,7 @@ bool legacyPostBatchUpsert(void)
           // - not added to "removeArray"
           //
           LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayload));
-          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400, false);
+          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400);
           kjChildRemove(incomingTree, entityP);
           continue;
         }
@@ -488,8 +488,7 @@ bool legacyPostBatchUpsert(void)
                         OrionldBadRequestData,
                         "",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400,
-                        false);
+                        400);
     }
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)

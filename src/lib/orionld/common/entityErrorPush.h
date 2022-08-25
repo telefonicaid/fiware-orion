@@ -45,8 +45,7 @@ extern void entityErrorPush
   OrionldResponseErrorType  type,
   const char*               title,
   const char*               detail,
-  int                       status,
-  bool                      avoidDuplicate
+  int                       status
 );
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_

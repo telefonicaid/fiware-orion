@@ -890,6 +890,32 @@ echo
 echo
 
 
+echo "22. Entity must exist"
+echo "====================="
+payload='{
+    "@id": "urn:ngsi-ld:entity:E1",
+    "@type": "123",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 22"
+    }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+payload='{
+    "@id": "urn:ngsi-ld:entity:E2",
+    "@type": "123",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 22"
+    }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
 echo "22. Attempt to update entities with entityOperations using @type invalid - see error"
 echo "===================================================================================="
 payload='[
@@ -1708,7 +1734,7 @@ Date: REGEX(*.)
 15. Attempt to create entities with entityOperations using @id invalid - see error
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 458
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1719,17 +1745,8 @@ Date: REGEX(*.)
       "entityId": "123",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
-        "status": 400
-      }
-    },
-    {
-      "entityId": "123",
-      "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1741,7 +1758,7 @@ Date: REGEX(*.)
 16. Attempt to create entities with entityOperations using @type invalid - see error
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 540
+Content-Length: 550
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1752,8 +1769,8 @@ Date: REGEX(*.)
       "entityId": "urn:ngsi-ld:entity:E1",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "field with invalid type",
-        "detail": "entity::type",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
         "status": 400
       }
     },
@@ -1761,8 +1778,8 @@ Date: REGEX(*.)
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "field with invalid type",
-        "detail": "entity::type",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
         "status": 400
       }
     }
@@ -1774,7 +1791,7 @@ Date: REGEX(*.)
 17. Attempt to create entities with entityOperations using @id and @type invalid - see error
 ============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 458
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1785,17 +1802,8 @@ Date: REGEX(*.)
       "entityId": "123",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
-        "status": 400
-      }
-    },
-    {
-      "entityId": "123",
-      "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1815,11 +1823,11 @@ Date: REGEX(*.)
   "success": [],
   "errors": [
     {
-      "entityId": "no entity::id",
+      "entityId": "No Entity::id",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "mandatory field missing",
-        "detail": "entity::id",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1831,7 +1839,7 @@ Date: REGEX(*.)
 19. Attempt to create entities with entityOperations w/o @type - see error
 ==========================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 576
+Content-Length: 598
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1843,7 +1851,7 @@ Date: REGEX(*.)
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
         "title": "Invalid Entity",
-        "detail": "Mandatory field entity::type is missing",
+        "detail": "no type in incoming payload for CREATION of Entity",
         "status": 400
       }
     },
@@ -1852,7 +1860,7 @@ Date: REGEX(*.)
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
         "title": "Invalid Entity",
-        "detail": "Mandatory field entity::type is missing",
+        "detail": "no type in incoming payload for CREATION of Entity",
         "status": 400
       }
     }
@@ -1872,11 +1880,11 @@ Date: REGEX(*.)
   "success": [],
   "errors": [
     {
-      "entityId": "no entity::id",
+      "entityId": "No Entity::id",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "mandatory field missing",
-        "detail": "entity::id",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1888,7 +1896,7 @@ Date: REGEX(*.)
 21. Attempt to update entities with entityOperations using @id invalid - see error
 ==================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 458
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1899,17 +1907,8 @@ Date: REGEX(*.)
       "entityId": "123",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
-        "status": 400
-      }
-    },
-    {
-      "entityId": "123",
-      "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1918,10 +1917,26 @@ Date: REGEX(*.)
 
 
 
+22. Entity must exist
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(*.)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(*.)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+
+
+
 22. Attempt to update entities with entityOperations using @type invalid - see error
 ====================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 540
+Content-Length: 550
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1932,8 +1947,8 @@ Date: REGEX(*.)
       "entityId": "urn:ngsi-ld:entity:E1",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "field with invalid type",
-        "detail": "entity::type",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
         "status": 400
       }
     },
@@ -1941,8 +1956,8 @@ Date: REGEX(*.)
       "entityId": "urn:ngsi-ld:entity:E2",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "field with invalid type",
-        "detail": "entity::type",
+        "title": "The Entity Type must be a JSON String",
+        "detail": "Int",
         "status": 400
       }
     }
@@ -1954,7 +1969,7 @@ Date: REGEX(*.)
 23. Attempt to update entities with entityOperations using @id and @type invalid - see error
 ============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 458
+Content-Length: 257
 Content-Type: application/json
 Date: REGEX(*.)
 
@@ -1965,17 +1980,8 @@ Date: REGEX(*.)
       "entityId": "123",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
-        "status": 400
-      }
-    },
-    {
-      "entityId": "123",
-      "error": {
-        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "Not a URI",
-        "detail": "123",
+        "title": "Invalid URI",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -1995,11 +2001,11 @@ Date: REGEX(*.)
   "success": [],
   "errors": [
     {
-      "entityId": "no entity::id",
+      "entityId": "No Entity::id",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "mandatory field missing",
-        "detail": "entity::id",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -2019,11 +2025,11 @@ Date: REGEX(*.)
   "success": [],
   "errors": [
     {
-      "entityId": "no entity::id",
+      "entityId": "No Entity::id",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "mandatory field missing",
-        "detail": "entity::id",
+        "title": "Mandatory field missing",
+        "detail": "Entity::id",
         "status": 400
       }
     }
@@ -2035,21 +2041,12 @@ Date: REGEX(*.)
 26. Attempt to upsert - options=update - entities with entityOperations using @id invalid - see error
 =====================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 317
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "123",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Invalid URI",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "123",
             "error": {
@@ -2099,21 +2096,12 @@ Date: REGEX(*.)
 28. Attempt to upsert - options=update - entities with entityOperations using @id and @type invalid - see error
 ===============================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 317
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "123",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Invalid URI",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "123",
             "error": {
@@ -2131,21 +2119,12 @@ Date: REGEX(*.)
 29. Attempt to upsert - options=update - entities with entityOperations w/o @id - see error
 ===========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 361
+Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "No Entity::id",
             "error": {
@@ -2195,21 +2174,12 @@ Date: REGEX(*.)
 31. Attempt to upsert - options=update - entities with entityOperations w/o @id and @type - see error
 =====================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 361
+Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "No Entity::id",
             "error": {
@@ -2227,21 +2197,12 @@ Date: REGEX(*.)
 32. Attempt to upsert - options=replace - entities with entityOperations using @id invalid - see error
 ======================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 317
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "123",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Invalid URI",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "123",
             "error": {
@@ -2291,21 +2252,12 @@ Date: REGEX(*.)
 34. Attempt to upsert - options=replace - entities with entityOperations using @id and @type invalid - see error
 ================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 317
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "123",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Invalid URI",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "123",
             "error": {
@@ -2323,21 +2275,12 @@ Date: REGEX(*.)
 35. Attempt to upsert - options=replace - entities with entityOperations w/o @id - see error
 ============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 361
+Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "No Entity::id",
             "error": {
@@ -2387,21 +2330,12 @@ Date: REGEX(*.)
 37. Attempt to upsert - options=replace - entities with entityOperations w/o @id and @type - see error
 ======================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 361
+Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
     "errors": [
-        {
-            "entityId": "No Entity::id",
-            "error": {
-                "detail": "Entity::id",
-                "status": 400,
-                "title": "Mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
         {
             "entityId": "No Entity::id",
             "error": {

@@ -114,7 +114,7 @@ Date: REGEX(.*)
 02. Attempt to change entity type of entity urn:E1 in a batch update operation
 ==============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 224
+Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -123,9 +123,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:E1",
             "error": {
-                "detail": "https://uri.etsi.org/ngsi-ld/default-context/T2",
+                "detail": "the Entity Type cannot be altered",
                 "status": 400,
-                "title": "non-matching entity type",
+                "title": "Invalid Entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }

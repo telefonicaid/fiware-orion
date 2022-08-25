@@ -4,4 +4,6 @@
 * Issue #280  Bug fix: getting lastNotification, lastSuccess, lastFailure from DB in when refreshing the subscription cache
 * Issue #280  TRoE for PUT /entities/{entityId}
 * Issue #280  Reimplementation of BATCH Upsert, using the new mongo driver (mongoc) - only used if -experimental is set
+* Issue #280  Reimplementation of BATCH Update, using the new mongo driver (mongoc) - only used if -experimental is set
+* Issue #280  Reimplementation of BATCH Create, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280  Better health check - before accepting, a connection to the mongo server is done (and postgres if troe is enabled)
