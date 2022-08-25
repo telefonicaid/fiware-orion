@@ -128,8 +128,10 @@ extern "C"
 #include "orionld/orionRestServices.h"
 #include "orionld/orionldRestServices.h"
 
+#include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
+#include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
 
@@ -1166,16 +1168,35 @@ int main(int argC, char* argV[])
   LM_I(("Startup completed"));
   orionldPhase = OrionldPhaseServing;
 
-  if (simulatedNotification)
-    LM_W(("simulatedNotification is 'true', outgoing notifications NGSIv2 won't be sent"));
+  //
+  // Get the version of the mongo server (could be in mongocInit instead)
+  //
+  if (mongocServerVersionGet(mongocServerVersion) == false)
+    LM_X(1, ("Unable to contact the MongoDB Server"));
 
-  LM_K(("Initialization ready - accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
+  if (troe)
+  {
+    extern bool pgVersionGet(char* versionString, int versionStringSize);
+    if (pgVersionGet(postgresServerVersion, sizeof(postgresServerVersion)) == false)
+      LM_X(1, ("Unable to contact the Postgres Server"));
+  }
+
+  LM_K(("Initialization is Done"));
+  LM_K(("  Accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
+  LM_K(("  TRoE:                    %s", (troe          == true)? "Enabled" : "Disabled"));
+  LM_K(("  Forwarding:              %s", (forwarding    == true)? "Enabled" : "Disabled"));
+  LM_K(("  Health Check:            %s", (socketService == true)? "Enabled" : "Disabled"));
+  LM_K(("  Mongo Driver:            %s", (experimental  == true)? "mongoc driver (partially)" : "Legacy C++ Driver"));
+  LM_K(("  Mongo Server Version:    %s", mongocServerVersion));
+  if (troe)
+    LM_K(("  Postgres Server Version: %s", postgresServerVersion));
 
   if (mongocOnly == true)
-    LM_K(("The MongoDB C++ Legacy Driver is DISABLED - careful ... only a subset of the requests work in this mode"));
+    LM_K(("  The MongoDB C++ Legacy Driver is DISABLED - careful ... only a subset of the requests work in this mode"));
 
   // Startup is done - we can free up the allocated kalloc buffers - assuming socketService doesn't use kalloc ...
   kaBufferReset(&orionldState.kalloc, KFALSE);
+
 
   if (socketService == true)
   {

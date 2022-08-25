@@ -42,6 +42,55 @@ extern int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, 
 
 // -----------------------------------------------------------------------------
 //
+// curlSaveForLaterCleanup -
+//
+static void curlSaveForLaterCleanup(CURL* curlHandleP, struct curl_slist* headersP)
+{
+  if (orionldState.easyV == NULL)
+  {
+    orionldState.easyV    = (CURL**) malloc(10 * sizeof(CURL*));
+    orionldState.easySize = 10;
+    orionldState.easyIx   = 0;
+  }
+  else if (orionldState.easyIx >= orionldState.easySize)
+  {
+    orionldState.easySize += 10;
+    CURL** easyV           = (CURL**) realloc(orionldState.easyV,  orionldState.easySize * sizeof(CURL*));;
+
+    if (easyV == NULL)
+      LM_X(1, ("Out of memory allocating %d curl easy handles", orionldState.easySize));
+
+    orionldState.easyV = easyV;
+  }
+
+  orionldState.easyV[orionldState.easyIx] = curlHandleP;
+  ++orionldState.easyIx;
+
+  if (orionldState.curlHeadersV == NULL)
+  {
+    orionldState.curlHeadersV    = (struct curl_slist**) malloc(10 * sizeof(struct curl_slist*));
+    orionldState.curlHeadersSize = 10;
+    orionldState.curlHeadersIx   = 0;
+  }
+  else if (orionldState.curlHeadersIx >= orionldState.curlHeadersSize)
+  {
+    orionldState.curlHeadersSize += 10;
+    struct curl_slist**  headers   = (struct curl_slist**) realloc(orionldState.curlHeadersV, orionldState.curlHeadersSize * sizeof(struct curl_slist*));
+
+    if (headers == NULL)
+      LM_X(1, ("Out of memory allocating %d curl header slots", orionldState.curlHeadersSize));
+
+    orionldState.curlHeadersV = headers;
+  }
+
+  orionldState.curlHeadersV[orionldState.curlHeadersIx] = headersP;
+  ++orionldState.curlHeadersIx;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // httpsNotify -
 //
 int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp, CURL** curlHandlePP)
@@ -75,7 +124,6 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
     return -1;
   }
 
-
   //
   // URL, Verb, ...
   //
@@ -91,7 +139,7 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
   curl_easy_setopt(curlHandleP, CURLOPT_SSL_VERIFYHOST, 0L);                   // DO NOT verify the certificate's name against host
 
   //
-  // HTTP Headers
+  // HTTP Headers -
   //
   struct curl_slist* headers = NULL;
   for (int ix = 1; ix < ioVecLen - 2; ix++)
@@ -105,6 +153,8 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
   }
   curl_easy_setopt(curlHandleP, CURLOPT_HTTPHEADER, headers);
 
+  // Must remember the curl easy handle and the slist for later cleanup
+  curlSaveForLaterCleanup(curlHandleP, headers);
 
   //
   // Payload Body

@@ -73,6 +73,7 @@ SET (SOURCES
     pgConnectionPoolCreate.cpp
     pgConnectionPoolInsert.cpp
     pgConnectionPoolInit.cpp
+    pgVersionGet.cpp
 )
 
 SET (HEADERS

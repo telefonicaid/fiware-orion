@@ -31,20 +31,19 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
-#include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
-#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
-#include "orionld/mongoc/mongocTenantsGet.h"                     // Own interface
+#include "orionld/mongoc/mongocServerVersionGet.h"               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocTenantsGet -
+// mongocServerVersionGet -
 //
-bool mongocTenantsGet(void)
+bool mongocServerVersionGet(char* serverVersionBuf)
 {
   bson_t        command;
   bson_t        reply;
@@ -55,7 +54,7 @@ bool mongocTenantsGet(void)
 
   mongocConnectionGet();
 
-  bson_append_int32(&command, "listDatabases", 13, 1);
+  bson_append_int32(&command, "buildinfo", 9, 1);
 
   bool b = mongoc_client_read_command_with_opts(orionldState.mongoc.client, "admin", &command, NULL, NULL, &reply, &mcError);
   if (b == false)
@@ -71,31 +70,12 @@ bool mongocTenantsGet(void)
   if (responseP == NULL)
     return false;
 
-  KjNode* databasesP = kjLookup(responseP, "databases");
-  if (databasesP == NULL)
+  KjNode* versionNodeP = kjLookup(responseP, "version");
+
+  if ((versionNodeP == NULL) || (versionNodeP->type != KjString))
     return false;
 
-  for (KjNode* dbP = databasesP->value.firstChildP; dbP != NULL; dbP = dbP->next)
-  {
-    KjNode* nameP = kjLookup(dbP, "name");
-
-    if (nameP == NULL)
-      continue;
-    if (nameP->type != KjString)
-      continue;
-
-    if (strncmp(nameP->value.s, dbName, dbNameLen) == 0)
-    {
-      // The prefix matches, now '-' + tenant
-      if ((nameP->value.s[dbNameLen] == '-') && (nameP->value.s[dbNameLen + 1] != 0))
-      {
-        char* tenantName = &nameP->value.s[dbNameLen + 1];
-
-        if (orionldTenantLookup(tenantName) == NULL)
-          orionldTenantCreate(tenantName);
-      }
-    }
-  }
+  strcpy(serverVersionBuf, versionNodeP->value.s);
 
   return true;
 }

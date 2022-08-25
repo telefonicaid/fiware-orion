@@ -345,6 +345,9 @@ typedef struct OrionldConnectionState
   bool                    useMalloc;         // allocate using kalloc or malloc?
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;           // Used by kjTreeFromBsonObj
+  OrionldPrefixCache      prefixCache;
+  OrionldResponseBuffer   httpResponse;
+
 
 #if 0
   //
@@ -372,10 +375,18 @@ typedef struct OrionldConnectionState
   //
   OrionldAlteration*      alterations;
   OrionldAlteration*      alterationsTail;
-  CURLM*                  multiP;                // curl multi api
 
-  OrionldPrefixCache      prefixCache;
-  OrionldResponseBuffer   httpResponse;
+  //
+  // CURL Handles + Headers Lists
+  //
+  CURLM*                  multiP;                // curl multi api
+  CURL**                  easyV;
+  int                     easySize;
+  int                     easyIx;
+  struct curl_slist**     curlHeadersV;
+  int                     curlHeadersSize;
+  int                     curlHeadersIx;
+
 
   //
   // MongoDB stuff - Context Cache uses mongoc regardless of which mongo client lib is in use
@@ -584,6 +595,8 @@ extern mongoc_collection_t*  mongoRegistrationsCollectionP;  // Deprecated
 extern mongoc_uri_t*          mongocUri;
 extern mongoc_client_pool_t*  mongocPool;
 extern sem_t                  mongocContextsSem;
+extern char                   mongocServerVersion[128];
+extern char                   postgresServerVersion[128];
 
 
 
