@@ -161,7 +161,7 @@ static QNode* qCheck(char* qString)
 //
 // apiEntityToGeoJson - transform an API Entity into a GEOJSON Entity
 //
-static KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPropertyFromProjection)
+KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPropertyFromProjection)
 {
   KjNode* propertiesP = kjObject(orionldState.kjsonP, "properties");
 
@@ -383,6 +383,7 @@ bool orionldGetEntities(void)
     {
       next = dbEntityP->next;
 
+      // Must remove dbEntityP from dbEntityArray as dbEntityP gets transformed into apiEntityP and then inserted into featuresP
       kjChildRemove(dbEntityArray, dbEntityP);
 
       KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, &orionldState.pd);

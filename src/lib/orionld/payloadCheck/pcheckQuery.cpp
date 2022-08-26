@@ -199,7 +199,7 @@ bool pcheckQuery(KjNode* tree, KjNode** entitiesPP, KjNode** attrsPP, QNode** qT
     return false;
   if ((qP != NULL) && ((*qTreePP = pcheckQ(qP->value.s)) == NULL))
     return false;
-  if ((geoqP != NULL) && (pcheckGeoQ(geoqP, NULL, false) == false))
+  if ((geoqP != NULL) && (pcheckGeoQ(geoqP, false) == NULL))
     return false;
 
   return true;

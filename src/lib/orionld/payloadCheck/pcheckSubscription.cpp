@@ -160,8 +160,10 @@ bool pcheckSubscription
       DUPLICATE_CHECK(geoqP, "geoQ", nodeP);
       OBJECT_CHECK(nodeP, "geoQ");
       EMPTY_OBJECT_CHECK(nodeP, "geoQ");
-      if (pcheckGeoQ(nodeP, geoCoordinatesPP, true) == false)
+      OrionldGeoInfo* geoInfoP = pcheckGeoQ(nodeP, true);
+      if (geoInfoP == NULL)
         return false;
+      *geoCoordinatesPP = geoInfoP->coordinates;
       *geoqPP = geoqP;
     }
     else if (strcmp(nodeP->name, "csf") == 0)

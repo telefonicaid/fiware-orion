@@ -63,6 +63,7 @@ SET (SOURCES
      pcheckRegistration.cpp
      pcheckSubscription.cpp
      pcheckTimeInterval.cpp
+     pCheckQuery.cpp
 )
 
 # Include directories

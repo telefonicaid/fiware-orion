@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                            // dotForEq
 #include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/types/OrionldGeometry.h"                      // OrionldGeometry
+#include "orionld/types/OrionldGeoInfo.h"                       // OrionldGeoInfo
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pCheckGeometry.h"                // pCheckGeometry
@@ -51,94 +52,96 @@ extern "C"
 //
 // pcheckGeoQ -
 //
-bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscription)
+OrionldGeoInfo* pcheckGeoQ(KjNode* geoqNodeP, bool isSubscription)
 {
   KjNode*          geometryP    = NULL;
   KjNode*          coordinatesP = NULL;
   KjNode*          georelP      = NULL;
   KjNode*          geopropertyP = NULL;
-  OrionldGeometry  geometry;
+  OrionldGeoInfo*  geoInfoP     = (OrionldGeoInfo*) kaAlloc(&orionldState.kalloc, sizeof(OrionldGeoInfo));
+
+  if (geoInfoP == NULL)
+  {
+    orionldError(OrionldInternalError, "Out of memory", "allocating OrionldGeoInfo", 500);
+    return NULL;
+  }
 
   for (KjNode* itemP = geoqNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     if (strcmp(itemP->name, "geometry") == 0)
     {
-      DUPLICATE_CHECK(geometryP, "geometry", itemP);
-      STRING_CHECK(geometryP, "the 'geometry' field of a GeoJSON object must be a JSON String");
+      DUPLICATE_CHECK_R(geometryP, "geometry", itemP, NULL);
+      STRING_CHECK_R(geometryP, "the 'geometry' field of a GeoJSON object must be a JSON String", NULL);
     }
     else if (strcmp(itemP->name, "coordinates") == 0)
     {
-      DUPLICATE_CHECK(coordinatesP, "coordinates", itemP);
-      PCHECK_STRING_OR_ARRAY(coordinatesP, 0, "Invalid Data Type", "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)", 400);
+      DUPLICATE_CHECK_R(coordinatesP, "coordinates", itemP, NULL);
+      PCHECK_STRING_OR_ARRAY_R(coordinatesP, 0, "Invalid Data Type", "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)", 400, NULL);
     }
     else if (strcmp(itemP->name, "georel") == 0)
     {
-      DUPLICATE_CHECK(georelP, "georel", itemP);
-      STRING_CHECK(georelP, "the 'georel' field of a GeoJSON object must be a JSON String");
+      DUPLICATE_CHECK_R(georelP, "georel", itemP, NULL);
+      STRING_CHECK_R(georelP, "the 'georel' field of a GeoJSON object must be a JSON String", NULL);
     }
     else if (strcmp(itemP->name, "geoproperty") == 0)
     {
-      DUPLICATE_CHECK(geopropertyP, "geoproperty", itemP);
-      STRING_CHECK(geopropertyP, "the 'geoproperty' field of a GeoJSON object must be a JSON String");
+      DUPLICATE_CHECK_R(geopropertyP, "geoproperty", itemP, NULL);
+      STRING_CHECK_R(geopropertyP, "the 'geoproperty' field of a GeoJSON object must be a JSON String", NULL);
     }
     else
     {
       orionldError(OrionldBadRequestData, "Invalid Payload Data - invalid field in geoQ", itemP->name, 400);
-      return false;
+      return NULL;
     }
   }
 
   if (geometryP == NULL)
   {
     orionldError(OrionldBadRequestData, "Invalid Payload Data", "mandatory geoQ field 'geometry' is missing", 400);
-    return false;
+    return NULL;
   }
 
   if (coordinatesP == NULL)
   {
     orionldError(OrionldBadRequestData, "Invalid Payload Data", "mandatory geoQ field 'coordinates' is missing", 400);
-    return false;
+    return NULL;
   }
 
   if (georelP == NULL)
   {
     orionldError(OrionldBadRequestData, "Invalid Payload Data", "mandatory geoQ field 'georel' is missing", 400);
-    return false;
+    return NULL;
   }
 
-  if (pCheckGeometry(geometryP->value.s, &geometry, isSubscription) == false)
+  if (pCheckGeometry(geometryP->value.s, &geoInfoP->geometry, isSubscription) == false)
   {
     // orionldError(OrionldBadRequestData, "Invalid Payload Data", detail, 400);
-    return false;
+    return NULL;
   }
 
   if (coordinatesP->type == KjString)
   {
-    coordinatesP = kjParse(orionldState.kjsonP, coordinatesP->value.s);
-    if (coordinatesP == NULL)
+    geoInfoP->coordinates = kjParse(orionldState.kjsonP, coordinatesP->value.s);
+    if (geoInfoP->coordinates == NULL)
     {
       orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' as string is not a valid JSON Array", 400);
-      return false;
+      return NULL;
     }
   }
+  else
+    geoInfoP->coordinates = coordinatesP;
 
-  if (pCheckGeoCoordinates(coordinatesP, geometry) == false)
+  if (pCheckGeoCoordinates(geoInfoP->coordinates, geoInfoP->geometry) == false)
   {
     //
     // Not overwriting - putting the call to orionldError back once I have error stacking
     // orionldError(OrionldBadRequestData, "Invalid Payload Data", "invalid coordinates", 400);
     //
-    return false;
+    return NULL;
   }
 
-  if (geoCoordinatesPP != NULL)
-    *geoCoordinatesPP = coordinatesP;
-
-  OrionldGeoInfo geoInfo;
-
-  geoInfo.geometry = geometry;
-  if (pCheckGeorel(georelP, &geoInfo) == false)
-    return false;  // pCheckGeorel calls orionldError
+  if (pCheckGeorel(georelP, geoInfoP) == false)
+    return NULL;  // pCheckGeorel calls orionldError
 
   //
   // If geoproperty has been given, the name must be expanded
@@ -160,7 +163,9 @@ bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool isSubscriptio
       //
       dotForEq(geopropertyP->value.s);
     }
+
+    geoInfoP->geoProperty = geopropertyP->value.s;
   }
 
-  return true;
+  return geoInfoP;
 }

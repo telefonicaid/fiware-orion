@@ -32,8 +32,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                    // LM_*
 
-#include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/common/orionldState.h"                      // orionldState
+#include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
 #include "orionld/payloadCheck/pCheckUri.h"                   // pCheckUri
 
@@ -112,6 +112,23 @@ do                                                                              
     return false;                                                                            \
   }                                                                                          \
 } while (0)
+
+
+
+#define PCHECK_STRING_OR_ARRAY_R(kNodeP, _type, _title, detail, status, retVal)              \
+do                                                                                           \
+{                                                                                            \
+  if ((kNodeP->type != KjArray) && (kNodeP->type != KjString))                               \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON String nor Array"   : _title;          \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return retVal;                                                                           \
+  }                                                                                          \
+} while (0)
+
+
 
 // -----------------------------------------------------------------------------
 //

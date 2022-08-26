@@ -53,6 +53,7 @@ SET (SOURCES
     mongocServerVersionGet.cpp
     mongocEntitiesExist.cpp
     mongocEntitiesDelete.cpp
+    mongocEntitiesQuery2.cpp
 )
 
 # Include directories
