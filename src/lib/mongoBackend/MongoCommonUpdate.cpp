@@ -1832,7 +1832,7 @@ static bool processOnChangeConditionForUpdateContext
     {
       for (unsigned int jx = 0; jx < attrL.size(); jx++)
       {
-        if (caP->name == attrL[jx] && !caP->skip)
+        if (caP->name == attrL[jx])
         {
           /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
            * cer.entity destructor does release() on the attrs vector */
