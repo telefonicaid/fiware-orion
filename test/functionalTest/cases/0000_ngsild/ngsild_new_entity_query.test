@@ -33,21 +33,37 @@ brokerStart CB 0 IPv4 -experimental
 #
 # 00. Create 100 Entities
 # 01. Type filter - query with type T0 - see entity E01
+# 01b Same same but with POST Query
 # 02. type filter - query with type T0,T1 - see entities E01-E03
+# 02b Same same but with POST Query
 # 03. Type filter - query with type T1,T2,T3 - see entities E02-E07
+# 03b Same same but with POST Query
 # 04. Default Limit of 20 - query with type T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20 - see E02-E21 due to limit defaults to 20
+# 04b Same same but with POST Query
 # 05. Offset - query with type T1-T20 and offset=10 - see E12-E31
+# 05b Same same but with POST Query
 # 06. Limit - query with type T1-T20 and offset=10 and limit=4 - see E12-E15
+# 06b Same same but with POST Query
 # 07. Sysattrs - query with type T1 and options=sysAttrs - see timestamps
+# 07b Same same but with POST Query
 # 08. Context - query with type T1 and Accept ld+json - see @context in payload body
+# 08b Same same but with POST Query
 # 09. Count - query with type T1, limit=1 and set count - see 2 entities in header, one in payload body
+# 09b Same same but with POST Query
 # 10. Count - query with type T0,T1,T2,T9, limit=0 and set count - see 7 entities in header, none in payload body
+# 10b Same same but with POST Query
 # 11. Count - query with type T0, limit=0, and without count - see error
+# 11b Same same but with POST Query
 # 12. Concise Representation
+# 12b Same same but with POST Query
 # 13. Normalized Representation
+# 13b Same same but with POST Query
 # 14. Simplified Representation
+# 14b Same same but with POST Query
 # 15. keyValues Representation
+# 15b Same same but with POST Query
 # 16. local=true
+# 16b Same same but with POST Query
 #
 
 echo "00. Create 100 Entities"
@@ -77,6 +93,21 @@ echo
 echo "01. Type filter - query with type T1 - see entity E01"
 echo "====================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T0&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "01b. Same same but with POST Query"
+echo "=================================="
+payload='{
+  "type": "Query",
+  "entities": [
+    {
+      "type": "T0"
+    }
+  ]  
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&spaces=2' --noPayloadCheck --payload "$payload"
 echo
 echo
 
@@ -293,6 +324,27 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E100
 
 01. Type filter - query with type T1 - see entity E01
 =====================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E01",
+    "type": "T0",
+    "A1": {
+      "type": "Property",
+      "value": "E1:A1"
+    }
+  }
+]
+
+
+
+01b. Same same but with POST Query
+==================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json

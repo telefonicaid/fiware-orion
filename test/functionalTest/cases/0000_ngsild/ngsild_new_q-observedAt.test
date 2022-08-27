@@ -39,6 +39,7 @@ brokerStart CB 212-249
 # 02. Create E2 with type T and attr A=2, and observedAt="2018-01-14"
 # 03. Create E3 with type T and attr A="String 1", and observedAt="2018-01-15"
 # 04. GET all entities with observedAt==2018-01-13 - see E1
+# 05. POST Query for all entities with observedAt==2018-01-13 - see E1
 #
 
 echo '01. Create E1 with type T and attr A=1, and observedAt="2018-01-13"'
@@ -96,6 +97,22 @@ echo
 echo
 
 
+echo "05. POST Query for all entities with observedAt==2018-01-13 - see E1"
+echo "===================================================================="
+payload='{
+  "type": "Query",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "A.observedAt==2018-01-13"
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create E1 with type T and attr A=1, and observedAt="2018-01-13"
 ===================================================================
@@ -126,6 +143,27 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 
 04. GET all entities with observedAt==2018-01-13 - see E1
 =========================================================
+HTTP/1.1 200 OK
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A": {
+            "observedAt": "2018-01-13T00:00:00.000Z",
+            "type": "Property",
+            "value": 1
+        },
+        "id": "http://a.b.c/entity/E1",
+        "type": "T"
+    }
+]
+
+
+05. POST Query for all entities with observedAt==2018-01-13 - see E1
+====================================================================
 HTTP/1.1 200 OK
 Content-Length: 118
 Content-Type: application/json
