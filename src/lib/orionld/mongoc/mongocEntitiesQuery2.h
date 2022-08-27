@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY2_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY2_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,25 +25,34 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldAttributeExpand -
+// mongocEntitiesQuery2 -
 //
-// This function expands unless:
-//   - has already been expanded
-//   - is a special attribute such as location, datasetId, ...
+// Four parameters are passed via orionldState:
+// - orionldState.uriParams.offset  (URL parameter)
+// - orionldState.uriParams.limit   (URL parameter)
+// - orionldState.uriParams.count   (URL parameter)
+// - orionldState.tenantP           (HTTP header)
 //
-extern char* orionldAttributeExpand
+extern KjNode* mongocEntitiesQuery2
 (
-  OrionldContext*       contextP,
-  char*                 shortName,
-  bool                  useDefaultUrlIfNotFound,
-  OrionldContextItem**  contextItemPP
+  KjNode*          entitySelectorP,
+  KjNode*          attrsArray,
+  QNode*           qTree,
+  OrionldGeoInfo*  geoInfoP,
+  char*            lang,
+  int64_t*         countP
 );
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY2_H_

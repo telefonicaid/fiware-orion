@@ -786,7 +786,7 @@ NGSILD-Tenant: t1
 03. Batch Create entity E1+E3 on default tenant and without context - E1 already exists, E3 OK
 ==============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 244
+Content-Length: 243
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -798,7 +798,7 @@ Date: REGEX(.*)
                 "detail": "Cannot create an existing entity",
                 "status": 409,
                 "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
             }
         }
     ],
@@ -811,7 +811,7 @@ Date: REGEX(.*)
 04. Batch Create entity E2+E4 on T1 tenant and without context - E2 already exists, E4 OK
 =========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 244
+Content-Length: 243
 Content-Type: application/json
 Date: REGEX(.*)
 NGSILD-Tenant: t1
@@ -824,7 +824,7 @@ NGSILD-Tenant: t1
                 "detail": "Cannot create an existing entity",
                 "status": 409,
                 "title": "Entity already exists",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+                "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
             }
         }
     ],

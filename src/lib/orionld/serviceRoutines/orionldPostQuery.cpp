@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,28 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjObject, kjArray, ...
-#include "kalloc/kaStrdup.h"                                   // kaStrdup
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjArray, ...
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
-#include "orionld/kjTree/kjEntityNormalizedToSimplified.h"     // kjEntityNormalizedToSimplified
-#include "orionld/payloadCheck/pcheckQuery.h"                  // pcheckQuery
-#include "orionld/db/dbConfiguration.h"                        // dbEntitiesQuery
-#include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
-#include "orionld/serviceRoutines/orionldPostQuery.h"          // Own Interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/TreeNode.h"                              // TreeNode
+#include "orionld/legacyDriver/legacyPostQuery.h"                // legacyPostQuery
+#include "orionld/payloadCheck/pCheckQuery.h"                    // pCheckQuery
+#include "orionld/mongoc/mongocEntitiesQuery2.h"                 // mongocEntitiesQuery2
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity2
+#include "orionld/serviceRoutines/orionldPostQuery.h"            // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// apiEntityToGeoJson - FIXME: Own module in orionld/common
+//
+extern KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPropertyFromProjection);
 
 
 
@@ -51,72 +54,102 @@ extern "C"
 //
 // orionldPostQuery -
 //
-// POST /ngsi-ld/v1/entityOperations/query
-//
 bool orionldPostQuery(void)
 {
-  if (orionldState.requestTree->type != KjObject)
-  {
-    orionldError(OrionldBadRequestData, "Bad Request", "The payload data for POST Query must be a JSON Object", 400);
-    return false;
-  }
+  if ((experimental == false) || (orionldState.in.legacy != NULL))  // If Legacy header - use old implementation
+    return legacyPostQuery();
 
-  KjNode*  entitiesP = NULL;
-  KjNode*  attrsP    = NULL;
-  QNode*   qTree     = NULL;
-  KjNode*  geoqP     = NULL;
-  char*    lang      = NULL;
-
-  // pcheckQuery makes sure the Payload Data is correct and it expands all fields that should be expanded
-  if (pcheckQuery(orionldState.requestTree, &entitiesP, &attrsP, &qTree, &geoqP, &lang) == false)
+  TreeNode* treeNodeV = pCheckQuery(orionldState.requestTree);
+  if (treeNodeV == NULL)
     return false;
 
-  int      count  = 0;
-  int      limit  = orionldState.uriParams.limit;
-  int      offset = orionldState.uriParams.offset;
-  int*     countP = (orionldState.uriParams.count == true)? &count : NULL;
-  KjNode*  dbEntityArray;
-
-  if ((dbEntityArray = dbEntitiesQuery(entitiesP, attrsP, qTree, geoqP, limit, offset, countP)) == NULL)
-  {
-    // Not an error - just "nothing found" - return an empty array
-    orionldState.responsePayload = (char*) "[]";
-    if (countP != NULL)
-      orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, 0);
-
-    return true;
-  }
+  LM(("QNode tree at %p", treeNodeV[3].output));
 
   //
-  // Now the "raw db entities" must be fixed.
-  // Also, do we need another field in the payload for filtering out which attrs to be returned???
+  // pCheckQuery has left us everything checked and expanded.
+  // Now we need to transform stuff so that we can call mongocEntitiesQuery
+  // Actually, we can't use mongocEntitiesQuery, unfortunately, because:
+  //   POST Query    has EntitySelector
+  //   GET Entities  has typeList+idList
+  // and they are not compatible :(((
   //
-  orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
 
-  if (dbEntityArray->value.firstChildP != NULL)
+  //
+  // Getting the relevant values from the output from pCheckQuery
+  // Four parameters are passed via orionldState:
+  // - orionldState.uriParams.offset  (URL parameter)
+  // - orionldState.uriParams.limit   (URL parameter)
+  // - orionldState.uriParams.count   (URL parameter)
+  // - orionldState.tenantP           (HTTP header)
+  //
+  int64_t          count;
+  KjNode*          entitySelectorP = treeNodeV[1].nodeP;
+  KjNode*          attrsArray      = treeNodeV[2].nodeP;
+  QNode*           qTree           = (QNode*) treeNodeV[3].output;
+  OrionldGeoInfo*  geoInfoP        = (OrionldGeoInfo*) treeNodeV[4].output;
+  char*            lang            = (treeNodeV[9].nodeP != NULL)? treeNodeV[9].nodeP->value.s : NULL;
+  KjNode*          dbEntityArray   = mongocEntitiesQuery2(entitySelectorP, attrsArray, qTree, geoInfoP, lang, &count);
+
+  //
+  // The post-processing (after the call to mongoc query entities) I simply copied from orionldGetEntities()
+  //
+  if (dbEntityArray == NULL)
+    return false;
+
+  KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+  RenderFormat  rf              = RF_NORMALIZED;
+
+  if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
+  else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
+
+  if (orionldState.out.contentType == GEOJSON)
   {
-    for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
+    KjNode* geojsonToplevelP = kjObject(orionldState.kjsonP, NULL);
+    KjNode* featuresP        = kjArray(orionldState.kjsonP, "features");  // this is where all entities go
+    KjNode* typeP            = kjString(orionldState.kjsonP, "type", "FeatureCollection");
+
+    kjChildAdd(geojsonToplevelP, typeP);
+    kjChildAdd(geojsonToplevelP, featuresP);
+
+    orionldState.responseTree = geojsonToplevelP;
+
+    KjNode* dbEntityP = dbEntityArray->value.firstChildP;
+    KjNode* next;
+
+    while (dbEntityP != NULL)
     {
-      KjNode*                entityP;
-      OrionldProblemDetails  pd;
+      next = dbEntityP->next;
 
-      if ((entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, lang, &pd)) == NULL)
-      {
-        LM_E(("Database Error (%s: %s)", pd.title, pd.detail));
-        orionldState.httpStatusCode = 500;
-        return false;
-      }
+      // Must remove dbEntityP from dbEntityArray as dbEntityP gets transformed into apiEntityP and then inserted into featuresP
+      kjChildRemove(dbEntityArray, dbEntityP);
 
-      kjChildAdd(orionldState.responseTree, entityP);
+      KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, &orionldState.pd);
+      const char* geometryPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+      KjNode*     geometryNodeP        = kjLookup(apiEntityP, geometryPropertyName);
+
+      apiEntityP = apiEntityToGeoJson(apiEntityP, geometryNodeP, orionldState.geoPropertyFromProjection);
+      kjChildAdd(featuresP, apiEntityP);
+
+      dbEntityP = next;
     }
   }
   else
-    orionldState.noLinkHeader = true;
+  {
+    orionldState.responseTree = apiEntityArray;
 
-  orionldState.httpStatusCode = 200;
+    for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
+    {
+      KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, &orionldState.pd);
+      kjChildAdd(apiEntityArray, apiEntityP);
+    }
+  }
 
-  if (countP != NULL)
+  if (orionldState.uriParams.count == true)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
+
+  // If empty result array, no Link header is needed
+  if (orionldState.responseTree->value.firstChildP == NULL)
+    orionldState.noLinkHeader = true;
 
   return true;
 }

@@ -7,4 +7,5 @@
 * Issue #280  Reimplementation of BATCH Update, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280  Reimplementation of BATCH Create, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280  Reimplementation of BATCH Delete, using the new mongo driver (mongoc) - only used if -experimental is set
+* Issue #280  Reimplementation of BATCH Query, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280  Better health check - before accepting, a connection to the mongo server is done (and postgres if troe is enabled)

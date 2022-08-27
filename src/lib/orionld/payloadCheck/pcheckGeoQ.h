@@ -30,12 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
+
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckGeoQ -
 //
-extern bool pcheckGeoQ(KjNode* geoqNodeP, KjNode** geoCoordinatesPP, bool pCheckGeoGeometry);
+extern OrionldGeoInfo* pcheckGeoQ(KjNode* geoqNodeP, bool pCheckGeoGeometry);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQ_H_

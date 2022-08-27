@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERY_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERY_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,25 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
+#include "orionld/types/TreeNode.h"                              // TreeNode
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldAttributeExpand -
+// pCheckQuery -
 //
-// This function expands unless:
-//   - has already been expanded
-//   - is a special attribute such as location, datasetId, ...
-//
-extern char* orionldAttributeExpand
-(
-  OrionldContext*       contextP,
-  char*                 shortName,
-  bool                  useDefaultUrlIfNotFound,
-  OrionldContextItem**  contextItemPP
-);
+extern TreeNode* pCheckQuery(KjNode* queryP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDATTRIBUTEEXPAND_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERY_H_

@@ -213,7 +213,7 @@ int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* d
     if ((cannotExist == true) && (dbEntityP != NULL))  // FIXME: Only interesting for BATCH CREATE
     {
       LM_E(("The entity '%s' already exists", entityId));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Entity already exists", "Cannot create an existing entity", 409);
+      entityErrorPush(errorsArrayP, entityId, OrionldAlreadyExists, "Entity already exists", "Cannot create an existing entity", 409);
       kjChildRemove(orionldState.requestTree, eP);
       eP = next;
       continue;

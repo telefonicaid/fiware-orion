@@ -31,6 +31,7 @@ SET (SOURCES
     legacyPostBatchUpdate.cpp
     legacyPostBatchCreate.cpp
     legacyPostBatchDelete.cpp
+    legacyPostQuery.cpp
 )
 
 # Include directories

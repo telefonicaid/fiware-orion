@@ -268,7 +268,7 @@ static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t
 //
 // qFilter -
 //
-static bool qFilter(bson_t* mongoFilterP, QNode* qNode)
+bool qFilter(bson_t* mongoFilterP, QNode* qNode)
 {
   char* title;
   char* detail;
@@ -714,7 +714,7 @@ static bool geoContainsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 //
 // geoFilter -
 //
-static bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
+bool geoFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
 {
   switch (geoInfoP->georel)
   {

@@ -656,7 +656,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. GET all entities with attrs A3 - see E2, E3, E4
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 1663
+Content-Length: 392
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -665,69 +665,17 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   {
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
-    "A1": {
-      "type": "Property",
-      "value": "E2/A1"
-    },
     "A3": {
       "type": "Property",
       "value": "E2/A3"
-    },
-    "location": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          12,
-          10
-        ]
-      }
-    },
-    "geoPoint2": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          12,
-          10
-        ]
-      }
     }
   },
   {
     "id": "http://a.b.c/entity/E3",
     "type": "T",
-    "A1": {
-      "type": "Property",
-      "value": "E3/A1"
-    },
-    "A2": {
-      "type": "Property",
-      "value": "E3/A2"
-    },
     "A3": {
       "type": "Property",
       "value": "E3/A3"
-    },
-    "location": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          13,
-          10
-        ]
-      }
-    },
-    "geoPoint2": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          13,
-          10
-        ]
-      }
     }
   },
   {
@@ -736,30 +684,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "A3": {
       "type": "Property",
       "value": "E4/A3"
-    },
-    "A4": {
-      "type": "Property",
-      "value": "E4/A4"
-    },
-    "location": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          14,
-          10
-        ]
-      }
-    },
-    "geoPoint2": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          14,
-          10
-        ]
-      }
     }
   }
 ]
@@ -769,7 +693,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. GET all entities with attrs A2 or A4 - see E1, E3 and E4
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 1736
+Content-Length: 391
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -778,105 +702,25 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   {
     "id": "http://a.b.c/entity/E1",
     "type": "T",
-    "A1": {
-      "type": "Property",
-      "value": "E1:A1"
-    },
     "A2": {
       "type": "Property",
       "value": "E1/A2"
-    },
-    "R1": {
-      "type": "Relationship",
-      "object": "urn:E2"
-    },
-    "location": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          11,
-          10
-        ]
-      }
-    },
-    "geoPoint2": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          11,
-          10
-        ]
-      }
     }
   },
   {
     "id": "http://a.b.c/entity/E3",
     "type": "T",
-    "A1": {
-      "type": "Property",
-      "value": "E3/A1"
-    },
     "A2": {
       "type": "Property",
       "value": "E3/A2"
-    },
-    "A3": {
-      "type": "Property",
-      "value": "E3/A3"
-    },
-    "location": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          13,
-          10
-        ]
-      }
-    },
-    "geoPoint2": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          13,
-          10
-        ]
-      }
     }
   },
   {
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
-    "A3": {
-      "type": "Property",
-      "value": "E4/A3"
-    },
     "A4": {
       "type": "Property",
       "value": "E4/A4"
-    },
-    "location": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          14,
-          10
-        ]
-      }
-    },
-    "geoPoint2": {
-      "type": "GeoProperty",
-      "value": {
-        "type": "Point",
-        "coordinates": [
-          14,
-          10
-        ]
-      }
     }
   }
 ]
@@ -1235,7 +1079,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 17. GET all entities of type 'T', with a 'geoPoint2' that is near the Point [ 11, 10], has an attr called A1, has an attr A2==E1/A2
 ===================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 336
+Content-Length: 167
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1245,14 +1089,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "A1": {
             "type": "Property",
             "value": "E1:A1"
-        },
-        "A2": {
-            "type": "Property",
-            "value": "E1/A2"
-        },
-        "R1": {
-            "object": "urn:E2",
-            "type": "Relationship"
         },
         "geoPoint2": {
             "type": "GeoProperty",
@@ -1265,16 +1101,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             }
         },
         "id": "http://a.b.c/entity/E1",
-        "location": {
-            "type": "GeoProperty",
-            "value": {
-                "coordinates": [
-                    11,
-                    10
-                ],
-                "type": "Point"
-            }
-        },
         "type": "T"
     }
 ]

@@ -51,6 +51,19 @@ do                                                                              
 
 
 
+#define DUPLICATE_CHECK_R(pointer, fieldName, value, retVal)                                                     \
+do                                                                                                               \
+{                                                                                                                \
+  if (pointer != NULL)                                                                                           \
+  {                                                                                                              \
+    orionldError(OrionldBadRequestData, "Duplicated field", fieldName, 400);                                     \
+    return retVal;                                                                                               \
+  }                                                                                                              \
+  pointer = value;                                                                                               \
+} while (0)
+
+
+
 // -----------------------------------------------------------------------------
 //
 // DUPLICATE_CHECK_WITH_PRESENCE -
@@ -176,6 +189,18 @@ do                                                                              
   {                                                                                                          \
     orionldError(OrionldBadRequestData, "Not a JSON String", fieldName, 400);                                \
     return false;                                                                                            \
+  }                                                                                                          \
+} while (0)
+
+
+
+#define STRING_CHECK_R(kNodeP, fieldName, retVal)                                                            \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->type != KjString)                                                                              \
+  {                                                                                                          \
+    orionldError(OrionldBadRequestData, "Not a JSON String", fieldName, 400);                                \
+    return retVal;                                                                                           \
   }                                                                                                          \
 } while (0)
 

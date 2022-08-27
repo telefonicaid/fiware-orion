@@ -197,8 +197,12 @@ bool pCheckSubscription
     {
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionGeoqPath, 400);
       PCHECK_DUPLICATE(geoqP, subItemP, 0, NULL, SubscriptionGeoqPath, 400);
-      if (pcheckGeoQ(geoqP, geoCoordinatesPP, true) == false)
+
+      OrionldGeoInfo* geoInfoP;
+      if ((geoInfoP = pcheckGeoQ(geoqP, true)) == NULL)
         return false;
+
+      *geoCoordinatesPP = geoInfoP->coordinates;
     }
     else if (strcmp(subItemP->name, "csf") == 0)
     {

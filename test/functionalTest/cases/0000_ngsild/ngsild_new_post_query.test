@@ -1,0 +1,380 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New POST Query basic test
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create entity E1, type T, with attrs A1, A2, location, and geoPoint2
+# 02. Create entity E2, type T2, with attrs A1, A3, location, and geoPoint2
+# 03. Create entity E3, type T, with attrs A1, A2, and A3, location, and geoPoint2
+# 04. Create entity E4, type T2, with attrs A3, A4, location, and geoPoint2
+# 05. POST Query with entities: { "type": "T" }
+# 06. POST Query with attrs: [ "A4" ]
+# 07. POST Query with attrs: [ "A7" ]
+#
+
+echo "01. Create entity E1, type T, with attrs A1, A2, location, and geoPoint2"
+echo "========================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": "E1:A1"
+  },
+  "A2": {
+    "type": "Property",
+    "value": "E1/A2"
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:E2"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11, 10]
+    }
+  },
+  "geoPoint2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11, 10]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2, type T2, with attrs A1, A3, location, and geoPoint2"
+echo "========================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T2",
+  "A1": {
+    "type": "Property",
+    "value": "E2/A1"
+  },
+  "A3": {
+    "type": "Property",
+    "value": "E2/A3"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 12, 10]
+    }
+  },
+  "geoPoint2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 12, 10]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3, type T, with attrs A1, A2, and A3, location, and geoPoint2"
+echo "================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": "E3/A1"
+  },
+  "A2": {
+    "type": "Property",
+    "value": "E3/A2"
+  },
+  "A3": {
+    "type": "Property",
+    "value": "E3/A3"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 13, 10]
+    }
+  },
+  "geoPoint2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 13, 10]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E4, type T2, with attrs A3, A4, location, and geoPoint2"
+echo "========================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E4",
+  "type": "T2",
+  "A3": {
+    "type": "Property",
+    "value": "E4/A3"
+  },
+  "A4": {
+    "type": "Property",
+    "value": "E4/A4"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 14, 10]
+    }
+  },
+  "geoPoint2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 14, 10]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '05. POST Query with entities: { "type": "T" }'
+echo '============================================='
+payload='{
+  "type": "Query",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "local": true
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload"
+echo
+echo
+
+
+echo '06. POST Query with attrs: [ "A4" ]'
+echo '==================================='
+payload='{
+  "type": "Query",
+  "attrs": [ "A4" ],
+  "local": true
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query?options=sysAttrs --payload "$payload"
+echo
+echo
+
+
+echo '07. POST Query with attrs: [ "A7" ]'
+echo '==================================='
+payload='{
+  "type": "Query",
+  "attrs": [ "A7" ],
+  "local": true
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1, type T, with attrs A1, A2, location, and geoPoint2
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+
+
+
+02. Create entity E2, type T2, with attrs A1, A3, location, and geoPoint2
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+
+
+
+03. Create entity E3, type T, with attrs A1, A2, and A3, location, and geoPoint2
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
+
+
+
+04. Create entity E4, type T2, with attrs A3, A4, location, and geoPoint2
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
+
+
+
+05. POST Query with entities: { "type": "T" }
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 665
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E1:A1"
+        },
+        "A2": {
+            "type": "Property",
+            "value": "E1/A2"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "geoPoint2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    11,
+                    10
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "http://a.b.c/entity/E1",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    11,
+                    10
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E3/A1"
+        },
+        "A2": {
+            "type": "Property",
+            "value": "E3/A2"
+        },
+        "A3": {
+            "type": "Property",
+            "value": "E3/A3"
+        },
+        "geoPoint2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13,
+                    10
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "http://a.b.c/entity/E3",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13,
+                    10
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "T"
+    }
+]
+
+
+06. POST Query with attrs: [ "A4" ]
+===================================
+HTTP/1.1 200 OK
+Content-Length: 244
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A4": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": "E4/A4"
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "http://a.b.c/entity/E4",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T2"
+    }
+]
+
+
+07. POST Query with attrs: [ "A7" ]
+===================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

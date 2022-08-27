@@ -165,7 +165,7 @@ bool legacyPostSubscriptions(void)
     // mongoGetLdSubscription takes the req semaphore
     if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenantP, &orionldState.httpStatusCode, &details) == true)
     {
-      orionldError(OrionldBadRequestData, "A subscription with that ID already exists", subIdP, 409);
+      orionldError(OrionldAlreadyExists, "A subscription with that ID already exists", subIdP, 409);
       return false;
     }
   }
