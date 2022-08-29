@@ -29,7 +29,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjParse.h"                                       // kjParse
-#include "kjson/kjBuilder.h"                                     // kjObject, kjString, ..., kjChildInsert
+#include "kjson/kjBuilder.h"                                     // kjObject, kjString, ..., kjChildAdd
 #include "kjson/kjClone.h"                                       // kjClone
 }
 

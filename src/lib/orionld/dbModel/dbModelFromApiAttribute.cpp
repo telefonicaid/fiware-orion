@@ -68,7 +68,7 @@ extern "C"
 //   * "modDate"  is added
 //   * "creDate"  is added iff the attribute did not previously exist
 //
-bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP)
+bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP, bool stealCreDate)
 {
   LM(("CA: Treating attribute '%s'", attrP->name));
   KjNode* mdP         = NULL;
@@ -81,6 +81,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
   if (attrP->type == KjNull)
   {
+    // Check: is null supported by the current service?
     KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, attrDotName);
     kjChildAdd(attrRemovedV, attrNameNodeP);
     return true;
@@ -125,6 +126,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   }
 
   KjNode*  dbAttrP = (dbAttrsP != NULL)? kjLookup(dbAttrsP, attrEqName) : NULL;
+  LM(("PE: dbAttrsP:%p, dbAttrP:%p", dbAttrsP, dbAttrP));
 
   // Move everything into "md", leaving attrP EMPTY
   mdP = kjObject(orionldState.kjsonP, "md");
@@ -158,14 +160,24 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       // After "type", add creDate, modDate
       if (ix == 0)
       {
-        if (dbAttrP == NULL)  // Attribute does not already exist
+        if (dbAttrP == NULL)  // Attribute does not already exist - needs a creDate
         {
-          LM(("CA: Adding creDate to attribute '%s'", attrP->name));
+          LM(("PE: Adding creDate to attribute '%s'", attrP->name));
           kjTimestampAdd(attrP, "creDate");
+        }
+        else if (stealCreDate == true)
+        {
+          KjNode* creDateP = kjLookup(dbAttrP, "creDate");
+          if (creDateP != NULL)
+          {
+            kjChildRemove(dbAttrP, creDateP);
+            kjChildAdd(attrP, creDateP);
+          }
         }
 
         // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
         kjTimestampAdd(attrP, "modDate");
+        LM(("PE: modDate in place"));
       }
     }
   }

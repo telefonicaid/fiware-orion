@@ -268,7 +268,7 @@ bool orionldPostBatchUpsert(void)
         finalDbEntityP = batchReplaceEntity(inEntityP, entityId, entityType, entityCreDate);
       }
       else
-        finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, entityId, entityType, false);
+        finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, false);
 
       if (finalDbEntityP != NULL)
       {

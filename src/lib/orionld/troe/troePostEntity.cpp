@@ -54,7 +54,7 @@ bool troePostEntity(void)
   PgAppendBuffer  attributesBuffer;
   PgAppendBuffer  subAttributesBuffer;
 
-  pgAppendInit(&attributesBuffer, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if necessary
+  pgAppendInit(&attributesBuffer, 2*1024);     // 2k - enough only for smaller entities - will be reallocated if need be
   pgAppendInit(&subAttributesBuffer, 2*1024);  // ditto
 
   pgAppend(&attributesBuffer,    PG_ATTRIBUTE_INSERT_START,     0);
