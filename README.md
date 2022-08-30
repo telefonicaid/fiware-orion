@@ -177,7 +177,7 @@ Reference sections below in order to know more details about the API
 
 ## API
 
--   Orion API FIWARE NGSIv2 Walkthrough FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
+-   FIWARE NGSIv2 Orion API Walkthrough FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
     [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
 
 [Top](#top)
@@ -186,7 +186,7 @@ Reference sections below in order to know more details about the API
 
 API Reference Documentation:
 
--   Orion API FIWARE NGSI v2
+-   FIWARE NGSIv2 Orion API
     [(en)](doc/manuals/orion-api.md)
     [(jp)](doc/manuals.jp/orion-api.md) (Markdown)
 
