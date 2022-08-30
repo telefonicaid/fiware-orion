@@ -152,7 +152,7 @@ built upon [the original NGSIv2 specification](http://telefonicaid.github.io/fiw
 adding a huge number of improvements and enhancements.
 
 The Orion API is fully compatible with the original NGSIv2 specification although some minor differences
-are described in [an annex]((#differences-regarding-the-original-ngsiv2-spec)) at the end of this document.
+are described in [an annex](#differences-regarding-the-original-ngsiv2-spec) at the end of this document.
 
 # Specification
 
