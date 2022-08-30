@@ -257,8 +257,7 @@ Some possible values for `lastFailureReason` (non exahustive list):
   doesn't run in insecure mode (i.e. without `-insecureNotif` [CLI parameters](cli.md)).
 
 More detail about `status`, `lastFailureReason` and `lastSuccessCode` in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) and
-in the [NGSIv2 implementation notes document](../user/ngsiv2_implementation_notes.md).
+[Orion API specification](../orion-api.md#subscription.notification).
 
 In addition, you may find useful the notification log examples shown in
 [the corresponding section of the administration manual](logs.md#log-examples-for-notification-transactions).
