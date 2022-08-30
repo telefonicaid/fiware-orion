@@ -25,6 +25,8 @@
 # - It is assumed that required commands (e.g. rvm, apiary, etc.) are already installed in the system where this scripts runs; otherwise it is going to fail
 # - It is assumed that required env vars (e.g. WORKSPACE) are already set; otherwise it is going to fail
 
+# FIXME: after the changes in the location of the NGSIv2 documents (from api/v2 to archive/api/v2) I'm not
+# sure if this script is longer working. It should checked if it is needed at some moment
 
 # Preparing specifications repo clone
 cd /tmp

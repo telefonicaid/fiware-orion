@@ -1,4 +1,4 @@
-# FIWARE-NGSI v2 (release 2.1) Specification
+# FIWARE NGSIv2 Orion API Specification
  
 <!-- TOC -->
 
@@ -146,9 +146,13 @@
 <!-- /TOC -->
 
 # Preface
- 
-This is the release 2.1 of the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable),
-fully backward compatible with the original NGSIv2 released at September 15th, 2018.
+
+This document describes the FIWARE NSGISv2 Orion API specification. The Orion API is 
+built upon [the original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/archive/api/v2/stable)],
+adding a huge number of improvements and enhancements.
+
+The Orion API is fully compatible with the original NGSIv2 specification although some differences
+are described in [an annex]((#differences-regarding-the-original-ngsiv2-spec)) at the end of this document.
 
 # Specification
 
@@ -4508,7 +4512,7 @@ _**Response code**_
 # Differences regarding the original NGSIv2 spec
 
 This section contains the topics that, due to implementation decision, differs from the described in [the 
-original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/). These differences come after years of experience with NGSIv2, in two senses:
+original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/archive/api/v2/stable/). These differences come after years of experience with NGSIv2, in two senses:
 
 * Some functionally originally included in NGSIv2 has resulted not to be really useful or needed in real world scenarios. Thus, Orion doesn't implement it. For instance, update registrations operation
 * NGSIv2 has some flaws not detected at specification time. For instance, the way in which `failed` subscription status was designed.
