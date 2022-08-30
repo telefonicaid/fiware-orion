@@ -1,0 +1,178 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attributes must be overwritten when appending entity attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create entity E1 with an attribute P1 with 2 sub-attrs
+# 02. See E1:P1 in mongo - see the two sub-attrs
+# 03. Replace E1:P1 using POST /entities/{EID}, with a P1 without attributes
+# 04. See E1:P1 in mongo - see no sub-attrs for P1
+#
+
+
+echo "01. Create entity E1 with an attribute P1 with 2 sub-attrs"
+echo "=========================================================="
+payload={'
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1,
+    "P1_P1": 1,
+    "P1_P2": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1:P1 in mongo - see the two sub-attrs"
+echo "=============================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Replace E1:P1 using POST /entities/{EID}, with a P1 without attributes"
+echo "=========================================================================="
+payload='{
+  "P1": 3
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "04. See E1:P1 in mongo - see no sub-attrs for P1"
+echo "================================================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with an attribute P1 with 2 sub-attrs
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+
+
+
+02. See E1:P1 in mongo - see the two sub-attrs
+==============================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P2"
+			],
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"type" : "Property",
+					"value" : 1,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P2" : {
+					"type" : "Property",
+					"value" : 1,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Replace E1:P1 using POST /entities/{EID}, with a P1 without attributes
+==========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. See E1:P1 in mongo - see no sub-attrs for P1
+================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 3,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

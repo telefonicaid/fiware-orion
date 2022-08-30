@@ -144,7 +144,6 @@ bool orionldPostEntity(void)
   }
 
   KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
-  LM(("TROE: Found dbAttrsP at %p from dbEntityP at %p", dbAttrsP, dbEntityP));
   //
   // Check the Entity, expand averything and transform it into Normalized form
   //
@@ -175,7 +174,6 @@ bool orionldPostEntity(void)
     }
   }
 
-
   //
   // Loop over the incoming payload tree
   // Foreach attribute
@@ -202,8 +200,6 @@ bool orionldPostEntity(void)
 
   while (attrP)
   {
-    LM(("PE: Treating attribute '%s'", attrP->name));
-
     OrionldContextItem*  contextItemP = NULL;
     char*                shortName    = attrP->name;
 
@@ -217,7 +213,7 @@ bool orionldPostEntity(void)
       kjChildRemove(orionldState.requestTree, attrP);
       attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
       attrP = next;
-      LM(("PE: attribute is invalid"));
+
       continue;
     }
 
@@ -231,7 +227,6 @@ bool orionldPostEntity(void)
     {
       if (ignoreExistingAttributes == true)
       {
-        LM(("PE: Ignoring attribute '%s'", attrP->name));
         kjChildRemove(orionldState.requestTree, attrP);
         attributeNotUpdated(notUpdatedP, shortName, "attribute already exists", "overwrite is not allowed");
       }
@@ -250,30 +245,23 @@ bool orionldPostEntity(void)
     else
     {
       bool ignore = false;
-      LM(("PE: Attribute '%s' is new", attrP->name));
       if (attributeToDbArray(dbAttrsUpdate, attrP, dbAttrsP, newDbAttrNamesV, &ignore) == false)
       {
-        LM(("PE: attributeToDbArray failed"));
         attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
         kjChildRemove(orionldState.requestTree, attrP);
       }
       else
-      {
         attributeUpdated(updatedP, shortName);
-        LM(("PE: Added '%s' to attributeUpdated", shortName));
-      }
     }
 
     attrP = next;
   }
 
-  kjTreeLog(orionldState.requestTree, "TROE: BEFORE mongocAttributesAdd");
   if (mongocAttributesAdd(entityId, newDbAttrNamesV, dbAttrsUpdate) == false)
   {
     orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
     return false;
   }
-  kjTreeLog(orionldState.requestTree, "TROE: AFTER mongocAttributesAdd");
 
   // WARNING: dbAttrsMerge DESTROYS dbEntityP - the initial state of the entity ...
   // Seems like it also destroys the incoming requestTree, so, need to clone for TRoE
@@ -281,18 +269,13 @@ bool orionldPostEntity(void)
   //
   KjNode* treeForTroe = NULL;
   if (troe)
-  {
     treeForTroe = kjClone(orionldState.kjsonP, orionldState.requestTree);
-    kjTreeLog(treeForTroe, "TROE: treeForTroe");
-  }
 
-  LM(("TROE: Merging with dbAttrsP at %p and dbEntityP at %p", dbAttrsP, dbEntityP));
   dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
-  kjTreeLog(dbEntityP, "TROE: Complete new DB Entity");
 
-  OrionldProblemDetails pd;
-  KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, &pd);
-  kjTreeLog(finalApiEntityP, "TROE: finalApiEntityP");
+  OrionldProblemDetails  pd;
+  KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, &pd);
+
   alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree);
 
   if (notUpdatedP->value.firstChildP == NULL)  // No errors
@@ -314,6 +297,5 @@ bool orionldPostEntity(void)
     orionldState.requestTree = treeForTroe;
 
   // The orionldState.requestTree is OK for TRoE - as ignored attributes have been removed
-  kjTreeLog(orionldState.requestTree, "TROE: Final orionldState.requestTree");
   return true;
 }

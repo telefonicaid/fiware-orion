@@ -61,12 +61,12 @@ extern "C"
 //     - datasetId
 //     - unitCode
 //
-//   * Actually, all children of 'attrP' are moved to 'md'
+//   * All children of 'attrP' are moved to 'md'
 //   * And then, all the special fields are moved back to 'attrP'
-//   * ".added"   is added
-//   * ".removed" is added
-//   * "modDate"  is added
-//   * "creDate"  is added iff the attribute did not previously exist
+//   * + ".added"   is added
+//   * + ".removed" is added
+//   * + "modDate"  is added
+//   * + "creDate"  is added OR "stolen" from dbAttrP
 //
 bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP, bool stealCreDate)
 {
@@ -121,7 +121,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     attrP->value.firstChildP = newAttrP;
     attrP->lastChild         = newAttrP;
 
-    *ignoreP = true;
+    *ignoreP = true;  // Ignoring datasetId attrs for TRoE
     return dbModelFromApiAttributeDatasetArray(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP);
   }
 
@@ -165,14 +165,15 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
           LM(("PE: Adding creDate to attribute '%s'", attrP->name));
           kjTimestampAdd(attrP, "creDate");
         }
-        else if (stealCreDate == true)
+        else if (stealCreDate == true)  // FIXME: opMode == REPLACE
         {
           KjNode* creDateP = kjLookup(dbAttrP, "creDate");
           if (creDateP != NULL)
-          {
             kjChildRemove(dbAttrP, creDateP);
-            kjChildAdd(attrP, creDateP);
-          }
+          else
+            creDateP = kjFloat(orionldState.kjsonP, "creDate", orionldState.requestTime);
+
+          kjChildAdd(attrP, creDateP);
         }
 
         // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
@@ -206,12 +207,20 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   else
   {
     // The attribute is not new, but, perhaps it didn't have any sub-attrs before but now it does?
-    // If so, never mind .added, .removed etc, what we need is to include the entire "md"
+    // If so, never mind '.added', '.removed' etc.
+    // What we need is to include the entire "md"
     //
     dbMdP    = kjLookup(dbAttrP, "md");
     mdNamesP = kjLookup(dbAttrP, "mdNames");
 
-    if (mdNamesP == NULL)
+    if (stealCreDate == true)  // FIXME: opMode == REPLACE
+    {
+      // The Attribute is being REPLACED - "mdNames" need to start from scratch
+      // Only those sub-attrs in 'attrP' are to be part of 'mdNames'
+      mdNamesP = kjArray(orionldState.kjsonP, "mdNames");
+      kjChildAdd(attrP, mdNamesP);
+    }
+    else if (mdNamesP == NULL)
     {
       //
       // No 'mdNames' field in DB Attribute?
