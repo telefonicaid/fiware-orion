@@ -148,7 +148,7 @@
 # Preface
 
 This document describes the FIWARE NSGISv2 Orion API specification. The Orion API is 
-built upon [the original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/archive/api/v2/],
+built upon [the original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/archive/api/v2/),
 adding a huge number of improvements and enhancements.
 
 The Orion API is fully compatible with the original NGSIv2 specification although some minor differences
