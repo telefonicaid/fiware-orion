@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYGET_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYGET_H_
 
 /*
 *
@@ -25,13 +25,17 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldDeleteAttribute -
+// mongocEntityGet -
 //
-extern bool orionldDeleteAttribute(void);
+extern KjNode* mongocEntityGet(const char* entityId, const char** projection, bool includeEntityId);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYGET_H_

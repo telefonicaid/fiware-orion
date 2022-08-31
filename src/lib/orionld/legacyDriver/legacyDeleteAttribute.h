@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYDELETEATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYDELETEATTRIBUTE_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,8 +30,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldDeleteAttribute -
+// legacyDeleteAttribute -
 //
-extern bool orionldDeleteAttribute(void);
+extern bool legacyDeleteAttribute(void);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYDELETEATTRIBUTE_H_

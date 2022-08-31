@@ -892,14 +892,6 @@ KjNode* mongocEntitiesQuery
 
   if (limit != 0)
   {
-#if 0
-    char* filterString  = bson_as_json(&mongoFilter, NULL);
-    char* optionsString = bson_as_json(&options, NULL);
-
-    bson_free(filterString);
-    bson_free(optionsString);
-#endif
-
     mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);
     bson_destroy(&options);
 
