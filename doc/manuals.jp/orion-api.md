@@ -3779,6 +3779,7 @@ _**レスポンス・ペイロード**_
           "attrs": [ "temperature " ],
           "expression": {
             "q": "temperature>40"
+          }
       }
     },
     "notification": {
