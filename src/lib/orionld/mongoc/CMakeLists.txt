@@ -54,6 +54,7 @@ SET (SOURCES
     mongocEntitiesExist.cpp
     mongocEntitiesDelete.cpp
     mongocEntitiesQuery2.cpp
+    mongocAttributesAdd.cpp
 )
 
 # Include directories

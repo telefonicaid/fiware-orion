@@ -43,9 +43,10 @@ extern "C"
 // mongocEntityLookup -
 //
 // This function, that seems quite similar to mongocEntityRetrieve, is used by:
-//   * orionldPutEntity    - uses creDate + attrs to make sure no attr types are modified
+//   * orionldPutEntity    - Uses creDate + attrs to make sure no attr types are modified
 //   * orionldPatchEntity  - Like PUT but also using entity type, entire attributes, etc.
-//   * orionldPostEntities - only to make sure the entity does not already exists (mongocEntityExists should be implemented and used instead)
+//   * orionldPostEntities - Only to make sure the entity does not already exists (mongocEntityExists should be implemented and used instead)
+//   * orionldPostEntity   - The entire DB Entity is needed as it is later used as base for the "merge" with the payload body
 //
 // So, this function is quite needed, just as it is.
 // I could merge the two though, moving the dbModel stuff from mongocEntityRetrieve

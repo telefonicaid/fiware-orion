@@ -59,7 +59,7 @@ extern "C"
 //
 // Slightly different if BATCH UPDATE - already existing attributes stay as is by default
 //
-KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* entityId, char* entityType, bool ignore)
+KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, bool ignoreExistingAttributes)
 {
   KjNode* dbFinalEntityP = kjClone(orionldState.kjsonP, originalDbEntityP);
 
@@ -99,7 +99,7 @@ KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* en
 
     if (dbAttrP != NULL)   // The attribute already existed - we remove it before the new version of the attribute is added
     {
-      if (ignore == true)  // ... Or we ignore it if BATCH Update and ?options=noOverwrite
+      if (ignoreExistingAttributes == true)  // ... Or we ignore it if BATCH Update and ?options=noOverwrite
       {
         kjChildRemove(inEntityP, apiAttrP);  // Must remove the ignored attribute from the incoming entity - for TRoE and Alterations
         apiAttrP = next;
@@ -124,7 +124,7 @@ KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* en
 
     dbAttrP = kjClone(orionldState.kjsonP, apiAttrP);  // Copy the API attribute and then transform it into DB Model
 
-    dbModelFromApiAttribute(dbAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL);
+    dbModelFromApiAttribute(dbAttrP, dbAttrsP, attrAddedV, attrRemovedV, NULL, false);
     kjChildAdd(dbAttrsP, dbAttrP);
 
     apiAttrP = next;

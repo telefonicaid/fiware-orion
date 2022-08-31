@@ -174,7 +174,7 @@ bool orionldPostBatchUpdate(void)
 
     LM(("Updating entity %s", entityId));
     LM(("originalDbEntityP: %p", originalDbEntityP));
-    finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, entityId, entityType, ignore);
+    finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, ignore);
 
     if (finalDbEntityP != NULL)
     {

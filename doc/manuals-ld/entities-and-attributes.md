@@ -69,7 +69,7 @@ Here a somewhat more complex example - an attribute *P1 with a _compound value_ 
       "city": "Torrevieja",
       "street": "Parodi Hermanos",
       "streetNumber": 123
-    }
+    },
     "P11": {
       "type": "Property",
       "value": 27

@@ -171,13 +171,10 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   KjNode* _idP      = NULL;
   KjNode* attrsP    = NULL;
   KjNode* datasetsP = kjLookup(dbEntityP, "@datasets");
+  bool    longNames = ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES));
 
   if (datasetsP != NULL)
     kjChildRemove(dbEntityP, datasetsP);
-
-  kjTreeLog(dbEntityP, "Entity from DB - without $datasets");
-  if (datasetsP != NULL)
-    kjTreeLog(datasetsP, "datasets from DB");
 
   for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
@@ -247,7 +244,8 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   KjNode* entityP = kjObject(orionldState.kjsonP, NULL);
   kjChildAdd(entityP, idP);
 
-  typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
+  if (longNames == false)
+    typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
   kjChildAdd(entityP, typeP);
 
   //

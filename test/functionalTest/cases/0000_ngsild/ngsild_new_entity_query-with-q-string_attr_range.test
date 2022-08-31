@@ -36,6 +36,7 @@ brokerStart CB 0 IPv4 -experimental
 # 03. Create E3, with test context, type T and attr A="3"
 # 04. Create E4, with test context, type T2 and attr A2="4"
 # 05. GET all entities that has an attribute A in list '1' to '5' - see E1 and E3
+# 06. POST Query for all entities that has an attribute A in list '1' to '5' - see E1 and E3
 #
 
 echo '01. Create E1, with test context, type T and attr A="1"'
@@ -109,6 +110,17 @@ echo
 echo
 
 
+echo "06. POST Query for all entities that has an attribute A in list '1' to '5' - see E1 and E3"
+echo "=========================================================================================="
+payload='{
+  "type": "Query",
+  "q": "A==%221%22..%225%22"
+}'
+orionCurl --url "/ngsi-ld/v1/entityOperations/query?prettyPrint=yes" --payload "$payload" --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create E1, with test context, type T and attr A="1"
 =======================================================
@@ -148,6 +160,36 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 
 05. GET all entities that has an attribute A in list '1' to '5' - see E1 and E3
 ===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 433
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "1"
+    }
+  },
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "3"
+    }
+  }
+]
+
+
+
+06. POST Query for all entities that has an attribute A in list '1' to '5' - see E1 and E3
+==========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 433
 Content-Type: application/ld+json

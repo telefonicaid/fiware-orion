@@ -98,7 +98,7 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
         return false;
       }
 
-      if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP) == false)
+      if (dbModelFromApiAttribute(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP, false) == false)
         return false;
 
       defaultFound = true;

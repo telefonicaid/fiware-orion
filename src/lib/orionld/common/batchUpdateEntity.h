@@ -36,6 +36,6 @@ extern "C"
 //
 // batchUpdateEntity -
 //
-extern KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, char* entityId, char* entityType, bool ignore);
+extern KjNode* batchUpdateEntity(KjNode* inEntityP, KjNode* originalDbEntityP, bool ignoreExistingAttributes);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_BATCHUPDATEENTITY_H_

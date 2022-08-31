@@ -49,7 +49,7 @@ typedef enum RenderFormat
   RF_CONCISE                        = 3,   // NGSI-LD Only - Concise format - as compact as possible while still lossless
   RF_KEYVALUES                      = 4,   // keyValues/Simplified
   RF_VALUES                         = 5,   // NGSIv2 only  - just the value, not even the key
-  RF_UNIQUE_VALUES                  = 6,   // NGSIv2 only  - just the value, not even the key, and no repitition of values
+  RF_UNIQUE_VALUES                  = 6,   // NGSIv2 only  - just the value, not even the key, and no repetition of values
   RF_CUSTOM                         = 7,   // NGSIv2 only  - custom format
   RF_CROSS_APIS_NORMALIZED          = 12,  // NGSI-LD Only - x-ngsiv2-normalized
   RF_CROSS_APIS_KEYVALUES           = 13,  // NGSI-LD Only - x-ngsiv2-keyValues

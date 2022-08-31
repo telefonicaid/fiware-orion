@@ -156,17 +156,32 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     if (valueP != NULL)
       valueP->name = (char*) "value";
 
+    //
     // If the sub-attr didn't exist, it needs a "createdAt"
+    // If it did exist, then steal if from DB, if there. If not, create it
+    //
     if (dbSubAttributeP == NULL)
     {
       kjTimestampAdd(saP, "createdAt");
 
       // The "mdNames" array stores the sub-attribute names in their original names, with dots - saDotName
-      if ((dbSubAttributeP == NULL) && (mdAddedV != NULL))
+      if (mdAddedV != NULL)
         kjChildAdd(mdAddedV, kjString(orionldState.kjsonP, NULL, saDotName));
     }
+    else
+    {
+      KjNode* createdAtP = kjLookup(dbSubAttributeP, "createdAt");
 
-    // All sub-attrs get a "modifiedAt"
+      if (createdAtP != NULL)
+      {
+        kjChildRemove(dbSubAttributeP, createdAtP);
+        kjChildAdd(saP, createdAtP);
+      }
+      else
+        kjTimestampAdd(saP, "createdAt");
+    }
+
+    // All sub-attrs get a fresh "modifiedAt"
     kjTimestampAdd(saP, "modifiedAt");
   }
 

@@ -52,6 +52,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/mqtt/mqttNotify.h"                             // mqttNotify
 #include "orionld/notifications/httpNotify.h"                    // httpNotify
 #include "orionld/notifications/httpsNotify.h"                   // httpsNotify
@@ -196,21 +197,16 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
   //
   // LanguageProperty and 'lang'
   //
-  LM(("attributeToNormalized: lang == '%s'", lang));
   if (attrTypeP != NULL)
   {
-    LM(("attrTypeP at %p (%s)", attrTypeP, attrTypeP->value.s));
     if ((lang[0] != 0) && (strcmp(attrTypeP->value.s, "LanguageProperty")  == 0))
     {
       KjNode* valueP = kjLookup(attrP, "languageMap");
-      LM(("languageMap at %p", valueP));
       if (valueP != NULL)
       {
         char*   pickedLanguage;  // Name of the picked language
         KjNode* langNodeP = langItemPick(valueP, attrP->name, lang, &pickedLanguage);
 
-        LM(("langNodeP at %p", langNodeP));
-        LM(("pickedLanguage: '%s'", pickedLanguage));
         valueP->value       = langNodeP->value;
         valueP->type        = langNodeP->type;
 
@@ -222,7 +218,6 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
 
         KjNode* langP = kjString(orionldState.kjsonP, "lang", pickedLanguage);
         kjChildAdd(attrP, langP);
-        LM(("Added lang '%s' to attr '%s'", pickedLanguage, attrP->name));
       }
     }
     else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
@@ -269,22 +264,14 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
   else if (concise)     attributeToConcise(attrP, &asSimplified, subP->lang.c_str());
   else                  attributeToNormalized(attrP, subP->lang.c_str());
 
-  kjTreeLog(attrP, "Attribute AFTER");
-
   if ((asSimplified == false) && (simplified == false))
   {
-    LM(("Not Simplified. Attribute %s's RHS is of type '%s'", attrP->name, kjValueType(attrP->type)));
     //
     // Here we're "in subAttributeFix"
     //
 
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
-      LM(("attr '%s'", attrP->name));
-      LM(("saP is a JSON %s, at %p", kjValueType(saP->type), saP));
-      LM(("saP->name at %p", saP->name));
-      LM(("Treating '%s' field of attr '%s", saP->name, attrP->name));
-
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;
@@ -299,8 +286,6 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
         attributeToSimplified(saP, subP->lang.c_str());
       else if (subP->renderFormat == RF_CONCISE)
         attributeToConcise(saP, &asSimplified, subP->lang.c_str());  // asSimplified is not used down here
-      else
-        LM(("subAttributeToNormalized"));
     }
   }
 }
@@ -351,24 +336,32 @@ KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
 //
 // orionldEntityToNgsiV2 -
 //
-KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
+KjNode* orionldEntityToNgsiV2(OrionldContext* contextP, KjNode* entityP, bool keyValues, bool compact)
 {
   KjNode* v2EntityP = kjClone(orionldState.kjsonP, entityP);
 
   // For all attributes, create a "metadata" object and move all sub-attributes inside
+  // Then move back "value", "type" to the attribute
   for (KjNode* attrP = v2EntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    if ((compact == true) && (strcmp(attrP->name, "type") == 0))
+    if (attrP->type != KjObject)  // attributes are objects, "id", "type", etc, are not
     {
-      eqForDot(attrP->value.s);
-      attrP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrP->value.s, NULL, NULL);
+      if (strcmp(attrP->name, "type") == 0)
+      {
+        if (compact == true)
+        {
+          eqForDot(attrP->value.s);
+          attrP->value.s = orionldContextItemAliasLookup(contextP, attrP->value.s, NULL, NULL);
+        }
+        else
+          attrP->value.s = orionldContextItemExpand(contextP, attrP->value.s, true, NULL);
+      }
+
+      continue;
     }
 
-    if (attrP->type != KjObject)  // attributes are objects, "id", "type", etc, are not
-      continue;
-
     eqForDot(attrP->name);
-    if (compact)
+    if (compact == true)
       attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrP->name, NULL, NULL);
 
     // Turn object, languageMap to 'value'
@@ -406,8 +399,6 @@ KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
         continue;
       }
       next = mdP->next;
-      kjChildRemove(attrP, mdP);
-      kjChildAdd(metadataObjectP, mdP);
 
       // Turn object, languageMap to 'value'
       KjNode* objectP      = kjLookup(mdP, "object");
@@ -415,6 +406,12 @@ KjNode* orionldEntityToNgsiV2(KjNode* entityP, bool keyValues, bool compact)
 
       if (objectP      != NULL)  objectP->name      = (char*) "value";
       if (languageMapP != NULL)  languageMapP->name = (char*) "value";
+
+      if (strcmp(mdP->name, "value") != 0)
+      {
+        kjChildRemove(attrP, mdP);
+        kjChildAdd(metadataObjectP, mdP);
+      }
 
       eqForDot(mdP->name);
       if (compact)
@@ -507,7 +504,7 @@ KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
   if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
     compact = true;
 
-  KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(apiEntityP, keyValues, compact);
+  KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(subP->contextP, apiEntityP, keyValues, compact);
 
   kjChildAdd(dataNodeP, ngsiv2EntityP);  // Adding only the first one ...
   kjChildAdd(notificationP, dataNodeP);
@@ -588,6 +585,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
 {
   bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
 
+#if 0
   // <DEBUG>
   for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
   {
@@ -599,6 +597,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
     LM(("Q:"));
   }
   // </DEBUG>
+#endif
 
   //
   // Payload Body
@@ -802,7 +801,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   // The message is ready - just need to be sent
   //
-  LM(("Q: delegating sending of the notification to httpNotify/httpsNotify/mqttNotify"));
   if      (mAltP->subP->protocol == HTTP)    return httpNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
   else if (mAltP->subP->protocol == HTTPS)   return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp, curlHandlePP);
   else if (mAltP->subP->protocol == MQTT)    return mqttNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
