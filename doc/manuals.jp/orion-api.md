@@ -150,7 +150,7 @@
 # はじめに
 
 このドキュメントでは、FIWARE NSGISv2 Orion API 仕様について説明します。Orion API は
-[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/stable)]
+[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/)]
 に基づいて構築され、膨大な数の改善と機能強化を追加しています。
 
 Orion API は、のオリジナル NGSIv2 仕様と完全に互換性がありますが、いくつかの小さな違いについては、
@@ -4615,7 +4615,7 @@ _**レスポンス・コード**_
 
 # 元の NGSIv2 仕様に関する相違点
 
-このセクションには、実装の決定により、[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/stable/)
+このセクションには、実装の決定により、[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/)
 で説明されているものとは異なるトピックが含まれています。これらの違いは、次の 2 つの意味で、垂直ソリューションを
 NGSIv2 と統合および運用してきた長年の経験の結果です。
 
