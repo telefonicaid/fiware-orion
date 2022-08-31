@@ -136,13 +136,13 @@
             - [クエリ `POST /v2/op/query`](#query-post-v2opquery)
         - [通知操作 (Notify operation)](#notify-operation)
             - [通知 `POST /v2/op/notify`](#notify-post-v2opnotify)
-- [元の NGSIv2 仕様に関する相違点](#differences-regarding-the-original-ngsiv2-spec)
-       - [`actionType` メタデータ](#actiontype-metadata)
-       - [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
-       - [`keyValues` は`POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
-       - [レジストレーションの実装の違い](#registration-implementation-differences)
-       - [`GET /v2` 操作](#get-v2-operation)
-       - [非推奨の機能 (Deprecated features)](#deprecated-features)
+- [オリジナルの NGSIv2 仕様に関する相違点](#differences-regarding-the-original-ngsiv2-spec)
+        - [`actionType` メタデータ](#actiontype-metadata)
+        - [あいまいなサブスクリプション・ステータス `failed` は使用されません](#ambiguous-subscription-status-failed-not-used)
+        - [`keyValues` は `POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
+        - [レジストレーションの実装の違い](#registration-implementation-differences)
+        - [`GET /v2` 操作](#get-v2-operation)
+        - [非推奨の機能 (Deprecated features)](#deprecated-features)
 <!-- /TOC -->
 
 <a name="preface"></a>
@@ -514,7 +514,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `ParqueNorte`, `ParqueOeste`, `ParqueSur` (Gardens の子) および `Fuencarral` と `Latina` (Districts の子)
 -   `Parterre1` と `Parterre2` (ParqueNorte の子)
 
-![](ServicePathExample.png "ServicePathExample.png")
+![](../manuals/ServicePathExample.png "ServicePathExample.png")
 
 使用するスコープは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
 `Parterre1` に `Tree` 型のエンティティ `Tree1` を作成するには、次の Fiware-ServicePath が使用されます:
@@ -566,7 +566,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
     その場合、各 `scope tree` (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
     同じ名前を使用することもできます。下の図を参照してください。
 
-![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
+![](../manuals/ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
 
 -   現在のバージョンでは、API を介してエンティティが属するスコープを変更することはできません (回避策は、
     [エンティティ・コレクション](admin/database_model.md#entities-collection) の `_id.servicePath`
@@ -612,7 +612,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 {
   "forbiddenAttr": {
    "type": "TextUnrestricted",
-   "value": "I'"'"'am a unrestricted (and I'"'"'m using forbidden chars)"
+   "value": "I'm a unrestricted (and I'm using forbidden chars, the apostrophe)"
   }
 }
 ```
@@ -2245,7 +2245,7 @@ the value of the "temperature" attribute (of type Number) is 23.4
 ## Oneshot サブスクリプション (Oneshot Subscriptions)
 
 Oneshot サブスクリプションは、一度の通知のためだけにエンティティをサブスクライブするオプションを提供します。コンシューマ
-がステータス `oneshot` のサブスクリプションを作成すると、[通常のサブスクリプション](walkthrough_apiv2.md#subscriptions)
+がステータス `oneshot` のサブスクリプションを作成すると、[通常のサブスクリプション](user/walkthrough_apiv2.md#subscriptions)
 ・リクエストと同じようにわずかな差異でサブスクリプションが作成されます。
 
 通常のケースでは、サブスクリプションが削除されるか、サブスクリプションの更新後にそのステータスが非アクティブになるまで、
@@ -2256,7 +2256,7 @@ Oneshot サブスクリプションは、一度の通知のためだけにエン
 なると、コンシューマは `oneshot` でステータスを更新して、同じ動作を繰り返すことができます。すなわち、1回限りの通知を
 再度得ることができます。
 
-![](../manuals/user/oneshot_subscription.png "oneshot_subscription.png")
+![](../manuals/oneshot_subscription.png "oneshot_subscription.png")
 
 -   Room1 という ID で Room 型のエンティティがすでにデータベースに存在していると仮定します。
 
@@ -4613,7 +4613,7 @@ _**レスポンス・コード**_
 
 <a name="differences-regarding-the-original-ngsiv2-spec"></a>
 
-# 元の NGSIv2 仕様に関する相違点
+# オリジナルの NGSIv2 仕様に関する相違点
 
 このセクションには、実装の決定により、[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/)
 で説明されているものとは異なるトピックが含まれています。これらの違いは、次の 2 つの意味で、垂直ソリューションを
@@ -4639,7 +4639,7 @@ NGSIv2 仕様のセクション "組み込みメタデータ" から `actionType
 
 <a name="ambiguous-subscription-status-failed-not-used"></a>
 
-## Ambiguous subscription status `failed` not used
+## あいまいなサブスクリプション・ステータス `failed` は使用されません
 
 NGSIv2 仕様では、サブスクリプションの `status` フィールドの `failed` 値について説明しています:
 
@@ -4663,7 +4663,7 @@ NGSIv2 仕様では、サブスクリプションの `status` フィールドの
 
 <a name="keyvalues-not-supported-in-post-v2opnotify"></a>
 
-## `keyValues` は`POST /v2/op/notify` でサポートされない
+## `keyValues` は `POST /v2/op/notify` でサポートされない
 
 現在の Orion の実装は、`POST /v2/op/notify` オペレーションの `keyValues` オプションをサポートしていません。
 それを使用しようとすると、400 Bad Request エラーが発生します。
@@ -4702,7 +4702,7 @@ NGSIv2 仕様には、エンドポイント URL を提供する `GET /v2` が含
 
 NGSIv2 仕様の作業中に、いくつかの機能が開発されましたが、仕様の最終バージョンには残っていません。ただし、Orion
 はいくつかのバージョンでそれらを実装し、下位互換性を維持するために引き続きサポートされています
-([非推奨の機能](../deprecated.md) として)。これらはここに文書化されていますが、**使用しないことを強くお勧めします**。
+([非推奨の機能](deprecated.md) として)。これらはここに文書化されていますが、**使用しないことを強くお勧めします**。
 
 特に：
 

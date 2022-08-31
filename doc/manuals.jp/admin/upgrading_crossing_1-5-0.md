@@ -1,6 +1,7 @@
 # 1.5.0 以前のバージョンから 1.5.0 以降へアップグレード
 
-この手順は、DB に [ID メタデータ](../user/metadata.md#id)を持つ属性が含まれている場合にのみ実行する必要があります。
+この手順は、DB に [ID メタデータ](https://github.com/telefonicaid/fiware-orion/blob/1.5.0/doc/manuals/user/metadata.md#metadata-id-for-attributes)
+を持つ属性が含まれている場合に*のみ*実行する必要があります。
 
 -   contextBroker を停止します
 -   contextBroker の旧バージョンを削除します

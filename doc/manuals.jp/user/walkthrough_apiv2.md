@@ -504,7 +504,7 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-
 
 エンティティ作成の場合と同様に、属性値の JSON データ型 (数値、文字列、ブール値など) に対応する単純な値は別として、複雑な構造やカスタム・メタデータを使用することもできます。これらは高度なトピックで、[このセクション](../orion-api.md#json-attribute-representation)と[別のセクション](../orion-api.md#context-metadata)でそれぞれ説明します。
 
-属性の追加/削除の詳細について は、マニュアルの [このセクション](update_action_types.md)を参照してください。
+属性の追加/削除の詳細については、[Orion API 仕様](../orion-api.md)を参照してください。
 
 このウォークスルーの例では、`26.5` などの特定の値で属性を更新します。ただし、*"温度を2.5度上げる"* などの
 更新を行うこともできます。この種の更新は高度なトピックであり、[このドキュメント](update_operators.md)
