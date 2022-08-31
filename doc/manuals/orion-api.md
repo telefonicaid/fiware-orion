@@ -1932,13 +1932,13 @@ Based on the [`condition` subscription field](#subscriptionsubjectcondition), up
 entity update, the notification triggering rules are as follow:
 
 * If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes and at the same time `expression` matches.
+  the `attrs` list changes (or is deleted) and at the same time `expression` matches.
 * If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
-  attributes in the `attrs` list changes.
+  attributes in the `attrs` list changes (or is deleted).
 * If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
-  attributes of the entity changes and at the same time `expression` matches.
+  attributes of the entity changes (or is deleted) and at the same time `expression` matches.
 * If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
-  attributes of the entity changes.
+  attributes of the entity changes (or is deleted).
 
 Note that changing the metadata of a given attribute is considered a change even though the attribute
 value itself hasn't changed.
