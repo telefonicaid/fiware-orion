@@ -137,12 +137,12 @@
         - [通知操作 (Notify operation)](#notify-operation)
             - [通知 `POST /v2/op/notify`](#notify-post-v2opnotify)
 - [オリジナルの NGSIv2 仕様に関する相違点](#differences-regarding-the-original-ngsiv2-spec)
-        - [`actionType` メタデータ](#actiontype-metadata)
-        - [あいまいなサブスクリプション・ステータス `failed` は使用されません](#ambiguous-subscription-status-failed-not-used)
-        - [`keyValues` は `POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
-        - [レジストレーションの実装の違い](#registration-implementation-differences)
-        - [`GET /v2` 操作](#get-v2-operation)
-        - [非推奨の機能 (Deprecated features)](#deprecated-features)
+    - [`actionType` メタデータ](#actiontype-metadata)
+    - [あいまいなサブスクリプション・ステータス `failed` は使用されません](#ambiguous-subscription-status-failed-not-used)
+    - [`keyValues` は `POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
+    - [レジストレーションの実装の違い](#registration-implementation-differences)
+    - [`GET /v2` 操作](#get-v2-operation)
+    - [非推奨の機能 (Deprecated features)](#deprecated-features)
 <!-- /TOC -->
 
 <a name="preface"></a>
