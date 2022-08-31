@@ -21,40 +21,42 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    mongocInit.cpp
+    mongocAttributeDelete.cpp
+    mongocAttributesAdd.cpp
     mongocConnectionGet.cpp
     mongocConnectionRelease.cpp
-    mongocEntityLookup.cpp
-    mongocEntityUpdate.cpp
-    mongocEntityReplace.cpp
-    mongocEntityRetrieve.cpp
-    mongocEntityInsert.cpp
-    mongocKjTreeFromBson.cpp
-    mongocKjTreeToBson.cpp
+    mongocContextCacheDelete.cpp
     mongocContextCacheGet.cpp
     mongocContextCachePersist.cpp
-    mongocContextCacheDelete.cpp
-    mongocRegistrationLookup.cpp
-    mongocSubscriptionLookup.cpp
-    mongocSubscriptionExists.cpp
-    mongocSubscriptionInsert.cpp
-    mongocTenantExists.cpp
-    mongocTenantsGet.cpp
-    mongocGeoIndexInit.cpp
+    mongocEntitiesDelete.cpp
+    mongocEntitiesExist.cpp
+    mongocEntitiesQuery.cpp
+    mongocEntitiesQuery2.cpp
+    mongocEntitiesUpsert.cpp
+    mongocEntityDelete.cpp
+    mongocEntityGet.cpp
+    mongocEntityInsert.cpp
+    mongocEntityLookup.cpp
+    mongocEntityReplace.cpp
+    mongocEntityRetrieve.cpp
+    mongocEntityUpdate.cpp
     mongocGeoIndexCreate.cpp
+    mongocGeoIndexInit.cpp
     mongocIdIndexCreate.cpp
+    mongocInit.cpp
+    mongocKjTreeFromBson.cpp
+    mongocKjTreeToBson.cpp
+    mongocRegistrationLookup.cpp
+    mongocServerVersionGet.cpp
     mongocSubCachePopulateByTenant.cpp
     mongocSubCountersUpdate.cpp
     mongocSubscriptionDelete.cpp
+    mongocSubscriptionExists.cpp
+    mongocSubscriptionInsert.cpp
+    mongocSubscriptionLookup.cpp
     mongocSubscriptionReplace.cpp
-    mongocEntitiesQuery.cpp
-    mongocEntityDelete.cpp
-    mongocEntitiesUpsert.cpp
-    mongocServerVersionGet.cpp
-    mongocEntitiesExist.cpp
-    mongocEntitiesDelete.cpp
-    mongocEntitiesQuery2.cpp
-    mongocAttributesAdd.cpp
+    mongocTenantExists.cpp
+    mongocTenantsGet.cpp
 )
 
 # Include directories

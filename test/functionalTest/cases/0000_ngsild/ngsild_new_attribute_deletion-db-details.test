@@ -1,0 +1,254 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute Deletion - database details
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with two attrs P1+P2
+# 02. See E1 in the DB
+# 03. Delete the attribute P1
+# 04. See E1 in the DB - make sure attrNames is OK, and that E1's modDate has been updated
+# 05. Delete the attribute P1
+# 06. See E1 in the DB - make sure attrNames is EMPTY, and that E1's modDate has been updated
+#
+
+echo "01. Create an entity E1 with two attrs P1+P2"
+echo "============================================"
+payload='{
+  "id": "urn:ngsi-ld:T:E1",
+  "type": "T",
+  "P1": 1,
+  "P2": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the DB"
+echo "===================="
+mongoCmd2 ftest "db.entities.findOne()" | tee /tmp/mongoCmd2.out
+#
+# creDate and modDate need to be the same
+#
+creDate2=$(egrep '^	"creDate" : ' /tmp/mongoCmd2.out | awk -F: '{print $2}' | awk -F, '{print $1}')
+modDate2=$(egrep '^	"modDate" : ' /tmp/mongoCmd2.out | awk -F: '{print $2}' | awk -F, '{print $1}')
+if [ "$creDate2" != "$modDate2" ]
+then
+  echo "Error: DB creDate and modDate need to be the same"
+  echo creDate: $creDate2
+  echo modDate: $modDate2
+else
+  echo "DB timestamps are OK"
+fi
+echo
+echo
+
+
+echo "03. Delete the attribute P1"
+echo "==========================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/P1 -X DELETE
+echo
+echo
+
+
+echo "04. See E1 in the DB - make sure attrNames is OK, and that E1's modDate has been updated"
+echo "========================================================================================"
+mongoCmd2 ftest "db.entities.findOne()" | tee /tmp/mongoCmd2.out
+#
+# creDate needs to be identical to $creDate2 and modDate must have changed (!= $modDate2)
+#
+creDate4=$(egrep '^	"creDate" : ' /tmp/mongoCmd2.out | awk -F: '{print $2}' | awk -F, '{print $1}')
+modDate4=$(egrep '^	"modDate" : ' /tmp/mongoCmd2.out | awk -F: '{print $2}' | awk -F, '{print $1}')
+if [ "$creDate4" != "$creDate2" ]
+then
+  echo "Error: DB creDate has changed"
+  echo Wanted: $creDate2
+  echo Got: $creDate4
+elif [ "$modDate4" == "$modDate2" ]
+then
+  echo "Error: DB modDate has NOT changed"
+else
+  echo "DB timestamps are OK"
+fi
+echo
+echo
+
+
+echo "05. Delete the attribute P2"
+echo "==========================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1/attrs/P2 -X DELETE
+echo
+echo
+
+
+echo "06. See E1 in the DB - make sure attrNames is EMPTY, and that E1's modDate has been updated"
+echo "==========================================================================================="
+mongoCmd2 ftest "db.entities.findOne()" | tee /tmp/mongoCmd2.out
+#
+# creDate needs to be identical to $creDate4 and modDate must have changed (!= $modDate4)
+#
+creDate6=$(egrep '^	"creDate" : ' /tmp/mongoCmd2.out | awk -F: '{print $2}' | awk -F, '{print $1}')
+modDate6=$(egrep '^	"modDate" : ' /tmp/mongoCmd2.out | awk -F: '{print $2}' | awk -F, '{print $1}')
+if [ "$creDate6" != "$creDate4" ]
+then
+  echo "Error: DB creDate has changed"
+  echo Wanted: $creDate4
+  echo Got: $creDate6
+elif [ "$modDate6" == "$modDate4" ]
+then
+  echo "Error: DB modDate has NOT changed"
+else
+  echo "DB timestamps are OK"
+fi
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with two attrs P1+P2
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
+
+
+
+02. See E1 in the DB
+====================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+DB timestamps are OK
+
+
+03. Delete the attribute P1
+===========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. See E1 in the DB - make sure attrNames is OK, and that E1's modDate has been updated
+========================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+DB timestamps are OK
+
+
+05. Delete the attribute P2
+===========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. See E1 in the DB - make sure attrNames is EMPTY, and that E1's modDate has been updated
+===========================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [ ],
+	"attrs" : {
+		
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+DB timestamps are OK
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

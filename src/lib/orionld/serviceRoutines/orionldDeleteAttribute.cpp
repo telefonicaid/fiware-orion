@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -20,131 +20,25 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin and Gabriel Quaresma
+* Author: Ken Zangelin
 */
-#include <string>                                                // std::string  - for servicePath only
-#include <vector>                                                // std::vector  - for servicePath only
-
 extern "C"
 {
-#include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
-#include "kjson/kjBuilder.h"                                     // kjChildRemove
+#include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/legacyDriver/legacyDeleteAttribute.h"          // legacyDeleteAttribute
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
-#include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldDeleteAttributeDatasetId -
-//
-// PARAMETERS
-//   entityId             The ID of the entity
-//   attrNameExpanded     Expanded Attribute Name
-//   attrNameExpandedEq   Expanded Attribute Name with dots already replaced for EQ signs
-//   datasetId            If NULL - all datasets for the attribute are deleted, else only the matching one
-//
-bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameExpanded, const char* attrNameExpandedEq, const char* datasetId)
-{
-  char fieldPath[512];
-
-  //
-  // Remove the entire dataset?
-  //
-  if (datasetId == NULL)
-  {
-    snprintf(fieldPath, sizeof(fieldPath), "@datasets.%s", attrNameExpandedEq);
-    if (dbEntityFieldDelete(entityId, fieldPath) == false)
-    {
-      orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
-      return false;
-    }
-
-    orionldState.httpStatusCode = 204;
-
-    return true;
-  }
-
-
-  //
-  // Remove a single dataset instance
-  //   1. Get the @datasets for 'attrNameExpandedEq':
-  //      KjTree* datasetsP = dbDatasetGet(entityId, attrName, attrNameExpandedEq);
-  //   2. Lookup the matching object (not found? 404)
-  //   3. Remove the matching object from datasetsP
-  //   4. Replace @datasets.attrNameExpandedEq with what's left in datasetsP
-  //      mongoCppLegacyEntityFieldReplace(entityId, fieldPath, datasetsP);
-  KjNode* datasetsP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
-
-  if (datasetsP == NULL)
-  {
-    orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
-    return false;
-  }
-
-  char datasetPath[512];
-  snprintf(datasetPath, sizeof(datasetPath), "@datasets.%s", attrNameExpandedEq);
-
-  if (datasetsP->type == KjArray)
-  {
-    bool found = false;
-
-    for (KjNode* instanceP = datasetsP->value.firstChildP; instanceP != NULL; instanceP = instanceP->next)
-    {
-      KjNode* datasetIdNode = kjLookup(instanceP, "datasetId");
-
-      if ((datasetIdNode != NULL) && (strcmp(datasetIdNode->value.s, datasetId) == 0))
-      {
-        // Found it
-        kjChildRemove(datasetsP, instanceP);
-        found = true;
-        break;
-      }
-    }
-
-    if (found == false)
-    {
-      orionldError(OrionldResourceNotFound, "Attribute dataset not found", datasetId, 404);
-      return false;
-    }
-
-    dbEntityFieldReplace(entityId, datasetPath, datasetsP);
-  }
-  else
-  {
-    //
-    // One single instance - if it matches, the entire item in @datasets is removed
-    //                                      else: 404
-    //
-    KjNode* datasetIdNode = kjLookup(datasetsP, "datasetId");
-
-    if ((datasetIdNode == NULL) || (strcmp(datasetIdNode->value.s, datasetId) != 0))
-    {
-      orionldError(OrionldResourceNotFound, "Attribute dataset not found", datasetId, 404);
-      return false;
-    }
-
-    // It matched - the entire item in @datasets is removed
-    dbEntityFieldDelete(entityId, datasetPath);
-  }
-
-  orionldState.httpStatusCode = 204;
-  return true;
-}
+#include "orionld/mongoc/mongocEntityGet.h"                      // mongocEntityGet
+#include "orionld/mongoc/mongocAttributeDelete.h"                // mongocAttributeDelete
+#include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own interface
 
 
 
@@ -154,19 +48,11 @@ bool orionldDeleteAttributeDatasetId(const char* entityId, const char* attrNameE
 //
 bool orionldDeleteAttribute(void)
 {
-  char*    entityId         = orionldState.wildcard[0];
-  char*    attrName         = orionldState.wildcard[1];
-  char*    attrNameExpanded = orionldState.in.pathAttrExpanded;
-  char*    attrNameExpandedEq;
+  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+    return legacyDeleteAttribute();
 
-  //
-  // URI param check: both datasetId and deleteAll cannot be set
-  //
-  if ((orionldState.uriParams.datasetId != NULL) && (orionldState.uriParams.deleteAll == true))
-  {
-    orionldError(OrionldBadRequestData, "Invalid URI param combination", "both datasetId and deleteAll are set", 400);
-    return false;
-  }
+  char* entityId = orionldState.wildcard[0];
+  char* attrName = orionldState.wildcard[1];
 
   //
   // Make sure the Entity ID is a valid URI
@@ -182,69 +68,47 @@ bool orionldDeleteAttribute(void)
 
 
   //
-  // Expand the attribute name and save it in the orionldState.wildcard array, so that the TROE won't have to expand it as well
+  // orionldMhdConnectionTreat() expands the attribute name for us.
+  // Here we save it in the orionldState.wildcard array, so that TRoE won't have to expand it
   //
   orionldState.wildcard[1] = orionldState.in.pathAttrExpanded;
 
-  attrNameExpandedEq = kaStrdup(&orionldState.kalloc, orionldState.in.pathAttrExpanded);
-  dotForEq(attrNameExpandedEq);
-
-
   //
-  // Three possibilities here (well, four, if we count the error of "both SET"):
+  // Retrieve part of the entity from the database (only attrNames)
   //
-  // URI Param datasetId   URI Param deleteAll  Action
-  // -------------------   -------------------  ---------------------
-  //      SET                    SET            Error - already taken care of
-  //      SET                    NOT SET        Delete only the dataset instance with the matching datasetId
-  //      NOT SET                SET            Delete both the default attribute and ALL dataset instances
-  //      NOT SET                NOT SET        Delete only the default attribute
-  //
-  if (orionldState.uriParams.datasetId != NULL)
+  const char* projection[] = { "attrNames", NULL };
+  KjNode*     dbEntityP    = mongocEntityGet(entityId, projection, false);
+
+  if (dbEntityP == NULL)
   {
-    if (dbEntityAttributeInstanceLookup(entityId, attrNameExpandedEq, orionldState.uriParams.datasetId) == NULL)
-    {
-      orionldError(OrionldResourceNotFound, "Entity/Attribute/datasetId not found", attrNameExpanded, 404);
-      return false;
-    }
-  }
-  else if (orionldState.uriParams.deleteAll == true)
-  {
-    // GET attribute AND its dataset
-    orionldState.dbAttrWithDatasetsP = dbEntityAttributeWithDatasetsLookup(entityId, attrNameExpandedEq);
-    if (orionldState.dbAttrWithDatasetsP == NULL)
-    {
-      orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
-      return false;
-    }
-  }
-  else
-  {
-    if (dbEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
-    {
-      orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
-      return false;
-    }
+    orionldError(OrionldResourceNotFound, "Entity Not Found", entityId, 404);
+    return false;
   }
 
-  if (orionldState.uriParams.datasetId != NULL)
+  kjTreeLog(dbEntityP, "dbEntityP");
+  KjNode* attrNamesP = kjLookup(dbEntityP, "attrNames");
+  if (attrNamesP == NULL)
   {
-    return orionldDeleteAttributeDatasetId(entityId, attrNameExpanded, attrNameExpandedEq, orionldState.uriParams.datasetId);
-  }
-  else if (orionldState.uriParams.deleteAll == true)
-  {
-    if (orionldDeleteAttributeDatasetId(entityId, attrName, attrNameExpandedEq, NULL) == false)
-      return false;
+    orionldError(OrionldInternalError, "Database Error (attrNames field not present in database)", entityId, 500);
+    return false;
   }
 
-  char* attrNameV[1] = { attrNameExpandedEq };
-  if (dbEntityAttributesDelete(entityId, attrNameV, 1) == false)
+  KjNode* attrNameP = kjStringValueLookupInArray(attrNamesP, orionldState.in.pathAttrExpanded);
+  if (attrNameP == NULL)
   {
-    LM_W(("dbEntityAttributesDelete failed"));
-    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", attrNameExpanded, 404);
+    orionldError(OrionldResourceNotFound, "Entity/Attribute not found", orionldState.in.pathAttrExpanded, 404);
+    return false;
+  }
+
+  int r = mongocAttributeDelete(entityId, orionldState.in.pathAttrExpanded);
+  if (r == false)
+  {
+    orionldError(OrionldInternalError, "Database Error (deleting attribute from entity)", entityId, 500);
     return false;
   }
 
   orionldState.httpStatusCode = 204;
+  orionldState.requestTree    = NULL;
+
   return true;
 }

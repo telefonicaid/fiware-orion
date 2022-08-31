@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCATTRIBUTEDELETE_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCATTRIBUTEDELETE_H_
 
 /*
 *
@@ -28,10 +28,10 @@
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldDeleteAttribute -
+// mongocAttributeDelete -
 //
-extern bool orionldDeleteAttribute(void);
+extern bool mongocAttributeDelete(const char* entityId, const char* attributeName);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCATTRIBUTEDELETE_H_

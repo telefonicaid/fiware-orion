@@ -49,7 +49,7 @@ extern "C"
 //   * orionldPostEntity   - The entire DB Entity is needed as it is later used as base for the "merge" with the payload body
 //
 // So, this function is quite needed, just as it is.
-// I could merge the two though, moving the dbModel stuff from mongocEntityRetrieve
+// FIXME: I should merge the two though, moving all the dbModel stuff away from mongocEntityRetrieve
 //
 KjNode* mongocEntityLookup(const char* entityId)
 {
@@ -75,7 +75,6 @@ KjNode* mongocEntityLookup(const char* entityId)
   //
   // Run the query
   //
-  // semTake(&mongoEntitiesSem);
   if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
