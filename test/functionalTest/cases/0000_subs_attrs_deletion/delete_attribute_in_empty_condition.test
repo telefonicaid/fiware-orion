@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Delete attribute (when attribute is in subject.condition)
+Delete attribute (when subject.condition.attrs is empty)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,7 +32,7 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create entity E1 with attributes A:1, B:2, C:3
-# 02. Subscribe to E.* for A, B and C; triggered by B, C
+# 02. Subscribe to E.* for A, B and C; triggered by any attribute
 # 03. Delete attribute B
 # 04. Dump accumulator: see notification with A and C (B has been deleted)
 # 05. Get subscription and check timesSent is 1
@@ -62,8 +62,8 @@ echo
 echo
 
 
-echo "02. Subscribe to E.* for A, B and C; triggered by B, C"
-echo "======================================================"
+echo "02. Subscribe to E.* for A, B and C; triggered by any attribute"
+echo "==============================================================="
 payload='{
   "subject": {
     "entities": [
@@ -71,10 +71,7 @@ payload='{
         "idPattern": "E.*",
         "type": "T"
       }
-    ],
-    "condition": {
-      "attrs": [ "B", "C" ]
-    }
+    ]
   },
   "notification": {
     "http": {
@@ -121,8 +118,8 @@ Date: REGEX(.*)
 
 
 
-02. Subscribe to E.* for A, B and C; triggered by B, C
-======================================================
+02. Subscribe to E.* for A, B and C; triggered by any attribute
+===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -176,7 +173,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Get subscription and check timesSent is 1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 417
+Content-Length: 410
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -204,10 +201,7 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": [
-                    "B",
-                    "C"
-                ]
+                "attrs": []
             },
             "entities": [
                 {
