@@ -91,9 +91,6 @@ bool mongocAttributesAdd
     bson_append_document_end(&push, &eachBson);
     bson_append_document(&request, "$push",  5, &push);
 
-    char* json = bson_as_canonical_extended_json(&request, NULL);
-    LM(("PE: request: %s", json));
-
     bson_destroy(&commaArrayBson);
     bson_destroy(&eachBson);
     bson_destroy(&push);
