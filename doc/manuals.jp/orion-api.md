@@ -67,6 +67,11 @@
     - [通知トリガー (Notification triggering)](#notification-triggering)
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
+      - [マクロ置換 (Macro substitution)](#macro-substitution)
+      - [JSON ペイロード (JSON payloads)](#json-payloads)
+      - [ペイロードの省略 (Omitting payload)](#omitting-payload)
+      - [ヘッダの削除 (Remove headers)](#remove-headers)
+      - [その他の考慮事項](#additional-considerations)
       - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
     - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
     - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
@@ -76,25 +81,25 @@
 - [API ルート (API Routes)](#api-routes)
     - [エンティティの操作 (Entities Operations)](#entities-operations)
         - [エンティティのリスト (Entities List)](#entities-list)
-            - [エンティティをリスト [GET /v2/entities]](#list-entities-get-v2entities)
-            - [エンティティを作成  [POST /v2/entities]](#create-entity-post-v2entities)
+            - [エンティティをリスト `GET /v2/entities`](#list-entities-get-v2entities)
+            - [エンティティを作成  `POST /v2/entities`](#create-entity-post-v2entities)
         - [id によるエンティティの操作 (Entity by ID)](#entity-by-id)
-            - [エンティティを取得 [GET /v2/entities/{entityId}]](#retrieve-entity-get-v2entitiesentityid)
-            - [エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs]](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
-            - [エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs]](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
-            - [既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs]](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
-            - [すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs]](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
-            - [エンティティを削除する [DELETE /v2/entities/{entityId}]](#remove-entity-delete-v2entitiesentityid)
+            - [エンティティを取得 `GET /v2/entities/{entityId}`](#retrieve-entity-get-v2entitiesentityid)
+            - [エンティティ属性を取得 `GET /v2/entities/{entityId}/attrs`](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
+            - [エンティティ属性の更新または追加 `POST /v2/entities/{entityId}/attrs`](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
+            - [既存のエンティティ属性の更新 `PATCH /v2/entities/{entityId}/attrs`](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
+            - [すべてのエンティティ属性を置換 `PUT /v2/entities/{entityId}/attrs`](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
+            - [エンティティを削除する `DELETE /v2/entities/{entityId}`](#remove-entity-delete-v2entitiesentityid)
         - [属性 (Attributes)](#attributes)
-            - [属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}]](#get-attribute-data-get-v2entitiesentityidattrsattrname)
-            - [属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}]](#update-attribute-data-put-v2entitiesentityidattrsattrname)
-            - [単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}]](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
+            - [属性データを取得 `GET /v2/entities/{entityId}/attrs/{attrName}`](#get-attribute-data-get-v2entitiesentityidattrsattrname)
+            - [属性データを更新 `PUT /v2/entities/{entityId}/attrs/{attrName}`](#update-attribute-data-put-v2entitiesentityidattrsattrname)
+            - [単一の属性を削除 `DELETE /v2/entities/{entityId}/attrs/{attrName}`](#remove-a-single-attribute-delete-v2entitiesentityidattrsattrname)
         - [属性値 (Attribute Value)](#attribute-value)
-            - [属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value]](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
-            - [属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value]](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
+            - [属性値を取得 `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
+            - [属性値を更新 `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [エンティティ型 (Types)](#types)
-            - [全エンティティ型のリスト [GET /v2/types]](#list-entity-types-get-v2types)
-            - [特定の型のエンティティ情報を取得 [GET /v2/types/{type}]](#retrieve-entity-information-for-a-given-type-get-v2typestype)
+            - [全エンティティ型のリスト `GET /v2/types`](#list-entity-types-get-v2types)
+            - [特定の型のエンティティ情報を取得 `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [サブスクリプションの操作 (Subscriptions Operations)](#subscriptions-operations)
         - [サブスクリプション・ペイロード・データモデル](#subscription-payload-datamodel)
             - [`subscription`](#subscription)
@@ -106,12 +111,12 @@
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
             - [`subscription.notification.mqttCustom`](#subscriptionnotificationmqttcustom)
         - [サブスクリプションのリスト](#subscription-list)
-            - [サブスクリプションをリスト [GET /v2/subscriptions]](#list-subscriptions-get-v2subscriptions)
-            - [サブスクリプションを作成 [POST /v2/subscriptions]](#create-subscription-post-v2subscriptions)
+            - [サブスクリプションをリスト `GET /v2/subscriptions`](#list-subscriptions-get-v2subscriptions)
+            - [サブスクリプションを作成 `POST /v2/subscriptions`](#create-subscription-post-v2subscriptions)
         - [id によるサブスクリプションの操作](#subscription-by-id)
-            - [サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]](#retrieve-subscription-get-v2subscriptionssubscriptionid)
-            - [サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]](#update-subscription-patch-v2subscriptionssubscriptionid)
-            - [サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]](#delete-subscription-delete-v2subscriptionssubscriptionid)
+            - [サブスクリプションを取得 `GET /v2/subscriptions/{subscriptionId}`](#retrieve-subscription-get-v2subscriptionssubscriptionid)
+            - [サブスクリプションを更新 `PATCH /v2/subscriptions/{subscriptionId}`](#update-subscription-patch-v2subscriptionssubscriptionid)
+            - [サブスクリプションを削除 `DELETE /v2/subscriptions/{subscriptionId}`](#delete-subscription-delete-v2subscriptionssubscriptionid)
     - [レジストレーションの操作 (Registration Operations)](#registration-operations)
         - [レジストレーション・ペイロード・データモデル](#registration-payload-datamodel)
             - [`registration`](#registration)
@@ -119,18 +124,18 @@
             - [`registration.dataProvided`](#registrationdataprovided)
             - [`registration.forwardingInformation`](#registrationforwardinginformation)
         - [レジストレーションのリスト](#registration-list)
-            - [レジストレーションをリスト [GET /v2/registrations]](#list-registrations-get-v2registrations)
-            - [レジストレーションを作成 [POST /v2/registrations]](#create-registration-post-v2registrations)
+            - [レジストレーションをリスト `GET /v2/registrations`](#list-registrations-get-v2registrations)
+            - [レジストレーションを作成 `POST /v2/registrations`](#create-registration-post-v2registrations)
         - [id によるレジストレーションの操作](#registration-by-id)
-            - [レジストレーションを取得 [GET /v2/registrations/{registrationId}]](#retrieve-registration-get-v2registrationsregistrationid)
-            - [レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]](#delete-registration-delete-v2registrationsregistrationid)
+            - [レジストレーションを取得 `GET /v2/registrations/{registrationId}`](#retrieve-registration-get-v2registrationsregistrationid)
+            - [レジストレーションを削除 `DELETE /v2/registrations/{registrationId}`](#delete-registration-delete-v2registrationsregistrationid)
     - [バッチ操作 (Batch Operations)](#batch-operations)
         - [更新操作 (Update operation)](#update-operation)
-            - [更新 [POST /v2/op/update]](#update-post-v2opupdate)
+            - [更新 `POST /v2/op/update`](#update-post-v2opupdate)
         - [クエリ操作 (Query operation)](#query-operation)
-            - [クエリ [POST /v2/op/query]](#query-post-v2opquery)
+            - [クエリ `POST /v2/op/query`](#query-post-v2opquery)
         - [通知操作 (Notify operation)](#notify-operation)
-            - [通知 [POST /v2/op/notify]](#notify-post-v2opnotify)
+            - [通知 `POST /v2/op/notify`](#notify-post-v2opnotify)
 - [元の NGSIv2 仕様に関する相違点](#differences-regarding-the-original-ngsiv2-spec)
        - [`actionType` メタデータ](#actiontype-metadata)
        - [あいまいなサブスクリプション・ステータス `failed` は使用されない](#ambiguous-subscription-status-failed-not-used)
@@ -158,7 +163,8 @@
 FIWARE NGSI (Next Generation Service Interface) API は、
 
 -   *コンテキスト・エンティティ*の概念を使用した単純な情報モデルに基づく、コンテキスト情報の**データ・モデル**
--   クエリ、サブスクリプション、および更新オペレーションによって情報を交換する**コンテキスト・データ・インターフェイス**
+-   クエリ、サブスクリプション、および更新オペレーションによって情報を交換する
+    **コンテキスト・データ・インターフェイス**
 -   コンテキスト情報を取得する方法に関する情報を交換するための**コンテキスト・アベイラビリティ・インタフェース**
     (2つのインタフェースを分離するかどうかは、現在検討中です)
 
@@ -178,13 +184,14 @@ NGSI データモデルの主な要素は、下図のように、コンテキス
 
 #### コンテキストのエンティティ (Context Entities)
 
-コンテキストのエンティティ、または単にエンティティは、FIWARE NGSI 情報モデルの中心です。エンティティはモノ、すなわち、
-任意の物理的または論理的オブジェクトです。たとえば、センサ、人、部屋、発券システムの問題などです。各エンティティには
-**entity id** があります。
+コンテキストのエンティティ、または単にエンティティは、Orion NGSIv2 ベースの情報モデルの中心です。エンティティはモノ、
+すなわち、任意の物理的または論理的オブジェクトです。たとえば、センサ、人、部屋、発券システムの問題などです。
+各エンティティには **entity id** があります。
 
-さらに、FIWARE NGSI の型システム (type system) により、エンティティは、**エンティティ型 (entity type)** を持つことが
-できます。エンティティ型はセマンティック型です。エンティティによって表されるモノの種類を記述することを意図しています。
-たとえば、id *sensor-365* のコンテキストのエンティティは、*temperatureSensor* 型を持つことができます。
+さらに、Orion NGSIv2 ベースの情報モデルの型システム (type system) により、エンティティは、**エンティティ型 (entity
+type)** を持つことができます。エンティティ型はセマンティック型です。エンティティによって表されるモノの種類を
+記述することを意図しています。たとえば、id *sensor-365* のコンテキストのエンティティは、*temperatureSensor*
+型を持つことができます。
 
 各エンティティは、その id と型の組み合わせによって一意に識別されます。
 
@@ -287,8 +294,8 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 
 ## 簡略化されたエンティティ表現 (Simplified Entity Representation)
 
-実装によってサポートされなければならない 2つの表現モードがあります。これらの表現モードは、エンティティの簡略化された表現
-を生成することを可能にします。
+*正規化された* (normalizeed) 表現モードとは別に、Orion でサポートされている3つの表現モードがあります。
+これらの表現モードにより、エンティティの簡略化された表現を生成できます。
 
 -   *keyValues* モード。このモードでは、型とメタデータに関する情報を除外して、エンティティの属性を値のみで表します。
     以下の例を参照してください
@@ -544,7 +551,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   異なるスコープで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
     に `Tree` 型のエンティティ ID `Tree1` を作成し、`Madrid/Gardens/ParqueOeste` に `Tree` 型の ID `Tree1`
     の別のエンティティをエラーなしで作成できます。ただし、このシナリオでは query が奇妙になる可能性があります
-    (たとえば、`Fiware-ServicePath /Madrid/Gardens` の query は、query response で同じ ID と型を持つ2つの
+    (たとえば、`Fiware-ServicePath /Madrid/Gardens` のクエリは、クエリ・レスポンスで同じ ID と型を持つ2つの
     エンティティを返すため、それぞれがどのスコープに属しているかを区別するのが難しくなります)
 
 -   エンティティは1つの (そして、1つだけの) スコープに属します
@@ -802,7 +809,7 @@ DateTime 属性 `null` の値はフィルタで考慮されません。つまり
 
 Orion は常に `YYYY-MM-DDThh:mm:ss.sssZ` の形式を使用して日時属性/メタデータを提供します。ただし、Orion は
 `YYYY-MM-DDThh:mm:ss.ssZ` 形式を使用して他のタイムスタンプ (レジストレーション/サブスクリプションの有効期限、
-最後の通知/失敗/通知の成功など) を提供することに注意してください (これについては、
+最後の通知/通知の失敗/通知の成功など) を提供することに注意してください (これについては、
 [関連する Issue](https://github.com/telefonicaid/fiware-orion/issues/3671) を参照)。
 
 さらに、Orion は datetime を提供する場合、常に UTC/Zulu タイムゾーンを使用することに注意してください
@@ -1682,7 +1689,7 @@ PUT /v2/entities/E/attrs/temperature
 - `avg`: `25.6` (存在するがリクエストに影響された)
 - `accuracy`: `98.7` (リクエストにより追加されたメタデータ)
 
-この既定の動作におけるメタデータの "粘着性" (stikyness) の背後にある理論的根拠は、
+この既定の動作におけるメタデータの "粘着性" (stickiness) の背後にある理論的根拠は、
 [Orion リポジトリのこの Issue](https://github.com/telefonicaid/fiware-orion/issues/4033)で詳しく説明しています。
 
 現時点で、Orion では、導入された個々のメタデータ要素を削除することはできません。ただし、`metadata` を `{}` に設定して
@@ -2024,6 +2031,10 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 
 ## カスタム通知 (Custom Notifications)
 
+<a name="macro-substitution"></a>
+
+### マクロ置換 (Macro substitution)
+
 クライアントは、`notification.httpCustom` または `notification.mqttCustom` が使用されている場合、単純な
 テンプレート・メカニズムを使用して通知メッセージをカスタマイズできます。テンプレート化できるフィールドは、プロトコル・
 タイプによって異なります。
@@ -2091,9 +2102,9 @@ Content-Length: 31
 The temperature is 23.4 degrees
 ```
 
-`payload` が `null` に設定されている場合、そのサブスクリプションに関連付けられている通知にはペイロードが含まれません
-(つまり、コンテンツ長 0 の通知)。これは、`""` に設定された `payload` を使用したり、フィールドを省略したりすることと
-同じではないことに注意してください。その場合、通知は NGSIv2 正規化形式を使用して送信されます。
+<a name="json-payloads"></a>
+
+### JSON ペイロード (JSON payloads)
 
 `httpCustom` または `mqttCustom` の `payload` フィールドの代わりに、`json` フィールドを使用して JSON ベースの
 ペイロードを生成できます。例えば:
@@ -2127,23 +2138,17 @@ The temperature is 23.4 degrees
 -   `payload` と `json` は同時に使用できません
 -    `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `application/json` に設定されます
 
-カスタム通知を使用する際に考慮すべき考慮事項:
+<a name="omitting-payload"></a>
 
--   クライアントは、置換後に通知が正しい HTTP メッセージであることを確認する責任があります。たとえば Content-Type
-    ヘッダが application/xml の場合、ペイロードは 整形式 XML 文書に対応する必要があります。具体的には、テンプレート
-    適用後の結果の URL の形式が誤っている場合、通知は送信されません
--   通知するデータに複数のエンティティが含まれている場合は、エンティティごとに個別の通知 (HTTP メッセージ) が送信
-    されます。デフォルトの動作とは異なり、すべてのエンティティが同じ HTTP メッセージで送信されます
--   禁止されている文字の制限により、Orion は発信するカスタム通知に追加のデコード・ステップを適用します。これについては、
-    [カスタム・ペイロードとヘッダの特別な処理](#custom-payload-and-headers-special-treats) セクションで詳しく説明して
-    います
--   Orion は、`-disableCustomNotifications` [CLI パラメータ](admin/cli.md) を使用して、カスタム通知を無効にするように
-    構成できます。この場合:
-    -   `httpCustom` は `http` として解釈されます。つまり、`url` を除くすべてのサブ・フィールドは無視されます
-    -   `${...}` マクロ置換は実行されません
+### ペイロードの省略 (Omitting payload)
 
-通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
-`Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
+`payload` が `null` に設定されている場合、そのサブスクリプションに関連付けられている通知にはペイロードが含まれません
+(つまり、コンテンツ長 0 の通知)。これは、`""` に設定された `payload` を使用したり、フィールドを省略したりすることと
+同じではないことに注意してください。その場合、通知は NGSIv2 正規化形式を使用して送信されます。
+
+<a name="remove-headers"></a>
+
+### ヘッダの削除 (Remove headers)
 
 `headers` オブジェクトのヘッダ・キーに空の文字列値を指定すると、そのヘッダが通知から削除されます。
 たとえば、次の構成です:
@@ -2162,6 +2167,28 @@ The temperature is 23.4 degrees
 例えば：
 -   通知にデフォルトで含まれるヘッダを避けるため (例: `Accept`)
 -   前述の `x-auth-token` などのヘッダの伝播 (更新から通知まで) をカットするため
+
+<a name="additional-considerations"></a>
+
+### その他の考慮事項
+
+カスタム通知を使用する際に考慮すべき考慮事項:
+
+-   クライアントは、置換後に通知が正しい HTTP メッセージであることを確認する責任があります。たとえば Content-Type
+    ヘッダが application/xml の場合、ペイロードは 整形式 XML 文書に対応する必要があります。具体的には、テンプレート
+    適用後の結果の URL の形式が誤っている場合、通知は送信されません
+-   通知するデータに複数のエンティティが含まれている場合は、エンティティごとに個別の通知 (HTTP メッセージ) が送信
+    されます。デフォルトの動作とは異なり、すべてのエンティティが同じ HTTP メッセージで送信されます
+-   禁止されている文字の制限により、Orion は発信するカスタム通知に追加のデコード・ステップを適用します。これについては、
+    [カスタム・ペイロードとヘッダの特別な処理](#custom-payload-and-headers-special-treats) セクションで詳しく説明して
+    います
+-   Orion は、`-disableCustomNotifications` [CLI パラメータ](admin/cli.md) を使用して、カスタム通知を無効にするように
+    構成できます。この場合:
+    -   `httpCustom` は `http` として解釈されます。つまり、`url` を除くすべてのサブ・フィールドは無視されます
+    -   `${...}` マクロ置換は実行されません
+
+通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
+`Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
 
 <a name="custom-payload-and-headers-special-treatment"></a>
 
@@ -2477,7 +2504,7 @@ GET /v2/entities?orderBy=temperature,!humidity
 
 <a name="list-entities-get-v2entities"></a>
 
-#### エンティティをリスト [GET /v2/entities]
+#### エンティティをリスト `GET /v2/entities`
 
 [JSON エンティティ表現](#json-entity-representation) に従って、id、型、パターン・マッチング (id または型)によって
 異なる基準に一致するエンティティ・オブジェクトの配列、および/または、クエリまたは地理的クエリ
@@ -2591,7 +2618,7 @@ _**レスポンス・ペイロード**_
 
 <a name="create-entity-post-v2entities"></a>
 
-#### エンティティを作成  [POST /v2/entities]
+#### エンティティを作成  `POST /v2/entities`
 
 _**リクエスト・クエリ・パラメータ**_
 
@@ -2664,7 +2691,7 @@ _**レスポンス・ヘッダ**_
 
 <a name="retrieve-entity-get-v2entitiesentityid"></a>
 
-#### エンティティを取得 [GET /v2/entities/{entityId}]
+#### エンティティを取得 `GET /v2/entities/{entityId}`
 
 _**リクエスト URL パラメータ**_
 
@@ -2746,7 +2773,7 @@ _**レスポンス・ペイロード**_
 
 <a name="retrieve-entity-attributes-get-v2entitiesentityidattrs"></a>
 
-#### エンティティ属性を取得 [GET /v2/entities/{entityId}/attrs]
+#### エンティティ属性を取得 `GET /v2/entities/{entityId}/attrs`
 
 このリクエストは、エンティティ全体を取得するのと同様ですが、これは `id` と `type` フィールドを省略しています。
 
@@ -2827,7 +2854,7 @@ _**レスポンス・ペイロード**_
 
 <a name="update-or-append-entity-attributes-post-v2entitiesentityidattrs"></a>
 
-#### エンティティ属性の更新または追加 [POST /v2/entities/{entityId}/attrs]
+#### エンティティ属性の更新または追加 `POST /v2/entities/{entityId}/attrs`
 
 エンティティ属性は、`append` オペレーションのオプションが使用されているかどうかに応じて、ペイロード内の属性で更新
 されます。
@@ -2896,7 +2923,7 @@ _**レスポンス・コード**_
 
 <a name="update-existing-entity-attributes-patch-v2entitiesentityidattrs"></a>
 
-#### 既存のエンティティ属性の更新 [PATCH /v2/entities/{entityId}/attrs]
+#### 既存のエンティティ属性の更新 `PATCH /v2/entities/{entityId}/attrs`
 
 エンティティ属性は、ペイロード内の属性で更新されます。それに加えて、ペイロード内の1つ以上の属性がエンティティに存在
 しない場合、エラーが返されます。
@@ -2961,7 +2988,7 @@ _**レスポンス**_
 
 <a name="replace-all-entity-attributes-put-v2entitiesentityidattrs"></a>
 
-#### すべてのエンティティ属性を置換 [PUT /v2/entities/{entityId}/attrs]
+#### すべてのエンティティ属性を置換 `PUT /v2/entities/{entityId}/attrs`
 
 ペイロード内の新しいエンティティ属性がエンティティに追加されます。以前にエンティティに存在していた属性が削除され、
 リクエスト内の属性に置き換えられます。
@@ -3025,7 +3052,7 @@ _**レスポンス・コード**_
 
 <a name="remove-entity-delete-v2entitiesentityid"></a>
 
-#### エンティティを削除する [DELETE /v2/entities/{entityId}]
+#### エンティティを削除する `DELETE /v2/entities/{entityId}`
 
 エンティティを削除します。
 
@@ -3062,7 +3089,7 @@ _**レスポンス・コード**_
 
 <a name="get-attribute-data-get-v2entitiesentityidattrsattrname"></a>
 
-#### 属性データを取得 [GET /v2/entities/{entityId}/attrs/{attrName}]
+#### 属性データを取得 `GET /v2/entities/{entityId}/attrs/{attrName}`
 
 属性の属性データを含む JSON オブジェクトを返します。オブジェクトは、属性の JSON 表現に従います
 ([JSON 属性表現](#json-attribute-representation)のセクションで説明)。
@@ -3125,7 +3152,7 @@ _**レスポンス・ペイロード**_
 
 <a name="update-attribute-data-put-v2entitiesentityidattrsattrname"></a>
 
-#### 属性データを更新 [PUT /v2/entities/{entityId}/attrs/{attrName}]
+#### 属性データを更新 `PUT /v2/entities/{entityId}/attrs/{attrName}`
 
 リクエスト・ペイロードは、新しい属性データを表すオブジェクトです。
 以前の属性データは、リクエスト内の属性データに置き換えられます。
@@ -3190,7 +3217,7 @@ _**レスポンス・コード**_
 
 <a name="remove-a-single-attribute-delete-v2entitiesentityidattrsattrname"></a>
 
-#### 単一の属性を削除 [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+#### 単一の属性を削除 `DELETE /v2/entities/{entityId}/attrs/{attrName}`
 
 エンティティ属性を削除します。
 
@@ -3228,7 +3255,7 @@ _**レスポンス・コード**_
 
 <a name="get-attribute-value-get-v2entitiesentityidattrsattrnamevalue"></a>
 
-#### 属性値を取得 [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+#### 属性値を取得 `GET /v2/entities/{entityId}/attrs/{attrName}/value`
 
 このオペレーションは属性の値  (Attribute Value) を持つ `value` プロパティを返します。
 
@@ -3299,7 +3326,7 @@ _**レスポンス・ペイロード**_
 
 <a name="update-attribute-value-put-v2entitiesentityidattrsattrnamevalue"></a>
 
-#### 属性値を更新 [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+#### 属性値を更新 `PUT /v2/entities/{entityId}/attrs/{attrName}/value`
 
 リクエスト・ペイロードは新しい属性値です。
 
@@ -3372,7 +3399,7 @@ _**レスポンス・コード**_
 
 <a name="list-entity-types-get-v2types"></a>
 
-#### 全エンティティ型のリスト [GET /v2/types]
+#### 全エンティティ型のリスト `GET /v2/types`
 
 以下のレスポンス・ペイロード セクションで説明されているように、エンティティ型のリストを取得します。
 
@@ -3464,7 +3491,7 @@ _**レスポンス・ペイロード**_
 
 <a name="retrieve-entity-information-for-a-given-type-get-v2typestype"></a>
 
-#### 特定の型のエンティティ情報を取得 [GET /v2/types/{type}]
+#### 特定の型のエンティティ情報を取得 `GET /v2/types/{type}`
 
 この操作は、以下のレスポンス・ペイロード セクションで説明されているように、型に関する情報を含む JSON
 オブジェクトを返します。
@@ -3575,7 +3602,6 @@ _**レスポンス・ペイロード**_
 | パラメータ        | オプション | タイプ | 説明                                                                                                                                                                                                                                                                               |
 |-------------------|------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`           | ✓          | array  | 通知をトリガーする属性名の配列。空のリストは許可されていません                                                                                                                                                                                                                     |
-| `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry` および `coords` で構成される式 (このフィールドについては、上記の[エンティティをリスト](#list-entities-get-v2entities)の操作を参照してください)                                                                                                     |
 | `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません |
 | `alterationTypes` | ✓          | array  | サブスクリプションがトリガーされる変更 (エンティティの作成、エンティティの変更など) を指定します ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを参照)                                                                               |
 
@@ -3638,13 +3664,13 @@ time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | c
 
 `mqtt` オブジェクトには、次のサブフィールドが含まれています:
 
-| パラメータ | オプション | タイプ | 説明                                                                                                                                                  |
-|------------|------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                   |
+|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
-| `topic`    |            | string | 使用する MQTT トピックを表します                                                                                                                      |
-| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                     |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザー名                                                                                                |
-| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常にオフになります (例: `GET /v2/subscriptions`)                                  |
+| `topic`    |            | string | 使用する MQTT トピックを表します                                                                                                                       |
+| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
+| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザー名                                                                                                 |
+| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
 
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
 
@@ -3671,13 +3697,13 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 
 `mqttCustom` オブジェクトには、次のサブフィールドが含まれています:
 
-| パラメータ | オプション | タイプ | 説明                                                                                                                                                  |
-|------------|------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                   |
+|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
-| `topic`    |            | string | 使用する MQTT トピックを表します. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                            |
-| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                     |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザー名                                                                                                |
-| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常にオフになります (例: `GET /v2/subscriptions`)                                  |
+| `topic`    |            | string | 使用する MQTT トピックを表します. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                             |
+| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
+| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザー名                                                                                                 |
+| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
 | `payload`  | ✓          | string | 通知で使用されるペイロード。省略した場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます          |
 
 `mqttCustom` を使用する場合は、[カスタム通知](#custom-notifications)のセクションで説明されている考慮事項が適用されます。
@@ -3689,7 +3715,7 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 
 <a name="list-subscriptions-get-v2subscriptions"></a>
 
-#### サブスクリプションをリスト [GET /v2/subscriptions]
+#### サブスクリプションをリスト `GET /v2/subscriptions`
 
 システムに存在するすべてのサブスクリプションのリストを返します:
 
@@ -3776,7 +3802,7 @@ _**レスポンス・ペイロード**_
 
 <a name="create-subscription-post-v2subscriptions"></a>
 
-#### サブスクリプションを作成 [POST /v2/subscriptions]
+#### サブスクリプションを作成 `POST /v2/subscriptions`
 
 新しいサブスクリプションを作成します。
 
@@ -3840,7 +3866,7 @@ _**レスポンス・ヘッダ**_
 
 <a name="retrieve-subscription-get-v2subscriptionssubscriptionid"></a>
 
-#### サブスクリプションを取得 [GET /v2/subscriptions/{subscriptionId}]
+#### サブスクリプションを取得 `GET /v2/subscriptions/{subscriptionId}`
 
 リクエストされたサブスクリプションを返します。
 
@@ -3911,7 +3937,7 @@ _**レスポンス・ペイロード**_
 
 <a name="update-subscription-patch-v2subscriptionssubscriptionid"></a>
 
-#### サブスクリプションを更新 [PATCH /v2/subscriptions/{subscriptionId}]
+#### サブスクリプションを更新 `PATCH /v2/subscriptions/{subscriptionId}`
 
 サブスクリプションでは、リクエストに含まれるフィールドのみが更新されます。
 
@@ -3952,7 +3978,7 @@ _**レスポンス・コード**_
 
 <a name="delete-subscription-delete-v2subscriptionssubscriptionid"></a>
 
-#### サブスクリプションを削除 [DELETE /v2/subscriptions/{subscriptionId}]
+#### サブスクリプションを削除 `DELETE /v2/subscriptions/{subscriptionId}`
 
 サブスクリプションをキャンセルします。
 
@@ -4059,7 +4085,7 @@ NGSIv1 ベースのクエリ/更新が使用されます。NGSIv1 は非推奨�
 
 <a name="list-registrations-get-v2registrations"></a>
 
-#### レジストレーションをリスト [GET /v2/registrations]
+#### レジストレーションをリスト `GET /v2/registrations`
 
 システムに存在するすべてのコンテキスト・プロバイダのレジストレーションをリストします。
 
@@ -4137,7 +4163,7 @@ _**レスポンス・ペイロード**_
 
 <a name="create-registration-post-v2registrations"></a>
 
-#### レジストレーションの作成 [POST /v2/registrations]
+#### レジストレーションの作成 `POST /v2/registrations`
 
 新しいコンテキスト・プロバイダのレジストレーションを作成します。これは通常、特定のデータのプロバイダとしてコンテキスト・
 ソースをバインドするために使用されます。
@@ -4196,7 +4222,7 @@ _**レスポンス・ヘッダ**_
 
 <a name="retrieve-registration-get-v2registrationsregistrationid"></a>
 
-#### レジストレーションを取得 [GET /v2/registrations/{registrationId}]
+#### レジストレーションを取得 `GET /v2/registrations/{registrationId}`
 
 リクエストされたレジストレーションを返します。
 
@@ -4266,7 +4292,7 @@ _**レスポンス・ペイロード**_
 
 <a name="delete-registration-delete-v2registrationsregistrationid"></a>
 
-#### レジストレーションを削除 [DELETE /v2/registrations/{registrationId}]
+#### レジストレーションを削除 `DELETE /v2/registrations/{registrationId}`
 
 コンテキスト・プロバイダのレジストレーションを取り消します。
 
@@ -4301,7 +4327,7 @@ _**レスポンス・コード**_
 
 <a name="update-post-v2opupdate"></a>
 
-#### 更新 [POST /v2/op/update]
+#### 更新 `POST /v2/op/update`
 
 このオペレーションにより、単一のバッチ・オペレーション (Batch Operations) で複数のエンティティを作成、更新、
 および/または、削除することができます。
@@ -4393,7 +4419,7 @@ _**レスポンス・コード**_
 
 <a name="query-post-v2opquery"></a>
 
-#### クエリ [POST /v2/op/query]
+#### クエリ `POST /v2/op/query`
 
 このオペレーションは、リクエスト・ペイロードで提供されるフィルタに基づいて、既存のエンティティ間でクエリを実行します。
 
@@ -4530,7 +4556,7 @@ _**レスポンス・ペイロード**_
 
 <a name="notify-post-v2opnotify"></a>
 
-#### 通知 [POST /v2/op/notify]
+#### 通知 `POST /v2/op/notify`
 
 このオペレーションは、通知ペイロードを消費し、その通知によって含まれるすべてのエンティティのデータが永続化され、必要に
 応じて上書きされるようにすることを目的としています。これは、ある Orion エンドポイントが別の Orion エンドポイントに
@@ -4680,7 +4706,7 @@ NGSIv2 仕様の作業中に、いくつかの機能が開発されましたが�
     で削除されました) は引き続きサポートされています。たとえば、`options=dateModified` です。ただし、代わりに `attrs`
     を使用することを強くお勧めします (つまり、`attrs=dateModified,*` です)
 -   `POST /v2/op/update` は NGSIv1 と同じアクション タイプ、つまり `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE`,
-    `REPLACE` を受け入れます。ただし、これらは使用しないでください。常に次の対応するものを使用することをお勧めします:
+    `REPLACE` を受け入れます。ただし、常に次の対応するものを優先して、使用しないでください:
     `append`, `appendStrict`, `update`, `delete` および `replace`.
 -   `POST /v2/op/query` の `attributes` フィールドは非推奨です。これは `attrs`
     (クエリへのレスポンスに含める属性を選択する) と `expression` 内の `q` の単項属性フィルタ
