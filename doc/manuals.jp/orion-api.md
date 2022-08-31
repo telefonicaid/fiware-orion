@@ -1,4 +1,4 @@
-# FIWARE-NGSI v2 (release 2.1) 仕様
+# FIWARE NGSIv2 Orion API 仕様
 
 <!-- TOC -->
 
@@ -149,8 +149,12 @@
 
 # はじめに
 
-これは、[NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable) のリリース 2.1 です。2018年9月15日に
-リリースされた元の NGSIv2 と完全な下位互換性があります。
+このドキュメントでは、FIWARE NSGISv2 Orion API 仕様について説明します。Orion API は
+[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/stable)]
+に基づいて構築され、膨大な数の改善と機能強化を追加しています。
+
+Orion API は、のオリジナル NGSIv2 仕様と完全に互換性がありますが、いくつかの小さな違いについては、
+このドキュメントの最後にある[別紙]((#differences-regarding-the-original-ngsiv2-spec))で説明しています。
 
 <a name="specification"></a>
 
@@ -4611,9 +4615,9 @@ _**レスポンス・コード**_
 
 # 元の NGSIv2 仕様に関する相違点
 
-このセクションには、実装の決定により、[元の NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)
-で説明されているものとは異なるトピックが含まれています。これらの違いは、次の 2 つの意味で NGSIv2
-を長年使用してきた結果です。
+このセクションには、実装の決定により、[オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/stable/)
+で説明されているものとは異なるトピックが含まれています。これらの違いは、次の 2 つの意味で、垂直ソリューションを
+NGSIv2 と統合および運用してきた長年の経験の結果です。
 
 -   元々 NGSIv2 に含まれていた機能の一部は、実際のシナリオでは実際には役に立たなかったり、必要とされなかったりしました。
     したがって、Orion はそれを実装していません。 たとえば、レジストレーションの更新操作です
