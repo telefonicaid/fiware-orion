@@ -34,7 +34,7 @@ Fields:
     -   **id**: entity NGSI ID
     -   **type**: entity NGSI type
     -   **servicePath**: related with [the service
-        path](../user/service_path.md) functionality.
+        path](../orion-api.md#service-path) functionality.
 -   **attrs** is an keymap of the different attributes that have been
     created for that entity. The key is generated with the attribute
     name (changing "." for "=", as "." is not a valid character in
@@ -45,8 +45,8 @@ Fields:
         received at least one update). Up to version 0.10.1, this value
         is always a string, but in 0.11.0 this value can be also a JSON
         object or JSON vector to represent an structured value (see
-        section about [structured attribute values in user
-        manual](../user/structured_attribute_valued.md)).
+        section about [attribute representation in Orion API
+        specification](../orion-api.md#json-attribute-representation)).
     -   **md** (optional): custom metadata. This is a keymap of metadata
         objects. The key is generated with the metadata
         name (changing "." for "=", as "." is not a valid character in
@@ -84,7 +84,7 @@ Fields:
     for `Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32`
     is `f320136c-0192-11eb-a893-000c29df7908`.
 -   **expDate** (optional): expiration timestamp (as a Date object) for the
-    entity. Have a look to the [transient entities functionality](../user/transient_entities.md)
+    entity. Have a look to the [transient entities functionality](../orion-api.md#transient-entities)
     for more detail.  
 
 Regarding `location.coords` in can use several formats:
@@ -123,7 +123,7 @@ Regarding `location.coords` in can use several formats:
   "fixed" cases.
 
 Note that coordinate pairs use the longitude-latitude order, which is opposite to the order used
-in the [geo-location API](../user/geolocation.md). This is due to the internal
+in the [Simple Location Format](../orion-api.md#simple-location-format). This is due to the internal
 [MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
 (which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
 to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
@@ -200,7 +200,7 @@ Fields:
     For NGSIv1 format, use **JSON** as value for `format`.
     For NGSIv2, as of today, only **normalized** format is supported.
 -   **servicePath**: related with [the service
-    path](../user/service_path.md) functionality.
+    path](../orion-api.md#service-path) functionality.
 -   **status** (optional): either `active` (for active registrations) or `inactive` (for inactive registrations).
     The default status (i.e. if the document omits this field) is "active".
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
@@ -273,7 +273,7 @@ Fields:
     queries by subscription IDs are very fast (as there is an automatic
     default index in \_id).
 -   **servicePath**: related with [the service
-    path](../user/service_path.md) functionality. This is the service path
+    path](../orion-api.md#service-path) functionality. This is the service path
     associated to the query "encapsulated" by the subscription. Default
     is `/#`.
 -   **expiration**: this is the timestamp (as integer number, meaning seconds) on which the
@@ -306,24 +306,24 @@ Fields:
 -   **format**: the format to use to send notification, possible values are **JSON**
     (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
-    `oneshot` (for [oneshot subscriptions](../user/oneshot_subscription.md)). Note that NGSIv2 API consider additional states (e.g. `expired`)
+    `oneshot` (for [oneshot subscriptions](../orion-api.md#oneshot-subscriptions)). Note that Orion API consider additional states (e.g. `expired`)
     but they never hit the DB (they are managed by Orion).
 -   **statusLastChange**: last time status was updated (as decimal number, meaning seconds and fractions of seconds).
     This is mainly to be used by the subscription cache update logic (so status in updated in DB from cache only if it is newer).
 -   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 -   **timeout** this field configures the maximum time the subscription waits for the response for http 
 notifications. It is a number between 0 and 1800000. If defined to 0 or omitted, the default timeout will be used.
--   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the NGSIv2 API).
+-   **custom**: a boolean field to specify if this subscription uses customized notifications (a functionality in the Orion API).
     If this field exist and its value is "true" then customized notifications are used and the `headers`, `qs`, `method` and
     `payload` fields are taken into account.
--   **headers**: optional field to store the HTTP headers keymap for notification customization functionality in NGSIv2.
--   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
--   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
--   **payload**: optional field to store the payload for notification customization functionality in NGSIv2. If
+-   **headers**: optional field to store the HTTP headers keymap for notification customization functionality.
+-   **qs**: optional field to store the query parameters keymap for notification customization functionality.
+-   **method**: optional field to store the HTTP method for notification customization functionality.
+-   **payload**: optional field to store the payload for notification customization functionality. If
     its value is `null` means that no payload has to be included in the notification. If its value is `""` or if
     the field is omitted, then the NGSIv2 normalized format is used.
 -   **json**: optional field to store a JSON object or array to generated JSON-based payload for
-    notification customization functionality in NGSIv2. More detail of this functionality [here](../user/ngsiv2_implementation_notes.md#custom-notification-with-json-payload)
+    notification customization functionality in the Orion API. More detail of this functionality [here](../orion-api.md#json-payloads)
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.
@@ -335,10 +335,10 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     Not present if the subscription has never provoked a successful notification.
 -   **maxFailsLimit**: An optional field used to specify the maximum limit of connection attempts, so when that number of failing notifications is reached, then the subscription passes automatically to inactive state.
 -   **failsCounter**: the number of consecutive failing notifications associated to the subscription. This is increased by one each time a notification attempt fails. It is reset to 0 if a notification attempt successes.
--   **altTypes**: array with a list of alteration types associated to the subscription. If the field is not included, a default is assumed (check [this document](../user/subscriptions_alttype.md)).
+-   **altTypes**: array with a list of alteration types associated to the subscription. If the field is not included, a default is assumed (check [this document](../orion-api.md#subscriptions-based-in-alteration-type)).
 -   **covered**: a boolean field that specifies if all `attrs` have to be included in notifications (if value is true)
     or only the ones existing in the triggering entity (if value is false or field is omitted).
-    More information in [covered subscription section in user manual documentation](../user/ngsiv2_implementation_notes.md#covered-subscriptions).
+    More information in [covered subscription section in Orion API specification](../orion-api.md#covered-subscriptions).
 
 Example document:
 
