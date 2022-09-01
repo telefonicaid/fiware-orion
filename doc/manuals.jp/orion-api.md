@@ -28,7 +28,7 @@
     - [組み込みメタデータ (Builtin Metadata)](#builtin-metadata)
     - [属性名の制限 (Attribute names restrictions)](#attribute-names-restrictions)
     - [メタデータ名の制限 (Metadata names restrictions)](#metadata-names-restrictions)
-    - [組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
+    - [組み込み名に一致するユーザ属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
     - [Datetime サポート](#datetime-support)
     - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
         - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
@@ -86,10 +86,10 @@
         - [id によるエンティティの操作 (Entity by ID)](#entity-by-id)
             - [エンティティを取得 `GET /v2/entities/{entityId}`](#retrieve-entity-get-v2entitiesentityid)
             - [エンティティ属性を取得 `GET /v2/entities/{entityId}/attrs`](#retrieve-entity-attributes-get-v2entitiesentityidattrs)
-            - [エンティティ属性の更新または追加 `POST /v2/entities/{entityId}/attrs`](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
-            - [既存のエンティティ属性の更新 `PATCH /v2/entities/{entityId}/attrs`](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
+            - [エンティティ属性を更新または追加 `POST /v2/entities/{entityId}/attrs`](#update-or-append-entity-attributes-post-v2entitiesentityidattrs)
+            - [既存のエンティティ属性を更新 `PATCH /v2/entities/{entityId}/attrs`](#update-existing-entity-attributes-patch-v2entitiesentityidattrs)
             - [すべてのエンティティ属性を置換 `PUT /v2/entities/{entityId}/attrs`](#replace-all-entity-attributes-put-v2entitiesentityidattrs)
-            - [エンティティを削除する `DELETE /v2/entities/{entityId}`](#remove-entity-delete-v2entitiesentityid)
+            - [エンティティを削除 `DELETE /v2/entities/{entityId}`](#remove-entity-delete-v2entitiesentityid)
         - [属性 (Attributes)](#attributes)
             - [属性データを取得 `GET /v2/entities/{entityId}/attrs/{attrName}`](#get-attribute-data-get-v2entitiesentityidattrsattrname)
             - [属性データを更新 `PUT /v2/entities/{entityId}/attrs/{attrName}`](#update-attribute-data-put-v2entitiesentityidattrsattrname)
@@ -98,7 +98,7 @@
             - [属性値を取得 `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
             - [属性値を更新 `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [エンティティ型 (Types)](#types)
-            - [全エンティティ型のリスト `GET /v2/types`](#list-entity-types-get-v2types)
+            - [全エンティティ型をリスト `GET /v2/types`](#list-entity-types-get-v2types)
             - [特定の型のエンティティ情報を取得 `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [サブスクリプションの操作 (Subscriptions Operations)](#subscriptions-operations)
         - [サブスクリプション・ペイロード・データモデル](#subscription-payload-datamodel)
@@ -139,7 +139,7 @@
 - [オリジナルの NGSIv2 仕様に関する相違点](#differences-regarding-the-original-ngsiv2-spec)
     - [`actionType` メタデータ](#actiontype-metadata)
     - [あいまいなサブスクリプション・ステータス `failed` は使用されません](#ambiguous-subscription-status-failed-not-used)
-    - [`keyValues` は `POST /v2/op/notify` でサポートされない](#keyvalues-not-supported-in-post-v2opnotify)
+    - [`keyValues` は `POST /v2/op/notify` でサポートされません](#keyvalues-not-supported-in-post-v2opnotify)
     - [レジストレーションの実装の違い](#registration-implementation-differences)
     - [`GET /v2` 操作](#get-v2-operation)
     - [非推奨の機能 (Deprecated features)](#deprecated-features)
@@ -149,11 +149,11 @@
 
 # はじめに
 
-このドキュメントでは、FIWARE NSGISv2 Orion API 仕様について説明します。Orion API は
+このドキュメントでは、FIWARE NGSIv2 Orion API 仕様について説明します。Orion API は
 [オリジナルの NGSIv2 仕様](http://telefonicaid.github.io/fiware-orion/archive/api/v2/)
 に基づいて構築され、膨大な数の改善と機能強化を追加しています。
 
-Orion API は、のオリジナル NGSIv2 仕様と完全に互換性がありますが、いくつかの小さな違いについては、
+Orion API は、オリジナルの NGSIv2 仕様と完全に互換性がありますが、いくつかの小さな違いについては、
 このドキュメントの最後にある[別紙]((#differences-regarding-the-original-ngsiv2-spec))で説明しています。
 
 <a name="specification"></a>
@@ -439,8 +439,8 @@ Oron の実装では、この節で説明する HTTP ステータス・コード
 -   URL パラメータまたはペイロードのいずれかでリクエスト自体によってのみ発生するエラー (つまり、Orion の
     ステータスに依存しないエラー) は、`BadRequest` (`400`) となります
     -   例外: 受信した JSON ペイロード・エラー。これには別の `error` メッセージがあります (前の箇条書きを参照)
--   空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) になります。詳細は、"エンティティの
-    地理空間プロパティ"を参照してください
+-   空間インデックスの制限を超過しようとすると、`NoResourceAvailable` (`413`) になります。詳細は、
+    [エンティティの地理空間プロパティ](#geospatial-properties-of-entities)を参照してください
 -   リクエストに起因する曖昧さは、いくつかのリソースを参照する可能性があります。その id だけを提供するエンティティを更新
     しようとすると、その id を持つ複数のエンティティが存在すると、`TooManyResults` (`409`) になります
 -   リクエストによって識別されるリソースが見つからない場合、`NotFound` (`404`) が返されます
@@ -460,7 +460,7 @@ Oron の実装では、この節で説明する HTTP ステータス・コード
 Orion は、単純なマルチ・テナント/マルチ・サービス・モデル・ベースの論理データベース分離を実装し、他の FIWARE
 コンポーネントまたはサード・パーティ・ソフトウェアによって提供されるサービス/テナント・ベースの認可ポリシー
 (authorization policies) を容易にします。たとえば、FIWARE セキュリティ・フレームワーク (PEP Proxy, IDM,
-およびアクセス制御)の認可ポリシー。この機能は、`-multiservice` [コマンド・ライン オプション](admin/cli.md)
+およびアクセス制御) の認可ポリシー。この機能は、`-multiservice` [コマンド・ライン オプション](admin/cli.md)
 を使用するとアクティブになります。 `-multiservice` を使用すると、Orion はリクエストで `Fiware-Service` HTTP
 ヘッダを使用してサービス/テナントを識別します。HTTP リクエストにヘッダが存在しない場合、デフォルトの
 サービス/テナントが使用されます。
@@ -509,8 +509,8 @@ Orion は階層スコープをサポートしているため、エンティテ�
 
 たとえば、次のスコープを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
 
--   第1レベルのスコープとして、`マドリッド`
--   第2レベルのスコープ (マドリッドの子供たち) としての `Gardens` と `Districts`
+-   第1レベルのスコープとして、`Madrid`
+-   第2レベルのスコープ (Madrid の子供たち) としての `Gardens` と `Districts`
 -   `ParqueNorte`, `ParqueOeste`, `ParqueSur` (Gardens の子) および `Fuencarral` と `Latina` (Districts の子)
 -   `Parterre1` と `Parterre2` (ParqueNorte の子)
 
@@ -704,7 +704,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `type` は、エンティティ型を表すために使用されるフィールドと競合するためです
 -   `geo:distance` は、中心点に近接するために `orderBy` で使用される文字列と競合するためです
 -   組み込みの属性名。同じ属性名を使用することは可能ですが、まったく推奨されません。このドキュメントの
-    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
+    [組み込み名に一致するユーザ属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
     セクションを確認してください
 -   `*` は、"すべてのカスタム/ユーザ属性" ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を
     参照) という特別な意味を持っています
@@ -716,14 +716,14 @@ Orion は階層スコープをサポートしているため、エンティテ�
 次の文字列をメタデータ名として使用しないでください:
 
 -   組み込みのメタデータ名。同じメタデータ名を使用することは可能ですが、まったく推奨されません。このドキュメントの
-    [組み込み名に一致するユーザー属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
+    [組み込み名に一致するユーザ属性またはメタデータ](#user-attributes-or-metadata-matching-builtin-name)の
     セクションを確認してください
 -   `*` は、"すべてのカスタム/ユーザ・メタデータ"
     ([属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)を参照) という特別な意味を持っています
 
 <a name="user-attributes-or-metadata-matching-builtin-name"></a>
 
-## 組み込み名に一致するユーザー属性またはメタデータ (User attributes or metadata matching builtin name)
+## 組み込み名に一致するユーザ属性またはメタデータ (User attributes or metadata matching builtin name)
 
 (このセクションの内容は、`dateExpires` 属性を除くすべてのビルトインに適用されます。`dateExpires` に関する特定の情報に
 ついては、[一時エンティティのセクション](#transient-entities) を確認してください)。
@@ -796,7 +796,7 @@ DateTime 属性 `null` の値はフィルタで考慮されません。つまり
     - `DD`: day (2桁)
 -   `<time>` に関しては、[ISO8601 仕様](https://en.wikipedia.org/wiki/ISO_8601#Times) で説明されているパターンの
     いずれかに従う必要があります:
-    -   `hh:mm:ss.sss` または `hhmmss.sss`.
+    -   `hh:mm:ss.sss` または `hhmmss.sss`
     -   `hh:mm:ss` または `hhmmss`。この場合、ミリ秒は `000` に設定されます
     -   `hh:mm` または `hhmm`。この場合、秒は `00` に設定されます
     -   `hh`。この場合、分と秒は `00` に設定されます
@@ -981,7 +981,7 @@ GeoJSON を使用してエンコードされた位置を表すコンテキスト
 -   Polygon
 -   MultiPolygon
 
-実施されたテストの詳細については、[こちら] (https://github.com/telefonicaid/fiware-orion/issues/3586) を
+実施されたテストの詳細については、[こちら](https://github.com/telefonicaid/fiware-orion/issues/3586) を
 参照してください。
 
 タイプ `Feature` および `FeatureCollection` もサポートされていますが、特別な方法でサポートされています。`Feature`
@@ -1642,7 +1642,7 @@ Cは値 `2` で作成されます。
 `attrs=A,B`
 
 *only* 組み込み属性 (メタデータ) を含めると、ユーザ定義の属性 (メタデータ) は使用できなくなります。組み込み属性
-(メタデータ) *と* ユーザー定義属性 (メタデータ) を同時に組み込む場合、
+(メタデータ) *と* ユーザ定義属性 (メタデータ) を同時に組み込む場合、
 
 -   ユーザ定義属性 (メタデータ) を明示的に含める必要があります。例えば、ユーザ定義属性 A と B を組み込み属性
     `dateModified` とともに含めるには、`attrs=dateModified,A,B` を使用します
@@ -1658,8 +1658,8 @@ Cは値 `2` で作成されます。
 
 属性が更新されると、次のルールが適用されます:
 
--  属性の更新リクエストに含まれるメタデータ *以前に存在しない*が属性に追加されます
--  属性の更新リクエストに含まれるメタデータ *以前の既存* が属性で更新されます
+-  属性更新リクエストに含まれるメタデータは、**以前には存在しなかった**ものを属性に追加します
+-  **既存**の属性更新リクエストに含まれるメタデータは、属性で更新されます
 -  リクエストに含まれていない既存のメタデータは、属性で変更されません (つまり、以前の値が保持されます)
 
 たとえば、メタデータ `unit` と `avg` を持つ属性 `temperature` を考えてみましょう。これらの値は現時点で次のとおりです。
@@ -2309,7 +2309,7 @@ EOF
 
 <a name="covered-subscriptions"></a>
 
-## Covered subscriptions
+## カバード・サブスクリプション (Covered subscriptions)
 
 `notification` 内の `attrs` フィールドは、サブスクリプションがトリガーされたときに通知に含まれるエンティティ属性の
 サブセットを指定します。デフォルトでは、Orion はエンティティに存在する属性のみを通知します。
@@ -2735,8 +2735,8 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、"エラー・レスポンス"
-    のサブセクションを参照してください
+-   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
+    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
 
 _**レスポンス・ヘッダ**_
 
@@ -2859,7 +2859,7 @@ _**レスポンス・ペイロード**_
 
 <a name="update-or-append-entity-attributes-post-v2entitiesentityidattrs"></a>
 
-#### エンティティ属性の更新または追加 `POST /v2/entities/{entityId}/attrs`
+#### エンティティ属性を更新または追加 `POST /v2/entities/{entityId}/attrs`
 
 エンティティ属性は、`append` オペレーションのオプションが使用されているかどうかに応じて、ペイロード内の属性で更新
 されます。
@@ -2928,7 +2928,7 @@ _**レスポンス・コード**_
 
 <a name="update-existing-entity-attributes-patch-v2entitiesentityidattrs"></a>
 
-#### 既存のエンティティ属性の更新 `PATCH /v2/entities/{entityId}/attrs`
+#### 既存のエンティティ属性を更新 `PATCH /v2/entities/{entityId}/attrs`
 
 エンティティ属性は、ペイロード内の属性で更新されます。それに加えて、ペイロード内の1つ以上の属性がエンティティに存在
 しない場合、エラーが返されます。
@@ -3057,7 +3057,7 @@ _**レスポンス・コード**_
 
 <a name="remove-entity-delete-v2entitiesentityid"></a>
 
-#### エンティティを削除する `DELETE /v2/entities/{entityId}`
+#### エンティティを削除 `DELETE /v2/entities/{entityId}`
 
 エンティティを削除します。
 
@@ -3404,7 +3404,7 @@ _**レスポンス・コード**_
 
 <a name="list-entity-types-get-v2types"></a>
 
-#### 全エンティティ型のリスト `GET /v2/types`
+#### 全エンティティ型をリスト `GET /v2/types`
 
 以下のレスポンス・ペイロード セクションで説明されているように、エンティティ型のリストを取得します。
 
@@ -3674,7 +3674,7 @@ time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | c
 | `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
 | `topic`    |            | string | 使用する MQTT トピックを表します                                                                                                                       |
 | `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザー名                                                                                                 |
+| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                   |
 | `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
 
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
@@ -3705,9 +3705,9 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 | パラメータ | オプション | タイプ | 説明                                                                                                                                                   |
 |------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
-| `topic`    |            | string | 使用する MQTT トピックを表します. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                             |
+| `topic`    |            | string | 使用する MQTT トピックを表します。このフィールドに対してもマクロ置換が実行されます (つまり、属性に基づくトピック)                                      |
 | `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザー名                                                                                                 |
+| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                   |
 | `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
 | `payload`  | ✓          | string | 通知で使用されるペイロード。省略した場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます          |
 
@@ -4662,7 +4662,7 @@ NGSIv2 仕様では、サブスクリプションの `status` フィールドの
 
 <a name="keyvalues-not-supported-in-post-v2opnotify"></a>
 
-## `keyValues` は `POST /v2/op/notify` でサポートされない
+## `keyValues` は `POST /v2/op/notify` でサポートされません
 
 現在の Orion の実装は、`POST /v2/op/notify` オペレーションの `keyValues` オプションをサポートしていません。
 それを使用しようとすると、400 Bad Request エラーが発生します。
@@ -4678,15 +4678,15 @@ Orion は、次の側面を除いて、NGSIv2 仕様で説明されているよ�
     [この Issue](https://github.com/telefonicaid/fiware-orion/issues/3007) を参照してください
 -   `idPattern` はサポートされていますが、正確な正規表現 `.*` に対してのみです
 -   `typePattern` は実装されていません
--   `expression` フィールド (`dataProvided` 内の) はサポートされていません。フィールドは単純に無視されます。
+-   (`dataProvided` 内の) `expression` はサポートされていません。フィールドは単純に無視されます。
     それについては、[この Issue](https://github.com/telefonicaid/fiware-orion/issues/3107) を参照してください
 -   `status` の `inactive` 値はサポートされていません。つまり、フィールドは正しく保存/取得されますが、値が `inactive`
     であっても、レジストレーションは常にアクティブです。それについては、
     [この Issue](https://github.com/telefonicaid/fiware-orion/issues/3108) を参照してください
 -   `status` の `expired` 値はサポートされていません。レジストレーションが実際に期限切れになっているにもかかわらず、
     ステータスが `active` と表示されます
--   従来のコンテキスト・プロバイダの NGSIv1 ベースのクエリ/更新形式での転送をサポートするための `legacyForwarding`
-    フィールド (`provider` 内の)
+-   従来のコンテキスト・プロバイダの NGSIv1 ベースのクエリ/更新形式での転送をサポートするための (`provider` 内の)
+    `legacyForwarding` フィールド
 
 <a name="get-v2-operation"></a>
 
