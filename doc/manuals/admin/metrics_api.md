@@ -27,7 +27,7 @@ GET /admin/metrics
 ```
 
 The response payload is a multi-level JSON tree storing the information in an structured way. It is
-based on the [service](../user/multitenancy.md) and [subservice](../user/service_path.md) (sometimes
+based on the [service](../orion-api.md#multi-tenancy) and [subservice](../orion-api.md#service-path) (sometimes
 refered to as "service path"). At any point of the tree, the value of a key could be `{}` to mean that
 there isn't actual information associated to that key.
 
@@ -85,7 +85,7 @@ The list of metrics is provided in [metrics section](#metrics).
 Some additional remarks:
 
 * Requests corresponding to invalid services or subservices (i.e. the ones that don't follow the syntax rules
-  described [here](../user/multitenancy.md) and [here](../user/service_path.md)) are not included in the
+  described [here](../orion-api.md#multi-tenancy) and [here](../orion-api.md#service-path)) are not included in the
   payload (i.e. their associated metrics are just ignored).
 * The default service uses **default-service** as service key. Note that it cannot collide with
   regular services as the `-` character is not allowed in regular services.

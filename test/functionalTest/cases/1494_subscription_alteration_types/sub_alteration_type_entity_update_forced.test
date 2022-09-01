@@ -40,7 +40,7 @@ accumulatorStart --pretty-print
 
 echo "01. Create entity"
 echo "================="
-payload={'
+payload='{
     "id":"Sensor:001",
     "type":"Sensor",
     "temperature":{"type":"Number", "value":50}

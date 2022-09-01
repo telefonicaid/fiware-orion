@@ -208,7 +208,7 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsform
 ## 17. Fiware-Service
 
 Fiware-Service is used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion.
-When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation [about multitenancy in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/multitenancy.md).
+When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation [about multitenancy in the user manual](../orion-api.md#multi-tenancy).
 		
     POST http://127.0.0.1:9977/notify    
     Content-Length: 725    
@@ -226,7 +226,7 @@ When `-multiservice` is used Orion includes the `Fiware-Service` header in the n
 
 ## 18. Fiware-Servicepath
 
-Fiware-ServicePath is an optional header used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion. See specific documentation [about service_path in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/service_path.md).
+Fiware-ServicePath is an optional header used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion. See specific documentation [about service_path in Orion API specification](../orion-api.md#service-path).
 
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1		
 
@@ -236,7 +236,7 @@ Fiware-ServicePath is an optional header used in any kind of HTTP transaction (i
 ## 19. Fiware-Total-Count
 
 It is an optional header used in outgoing HTTP responses sent by Orion.
-Its operation is related with pagination, see related documentation [about pagination in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/pagination.md#pagination).
+Its operation is related with pagination, see related documentation [about pagination in the user manual](../orion-api.md#pagination).
 	    
 [Top](#top)
 

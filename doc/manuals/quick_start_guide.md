@@ -3,9 +3,8 @@
 Welcome to Orion Context Broker! In this brief guide you will find information about some initial steps to work with the
 Orion Context Broker global instance in [FIWARE Lab](https://lab.fiware.org) (owned and managed by the FIWARE Foundation) in an easy way.
 
-Orion Context Broker implements the [FIWARE NGSI version 2](http://fiware-ges.github.io/orion/api/v2/stable/) API.
-A good learning resource for such API is the
-[NGSI version 2 Cookbook](http://fiware-ges.github.io/orion/api/v2/stable/cookbook/).
+Orion Context Broker implements the [Orion API FIWARE NGSIv2](orion-api.md). A good learning resource for such API is the
+[API walkthrough](user/walkthrough_apiv2.md).
 
 First of all, you need an account in FIWARE Lab, so register for one in [the following link](https://account.lab.fiware.org/sign_up) if you don't have one (it's free, all you need is a valid email adress :). With that account you can obtain a valid authentication token to use in the REST API calls to Orion. To get that token, get and run the `token_script.sh` script using `orion-gi` as parameter (`orion-gi` means Orion global instance at FIWARE infrastructure). Introduce your FIWARE Lab user and password when the scripts ask for it (**note you have to use the complete username, including email domain**, e.g. if you email were "foo@gmail.com" you have to use "foo@gmail.com", not just "foo"):
 
