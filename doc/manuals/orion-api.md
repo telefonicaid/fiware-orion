@@ -147,7 +147,7 @@
 
 # Preface
 
-This document describes the FIWARE NSGISv2 Orion API specification. The Orion API is 
+This document describes the FIWARE NGSIv2 Orion API specification. The Orion API is
 built upon [the original NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/archive/api/v2/),
 adding a huge number of improvements and enhancements.
 
@@ -266,7 +266,7 @@ or what representation will be provided (rendered) as output.
 An attribute is represented by a JSON object with the following syntax:
 
 * The attribute value is specified by the `value` property, whose value may be any JSON datatype. 
-  However, some attribute value updates has special semantics in order to modify the content in the attribute
+  However, some attribute value updates have special semantics in order to modify the content in the attribute
   value based on the current value and an operator (see [Update operators for attribute values](#update-operators-for-attribute-values)
   section).
 
@@ -724,7 +724,7 @@ The list of builtin metadata is as follows:
   was included in the request that triggered the notification. Its value depends on the request operation
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 
-* `location`, which is currently [deprecated](#deprecated.md), but still supported.
+* `location`, which is currently [deprecated](deprecated.md), but still supported.
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
@@ -1029,7 +1029,7 @@ More information on the tests conducted can be found [here](https://github.com/t
 
 The types `Feature` and `FeatureCollection` are also supported, but in a special way. You can
 use `Feature` or `FeatureCollection` to create/update `geo:json` attributes. However, when
-the attribute value is retrieved (GET resposes or notifictaions) you will get only the content of:
+the attribute value is retrieved (GET responses or notifications) you will get only the content of:
 
 * the `geometry` field, in the case of `Feature`
 * the `geometry` field of the first item of the `features` array, in the case of `FeatureCollection`
@@ -2206,7 +2206,7 @@ Some considerations to take into account when using custom notifications:
   custom notifications. This is described in detail in
   [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
 * Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
-  [CLI parameter](../admin/cli.md). In this case:
+  [CLI parameter](admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
   * No `${...}` macro substitution is performed.
 
@@ -2358,7 +2358,7 @@ in which case all attributes are included in the notification, no matter if they
 entity. For these attributes that don't exist (`brightness` in this example) the `null`
 value (of type `"None"`) is used.
 
-In the case of custom notifications, if `covered` is set to `true` then `null` will be use to replace `${...}`
+In the case of custom notifications, if `covered` is set to `true` then `null` will be used to replace `${...}`
 for non existing attributes (the default behavior when `covered` is not set to `true` is to replace by the
 empty string the non existing attributes).
 
@@ -3559,7 +3559,7 @@ A subscription is represented by a JSON object with the following fields:
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
-values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
+values (more on this [here](admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
 
 #### `subscription.subject`
@@ -4582,7 +4582,7 @@ doesn't support it.
 
 ## Deprecated features
 
-During the NGSIv2 specification work, some features were developed but they don't remain in the final version of the specification. However, Orion implemented them at some version and are still supported in order to keep backward compatibility (as [deprecated functionality](../deprecated.md)). They are documented here, although **you are highly encouraged to not use any of them**.
+During the NGSIv2 specification work, some features were developed but they don't remain in the final version of the specification. However, Orion implemented them at some version and are still supported in order to keep backward compatibility (as [deprecated functionality](deprecated.md)). They are documented here, although **you are highly encouraged to not use any of them**.
 
 In particular:
 

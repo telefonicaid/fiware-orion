@@ -85,7 +85,7 @@ Keeping communication public means everybody can benefit and learn from the conv
 
 ### Directory layout
 
-For a detailed explanation of the directory structure, see [this section in the Development Manual](devel/directoryStructure.md).
+For a detailed explanation of the directory structure, see [this section in the Development Manual](directoryStructure.md).
 
 ### File layout for source code files 
 
