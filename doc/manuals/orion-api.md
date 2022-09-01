@@ -724,7 +724,7 @@ The list of builtin metadata is as follows:
   was included in the request that triggered the notification. Its value depends on the request operation
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 
-* `location`, which is currently [deprecated](#deprecated.md), but still supported.
+* `location`, which is currently [deprecated](deprecated.md), but still supported.
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
@@ -2206,7 +2206,7 @@ Some considerations to take into account when using custom notifications:
   custom notifications. This is described in detail in
   [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
 * Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
-  [CLI parameter](../admin/cli.md). In this case:
+  [CLI parameter](admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
   * No `${...}` macro substitution is performed.
 
@@ -3559,7 +3559,7 @@ A subscription is represented by a JSON object with the following fields:
 
 Referring to `throttling` field, it is implemented in a local way. In multi-CB configurations (HA scenarios), take into account that the last-notification
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
-values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
+values (more on this [here](admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
 
 #### `subscription.subject`
@@ -4582,7 +4582,7 @@ doesn't support it.
 
 ## Deprecated features
 
-During the NGSIv2 specification work, some features were developed but they don't remain in the final version of the specification. However, Orion implemented them at some version and are still supported in order to keep backward compatibility (as [deprecated functionality](../deprecated.md)). They are documented here, although **you are highly encouraged to not use any of them**.
+During the NGSIv2 specification work, some features were developed but they don't remain in the final version of the specification. However, Orion implemented them at some version and are still supported in order to keep backward compatibility (as [deprecated functionality](deprecated.md)). They are documented here, although **you are highly encouraged to not use any of them**.
 
 In particular:
 
