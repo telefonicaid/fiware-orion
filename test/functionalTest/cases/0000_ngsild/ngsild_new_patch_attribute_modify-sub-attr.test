@@ -118,9 +118,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 04. See the entity in mongo
 ===========================
-MongoDB shell version v4.4.16
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.16
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
