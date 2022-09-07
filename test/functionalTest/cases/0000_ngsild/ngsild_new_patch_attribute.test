@@ -1,0 +1,214 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH an attribute, adding one sub-attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+#
+# 01. Create an entity E1 with one property P1 having one sub-property P1_P1
+# 02. Create a subscription for all entities of type T
+# 03. PATCH E1:P1, adding sub-property P1_P2
+# 04. See E1 in mongo
+# 05. Dump accumulator, see one notification
+#
+
+echo "01. Create an entity E1 with one property P1 having one sub-property P1_P1"
+echo "=========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1,
+    "P1_P1": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription for all entities of type T"
+echo "===================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscription:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. PATCH E1:P1, adding sub-property P1_P2"
+echo "=========================================="
+payload='{
+  "P1_P2": 2
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. Dump accumulator, see one notification"
+echo "=========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with one property P1 having one sub-property P1_P1
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+
+
+
+02. Create a subscription for all entities of type T
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:S1
+
+
+
+03. PATCH E1:P1, adding sub-property P1_P2
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P2"
+			],
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"type" : "Property",
+					"value" : 1,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P2" : {
+					"type" : "Property",
+					"value" : 2,
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. Dump accumulator, see one notification
+==========================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:S1
+Content-Length: 341
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "P1_P1": {
+                    "type": "Property",
+                    "value": 1
+                },
+                "P1_P2": {
+                    "type": "Property",
+                    "value": 2
+                },
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:ngsi-ld:entity:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscription:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

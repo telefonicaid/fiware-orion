@@ -41,7 +41,7 @@ extern "C"
 //
 // alteration -
 //
-void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* incomingP)
+void alteration(const char* entityId, const char* entityType, KjNode* apiEntityP, KjNode* incomingP, KjNode* dbEntityBeforeP)
 {
   OrionldAlteration* alterationP = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
 
@@ -53,10 +53,10 @@ void alteration(char* entityId, char* entityType, KjNode* apiEntityP, KjNode* in
       entityType = typeP->value.s;
   }
 
-  alterationP->entityId          = entityId;
-  alterationP->entityType        = entityType;
+  alterationP->entityId          = (char*) entityId;
+  alterationP->entityType        = (char*) entityType;
   alterationP->inEntityP         = incomingP;
-  alterationP->dbEntityP         = NULL;
+  alterationP->dbEntityP         = dbEntityBeforeP;
   alterationP->finalApiEntityP   = apiEntityP;
   alterationP->alteredAttributes = 0;
   alterationP->alteredAttributeV = NULL;

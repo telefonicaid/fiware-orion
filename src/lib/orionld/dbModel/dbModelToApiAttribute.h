@@ -39,7 +39,7 @@ extern "C"
 //
 // dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
 //
-extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs);
+extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs, bool eqsForDots);
 
 
 

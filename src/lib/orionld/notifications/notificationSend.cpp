@@ -318,6 +318,11 @@ KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
     if (strcmp(attrP->name, "id") == 0)
       continue;
 
+    if (strcmp(attrP->name, "createdAt") == 0)
+      continue;
+    if (strcmp(attrP->name, "modifiedAt") == 0)
+      continue;
+
     if (strcmp(attrP->name, "type") == 0)
     {
       attrP->value.s = orionldContextItemAliasLookup(subP->contextP, attrP->value.s, NULL, NULL);

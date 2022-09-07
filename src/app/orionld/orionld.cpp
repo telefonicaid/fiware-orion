@@ -67,6 +67,7 @@
 #include <vector>
 #include <limits.h>
 #include <sys/mman.h>                                       // mlockall
+#include <mongo/version.h>                                  // MONGOCLIENT_VERSION
 
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
@@ -1183,6 +1184,9 @@ int main(int argC, char* argV[])
   LM_K(("  Forwarding:              %s", (forwarding    == true)? "Enabled" : "Disabled"));
   LM_K(("  Health Check:            %s", (socketService == true)? "Enabled" : "Disabled"));
   LM_K(("  Mongo Driver:            %s", (experimental  == true)? "mongoc driver (partially)" : "Legacy C++ Driver"));
+  if (experimental  == true)
+    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
+
   LM_K(("  Mongo Server Version:    %s", mongocServerVersion));
   if (troe)
     LM_K(("  Postgres Server Version: %s", postgresServerVersion));

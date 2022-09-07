@@ -36,6 +36,7 @@ extern "C"
 #include "common/globals.h"                                    // parse8601Time
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/q/QNode.h"                                   // QNode, qNodeType
 #include "orionld/q/qBuild.h"                                  // qBuild
 #include "orionld/q/qPresent.h"                                // qPresent
@@ -139,13 +140,12 @@ static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* 
     {
       if ((matchP->altAttrP == NULL) && (itemP->altAttrP == NULL))
       {
-        LM(("Already there (itemP entity id %s vs matchList entity %s)", itemP->altP->entityId, matchP->altP->entityId));
         //
         // If the altered entity is the same, this is a duplicate.
         // If the altered entity is different, then itemP's entity needs to be added to the datas array of matchP ...
         //
         if (strcmp(itemP->altP->entityId, matchP->altP->entityId) != 0)
-          LM(("Different entity (%s vs %s) - need to add it to the notification for sub %s", itemP->altP->entityId, matchP->altP->entityId, matchP->subP->subscriptionId));
+          LM_W(("Different entity (%s vs %s) - need to add it to the notification for sub %s", itemP->altP->entityId, matchP->altP->entityId, matchP->subP->subscriptionId));
         // return true;
       }
       else if ((matchP->altAttrP != NULL) && (itemP->altAttrP != NULL))
@@ -155,7 +155,6 @@ static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* 
 
         if (inListAlterationType == candidate)
         {
-          LM(("Already there *************** 2"));
           return true;
         }
       }
@@ -164,7 +163,6 @@ static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* 
     matchP = matchP->next;
   }
 
-  LM(("No Match - must keep it"));
   return false;
 }
 
@@ -201,7 +199,6 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
         prev->next = itemP;
       }
 
-      LM(("Q: Inserted Alteration of entity '%s' for subscription '%s' (consecutive alteration)", itemP->altP->entityId, itemP->subP->subscriptionId));
       return matchList;
     }
 
@@ -211,7 +208,6 @@ static OrionldAlterationMatch* matchListInsert(OrionldAlterationMatch* matchList
 
 
   // First alteration-match of a subscription - prepending it to the matchList
-  LM(("Q: Inserting Alteration of entity '%s' for subscription '%s' (First alteration for this subscription)", itemP->altP->entityId, itemP->subP->subscriptionId));
   itemP->next = matchList;
   return itemP;  // As new matchList
 }
@@ -238,7 +234,6 @@ static OrionldAlterationMatch* matchToMatchList
 
   if (matchList == NULL)
   {
-    LM(("Inserting Alteration of entity '%s' for subscription '%s' (First alteration for this subscription)", amP->altP->entityId, amP->subP->subscriptionId));
     matchList  = amP;
     amP->next  = NULL;
     *matchesP += 1;
@@ -248,15 +243,66 @@ static OrionldAlterationMatch* matchToMatchList
     // Already there? - look up the existing subs in matchList to make sure we don't get any duplicates
     if (matchLookup(matchList, amP) == false)
     {
-      LM(("Q: Inserting match for subscription '%s'", subP->subscriptionId));
       matchList  = matchListInsert(matchList, amP);
       *matchesP += 1;
     }
-    else
-      LM(("Q: NOT Inserting match for subscription '%s' (already there)", subP->subscriptionId));
   }
 
   return matchList;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// falseUpdate -
+//
+bool falseUpdate(KjNode* attrP, KjNode* dbAttrsP)
+{
+  char eqAttrName[512];
+
+  strncpy(eqAttrName, attrP->name, sizeof(eqAttrName) - 1);
+  dotForEq(eqAttrName);
+
+  KjNode* dbAttrP = kjLookup(dbAttrsP, eqAttrName);
+
+  if (dbAttrP == NULL)  // New attribute - didn't exist
+  {
+    // LM(("FU: NO  - NOT a False Update as '%s' did not exist before", attrP->name));
+    return false;
+  }
+
+  KjNode* dbAttrValueP = kjLookup(dbAttrP, "value");
+
+  if (dbAttrValueP == NULL)  // DB ERROR but ... never mind (will never happen)
+  {
+    // LM(("FU: NO  - NOT a False Update as '%s' presents a DB error - no value field in the DB", attrP->name));
+    return false;
+  }
+
+  KjNode* attrValueP = kjLookup(attrP, "value");
+
+  if (attrValueP == NULL)  // No change in attribute value - false update
+  {
+    // LM(("FU: YES - False Update as '%s' has no 'value' field in the normalized input", attrP->name));
+    return true;
+  }
+
+  if (dbAttrValueP->type != attrValueP->type)  // Change in JSON type - real update
+  {
+    // LM(("FU: NO  - NOT a False Update as '%s' the type of the attribute value is altered", attrP->name));
+    return false;
+  }
+
+  if ((attrValueP->type == KjInt)     && (attrValueP->value.i != dbAttrValueP->value.i))    return false;
+  if ((attrValueP->type == KjFloat)   && (attrValueP->value.f != dbAttrValueP->value.f))    return false;
+  if ((attrValueP->type == KjBoolean) && (attrValueP->value.b != dbAttrValueP->value.b))    return false;
+
+  // FIXME: Object + Array
+  // LM(("FU: PERHAPS - as Object + Array modification checks are still to be implemented (for '%s')", attrP->name));
+  // LM(("FU: YES - False Update as no value change was detected for '%s'", attrP->name));
+
+  return true;
 }
 
 
@@ -278,7 +324,10 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
   //
   if (altP->alteredAttributes == 0)  // E.g. complete replace of an entity - treating it as EntityModified (for now)
   {
-    LM(("Q: Subscription '%s': altP->alteredAttributes == 0", subP->subscriptionId));
+    KjNode* dbAttrsP = NULL;
+
+    if ((altP->dbEntityP != NULL) && (noNotifyFalseUpdate == true))
+      dbAttrsP = kjLookup(altP->dbEntityP, "attrs");
 
     //
     // watchedAttributes
@@ -286,11 +335,8 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     int  watchAttrs = subP->notifyConditionV.size();
     bool match      = (watchAttrs == 0);  // If no watchedAttributes, then it's a match
 
-    LM(("Q: Subscription '%s' has %d watchedAttributes", subP->subscriptionId, watchAttrs));
-
     if ((watchAttrs > 0) && (altP->inEntityP != NULL))
     {
-      LM(("Q: Alteration %p has a inEntityP at %p", altP, altP->inEntityP));
       for (KjNode* attrP = altP->inEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         if (strcmp(attrP->name, "id")   == 0) continue;
@@ -298,11 +344,13 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
         for (int ix = 0; ix < watchAttrs; ix++)
         {
-          LM(("Q: Comparing attr '%s' with watchedAttribute '%s'", attrP->name, subP->notifyConditionV[ix].c_str()));
           if (strcmp(attrP->name, subP->notifyConditionV[ix].c_str()) == 0)
           {
-            match = true;
-            break;
+            if ((dbAttrsP == NULL) || (noNotifyFalseUpdate == false) || (falseUpdate(attrP, dbAttrsP) == false))
+            {
+              match = true;
+              break;
+            }
           }
         }
 
@@ -310,7 +358,28 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
           break;
       }
     }
-    LM(("Q: match: %s", (match == true)? "yes" : "no"));
+
+    //
+    // If no watchedAttributes - make sure not all attributes were unchanged (if noNotifyFalseUpdate in ON)
+    // Only interesting of match == true
+    // And of course, if the entity already existed (dbAttrsP != NULL)
+    //
+    if ((match == true) && (watchAttrs == 0) && (dbAttrsP != NULL) && (noNotifyFalseUpdate == true) && (altP->inEntityP != NULL))
+    {
+      int changed = 0;
+      kjTreeLog(altP->inEntityP, "inEntityP - or ... is it just an attribute???");
+      for (KjNode* attrP = altP->inEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+        if (strcmp(attrP->name, "id")   == 0) continue;
+        if (strcmp(attrP->name, "type") == 0) continue;
+
+        if (falseUpdate(attrP, dbAttrsP) == false)
+          ++changed;
+      }
+
+      if (changed == 0)
+        match = false;
+    }
 
     // FIXME: Would need also to check those attributes that were deleted (either directly or via a REPLACE)
 
@@ -318,28 +387,20 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     if (match == true)
     {
       if (subP->triggers[EntityModified] == true)
-      {
-        LM(("Q: Adding match for subscription '%s'", subP->subscriptionId));
         matchList = matchToMatchList(matchList, subP, altP, NULL, &matches);
-      }
-      else
-        LM(("Q: Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(EntityModified)));
     }
     else
-      LM(("Q: Sub '%s' - no match due to Watched Attributes", subP->subscriptionId));
+      LM(("Sub '%s' - no match due to Watched Attributes", subP->subscriptionId));
   }
 
-  LM(("Q: alteredAttributes: %d", altP->alteredAttributes));
   for (int aaIx = 0; aaIx < altP->alteredAttributes; aaIx++)
   {
     OrionldAttributeAlteration*  aaP        = &altP->alteredAttributeV[aaIx];
     int                          watchAttrs = subP->notifyConditionV.size();
     int                          nIx        = 0;
 
-    LM(("Subscription '%s' has %d watchedAttributes", subP->subscriptionId, watchAttrs));
     while (nIx < watchAttrs)
     {
-      LM(("Comparing '%s' and '%s'", aaP->attrName, subP->notifyConditionV[nIx].c_str()));
       if (strcmp(aaP->attrName, subP->notifyConditionV[nIx].c_str()) == 0)
         break;
       ++nIx;
@@ -417,7 +478,7 @@ static KjNode* kjNavigate(KjNode* treeP, char** compV)
 //
 static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
 {
-  int   components = dotCount(path) + 1;
+  int components = dotCount(path) + 1;
   if (components > 20)
     LM_X(1, ("The current implementation of Orion-LD can only handle 20 levels of tree navigation"));
 
@@ -433,6 +494,7 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
   //
   // 'attrs' and 'md' don't exist in an API entity and must be nulled out here.
   //
+
   eqForDot(compV[0]);  // As it is an Attribute
   eqForDot(compV[1]);  // As it MIGHT be a Sub-Attribute (and if not, it has no '=')
 
@@ -472,7 +534,7 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
 //
 // qRangeCompare -
 //
-bool qRangeCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+static bool qRangeCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
   QNode* low  = rhs->value.children;
 
@@ -666,7 +728,7 @@ bool stringComparison(KjNode* lhsP, QNode* rhs, bool isTimestamp)
 //
 // qCommaListCompare -
 //
-bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+bool qCommaListCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
   if (isTimestamp == true)  // The first in the list id a FLOAT, the rest need to be converted to float
   {
@@ -728,7 +790,7 @@ bool qCommaListCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, boo
 //
 // qEqCompare -
 //
-bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+bool qEqCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
@@ -798,7 +860,7 @@ bool qEqCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
 //
 // qGtCompare -
 //
-bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+bool qGtCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
@@ -858,10 +920,8 @@ bool qGtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
 //
 // qLtCompare -
 //
-bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTimestamp)
+bool qLtCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 {
-  LM(("Q: isTimestamp: %s", (isTimestamp == true)? "yes" : "no"));
-
   //
   // Might be a timestamp ... (observedAt, modifiedAt, or createdAt)
   //
@@ -890,9 +950,6 @@ bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
     }
   }
 
-  LM(("Q: lhsNode->type: %s", kjValueType(lhsNode->type)));
-  LM(("Q: rhs->type:     %s", qNodeType(rhs->type)));
-
   bool r = false;
   if (lhsNode->type == KjInt)
   {
@@ -915,7 +972,6 @@ bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
     if (rhs->type == QNodeFalseValue)      r = (lhsNode->value.b == true);
   }
 
-  LM(("Q: Returning %s", (r == true)? "true" : "false"));
   return r;
 }
 
@@ -925,7 +981,7 @@ bool qLtCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs, bool isTim
 //
 // qMatchCompare -
 //
-bool qMatchCompare(OrionldAlteration* altP, KjNode* lhsNode, QNode* rhs)
+bool qMatchCompare(KjNode* lhsNode, QNode* rhs)
 {
   //
   // Create the REGEX in subCache - QNode might need a new QNodeValue
@@ -978,40 +1034,36 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     // If it does not, then the result is always "false" (except for the case "q=!P1", of course :))
     //
     bool     isTimestamp = false;
-    KjNode*  lhsNode     = kjNavigate2(altP->inEntityP, lhs->value.v, &isTimestamp);
-
-    kjTreeLog(altP->inEntityP, "Q2: inEntityP");
+    KjNode*  lhsNode     = kjNavigate2(altP->finalApiEntityP, lhs->value.v, &isTimestamp);
 
     //
     // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
     //
     if (lhsNode == NULL)
     {
-      LM(("Q2: Attribute '%s' does not exist", lhs->value.v));
       return (qP->type == QNodeNotExists)? true : false;
     }
-    LM(("Q2: Attribute '%s' exists", lhs->value.v));
 
     if      (qP->type == QNodeNotExists)  return false;
     else if (qP->type == QNodeExists)     return true;
     else if (qP->type == QNodeEQ)
     {
-      if      (rhs->type == QNodeRange)   return  qRangeCompare(altP, lhsNode, rhs, isTimestamp);
-      else if (rhs->type == QNodeComma)   return  qCommaListCompare(altP, lhsNode, rhs, isTimestamp);
-      else                                return  qEqCompare(altP, lhsNode, rhs, isTimestamp);
+      if      (rhs->type == QNodeRange)   return  qRangeCompare(lhsNode, rhs, isTimestamp);
+      else if (rhs->type == QNodeComma)   return  qCommaListCompare(lhsNode, rhs, isTimestamp);
+      else                                return  qEqCompare(lhsNode, rhs, isTimestamp);
     }
     else if (qP->type == QNodeNE)
     {
-      if      (rhs->type == QNodeRange)   return !qRangeCompare(altP, lhsNode, rhs, isTimestamp);
-      else if (rhs->type == QNodeComma)   return !qCommaListCompare(altP, lhsNode, rhs, isTimestamp);
-      else                                return !qEqCompare(altP, lhsNode, rhs, isTimestamp);
+      if      (rhs->type == QNodeRange)   return !qRangeCompare(lhsNode, rhs, isTimestamp);
+      else if (rhs->type == QNodeComma)   return !qCommaListCompare(lhsNode, rhs, isTimestamp);
+      else                                return !qEqCompare(lhsNode, rhs, isTimestamp);
     }
-    else if (qP->type == QNodeGT)         return  qGtCompare(altP, lhsNode, rhs, isTimestamp);
-    else if (qP->type == QNodeLT)         return  qLtCompare(altP, lhsNode, rhs, isTimestamp);
-    else if (qP->type == QNodeGE)  { bool r; LM(("Q: GE")); r = !qLtCompare(altP, lhsNode, rhs, isTimestamp); LM(("Q: Returning %s", (r == true)? "true" : "false" )); return r; }
-    else if (qP->type == QNodeLE)         return !qGtCompare(altP, lhsNode, rhs, isTimestamp);
-    else if (qP->type == QNodeMatch)      return qMatchCompare(altP, lhsNode, rhs);
-    else if (qP->type == QNodeNoMatch)    return !qMatchCompare(altP, lhsNode, rhs);
+    else if (qP->type == QNodeGT)         return  qGtCompare(lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeLT)         return  qLtCompare(lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeGE)         return !qLtCompare(lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeLE)         return !qGtCompare(lhsNode, rhs, isTimestamp);
+    else if (qP->type == QNodeMatch)      return qMatchCompare(lhsNode, rhs);
+    else if (qP->type == QNodeNoMatch)    return !qMatchCompare(lhsNode, rhs);
     else if (qP->type == QNodeComma)      return false;
     else if (qP->type == QNodeRange)      return false;
   }
@@ -1037,11 +1089,9 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   int ix = 0;
   for (OrionldAlteration* altP = alterationList; altP != NULL; altP = altP->next)
   {
-    LM(("Q: Checking alteration %d (%p) on Entity '%s'", ix, altP, altP->entityId));
     ++ix;
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
     {
-      LM(("Q: Checking match for subscription '%s' on alteration %p", subP->subscriptionId, altP));
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
       {
         LM(("Sub '%s' - no match due to tenant", subP->subscriptionId));
@@ -1093,7 +1143,6 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       if (subP->qP != NULL)
       {
-        LM(("Q: Calling qMatch for subscription '%s'", subP->subscriptionId));
         if (qMatch(subP->qP, altP) == false)
         {
           LM(("Q: Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
@@ -1112,7 +1161,6 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       // 'geoQ' MUST come last as it requires a database query
       // (OR: somehow use GEOS library and fix it that way ...)
       //
-      LM(("Q: Calling attributeMatch(alteration %p, subscription '%s')", altP, subP->subscriptionId));
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
   }

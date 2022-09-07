@@ -143,7 +143,10 @@ bool orionldPostEntity(void)
     return false;
   }
 
-  KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
+  // Keep untouched initial state of the entity in the database - for alterations (to check for false updates)
+  KjNode* initialDbEntityP = NULL;  // kjClone(orionldState.kjsonP, dbEntityP);
+  KjNode* dbAttrsP         = kjLookup(dbEntityP, "attrs");
+
   //
   // Check the Entity, expand averything and transform it into Normalized form
   //
@@ -257,26 +260,29 @@ bool orionldPostEntity(void)
     attrP = next;
   }
 
-  if (mongocAttributesAdd(entityId, newDbAttrNamesV, dbAttrsUpdate) == false)
-  {
-    orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
-    return false;
-  }
-
-  // WARNING: dbAttrsMerge DESTROYS dbEntityP - the initial state of the entity ...
-  // Seems like it also destroys the incoming requestTree, so, need to clone for TRoE
-  // Would be nice to have it NOT destroying the incoming tree (modified by pCheckAttribute)
-  //
   KjNode* treeForTroe = NULL;
-  if (troe)
-    treeForTroe = kjClone(orionldState.kjsonP, orionldState.requestTree);
+  if (dbAttrsUpdate->value.firstChildP != NULL)
+  {
+    if (mongocAttributesAdd(entityId, newDbAttrNamesV, dbAttrsUpdate, false) == false)
+    {
+      orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
+      return false;
+    }
 
-  dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
+    // WARNING: dbAttrsMerge DESTROYS dbEntityP - the initial state of the entity ...
+    // Seems like it also destroys the incoming requestTree, so, need to clone for TRoE
+    // Would be nice to have it NOT destroying the incoming tree (modified by pCheckAttribute)
+    //
+    if (troe)
+      treeForTroe = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
-  OrionldProblemDetails  pd;
-  KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, &pd);
+    dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
 
-  alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree);
+    OrionldProblemDetails  pd;
+    KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, &pd);
+
+    alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree, initialDbEntityP);
+  }
 
   if (notUpdatedP->value.firstChildP == NULL)  // No errors
   {

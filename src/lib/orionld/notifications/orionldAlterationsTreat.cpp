@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
 #include "orionld/notifications/notificationSuccess.h"           // notificationSuccess
@@ -166,6 +167,7 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
+#if 0
   // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
@@ -182,10 +184,14 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM(("ALT:   Attribute        %s", aP->alteredAttributeV[ix].attrName));
       LM(("ALT:   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
+
+    kjTreeLog(aP->inEntityP, "ALT:   inEntityP");
     ++alterations;
   }
   LM(("ALT: %d Alterations present", alterations));
   // </DEBUG>
+#endif
+
 
   OrionldAlterationMatch* matchList;
   int                     matches;
@@ -231,9 +237,10 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   // Instead of having this function create finalApiEntityP, it should be done by the service routine
   // And, after that, altList->dbEntityP is no longer needed
   //
-  if (altList->dbEntityP != NULL)
+  // FIXME: Make orionldPatchEntity2 create the finalApiEntity itself !!!
+  //
+  if ((altList->dbEntityP != NULL) && (altList->finalApiEntityP == NULL))
   {
-    LM(("Applying PATCH"));
     altList->finalApiEntityP = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
 
     for (KjNode* patchP = altList->inEntityP->value.firstChildP; patchP != NULL; patchP = patchP->next)

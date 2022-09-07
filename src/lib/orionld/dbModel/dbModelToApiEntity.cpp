@@ -116,7 +116,7 @@ KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityI
     {
       next = dbAttrP->next;
       kjChildRemove(dbAttrP, dbAttrsP);
-      dbModelToApiAttribute(dbAttrP, sysAttrs);
+      dbModelToApiAttribute(dbAttrP, sysAttrs, true);
       kjChildAdd(apiEntityP, dbAttrP);  // No longer a DB attr - has been transformed to API representation
       dbAttrP = next;
     }

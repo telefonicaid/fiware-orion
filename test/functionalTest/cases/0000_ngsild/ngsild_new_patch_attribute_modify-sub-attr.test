@@ -1,0 +1,161 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH a sub-attr of an attribute 
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create an entity E1 with property P1 having a sub-relationship P1-R1
+# 02. PATCH the Property P1, modifying its P1-R1
+# 03. GET E1 and see the new P1-R1
+# 04. See the entity in mongo
+#
+
+echo "01. Create an entity E1 with property P1 having a sub-relationship P1-R1"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1,
+    "P1-R1": { "object": "urn:E1" }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH the Property P1, modifying its P1-R1"
+echo "=============================================="
+payload='{
+  "value": 2,
+  "P1-R1": { "object": "urn:E2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/P1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03. GET E1 and see the new P1-R1"
+echo "================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+echo
+echo
+
+
+echo "04. See the entity in mongo"
+echo "==========================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with property P1 having a sub-relationship P1-R1
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+
+
+
+02. PATCH the Property P1, modifying its P1-R1
+==============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET E1 and see the new P1-R1
+================================
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "P1-R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "type": "Property",
+        "value": 2
+    },
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T"
+}
+
+
+04. See the entity in mongo
+===========================
+MongoDB shell version v4.4.16
+connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
+MongoDB server version: 4.4.16
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 2,
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/P1-R1"
+			],
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1-R1" : {
+					"value" : "urn:E2",
+					"type" : "Relationship",
+					"createdAt" : REGEX(.*),
+					"modifiedAt" : REGEX(.*)
+				}
+			}
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

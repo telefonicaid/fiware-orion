@@ -54,13 +54,22 @@ extern "C"
 //
 // dbModelToApiAttribute - produce an NGSI-LD API Attribute from its DB format
 //
-void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs)
+void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs, bool eqsForDots)
 {
   //
   // Remove unwanted parts of the attribute from DB
   //
   const char* unwanted[]   = { "mdNames", ".added", ".removed", "creDate",   "modDate"    };
   const char* ngsildName[] = { NULL,      NULL,     NULL,       "createdAt", "modifiedAt" };
+
+
+  //
+  // To truly be API Format, all '=' needs to be changed for '.'
+  // But, if I do that here, then PATCH Entity2 stops working - it NEEDS the = for it's TREE thingy ...
+  // Other service routines, like BATCH Upsert, need the eqForDot to be done, so ...
+  //
+  // if (eqsForDots == true)  // Only PATCH Entity2 sets eqsForDots == false - also doewsn't for for ~10 functests
+  //   eqForDot(dbAttrP->name);
 
   for (unsigned int ix = 0; ix < K_VEC_SIZE(unwanted); ix++)
   {

@@ -1,0 +1,383 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH an attribute of an entity and see a notification about the update
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int
+# 02. Create a subscription matching E1
+# 03. PATCH E1:P, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
+# 04. Dump accumulator, see one notification
+#
+
+echo "01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int"
+echo "===================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P": {
+    "type": "Property",
+    "value": "P of E1",
+    "observedAt": "2020-12-10T07:11:00.123Z",
+    "Sub-R": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:rel:R",
+      "observedAt": "2020-12-10T07:12:00.123Z"
+    },
+    "Sub-Int": {
+      "type": "Property",
+      "value": 33,
+      "observedAt": "2020-12-10T07:12:00.128Z",
+      "unitCode": "pi-i"
+    }
+  },
+  "R": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:relationships:R",
+    "observedAt": "2020-12-10T07:11:00.129Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription matching E1"
+echo "====================================="
+payload='{
+  "id": "urn:ngsdi-ld:subscriptions:s1",
+  "type": "Subscription",
+  "name": "Sub 1",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["geo-point"],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. PATCH E1:P, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44"
+echo "======================================================================================================"
+payload='{
+  "value": 44,
+  "Sub-R": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:rel:R2",
+    "observedAt": "2020-12-10T07:12:00.124Z"
+  },
+  "Sub-P": {
+    "type": "Property",
+    "value": "Sub-P"
+  },
+  "geo-point": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1,2,3 ]
+    }
+  },
+  "geo-line-string": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates":  [ [ 1,2 ], [3,4], [5,6] ]
+    }
+  },
+  "geo-multi-line-string": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "MultiLineString",
+      "coordinates":  [ [ [ 1,2 ], [3,4], [5,6] ], [ [ 1,2 ], [3,4], [5,6] ] ]
+    }
+  },
+  "geo-polygon": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]]
+    }
+  },
+  "geo-multi-polygon": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "MultiPolygon",
+      "coordinates": [ [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]], [[ [10,0], [14,0], [14,-2], [10,-2], [10,0] ]] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Dump accumulator, see one notification"
+echo "=========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+
+
+
+02. Create a subscription matching E1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsdi-ld:subscriptions:s1
+
+
+
+03. PATCH E1:P, replacing Sub-R and adding Sub-P + 6 geo-props, and changing the attribute value to 44
+======================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Dump accumulator, see one notification
+==========================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsdi-ld:subscriptions:s1
+Content-Length: 1161
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P": {
+                "Sub-Int": {
+                    "observedAt": "2020-12-10T07:12:00.128Z",
+                    "type": "Property",
+                    "unitCode": "pi-i",
+                    "value": 33
+                },
+                "Sub-P": {
+                    "type": "Property",
+                    "value": "Sub-P"
+                },
+                "Sub-R": {
+                    "object": "urn:ngsi-ld:rel:R2",
+                    "observedAt": "2020-12-10T07:12:00.124Z",
+                    "type": "Relationship"
+                },
+                "geo-line-string": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            [
+                                1,
+                                2
+                            ],
+                            [
+                                3,
+                                4
+                            ],
+                            [
+                                5,
+                                6
+                            ]
+                        ],
+                        "type": "LineString"
+                    }
+                },
+                "geo-multi-line-string": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            [
+                                [
+                                    1,
+                                    2
+                                ],
+                                [
+                                    3,
+                                    4
+                                ],
+                                [
+                                    5,
+                                    6
+                                ]
+                            ],
+                            [
+                                [
+                                    1,
+                                    2
+                                ],
+                                [
+                                    3,
+                                    4
+                                ],
+                                [
+                                    5,
+                                    6
+                                ]
+                            ]
+                        ],
+                        "type": "MultiLineString"
+                    }
+                },
+                "geo-multi-polygon": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            [
+                                [
+                                    [
+                                        0,
+                                        0
+                                    ],
+                                    [
+                                        4,
+                                        0
+                                    ],
+                                    [
+                                        4,
+                                        -2
+                                    ],
+                                    [
+                                        0,
+                                        -2
+                                    ],
+                                    [
+                                        0,
+                                        0
+                                    ]
+                                ]
+                            ],
+                            [
+                                [
+                                    [
+                                        10,
+                                        0
+                                    ],
+                                    [
+                                        14,
+                                        0
+                                    ],
+                                    [
+                                        14,
+                                        -2
+                                    ],
+                                    [
+                                        10,
+                                        -2
+                                    ],
+                                    [
+                                        10,
+                                        0
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "type": "MultiPolygon"
+                    }
+                },
+                "geo-point": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "geo-polygon": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            [
+                                [
+                                    0,
+                                    0
+                                ],
+                                [
+                                    4,
+                                    0
+                                ],
+                                [
+                                    4,
+                                    -2
+                                ],
+                                [
+                                    0,
+                                    -2
+                                ],
+                                [
+                                    0,
+                                    0
+                                ]
+                            ]
+                        ],
+                        "type": "Polygon"
+                    }
+                },
+                "observedAt": "2020-12-10T07:11:00.123Z",
+                "type": "Property",
+                "value": 44
+            },
+            "id": "urn:ngsi-ld:entities:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsdi-ld:subscriptions:s1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

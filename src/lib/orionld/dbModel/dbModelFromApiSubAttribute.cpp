@@ -70,7 +70,9 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
       return true;  // Just ignore it
     }
 
-    kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));
+    if (mdRemovedV != NULL)
+      kjChildAdd(mdRemovedV, kjString(orionldState.kjsonP, NULL, saDotName));
+
     return true;
   }
 

@@ -48,7 +48,6 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
-#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
@@ -437,7 +436,7 @@ bool orionldPatchEntity2(void)
       {
         KjNode* troeAttrP = kjClone(orionldState.kjsonP, dbAttrP);
 
-        dbModelToApiAttribute(troeAttrP, orionldState.uriParamOptions.sysAttrs);
+        dbModelToApiAttribute(troeAttrP, orionldState.uriParamOptions.sysAttrs, false);
         kjChildAdd(troeTree, troeAttrP);
       }
       eqForDot(patchedAttrP->name);
