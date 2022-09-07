@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPATCHATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPATCHATTRIBUTE_H_
+
 /*
 *
 * Copyright 2018 FIWARE Foundation e.V.
@@ -22,41 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                                        // strcmp
-
-extern "C"
-{
-#include "kjson/KjNode.h"                                                  // KjNode
-}
-
-#include "orionld/kjTree/kjStringValueLookupInArray.h"                     // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// kjStringValueLookupInArray -
+// legacyPatchAttribute -
 //
-// NOTE
-//   This lookup function works on string items in an array.
-//   The caller needs to be sure that the 'stringArray' is really an array and that ALL its items are Strings
-//
-KjNode* kjStringValueLookupInArray(KjNode* stringArray, const char* value)
-{
-  if (stringArray != NULL)
-  {
-    if ((stringArray->type != KjArray) && (stringArray->type != KjObject))
-      return NULL;
+extern bool legacyPatchAttribute(void);
 
-    for (KjNode* nodeP = stringArray->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-    {
-      if (nodeP->type != KjString)
-        continue;
-
-      if (strcmp(value, nodeP->value.s) == 0)
-        return nodeP;
-    }
-  }
-
-  return NULL;
-}
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYPATCHATTRIBUTE_H_

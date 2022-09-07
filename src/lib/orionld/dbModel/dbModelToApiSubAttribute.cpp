@@ -162,8 +162,6 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Render
         kjChildAdd(subAttrP, nodeP);
       }
     }
-    else
-      LM_W(("Skipping sub-sub-attribute '%s'", nodeP->name));
 
     nodeP = next;
   }

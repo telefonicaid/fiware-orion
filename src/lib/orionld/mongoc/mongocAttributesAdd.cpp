@@ -26,11 +26,13 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // Own interface
@@ -41,13 +43,18 @@ extern "C"
 //
 // mongocAttributesAdd -
 //
-// db.entities.update_one({_id.id: entityId}, {attrNames: }
+// attrsToUpdate - can be either an array of DB-Attributes, or just the one attribute
+//
+// USED BY
+//   * orionldPatchAttribute()   - attrsToUpdate is a SINGLE ATTRIBUTE
+//   * orionldPostEntity()       - attrsToUpdate is an ARRAY of ATTRIBUTES
 //
 bool mongocAttributesAdd
 (
   const char*  entityId,
   KjNode*      newDbAttrNamesV,
-  KjNode*      attrsToUpdate
+  KjNode*      attrsToUpdate,
+  bool         singleAttribute
 )
 {
   mongocConnectionGet();
@@ -105,14 +112,33 @@ bool mongocAttributesAdd
   //
   // Populating the $set array with attributes from 'attrsToUpdate'
   //
-  for (KjNode* dbAttrP = attrsToUpdate->value.firstChildP; dbAttrP != NULL; dbAttrP = dbAttrP->next)
+  // Note that attrsToUpdate may be a single attribute and not an array
+  //
+  kjTreeLog(attrsToUpdate, "PE: attrsToUpdate");
+  KjNode* dbAttrP = (singleAttribute == true)? attrsToUpdate : attrsToUpdate->value.firstChildP;
+
+  LM(("PE: %s attribute: '%s'", (singleAttribute == true)? "Only": "First", dbAttrP->name));
+  while (dbAttrP != NULL)
   {
+    // Update the Attribute's modDate
+    KjNode* attrModDateP = kjLookup(dbAttrP, "modDate");
+    if (attrModDateP != NULL)
+      attrModDateP->value.f = orionldState.requestTime;
+
     bson_t attr;
     mongocKjTreeToBson(dbAttrP, &attr);
     strncpy(&attrPath[6], dbAttrP->name, 505);
     bson_append_document(&set, attrPath, -1, &attr);
     bson_destroy(&attr);
+
+    if (singleAttribute == true)
+      break;
+
+    dbAttrP = dbAttrP->next;
   }
+
+  // Update the Entity's modDate
+  bson_append_double(&set, "modDate", 7, orionldState.requestTime);
 
   bson_append_document(&request, "$set", 4, &set);
   bson_destroy(&set);

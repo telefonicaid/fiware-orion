@@ -34,6 +34,7 @@ SET (SOURCES
     legacyPostQuery.cpp
     legacyPostEntity.cpp
     legacyDeleteAttribute.cpp
+    legacyPatchAttribute.cpp
 )
 
 # Include directories

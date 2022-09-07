@@ -49,6 +49,9 @@ extern "C"
 //
 bool troePostEntity(void)
 {
+  if (orionldState.requestTree == NULL)  // Nothing was really changed
+    return true;
+
   const char*     opMode   = (orionldState.uriParamOptions.noOverwrite == true)? "Append" : "Replace";
   char*           entityId = orionldState.wildcard[0];
   PgAppendBuffer  attributesBuffer;

@@ -41,7 +41,8 @@ extern bool mongocAttributesAdd
 (
   const char* entityId,
   KjNode*     newDbAttrNamesV,
-  KjNode*     attrsToUpdate
+  KjNode*     attrsToUpdate,
+  bool        singleAttribute
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCATTRIBUTESADD_H_

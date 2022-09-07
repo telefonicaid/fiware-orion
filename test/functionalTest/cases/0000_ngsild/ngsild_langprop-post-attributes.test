@@ -33,7 +33,7 @@ brokerStart CB 0-255 IPv4 -experimental
 #
 # 01. POST /ngsi-ld/v1/entities with a language property L1
 # 02. See the entity in the database
-# 03. POST /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
+# 03. PATCH /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
 # 04. See the entity in the database - make sure L1:es is 'Castellano'
 # 05. GET entity in Normalized form
 # 06. Attempt with RHS of L1:languageMap as a non-object, e.g. the number 13 - see error
@@ -56,7 +56,7 @@ payload='{
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
 echo
-
+ 
 
 echo "02. See the entity in the database"
 echo "=================================="
@@ -65,8 +65,8 @@ echo
 echo
 
 
-echo "03. POST /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)"
-echo "==========================================================================="
+echo "03. PATCH /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)"
+echo "============================================================================"
 payload='{
   "L1": {
     "languageMap": {
@@ -172,8 +172,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. POST /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
-===========================================================================
+03. PATCH /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
+============================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

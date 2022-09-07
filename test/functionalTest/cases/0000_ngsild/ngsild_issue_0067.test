@@ -149,4 +149,4 @@ Date: REGEX(.*)
 brokerStop CB
 accumulatorStop
 dbDrop CB
-dbDrop CB openiot
+#dbDrop CB openiot

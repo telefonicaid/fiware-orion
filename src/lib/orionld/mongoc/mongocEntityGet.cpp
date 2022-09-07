@@ -47,7 +47,7 @@ extern "C"
 KjNode* mongocEntityGet(const char* entityId, const char** projectionV, bool includeEntityId)
 {
   bson_t        mongoFilter;
-  const bson_t* mongoDocP;
+  const bson_t* mongoDocP = NULL;
   bson_t        options;
 
   //
@@ -61,26 +61,32 @@ KjNode* mongocEntityGet(const char* entityId, const char** projectionV, bool inc
   //
   bson_init(&options);
 
-  //
-  // Populate the projection
-  //
-  bson_t projection;
-  bson_init(&projection);
-
-  if (includeEntityId)
-    bson_append_bool(&projection, "_id.id", 6, true);
-  else
-    bson_append_bool(&projection, "_id", 3, false);
-
-  int ix = 0;
-  while (projectionV[ix] != NULL)
+  if (projectionV != NULL)
   {
-    bson_append_bool(&projection, projectionV[ix], -1, true);
-    ++ix;
-  }
+    //
+    // Populate the projection
+    //
+    bson_t projection;
+    bson_init(&projection);
 
-  bson_append_document(&options, "projection", 10, &projection);
-  bson_destroy(&projection);
+    int projections = 0;
+
+    while (projectionV[projections] != NULL)
+    {
+      bson_append_bool(&projection, projectionV[projections], -1, true);
+      ++projections;
+    }
+
+    if (includeEntityId)
+      bson_append_bool(&projection, "_id.id", 6, true);
+    else
+      bson_append_bool(&projection, "_id", 3, false);
+
+    if (projections > 0)
+      bson_append_document(&options, "projection", 10, &projection);
+
+    bson_destroy(&projection);
+  }
 
   //
   // Get the connection
@@ -112,14 +118,13 @@ KjNode* mongocEntityGet(const char* entityId, const char** projectionV, bool inc
   if (mongoc_cursor_next(mongoCursorP, &mongoDocP) == false)
     return NULL;  // Not Found
 
-  mongoc_cursor_destroy(mongoCursorP);
-
-  char* title;
-  char* detail;
+  char* title  = (char*) "title";
+  char* detail = (char*) "detail";
   entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
-
   if (entityNodeP == NULL)
     LM_E(("mongocKjTreeFromBson: %s: %s", title, detail));
+
+  mongoc_cursor_destroy(mongoCursorP);
 
   return entityNodeP;
 }

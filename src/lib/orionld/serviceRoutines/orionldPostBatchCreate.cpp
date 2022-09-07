@@ -165,10 +165,11 @@ bool orionldPostBatchCreate(void)
       // Alterations:
       // dbModelToApiEntity is DESTRUCTIVE, so I need to clone the 'finalDbEntityP' first
       //
-      KjNode* dbEntityCopy    = kjClone(orionldState.kjsonP, finalDbEntityP);
-      KjNode* finalApiEntityP = dbModelToApiEntity(dbEntityCopy, false, entityId);
+      KjNode* dbEntityCopy      = kjClone(orionldState.kjsonP, finalDbEntityP);
+      KjNode* finalApiEntityP   = dbModelToApiEntity(dbEntityCopy, false, entityId);
+      KjNode* initialDbEntityP  = NULL;  // FIXME: initialDbEntity might not be NULL
 
-      alteration(entityId, entityType, finalApiEntityP, inEntityP);
+      alteration(entityId, entityType, finalApiEntityP, inEntityP, initialDbEntityP);
     }
 
     inEntityP = next;

@@ -1,0 +1,1408 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH Attribute with Simplified Format
+
+--SHELL-INIT--
+# copied from ngsild_simplified_PATCH_Attribute.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# We learnt that JSON-LD doesn't allow for the payloadbody to be just a simple type, like String or Bool.
+# This is OK in JSON, but not in JSON-LD.
+# So, those tests that use simple types as payload bidy are modified to use { "value": XXX }  instead of just XXX.
+#
+# Payloads to test ... there ara MANY !!!
+#
+# The entire payload is the "value", unless it's a JSON Object:
+#   o 2 => Property
+#   o "04" => Property
+#   o 3.1416 => Property
+#   o true => Property
+#   o [ 1, 2 ] => Property
+#   o { "type": "Point", "coordinates": [1,2] }  => GeoProperty
+#   o "urn:ngsi-ld:xxx" - Relationship!  => Relationship
+#   o "urn:ngsi-lf:xxx" - Property! => Property
+#
+# The payload is an object with a value field, but no type field - the broker must guess
+# o { "value": 2 }
+# o { "value": "04" }
+# o { "value": 3.1416 }
+# o { "value": true }
+# o { "value": { "a": 1 } }
+# o { "value": [ 1, 2 ] }
+# o { "object": "urn:ngsi-ld:step:36" }
+# o { "value": { "type": "Point", "coordinates": [37,38] }}
+#
+# o "urn:ngsi-lf:xxx" - Property!
+# o 
+# o 
+# o 
+# o 
+# o 
+# 
+# Some PATCHes are for Relationships, others for GeoProperties.
+# As the NGSI-LD API states that it is not allowed to change the type of an attribute,
+# we will need one attribute of each type for these tests.
+#
+
+# - What should happen if I set the value of the attribute "location" to 21 ?
+#
+#
+# 01. Create an entity with a Property P, a Relationship R, and a GeoProperty G
+# 02. PATCH the Property P with simplified format, setting it to the INTEGER 2
+# 03. GET the entity and see the update from the previous step
+# 04. PATCH the Property P with simplified format, setting it to the STRING 04
+# 05. GET the entity and see the update from the previous step
+# 06. PATCH the Property P with simplified format, setting it to the FLOAT 3.1416
+# 07. GET the entity and see the update from step the previous step
+# 08. PATCH the Property P with simplified format, setting it to the BOOL true
+# 09. GET the entity and see the update from the previous step
+# 10. PATCH the Property P with simplified format, using { "a": 1 } - adding a sub-attribute /a/
+# 11. GET the entity and see the update from the previous step
+# 12. PATCH the Property P with simplified format, using [ 1, 2 ]
+# 13. GET the entity and see the update from the previous step
+# 14. PATCH the GeoProperty G with simplified format, making it a polygon
+# 15. GET the entity and see the update from the previous step
+# 16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error
+# 17. GET the entity and see NO update from the previous step
+# 18. PATCH the Relationship R with simplified format, using "urn:ngsi-ld:step:18"
+# 19. GET the entity and see the update from the previous step
+# 20. PATCH the GeoProperty G with simplified format, making it a Point again - more compact! :)
+# 21. GET the entity and see the update from the previous step
+# 22. PATCH the Property P with simplified format, using "urn:ngsi-lf:xxx" - not assumed a Relationship, so, OK, still a Property
+# 23. GET the entity and see the update from the previous step
+# 24. PATCH the Property P with simplified format, using { "value": 2 }
+# 25. GET the entity and see the update from the previous step
+# 26. PATCH the Property P with simplified format, using { "value": "04" }
+# 27. GET the entity and see the update from the previous step
+# 28. PATCH the Property P with simplified format, using { "value": 3.1416 }
+# 29. GET the entity and see the update from the previous step
+# 30. PATCH the Property P with simplified format, using { "value": true }
+# 31. GET the entity and see the update from the previous step
+# 32. PATCH the Property P with simplified format, using { "value": { "b": 1 } }
+# 33. GET the entity and see the update from the previous step
+# 34. PATCH the Property P with simplified format, using { "value": [ 1, 2 ] }
+# 35. GET the entity and see the update from the previous step
+#
+# 36. PATCH the Property R with simplified format, using { "object": "urn:ngsi-ld:step:36" }
+# 37. GET the entity and see the update from the previous step
+# 38. PATCH the Property G with simplified format, using { "value": { "type": "Point", "coordinates": [37,38] }}
+# 39. GET the entity and see the update from the previous step
+#
+
+
+echo "01. Create an entity with a Property P, a Relationship R, and a GeoProperty G"
+echo "============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:T:E1",
+  "type": "T",
+  "P": {
+    "type": "Property",
+    "value": 1,
+    "P1": {
+      "type": "Property",
+      "value": "kept after PATCH"
+    }
+  },
+  "R": {
+    "type": "Relationship",
+    "object": "urn:test:step:01"
+  },
+  "G": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [1,2]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH the Property P with simplified format, setting it to the INTEGER 2"
+echo "============================================================================"
+payload='{"value": 2}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "04. PATCH the Property P with simplified format, setting it to the STRING 04"
+echo "============================================================================"
+payload='{"value": "04"}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "06. PATCH the Property P with simplified format, setting it to the FLOAT 3.1416"
+echo "==============================================================================="
+payload='{"value": 3.1416}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "08. PATCH the Property P with simplified format, setting it to the BOOL true"
+echo "============================================================================"
+payload='{"value": true}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '10. PATCH the Property P with simplified format, using { "a": 1 } - adding a sub-attribute /a/'
+echo "=============================================================================================="
+payload='{
+  "a": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo "12. PATCH the Property P with simplified format, using [ 1, 2 ]"
+echo "==============================================================="
+payload='[
+  1, 2
+]'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "13. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '14. PATCH the GeoProperty G with simplified format, making it a polygon'
+echo '======================================================================='
+payload='{ "type": "Polygon", "coordinates": [ [ [ 7,2.5 ], [ 7,6 ], [ 2,6 ], [ 7,2.5 ] ] ] }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/G -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '15. GET the entity and see the update from the previous step'
+echo '============================================================'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error'
+echo '======================================================================================================================'
+payload='{"value": "urn:ngsi-ld:xxx"}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/G -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '17. GET the entity and see NO update from the previous step'
+echo '==========================================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '18. PATCH the Relationship R with simplified format, using "urn:ngsi-ld:step:18"'
+echo '================================================================================'
+payload='{"object": "urn:ngsi-ld:step:18"}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "19. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '20. PATCH the GeoProperty G with simplified format, making it a Point again - more compact! :)'
+echo '=============================================================================================='
+payload='{ "type": "Point", "coordinates": [ 20,20 ] }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/G -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '21. GET the entity and see the update from the previous step'
+echo '============================================================'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '22. PATCH the Property P with simplified format, using "urn:ngsi-lf:xxx" - not assumed a Relationship, so, OK, still a Property'
+echo '==============================================================================================================================='
+payload='{"value": "urn:ngsi-lf:xxx"}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "23. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '24. PATCH the Property P with simplified format, using { "value": 2 }'
+echo '====================================================================='
+payload='{ "value": 2 }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "25. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '26. PATCH the Property P with simplified format, using { "value": "04" }'
+echo '========================================================================'
+payload='{ "value": "04" }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "27. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '28. PATCH the Property P with simplified format, using { "value": 3.1416 }'
+echo '=========================================================================='
+payload='{ "value": 3.1416 }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "29. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '30. PATCH the Property P with simplified format, using { "value": true }'
+echo '========================================================================'
+payload='{ "value": true }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "31. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '32. PATCH the Property P with simplified format, using { "value": { "b": 1 } }'
+echo '=============================================================================='
+payload='{ "value": { "b": 1 } }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "33. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '34. PATCH the Property P with simplified format, using { "value": [ 1, 2 ] }'
+echo "============================================================================"
+payload='{ "value": [ 1, 2 ] }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/P -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "35. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '36. PATCH the Property R with simplified format, using { "object": "urn:ngsi-ld:step:36" }'
+echo "=========================================================================================="
+payload='{"object": "urn:ngsi-ld:step:36"}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/R -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "37. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+echo '38. PATCH the Property G with simplified format, using { "value": { "type": "Point", "coordinates": [37,38] }}'
+echo "=============================================================================================================="
+payload='{"value": { "type": "Point", "coordinates": [37,38]}}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1/attrs/G -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "39. GET the entity and see the update from the previous step"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with a Property P, a Relationship R, and a GeoProperty G
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
+
+
+
+02. PATCH the Property P with simplified format, setting it to the INTEGER 2
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 259
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "value": 2
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+04. PATCH the Property P with simplified format, setting it to the STRING 04
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 262
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "value": "04"
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+06. PATCH the Property P with simplified format, setting it to the FLOAT 3.1416
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "value": 3.1416
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+08. PATCH the Property P with simplified format, setting it to the BOOL true
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 262
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "type": "Property",
+        "value": true
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+10. PATCH the Property P with simplified format, using { "a": 1 } - adding a sub-attribute /a/
+==============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 296
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": true
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+12. PATCH the Property P with simplified format, using [ 1, 2 ]
+===============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+13. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 297
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+14. PATCH the GeoProperty G with simplified format, making it a polygon
+=======================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+15. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 325
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        7,
+                        2.5
+                    ],
+                    [
+                        7,
+                        6
+                    ],
+                    [
+                        2,
+                        6
+                    ],
+                    [
+                        7,
+                        2.5
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+16. PATCH the Property G with simplified format, using "urn:ngsi-ld:step:16", trying to make it a Property - see error
+======================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/G",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+17. GET the entity and see NO update from the previous step
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 325
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        7,
+                        2.5
+                    ],
+                    [
+                        7,
+                        6
+                    ],
+                    [
+                        2,
+                        6
+                    ],
+                    [
+                        7,
+                        2.5
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:test:step:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+18. PATCH the Relationship R with simplified format, using "urn:ngsi-ld:step:18"
+================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+19. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 328
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        7,
+                        2.5
+                    ],
+                    [
+                        7,
+                        6
+                    ],
+                    [
+                        2,
+                        6
+                    ],
+                    [
+                        7,
+                        2.5
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+20. PATCH the GeoProperty G with simplified format, making it a Point again - more compact! :)
+==============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+21. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 302
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+22. PATCH the Property P with simplified format, using "urn:ngsi-lf:xxx" - not assumed a Relationship, so, OK, still a Property
+===============================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+23. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": "urn:ngsi-lf:xxx"
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+24. PATCH the Property P with simplified format, using { "value": 2 }
+=====================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+25. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 298
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": 2
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+26. PATCH the Property P with simplified format, using { "value": "04" }
+========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+27. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 301
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": "04"
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+28. PATCH the Property P with simplified format, using { "value": 3.1416 }
+==========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+29. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 303
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": 3.1416
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+30. PATCH the Property P with simplified format, using { "value": true }
+========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+31. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 301
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": true
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+32. PATCH the Property P with simplified format, using { "value": { "b": 1 } }
+==============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+33. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 304
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": {
+            "b": 1
+        }
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+34. PATCH the Property P with simplified format, using { "value": [ 1, 2 ] }
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+35. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 302
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:18",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+36. PATCH the Property R with simplified format, using { "object": "urn:ngsi-ld:step:36" }
+==========================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+37. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 302
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:36",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+38. PATCH the Property G with simplified format, using { "value": { "type": "Point", "coordinates": [37,38] }}
+==============================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+39. GET the entity and see the update from the previous step
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 302
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                37,
+                38
+            ],
+            "type": "Point"
+        }
+    },
+    "P": {
+        "P1": {
+            "type": "Property",
+            "value": "kept after PATCH"
+        },
+        "a": {
+            "type": "Property",
+            "value": 1
+        },
+        "type": "Property",
+        "value": [
+            1,
+            2
+        ]
+    },
+    "R": {
+        "object": "urn:ngsi-ld:step:36",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:T:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
