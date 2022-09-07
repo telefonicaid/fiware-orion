@@ -81,7 +81,7 @@ payload='{
       "type": "T"
     }
   ],
-  "watchedAttributes": ["geo-point"],
+  "watchedAttributes": ["P"],
   "notification": {
     "endpoint": {
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 04. Dump accumulator, see one notification
 ==========================================
 POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsdi-ld:subscriptions:s1
-Content-Length: 1161
+Content-Length: 1268
 User-Agent: orionld/REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -365,6 +365,11 @@ Ngsild-Attribute-Format: Normalized
                 "observedAt": "2020-12-10T07:11:00.123Z",
                 "type": "Property",
                 "value": 44
+            },
+            "R": {
+                "object": "urn:ngsi-ld:relationships:R",
+                "observedAt": "2020-12-10T07:11:00.129Z",
+                "type": "Relationship"
             },
             "id": "urn:ngsi-ld:entities:E1",
             "type": "T"

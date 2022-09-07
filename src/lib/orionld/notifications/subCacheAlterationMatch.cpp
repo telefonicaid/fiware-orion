@@ -495,9 +495,6 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
   // 'attrs' and 'md' don't exist in an API entity and must be nulled out here.
   //
 
-  eqForDot(compV[0]);  // As it is an Attribute
-  eqForDot(compV[1]);  // As it MIGHT be a Sub-Attribute (and if not, it has no '=')
-
   //
   // Is it a timestamp?   (if so, an ISO8601 string must be turned into a float/integer to be compared
   //
@@ -514,12 +511,33 @@ static KjNode* kjNavigate2(KjNode* treeP, char* path, bool* isTimestampP)
     return result;
 
   //
+  // Nothing found
+  //
+  //   What if it's due to '.' vs '=' ...
+  //   Yes, I know, this is messy, some order is needed
+  //
+  // FIXME: Fix this!
+  //
+  eqForDot(compV[0]);  // As it IS an Attribute
+  eqForDot(compV[1]);  // As it MIGHT be a Sub-Attribute (and if not, it has no '=')
+
+  result = kjNavigate(treeP, compV);
+  if (result != NULL)
+    return result;
+
+  //
   // Could be a Relationship ...
   // Perhaps I should "bake in" the value|object|languageMap inside kjNavigate ...
   //
   if ((components == 2) && (strcmp(compV[1], "value") == 0))
   {
     compV[1] = (char*) "object";
+    result = kjNavigate(treeP, compV);
+    if (result != NULL)
+      return result;
+
+    // FIXME: Here I put the '=' back ... Even messier now :(
+    dotForEq(compV[0]);
     result = kjNavigate(treeP, compV);
     if (result != NULL)
       return result;
@@ -1040,9 +1058,7 @@ bool qMatch(QNode* qP, OrionldAlteration* altP)
     // If Left-Hand-Side does not exist - MATCH for op "NotExist" and No Match for all other operations
     //
     if (lhsNode == NULL)
-    {
       return (qP->type == QNodeNotExists)? true : false;
-    }
 
     if      (qP->type == QNodeNotExists)  return false;
     else if (qP->type == QNodeExists)     return true;
@@ -1145,11 +1161,9 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       {
         if (qMatch(subP->qP, altP) == false)
         {
-          LM(("Q: Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
+          LM(("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
           continue;
         }
-        else
-          LM(("Q: Sub '%s' - MATCH with ldq == '%s'", subP->subscriptionId, subP->qText));
       }
 
       //
