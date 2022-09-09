@@ -26,7 +26,7 @@ Subscription with erroneous q - error handling
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+brokerStart CB
 
 --SHELL--
 
