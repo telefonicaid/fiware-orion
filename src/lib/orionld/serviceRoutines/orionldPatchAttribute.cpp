@@ -48,7 +48,7 @@ extern "C"
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
 #include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute
 #include "orionld/notifications/alteration.h"                    // alteration
-#include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own interface
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own interface
 
 
 
@@ -398,7 +398,7 @@ bool orionldPatchAttribute(void)
 
     if (entityType != NULL)
     {
-      KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, NULL, &orionldState.pd);
+      KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
 
       // We need the "Incoming Entity", we have just an attribute ...
       KjNode* attributeNodeP = incomingP;

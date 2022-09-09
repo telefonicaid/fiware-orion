@@ -455,7 +455,7 @@ bool legacyGetEntities(void)
         for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
         {
           OrionldProblemDetails pd;
-          KjNode*               entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, &pd);
+          KjNode*               entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, true, &pd);
 
           if (entityP != NULL)
             kjChildAdd(orionldState.geoPropertyNodes, entityP);

@@ -123,7 +123,7 @@ bool orionldPostQuery(void)
       // Must remove dbEntityP from dbEntityArray as dbEntityP gets transformed into apiEntityP and then inserted into featuresP
       kjChildRemove(dbEntityArray, dbEntityP);
 
-      KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, &orionldState.pd);
+      KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, true, &orionldState.pd);
       const char* geometryPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
       KjNode*     geometryNodeP        = kjLookup(apiEntityP, geometryPropertyName);
 
@@ -139,7 +139,7 @@ bool orionldPostQuery(void)
 
     for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
     {
-      KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, &orionldState.pd);
+      KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, true, &orionldState.pd);
       kjChildAdd(apiEntityArray, apiEntityP);
     }
   }
