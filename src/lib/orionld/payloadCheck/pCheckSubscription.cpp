@@ -191,7 +191,7 @@ bool pCheckSubscription
       *qNodeP = qP;
 
       if (*qTreeP == NULL)
-        return false;
+        LM_RE(false, ("qBuild failed"));
     }
     else if (strcmp(subItemP->name, "geoQ") == 0)
     {
