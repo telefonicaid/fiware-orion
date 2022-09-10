@@ -122,7 +122,7 @@ extern int subCacheItems(void);
 *
 * subCacheItemInsert -
 */
-extern void subCacheItemInsert
+extern bool subCacheItemInsert
 (
   const char*                        tenant,
   const char*                        servicePath,

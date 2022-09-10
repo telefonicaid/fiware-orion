@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload
-#include "orionld/q/qBuild.h"                                    // qBuild
 #include "orionld/q/qRender.h"                                   // qRender
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
