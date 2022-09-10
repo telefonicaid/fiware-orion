@@ -810,7 +810,7 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 * Meaning, it's only "old" stuff, either NGSIv2, or NGSI-LD using mongoBackend.
 *
 */
-void subCacheItemInsert
+bool subCacheItemInsert
 (
   const char*                        tenant,
   const char*                        servicePath,
@@ -922,6 +922,11 @@ void subCacheItemInsert
       cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // cSubP->qText needs real allocation
       if (cSubP->qText != NULL)
         cSubP->qText = strdup(cSubP->qText);
+      else
+      {
+        delete cSubP;
+        return false;
+      }
     }
     else
       cSubP->qText = (char*) strdup(q.c_str());
@@ -1006,6 +1011,7 @@ void subCacheItemInsert
   // Insert the subscription in the cache
   //
   subCacheItemInsert(cSubP);
+  return true;
 }
 
 
