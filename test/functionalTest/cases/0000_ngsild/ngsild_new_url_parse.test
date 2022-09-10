@@ -1,0 +1,484 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URL Parse
+
+--SHELL-INIT--
+# Copied from ngsild_url_parse.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. GET /ngsi-ld/v1/entities
+# 02. GET /ngsi-ld/v1/entities/E1
+# 03. GET /ngsi-ld/v1/subscriptions
+# 04. GET /ngsi-ld/v1/subscriptions/S1
+# 05. GET /ngsi-ld/v1/csourceRegistrations
+# 06. GET /ngsi-ld/v1/csourceRegistrations/R1
+# 07. GET /ngsi-ld/v1/jsonldContexts/C1
+#
+# 08. POST /ngsi-ld/v1/entities
+# 09. POST /ngsi-ld/v1/entities/E9/attrs
+# 10. POST /ngsi-ld/v1/subscriptions
+# 11. POST /ngsi-ld/v1/csourceRegistrations
+#
+# 12. PATCH /ngsi-ld/v1/entities/E1/attrs
+# 13. PATCH /ngsi-ld/v1/subscriptions/S1
+# 14. PATCH /ngsi-ld/v1/csourceRegistrations/R1
+#
+# 15. DELETE /ngsi-ld/v1/entities/E1
+# 16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
+# 17. DELETE /ngsi-ld/v1/subscriptions/S1
+# 18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
+#
+# 19. GET /ngsi-ld/nada
+#
+
+echo "01. GET /ngsi-ld/v1/entities"
+echo "============================"
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "02. GET /ngsi-ld/v1/entities/E1"
+echo "==============================="
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx'
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/subscriptions"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "04. GET /ngsi-ld/v1/subscriptions/S1"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/S1
+echo
+echo
+
+
+echo "05. GET /ngsi-ld/v1/csourceRegistrations"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations
+echo
+echo
+
+
+echo "06. GET /ngsi-ld/v1/csourceRegistrations/R1"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1
+echo
+echo
+
+
+echo "07. GET /ngsi-ld/v1/jsonldContexts/C1"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts/C1
+echo
+echo
+
+
+echo "08. POST /ngsi-ld/v1/entities"
+echo "============================="
+payload='{
+  "id": "http://a.b.c/E8",
+  "type": "A",
+  "name": { "type": "Property", "value": "John" }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "09. POST /ngsi-ld/v1/entities/E9/attrs"
+echo "======================================"
+payload='{
+  "A1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E9.xxx/attrs --payload "$payload"
+echo
+echo
+
+
+echo "10. POST /ngsi-ld/v1/subscriptions"
+echo "=================================="
+payload='{
+  "type": "Subscription",
+  "watchedAttributes": [ "A1", "A2" ],
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "11. POST /ngsi-ld/v1/csourceRegistrations"
+echo "========================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "expires": "2028-12-31T10:00:00",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "http://a.b.c/E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "12. PATCH /ngsi-ld/v1/entities/E1/attrs"
+echo "======================================="
+payload='{ "a": 1 }'
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "13. PATCH /ngsi-ld/v1/subscriptions/S1"
+echo "======================================"
+payload='{ "a": 1 }'
+orionCurl --url /ngsi-ld/v1/subscriptions/S1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "14. PATCH /ngsi-ld/v1/csourceRegistrations/R1"
+echo "============================================="
+payload='{ "a": 1 }'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "15. DELETE /ngsi-ld/v1/entities/E9"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E9.xxx -X DELETE
+echo
+echo
+
+
+echo "16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/list/of/entities/E1.xxx/attrs/http://a.b.c/list/of/attributes/A1.xxx -X DELETE
+echo
+echo
+
+
+echo "17. DELETE /ngsi-ld/v1/subscriptions/S1"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 -X DELETE
+echo
+echo
+
+
+echo "18. DELETE /ngsi-ld/v1/csourceRegistrations/R1"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 -X DELETE
+echo
+echo
+
+
+echo "19. GET /ngsi-ld/nada"
+echo "====================="
+orionCurl --url /ngsi-ld/nada
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /ngsi-ld/v1/entities
+============================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+02. GET /ngsi-ld/v1/entities/E1
+===============================
+HTTP/1.1 404 Not Found
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+03. GET /ngsi-ld/v1/subscriptions
+=================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[]
+
+
+04. GET /ngsi-ld/v1/subscriptions/S1
+====================================
+HTTP/1.1 404 Not Found
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "S1",
+    "title": "subscription not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+05. GET /ngsi-ld/v1/csourceRegistrations
+========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[]
+
+
+06. GET /ngsi-ld/v1/csourceRegistrations/R1
+===========================================
+HTTP/1.1 404 Not Found
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "R1",
+    "title": "registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+07. GET /ngsi-ld/v1/jsonldContexts/C1
+=====================================
+HTTP/1.1 404 Not Found
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "C1",
+    "title": "Context Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+08. POST /ngsi-ld/v1/entities
+=============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/E8
+
+
+
+09. POST /ngsi-ld/v1/entities/E9/attrs
+======================================
+HTTP/1.1 404 Not Found
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "http://a.b.c/list/of/entities/E9.xxx",
+    "title": "Entity does not exist",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+10. POST /ngsi-ld/v1/subscriptions
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+
+
+
+11. POST /ngsi-ld/v1/csourceRegistrations
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)
+
+
+
+12. PATCH /ngsi-ld/v1/entities/E1/attrs
+=======================================
+HTTP/1.1 404 Not Found
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "Entity does not exist",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+13. PATCH /ngsi-ld/v1/subscriptions/S1
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "S1",
+    "title": "Subscription ID must be a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. PATCH /ngsi-ld/v1/csourceRegistrations/R1
+=============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "R1",
+    "title": "Registration ID must be a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. DELETE /ngsi-ld/v1/entities/E9
+==================================
+HTTP/1.1 404 Not Found
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "http://a.b.c/list/of/entities/E9.xxx",
+    "title": "Entity not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
+===========================================
+HTTP/1.1 404 Not Found
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+17. DELETE /ngsi-ld/v1/subscriptions/S1
+=======================================
+HTTP/1.1 404 Not Found
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:S1",
+    "title": "Subscription not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
+==============================================
+HTTP/1.1 404 Not Found
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:R1",
+    "title": "Context Source Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+19. GET /ngsi-ld/nada
+=====================
+HTTP/1.1 404 Not Found
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/nada",
+    "title": "Service Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
