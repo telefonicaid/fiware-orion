@@ -100,7 +100,7 @@ bool legacyPostQuery(void)
       KjNode*                entityP;
       OrionldProblemDetails  pd;
 
-      if ((entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, lang, &pd)) == NULL)
+      if ((entityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, lang, true, &pd)) == NULL)
       {
         LM_E(("Database Error (%s: %s)", pd.title, pd.detail));
         orionldState.httpStatusCode = 500;

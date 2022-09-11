@@ -1,0 +1,177 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+# Copied from ngsild_issue_0108.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create an entity urn:ngsi-ld:T:001, with an attr P1 without context
+# 02. Update the attribute P1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs
+# 03. GET the entity to see the patched attribute P1
+# 04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is ignored
+# 05. Get the entity and make sure P1 has changed to 'Goodbye' and that the property P2 does not exist"
+#
+
+echo "01. Create an entity urn:ngsi-ld:T:001, with an attr P1 without context"
+echo "======================================================================="
+payload='{
+  "id": "urn:ngsi-ld:T:001",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "Hola"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Update the attribute P1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs"
+echo "===================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "Ciao"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity to see the patched attribute P1"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:001
+echo
+echo
+
+
+echo "04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is ignored"
+echo "============================================================================"
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "Goodbye"
+  },
+  "P2": {
+    "type": "Property",
+    "value": "Will fail"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Get the entity and make sure P1 has changed to 'Goodbye' and that the property P2 does not exist"
+echo "===================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:001
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:T:001, with an attr P1 without context
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:001
+
+
+
+02. Update the attribute P1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs
+====================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET the entity to see the patched attribute P1
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 77
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "Ciao"
+    },
+    "id": "urn:ngsi-ld:T:001",
+    "type": "T"
+}
+
+
+04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is ignored
+============================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 87
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "P2",
+            "reason": "Attribute not found"
+        }
+    ],
+    "updated": [
+        "P1"
+    ]
+}
+
+
+05. Get the entity and make sure P1 has changed to 'Goodbye' and that the property P2 does not exist
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "Goodbye"
+    },
+    "id": "urn:ngsi-ld:T:001",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

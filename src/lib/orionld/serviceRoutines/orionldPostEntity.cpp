@@ -57,7 +57,7 @@ extern "C"
 //
 // dbEntityTypeExtract -
 //
-static KjNode* dbEntityTypeExtract(KjNode* dbEntityP)
+KjNode* dbEntityTypeExtract(KjNode* dbEntityP)
 {
   KjNode* _idP = kjLookup(dbEntityP, "_id");
 
@@ -279,7 +279,7 @@ bool orionldPostEntity(void)
     dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
 
     OrionldProblemDetails  pd;
-    KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, &pd);
+    KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
 
     alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree, initialDbEntityP);
   }

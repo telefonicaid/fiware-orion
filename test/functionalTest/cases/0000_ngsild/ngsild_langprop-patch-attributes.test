@@ -175,7 +175,7 @@ bye
 03. PATCH /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
 ============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 140
+Content-Length: 87
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -184,7 +184,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "notUpdated": [
         {
             "attributeName": "L2",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/L2"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [

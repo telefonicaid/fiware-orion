@@ -166,12 +166,12 @@ KjNode* datasetExtract(KjNode* datasetsP, const char* attrName)
 //   Add "concise/keyValues" and "lang" treatment to "dbModelToApiEntity2()"
 //   Remove "concise/keyValues" and "lang" treatment from "kjTreeFromQueryContextResponse()"
 //
-KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP)
 {
   KjNode* _idP      = NULL;
   KjNode* attrsP    = NULL;
   KjNode* datasetsP = kjLookup(dbEntityP, "@datasets");
-  bool    longNames = ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES));
+  bool    longNames = (compacted == false) || ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES));
 
   if (datasetsP != NULL)
     kjChildRemove(dbEntityP, datasetsP);
@@ -242,10 +242,12 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   }
 
   KjNode* entityP = kjObject(orionldState.kjsonP, NULL);
+  kjChildRemove(_idP, idP);
   kjChildAdd(entityP, idP);
 
   if (longNames == false)
     typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
+  kjChildRemove(_idP, typeP);
   kjChildAdd(entityP, typeP);
 
   //
@@ -295,7 +297,7 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
     KjNode* attributeP;
     KjNode* datasetP = datasetExtract(datasetsP, attrP->name);  // datasetExtract removes the dataset from @datasets
 
-    if ((attributeP = dbModelToApiAttribute2(attrP, datasetP, sysAttrs, renderFormat, lang, pdP)) == NULL)
+    if ((attributeP = dbModelToApiAttribute2(attrP, datasetP, sysAttrs, renderFormat, lang, compacted, pdP)) == NULL)
     {
       LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
       return NULL;
@@ -314,7 +316,7 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
       KjNode* attributeP;
 
       kjChildRemove(datasetsP, datasetP);
-      if ((attributeP = dbModelToApiAttribute2(NULL, datasetP, sysAttrs, renderFormat, lang, pdP)) == NULL)
+      if ((attributeP = dbModelToApiAttribute2(NULL, datasetP, sysAttrs, renderFormat, lang, compacted, pdP)) == NULL)
       {
         LM_E(("Datamodel Error (%s: %s)", pdP->title, pdP->detail));
         return NULL;

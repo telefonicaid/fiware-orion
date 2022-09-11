@@ -560,7 +560,7 @@ NGSILD-Tenant: t1
 03. Patch E1, all 7 attributes, on default tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
 ===================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 510
+Content-Length: 449
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -585,7 +585,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -656,7 +656,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 05. Patch E2, all 7 attributes, on T1 tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
 ==============================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 510
+Content-Length: 449
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -681,7 +681,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -752,7 +752,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 07. Patch E1, all 7 attributes, on default tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 ======================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 692
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -777,15 +777,15 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -854,7 +854,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. Patch E2, all 7 attributes, on T1 tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 =================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 692
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -879,15 +879,15 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -956,7 +956,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 11. Patch E1, all 7 attributes, on default tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 =======================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 692
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: REGEX(.*)
@@ -981,15 +981,15 @@ Link: REGEX(.*)
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -1058,7 +1058,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 13. Patch E2, all 7 attributes, on T1 tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 ==================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 692
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1083,15 +1083,15 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
