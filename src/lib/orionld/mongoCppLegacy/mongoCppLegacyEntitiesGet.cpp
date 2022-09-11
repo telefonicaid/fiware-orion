@@ -47,22 +47,16 @@ extern "C"
 //
 // mongoCppLegacyEntitiesGet -
 //
-KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields)
+KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields, bool entityIdPresent)
 {
-  bool idPresent = false;
-
   mongo::BSONObjBuilder  dbFields;
+
+  dbFields.append("_id", (entityIdPresent == true)? 1 : 0);  // Add _id or force out
 
   for (int ix = 0; ix < fields; ix++)
   {
     dbFields.append(fieldV[ix], 1);
-
-    if (strcmp(fieldV[ix], "_id") == 0)
-      idPresent = true;
   }
-
-  if (idPresent == false)
-    dbFields.append("_id", 0);
 
   mongo::BSONObjBuilder                 filter;
   mongo::Query                          query(filter.obj());

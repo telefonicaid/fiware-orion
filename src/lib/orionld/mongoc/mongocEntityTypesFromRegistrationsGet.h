@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESGET_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESGET_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYTYPESFROMREGISTRATIONSGET_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYTYPESFROMREGISTRATIONSGET_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -28,15 +28,15 @@
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                         // KjNode
+#include "kjson/KjNode.h"                                          // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntitiesGet -
+// mongocEntityTypesFromRegistrationsGet -
 //
-extern KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields, bool entityIdPresent);
+extern KjNode* mongocEntityTypesFromRegistrationsGet(bool details);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESGET_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYTYPESFROMREGISTRATIONSGET_H_
