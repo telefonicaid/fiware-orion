@@ -207,7 +207,7 @@ static KjNode* dbEntityAttributesGetWithoutDetails(OrionldProblemDetails* pdP)
   KjNode* localEntityArray;
   char*   fields[1] = { (char*) "attrNames" };
 
-  localEntityArray = dbEntitiesGet(fields, 1);
+  localEntityArray = dbEntitiesGet(fields, 1, false);
 
   KjNode* outArray = kjArray(orionldState.kjsonP, "attributeList");
 
@@ -450,9 +450,9 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char
   // GET local attributes - i.e. from the "entities" collection
   //
   KjNode* localEntityArray;
-  char*   fields[2] = { (char*) "_id", (char*) "attrs" };
+  char*   fields[1] = { (char*) "attrs" };
 
-  localEntityArray = dbEntitiesGet(fields, 2);
+  localEntityArray = dbEntitiesGet(fields, 1, true);
 
   if (localEntityArray == NULL)
   {

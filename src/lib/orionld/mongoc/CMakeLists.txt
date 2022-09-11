@@ -57,6 +57,8 @@ SET (SOURCES
     mongocSubscriptionReplace.cpp
     mongocTenantExists.cpp
     mongocTenantsGet.cpp
+    mongocEntitiesGet.cpp
+    mongocEntityTypesFromRegistrationsGet.cpp
 )
 
 # Include directories

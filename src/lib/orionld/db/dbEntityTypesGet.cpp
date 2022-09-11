@@ -27,23 +27,24 @@
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                         // KjNode
-#include "kjson/kjBuilder.h"                                      // kjArray, kjObject, kjChildRemove
-#include "kjson/kjLookup.h"                                       // kjLookup
-#include "kjson/kjClone.h"                                        // kjClone
+#include "kjson/KjNode.h"                                          // KjNode
+#include "kjson/kjBuilder.h"                                       // kjArray, kjObject, kjChildRemove
+#include "kjson/kjLookup.h"                                        // kjLookup
+#include "kjson/kjClone.h"                                         // kjClone
 }
 
-#include "logMsg/logMsg.h"                                        // LM_*
-#include "logMsg/traceLevels.h"                                   // Lmt*
+#include "logMsg/logMsg.h"                                         // LM_*
 
-#include "orionld/types/OrionldProblemDetails.h"                  // OrionldProblemDetails
-#include "orionld/common/orionldState.h"                          // orionldState
-#include "orionld/common/uuidGenerate.h"                          // uuidGenerate
-#include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjStringValueLookupInArray.h"            // kjStringValueLookupInArray
-#include "orionld/kjTree/kjStringArraySortedInsert.h"             // kjStringArraySortedInsert
-#include "orionld/db/dbConfiguration.h"                           // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
-#include "orionld/db/dbEntityTypesGet.h"                          // Own interface
+#include "orionld/common/orionldState.h"                           // orionldState
+#include "orionld/common/uuidGenerate.h"                           // uuidGenerate
+#include "orionld/types/OrionldProblemDetails.h"                   // OrionldProblemDetails
+#include "orionld/context/orionldContextItemAliasLookup.h"         // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjStringValueLookupInArray.h"             // kjStringValueLookupInArray
+#include "orionld/kjTree/kjStringArraySortedInsert.h"              // kjStringArraySortedInsert
+#include "orionld/db/dbConfiguration.h"                            // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
+#include "orionld/mongoc/mongocEntitiesGet.h"                      // mongocEntitiesGet
+#include "orionld/mongoc/mongocEntityTypesFromRegistrationsGet.h"  // mongocEntityTypesFromRegistrationsGet
+#include "orionld/db/dbEntityTypesGet.h"                           // Own interface
 
 
 
@@ -314,20 +315,36 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP, bool details)
 {
   KjNode*  local;
   KjNode*  remote;
-  char*    fields[2];
   KjNode*  arrayP = NULL;
 
-  fields[0] = (char*) "_id";
+  //
+  // This is a bit ugly ...
+  // Default DB function is still the C++ Legacy driver.
+  // But, if the broker is started with '-experimental', then mongoc is used instead.
+  // OR, if the HTTP header XXX is used ...
+  //
+  // Need to use local function pointers to not alter the global state of the broker
+  //
+  DbEntitiesGet                     entitiesGet                     = dbEntitiesGet;
+  DbEntityTypesFromRegistrationsGet entityTypesFromRegistrationsGet = dbEntityTypesFromRegistrationsGet;
+  if (experimental == true)
+  {
+    if (orionldState.in.legacy == NULL)
+    {
+      entitiesGet                     = mongocEntitiesGet;
+      entityTypesFromRegistrationsGet = mongocEntityTypesFromRegistrationsGet;
+    }
+  }
 
   //
   // GET local types - i.e. from the "entities" collection
   //
   if (details == false)
-    local  = dbEntitiesGet(fields, 1);
+    local  = entitiesGet(NULL, 0, true);
   else
   {
-    fields[1] = (char*) "attrNames";
-    local  = dbEntitiesGet(fields, 2);
+    char* fields[1] = { (char*) "attrNames" };
+    local  = entitiesGet(fields, 1, true);
   }
 
   if (local != NULL)
@@ -341,7 +358,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP, bool details)
   //
   // GET remote types - i.e. from the "registrations" collection
   //
-  remote = dbEntityTypesFromRegistrationsGet(details);
+  remote = entityTypesFromRegistrationsGet(details);
 
   if ((remote != NULL) && (details == true))
     remote = typesAndAttributesExtractFromRegistrations(remote);
