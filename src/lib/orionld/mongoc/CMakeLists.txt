@@ -59,6 +59,7 @@ SET (SOURCES
     mongocTenantsGet.cpp
     mongocEntitiesGet.cpp
     mongocEntityTypesFromRegistrationsGet.cpp
+    mongocEntityTypeGet.cpp
 )
 
 # Include directories
