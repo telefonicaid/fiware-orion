@@ -47,8 +47,6 @@ extern "C"
 //
 KjNode* mongocEntitiesGet(char** fieldV, int fields, bool entityIdPresent)
 {
-  LM(("IN"));
-
   const bson_t*         mongoDocP;
   mongoc_cursor_t*      mongoCursorP;
   KjNode*               entityNodeP = NULL;
@@ -146,6 +144,5 @@ KjNode* mongocEntitiesGet(char** fieldV, int fields, bool entityIdPresent)
   mongoc_cursor_destroy(mongoCursorP);
   mongoc_read_prefs_destroy(readPrefs);
 
-  LM(("From: %d hits", hits));
   return entityArray;
 }
