@@ -22,32 +22,33 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                               // NULL
+#include <unistd.h>                                                // NULL
 
 extern "C"
 {
-#include "kalloc/kaStrdup.h"                                      // kaStrdup
-#include "kjson/KjNode.h"                                         // KjNode
-#include "kjson/kjBuilder.h"                                      // kjArray, kjObject
-#include "kjson/kjLookup.h"                                       // kjLookup
-#include "kjson/kjClone.h"                                        // kjClone
-#include "kjson/kjRender.h"                                       // kjFastRender
+#include "kalloc/kaStrdup.h"                                       // kaStrdup
+#include "kjson/KjNode.h"                                          // KjNode
+#include "kjson/kjBuilder.h"                                       // kjArray, kjObject
+#include "kjson/kjLookup.h"                                        // kjLookup
+#include "kjson/kjClone.h"                                         // kjClone
+#include "kjson/kjRender.h"                                        // kjFastRender
 }
 
-#include "logMsg/logMsg.h"                                        // LM_*
-#include "logMsg/traceLevels.h"                                   // Lmt*
+#include "logMsg/logMsg.h"                                         // LM_*
 
-#include "orionld/common/orionldState.h"                          // orionldState
-#include "orionld/common/orionldError.h"                          // orionldError
-#include "orionld/types/OrionldProblemDetails.h"                  // OrionldProblemDetails
-#include "orionld/common/uuidGenerate.h"                          // uuidGenerate
-#include "orionld/common/eqForDot.h"                              // eqForDot
-#include "orionld/common/dotForEq.h"                              // dotForEq
-#include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjStringValueLookupInArray.h"            // kjStringValueLookupInArray
-#include "orionld/kjTree/kjStringArraySortedInsert.h"             // kjStringArraySortedInsert
-#include "orionld/db/dbConfiguration.h"                           // dbEntityAttributesFromRegistrationsGet, dbEntitiesGet
-#include "orionld/db/dbEntityAttributesGet.h"                     // Own interface
+#include "orionld/common/orionldState.h"                           // orionldState
+#include "orionld/common/orionldError.h"                           // orionldError
+#include "orionld/types/OrionldProblemDetails.h"                   // OrionldProblemDetails
+#include "orionld/common/uuidGenerate.h"                           // uuidGenerate
+#include "orionld/common/eqForDot.h"                               // eqForDot
+#include "orionld/common/dotForEq.h"                               // dotForEq
+#include "orionld/context/orionldContextItemAliasLookup.h"         // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjStringValueLookupInArray.h"             // kjStringValueLookupInArray
+#include "orionld/kjTree/kjStringArraySortedInsert.h"              // kjStringArraySortedInsert
+#include "orionld/mongoc/mongocEntitiesGet.h"                      // mongocEntitiesGet
+#include "orionld/mongoc/mongocEntityTypesFromRegistrationsGet.h"  // mongocEntityTypesFromRegistrationsGet
+#include "orionld/db/dbConfiguration.h"                            // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
+#include "orionld/db/dbEntityAttributesGet.h"                      // Own interface
 
 
 
@@ -202,12 +203,32 @@ static void remoteAttrNamesExtract(KjNode* outArray, KjNode* remote)
 static KjNode* dbEntityAttributesGetWithoutDetails(OrionldProblemDetails* pdP)
 {
   //
+  // This is a bit ugly ...
+  // Default DB function is still the C++ Legacy driver.
+  // But, if the broker is started with '-experimental', then mongoc is used instead.
+  // OR, if the HTTP header XXX is used ...
+  //
+  // Need to use local function pointers to not alter the global state of the broker
+  //
+  DbEntitiesGet                     entitiesGet                     = dbEntitiesGet;
+  DbEntityTypesFromRegistrationsGet entityTypesFromRegistrationsGet = dbEntityTypesFromRegistrationsGet;
+  if (experimental == true)
+  {
+    if (orionldState.in.legacy == NULL)
+    {
+      entitiesGet                     = mongocEntitiesGet;
+      entityTypesFromRegistrationsGet = mongocEntityTypesFromRegistrationsGet;
+    }
+  }
+
+
+  //
   // GET local attributes - i.e. from the "entities" collection
   //
   KjNode* localEntityArray;
   char*   fields[1] = { (char*) "attrNames" };
 
-  localEntityArray = dbEntitiesGet(fields, 1);
+  localEntityArray = entitiesGet(fields, 1, false);
 
   KjNode* outArray = kjArray(orionldState.kjsonP, "attributeList");
 
@@ -217,7 +238,7 @@ static KjNode* dbEntityAttributesGetWithoutDetails(OrionldProblemDetails* pdP)
   //
   // GET external attributes - i.e. from the "registrations" collection
   //
-  KjNode* remote = dbEntityTypesFromRegistrationsGet(true);
+  KjNode* remote = entityTypesFromRegistrationsGet(true);
 
   if (remote)
     remoteAttrNamesExtract(outArray, remote);
@@ -447,12 +468,28 @@ static KjNode* attributeLookup(KjNode* attrV, char* attrLongName)
 static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char* attributeName)
 {
   //
+  // This is a bit ugly ...
+  // Default DB function is still the C++ Legacy driver.
+  // But, if the broker is started with '-experimental', then mongoc is used instead.
+  // OR, if the HTTP header XXX is used ...
+  //
+  // Need to use local function pointers to not alter the global state of the broker
+  //
+  DbEntitiesGet                     entitiesGet                     = dbEntitiesGet;
+  if (experimental == true)
+  {
+    if (orionldState.in.legacy == NULL)
+      entitiesGet                     = mongocEntitiesGet;
+  }
+
+
+  //
   // GET local attributes - i.e. from the "entities" collection
   //
   KjNode* localEntityArray;
-  char*   fields[2] = { (char*) "_id", (char*) "attrs" };
+  char*   fields[1] = { (char*) "attrs" };
 
-  localEntityArray = dbEntitiesGet(fields, 2);
+  localEntityArray = entitiesGet(fields, 1, true);
 
   if (localEntityArray == NULL)
   {
@@ -480,7 +517,7 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char
     dotForEq(attributeNameEq);
   }
 
-  // Looping over output from dbEntitiesGet
+  // Looping over output from entitiesGet
   KjNode* attrV = kjArray(orionldState.kjsonP, NULL);
   for (KjNode* entityP = localEntityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {

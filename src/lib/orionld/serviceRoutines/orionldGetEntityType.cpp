@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/mongoc/mongocEntityTypeGet.h"                  // mongocEntityTypeGet
 #include "orionld/serviceRoutines/orionldGetEntityType.h"        // Own Interface
 
 
@@ -132,7 +133,15 @@ bool orionldGetEntityType(void)
   char*                  typeAlias    = orionldContextItemAliasLookup(orionldState.contextP, typeExpanded, NULL, NULL);
   KjNode*                entityTypeV;
 
-  entityTypeV = dbEntityTypeGet(&pd, typeExpanded, &entities);
+  //
+  // If the broker is started with '-experimental', then mongocEntityTypeGet is to be used instead of mongoCppEntityTypeGet.
+  // [ dbEntityTypeGet points to mongoCppEntityTypeGet ]
+  // - Except if the HTTP Header 'legacy' is used
+  //
+  if ((experimental == true) && (orionldState.in.legacy == NULL))
+    entityTypeV = mongocEntityTypeGet(&pd, typeExpanded, &entities);
+  else
+    entityTypeV = dbEntityTypeGet(&pd, typeExpanded, &entities);
 
   if (entityTypeV == NULL)
   {

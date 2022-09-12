@@ -82,8 +82,12 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   if (attrP->type == KjNull)
   {
     // Check: is null supported by the current service?
-    KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, attrDotName);
-    kjChildAdd(attrRemovedV, attrNameNodeP);
+    if (attrRemovedV != NULL)
+    {
+      KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, attrDotName);
+      kjChildAdd(attrRemovedV, attrNameNodeP);
+    }
+
     return true;
   }
 
@@ -121,7 +125,9 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     attrP->value.firstChildP = newAttrP;
     attrP->lastChild         = newAttrP;
 
-    *ignoreP = true;  // Ignoring datasetId attrs for TRoE
+    if (ignoreP != NULL)
+      *ignoreP = true;  // Ignoring datasetId attrs for TRoE
+
     return dbModelFromApiAttributeDatasetArray(attrP, dbAttrsP, attrAddedV, attrRemovedV, ignoreP);
   }
 
@@ -193,12 +199,15 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     if (attrP->type == KjNull)
     {
       // Apparently it's OK to try to delete an attribute that does not exist
-      *ignoreP = true;
+      if (ignoreP != NULL)
+        *ignoreP = true;
+
       return true;  // Just ignore it
     }
 
     // The "attrNames" array stores the sub-attribute names in their original names, with dots - attrDotName
-    kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrDotName));
+    if (attrAddedV != NULL)
+      kjChildAdd(attrAddedV, kjString(orionldState.kjsonP, NULL, attrDotName));
 
     // All attributes have a field 'mdNames' - it's an array
     mdNamesP = kjArray(orionldState.kjsonP, "mdNames");

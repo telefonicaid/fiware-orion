@@ -201,6 +201,12 @@ bool legacyPostSubscriptions(void)
   // FIXME: Check oError for failure (oError is output from mongoCreateSubscription!)
   //        Disconnect from MQTT broker if needed
 
+  if (subId == "")
+  {
+    LM_E(("Error creating subscription"));
+    return false;
+  }
+
   orionldState.httpStatusCode = SccCreated;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str(), orionldState.tenantP->tenant);
 

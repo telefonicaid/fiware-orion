@@ -202,20 +202,30 @@ static void sysAttrsToTimestamps(KjNode* attrP)
 //
 // dbModelToApiAttribute2 -
 //
-KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP)
 {
+  if ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES))
+    compacted = false;
+
   if (datasetP != NULL)
   {
-    char*   longName            = kaStrdup(&orionldState.kalloc, datasetP->name);
-    eqForDot(longName);
+    char* shortName = datasetP->name;
 
-    char*   shortName           = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
-    KjNode* attrArray           = kjArray(orionldState.kjsonP, shortName);
+    if (compacted == true)
+    {
+      char* longName  = (compacted == true)? kaStrdup(&orionldState.kalloc, datasetP->name) : datasetP->name;
+      eqForDot(longName);
+      shortName = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+    }
+    else
+      eqForDot(shortName);
+
+    KjNode* attrArray = kjArray(orionldState.kjsonP, shortName);
 
     // 1. First the Default attribute
     if (dbAttrP != NULL)
     {
-      KjNode* apiAttrP = dbModelToApiAttribute2(dbAttrP, NULL, sysAttrs, renderFormat, lang, pdP);
+      KjNode* apiAttrP = dbModelToApiAttribute2(dbAttrP, NULL, sysAttrs, renderFormat, lang, compacted, pdP);
 
       if (apiAttrP == NULL)
         return NULL;
@@ -276,10 +286,19 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
     return attrArray;
   }
 
-  char*   longName = kaStrdup(&orionldState.kalloc, dbAttrP->name);
-  eqForDot(longName);
-  char*   shortName = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
-  KjNode* attrP     = NULL;
+  char* shortName = dbAttrP->name;
+
+  if (compacted == true)
+  {
+    char*   longName = kaStrdup(&orionldState.kalloc, dbAttrP->name);
+
+    eqForDot(longName);
+    shortName = orionldContextItemAliasLookup(orionldState.contextP, longName, NULL, NULL);
+  }
+  else
+    eqForDot(shortName);
+
+  KjNode* attrP = NULL;
 
   //
   // If CONCISE:

@@ -72,7 +72,7 @@ static void setTimestamp(const char* name, double ts, mongo::BSONObjBuilder* bob
 *
 * insertInCache - insert in csub cache
 */
-static void insertInCache
+static bool insertInCache
 (
   const Subscription&  sub,
   const std::string&   subId,
@@ -107,43 +107,45 @@ static void insertInCache
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-  subCacheItemInsert(tenant.c_str(),
-                     servicePath.c_str(),
-                     sub.notification.httpInfo,
-                     sub.subject.entities,
-                     sub.notification.attributes,
-                     sub.notification.metadata,
-                     sub.subject.condition.attributes,
-                     subId.c_str(),
-                     sub.expires,
-                     sub.throttling,
-                     sub.attrsFormat,
-                     notificationDone,
-                     lastNotification,
-                     lastFailure,
-                     lastSuccess,
-                     stringFilterP,
-                     mdStringFilterP,
-                     sub.status,
+  bool b = subCacheItemInsert(tenant.c_str(),
+                              servicePath.c_str(),
+                              sub.notification.httpInfo,
+                              sub.subject.entities,
+                              sub.notification.attributes,
+                              sub.notification.metadata,
+                              sub.subject.condition.attributes,
+                              subId.c_str(),
+                              sub.expires,
+                              sub.throttling,
+                              sub.attrsFormat,
+                              notificationDone,
+                              lastNotification,
+                              lastFailure,
+                              lastSuccess,
+                              stringFilterP,
+                              mdStringFilterP,
+                              sub.status,
 #ifdef ORIONLD
-                     sub.name,
-                     sub.ldContext,
-                     sub.lang,
-                     sub.notification.httpInfo.mqtt.username,
-                     sub.notification.httpInfo.mqtt.password,
-                     sub.notification.httpInfo.mqtt.version,
-                     sub.notification.httpInfo.mqtt.qos,
+                              sub.name,
+                              sub.ldContext,
+                              sub.lang,
+                              sub.notification.httpInfo.mqtt.username,
+                              sub.notification.httpInfo.mqtt.password,
+                              sub.notification.httpInfo.mqtt.version,
+                              sub.notification.httpInfo.mqtt.qos,
 #endif
-                     sub.subject.condition.expression.q,
-                     sub.subject.condition.expression.geometry,
-                     sub.subject.condition.expression.coords,
-                     sub.subject.condition.expression.georel,
+                              sub.subject.condition.expression.q,
+                              sub.subject.condition.expression.geometry,
+                              sub.subject.condition.expression.coords,
+                              sub.subject.condition.expression.georel,
 #ifdef ORIONLD
-                     sub.subject.condition.expression.geoproperty,
+                              sub.subject.condition.expression.geoproperty,
 #endif
-                     sub.notification.blacklist);
+                              sub.notification.blacklist);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
+
+  return b;
 }
 
 
@@ -222,7 +224,10 @@ std::string mongoCreateSubscription
   // We need to insert the csub in the cache before (potentially) sending the
   // initial notification (have a look to issue #2974 for details)
   if (!noCache)
-    insertInCache(sub, subId, tenantP->tenant, servicePath, false, 0, 0, 0);
+  {
+    if (insertInCache(sub, subId, tenantP->tenant, servicePath, false, 0, 0, 0) == false)
+      return "";
+  }
 
   setCondsAndInitialNotify(sub,
                            subId,

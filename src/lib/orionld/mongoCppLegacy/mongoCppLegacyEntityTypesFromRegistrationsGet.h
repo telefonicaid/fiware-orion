@@ -31,8 +31,6 @@ extern "C"
 #include "kjson/KjNode.h"                                         // KjNode
 }
 
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // Own interface
-
 
 
 // -----------------------------------------------------------------------------

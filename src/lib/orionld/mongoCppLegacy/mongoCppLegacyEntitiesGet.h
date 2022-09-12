@@ -37,6 +37,6 @@ extern "C"
 //
 // mongoCppLegacyEntitiesGet -
 //
-extern KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields);
+extern KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields, bool entityIdPresent);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESGET_H_

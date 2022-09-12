@@ -101,7 +101,7 @@ bool orionldPostSubscriptions(void)
     if (qTree != NULL)
       qRelease(qTree);
 
-    return false;
+    LM_RE(false, ("pCheckSubscription FAILED"));
   }
 
   // Subscription id special treats

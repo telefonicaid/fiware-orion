@@ -400,11 +400,11 @@ bool pCheckTenantName(const char* dbName)
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
-  if (strcmp(key, "Orionld-Legacy") == 0)
+  if (strcasecmp(key, "Orionld-Legacy") == 0)
     orionldState.in.legacy = (char*) value;
-  else if (strcmp(key, "Performance") == 0)
+  else if (strcasecmp(key, "Performance") == 0)
     orionldState.in.performance = true;
-  else if (strcmp(key, "NGSILD-Scope") == 0)
+  else if (strcasecmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));
     if (orionldState.scopes == -1)
@@ -413,7 +413,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
       orionldError(OrionldBadRequestData, "Bad value for HTTP header /NGSILD-Scope/", value, 400);
     }
   }
-  else if (strcmp(key, "Accept") == 0)
+  else if (strcasecmp(key, "Accept") == 0)
   {
     orionldState.out.contentType = acceptHeaderParse((char*) value, false);
 

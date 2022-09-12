@@ -37,7 +37,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityLookup -
+// mongoCppLegacyEntityTypeGet -
 //
 extern KjNode* mongoCppLegacyEntityTypeGet(OrionldProblemDetails* pdP, const char* typeLongName, int* noOfEntitiesP);
 

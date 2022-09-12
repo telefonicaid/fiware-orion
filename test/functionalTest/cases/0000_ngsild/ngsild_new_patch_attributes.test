@@ -403,7 +403,7 @@ bye
 02.  PATCH E1, all 7 attributes - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
 =================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 510
+Content-Length: 449
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -428,7 +428,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -504,6 +504,10 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : 200,
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			],
 			"md" : {
 				"unitCode" : {
 					"value" : "kg"
@@ -511,25 +515,21 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1615372260.123
 				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt"
-			]
+			}
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:owner:2",
+			"mdNames" : [
+				"observedAt"
+			],
 			"md" : {
 				"observedAt" : {
 					"value" : 1615372320.123
 				}
-			},
-			"mdNames" : [
-				"observedAt"
-			]
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -597,7 +597,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04.  PATCH E1, all 7 attributes, and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 =====================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 692
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -622,15 +622,15 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -653,45 +653,13 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/weight",
-		"https://uri.etsi.org/ngsi-ld/default-context/owner",
 		"location",
 		"observationSpace",
-		"operationSpace"
+		"operationSpace",
+		"https://uri.etsi.org/ngsi-ld/default-context/weight",
+		"https://uri.etsi.org/ngsi-ld/default-context/owner"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : 200,
-			"md" : {
-				"unitCode" : {
-					"value" : "kg"
-				},
-				"observedAt" : {
-					"value" : 1615372260.123
-				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt"
-			]
-		},
-		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
-			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "urn:ngsi-ld:owner:2",
-			"md" : {
-				"observedAt" : {
-					"value" : 1615372320.123
-				}
-			},
-			"mdNames" : [
-				"observedAt"
-			]
-		},
 		"location" : {
 			"type" : "GeoProperty",
 			"creDate" : REGEX(.*),
@@ -730,6 +698,38 @@ MongoDB server version: REGEX(.*)
 				]
 			},
 			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 200,
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "kg"
+				},
+				"observedAt" : {
+					"value" : 1615372260.123
+				}
+			}
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:owner:2",
+			"mdNames" : [
+				"observedAt"
+			],
+			"md" : {
+				"observedAt" : {
+					"value" : 1615372320.123
+				}
+			}
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -797,7 +797,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 06.  PATCH E1, all 7 attributes, and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 ======================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 692
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: REGEX(.*)
@@ -822,15 +822,15 @@ Link: REGEX(.*)
         },
         {
             "attributeName": "weight",
-            "reason": "attribute doesn't exist: https://w3id.org/saref#weight"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "owner",
-            "reason": "attribute doesn't exist: https://uri.fiware.org/ns/data-models#owner"
+            "reason": "Attribute not found"
         },
         {
             "attributeName": "noSuchAttr",
-            "reason": "attribute doesn't exist: https://uri.etsi.org/ngsi-ld/default-context/noSuchAttr"
+            "reason": "Attribute not found"
         }
     ],
     "updated": [
@@ -853,45 +853,13 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/weight",
-		"https://uri.etsi.org/ngsi-ld/default-context/owner",
 		"location",
 		"observationSpace",
-		"operationSpace"
+		"operationSpace",
+		"https://uri.etsi.org/ngsi-ld/default-context/weight",
+		"https://uri.etsi.org/ngsi-ld/default-context/owner"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : 200,
-			"md" : {
-				"unitCode" : {
-					"value" : "kg"
-				},
-				"observedAt" : {
-					"value" : 1615372260.123
-				}
-			},
-			"mdNames" : [
-				"unitCode",
-				"observedAt"
-			]
-		},
-		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
-			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "urn:ngsi-ld:owner:2",
-			"md" : {
-				"observedAt" : {
-					"value" : 1615372320.123
-				}
-			},
-			"mdNames" : [
-				"observedAt"
-			]
-		},
 		"location" : {
 			"type" : "GeoProperty",
 			"creDate" : REGEX(.*),
@@ -930,6 +898,38 @@ MongoDB server version: REGEX(.*)
 				]
 			},
 			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/weight" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 200,
+			"mdNames" : [
+				"unitCode",
+				"observedAt"
+			],
+			"md" : {
+				"unitCode" : {
+					"value" : "kg"
+				},
+				"observedAt" : {
+					"value" : 1615372260.123
+				}
+			}
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/owner" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:owner:2",
+			"mdNames" : [
+				"observedAt"
+			],
+			"md" : {
+				"observedAt" : {
+					"value" : 1615372320.123
+				}
+			}
 		}
 	},
 	"creDate" : REGEX(.*),

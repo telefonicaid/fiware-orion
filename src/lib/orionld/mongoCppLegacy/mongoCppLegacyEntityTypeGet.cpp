@@ -30,7 +30,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 
@@ -69,7 +68,7 @@ extern "C"
 //
 // Also, the '=' in attribute names are to be replaced with '.' (NGSI data model details)
 //
-static bool kjAttributesWithTypeExtract(KjNode* kjTree, KjNode* entityP)
+bool kjAttributesWithTypeExtract(KjNode* kjTree, KjNode* entityP)
 {
   KjNode* attrsP = kjLookup(kjTree, "attrs");
 

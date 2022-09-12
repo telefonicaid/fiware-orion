@@ -100,7 +100,7 @@ typedef bool    (*DbSubscriptionReplace)(const char* subscriptionId, KjNode* dbS
 typedef bool    (*DbSubscriptionDelete)(const char* subscriptionId);
 typedef KjNode* (*DbRegistrationGet)(const char* registrationId);
 typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbRegistrationP);
-typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
+typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields, bool entityIdPresent);
 typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(bool details);
 typedef bool    (*DbGeoIndexCreate)(OrionldTenant* tenantP, const char* attrName);
 typedef bool    (*DbIdIndexCreate)(OrionldTenant* tenantP);

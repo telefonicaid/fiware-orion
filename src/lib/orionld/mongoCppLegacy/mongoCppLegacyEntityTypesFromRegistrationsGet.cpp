@@ -82,9 +82,9 @@ void typeExtract(KjNode* regArray, KjNode* typeArray)
 
 // -----------------------------------------------------------------------------
 //
-// entitiesAndProprertiesExtract -
+// entitiesAndPropertiesExtract -
 //
-void entitiesAndProprertiesExtract(KjNode* regArray, KjNode* typeArray)
+void entitiesAndPropertiesExtract(KjNode* regArray, KjNode* typeArray)
 {
   for (KjNode* arrItemP = regArray->value.firstChildP; arrItemP != NULL; arrItemP = arrItemP->next)
   {
@@ -221,13 +221,14 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details)
     }
   }
 
+  // FIXME: This part has nothing to do with DB - move out from the database libs
   if (regArray != NULL)
   {
     typeArray = kjArray(orionldState.kjsonP, NULL);
     if (details == false)
       typeExtract(regArray, typeArray);
     else
-      entitiesAndProprertiesExtract(regArray, typeArray);
+      entitiesAndPropertiesExtract(regArray, typeArray);
   }
 
   releaseMongoConnection(connectionP);

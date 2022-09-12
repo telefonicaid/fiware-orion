@@ -221,6 +221,7 @@ SET (ORION_LIBS
     orionld_legacyDriver # legacyDriver uses payloadCheck functions
     orionld_payloadCheck
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
+    orionld_payloadCheck
     orionld_mqtt
     orionld_q
     orionld_mongoc       # subCache needs mongoc
