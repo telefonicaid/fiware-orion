@@ -15,3 +15,4 @@
 * Issue #1229  Fixed a CRASH on erroneous q, when creating subscriptions
 * Issue #280   Reimplementation of PATCH /entities/attrs, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280   Reimplementation of GET /types, using the new mongo driver (mongoc) - only used if -experimental is set
+* Issue #280   Reimplementation of GET /types/{typeName}, using the new mongo driver (mongoc) - only used if -experimental is set
