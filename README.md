@@ -7,7 +7,7 @@
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
 [![Support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
+[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](doc/manuals/orion-api.md)
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
@@ -60,12 +60,6 @@ check the FIWARE Catalogue entry for
 You can find the User & Programmer's Manual and the Installation &
 Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
-For documentation previous to Orion 0.23.0 please check the manuals at FIWARE
-public wiki:
-
--   [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
--   [Orion Context Broker - User and Programmers Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
-
 Any feedback on this documentation is highly welcome, including bugs, typos or
 things you think should be included but aren't. You can use
 [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
@@ -99,11 +93,11 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220301)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220301-251267820)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220526)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220526-251860297)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220301)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220301-251267815)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)
 
 [Top](#top)
 
@@ -183,15 +177,8 @@ Reference sections below in order to know more details about the API
 
 ## API
 
--   FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
+-   FIWARE NGSIv2 Orion API Walkthrough FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
     [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
--   FIWARE NGSI v2
-    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook)
-    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook)
-    (Apiary)
-    -   See also NGSIv2 implementation notes
-        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
-        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
 
@@ -199,12 +186,9 @@ Reference sections below in order to know more details about the API
 
 API Reference Documentation:
 
--   FIWARE NGSI v2
-    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
-    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
-    -   See also NGSIv2 implementation notes
-        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
-        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
+-   FIWARE NGSIv2 Orion API
+    [(en)](doc/manuals/orion-api.md)
+    [(jp)](doc/manuals.jp/orion-api.md) (Markdown)
 
 Orion Reference Documentation:
 
@@ -251,10 +235,10 @@ target.
         [(jp)](docker/docker_swarm.jp.md)
 -   Development Manual [(en)](doc/manuals/devel/README.md)
     [(jp)](doc/manuals.jp/devel/README.md)
--   Sample code contributions [(en)](doc/manuals/code_contributions.md)
-    [(jp)](doc/manuals.jp/code_contributions.md)
--   Contribution guidelines [(en)](doc/manuals/contribution_guidelines.md)
-    [(jp)](doc/manuals.jp/contribution_guidelines.md), especially important if
+-   Sample code contributions [(en)](doc/manuals/devel/code_contributions.md)
+    [(jp)](doc/manuals.jp/devel/code_contributions.md)
+-   Contribution guidelines [(en)](doc/manuals/devel/contribution_guidelines.md)
+    [(jp)](doc/manuals.jp/devel/contribution_guidelines.md), especially important if
     you plan to contribute with code to Orion Context Broker
 -   Deprecated features [(en)](doc/manuals/deprecated.md)
     [(jp)](doc/manuals.jp/deprecated.md)

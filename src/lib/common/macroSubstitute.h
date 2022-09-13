@@ -33,6 +33,6 @@
 *
 * macroSubstitute - 
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, const Entity& en);
+extern bool macroSubstitute(std::string* sP, const std::string& in, const Entity& en, const std::string& service, const std::string& authToken);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

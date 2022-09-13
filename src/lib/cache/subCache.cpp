@@ -92,11 +92,9 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isPattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED))
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
+      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern", _entityId);
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityIdPatternToBeFreed = false;
@@ -113,11 +111,9 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isTypePattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED))
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
+      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern", _entityType);
       isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityTypePatternToBeFreed = false;
@@ -444,7 +440,8 @@ static bool subMatch
   const char*                      servicePath,
   const char*                      entityId,
   const char*                      entityType,
-  const std::vector<std::string>&  attrV,
+  const std::vector<std::string>&  attributes,
+  const std::vector<std::string>&  modifiedAttrs,
   ngsiv2::SubAltType               targetAltType
 )
 {
@@ -493,10 +490,23 @@ static bool subMatch
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).
   //
-  if (!attributeMatch(cSubP, attrV))
+  // Depending of the alteration type, we use the list of attributes in the request or the list
+  // with effective modifications
+  if (targetAltType == ngsiv2::EntityUpdate)
   {
-    LM_T(LmtSubCacheMatch, ("No match due to attributes"));
-    return false;
+    if (!attributeMatch(cSubP, attributes))
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+      return false;
+    }
+  }
+  else
+  {
+    if (!attributeMatch(cSubP, modifiedAttrs))
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+      return false;
+    }
   }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
@@ -538,7 +548,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -561,7 +571,8 @@ void subCacheMatch
   const char*                        servicePath,
   const char*                        entityId,
   const char*                        entityType,
-  const std::vector<std::string>&    attrV,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    modifiedAttrs,
   ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
@@ -570,7 +581,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, modifiedAttrs, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -606,6 +617,9 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     free(cSubP->subscriptionId);
     cSubP->subscriptionId = NULL;
   }
+
+  cSubP->httpInfo.release();
+  cSubP->mqttInfo.release();
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
@@ -853,13 +867,22 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
   cSubP->covered               = covered;
-  cSubP->httpInfo              = httpInfo;
-  cSubP->mqttInfo              = mqttInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->subAltTypeV           = altTypes;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
+  cSubP->httpInfo = httpInfo;
+  if (httpInfo.json != NULL)
+  {
+    cSubP->httpInfo.json = httpInfo.json->clone();
+  }
+
+  cSubP->mqttInfo = mqttInfo;
+  if (mqttInfo.json != NULL)
+  {
+    cSubP->mqttInfo.json = mqttInfo.json->clone();
+  }
 
   //
   // String filters

@@ -35,8 +35,8 @@
 #include "rest/OrionError.h"
 
 #include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseMetadataCompoundValue.h"
 #include "jsonParseV2/parseMetadata.h"
+#include "jsonParseV2/parseCompoundCommon.h"
 
 
 
@@ -98,7 +98,14 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
       {
         compoundVector = (type == "Array")? true : false;
         mdP->valueType = orion::ValueTypeObject;  // Used both for Array and Object ...
-        std::string r  = parseMetadataCompoundValue(iter, mdP, NULL, 0);
+
+        std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+        mdP->compoundValueP            = new orion::CompoundValueNode();
+        mdP->compoundValueP->name      = "";
+        mdP->compoundValueP->valueType = stringToCompoundType(type);
+
+        std::string r  = parseCompoundValue(iter, mdP->compoundValueP, 0);
 
         if (r != "OK")
         {
@@ -107,14 +114,14 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
       }
       else
       {
-        std::string details = std::string("ContextAttribute::Metadata::type is '") + type + "'";
-        alarmMgr.badInput(clientIp, details);
+        std::string extra = std::string("ContextAttribute::Metadata::type is '") + type + "'";
+        alarmMgr.badInput(clientIp, "invalid JSON type for attribute metadata value", extra);
         return "invalid JSON type for attribute metadata value";
       }
     }
     else
     {
-      alarmMgr.badInput(clientIp, "invalid JSON field for attribute metadata");
+      alarmMgr.badInput(clientIp, "invalid JSON field for attribute metadata", name);
       return "invalid JSON field for attribute metadata";
     }
   }
@@ -126,7 +133,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
 
     if (mdP->numberValue == -1)
     {
-      alarmMgr.badInput(clientIp, "date has invalid format");
+      alarmMgr.badInput(clientIp, "date has invalid format", mdP->stringValue);
       return "date has invalid format";
     }
 

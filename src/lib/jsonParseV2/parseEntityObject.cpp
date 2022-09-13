@@ -26,6 +26,7 @@
 
 #include "rapidjson/document.h"
 
+#include "common/string.h"
 #include "common/errorMessages.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -99,7 +100,7 @@ std::string parseEntityObject
       }
 
       regex_t re;
-      if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
+      if (!regComp(&re, iter->value.GetString(), REG_EXTENDED))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTIDPATTERN;
       }
@@ -136,7 +137,7 @@ std::string parseEntityObject
       }
 
       regex_t re;
-      if (regcomp(&re, iter->value.GetString(), REG_EXTENDED) != 0)
+      if (!regComp(&re, iter->value.GetString(), REG_EXTENDED))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_REGEX_ENTTYPEPATTERN;
       }

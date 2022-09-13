@@ -325,6 +325,7 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
   if (mosq == NULL)
   {
     // No need of log traces here: the getConnection() method would already print them
+    delete cP;
     semGive();
     return false;
   }

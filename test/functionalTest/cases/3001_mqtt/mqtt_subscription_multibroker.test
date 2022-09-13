@@ -352,6 +352,7 @@ Date: REGEX(.*)
 
 
 
+#SORT_START
 10. Dump accumulator for localhost:1883 and see 4 notifications
 ===============================================================
 MQTT message at topic /sub1:
@@ -418,6 +419,7 @@ MQTT message at topic /sub2:
     "subscriptionId": "REGEX([0-9a-f\-]{24})"
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--

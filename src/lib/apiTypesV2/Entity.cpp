@@ -456,7 +456,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     if (isTrue(isPattern))
     {
       regex_t re;
-      if ((id.find('\0') != std::string::npos) || (regcomp(&re, id.c_str(), REG_EXTENDED) != 0))
+      if ((id.find('\0') != std::string::npos) || (!regComp(&re, id.c_str(), REG_EXTENDED)))
       {
         return "invalid regex for entity id pattern";
       }
@@ -495,7 +495,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     // isPattern MUST be either "true" or "false" (or empty => "false")
     if ((isPattern != "true") && (isPattern != "false"))
     {
-      alarmMgr.badInput(clientIp, "invalid value for isPattern");
+      alarmMgr.badInput(clientIp, "invalid value for isPattern", isPattern);
       return "Invalid value for isPattern";
     }
 
@@ -504,7 +504,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     {
       if (forbiddenIdChars(V2, id.c_str()))
       {
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, id);
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
     }
@@ -531,7 +531,7 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
     {
       if (forbiddenIdChars(V2, type.c_str()))
       {
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, type);
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
     }

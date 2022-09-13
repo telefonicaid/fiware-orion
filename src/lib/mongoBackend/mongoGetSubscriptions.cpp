@@ -337,10 +337,11 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  while (cursor.next(&r))
+  while ((limit != 0) && (cursor.next(&r)))
   {
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));

@@ -500,7 +500,7 @@ std::string CompoundValueNode::check(const std::string& path)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";
     }
   }
@@ -526,7 +526,7 @@ std::string CompoundValueNode::check(const std::string& path)
 * CompoundValueNode:toJson
 *
 */
-std::string CompoundValueNode::toJson(void)
+std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replacementsP)
 {
   std::string      out;
   JsonVectorHelper jvh;
@@ -535,9 +535,28 @@ std::string CompoundValueNode::toJson(void)
   switch (valueType)
   {
   case orion::ValueTypeString:
-    out = '"';
-    out += toJsonString(stringValue);
-    out += '"';
+    if ((replacementsP != NULL) && (stringValue.rfind("${", 0) == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
+    {
+      // len("${") + len("}") = 3
+      std::string macroName = stringValue.substr(2, stringValue.size() - 3);
+      std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
+      if (iter == replacementsP->end())
+      {
+        // macro doesn't exist in the replacement map, so we use null al failsafe
+        out += "null";
+      }
+      else
+      {
+        out += iter->second;
+      }
+    }
+    else
+    {
+      out = '"';
+      out += toJsonString(stringValue);
+      out += '"';
+    }
+
     return out;
 
   case orion::ValueTypeNumber:
@@ -552,14 +571,14 @@ std::string CompoundValueNode::toJson(void)
   case orion::ValueTypeVector:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      jvh.addRaw(childV[ix]->toJson());
+      jvh.addRaw(childV[ix]->toJson(replacementsP));
     }
     return jvh.str();
 
   case orion::ValueTypeObject:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      joh.addRaw(childV[ix]->name, childV[ix]->toJson());
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson(replacementsP));
     }
     return joh.str();
 

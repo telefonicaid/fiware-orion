@@ -22,8 +22,7 @@ scripts used for testing and release making are found under `scripts/`.
 * **doc**: contains documentation, with the following subdirectories:
   * **apiary**: for apiary-based documentation
   * **manuals**: for markdown based documentation
-* **rpm**: contains files for RPM building *(deprecated)*
-* **etc**: scripts that are installed under etc/ (typically, included in RPM package) *(deprecated)*
+* **etc**: files that are installed under etc/ (logrotate examples, etc.)
 * **docker**: contains the docker files
 * **ci**: contains files required by Orion's CI process
 * **archive**: contains older files that is no longer in use but that we don't feel comfortable removing just yet

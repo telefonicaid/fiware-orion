@@ -583,7 +583,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number1, &newLatitude) == false) || (newLatitude > 90) || (newLatitude < -90))
   {
     std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, s);
 
     free(initial);
     return false;
@@ -592,7 +592,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number2, &newLongitude) == false) || (newLongitude > 180) || (newLongitude < -180))
   {
     std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, s);
 
     free(initial);
     return false;
@@ -874,7 +874,7 @@ std::string servicePathCheck(const char* servicePath)
     else
     {
       std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(clientIp, details, servicePath);
 
       return "Bad Character in Service-Path";
     }
@@ -1104,4 +1104,30 @@ std::string offuscatePassword(const std::string& uri, const std::string& pwd)
   std::string s(uri);  // replace cannot be called in const std::string&
   s.replace(uri.find(pwd), pwd.length(), "******");
   return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* regComp -
+*
+* Wrapper or standard regcomp() from regex.h, including some advanced features
+* (e.g. error logging)
+*/
+bool regComp(regex_t* re, const char* pattern, int flags)
+{
+  int r = regcomp(re, pattern, flags);
+  if (r == 0)
+  {
+    return true;
+  }
+
+  // Log error in corresponding tracelevel (see example at
+  // https://www.ibm.com/docs/en/i/7.1?topic=functions-regerror-return-error-message-regular-expression)
+  char    buffer[100];
+  regerror(r, re, buffer, 100);
+  LM_T(LmtRegexError, ("regcomp() failed for pattern '%s': %s", pattern, buffer));
+
+  return false;
 }

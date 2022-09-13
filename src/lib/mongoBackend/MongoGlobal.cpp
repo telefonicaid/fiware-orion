@@ -417,7 +417,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     regex_t regex;
 
     idMatch = false;
-    if (regcomp(&regex, en2->id.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
     {
       std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
       alarmMgr.badInput(clientIp, details);
@@ -1589,10 +1589,11 @@ bool entitiesQuery
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  int             errType;
+  int             errType = ON_NEXT_NO_ERROR;
   std::string     nextErr;
 
-  while (cursor.next(&r, &errType, &nextErr))
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
+  while ((limit != 0) && (cursor.next(&r, &errType, &nextErr)))
   {
     alarmMgr.dbErrorReset();
 

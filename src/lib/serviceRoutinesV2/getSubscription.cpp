@@ -77,9 +77,14 @@ std::string getSubscription
   {
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
-    return out;
+  }
+  else  // oe.code == SccOk
+  {
+    TIMED_RENDER(out = sub.toJson());
   }
 
-  TIMED_RENDER(out = sub.toJson());
+  // free sub memory associated to subscriptions
+  sub.release();
+
   return out;
 }

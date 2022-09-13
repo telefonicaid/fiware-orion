@@ -77,7 +77,7 @@ commands that require root privilege):
         cd fiware-orion
         make
 
-* (Optional but highly recommended) run unit test and functional tests. More on this on [its specific section below](#testing-coverage-and-rpm).
+* (Optional but highly recommended) run unit test and functional tests. More on this on [its specific section below](#testing-and-coverage).
 
 * Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is /usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
 
@@ -302,8 +302,8 @@ You can generate coverage reports for the Orion Context Broker using the followi
         sudo cp /opt/fiware-orion/etc/config/contextBroker /etc/sysconfig/
         sudo touch /var/log/contextBroker/contextBroker.log
         sudo chown orion /var/log/contextBroker/contextBroker.log
-        sudo cp /opt/fiware-orion/rpm/SOURCES/etc/logrotate.d/logrotate-contextBroker-daily /etc/logrotate.d/
-        sudo cp /opt/fiware-orion/rpm/SOURCES/etc/sysconfig/logrotate-contextBroker-size /etc/sysconfig/
-        sudo cp /opt/fiware-orion/rpm/SOURCES/etc/cron.d/cron-logrotate-contextBroker-size /etc/cron.d/
+        sudo cp /opt/fiware-orion/etc/logrotate.d/logrotate-contextBroker-daily /etc/logrotate.d/
+        sudo cp /opt/fiware-orion/etc/sysconfig/logrotate-contextBroker-size /etc/sysconfig/
+        sudo cp /opt/fiware-orion/etc/cron.d/cron-logrotate-contextBroker-size /etc/cron.d/
         sudo systemctl daemon-reload
         sudo systemctl start contextBroker.service 

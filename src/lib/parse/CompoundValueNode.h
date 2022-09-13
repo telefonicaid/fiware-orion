@@ -27,6 +27,7 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "common/globals.h"
 
@@ -113,7 +114,7 @@ class CompoundValueNode
   std::string         check(const std::string& path);
   std::string         finish(void);
 
-  std::string         toJson(void);
+  std::string         toJson(std::map<std::string, std::string>* replacementsP = NULL);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);
