@@ -1265,6 +1265,7 @@ static void fill_idPtypeNP
   const std::string&  typePatternQ
 )
 {
+#if 0
   bgP->functionIdPtypeNP = std::string("function()") +
          "{" +
             "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
@@ -1280,7 +1281,62 @@ static void fill_idPtypeNP
             "return false; " +
          "}";
   LM_T(LmtMongo, ("idTtypeNP function: %s", bgP->functionIdPtypeNP.c_str()));
+#else
+  orion::BSONObjBuilder outer_obj;
+  orion::BSONObjBuilder anyElementTrue;
+  orion::BSONObjBuilder map_obj;
+  orion::BSONObjBuilder in;
+  orion::BSONArrayBuilder and_arr;
+  orion::BSONObjBuilder and_first;
+  orion::BSONObjBuilder and_second;
+  orion::BSONObjBuilder and_third;
+  orion::BSONObjBuilder and_fourth;
+  orion::BSONObjBuilder regex_obj;
+  orion::BSONArrayBuilder eq_arr;
+  orion::BSONObjBuilder eq_obj;
+  orion::BSONObjBuilder eq_obj_2;
+  orion::BSONObjBuilder eq_obj_3;
+  orion::BSONObjBuilder type_obj;
+  orion::BSONArrayBuilder eq_arr_2;
+  orion::BSONArrayBuilder eq_arr_3;
+  orion::BSONArrayBuilder eq_arr_4;
+  orion::BSONArrayBuilder or_arr;
 
+  map_obj.append("input", "$entities");
+  
+  regex_obj.append("input", "Room1");
+  regex_obj.append("regex", "$$this.id");
+  regex_obj.append("options", "i");
+  and_first.append("$regexMatch", regex_obj.obj());
+  and_arr.append(and_first.obj());
+  
+  eq_arr.append("$$this.isPattern");
+  eq_arr.append("true");
+  and_second.append("$eq", eq_arr.arr());
+  and_arr.append(and_second.obj());
+
+  eq_arr_2.append("$$this.type");
+  eq_arr_2.append("Room");
+  eq_obj.append("$eq", eq_arr_2.arr());
+  or_arr.append(eq_obj.obj());
+
+  eq_arr_3.append("$$this.type");
+  eq_arr_3.append("");
+  eq_obj_2.append("$eq", eq_arr_3.arr());
+  or_arr.append(eq_obj_2.obj());
+  and_third.append("$or", or_arr.arr());
+  and_arr.append(and_third.obj());
+
+  type_obj.append("$type", "$$this.isTypePattern");
+  eq_arr_4.append(type_obj.obj());
+  eq_arr_4.append("missing");
+
+  in.append("$and", and_arr.arr());
+  map_obj.append("in", in.obj());
+
+  anyElementTrue.append("$map", map_obj.obj());
+  outer_obj.append("$anyElementTrue", anyElementTrue.obj());
+#endif
   orion::BSONObjBuilder bobNeTrue;
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
@@ -1293,8 +1349,11 @@ static void fill_idPtypeNP
   bgP->boPNP.append(typePatternQ, bobNeTrue.obj());
   bgP->boPNP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boPNP.append(CSUB_STATUS, bobNeStatus.obj());
+#if 0
   bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
-
+#else
+  bgP->boPNP.append("$expr", outer_obj.obj());
+#endif
   bgP->idPtypeNP = bgP->boPNP.obj();
 }
 
