@@ -46,8 +46,8 @@ check the FIWARE Catalogue entry for
 -   [Install](#install)
 -   [Running](#running)
 -   [Usage](#usage)
--   [API](#api)
--   [Reference Documentation](#reference-documentation)
+-   [API Walkthrough](#api)
+-   [API Reference Documentation](#reference-documentation)
 -   [Testing](#testing)
     -   [End-to-end tests](#end-to-end-tests)
     -   [Unit Tests](#unit-tests)
@@ -175,14 +175,14 @@ Reference sections below in order to know more details about the API
 
 [Top](#top)
 
-## API
+## API Walkthrough
 
 -   FIWARE NGSIv2 Orion API Walkthrough FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
     [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
 
 [Top](#top)
 
-## Reference Documentation
+## API Reference Documentation
 
 API Reference Documentation:
 
