@@ -1183,16 +1183,25 @@ int main(int argC, char* argV[])
   LM_K(("  TRoE:                    %s", (troe          == true)? "Enabled" : "Disabled"));
   LM_K(("  Forwarding:              %s", (forwarding    == true)? "Enabled" : "Disabled"));
   LM_K(("  Health Check:            %s", (socketService == true)? "Enabled" : "Disabled"));
-  LM_K(("  Mongo Driver:            %s", (experimental  == true)? "mongoc driver (partially)" : "Legacy C++ Driver"));
-  if (experimental  == true)
-    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
 
-  LM_K(("  Mongo Server Version:    %s", mongocServerVersion));
   if (troe)
     LM_K(("  Postgres Server Version: %s", postgresServerVersion));
 
+  LM_K(("  Mongo Server Version:    %s", mongocServerVersion));
+
   if (mongocOnly == true)
-    LM_K(("  The MongoDB C++ Legacy Driver is DISABLED - careful ... only a subset of the requests work in this mode"));
+  {
+    LM_K(("  Mongo Driver:            mongoc driver"));
+    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
+    LM_K(("  The MongoDB C++ Legacy Driver is DISABLED - registration requests don't work in this mode"));
+  }
+  else if (experimental  == true)
+  {
+    LM_K(("  Mongo Driver:            mongoc driver"));
+    LM_K(("  MongoC Driver Version:   %s (for all requests but registrations)", MONGOC_VERSION_S));
+  }
+  else
+    LM_K(("  Mongo Driver:            Legacy C++ Driver (deprecated by mongodb)"));
 
   // Startup is done - we can free up the allocated kalloc buffers - assuming socketService doesn't use kalloc ...
   kaBufferReset(&orionldState.kalloc, KFALSE);
