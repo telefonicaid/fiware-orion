@@ -80,7 +80,7 @@ echo
 
 echo "04. GET /ngsi-ld/v1/subscriptions/S1"
 echo "===================================="
-orionCurl --url /ngsi-ld/v1/subscriptions/S1
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
 echo
 echo
 
@@ -276,12 +276,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET /ngsi-ld/v1/subscriptions/S1
 ====================================
 HTTP/1.1 404 Not Found
-Content-Length: 110
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "S1",
+    "detail": "urn:S1",
     "title": "subscription not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }

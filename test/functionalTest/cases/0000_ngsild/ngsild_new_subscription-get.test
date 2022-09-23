@@ -93,7 +93,7 @@ echo
 
 echo "03. GET the subscription - from DB (options=fromDb)"
 echo "==================================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?options=fromDb&prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?options=fromDb,sysAttrs&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 
@@ -180,7 +180,7 @@ bye
 03. GET the subscription - from DB (options=fromDb)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 953
+Content-Length: 1040
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -210,15 +210,15 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
+    "geoproperty": "location",
+    "georel": "near;maxDistance==100",
     "coordinates": [
       1,
       2
-    ],
-    "georel": "near;maxDistance==100",
-    "geoproperty": "location"
+    ]
   },
-  "status": "paused",
   "isActive": false,
+  "status": "paused",
   "notification": {
     "attributes": [
       "P1",
@@ -232,9 +232,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "status": "ok"
   },
+  "origin": "database",
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "database"
+  "createdAt": "202REGEX(.*)Z",
+  "modifiedAt": "202REGEX(.*)Z"
 }
 
 

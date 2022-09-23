@@ -97,7 +97,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     QNode*  qTree        = NULL;
     KjNode* contextNodeP = NULL;
     KjNode* coordinatesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, tenantP->tenant, &qTree, &coordinatesP, &contextNodeP);
+    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, tenantP->tenant, true, &qTree, &coordinatesP, &contextNodeP);
 
     if (apiSubP == NULL)
       continue;
@@ -113,7 +113,6 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     LM_RE(false, ("Internal Error (DB Error '%s')", mongoError.message));
 
   mongoc_cursor_destroy(mongoCursorP);
-  // semGive(&mongoSubscriptionsSem);
   bson_destroy(&mongoFilter);
 
   return true;

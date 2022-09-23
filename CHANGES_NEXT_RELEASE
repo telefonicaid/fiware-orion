@@ -18,3 +18,5 @@
 * Issue #280   Reimplementation of GET /types/{typeName}, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280   Reimplementation of GET /attributes, using the new mongo driver (mongoc) - only used if -experimental is set
 * Issue #280   Reimplementation of GET /attributes/{attrName}, using the new mongo driver (mongoc) - only used if -experimental is set
+* Issue #280   Added a URL parameter for GET /subscriptions/{subId}: ?options=fromDb  to get the subscription from DB and not subscription cache
+* Issue #280   Implemented retrieval of a subscription from the database instead of from the subscription cache:  GET /subscriptions/{subId}?options=fromDb

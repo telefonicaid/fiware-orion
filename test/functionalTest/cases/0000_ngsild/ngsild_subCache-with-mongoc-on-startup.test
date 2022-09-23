@@ -310,7 +310,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET the subscription from DB, without context - see long names
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 936
+Content-Length: 937
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -364,7 +364,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             ],
             "uri": "mqtt://localhost:1883/entities"
         },
-        "format": "keyValues",
+        "format": "simplified",
         "status": "ok"
     },
     "origin": "database",
@@ -454,7 +454,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.json
 06. GET the subscription from DB, with testFullContext - see short names
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 860
+Content-Length: 861
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -508,7 +508,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.json
             ],
             "uri": "mqtt://localhost:1883/entities"
         },
-        "format": "keyValues",
+        "format": "simplified",
         "status": "ok"
     },
     "origin": "database",
@@ -661,7 +661,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 10. GET the subscription from DB
 ================================
 HTTP/1.1 200 OK
-Content-Length: 936
+Content-Length: 937
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -715,7 +715,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             ],
             "uri": "mqtt://localhost:1883/entities"
         },
-        "format": "keyValues",
+        "format": "simplified",
         "status": "ok"
     },
     "origin": "database",

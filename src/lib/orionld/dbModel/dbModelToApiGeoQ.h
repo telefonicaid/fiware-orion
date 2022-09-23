@@ -36,6 +36,6 @@ extern "C"
 //
 // dbModelToApiGeoQ -
 //
-extern bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP);
+extern bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP, bool* emptyP);
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIGEOQ_H_

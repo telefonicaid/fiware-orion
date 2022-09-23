@@ -29,8 +29,12 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildRemove, kjChildAdd
 }
 
+#include "logMsg/logMsg.h"                                       // LM
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/dbModel/dbModelToApiGeometry.h"                // dbModelToApiGeometry
 #include "orionld/dbModel/dbModelToApiGeorel.h"                  // dbModelToApiGeorel
 #include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
@@ -42,11 +46,12 @@ extern "C"
 //
 // dbModelToApiGeoQ -
 //
-bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP)
+bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP, bool* emptyP)
 {
-  KjNode* geometryP    = kjLookup(geoqP, "geometry");
-  KjNode* georelP      = kjLookup(geoqP, "georel");
-  KjNode* coordsP      = kjLookup(geoqP, "coords");
+  KjNode* geometryP     = kjLookup(geoqP, "geometry");
+  KjNode* georelP       = kjLookup(geoqP, "georel");
+  KjNode* coordsP       = kjLookup(geoqP, "coords");
+  KjNode* geopropertyP  = kjLookup(geoqP, "geoproperty");
 
   if (geometryP == NULL)
   {
@@ -78,6 +83,12 @@ bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP)
     return false;
   }
 
+  if (geometryP->value.s[0] == 0)  // Empty geometry?
+  {
+    *emptyP = true;
+    return true;
+  }
+
   geometryP->value.s = (char*) dbModelToApiGeometry(geometryP->value.s);
 
   KjNode* newGeoRelNodeP = dbModelToApiGeorel(georelP->value.s);
@@ -100,6 +111,12 @@ bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP)
   {
     orionldError(OrionldInternalError, "Database Error", "/coordinates/ field for geoQ in database is not an Array nor a String", 500);
     return false;
+  }
+
+  if (geopropertyP != NULL)
+  {
+    eqForDot(geopropertyP->value.s);
+    geopropertyP->value.s = orionldContextItemAliasLookup(orionldState.contextP, geopropertyP->value.s, NULL, NULL);
   }
 
   *coordinatesPP = coordsP;
