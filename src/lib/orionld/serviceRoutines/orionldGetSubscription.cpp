@@ -67,8 +67,9 @@ static void subTimestampSet(KjNode* apiSubP, const char* fieldName, double value
   }
   else
   {
-    // We have to assume the current timestamp has a char buffer that is of sufficient length ...
-    strncpy(timestampNodeP->value.s, dateTime, 63);
+    // We have to assume the current timestamp has a char buffer that is of sufficient length.
+    // We actually know that, as the string was initially created as a timestamp
+    strncpy(timestampNodeP->value.s, dateTime, 64);
   }
 }
 
