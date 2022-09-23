@@ -36,15 +36,19 @@ accumulatorStart --pretty-print
 # 01. Create a subscription on everything for the accumulator
 # 02. See the subscription in mongo - make sure all timestamps have milliseconds
 # 03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
+# 03b. GET the subscription via REST from DB - make sure all timestamps have milliseconds, save timestamps
 # 04. Create an entity to provoke a notification
 # 05. Dump the accumulator - check milliseconds for all timestamps
 # 06. Update the entity, to provoke a new notification
-# 07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
+# 07. GET the subscription via REST - see 'timesSent==2' and timestamps for lastSuccess, lastNotification
+# 07b. GET the subscription via REST from DB - see 'timesSent==2' and timestamps for lastSuccess, lastNotification
 # 08. Update the subscription to provoke a newer 'modifiedAt'
 # 09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
+# 09b. ...
 # 10. Kill the accumulator to make room for a failed notification
 # 11. Update the entity, to provoke a new notification - which will fail as the accumulator is dead
 # 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
+# 12b. ...
 #
 # Later - Orion-LD doesn't even support Periodic Notifications right now:
 # 13. Create a subscription with timeInterval in milliseconds
@@ -94,6 +98,15 @@ echo
 echo
 
 
+echo "03b. GET the subscription via REST from DB - make sure all timestamps have milliseconds, save timestamps"
+echo "========================================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs,fromDb
+createdAtB=$(kjson /tmp/orionCurl.response | grep createdAt | awk -F\" '{ print $4}')
+modifiedAtB=$(kjson /tmp/orionCurl.response | grep modifiedAt| awk -F\" '{ print $4}')
+echo
+echo
+
+
 echo "04. Create an entity to provoke a notification"
 echo "=============================================="
 payload='{
@@ -131,7 +144,7 @@ echo
 echo
 
 
-echo "07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification"
+echo "07. GET the subscription via REST - see 'timesSent==2' and timestamps for lastSuccess, lastNotification"
 echo "======================================================================================================="
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs
 createdAt2=$(kjson /tmp/orionCurl.response | grep createdAt | awk -F\" '{ print $4}')
@@ -163,6 +176,41 @@ fi
 
 echo
 echo
+
+
+echo "07b. GET the subscription via REST from DB - see 'timesSent==2' and timestamps for lastSuccess, lastNotification"
+echo "================================================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs,fromDb
+createdAt2B=$(kjson /tmp/orionCurl.response | grep createdAt | awk -F\" '{ print $4}')
+modifiedAt2B=$(kjson /tmp/orionCurl.response | grep modifiedAt| awk -F\" '{ print $4}')
+lastNotificationB=$(kjson /tmp/orionCurl.response | grep lastNotification | awk -F\" '{ print $4}')
+lastSuccessB=$(kjson /tmp/orionCurl.response | grep lastSuccess | awk -F\" '{ print $4}')
+timesSentB=$(kjson /tmp/orionCurl.response | grep timesSent | awk -F:\  '{ print $2}' | awk -F, '{ print $1}')
+
+if [ "$createdAt2B" != "$createdAtB" ]
+then
+  echo "createdAt has changed - error"
+else
+  echo "createdAt stays the same - good!"
+fi
+
+if [ "$modifiedAt2B" == "modifiedAtB" ]
+then
+  echo "modifiedAt has not changed - error"
+else
+  echo "modifiedAt has changed - good!"
+fi
+
+if [ "$timesSentB" != 2 ]
+then
+  echo "timesSent != 2 ($timesSentB) - error"
+else
+  echo "timesSent == 2 - good!"
+fi
+
+echo
+echo
+
 
 
 echo "08. Update the subscription to provoke a newer 'modifiedAt'"
@@ -327,6 +375,42 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
+03b. GET the subscription via REST from DB - make sure all timestamps have milliseconds, save timestamps
+========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 501
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2028-12-31T11:12:13.456Z",
+    "id": "urn:ngsi-ld:subscriptions:s1",
+    "isActive": true,
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "REGEX(.*)"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "database",
+    "status": "active",
+    "subscriptionName": "Test subscription 01",
+    "throttling": 1.459,
+    "type": "Subscription"
+}
+
+
 04. Create an entity to provoke a notification
 ==============================================
 HTTP/1.1 201 Created
@@ -372,7 +456,7 @@ Date: REGEX(.*)
 
 
 
-07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
+07. GET the subscription via REST - see 'timesSent==2' and timestamps for lastSuccess, lastNotification
 =======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 599
@@ -404,6 +488,48 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "timesSent": 2
     },
     "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Test subscription 01",
+    "throttling": 1.459,
+    "type": "Subscription"
+}
+createdAt stays the same - good!
+modifiedAt has changed - good!
+timesSent == 2 - good!
+
+
+07b. GET the subscription via REST from DB - see 'timesSent==2' and timestamps for lastSuccess, lastNotification
+================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 602
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2028-12-31T11:12:13.456Z",
+    "id": "urn:ngsi-ld:subscriptions:s1",
+    "isActive": true,
+    "modifiedAt": "202REGEX(.*)Z",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "REGEX(.*)"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 2
+    },
+    "origin": "database",
     "status": "active",
     "subscriptionName": "Test subscription 01",
     "throttling": 1.459,

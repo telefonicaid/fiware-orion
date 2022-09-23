@@ -33,7 +33,11 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/q/qAliasCompact.h"                             // qAliasCompact
+#include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
 #include "orionld/dbModel/dbModelToApiGeoQ.h"                    // dbModelToApiGeoQ
 #include "orionld/dbModel/dbModelToApiSubscription.h"            // Own interface
 
@@ -57,7 +61,45 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// notificationStatus -
+//
+static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
+{
+  if ((dbLastSuccessP == NULL) && (dbLastFailureP == NULL))    return true;
+  if ((dbLastSuccessP != NULL) && (dbLastFailureP == NULL))    return true;
+  if ((dbLastSuccessP == NULL) && (dbLastFailureP != NULL))    return false;
+
+  if (dbLastSuccessP->type != dbLastFailureP->type)
+    return false;
+
+  if (dbLastSuccessP->type == KjString)
+  {
+    if (strcmp(dbLastSuccessP->value.s, dbLastFailureP->value.s) < 0)
+      return false;
+  }
+  else if (dbLastSuccessP->type == KjFloat)
+  {
+    if (dbLastSuccessP->value.f > dbLastFailureP->value.f)
+      return true;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbModelToApiSubscription - modify the DB Model tree into an API Subscription
+//
+// PARAMETERS
+//   dbSubP             KjNode tree of the subscription in database model
+//   tenant             The tenant is needed for the subscription cache
+//   forSubCache        When invoked for subscription cache, we want Floating points, not ISO8601 strings.
+//                      We also want expanded names, not short names
+//   qNodePP            Output QNode tree
+//   coordinatesPP      Output coordinates tree
+//   contextNodePP      Output @context node
 //
 // Example of Subscription in DB:
 // {
@@ -128,15 +170,14 @@ do                                                                              
 //   "throttling": 5                          => SAME
 // }
 //
-KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP)
+KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSubCache, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP)
 {
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
   KjNode* dbNameP             = kjLookup(dbSubP, "name");
   KjNode* dbDescriptionP      = kjLookup(dbSubP, "description");
   KjNode* dbEntitiesP         = kjLookup(dbSubP, "entities");    DB_ITEM_NOT_FOUND(dbSubIdP, "entities",    tenant);
   KjNode* dbLdqP              = kjLookup(dbSubP, "ldQ");
-  KjNode* dbCreatedAtP        = kjLookup(dbSubP, "createdAt");   DB_ITEM_NOT_FOUND(dbSubIdP, "createdAt",   tenant);
-  KjNode* dbModifiedAtP       = kjLookup(dbSubP, "modifiedAt");  DB_ITEM_NOT_FOUND(dbSubIdP, "modifiedAt",  tenant);
+  KjNode* qP                  = kjLookup(dbSubP, "q");
   KjNode* dbThrottlingP       = kjLookup(dbSubP, "throttling");  DB_ITEM_NOT_FOUND(dbSubIdP, "throttling",  tenant);
   KjNode* dbExpressionP       = kjLookup(dbSubP, "expression");  DB_ITEM_NOT_FOUND(dbSubIdP, "expression",  tenant);
   KjNode* dbFormatP           = kjLookup(dbSubP, "format");      DB_ITEM_NOT_FOUND(dbSubIdP, "format",      tenant);
@@ -147,14 +188,20 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   KjNode* dbAttrsP            = kjLookup(dbSubP, "attrs");       DB_ITEM_NOT_FOUND(dbSubIdP, "attrs",       tenant);
   KjNode* dbConditionsP       = kjLookup(dbSubP, "conditions");  DB_ITEM_NOT_FOUND(dbSubIdP, "conditions",  tenant);
   KjNode* dbStatusP           = kjLookup(dbSubP, "status");
-  KjNode* dbServicePathP      = kjLookup(dbSubP, "servicePath");
-  KjNode* dbBlacklistP        = kjLookup(dbSubP, "blacklist");
   KjNode* dbExpirationP       = kjLookup(dbSubP, "expiration");
   KjNode* dbLdContextP        = kjLookup(dbSubP, "ldContext");
   KjNode* dbCountP            = kjLookup(dbSubP, "count");
   KjNode* dbLastNotificationP = kjLookup(dbSubP, "lastNotification");
   KjNode* dbLastSuccessP      = kjLookup(dbSubP, "lastSuccess");
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
+  KjNode* dbCreatedAtP        = NULL;
+  KjNode* dbModifiedAtP       = NULL;
+
+  if (orionldState.uriParamOptions.sysAttrs == true)
+  {
+    dbCreatedAtP  = kjLookup(dbSubP, "createdAt");   DB_ITEM_NOT_FOUND(dbSubIdP, "createdAt",   tenant);
+    dbModifiedAtP = kjLookup(dbSubP, "modifiedAt");  DB_ITEM_NOT_FOUND(dbSubIdP, "modifiedAt",  tenant);
+  }
 
   *contextNodePP = dbLdContextP;
 
@@ -164,6 +211,10 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   // id
   dbSubIdP->name = (char*) "id";
   kjChildAdd(apiSubP, dbSubIdP);
+
+  // type
+  KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", "Subscription");
+  kjChildAdd(apiSubP, typeNodeP);
 
   //
   // If dbSubIdP is a JSON Object, it's an NGSIv2 subscription and its "id" looks like this:
@@ -184,8 +235,11 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   }
 
   // tenant?
-  KjNode* tenantP = kjString(orionldState.kjsonP, "tenant", tenant);
-  kjChildAdd(apiSubP, tenantP);
+  if (tenant[0] != 0)
+  {
+    KjNode* tenantP = kjString(orionldState.kjsonP, "tenant", tenant);
+    kjChildAdd(apiSubP, tenantP);
+  }
 
   // name
   if (dbNameP != NULL)
@@ -210,6 +264,7 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   {
     KjNode* isPatternP     = kjLookup(entityP, "isPattern");
     KjNode* isTypePatternP = kjLookup(entityP, "isTypePattern");
+    KjNode* typeP          = kjLookup(entityP, "type");
 
     if (ngsild)
     {
@@ -221,61 +276,107 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
         if (strcmp(isPatternP->value.s, "true") == 0)
         {
           KjNode* idP = kjLookup(entityP, "id");
-          idP->name   = (char*) "idPattern";
+          if (strcmp(idP->value.s, ".*") == 0)
+            kjChildRemove(entityP, idP);
+          else
+            idP->name = (char*) "idPattern";
         }
+
         kjChildRemove(entityP, isPatternP);
+
+        // type must be compacted
+        if (typeP != NULL)  // Can't really be NULL though ...
+        {
+          // But, for sub-cache we need the long names
+          if (forSubCache == false)
+            typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
+        }
       }
     }
   }
   kjChildAdd(apiSubP, dbEntitiesP);
 
-  // watchedAttributes
-  if (dbConditionsP != NULL)
+  // watchedAttributes - NON-EMPTY !
+  if ((dbConditionsP != NULL) && (dbConditionsP->value.firstChildP != NULL))
   {
     dbConditionsP->name = (char*) "watchedAttributes";
     kjChildAdd(apiSubP, dbConditionsP);
+
+    // Now we need to go over all watched attributes and find their alias according to the current @context
+    if (forSubCache == false)
+    {
+      for (KjNode* attrNameNodeP = dbConditionsP->value.firstChildP; attrNameNodeP != NULL; attrNameNodeP = attrNameNodeP->next)
+      {
+        attrNameNodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrNameNodeP->value.s, NULL, NULL);
+      }
+    }
   }
 
   // "q" for NGSI-LD
-  if (dbLdqP != NULL)
+  if ((dbLdqP != NULL) && (dbLdqP->value.s[0] != 0))
+  {
+    if (forSubCache == false)
+    {
+      if (qAliasCompact(dbLdqP, true) == true)
+      {
+        dbModelValueStrip(dbLdqP);
+        dbLdqP->name = (char*) "q";
+      }
+    }
+
     kjChildAdd(apiSubP, dbLdqP);
+  }
+  else if (qP != NULL)
+  {
+    if (forSubCache == false)
+    {
+      if (qAliasCompact(qP, true) == true)
+      {
+        dbModelValueStrip(qP);
+      }
+    }
+
+    kjChildAdd(apiSubP, qP);
+  }
 
   // "geoQ"
   // The "expression" in the DB contains all 4 items of NGSI-LD's "geoQ".
   // It also contains "q" and "mq" of NGSIv2
   // So, let's just rename it to "geoQ", remove "q" amd "mq" if present (well, move them ...)
   //
-  KjNode* v2qP  = NULL;
-  KjNode* v2mqP = NULL;
   if (dbExpressionP != NULL)
   {
-    dbExpressionP->name = (char*) "geoQ";
+    KjNode* v2qP  = kjLookup(dbExpressionP, "q");
+    KjNode* v2mqP = kjLookup(dbExpressionP, "mq");
 
-    v2qP  = kjLookup(dbExpressionP, "q");
-    if (v2qP != NULL)
+    kjChildRemove(dbExpressionP, v2qP);
+    kjChildRemove(dbExpressionP, v2mqP);
+
+    if (orionldState.apiVersion != NGSI_LD_V1)  // FIXME: When taking from DB at startup, this won't work ...
     {
-      kjChildRemove(dbExpressionP, v2qP);
-      kjChildAdd(apiSubP, v2qP);
+      if ((v2qP != NULL) && (v2qP->value.s[0] != 0))
+        kjChildAdd(apiSubP, v2qP);
+
+      if ((v2mqP != NULL) && (v2mqP->value.s[0] != 0))
+        kjChildAdd(apiSubP, v2mqP);
     }
 
-    v2mqP = kjLookup(dbExpressionP, "mq");
-    if (v2mqP != NULL)
-    {
-      kjChildRemove(dbExpressionP, v2mqP);
-      kjChildAdd(apiSubP, v2mqP);
-    }
-
-    if (dbModelToApiGeoQ(dbExpressionP, coordinatesPP) == false)
+    bool empty = false;
+    if (dbModelToApiGeoQ(dbExpressionP, coordinatesPP, &empty) == false)
     {
       // orionldError is done by dbModelToGeoQ
       return NULL;
     }
 
-    kjChildAdd(apiSubP, dbExpressionP);
+    if (empty == false)
+    {
+      dbExpressionP->name = (char*) "geoQ";
+      kjChildAdd(apiSubP, dbExpressionP);
+    }
   }
 
   // isActive (steal "status" if present)
-  KjNode* isActiveP;
+  KjNode* isActiveP = NULL;
   if (dbStatusP != NULL)
   {
     isActiveP = dbStatusP;
@@ -294,6 +395,20 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   // FIXME: Check also "expiration"
   kjChildAdd(apiSubP, isActiveP);
 
+  // status
+  KjNode* statusP;
+
+  if (isActiveP != NULL)
+  {
+    if (isActiveP->value.b == true)
+      statusP = kjString(orionldState.kjsonP, "status", "active");
+    else
+      statusP = kjString(orionldState.kjsonP, "status", "paused");
+  }
+  else
+    statusP = kjString(orionldState.kjsonP, "status", "error");
+  kjChildAdd(apiSubP, statusP);
+
 
   //
   // notification
@@ -301,14 +416,32 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   KjNode* notificationP = kjObject(orionldState.kjsonP, "notification");
   if (dbAttrsP != NULL)
   {
-    dbAttrsP->name = (char*) "attributes";
-    kjChildAdd(notificationP, dbAttrsP);
+    if (dbAttrsP->value.firstChildP != NULL)
+    {
+      dbAttrsP->name = (char*) "attributes";
+      kjChildAdd(notificationP, dbAttrsP);
+
+      // Find alias for all attributes
+      for (KjNode* attrNameNodeP = dbAttrsP->value.firstChildP; attrNameNodeP != NULL; attrNameNodeP = attrNameNodeP->next)
+      {
+        attrNameNodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrNameNodeP->value.s, NULL, NULL);
+      }
+    }
   }
+
   if (dbFormatP != NULL)
     kjChildAdd(notificationP, dbFormatP);
 
   KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");
+
   kjChildAdd(notificationP, endpointP);
+
+  // notification::status
+  bool    nStatus      = notificationStatus(dbLastSuccessP, dbLastFailureP);
+  KjNode* nStatusNodeP = kjString(orionldState.kjsonP, "status", (nStatus == true)? "ok" : "failed");
+
+  kjChildAdd(notificationP, nStatusNodeP);
+
 
   if (dbReferenceP != NULL)
   {
@@ -325,6 +458,16 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
   kjChildAdd(apiSubP, notificationP);
 
 
+  //
+  // origin
+  //
+  KjNode* originP = kjString(orionldState.kjsonP, "origin", "database");
+  kjChildAdd(apiSubP, originP);
+
+
+  //
+  // Headers
+  //
   if (dbHeadersP != NULL)
   {
     // In the database, "headers" is stored as:
@@ -380,8 +523,22 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
 
   if (dbExpirationP != NULL)
   {
-    kjChildAdd(apiSubP, dbExpirationP);
-    dbExpirationP->name = (char*) "expiresAt";
+    //
+    // It's a double in the DB - need it to be an ISO8601 String in the API
+    // UNLESS the user asks to get it as a Floating Point value
+    //
+    KjNode* expiresAtNodeP = NULL;
+    if (forSubCache == false)
+    {
+      char dateTime[64];
+      numberToDate(dbExpirationP->value.f, dateTime, sizeof(dateTime));
+
+      expiresAtNodeP = kjString(orionldState.kjsonP, "expiresAt", dateTime);
+    }
+    else
+      expiresAtNodeP = kjFloat(orionldState.kjsonP, "expiresAt", dbExpirationP->value.f);
+
+    kjChildAdd(apiSubP, expiresAtNodeP);
   }
 
   // throttling
@@ -390,44 +547,70 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, QNode** qNo
 
   // createdAt
   if (dbCreatedAtP != NULL)
-    kjChildAdd(apiSubP, dbCreatedAtP);
+  {
+    //
+    // It's a double in the DB - need it to be an ISO8601 String in the API
+    // UNLESS the user asks to get it as a Floating Point value
+    //
+    KjNode* createdAtNodeP = NULL;
+    if (forSubCache == false)
+    {
+      char dateTime[64];
+      numberToDate(dbCreatedAtP->value.f, dateTime, sizeof(dateTime));
+
+      createdAtNodeP = kjString(orionldState.kjsonP, "createdAt", dateTime);
+    }
+    else
+      createdAtNodeP = kjFloat(orionldState.kjsonP, "createdAt", dbCreatedAtP->value.f);
+
+    kjChildAdd(apiSubP, createdAtNodeP);
+  }
 
   // modifiedAt
   if (dbModifiedAtP != NULL)
-    kjChildAdd(apiSubP, dbModifiedAtP);
+  {
+    //
+    // It's a double in the DB - need it to be an ISO8601 String in the API
+    // UNLESS the user asks to get it as a Floating Point value
+    //
+    KjNode* modifiedAtNodeP = NULL;
+    if (forSubCache == false)
+    {
+      char dateTime[64];
+      numberToDate(dbModifiedAtP->value.f, dateTime, sizeof(dateTime));
 
-  // FIXME: custom
-  // KjNode* dbCustomP = kjLookup(dbSubP, "custom");
+      modifiedAtNodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
+    }
+    else
+      modifiedAtNodeP = kjFloat(orionldState.kjsonP, "modifiedAt", dbCreatedAtP->value.f);
 
-  // servicePath
-  if (dbServicePathP != NULL)
-    kjChildAdd(apiSubP, dbServicePathP);
+    kjChildAdd(apiSubP, modifiedAtNodeP);
+  }
 
-  // blacklist
-  if (dbBlacklistP != NULL)
-    kjChildAdd(apiSubP, dbBlacklistP);
-
-  // ldContext
+#if 0
+  // ldContext ... not yet implemented in the API SPEC for subscriptions to have their own @context
   if (dbLdContextP != NULL)
     kjChildAdd(apiSubP, dbLdContextP);
+#endif
 
-  // count
+  // count - take sub-cache delta into consideration
   if (dbCountP != NULL)
     kjChildAdd(apiSubP, dbCountP);
 
-  // lastNotification
+  // lastNotification - take from sub-cache
   if (dbLastNotificationP != NULL)
     kjChildAdd(apiSubP, dbLastNotificationP);
 
-  // lastSuccess
+  // lastSuccess - take from sub-cache
   if (dbLastSuccessP != NULL)
     kjChildAdd(apiSubP, dbLastSuccessP);
 
-  // lastFailure
+  // lastFailure - take from sub-cache
   if (dbLastFailureP != NULL)
     kjChildAdd(apiSubP, dbLastFailureP);
 
-  *qNodePP = NULL;
+  if (qNodePP != NULL)  // FIXME: This is more than a bit weird ...
+    *qNodePP = NULL;
 
   return apiSubP;
 }
