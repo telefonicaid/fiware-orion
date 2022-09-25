@@ -39,6 +39,9 @@ extern "C"
 #include "orionld/legacyDriver/legacyGetSubscriptions.h"         // legacyGetSubscriptions
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
 #include "orionld/mongoc/mongocSubscriptionsGet.h"               // mongocSubscriptionsGet
+#include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
+#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
 
 
@@ -75,18 +78,19 @@ static bool orionldGetSubscriptionsFromDb(void)
 
   orionldState.pd.status = 200;
 
-  KjNode* subArray = mongocSubscriptionsGet(&count, orionldState.out.contentType == JSONLD);
+  KjNode* dbSubV  = mongocSubscriptionsGet(&count);
+  KjNode* apiSubV = kjArray(orionldState.kjsonP, NULL);
 
   orionldState.httpStatusCode = orionldState.pd.status;
-  orionldState.responseTree   = subArray;
+  orionldState.responseTree   = apiSubV;
 
-  if (subArray == NULL)  // mongocSubscriptionsGet calls orionldError
+  if (dbSubV == NULL)  // mongocSubscriptionsGet calls orionldError
     return false;
 
   //
   // If the array is empty AND orionldState.pd.status flags an error then something has gone wrong
   //
-  if (subArray->value.firstChildP == NULL)
+  if (dbSubV->value.firstChildP == NULL)
   {
     orionldState.noLinkHeader = true;  // Don't want the Link header if there is no payload body (empty array)
 
@@ -98,11 +102,34 @@ static bool orionldGetSubscriptionsFromDb(void)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
 
   //
-  // Need to take counters and timestamps from sub-cache
+  // Must convert all the subs from DB to API format
+  // Also, need to take counters and timestamps from sub-cache
   //
-  for (KjNode* apiSubP = subArray->value.firstChildP; apiSubP != NULL; apiSubP = apiSubP->next)
+  for (KjNode* dbSubP = dbSubV->value.firstChildP; dbSubP != NULL; dbSubP = dbSubP->next)
   {
+    QNode*  qTree        = NULL;
+    KjNode* contextNodeP = NULL;
+    KjNode* coordinatesP = NULL;
+    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP);
+
+    if (apiSubP == NULL)
+    {
+      orionldError(OrionldInternalError, "Database Error", "unable to convert subscription to API format)", 500);
+      continue;
+    }
+
+    if (orionldState.out.contentType == JSONLD)
+    {
+      KjNode* nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
+      if (nodeP == NULL)
+        LM_E(("Internal error (out of memory creating an '@context' field for a subscription)"));
+      else
+        kjChildAdd(apiSubP, nodeP);
+    }
+
     orionldSubCounters(apiSubP, NULL);
+
+    kjChildAdd(apiSubV, apiSubP);
   }
 
   return true;

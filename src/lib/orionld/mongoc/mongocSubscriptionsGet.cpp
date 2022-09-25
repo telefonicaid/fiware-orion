@@ -34,9 +34,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
-#include "orionld/q/QNode.h"                                     // QNode
-#include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocSubscriptionsGet.h"               // Own interface
@@ -47,16 +44,16 @@ extern "C"
 *
 * mongocSubscriptionsGet -
 */
-KjNode* mongocSubscriptionsGet(int64_t* countP, bool contextInBody)
+KjNode* mongocSubscriptionsGet(int64_t* countP)
 {
   bson_t               mongoFilter;
   const bson_t*        mongoDocP;
   mongoc_cursor_t*     mongoCursorP;
   bson_error_t         mongoError;
   mongoc_read_prefs_t* readPrefs = mongoc_read_prefs_new(MONGOC_READ_NEAREST);
+  KjNode*              dbSubV    = kjArray(orionldState.kjsonP, NULL);
   char*                title;
   char*                details;
-  KjNode*              subArrayP = kjArray(orionldState.kjsonP, NULL);  // This is the response payload body
 
   //
   // Sort, Limit, Offset
@@ -110,7 +107,7 @@ KjNode* mongocSubscriptionsGet(int64_t* countP, bool contextInBody)
         return NULL;
       }
 
-      return subArrayP;
+      return dbSubV;
     }
   }
 
@@ -135,27 +132,7 @@ KjNode* mongocSubscriptionsGet(int64_t* countP, bool contextInBody)
       continue;
     }
 
-    QNode*  qTree        = NULL;
-    KjNode* contextNodeP = NULL;
-    KjNode* coordinatesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP);
-
-    if (apiSubP == NULL)
-    {
-      orionldError(OrionldInternalError, "Database Error", "unable to convert subscription to API format)", 500);
-      continue;
-    }
-
-    if (contextInBody == true)
-    {
-      KjNode* nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
-      if (nodeP == NULL)
-        LM_E(("Internal error (out of memory creating an '@context' field for a subscription)"));
-      else
-        kjChildAdd(apiSubP, nodeP);
-    }
-
-    kjChildAdd(subArrayP, apiSubP);
+    kjChildAdd(dbSubV, dbSubP);
   }
 
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
@@ -167,5 +144,5 @@ KjNode* mongocSubscriptionsGet(int64_t* countP, bool contextInBody)
   mongoc_cursor_destroy(mongoCursorP);
   bson_destroy(&mongoFilter);
 
-  return subArrayP;
+  return dbSubV;
 }

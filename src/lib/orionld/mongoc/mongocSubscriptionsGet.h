@@ -37,6 +37,6 @@ extern "C"
 //
 // mongocSubscriptionsGet -
 //
-extern KjNode* mongocSubscriptionsGet(int64_t* countP, bool contextInBody);
+extern KjNode* mongocSubscriptionsGet(int64_t* countP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCSUBSCRIPTIONSGET_H_
