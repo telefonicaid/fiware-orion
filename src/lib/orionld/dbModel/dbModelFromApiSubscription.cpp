@@ -274,7 +274,6 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     KjNode* coordinatesP = kjLookup(geoqP, "coordinates");
     KjNode* geometryP    = kjLookup(geoqP, "geometry");
     KjNode* georelP      = kjLookup(geoqP, "georel");
-    KjNode* geopropertyP = kjLookup(geoqP, "geoproperty");
 
     //
     // As "geoQ" in NGSI-LD Subscription contains many fields (4 out of 6) of what is "expression" in the DB Model
@@ -298,7 +297,12 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
         return false;
     }
 
+    //
     // If 'geoproperty' is not there, add it:
+    // Database Model decision. Perhaps a bad one ...
+    // I could set it to "location", as that's the default value ...
+    //
+    KjNode* geopropertyP = kjLookup(geoqP, "geoproperty");
     if ((geopropertyP == NULL) && (patch == false))
     {
       geopropertyP = kjString(orionldState.kjsonP, "geoproperty", "");

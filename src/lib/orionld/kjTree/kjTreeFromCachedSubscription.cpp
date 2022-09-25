@@ -492,7 +492,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   if (contextInBody == true)
   {
-    nodeP = kjString(orionldState.kjsonP, "@context", cSubP->ldContext.c_str());
+    nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
     NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
   }

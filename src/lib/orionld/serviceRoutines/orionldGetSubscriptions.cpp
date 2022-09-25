@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/legacyDriver/legacyGetSubscriptions.h"         // legacyGetSubscriptions
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
+#include "orionld/mongoc/mongocSubscriptionsGet.h"               // mongocSubscriptionsGet
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
 
 
@@ -63,6 +64,51 @@ static bool tenantMatch(OrionldTenant* requestTenantP, const char* subscriptionT
 }
 
 
+extern void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP);
+// -----------------------------------------------------------------------------
+//
+// orionldGetSubscriptionsFromDb -
+//
+static bool orionldGetSubscriptionsFromDb(void)
+{
+  int64_t count = 0;
+
+  orionldState.pd.status = 200;
+
+  KjNode* subArray = mongocSubscriptionsGet(&count, orionldState.out.contentType == JSONLD);
+
+  orionldState.httpStatusCode = orionldState.pd.status;
+  orionldState.responseTree   = subArray;
+
+  if (subArray == NULL)  // mongocSubscriptionsGet calls orionldError
+    return false;
+
+  //
+  // If the array is empty AND orionldState.pd.status flags an error then something has gone wrong
+  //
+  if (subArray->value.firstChildP == NULL)
+  {
+    orionldState.noLinkHeader = true;  // Don't want the Link header if there is no payload body (empty array)
+
+    if (orionldState.pd.status >= 400)
+      return false;
+  }
+
+  if (orionldState.uriParams.count == true)
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
+
+  //
+  // Need to take counters and timestamps from sub-cache
+  //
+  for (KjNode* apiSubP = subArray->value.firstChildP; apiSubP != NULL; apiSubP = apiSubP->next)
+  {
+    orionldSubCounters(apiSubP, NULL);
+  }
+
+  return true;
+}
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -76,17 +122,14 @@ bool orionldGetSubscriptions(void)
   if (orionldState.uriParamOptions.fromDb == true)
   {
     //
-    // GET Subscriptions with mongoc is yet to be implemented, so, we'll have to use the old Legacy function ...
-    // BUT, not if mongocOnly is set
+    // GET Subscriptions with mongoc
     //
-    if (mongocOnly == true)
-    {
-      orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
-      return false;
-    }
-
-    return legacyGetSubscriptions();
+    return orionldGetSubscriptionsFromDb();
   }
+
+  //
+  // Not Legacy, not "From DB" - Getting the subscriptions from the subscription cache
+  //
 
   int      offset    = orionldState.uriParams.offset;
   int      limit     = orionldState.uriParams.limit;

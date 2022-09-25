@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/dbModel/dbModelToApiGeometry.h"                // dbModelToApiGeometry
 #include "orionld/dbModel/dbModelToApiGeorel.h"                  // dbModelToApiGeorel
@@ -52,6 +53,8 @@ bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP, bool* emptyP)
   KjNode* georelP       = kjLookup(geoqP, "georel");
   KjNode* coordsP       = kjLookup(geoqP, "coords");
   KjNode* geopropertyP  = kjLookup(geoqP, "geoproperty");
+
+  kjTreeLog(geoqP, "GP: geoqP tree");
 
   if (geometryP == NULL)
   {
@@ -115,8 +118,14 @@ bool dbModelToApiGeoQ(KjNode* geoqP, KjNode** coordinatesPP, bool* emptyP)
 
   if (geopropertyP != NULL)
   {
-    eqForDot(geopropertyP->value.s);
-    geopropertyP->value.s = orionldContextItemAliasLookup(orionldState.contextP, geopropertyP->value.s, NULL, NULL);
+    // "geoproperty" is present in the DB also when not in use (its RHS is "")
+    if (geopropertyP->value.s[0] == 0)
+      kjChildRemove(geoqP, geopropertyP);
+    else
+    {
+      eqForDot(geopropertyP->value.s);
+      geopropertyP->value.s = orionldContextItemAliasLookup(orionldState.contextP, geopropertyP->value.s, NULL, NULL);
+    }
   }
 
   *coordinatesPP = coordsP;
