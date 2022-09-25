@@ -205,7 +205,6 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
 
   *contextNodePP = dbLdContextP;
 
-  bool    ngsild  = (dbLdContextP != NULL);
   KjNode* apiSubP = kjObject(orionldState.kjsonP, NULL);
 
   // id
@@ -234,8 +233,12 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
     dbSubIdP->value.s   = oidP->value.s;
   }
 
+  //
   // tenant?
-  if (tenant[0] != 0)
+  //
+  // Only if it's for the subscription cache
+  //
+  if ((forSubCache == true) && (tenant[0] != 0))
   {
     KjNode* tenantP = kjString(orionldState.kjsonP, "tenant", tenant);
     kjChildAdd(apiSubP, tenantP);
@@ -266,7 +269,9 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
     KjNode* isTypePatternP = kjLookup(entityP, "isTypePattern");
     KjNode* typeP          = kjLookup(entityP, "type");
 
-    if (ngsild)
+
+    // bool ngsild  = (dbLdContextP != NULL);
+    // if (ngsild)
     {
       if (isTypePatternP != NULL)
         kjChildRemove(entityP, isTypePatternP);
@@ -317,11 +322,9 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   {
     if (forSubCache == false)
     {
-      if (qAliasCompact(dbLdqP, true) == true)
-      {
-        dbModelValueStrip(dbLdqP);
-        dbLdqP->name = (char*) "q";
-      }
+      dbModelValueStrip(dbLdqP);
+      qAliasCompact(dbLdqP, true);
+      dbLdqP->name = (char*) "q";
     }
 
     kjChildAdd(apiSubP, dbLdqP);
@@ -330,10 +333,8 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   {
     if (forSubCache == false)
     {
-      if (qAliasCompact(qP, true) == true)
-      {
-        dbModelValueStrip(qP);
-      }
+      dbModelValueStrip(qP);
+      qAliasCompact(qP, true);
     }
 
     kjChildAdd(apiSubP, qP);
@@ -543,7 +544,13 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
 
   // throttling
   if (dbThrottlingP != NULL)
-    kjChildAdd(apiSubP, dbThrottlingP);
+  {
+    // Not present if < 0
+    if ((dbThrottlingP->type == KjInt) && (dbThrottlingP->value.i > 0))
+      kjChildAdd(apiSubP, dbThrottlingP);
+    if ((dbThrottlingP->type == KjFloat) && (dbThrottlingP->value.f > 0))
+      kjChildAdd(apiSubP, dbThrottlingP);
+  }
 
   // createdAt
   if (dbCreatedAtP != NULL)

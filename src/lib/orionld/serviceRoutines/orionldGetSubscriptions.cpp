@@ -38,6 +38,10 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/legacyDriver/legacyGetSubscriptions.h"         // legacyGetSubscriptions
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
+#include "orionld/mongoc/mongocSubscriptionsGet.h"               // mongocSubscriptionsGet
+#include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
+#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"     // Own Interface
 
 
@@ -63,6 +67,75 @@ static bool tenantMatch(OrionldTenant* requestTenantP, const char* subscriptionT
 }
 
 
+extern void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP);
+// -----------------------------------------------------------------------------
+//
+// orionldGetSubscriptionsFromDb -
+//
+static bool orionldGetSubscriptionsFromDb(void)
+{
+  int64_t count = 0;
+
+  orionldState.pd.status = 200;
+
+  KjNode* dbSubV  = mongocSubscriptionsGet(&count);
+  KjNode* apiSubV = kjArray(orionldState.kjsonP, NULL);
+
+  orionldState.httpStatusCode = orionldState.pd.status;
+  orionldState.responseTree   = apiSubV;
+
+  if (dbSubV == NULL)  // mongocSubscriptionsGet calls orionldError
+    return false;
+
+  //
+  // If the array is empty AND orionldState.pd.status flags an error then something has gone wrong
+  //
+  if (dbSubV->value.firstChildP == NULL)
+  {
+    orionldState.noLinkHeader = true;  // Don't want the Link header if there is no payload body (empty array)
+
+    if (orionldState.pd.status >= 400)
+      return false;
+  }
+
+  if (orionldState.uriParams.count == true)
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
+
+  //
+  // Must convert all the subs from DB to API format
+  // Also, need to take counters and timestamps from sub-cache
+  //
+  for (KjNode* dbSubP = dbSubV->value.firstChildP; dbSubP != NULL; dbSubP = dbSubP->next)
+  {
+    QNode*  qTree        = NULL;
+    KjNode* contextNodeP = NULL;
+    KjNode* coordinatesP = NULL;
+    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP);
+
+    if (apiSubP == NULL)
+    {
+      orionldError(OrionldInternalError, "Database Error", "unable to convert subscription to API format)", 500);
+      continue;
+    }
+
+    if (orionldState.out.contentType == JSONLD)
+    {
+      KjNode* nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
+      if (nodeP == NULL)
+        LM_E(("Internal error (out of memory creating an '@context' field for a subscription)"));
+      else
+        kjChildAdd(apiSubP, nodeP);
+    }
+
+    orionldSubCounters(apiSubP, NULL);
+
+    kjChildAdd(apiSubV, apiSubP);
+  }
+
+  return true;
+}
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -76,17 +149,14 @@ bool orionldGetSubscriptions(void)
   if (orionldState.uriParamOptions.fromDb == true)
   {
     //
-    // GET Subscriptions with mongoc is yet to be implemented, so, we'll have to use the old Legacy function ...
-    // BUT, not if mongocOnly is set
+    // GET Subscriptions with mongoc
     //
-    if (mongocOnly == true)
-    {
-      orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
-      return false;
-    }
-
-    return legacyGetSubscriptions();
+    return orionldGetSubscriptionsFromDb();
   }
+
+  //
+  // Not Legacy, not "From DB" - Getting the subscriptions from the subscription cache
+  //
 
   int      offset    = orionldState.uriParams.offset;
   int      limit     = orionldState.uriParams.limit;

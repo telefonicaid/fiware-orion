@@ -60,6 +60,7 @@ SET (SOURCES
     mongocEntitiesGet.cpp
     mongocEntityTypesFromRegistrationsGet.cpp
     mongocEntityTypeGet.cpp
+    mongocSubscriptionsGet.cpp
 )
 
 # Include directories

@@ -97,6 +97,37 @@ static void subCounterSet(KjNode* apiSubP, const char* fieldName, int64_t valueI
 
 
 
+// -----------------------------------------------------------------------------
+//
+// orionldSubCounters - FIXME: Own Module
+//
+void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP)
+{
+  if (cSubP == NULL)
+  {
+    KjNode* subIdP = kjLookup(apiSubP, "id");
+
+    if (subIdP == NULL)
+      return;
+
+    cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subIdP->value.s);
+    if (cSubP == NULL)
+      return;
+  }
+
+  KjNode* notificationNodeP = kjLookup(apiSubP, "notification");
+
+  if (notificationNodeP != NULL)
+  {
+    subTimestampSet(notificationNodeP, "lastNotification", cSubP->lastNotificationTime);
+    subTimestampSet(notificationNodeP, "lastSuccess",      cSubP->lastSuccess);
+    subTimestampSet(notificationNodeP, "lastFailure",      cSubP->lastFailure);
+    subCounterSet(notificationNodeP,   "timesSent",        cSubP->dbCount + cSubP->count);
+  }
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldGetSubscriptionFromDb -
@@ -127,17 +158,7 @@ static bool orionldGetSubscriptionFromDb(void)
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
 
   if (cSubP != NULL)
-  {
-    KjNode* notificationNodeP = kjLookup(apiSubP, "notification");
-
-    if (notificationNodeP != NULL)
-    {
-      subTimestampSet(notificationNodeP, "lastNotification", cSubP->lastNotificationTime);
-      subTimestampSet(notificationNodeP, "lastSuccess",      cSubP->lastSuccess);
-      subTimestampSet(notificationNodeP, "lastFailure",      cSubP->lastFailure);
-      subCounterSet(notificationNodeP,   "timesSent",        cSubP->dbCount + cSubP->count);
-    }
-  }
+    orionldSubCounters(apiSubP, cSubP);
 
   orionldState.httpStatusCode = 200;
   orionldState.responseTree   = apiSubP;
@@ -162,15 +183,8 @@ bool orionldGetSubscription(void)
   if (orionldState.uriParamOptions.fromDb == true)
   {
     //
-    // GET Subscription with mongoc is yet to be implemented, so, we'll have to use the old Legacy function ...
-    // BUT, not if mongocOnly is set
+    // GET Subscription with mongoc
     //
-    if (mongocOnly == true)
-    {
-      orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
-      return false;
-    }
-
     return orionldGetSubscriptionFromDb();
   }
 
