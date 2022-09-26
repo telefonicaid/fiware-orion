@@ -925,8 +925,30 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+#if 0
+  //
+  // Uncomment this piece of code and run the functests (-ld) to make sure everything works "more or less" with the Legacy Driver disabled.
+  //
+  // The following tests fail (for obvious reasons):
+  //   o ngsild_langprop-and-notifications.test                                  (LD notif instead of v2)
+  //   o ngsild_new-false-error-for-optional-field-not-present.test              (Registrations not supported with mongoc)
+  //   o ngsild_new_atid_attype_alias_validation.test                            (Registrations not supported with mongoc)
+  //   o ngsild_new_atid_attype_alias_validation_errors.test                     (Registrations not supported with mongoc)
+  //   o ngsild_new_entity_attributes.test                                       (Registrations not supported with mongoc)
+  //   o ngsild_new_entity_types-merge-of-entities-and-registrations.test        (Registrations not supported with mongoc)
+  //   o ngsild_new_entity_types-merge-of-registrations.test                     (Registrations not supported with mongoc)
+  //   o ngsild_new_entity_types.test                                            (Registrations not supported with mongoc)
+  //   o ngsild_new_notification_with-q-or.test                                  (NGSIv2 request)
+  //   o ngsild_new_url_parse.test                                               (Registrations not supported with mongoc)
+  //   o ngsild_subCache-counters-with-ngsiv2-subscriptions.test                 (Registrations not supported with mongoc)
+  //   o ngsild_subCache-with-mongoc-on-startup-with-ngsiv2-subscriptions.test   (Registrations not supported with mongoc)
+  //
+  if (experimental == true)
+    mongocOnly = true;
+#endif
+
   if (mongocOnly == true)
-    experimental   = true;
+    experimental = true;
 
   if (noswap == true)
   {
