@@ -1313,6 +1313,7 @@ static MHD_Result connectionTreat
   //  NOT NGSI-LD
   //
 
+
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
@@ -1338,6 +1339,17 @@ static MHD_Result connectionTreat
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
 
     ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
+
+    if (mongocOnly == true)
+    {
+      OrionError error(SccNotImplemented, "NGSIv1/v2 request not supported if -mongocOnly is set");
+      LM_E(("NGSIv1/v2 request not supported if -mongocOnly is set"));
+
+      orionldState.httpStatusCode = 501;
+      ciP->answer                 = error.smartRender(orionldState.apiVersion);
+
+      return MHD_YES;
+    }
 
     //
     // Check validity of URI parameters

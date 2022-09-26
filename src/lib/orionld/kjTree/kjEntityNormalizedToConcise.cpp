@@ -54,8 +54,12 @@ void kjEntityNormalizedToConcise(KjNode* treeP, const char* lang)
     if (attrP->type != KjObject)
       continue;
 
-    if ((treeP->name != NULL) && (strcmp(treeP->name, "value") == 0))
-      continue;
+    if (attrP->name != NULL)
+    {
+      if (strcmp(attrP->name, "value")       == 0)  continue;
+      if (strcmp(attrP->name, "languageMap") == 0)  continue;
+      if (strcmp(attrP->name, "object")      == 0)  continue;
+    }
 
     KjNode* typeP  = kjLookup(attrP, "type");
     KjNode* valueP = NULL;

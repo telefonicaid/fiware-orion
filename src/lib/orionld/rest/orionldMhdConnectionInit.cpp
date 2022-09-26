@@ -401,7 +401,10 @@ bool pCheckTenantName(const char* dbName)
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (strcasecmp(key, "Orionld-Legacy") == 0)
-    orionldState.in.legacy = (char*) value;
+  {
+    if (mongocOnly == false)
+      orionldState.in.legacy = (char*) value;
+  }
   else if (strcasecmp(key, "Performance") == 0)
     orionldState.in.performance = true;
   else if (strcasecmp(key, "NGSILD-Scope") == 0)
@@ -1018,7 +1021,7 @@ MHD_Result orionldMhdConnectionInit
   //
   // Is only mongoc supporting operations allowed?
   //
-  if ((mongocOnly) && ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT) == 0))
+  if ((mongocOnly) && ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT) == 0) && (orionldState.verb != OPTIONS))
   {
     orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
     return MHD_YES;

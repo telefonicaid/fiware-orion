@@ -26,7 +26,7 @@ Language Property and Entities Query - Arrays
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+brokerStart CB 0 IPv4 -mongocOnly
 
 --SHELL--
 
