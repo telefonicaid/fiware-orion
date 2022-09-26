@@ -424,9 +424,10 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
               }
               else if (langNodeP->type == KjArray)
               {
-                attrP->type                   = KjArray;
-                attrP->value.firstChildP      = langNodeP->value.firstChildP;
-                attrP->lastChild              = langNodeP->lastChild;
+                nodeP->type                   = KjArray;
+                nodeP->value.firstChildP      = langNodeP->value.firstChildP;
+                nodeP->lastChild              = langNodeP->lastChild;
+
                 langNodeP->value.firstChildP  = NULL;
                 langNodeP->lastChild          = NULL;
               }
@@ -441,6 +442,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
             nodeP->name = (char*) "languageMap";
         }
 
+        kjChildRemove(dbAttrP, nodeP);
         kjChildAdd(attrP, nodeP);
       }
       else if ((strcmp(nodeP->name, "creDate") == 0) || (strcmp(nodeP->name, "modDate") == 0))
@@ -454,6 +456,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
           nodeP->type      = KjString;
           nodeP->value.s   = dateTimeBuf;
 
+          kjChildRemove(dbAttrP, nodeP);
           kjChildAdd(attrP, nodeP);
         }
       }
@@ -465,9 +468,14 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
 
     if (mdsP != NULL)
     {
-      for (KjNode* mdP = mdsP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+      KjNode* mdP = mdsP->value.firstChildP;
+      KjNode* next;
+
+      while (mdP != NULL)
       {
         KjNode* subAttributeP;
+
+        next = mdP->next;
 
         if ((subAttributeP = dbModelToApiSubAttribute2(mdP, sysAttrs, renderFormat, lang, pdP)) == NULL)
         {
@@ -475,7 +483,9 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
           return NULL;
         }
 
+        kjChildRemove(mdsP, mdP);
         kjChildAdd(attrP, subAttributeP);
+        mdP = next;
       }
     }
   }
