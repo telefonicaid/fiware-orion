@@ -933,6 +933,8 @@ KjNode* mongocEntitiesQuery
 
     mongoc_cursor_destroy(mongoCursorP);
   }
+  else
+    bson_destroy(&options);
 
   // semGive(&mongoEntitiesSem);
   bson_destroy(&mongoFilter);

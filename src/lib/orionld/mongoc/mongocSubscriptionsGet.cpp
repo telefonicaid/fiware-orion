@@ -100,6 +100,7 @@ KjNode* mongocSubscriptionsGet(int64_t* countP)
     if (limit == 0)  // Only count requested
     {
       bson_destroy(&mongoFilter);
+      mongoc_read_prefs_destroy(readPrefs);
 
       if (*countP == -1)
       {
@@ -119,6 +120,8 @@ KjNode* mongocSubscriptionsGet(int64_t* countP)
   if (mongoCursorP == NULL)
   {
     orionldError(OrionldInternalError, "Database Error", "mongoc_collection_find_with_opts ERROR", 500);
+    mongoc_read_prefs_destroy(readPrefs);
+    bson_destroy(&mongoFilter);
     return NULL;
   }
 
@@ -138,10 +141,11 @@ KjNode* mongocSubscriptionsGet(int64_t* countP)
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
   {
     orionldError(OrionldInternalError, "Database Error", mongoError.message, 500);
-    return NULL;
+    dbSubV = NULL;
   }
 
   mongoc_cursor_destroy(mongoCursorP);
+  mongoc_read_prefs_destroy(readPrefs);
   bson_destroy(&mongoFilter);
 
   return dbSubV;

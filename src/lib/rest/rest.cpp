@@ -374,13 +374,9 @@ static void requestCompleted
   const char*      spath    = ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
 
-  // Release the connection to mongo, if there is any
-  if (orionldState.mongoc.contextsP)       mongoc_collection_destroy(orionldState.mongoc.contextsP);
-  if (orionldState.mongoc.entitiesP)       mongoc_collection_destroy(orionldState.mongoc.entitiesP);
-  if (orionldState.mongoc.subscriptionsP)  mongoc_collection_destroy(orionldState.mongoc.subscriptionsP);
-  if (orionldState.mongoc.registrationsP)  mongoc_collection_destroy(orionldState.mongoc.registrationsP);
-  mongocConnectionRelease();
-
+  //
+  // Notifications
+  //
   if (orionldState.alterations != NULL)
   {
     PERFORMANCE(notifStart);
@@ -393,6 +389,17 @@ static void requestCompleted
     free(orionldState.in.payload);
     orionldState.in.payload = NULL;
   }
+
+
+  //
+  // Release the connection to mongo - after all notifications have been sent (orionldAlterationsTreat takes care of that)
+  //
+  if (orionldState.mongoc.contextsP)       mongoc_collection_destroy(orionldState.mongoc.contextsP);
+  if (orionldState.mongoc.entitiesP)       mongoc_collection_destroy(orionldState.mongoc.entitiesP);
+  if (orionldState.mongoc.subscriptionsP)  mongoc_collection_destroy(orionldState.mongoc.subscriptionsP);
+  if (orionldState.mongoc.registrationsP)  mongoc_collection_destroy(orionldState.mongoc.registrationsP);
+
+  mongocConnectionRelease();
 
   //
   // CURL Handles And Headers
