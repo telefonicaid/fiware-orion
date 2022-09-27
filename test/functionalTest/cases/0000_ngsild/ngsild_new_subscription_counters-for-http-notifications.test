@@ -88,6 +88,7 @@ echo
 
 echo "03. GET S1, see lastSuccess, lastNotification, and timesSent==1"
 echo "==============================================================="
+valgrindSleep 2
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
