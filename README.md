@@ -22,11 +22,11 @@ data concepts. Orion-LD follows the [ETSI](https://en.wikipedia.org/wiki/ETSI) s
 been tested to be a stable and fast **NGSI-LD** broker with close compliance to the version 1.3.1 of the NGSI-LD API
 specification.
 
-Note that the **NGSI-LD** [specification](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.04.01_60/gs_cim009v010401p.pdf)
-is a living, changing document (version 1.5 as of June 2021), with features being continuously added at a pace such that it is not
+Note that the [NGSI-LD API specification](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf)
+is a living, changing document (version 1.6 as of Aug 2022), with features being continuously added at a pace such that it is not
 possible to align a context broker to the cutting edge specification for **NGSI-LD** implementation.
 
-> The latest release of Orion-LD is [1.0.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.0.1) from January 2022
+> The latest release of Orion-LD is [1.1.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.1) from September 2022
 
 This project is part of [FIWARE](https://www.fiware.org/). For more information check the FIWARE Catalogue entry for
 [Core Context](https://github.com/Fiware/catalogue/tree/master/core).
@@ -46,11 +46,11 @@ If you (at your own risk) want to evaluate the bleeding edge development changes
 [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it.
 Please note that for production and/or performance implementations, there is a thorough guide for that right [here](https://github.com/FIWARE/load-tests)
 
-If you instead want to use a more stable image, the latest release (as of Jan 2022) is
-[1.0.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.0.1)
+If you instead want to use a more stable image, the latest release (as of September 2022) is
+[1.1.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.1)
 
 ```console
-docker run fiware/orion-ld:1.0.1
+docker run fiware/orion-ld:1.1.1
 ```
 
 Please check [dockerhub](https://hub.docker.com/r/fiware/orion-ld/tags) for newer releases.
@@ -77,6 +77,8 @@ Documentation:
 -   [Temporal Representation](doc/manuals-ld/troe.md)
 -   [The Broker as Context Server](doc/manuals-ld/contextServer.md)
 -   [State of the Implementation](doc/manuals-ld/implementationState.md)
+-   [Roadmap](roadmap.md)
+-   [Planning - Issue #280](https://github.com/FIWARE/context.Orion-LD/issues/280)
 
 A Test Suite for NGSI-LD compliant brokers can be found [here](https://github.com/fiware/NGSI-LD_Tests).
 This test suite is kind of deprecated in favor of the [ETSI NGSI-LD API Conformance Test Suite](https://forge.etsi.org/rep/cim/ngsi-ld-test-suite).
