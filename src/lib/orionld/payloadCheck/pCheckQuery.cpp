@@ -122,10 +122,10 @@ static bool pCheckTreeNodesExtract(KjNode* treeP, TreeNode* treeNodeV, int treeN
   }
 
   //
-  // MANDATORY but missing Check
+  // Check for "MANDATORY but missing"
   //
   int ix = 0;
-  while (treeNodeV[ix].name != NULL)
+  while ((ix < treeNodes) && (treeNodeV[ix].name != NULL))
   {
     if ((treeNodeV[ix].aux == MANDATORY) && (treeNodeV[ix].nodeP == NULL))
     {

@@ -89,6 +89,7 @@ echo
 
 echo "03. GET S1, see lastSuccess, lastNotification, and timesSent==1"
 echo "==============================================================="
+valgrindSleep 2
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -139,6 +140,7 @@ echo
 
 echo "08. GET S1, see lastSuccess, lastNotification, and timesSent==4"
 echo "==============================================================="
+valgrindSleep 4
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -165,6 +167,7 @@ echo
 
 echo "11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5"
 echo "============================================================================"
+valgrindSleep 2
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -226,6 +229,7 @@ echo
 
 echo "18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7"
 echo "============================================================================"
+valgrindSleep 2
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo

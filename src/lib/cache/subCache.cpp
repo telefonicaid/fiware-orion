@@ -854,8 +854,6 @@ bool subCacheItemInsert
   // First the non-complex values
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->servicePath           = strdup(servicePath);
-  cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -958,6 +956,12 @@ bool subCacheItemInsert
   cSubP->attributes             = attributes;
   cSubP->metadata               = metadata;
 
+
+  //
+  // servicePath and subscriptionId need strdup - done after possible failure (qBuild)
+  //
+  cSubP->servicePath           = strdup(servicePath);
+  cSubP->subscriptionId        = strdup(subscriptionId);
 
   //
   // IP, port and rest
