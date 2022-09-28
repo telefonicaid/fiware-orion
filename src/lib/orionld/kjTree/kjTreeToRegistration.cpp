@@ -307,7 +307,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       PCHECK_DUPLICATE(scopeP, kNodeP, 0, NULL, "Registration::scope", 400);
       PCHECK_STRING(scopeP, 0, NULL, "Registration::scope", 400);
       PCHECK_STRING_EMPTY(scopeP, 0, NULL, "Registration::scope", 400);
-      regP->scope = kjClone(NULL, scopeP);
+      regP->scope = kjClone(orionldState.kjsonP, scopeP);
     }
     else if (strcmp(kNodeP->name, "mode") == 0)
     {
@@ -328,7 +328,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       PCHECK_ARRAY(operationsP, 0, NULL, "Registration::operations", 400);
       PCHECK_ARRAY_EMPTY(operationsP, 0, NULL, "Registration::operations", 400);
       PCHECK_ARRAY_OF_STRING(operationsP, 0, NULL, "Registration::operations", 400);
-      regP->operations = kjClone(NULL, operationsP);
+      regP->operations = kjClone(orionldState.kjsonP, operationsP);
     }
     else if (strcmp(kNodeP->name, "refreshRate") == 0)
     {
@@ -342,7 +342,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       PCHECK_DUPLICATE(managementP, kNodeP, 0, NULL, "Registration::management", 400);
       PCHECK_OBJECT(managementP, 0, NULL, "Registration::management", 400);
       PCHECK_OBJECT_EMPTY(managementP, 0, NULL, "Registration::management", 400);
-      regP->management = kjClone(NULL, managementP);
+      regP->management = kjClone(orionldState.kjsonP, managementP);
     }
     else if (strcmp(kNodeP->name, "createdAt") == 0)
     {

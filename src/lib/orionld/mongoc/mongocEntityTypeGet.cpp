@@ -120,6 +120,10 @@ KjNode* mongocEntityTypeGet(OrionldProblemDetails* pdP, const char* typeLongName
       LM_E(("Internal Error (kjAttributesWithTypeExtract failed)"));
   }
 
+  mongoc_read_prefs_destroy(readPrefs);
+  mongoc_cursor_destroy(mongoCursorP);
+
   *noOfEntitiesP = entities;
+
   return outArray;
 }

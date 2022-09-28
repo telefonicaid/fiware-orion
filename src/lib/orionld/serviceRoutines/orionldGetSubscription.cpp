@@ -62,7 +62,7 @@ static void subTimestampSet(KjNode* apiSubP, const char* fieldName, double value
 
   if (timestampNodeP == NULL)  // Doesn't exist, we'll have to create it
   {
-    timestampNodeP = kjString(NULL, fieldName, dateTime);
+    timestampNodeP = kjString(orionldState.kjsonP, fieldName, dateTime);
     kjChildAdd(apiSubP, timestampNodeP);
   }
   else
@@ -88,7 +88,7 @@ static void subCounterSet(KjNode* apiSubP, const char* fieldName, int64_t valueI
 
   if (counterNodeP == NULL)  // Doesn't exist, we'll have to create it
   {
-    counterNodeP = kjInteger(NULL, fieldName, valueInSubCache);
+    counterNodeP = kjInteger(orionldState.kjsonP, fieldName, valueInSubCache);
     kjChildAdd(apiSubP, counterNodeP);
   }
   else

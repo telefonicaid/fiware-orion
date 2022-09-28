@@ -116,7 +116,10 @@ KjNode* mongocEntityGet(const char* entityId, const char** projectionV, bool inc
   }
 
   if (mongoc_cursor_next(mongoCursorP, &mongoDocP) == false)
+  {
+    mongoc_cursor_destroy(mongoCursorP);
     return NULL;  // Not Found
+  }
 
   char* title  = (char*) "title";
   char* detail = (char*) "detail";
