@@ -1316,7 +1316,7 @@ static void fill_idPtypeNP
   and_arr.append(and_second.obj());
 
   eq_arr_2.append("$$this.type");
-  eq_arr_2.append("Room");
+  eq_arr_2.append(entityType);
   eq_obj.append("$eq", eq_arr_2.arr());
   or_arr.append(eq_obj.obj());
 
