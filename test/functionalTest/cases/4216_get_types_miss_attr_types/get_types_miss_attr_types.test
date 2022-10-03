@@ -35,7 +35,7 @@ brokerStart CB 100
 # 03. Create E21/ET2/A-AT3
 # 04. Create E22/ET2/A-AT4
 # 05. GET /v2/types and get AT1 and AT2 attribute types in ET1 and AT3 and AT4 in ET2
-# 06. GET /v2/types/ET1 and get AT3 and AT4 attribute types
+# 06. GET /v2/types/ET1 and get AT1 and AT2 attribute types
 #
 
 echo "01. Create E11/ET1/A-AT1"
