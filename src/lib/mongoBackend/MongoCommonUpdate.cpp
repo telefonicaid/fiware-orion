@@ -1304,7 +1304,7 @@ static void fill_idPtypeNP
 
   map_obj.append("input", "$entities");
   
-  regex_obj.append("input", "Room1");
+  regex_obj.append("input", entityId);
   regex_obj.append("regex", "$$this.id");
   regex_obj.append("options", "i");
   and_first.append("$regexMatch", regex_obj.obj());
