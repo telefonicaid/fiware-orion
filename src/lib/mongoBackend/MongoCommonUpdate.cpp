@@ -1297,7 +1297,6 @@ static void fill_idPtypeNP
   orion::BSONObjBuilder eq_obj_2;
   orion::BSONObjBuilder eq_obj_3;
   orion::BSONObjBuilder eq_obj_4;
-  orion::BSONObjBuilder type_obj;
   orion::BSONArrayBuilder eq_arr_2;
   orion::BSONArrayBuilder eq_arr_3;
   orion::BSONArrayBuilder eq_arr_4;
@@ -1335,8 +1334,7 @@ static void fill_idPtypeNP
   and_third.append("$or", or_arr.arr());
   and_arr.append(and_third.obj());
 
-  type_obj.append("$type", "$$this.isTypePattern");
-  eq_arr_4.append(type_obj.obj());
+  eq_arr_4.append("$$this.isTypePattern");
   eq_arr_4.append(false);
   eq_obj_4.append("$eq", eq_arr_4.arr());
   and_arr.append(eq_obj_4.obj());
