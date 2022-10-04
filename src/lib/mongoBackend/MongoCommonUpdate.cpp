@@ -1300,6 +1300,7 @@ static void fill_idPtypeNP
   orion::BSONArrayBuilder eq_arr_2;
   orion::BSONArrayBuilder eq_arr_3;
   orion::BSONArrayBuilder eq_arr_4;
+  orion::BSONArrayBuilder eq_arr_5;
   orion::BSONArrayBuilder or_arr;
 
   map_obj.append("input", "$entities");
@@ -1324,12 +1325,18 @@ static void fill_idPtypeNP
   eq_arr_3.append("");
   eq_obj_2.append("$eq", eq_arr_3.arr());
   or_arr.append(eq_obj_2.obj());
+  
+  eq_arr_5.append("$$this.type");
+  eq_arr_5.append(NULL);
+  eq_obj_3.append("$eq", eq_arr_5.arr());
+  or_arr.append(eq_obj_3.obj());
+  
   and_third.append("$or", or_arr.arr());
   and_arr.append(and_third.obj());
 
   type_obj.append("$type", "$$this.isTypePattern");
   eq_arr_4.append(type_obj.obj());
-  eq_arr_4.append("missing");
+  eq_arr_4.append(false);
 
   in.append("$and", and_arr.arr());
   map_obj.append("in", in.obj());
