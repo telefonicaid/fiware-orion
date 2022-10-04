@@ -1328,7 +1328,7 @@ static void fill_idPtypeNP
   or_arr.append(eq_obj_2.obj());
   
   eq_arr_5.append("$$this.type");
-  eq_arr_5.append(NULL);
+  eq_arr_5.appendNull();
   eq_obj_3.append("$eq", eq_arr_5.arr());
   or_arr.append(eq_obj_3.obj());
   
