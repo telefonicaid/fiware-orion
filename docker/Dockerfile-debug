@@ -2,12 +2,8 @@ FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='opt/orion/'
 
-
 RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
 RUN rm -r /usr/local/lib/
-
-ADD ./docker/debug/gdbinit gdbinit
-RUN yum -y --nogpgcheck install gdb
 
 COPY . ${PATH_TO_SRC}
 
@@ -15,6 +11,10 @@ WORKDIR ${PATH_TO_SRC}
 
 RUN make debug install
 
-ENTRYPOINT ["gdb", "-x", "gdbinit", "--args", "orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+RUN mkdir -p /var/{log,run}/orionld
+
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/lib/x86_64-linux-gnu/
+
+ENTRYPOINT ["orionld", "-fg", "-multiservice" ]
 
 EXPOSE 1026
