@@ -1346,7 +1346,7 @@ static void fill_idPtypeNP
   eq_obj_4.append("$eq", eq_arr_4.arr());
   or_arr_1.append(eq_obj_4.obj());
   
-  typ_obj_1.append("$type", "$$this.isTypePattern");
+  type_obj_1.append("$type", "$$this.isTypePattern");
   eq_arr_6.append(type_obj_1.obj());
   eq_arr_6.append("missing");
   eq_obj_5.append("$eq", eq_arr_6.arr());
