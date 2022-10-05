@@ -1973,15 +1973,6 @@ is used:
         "type": "percentage",
         "metadata": {}
       }
-    },
-    {
-      "id": "Room2",
-      "type": "Room",
-      "temperature": {
-        "value": 24,
-        "type": "Number",
-        "metadata": {}
-      }
     }
   ]
 }
@@ -1998,11 +1989,6 @@ If `attrsFormat` is `keyValues` then keyValues partial entity representation mod
       "type": "Room",
       "temperature": 23,
       "humidity": 70
-    },
-    {
-      "id": "Room2",
-      "type": "Room",
-      "temperature": 24
     }
   ]
 }
