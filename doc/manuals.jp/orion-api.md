@@ -1952,15 +1952,6 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
         "type": "percentage",
         "metadata": {}
       }
-    },
-    {
-      "id": "Room2",
-      "type": "Room",
-      "temperature": {
-        "value": 24,
-        "type": "Number",
-        "metadata": {}
-      }
     }
   ]
 }
@@ -1977,11 +1968,6 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
       "type": "Room",
       "temperature": 23,
       "humidity": 70
-    },
-    {
-      "id": "Room2",
-      "type": "Room",
-      "temperature": 24
     }
   ]
 }
