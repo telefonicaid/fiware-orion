@@ -1297,11 +1297,17 @@ static void fill_idPtypeNP
   orion::BSONObjBuilder eq_obj_2;
   orion::BSONObjBuilder eq_obj_3;
   orion::BSONObjBuilder eq_obj_4;
+  orion::BSONObjBuilder eq_obj_5;
+  orion::BSONObjBuilder or_obj;
+  orion::BSONObjBuilder type_obj;
+  orion::BSONObjBuilder type_obj_1;
   orion::BSONArrayBuilder eq_arr_2;
   orion::BSONArrayBuilder eq_arr_3;
   orion::BSONArrayBuilder eq_arr_4;
   orion::BSONArrayBuilder eq_arr_5;
+  orion::BSONArrayBuilder eq_arr_6;
   orion::BSONArrayBuilder or_arr;
+  orion::BSONArrayBuilder or_arr_1;
 
   map_obj.append("input", "$entities");
   
@@ -1326,8 +1332,9 @@ static void fill_idPtypeNP
   eq_obj_2.append("$eq", eq_arr_3.arr());
   or_arr.append(eq_obj_2.obj());
   
-  eq_arr_5.append("$$this.type");
-  eq_arr_5.appendNull();
+  type_obj.append("$type", "$$this.type");
+  eq_arr_5.append(type_obj.obj());
+  eq_arr_5.append("missing");
   eq_obj_3.append("$eq", eq_arr_5.arr());
   or_arr.append(eq_obj_3.obj());
   
@@ -1337,7 +1344,16 @@ static void fill_idPtypeNP
   eq_arr_4.append("$$this.isTypePattern");
   eq_arr_4.append(false);
   eq_obj_4.append("$eq", eq_arr_4.arr());
-  and_arr.append(eq_obj_4.obj());
+  or_arr_1.append(eq_obj_4.obj());
+  
+  typ_obj_1.append("$type", "$$this.isTypePattern");
+  eq_arr_6.append(type_obj_1.obj());
+  eq_arr_6.append("missing");
+  eq_obj_5.append("$eq", eq_arr_6.arr());
+  or_arr_1.append(eq_obj_5.obj());
+  or_obj.append("$or", or_arr_1.arr());
+  
+  and_arr.append(or_obj.obj());
 
   in.append("$and", and_arr.arr());
   map_obj.append("in", in.obj());
