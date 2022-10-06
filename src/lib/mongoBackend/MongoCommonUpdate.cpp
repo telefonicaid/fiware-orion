@@ -1310,13 +1310,13 @@ static void fill_idPtypeNP
   orion::BSONArrayBuilder or_arr_1;
 
   map_obj.append("input", "$entities");
-  
+
   regex_obj.append("input", entityId);
   regex_obj.append("regex", "$$this.id");
   regex_obj.append("options", "i");
   and_first.append("$regexMatch", regex_obj.obj());
   and_arr.append(and_first.obj());
-  
+
   eq_arr.append("$$this.isPattern");
   eq_arr.append("true");
   and_second.append("$eq", eq_arr.arr());
@@ -1331,13 +1331,13 @@ static void fill_idPtypeNP
   eq_arr_3.append("");
   eq_obj_2.append("$eq", eq_arr_3.arr());
   or_arr.append(eq_obj_2.obj());
-  
+
   type_obj.append("$type", "$$this.type");
   eq_arr_5.append(type_obj.obj());
   eq_arr_5.append("missing");
   eq_obj_3.append("$eq", eq_arr_5.arr());
   or_arr.append(eq_obj_3.obj());
-  
+
   and_third.append("$or", or_arr.arr());
   and_arr.append(and_third.obj());
 
@@ -1345,14 +1345,14 @@ static void fill_idPtypeNP
   eq_arr_4.append(false);
   eq_obj_4.append("$eq", eq_arr_4.arr());
   or_arr_1.append(eq_obj_4.obj());
-  
+
   type_obj_1.append("$type", "$$this.isTypePattern");
   eq_arr_6.append(type_obj_1.obj());
   eq_arr_6.append("missing");
   eq_obj_5.append("$eq", eq_arr_6.arr());
   or_arr_1.append(eq_obj_5.obj());
   or_obj.append("$or", or_arr_1.arr());
-  
+
   and_arr.append(or_obj.obj());
 
   in.append("$and", and_arr.arr());
