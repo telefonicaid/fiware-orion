@@ -11,8 +11,6 @@ WORKDIR ${PATH_TO_SRC}
 
 RUN make debug install
 
-RUN mkdir -p /var/{log,run}/orionld
-
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/lib/x86_64-linux-gnu/
 
 ENTRYPOINT ["orionld", "-fg", "-multiservice" ]
