@@ -2000,7 +2000,7 @@ If `attrsFormat` is `values` then values partial entity representation mode is u
 ```json
 {
   "subscriptionId": "12345",
-  "data": [ [23, 70], [24] ]
+  "data": [ [23, 70] ]
 }
 ```
 
