@@ -88,11 +88,6 @@ class TriggeredSubscription
                         const char*              _tenant,
                         bool                     _covered);
 
-  TriggeredSubscription(RenderFormat             _renderFormat,
-                        const ngsiv2::HttpInfo&  _httpInfo,
-                        const ngsiv2::MqttInfo&  _mqttInfo,
-                        const StringList&        _attrL);
-
   ~TriggeredSubscription();
 
   // FIXME P5: This method will cease to exist once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)

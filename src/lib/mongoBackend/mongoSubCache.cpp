@@ -129,8 +129,14 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
-  cSubP->mqttInfo.fill(sub);
+  if (sub.hasField(CSUB_MQTTTOPIC))
+  {
+    cSubP->mqttInfo.fill(sub);
+  }
+  else
+  {
+    cSubP->httpInfo.fill(sub);
+  }
 
 
   //
@@ -410,9 +416,16 @@ int mongoSubCacheItemInsert
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
-  cSubP->mqttInfo.fill(sub);
-
+  if (sub.hasField(CSUB_MQTTTOPIC))
+  {
+    cSubP->mqttInfo.fill(sub);
+    //cSubP->httpInfo.json = NULL;
+  }
+  else
+  {
+    cSubP->httpInfo.fill(sub);
+    //cSubP->mqttInfo.json = NULL;
+  }
 
   //
   // String Filters
