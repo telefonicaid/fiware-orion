@@ -1,0 +1,413 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification filters on "attributes" - issue #1244
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER2_PORT
+
+--SHELL--
+
+#
+# 01. Create a subscription with attributes [speed", "brandName"] for accumulator1
+# 01. Create a subscription without attributes for accumulator2
+# 02. Create a matching entity, using batch create
+# 03. Dump accumulator1 to see one notification, then reset the accumulator1
+# 04. PATCH the speed attribute (using PATCH /attrs/speed)
+# 05. Dump accumulator1 to see one notification
+# 06. Update the speed attribute (using BATCH upsert - REPLACING the entity)
+# 07. Dump accumulator1 to see one notification, just only with the speed attribute
+# 08. Dump accumulator2 - see 3 notification (first 2 with 3 attrs, last notif with only speed)
+#
+
+echo '01. Create a subscription with attributes [speed", "brandName"]'
+echo '==============================================================='
+payload='{
+  "id": "urn:ngsi-ld:Subscription:withAttributes",
+  "type": "Subscription",
+  "entities": [{"type": "Vehicle"}],
+  "watchedAttributes": ["speed"],
+  "throttling": 0,
+  "notification": {
+    "format": "normalized",
+    "attributes": ["speed", "brandName"],
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Link: <https://fiware.github.io/data-models/full-context.jsonld>"
+echo
+echo
+
+
+echo "01. Create a subscription without attributes for accumulator2"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:withoutAttributes",
+  "type": "Subscription",
+  "entities": [{"type": "Vehicle"}],
+  "watchedAttributes": ["speed"],
+  "throttling": 0,
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER2_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Link: <https://fiware.github.io/data-models/full-context.jsonld>"
+echo
+echo
+
+
+echo "02. Create a matching entity, using batch create"
+echo "================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:Vehicle:A100",
+    "type": "Vehicle",
+    "brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "speed": {
+      "type": "Property",
+      "value": 80
+    },
+    "speed2": {
+      "type": "Property",
+      "value": "Should NOT be part of the notifications"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create -X POST --payload "$payload" -H "Link: <https://fiware.github.io/data-models/full-context.jsonld>"
+echo
+echo
+
+
+echo "03. Dump accumulator1 to see one notification, then reset the accumulator1"
+echo "=========================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. PATCH the speed attribute (using PATCH /attrs/speed)"
+echo "========================================================"
+payload='{
+  "type": "Property",
+  "value": 80
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A100/attrs/speed -X PATCH --payload "$payload" -H "Link: <https://fiware.github.io/data-models/full-context.jsonld>"
+echo
+echo
+
+
+echo "05. Dump accumulator1 to see one notification"
+echo "============================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Update the speed attribute (using BATCH upsert - REPLACING the entity)"
+echo "=========================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:Vehicle:A100",
+    "type": "Vehicle",
+    "speed": {
+      "type": "Property",
+      "value": 80
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X POST --payload "$payload" -H "Link: <https://fiware.github.io/data-models/full-context.jsonld>"
+echo
+echo
+
+
+echo "07. Dump accumulator1 to see one notification, just only with the speed attribute"
+echo "================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Dump accumulator2 - see 3 notification (first 2 with 3 attrs, last notif with only speed)"
+echo "============================================================================================="
+accumulator2Dump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with attributes [speed", "brandName"]
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:withAttributes
+
+
+
+01. Create a subscription without attributes for accumulator2
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:withoutAttributes
+
+
+
+02. Create a matching entity, using batch create
+================================================
+HTTP/1.1 201 Created
+Content-Length: 28
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:Vehicle:A100"
+]
+
+
+03. Dump accumulator1 to see one notification, then reset the accumulator1
+==========================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withAttributes
+Content-Length: 411
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
+
+{
+    "@context": "https://fiware.github.io/data-models/full-context.jsonld",
+    "data": [
+        {
+            "brandName": {
+                "type": "Property",
+                "value": "Mercedes"
+            },
+            "id": "urn:ngsi-ld:Vehicle:A100",
+            "speed": {
+                "type": "Property",
+                "value": 80
+            },
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:withAttributes",
+    "type": "Notification"
+}
+=======================================
+
+
+04. PATCH the speed attribute (using PATCH /attrs/speed)
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator1 to see one notification
+=============================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withAttributes
+Content-Length: 411
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
+
+{
+    "@context": "https://fiware.github.io/data-models/full-context.jsonld",
+    "data": [
+        {
+            "brandName": {
+                "type": "Property",
+                "value": "Mercedes"
+            },
+            "id": "urn:ngsi-ld:Vehicle:A100",
+            "speed": {
+                "type": "Property",
+                "value": 80
+            },
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:withAttributes",
+    "type": "Notification"
+}
+=======================================
+
+
+06. Update the speed attribute (using BATCH upsert - REPLACING the entity)
+==========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator1 to see one notification, just only with the speed attribute
+=================================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withAttributes
+Content-Length: 360
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
+
+{
+    "@context": "https://fiware.github.io/data-models/full-context.jsonld",
+    "data": [
+        {
+            "id": "urn:ngsi-ld:Vehicle:A100",
+            "speed": {
+                "type": "Property",
+                "value": 80
+            },
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:withAttributes",
+    "type": "Notification"
+}
+=======================================
+
+
+08. Dump accumulator2 - see 3 notification (first 2 with 3 attrs, last notif with only speed)
+=============================================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withoutAttributes
+Content-Length: 493
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
+
+{
+    "@context": "https://fiware.github.io/data-models/full-context.jsonld",
+    "data": [
+        {
+            "brandName": {
+                "type": "Property",
+                "value": "Mercedes"
+            },
+            "id": "urn:ngsi-ld:Vehicle:A100",
+            "speed": {
+                "type": "Property",
+                "value": 80
+            },
+            "speed2": {
+                "type": "Property",
+                "value": "Should NOT be part of the notifications"
+            },
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:withoutAttributes",
+    "type": "Notification"
+}
+=======================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withoutAttributes
+Content-Length: 493
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
+
+{
+    "@context": "https://fiware.github.io/data-models/full-context.jsonld",
+    "data": [
+        {
+            "brandName": {
+                "type": "Property",
+                "value": "Mercedes"
+            },
+            "id": "urn:ngsi-ld:Vehicle:A100",
+            "speed": {
+                "type": "Property",
+                "value": 80
+            },
+            "speed2": {
+                "type": "Property",
+                "value": "Should NOT be part of the notifications"
+            },
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:withoutAttributes",
+    "type": "Notification"
+}
+=======================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withoutAttributes
+Content-Length: 363
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+Ngsild-Attribute-Format: Normalized
+
+{
+    "@context": "https://fiware.github.io/data-models/full-context.jsonld",
+    "data": [
+        {
+            "id": "urn:ngsi-ld:Vehicle:A100",
+            "speed": {
+                "type": "Property",
+                "value": 80
+            },
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:withoutAttributes",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+accumulatorStop $LISTENER2_PORT
+dbDrop CB
