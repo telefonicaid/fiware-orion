@@ -173,8 +173,7 @@ The symptoms of this problem are:
 -   The MD5SUM of /usr/bin/contextBroker binary (that can be obtained with
     "md5sum /usr/bin/contextBroker" is not the right one (check list for
     particular versions at the end of this section).
--   The prelink package is installed (this can be checked running the
-    command "rpm -qa | grep prelink")
+-   The prelink package is installed
 
 The cause of this problem is
 [prelink](http://en.wikipedia.org/wiki/Prelink), a program that modifies
@@ -187,8 +186,7 @@ The solution for this problems is:
 
 -   Disable prelink, either implementing one of the following
     alternatives:
-    -   Remove the prelink software, typically running (as root or using
-        sudo): `rpm -e prelink`
+    -   Remove the prelink software
     -   Disable the prelink processing of contextBroker binary, creating
         the /etc/prelink.conf.d/contextBroker.conf file with the
         following content (just one line)
@@ -259,8 +257,7 @@ Some possible values for `lastFailureReason` (non exahustive list):
   doesn't run in insecure mode (i.e. without `-insecureNotif` [CLI parameters](cli.md)).
 
 More detail about `status`, `lastFailureReason` and `lastSuccessCode` in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) and
-in the [NGSIv2 implementation notes document](../user/ngsiv2_implementation_notes.md).
+[Orion API specification](../orion-api.md#subscription.notification).
 
 In addition, you may find useful the notification log examples shown in
 [the corresponding section of the administration manual](logs.md#log-examples-for-notification-transactions).
@@ -316,9 +313,7 @@ The symptoms of a database connection problem are the following:
 ```
 
 In both cases, check that the connection to MonogDB is correctly
-configured (in particular, the BROKER\_DATABASE\_HOST if you are running
-Orion Context Broker [as a service](../../../README.md#as-system-service) or
-the "-dbhost" option if you are running it [from the command
+configured (in particular, the "-dbhost" option [from the command
 line](cli.md)) and that the mongod/mongos
 process (depending if you are using sharding or not) is up and running.
 

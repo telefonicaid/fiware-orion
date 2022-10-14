@@ -35,8 +35,8 @@
 #include "rest/OrionError.h"
 
 #include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseMetadataCompoundValue.h"
 #include "jsonParseV2/parseMetadata.h"
+#include "jsonParseV2/parseCompoundCommon.h"
 
 
 
@@ -98,7 +98,14 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
       {
         compoundVector = (type == "Array")? true : false;
         mdP->valueType = orion::ValueTypeObject;  // Used both for Array and Object ...
-        std::string r  = parseMetadataCompoundValue(iter, mdP, NULL, 0);
+
+        std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+        mdP->compoundValueP            = new orion::CompoundValueNode();
+        mdP->compoundValueP->name      = "";
+        mdP->compoundValueP->valueType = stringToCompoundType(type);
+
+        std::string r  = parseCompoundValue(iter, mdP->compoundValueP, 0);
 
         if (r != "OK")
         {

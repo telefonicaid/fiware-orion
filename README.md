@@ -7,7 +7,7 @@
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
 [![Support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
+[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](doc/manuals/orion-api.md)
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
@@ -46,8 +46,8 @@ check the FIWARE Catalogue entry for
 -   [Install](#install)
 -   [Running](#running)
 -   [Usage](#usage)
--   [API](#api)
--   [Reference Documentation](#reference-documentation)
+-   [API Walkthrough](#api-walkthrough)
+-   [API Reference Documentation](#api-reference-documentation)
 -   [Testing](#testing)
     -   [End-to-end tests](#end-to-end-tests)
     -   [Unit Tests](#unit-tests)
@@ -175,30 +175,20 @@ Reference sections below in order to know more details about the API
 
 [Top](#top)
 
-## API
+## API Walkthrough
 
--   FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
+-   FIWARE NGSIv2 Orion API Walkthrough FIWARE NGSI v2 [(en)](doc/manuals/user/walkthrough_apiv2.md)
     [(jp)](doc/manuals.jp/user/walkthrough_apiv2.md) (Markdown)
--   FIWARE NGSI v2
-    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable/cookbook)
-    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/cookbook)
-    (Apiary)
-    -   See also NGSIv2 implementation notes
-        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
-        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
 
 [Top](#top)
 
-## Reference Documentation
+## API Reference Documentation
 
 API Reference Documentation:
 
--   FIWARE NGSI v2
-    [(en)](http://telefonicaid.github.io/fiware-orion/api/v2/stable)
-    [(jp)](https://open-apis.letsfiware.jp/fiware-orion/api/v2/stable/) (Apiary)
-    -   See also NGSIv2 implementation notes
-        [(en)](doc/manuals/user/ngsiv2_implementation_notes.md)
-        [(jp)](doc/manuals.jp/user/ngsiv2_implementation_notes.md)
+-   FIWARE NGSIv2 Orion API
+    [(en)](doc/manuals/orion-api.md)
+    [(jp)](doc/manuals.jp/orion-api.md) (Markdown)
 
 Orion Reference Documentation:
 

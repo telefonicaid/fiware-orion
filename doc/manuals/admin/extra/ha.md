@@ -1,5 +1,8 @@
 # Create an Orion Context Broker cluster in High Availability
 
+**WARNING**: this procedure is obsolete, as it is based in Orion installation using RPMs,
+which support was removed in Orion 3.7.0. It should be updated by its original author.
+
 This documentation describe how to set-up on a generic infrastructure an
 Orion Context Broker cluster in High Availability.
 

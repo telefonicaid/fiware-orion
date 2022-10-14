@@ -67,6 +67,15 @@ TriggeredSubscription::TriggeredSubscription
   blacklist(false),
   covered(_covered)
 {
+  // Dynamic memory must be cloned
+  if (_httpInfo.json != NULL)
+  {
+    httpInfo.json = _httpInfo.json->clone();
+  }
+  if (_mqttInfo.json != NULL)
+  {
+    mqttInfo.json = _mqttInfo.json->clone();
+  }
 }
 
 
@@ -121,6 +130,10 @@ TriggeredSubscription::~TriggeredSubscription()
     delete mdStringFilterP;
     mdStringFilterP = NULL;
   }
+
+  // Only one of the release operations will actually do something
+  httpInfo.release();
+  mqttInfo.release();
 }
 
 

@@ -38,8 +38,6 @@ function _usage()
     -m   --make          cmake/make (works with unit/functional/valgrind stage only)
     -i   --install       make install (works with unit/functional/valgrind stage only)
     -t   --test          run unit/functional/compliance/valgrind test (depends on the defined stage)
-    -r   --rpm           specify rpm (nightly, release, testing) to build
-    -u   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
     -j   --jenkins       execute fix for jenkins during functional/valgrind testing (disable ipv6 test)
     -J                   execute fix for jenkins
     -q   --speed         execute fix for functional/valgrind tests during testing (improve speed)
@@ -118,8 +116,6 @@ do
        --make) set -- "$@" -m ;;
        --install) set -- "$@" -i ;;
        --test) set -- "$@" -t ;;
-       --rpm) set -- "$@" -r ;;
-       --upload) set - "$@" -u ;;
        --jenkins) set -- "$@" -j ;;
        --speed) set -- "$@" -q ;;
        --execute) set -- "$@" -e ;;
@@ -139,8 +135,6 @@ while getopts ":hb:S:p:s:mitr:ujJeHa:" opt; do
         m)  make=true;;
         i)  install=true;;
         t)  test=true ;;
-        r)  rpm=$OPTARG ;;
-        u)  upload=true ;;
         j)  fix_j=true ;;
         J)  fix_J=true ;;
         e)  execute=true ;;
@@ -163,9 +157,6 @@ if [ -n "${upload}" ]; then
         echo "Builder: failed, REPO_USER or REPO_PASSWORD env variables not set"; exit 1;
     fi
 fi
-
-echo "Builder: check if stage/rpm defined"
-if [[ -z "${stage}" && -z "${rpm}" ]]; then echo "Builder: failed, stage/rpm not defined"; fi
 
 echo "Builder: check if target folder can be created"
 if [ -z "${path}" ]; then path='/opt/fiware-orion'; fi
@@ -306,66 +297,6 @@ if [ -n "${test}" ] && [ "${stage}" = "valgrind" ]; then
     if [ -n "${fix_j}" ]; then _unfix_jenkins; fi
 
     if ! ${status}; then echo "Builder: valgrind test failed"; exit 1; fi
-
-fi
-
-if [ -n "${rpm}" ]; then
-    echo "===================================== BUILDING RPM ====================================="
-    echo "Builder: ${rpm} rpm"
-
-    if [ "$rpm" = "nightly" ]; then
-
-        export BROKER_RELEASE=$(date "+%Y%m%d")
-        git reset --hard && git clean -qfdx
-
-        cd ${path}/src/app/contextBroker
-        version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
-        sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
-        cd ${path}
-
-        make rpm
-
-        pack='nightly'
-
-    fi
-
-    if [ "${rpm}" = "release" ]; then
-
-        export BROKER_RELEASE=1
-        git reset --hard && git clean -qfdx
-
-        make rpm
-
-        pack='release'
-
-    fi
-
-    if [ "${rpm}" = "testing" ]; then
-
-        export BROKER_RELEASE=$(date "+%Y%m%d%H%M")
-        git reset --hard && git clean -qfdx
-
-        cd ${path}/src/app/contextBroker
-        version=$(cat version.h | grep ORION_VERSION | awk '{ print $3}' | sed 's/"//g' | sed 's/-next//g')
-        sed -i "s/ORION_VERSION .*/ORION_VERSION \"$version\"/g" version.h
-        cd ${path}
-
-        make rpm
-
-        pack='testing'
-
-    fi
-fi
-
-if [ -n "${upload}" ]; then
-    echo "===================================== UPLOADING RPMS ==================================="
-
-    cd ${path}/rpm/RPMS/x86_64
-    for file in $(ls); do
-      echo "Builder: uploading ${file}"
-      curl -v -u ${REPO_USER}:${REPO_PASSWORD} --upload-file ${file} ${url_dst}/${releasever}/${basearch}/${pack}/${file};
-      if !(curl --output /dev/null --silent --head --fail ${url_dst}/${releasever}/${basearch}/${pack}/${file}); then echo "UPLOAD FAILED!"; exit 1; fi
-   done
 
 fi
 

@@ -8,7 +8,7 @@ is triggered.
 
 From an operational point of view, MQTT subscriptions are like HTTP ones,
 as described in [this section of the documentation](walkthrough_apiv2.md#subscriptions) and in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable) (e.g. the notification
+[Orion API specification](../orion-api.md) (e.g. the notification
 payload is the same, you can set an expiration date, a filtering expression, etc.) but they use `mqtt`
 instead of `http` in the `notification` object.
 
@@ -46,12 +46,12 @@ success/failure) are supported in MQTT subscriptions in the same way than in HTT
 
 ## Custom notifications
 
-Custom notifications (described in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable))
+Custom notifications (described in [this section of the Orion API specification](../orion-api.md#custom-notifications))
 in MQTT subscriptions work the same as in HTTP subscriptions, taking into account the following:
 
 * `mqttCustom` is used instead of `httpCustom`
 * The same fields used in `mqtt` can be used in `mqttCustom`.
-* `headers` and `qs`cannot be used, as they doesn’t have equivalence in MQTT
+* `headers`, `qs` and `method`cannot be used, as they doesn’t have equivalence in MQTT
 * Macro replacement is performed in `topic` and `payload` fields. `url`, `qos`, `user` and `passwd` are fixed values
 
 ## Connection management

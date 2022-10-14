@@ -18,7 +18,7 @@ In Orion context broker `.feature`-files are composed of the following parts:
     ```
     Setup: update contextBroker config file
     ```
-    *start the ContextBroker remotely, per CLI mode or RPM mode*
+    *start the ContextBroker remotely, per CLI*
     ```
     Setup: start ContextBroker
     ```

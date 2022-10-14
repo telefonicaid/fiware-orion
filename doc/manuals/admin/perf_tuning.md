@@ -49,6 +49,10 @@ read **and** write performance:
 * Collection [entities](database_model.md#entities-collection)
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that this is a compound index and key order matters in this case)
     * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
 
 In addition, depending on your queries, you may need *additional* indexes.
 
@@ -70,8 +74,8 @@ creation/modification date (e.g. `GET /v2/entities?dateModified<2019-01-01`), us
 The only indexes that Orion Context Broker actually ensure are the following ones. Both are ensured on 
 Orion startup or when entities are created.
 
-* A "2dsphere" index for the `location.coords` field in the entities collection, due to functional needs of the [geo-location functionality](../user/geolocation.md).
-* An index with `expireAfterSeconds: 0` for the `expDate` field in the entities collection, due to functional needs of the [transient entities functionality](../user/transient_entities.md).
+* A "2dsphere" index for the `location.coords` field in the entities collection, due to functional needs of the [geo-location functionality](../orion-api.md#geospatial-properties-of-entities).
+* An index with `expireAfterSeconds: 0` for the `expDate` field in the entities collection, due to functional needs of the [transient entities functionality](../orion-api.md#transient-entities).
 
 You can find an analysis about the effect of indexes in [this document](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md), although
 it is based on an old Orion version, so it is probably outdated. In addition, please find some useful references about [compound indexes](https://docs.mongodb.com/manual/core/index-compound/) and [sort results with indexes](https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/) from the MongoDB official documentation.

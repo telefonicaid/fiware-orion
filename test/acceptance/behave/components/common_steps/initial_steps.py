@@ -22,7 +22,6 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-
 from components.common_steps.general_steps import *
 from iotqatools.fabric_utils import FabricSupport
 from iotqatools.mongo_utils import Mongo
@@ -71,11 +70,6 @@ def update_context_broker_config_file_and_restart_service(context):
                            password=props_cb["CB_FABRIC_PASS"], cert_file=props_cb["CB_FABRIC_CERT"],
                            retry=props_cb["CB_FABRIC_RETRY"], hide=True, sudo=props_cb["CB_FABRIC_SUDO"])
     context.configuration = properties_class.read_configuration_json()
-    __logger__.debug("CB_RUNNING_MODE: %s" % context.configuration["CB_RUNNING_MODE"])
-    if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
-        __logger__.debug("Updating /etc/sysconfig/contextBroker file...")
-        properties_class.update_context_broker_file(context.my_fab)
-        __logger__.info("...Updated /etc/sysconfig/contextBroker file")
 
 
 @step(u'start ContextBroker')
@@ -85,21 +79,16 @@ def start_context_broker(context):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     global props_cb, props_mongo
-    if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
-        __logger__.debug("Starting contextBroker service...")
-        context.my_fab.run("service contextBroker restart")
-        __logger__.info("...Started contextBroker service")
-    else:
-        __logger__.debug("Starting contextBroker per command line interface...")
-        props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
-        # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
-        command = "contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %\
-                  (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
-                   props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"])
-        __logger__.debug("command: %s" % command)
-        resp = context.my_fab.run(command)
-        __logger__.debug("output: %s" % repr(resp))
-        __logger__.info("...Started contextBroker command line interface")
+    __logger__.debug("Starting contextBroker per command line interface...")
+    props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
+    # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
+    command = "contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %\
+              (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+               props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"])
+    __logger__.debug("command: %s" % command)
+    resp = context.my_fab.run(command)
+    __logger__.debug("output: %s" % repr(resp))
+    __logger__.info("...Started contextBroker command line interface")
 
 
 @step(u'stop ContextBroker')
@@ -109,15 +98,10 @@ def stop_Context_broker(context):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     global props_cb
-    if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
-        __logger__.debug("Stopping contextBroker service...")
-        context.my_fab.run("service contextBroker stop")
-        __logger__.info("...Stopped contextBroker service")
-    else:
-        __logger__.debug("Stopping contextBroker per harakiri...")
-        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
-        cb.harakiri()
-        __logger__.info("...Stopped contextBroker per harakiri")
+    __logger__.debug("Stopping contextBroker per harakiri...")
+    cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
+    cb.harakiri()
+    __logger__.info("...Stopped contextBroker per harakiri")
 
 
 @step(u'verify contextBroker is installed successfully')
