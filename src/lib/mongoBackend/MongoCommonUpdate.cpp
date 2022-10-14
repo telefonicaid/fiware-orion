@@ -1396,6 +1396,7 @@ static void fill_idNPtypeP
   const std::string&  typePatternQ
 )
 {
+#if 0
   bgP->functionIdNPtypeP = std::string("function()") +
       "{" +
          "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
@@ -1409,7 +1410,51 @@ static void fill_idNPtypeP
          "return false; " +
       "}";
   LM_T(LmtMongo, ("idNPtypeP function: %s", bgP->functionIdNPtypeP.c_str()));
+# else
+  orion::BSONObjBuilder outer_obj;
+  orion::BSONObjBuilder anyElementTrue;
+  orion::BSONObjBuilder map_obj;
+  orion::BSONObjBuilder in_obj;
+  orion::BSONArrayBuilder and_arr;
+  orion::BSONObjBuilder and_first;
+  orion::BSONObjBuilder and_second;
+  orion::BSONObjBuilder and_third;
+  orion::BSONObjBuilder and_fourth;
+  orion::BSONObjBuilder regex_obj;
+  orion::BSONArrayBuilder eq_arr;
+  orion::BSONArrayBuilder eq_arr_2;
+  orion::BSONArrayBuilder eq_arr_3;
+  orion::BSONArrayBuilder or_arr;
+  orion::BSONArrayBuilder or_arr_1;
 
+  eq_arr.append("$$this.isPattern");
+  eq_arr.append("false");
+  and_first.append("$eq", eq_arr.arr());
+  and_arr.append(and_first.obj());
+
+  eq_arr_2.append("$$this.isTypePattern");
+  eq_arr_2.append(true);
+  and_second.append("$eq", eq_arr_2.arr());
+  and_arr.append(and_second.obj());
+
+  eq_arr_3.append("$$this.id");
+  eq_arr_3.append(entityId);
+  and_third.append("$eq", eq_arr_3.arr());
+  and_arr.append(and_third.obj());
+
+  regex_obj.append("input", entityType);
+  regex_obj.append("regex", "$$this.type");
+  regex_obj.append("options", "i");
+  and_fourth.append("$regexMatch", regex_obj.obj());
+  and_arr.append(and_fourth.obj());
+
+  in_obj.append("$and", and_arr.arr());
+  map_obj.append("input", "$entities");
+  map_obj.append("in", in_obj.obj());
+
+  anyElementTrue.append("$map", map_obj.obj());
+  outer_obj.append("$anyElementTrue", anyElementTrue.obj());
+#endif
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
 
@@ -1420,8 +1465,11 @@ static void fill_idNPtypeP
   bgP->boNPP.append(typePatternQ, true);
   bgP->boNPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boNPP.append(CSUB_STATUS, bobNeStatus.obj());
+ #if 0
   bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
-
+#else
+  bgP->boPNP.append("$expr", outer_obj.obj());
+#endif
   bgP->idNPtypeP = bgP->boNPP.obj();
 }
 
